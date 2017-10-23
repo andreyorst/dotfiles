@@ -2,8 +2,6 @@
 
 echo "copying nvim configuration file"
 cp -r ~/.config/nvim/ config/nvim/
-echo "copying vim plugins"
-cp -r ~/.vim/ vim/
 git add *
 git commit -m "Update"
 git push
