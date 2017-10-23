@@ -2,7 +2,7 @@
 
 echo "copying nvim configuration file"
 cp -r ~/.config/nvim/ config/nvim/
-cp -r ~/.share/konsole/ share/konsole/
+cp -r ~/.local/share/konsole/ share/konsole/
 git add *
 git commit -m "Update"
 git push
