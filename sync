@@ -3,6 +3,9 @@
 echo "copying nvim configuration file"
 cp -r ~/.config/nvim/ config/nvim/
 cp -r ~/.local/share/konsole/ share/konsole/
+cp -r ~/.local/share/color-schemes/ share/color-schemes/
+cp ~/.zshrc zshrc
+cp ~/.tmux.conf tmux.conf
 git add *
 git commit -m "Update"
 git push
