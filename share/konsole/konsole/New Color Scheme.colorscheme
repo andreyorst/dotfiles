@@ -5,7 +5,7 @@ Color=29,31,33
 Color=29,31,33
 
 [BackgroundIntense]
-Color=29,31,33
+Color=16,17,19
 
 [Color0]
 Color=29,31,33
@@ -14,7 +14,7 @@ Color=29,31,33
 Color=29,31,33
 
 [Color0Intense]
-Color=197,200,198
+Color=150,152,150
 
 [Color1]
 Color=204,102,102
@@ -89,6 +89,6 @@ Color=197,200,198
 Color=255,255,255
 
 [General]
-Description=New Color Scheme
+Description=Base16_shell
 Opacity=1
 Wallpaper=
