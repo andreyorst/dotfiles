@@ -1,0 +1,6 @@
+class _Class_Name_ {
+public:
+	_Class_Name_();
+	~_Class_Name_();
+private:
+};

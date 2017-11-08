@@ -1,11 +1,10 @@
 #!/bin/sh
 
-echo "copying nvim configuration file"
-cp -r ~/.config/nvim/ config/nvim/
-cp -r ~/.local/share/konsole/ share/konsole/
-cp -r ~/.local/share/color-schemes/ share/color-schemes/
-cp ~/.zshrc zshrc
-cp ~/.tmux.conf tmux.conf
+echo "updating nvim configuration file"
+cp ~/.config/nvim/init.vim ./config/nvim/
+echo "updating snippets"
+cp -r ~/.vim/snippets/ ./vim/
+
 git add *
 git commit -m "Update"
 git push
