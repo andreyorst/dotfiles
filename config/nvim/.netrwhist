@@ -1,5 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
-let g:netrw_dirhist_1='/home/andreyorst'
-let g:netrw_dirhist_2='/home/andreyorst/tinyrenderer.wiki'
-let g:netrw_dirhist_3='/home/andreyorst/Programming/Cpp/cppstudy/4. Containers and Algorythms'
