@@ -1,0 +1,7 @@
+#!/bin/sh
+convert $2 -brightness-contrast -15,-25 -blur 0x40 /home/$3/.bg.png
+cp /home/$3/.bg.png /usr/share/plasma/look-and-feel/org.kde.$1.desktop/contents/components/artwork/background.png
+cp /home/$3/.bg.png /usr/share/sddm/themes/$1/background.png
+cp /home/$3/.bg.png /usr/share/sddm/themes/$1/components/artwork/background.png
+cp /home/$3/.bg.png /usr/share/plasma/look-and-feel/org.kde.$1.desktop/contents/splash/images/background.png
+echo "Done."

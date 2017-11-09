@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "updating blur script"
+cp /usr/bin/wpblur ./
 echo "updating nvim configuration file"
 cp ~/.config/nvim/init.vim ./config/nvim/
 echo "updating snippets"
