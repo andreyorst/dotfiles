@@ -33,16 +33,12 @@ filetype off
 	set path+=**
 	set wildmenu
 
-	set foldmethod=syntax
+	set foldmethod=indent
 	set foldlevelstart=20
 	hi Folded ctermfg=black
 	hi Folded ctermbg=white
 
-	set foldmethod=syntax
-	set foldlevelstart=20
-	hi Folded ctermbg=black
-
-	set cursorline
+	" set cursorline
 	set wrap
 	set linebreak
 
@@ -186,5 +182,5 @@ filetype off
 		map  <F20> :emenu FEnc.<Tab>
 
 " Snippets
-nnoremap class<Tab> :-1read $HOME/.vim/snippets/class<CR>/_Class_Name_<CR>:%s///g<left><left>
-
+nnoremap <keymap> classa <Esc>:-1read $HOME/.vim/snippets/class<CR>/_Class_Name_<CR>:noh<CR>:%s///g<left><left>
+nnoremap ,gen<Tab>   <Esc>:set nohlsearch<CR>h0/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/obtain<CR>0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>>>j0/)<CR>bPnbb~hiestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p$>>:set hlsearch<CR>:noh<CR>
