@@ -182,5 +182,5 @@ filetype off
 		map  <F20> :emenu FEnc.<Tab>
 
 " Snippets
-nnoremap <keymap> classa <Esc>:-1read $HOME/.vim/snippets/class<CR>/_Class_Name_<CR>:noh<CR>:%s///g<left><left>
+nnoremap ,class<Tab> <Esc>:-1read $HOME/.vim/snippets/class<CR>/_Class_Name_<CR>:noh<CR>:%s///g<left><left>
 nnoremap ,gen<Tab>   <Esc>:set nohlsearch<CR>h0/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/obtain<CR>0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>>>j0/)<CR>bPnbb~hiestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p$>>:set hlsearch<CR>:noh<CR>
