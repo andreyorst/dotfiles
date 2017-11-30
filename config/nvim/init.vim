@@ -153,8 +153,8 @@ filetype off
 	let g:ale_sign_error = '⬥ '
 	let g:ale_sign_warning = '⬥ '
 	let g:ale_linters = {
-		\   'c': ['gcc'],
-		\   'cpp': ['gcc'],
+		\   'c': ['gcc', 'clang'],
+		\   'cpp': ['clang', 'gcc']
 	\}
 	let g:ale_c_clang_options='-Wall -I ~/s183/kmdtrunk/include/ -I ~/s183/kmdtrunk/platforms/sw_hub_3/include/'
 	let g:ale_c_gcc_options='-Wall -I ~/s183/kmdtrunk/include/ -I ~/s183/kmdtrunk/platforms/sw_hub_3/include/'
