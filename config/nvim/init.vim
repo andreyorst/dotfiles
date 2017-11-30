@@ -12,7 +12,7 @@ filetype off
 		Plugin 'vim-airline/vim-airline-themes'
 
 	" Tools
-		" Plugin 'octol/vim-cpp-enhanced-highlight'
+		Plugin 'octol/vim-cpp-enhanced-highlight'
 		Plugin 'justinmk/vim-syntax-extra'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'Shougo/deoplete.nvim'
@@ -221,3 +221,11 @@ filetype off
 
 	" Simple main() snip
 	nnoremap ,main<Tab> <Esc>:-1read $HOME/.vim/snippets/main<CR>2ji
+
+	" function! SomeCheck()
+	" 	if filereadable("./testkit.settings")
+	" 	endif
+	" endfunction
+
+	" autocmd BufEnter *.* :call SomeCheck()
+
