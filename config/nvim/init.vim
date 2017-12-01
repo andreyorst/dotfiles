@@ -156,8 +156,24 @@ filetype off
 		\   'c': ['gcc', 'clang'],
 		\   'cpp': ['clang', 'gcc']
 	\}
-	let g:ale_c_clang_options='-Wall -I ~/s183/kmdtrunk/include/ -I ~/s183/kmdtrunk/platforms/sw_hub_3/include/'
-	let g:ale_c_gcc_options='-Wall -I ~/s183/kmdtrunk/include/ -I ~/s183/kmdtrunk/platforms/sw_hub_3/include/'
+
+	" Weird function that generates path to librares for curren 
+	" dir if testkit.settings exists
+	" WARNING: you 99% don't need this function,
+	" delete it if you somehow got this file
+	function! GenPlatformIncludes()
+		if filereadable("./testkit.settings")
+			set shell=/bin/sh
+			silent! !echo let g:ale_c_clang_options=\'-Wall -I $(pwd)/include/ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\' > ./.ale_local_include_paths
+			silent! !echo let g:ale_c_gcc_options=\'-Wall -I $(pwd)/include/ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\' >> ./.ale_local_include_paths
+			set shell=$SHELL
+				if filereadable("./.ale_local_include_paths")
+					so ./.ale_local_include_paths
+				endif
+		endif
+	endfunction
+
+	call GenPlatformIncludes()
 
 " DelimitMate
 	let delimitMate_expand_cr = 1
@@ -220,12 +236,6 @@ filetype off
 	iabbr forj for(j = 0; j <; j++) {}<Esc>8hi
 
 	" Simple main() snip
-	nnoremap ,main<Tab> <Esc>:-1read $HOME/.vim/snippets/main<CR>2ji
+	nnoremap ,main<Tab> <Esc>:-1read $HOME/.vim/snippets/main<CR>2ji<Tab>
 
-	" function! SomeCheck()
-	" 	if filereadable("./testkit.settings")
-	" 	endif
-	" endfunction
-
-	" autocmd BufEnter *.* :call SomeCheck()
 
