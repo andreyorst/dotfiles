@@ -70,3 +70,5 @@
 	let delimitMate_expand_space = 0
 	let delimitMate_nesting_quotes = ['`']
 
+" NERDTree
+	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif

@@ -3,7 +3,7 @@
 	 	" autocmd CursorMoved * silent! exe printf("match Search /\\<%s\\>/", expand('<cword>'))
 
 	" Delete all trailing spaces on file open
-		autocmd BufEnter *.* :call RemoveTrailingSpaces()
+		autocmd BufWritePre *.* :call RemoveTrailingSpaces()
 
 	" Delete trailing spaces (frantsev)
 		function! RemoveTrailingSpaces()
@@ -33,6 +33,26 @@
 			let g:term_win = win_getid()
 		endif
 	endfunction
+
+" Toggle Netrw
+" 	let g:netrw_buf = 0
+" 	let g:netrw_win = 0
+"
+" 	function! Netrw_toggle()
+" 		if win_gotoid(g:netrw_win)
+" 			:q
+" 			let g:netrw_win = 0
+" 			let g:netrw_buf = 0
+" 		else
+" 			try
+" 				exec "buffer " . g:netrw_buf
+" 			catch
+" 				:Lexplore 25
+" 				let g:netrw_buf = bufnr("")
+" 			endtry
+" 			let g:netrw_win = win_getid()
+" 		endif
+" 	endfunction
 
 " Encoding
 	" <F7> EOL format (dos <CR><NL>,unix <NL>,mac <CR>)

@@ -9,7 +9,10 @@
 
 	set path+=**
 	set wildmenu
+	set termguicolors
+	set updatetime=350
 
+" Folds
 	set foldmethod=indent
 	set foldlevelstart=20
 	hi Folded ctermfg=black
@@ -18,10 +21,12 @@
 	set wrap
 	set linebreak
 
+" Tabs, trailing spaces
 	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:\ ,trail:⋅
 	set list
-	set termguicolors
 
+" Splits
+	set noequalalways
 	set splitright
 	set splitbelow
 	set signcolumn=yes
@@ -33,3 +38,6 @@
 	set autoindent
 	set smartindent
 
+" Netrw
+	let g:netrw_banner=0
+	let g:netrw_liststyle = 3

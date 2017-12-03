@@ -1,9 +1,15 @@
 " Map Settings
+	" Open file under cursor
+		nnoremap gf <C-w>gf
 
 	" Toggle terminal on/off
-		nnoremap <A-t> :call Term_toggle(12)<cr>
-		inoremap <A-t> <Esc>:call Term_toggle(12)<cr>
-		tnoremap <A-t> <C-\><C-n>:call Term_toggle(12)<cr>
+		nnoremap <A-t> :call Term_toggle(12)<CR>
+		inoremap <A-t> <Esc>:call Term_toggle(12)<CR>
+		tnoremap <A-t> <C-\><C-n>:call Term_toggle(12)<CR>
+
+	" Toggle netrw on/off
+		" noremap <A-s> :call Netrw_toggle()<CR>
+		" noremap <A-s> <Esc>:call Netrw_toggle()<CR>
 
 	" Terminal go back to normal mode
 		:tnoremap <Esc> <C-\><C-n>
@@ -14,6 +20,6 @@
 
 	" Tagbar
 		noremap <A-b> :TagbarToggle<CR>
-	
+
 	" NERDTree
-		noremap <A-n> :NERDTreeToggle<CR>
+		noremap <A-n> <Esc>:NERDTreeToggle<CR>
