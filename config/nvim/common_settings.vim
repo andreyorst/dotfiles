@@ -10,7 +10,10 @@
 	set path+=**
 	set wildmenu
 	set termguicolors
+
 	set updatetime=350
+
+	set signcolumn=yes
 
 " Folds
 	set foldmethod=indent
@@ -29,7 +32,6 @@
 	set noequalalways
 	set splitright
 	set splitbelow
-	set signcolumn=yes
 
 " Tabs
 	set noexpandtab

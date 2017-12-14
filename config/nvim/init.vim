@@ -12,7 +12,6 @@ filetype off
 		Plugin 'vim-airline/vim-airline-themes'
 
 	" Tools
-		Plugin 'taglist.vim'
 		Plugin 'majutsushi/tagbar'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'octol/vim-cpp-enhanced-highlight'

@@ -54,8 +54,18 @@
 	function! GenPlatformIncludes()
 		if filereadable("./testkit.settings")
 			set shell=/bin/sh
-			silent! !echo let g:ale_c_clang_options=\'-Wall -I $(pwd)/include/ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\' > ./.ale_local_include_paths
-			silent! !echo let g:ale_c_gcc_options=\'-Wall -I $(pwd)/include/ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\' >> ./.ale_local_include_paths
+			silent! !echo
+				\ let g:ale_c_clang_options=\'-Wall
+				\ -I $(pwd)/include/
+				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
+				\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\'
+				\ > ./.ale_local_include_paths
+			silent! !echo
+				\ let g:ale_c_gcc_options=\'-Wall
+				\ -I $(pwd)/include/
+				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
+				\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\'
+				\ >> ./.ale_local_include_paths
 			set shell=$SHELL
 				if filereadable("./.ale_local_include_paths")
 					so ./.ale_local_include_paths
@@ -72,3 +82,9 @@
 
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" Tagbar
+	" let g:tagbar_autofocus = 1
+	let g:tagbar_sort = 0
+	let g:tagbar_compact = 1
+	autocmd FileType c,cpp nested :TagbarToggle

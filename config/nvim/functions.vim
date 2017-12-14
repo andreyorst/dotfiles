@@ -35,26 +35,19 @@
 	endfunction
 
 " Toggle Netrw
-" 	let g:netrw_buf = 0
-" 	let g:netrw_win = 0
-"
-" 	function! Netrw_toggle()
-" 		if win_gotoid(g:netrw_win)
-" 			:q
-" 			let g:netrw_win = 0
-" 			let g:netrw_buf = 0
-" 		else
-" 			try
-" 				exec "buffer " . g:netrw_buf
-" 			catch
-" 				:Lexplore 25
-" 				let g:netrw_buf = bufnr("")
-" 			endtry
-" 			let g:netrw_win = win_getid()
-" 		endif
-" 	endfunction
+	let g:netrw_win = 0
 
-" Encoding
+	function! Netrw_toggle()
+		if win_gotoid(g:netrw_win)
+			:q
+			let g:netrw_win = 0
+		else
+			:Lexplore 30
+			let g:netrw_win = win_getid()
+		endif
+	endfunction
+
+""  Encoding
 	" <F7> EOL format (dos <CR><NL>,unix <NL>,mac <CR>)
 		set  wcm=<Tab>
 		menu EOL.unix :set fileformat=unix<CR>
