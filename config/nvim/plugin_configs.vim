@@ -47,21 +47,23 @@
 		\   'cpp': ['clang', 'gcc']
 	\}
 
-	" Weird function that generates path to librares for curren
-	" dir if testkit.settings exists
-	" WARNING: you 99% don't need this function,
+	" Weird function that generates path to librares for current
+	" platform if testkit.settings exists
+	" WARNING: you 99.9% don't need this function,
 	" delete it if you somehow got this file
 	function! GenPlatformIncludes()
 		if filereadable("./testkit.settings")
 			set shell=/bin/sh
 			silent! !echo
-				\ let g:ale_c_clang_options=\'-Wall
+				\ let g:ale_c_clang_options=
+				\ \'-Wall
 				\ -I $(pwd)/include/
 				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
 				\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\'
 				\ > ./.ale_local_include_paths
 			silent! !echo
-				\ let g:ale_c_gcc_options=\'-Wall
+				\ let g:ale_c_gcc_options=
+				\ \'-Wall
 				\ -I $(pwd)/include/
 				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
 				\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\'
