@@ -1,20 +1,22 @@
 " Some notes about snippets:
 " There are 3 categories for now:
-	" 1. Normal mode snippets, begins with comma and ends with Tab keypress
-	" Bacically the simplest one out there to use, all you need is to
+	" 1. Normal mode snippets.
+	" Snippet begins with comma and ends with Tab keypress.
+	" Basically the simplest one out there to use, all you need is to
 	" type ,snippetName and hit Tab to expand it. Cursor will be placed
 	" accordingly to snippet context, and mode will be changed to insert
 
-	" 2. Insert mode snippets, that are just abbreviations, yet a snippet
-	" with some cursor positioning.
+	" 2. Insert mode snippets. 
+	" Snippets that are just abbreviations, yet a snippet with some cursor 
+	" positioning.
 
 	" 3. Insert mode interactive snippets.
-	" These snippets are abbreviations too, but they end with a '/' symbol
-	" The complicated part to understand is that these snippets must be ended
-	" with double press of '/' button: first press is part of abbreviation
-	" and second one is part of ':%s///g' command that is executed at the end.
-	" This command will be used to replace all template names in the snippet
-	" to disired one.
+	" These snippets are abbreviations too, but they end with a '/' symbol. 
+	" The complicated part to understand is that these snippets must be ended 
+	" with double press of '/' button: first press is part of abbreviation and
+	" the second one is part of ':%s///g' command that is executed at the end.
+	" This command will be used to replace all template names in the snippet to 
+	" desired one.
 
 " Snippet files are located in ~/.vim/snippets/
 
