@@ -55,22 +55,28 @@ cursor_foreground = #1d1f21
 highlight = #2f2f2f
 
 # Colors from color0 to color254 can be set
-color0 = #1d1f21
-color1 = #705050
-color2 = #60b48a
-color3 = #dfaf8f
-color4 = #506070
-color5 = #dc8cc3
-color6 = #8cd0d3
-color7 = #dcdccc
-color8 = #709080
-color9 = #dca3a3
-color10 = #c3bf9f
-color11 = #f0dfaf
-color12 = #94bff3
-color13 = #ec93d3
-color14 = #93e0e3
-color15 = #ffffff
+color0 = #1D1F21
+color1 = #CC6666
+color2 = #B5BD68
+color3 = #F0C674
+color4 = #81A2BE
+color5 = #B294BB
+color6 = #8ABEB7
+color7 = #C5C8C6
+color8 = #969896
+color9 = #CC6666
+color10 = #B5BD68
+color11 = #F0C674
+color12 = #81A2BE
+color13 = #B294BB
+color14 = #8ABEB7
+color15 = #FFFFFF
+color16 = #DE935F
+color17 = #A3685A
+color18 = #282A2E
+color19 = #373B41
+color20 = #B4B7B4
+color21 = #E0E0E0
 
 [hints]
 #font = Monospace 12

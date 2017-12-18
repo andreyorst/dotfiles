@@ -10,6 +10,7 @@
 	set path+=**
 	set wildmenu
 	set termguicolors
+	colorscheme base16-tomorrow-night
 
 	set updatetime=350
 
