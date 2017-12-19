@@ -28,6 +28,7 @@
 				call termopen($SHELL, {"detach": 0})
 				let g:term_buf = bufnr("")
 				set nonu
+				set signcolumn=no
 			endtry
 			startinsert!
 			let g:term_win = win_getid()

@@ -1,0 +1,53 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+,gen<Tab>	config/nvim/snippets.vim	/^	nnoremap ,gen<Tab> <Esc>0:set nohlsearch<CR>\/;<CR>y^?private<CR>:-1read $HOME\/.vim\/snippets\/getSet.cpp<CR>0Pa()<Esc>bbyw~hiobtain<Esc>\/;<CR>P:noh<CR>>>j0>>\/)<CR>bPnbb~hiestablish<Esc>nPnb~\/ =<CR>P\/;<CR>Pnb~?obtain<CR>y^j\/(<CR>p^:set hlsearch<CR>:noh<CR>$/;"	m
+,main<Tab>	config/nvim/snippets.vim	/^	nnoremap ,main<Tab> <Esc>:-1read $HOME\/.vim\/snippets\/main.c<CR>$v%=%2ji<Tab>$/;"	m
+<A-b>	config/nvim/mappings.vim	/^		noremap <A-b> <Esc>:TagbarToggle<CR>$/;"	m
+<A-n>	config/nvim/mappings.vim	/^		noremap <A-n> <Esc>:NERDTreeToggle<CR>$/;"	m
+<A-s>	config/nvim/mappings.vim	/^		noremap <A-s> :call Netrw_toggle()<CR>$/;"	m
+<A-s>	config/nvim/mappings.vim	/^		noremap <A-s> <Esc>:call Netrw_toggle()<CR>$/;"	m
+<A-t>	config/nvim/mappings.vim	/^		inoremap <A-t> <Esc>:call Term_toggle(12)<CR>$/;"	m
+<A-t>	config/nvim/mappings.vim	/^		nnoremap <A-t> :call Term_toggle(12)<CR>$/;"	m
+<C-v>	config/nvim/mappings.vim	/^		inoremap <C-v> <Esc>l<C-v>$/;"	m
+<F20>	config/nvim/functions.vim	/^		map  <F20> :emenu FEnc.<Tab>$/;"	m
+<F7>	config/nvim/functions.vim	/^		map  <F7> :emenu EOL.<Tab>$/;"	m
+<F8>	config/nvim/functions.vim	/^		map  <F8> :emenu Enc.<Tab>$/;"	m
+<TAB>	config/nvim/plugin_configs.vim	/^	inoremap <silent><expr> <TAB>$/;"	m
+GenPlatformIncludes	config/nvim/plugin_configs.vim	/^	function! GenPlatformIncludes()$/;"	f
+Netrw_toggle	config/nvim/functions.vim	/^	function! Netrw_toggle()$/;"	f
+RemoveTrailingSpaces	config/nvim/functions.vim	/^		function! RemoveTrailingSpaces()$/;"	f
+Term_toggle	config/nvim/functions.vim	/^	function! Term_toggle(height)$/;"	f
+_Class_Name_	vim/snippets/class.cpp	/^class _Class_Name_ {$/;"	c	file:
+base16colorspace	config/nvim/plugin_configs.vim	/^		let base16colorspace=256$/;"	v
+check_back_space	config/nvim/plugin_configs.vim	/^	function! s:check_back_space() abort "{{{$/;"	f
+delimitMate_expand_cr	config/nvim/plugin_configs.vim	/^	let delimitMate_expand_cr = 1$/;"	v
+delimitMate_expand_space	config/nvim/plugin_configs.vim	/^	let delimitMate_expand_space = 0$/;"	v
+delimitMate_nesting_quotes	config/nvim/plugin_configs.vim	/^	let delimitMate_nesting_quotes = ['`']$/;"	v
+g:airline#extensions#ale#enabled	config/nvim/plugin_configs.vim	/^	let g:airline#extensions#ale#enabled = 1$/;"	v
+g:airline#extensions#tabline#enabled	config/nvim/plugin_configs.vim	/^		let g:airline#extensions#tabline#enabled = 1$/;"	v
+g:airline#extensions#tabline#left_alt_sep	config/nvim/plugin_configs.vim	/^		let g:airline#extensions#tabline#left_alt_sep = ''$/;"	v
+g:airline#extensions#tabline#left_sep	config/nvim/plugin_configs.vim	/^		let g:airline#extensions#tabline#left_sep = ''$/;"	v
+g:airline_powerline_fonts	config/nvim/plugin_configs.vim	/^		let g:airline_powerline_fonts = 1$/;"	v
+g:airline_symbols	config/nvim/plugin_configs.vim	/^			let g:airline_symbols = {}$/;"	v
+g:airline_symbols	config/nvim/plugin_configs.vim	/^		let g:airline_symbols.linenr = '≣'$/;"	v
+g:ale_cpp_clang_options	config/nvim/plugin_configs.vim	/^	let g:ale_cpp_clang_options = '-Wall --std=c++11'$/;"	v
+g:ale_lint_delay	config/nvim/plugin_configs.vim	/^	let g:ale_lint_delay = 350$/;"	v
+g:ale_linters	config/nvim/plugin_configs.vim	/^	let g:ale_linters = {$/;"	v
+g:ale_sign_error	config/nvim/plugin_configs.vim	/^	let g:ale_sign_error = '⬥ '$/;"	v
+g:ale_sign_warning	config/nvim/plugin_configs.vim	/^	let g:ale_sign_warning = '⬥ '$/;"	v
+g:deoplete#enable_at_startup	config/nvim/plugin_configs.vim	/^	let g:deoplete#enable_at_startup = 1$/;"	v
+g:deoplete#sources#clang#clang_header	config/nvim/plugin_configs.vim	/^	let g:deoplete#sources#clang#clang_header='\/lib\/clang\/'$/;"	v
+g:deoplete#sources#clang#libclang_path	config/nvim/plugin_configs.vim	/^	let g:deoplete#sources#clang#libclang_path='\/usr\/lib\/libclang.so'$/;"	v
+g:netrw_banner	config/nvim/common_settings.vim	/^	let g:netrw_banner = 0$/;"	v
+g:netrw_liststyle	config/nvim/common_settings.vim	/^	let g:netrw_liststyle = 3$/;"	v
+g:netrw_win	config/nvim/functions.vim	/^	let g:netrw_win = 0$/;"	v
+g:tagbar_compact	config/nvim/plugin_configs.vim	/^	let g:tagbar_compact = 1$/;"	v
+g:tagbar_sort	config/nvim/plugin_configs.vim	/^	let g:tagbar_sort = 0$/;"	v
+g:term_buf	config/nvim/functions.vim	/^	let g:term_buf = 0$/;"	v
+g:term_win	config/nvim/functions.vim	/^	let g:term_win = 0$/;"	v
+gf	config/nvim/mappings.vim	/^		nnoremap gf <C-w>gf$/;"	m
+main	vim/snippets/main.c	/^int main(int argc, char* argv[]) {$/;"	f
