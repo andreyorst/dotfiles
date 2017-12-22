@@ -13,7 +13,7 @@ filetype off
 
 	" Tools
 		Plugin 'majutsushi/tagbar'
-		Plugin 'ludovicchabant/vim-gutentags'
+		Plugin 'craigemery/vim-autotag'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'octol/vim-cpp-enhanced-highlight'
 		Plugin 'justinmk/vim-syntax-extra'

@@ -41,3 +41,7 @@
 " Highlights
 	highlight EndOfBuffer guifg=#1D1F21
 	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
+	highlight LineNr guifg=#6c6d6c
+	highlight NonText guifg=#636463
+	highlight Search guifg=#282a2e
+	highlight IncSearch guifg=#282a2e

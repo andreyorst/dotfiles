@@ -50,33 +50,54 @@
 		\ 'cpp': ['clang', 'gcc']
 	\}
 	let g:ale_cpp_clang_options = '-Wall --std=c++11'
+	let g:ale_c_clang_options = '-Wall --std=c11'
+	let g:ale_c_gcc_options = '-Wall --std=c11'
 
 	" Weird function that generates path to librares for current
 	" platform if testkit.settings exists
 	" WARNING: you 99.9% don't need this function,
 	" delete it if you somehow got this file
 	function! GenPlatformIncludes()
+		set shell=/bin/sh
 		if filereadable("./testkit.settings")
-			set shell=/bin/sh
 			silent! !echo
-				\ let g:ale_c_clang_options=
-				\ \'-Wall
-				\ -I $(pwd)/include/
-				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
-				\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\'
+				\ let g:ale_c_clang_options.= \'
+					\ -I $(pwd)/include/
+					\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
+					\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/
+				\ \'
 				\ > ./.ale_local_include_paths
 			silent! !echo
-				\ let g:ale_c_gcc_options=
-				\ \'-Wall
-				\ -I $(pwd)/include/
-				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
-				\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/\'
+				\ let g:ale_c_gcc_options.= \'
+					\ -I $(pwd)/include/
+					\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
+					\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/
+				\ \'
 				\ >> ./.ale_local_include_paths
-			set shell=$SHELL
-				if filereadable("./.ale_local_include_paths")
-					so ./.ale_local_include_paths
-				endif
 		endif
+		if filereadable("./main.c")
+			silent! !echo
+				\ let g:ale_c_clang_options.= \'
+					\ -I $(pwd)/include
+					\ -I $(pwd)/include/cp2
+					\ -I $(pwd)/include/hdrtest
+					\ -I $(pwd)../../include
+				\ \'
+				\ > ./.ale_local_include_paths
+			silent! !echo
+				\ let g:ale_c_gcc_options.= \'
+					\ -I $(pwd)/include
+					\ -I $(pwd)/include/cp2
+					\ -I $(pwd)/include/hdrtest
+					\ -I $(pwd)../../include
+				\ \'
+				\ >> ./.ale_local_include_paths
+		endif
+		if filereadable("./.ale_local_include_paths")
+			so ./.ale_local_include_paths
+			silent! !rm .ale_local_include_paths
+		endif
+		set shell=$SHELL
 	endfunction
 
 	call GenPlatformIncludes()
