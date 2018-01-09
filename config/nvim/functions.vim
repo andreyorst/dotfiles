@@ -75,3 +75,12 @@
 		menu FEnc.ucs-2le :set fenc=ucs-2le<CR>
 		menu FEnc.koi8-u  :set fenc=koi8-u<CR>
 		map  <F20> :emenu FEnc.<Tab>
+
+" Visual Selection Macro
+	xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+
+	function! ExecuteMacroOverVisualRange()
+		echo "@".getcmdline()
+		execute ":'<,'>normal @".nr2char(getchar())
+	endfunction
+
