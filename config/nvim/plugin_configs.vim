@@ -115,3 +115,7 @@
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
 	autocmd FileType c,cpp nested :TagbarToggle
+
+" IndentLine
+	let g:indentLine_enabled = 1
+	let g:indentLine_char = '▏'

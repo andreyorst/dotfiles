@@ -42,6 +42,7 @@
 	highlight EndOfBuffer guifg=#1D1F21
 	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
 	highlight LineNr guifg=#6c6d6c
-	highlight NonText guifg=#636463
+	"#636463
+	highlight NonText guifg=#4d4d4d
 	highlight Search guifg=#282a2e
 	highlight IncSearch guifg=#282a2e
