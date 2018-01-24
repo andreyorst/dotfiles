@@ -21,7 +21,6 @@ filetype off
 		Plugin 'Shougo/deoplete.nvim'
 		Plugin 'zchee/deoplete-clang'
 		Plugin 'w0rp/ale'
-		Plugin 'dbgx/lldb.nvim'
 
 	call vundle#end()
 

@@ -46,3 +46,7 @@
 	highlight NonText guifg=#4d4d4d
 	highlight Search guifg=#282a2e
 	highlight IncSearch guifg=#282a2e
+
+" disable help
+	nmap <F1> <nop>
+	imap <F1> <nop>

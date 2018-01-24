@@ -26,7 +26,3 @@
 		noremap <A-n> <Esc>:NERDTreeToggle<CR>
 		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
-	" LLDB
-		nnoremap <F1> :LL next<Cr>
-		nnoremap <F2> :LL step<Cr>
-		nnoremap <F3> :LL continue<Cr>
