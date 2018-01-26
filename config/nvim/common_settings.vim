@@ -42,11 +42,12 @@
 	highlight EndOfBuffer guifg=#1D1F21
 	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
 	highlight LineNr guifg=#6c6d6c
-	"#636463
 	highlight NonText guifg=#4d4d4d
 	highlight Search guifg=#282a2e
 	highlight IncSearch guifg=#282a2e
 
-" disable help
+	" this will search for all ->word and .word and color word only
+	autocmd FileType c,cpp,h,hpp syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"
+	" disable help
 	nmap <F1> <nop>
 	imap <F1> <nop>
