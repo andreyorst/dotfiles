@@ -26,3 +26,5 @@
 		noremap <A-n> <Esc>:NERDTreeToggle<CR>
 		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
+	nnoremap bn :bn<Cr>
+	nnoremap bN :bp<Cr>
