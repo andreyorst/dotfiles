@@ -26,5 +26,9 @@
 		noremap <A-n> <Esc>:NERDTreeToggle<CR>
 		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
+" Common fixes
 	nnoremap bn :bn<Cr>
 	nnoremap bN :bp<Cr>
+
+	nmap <F1> <nop>
+	imap <F1> <nop>

@@ -11,16 +11,8 @@
 		let g:airline#extensions#tabline#enabled = 1
 		let g:airline#extensions#tabline#left_sep = ''
 		let g:airline#extensions#tabline#left_alt_sep = ''
-
 	" Theme
 		let g:airline_powerline_fonts = 1
-		" let g:airline_theme='tomorrow'
-
-" Base 16
-	if filereadable(expand("~/.vimrc_background"))
-		let base16colorspace=256
-		source ~/.vimrc_background
-	endif
 
 " Deoplete
 	set completeopt-=preview
@@ -42,13 +34,16 @@
 " ALE
 	let g:airline#extensions#ale#enabled = 1
 	let g:ale_lint_delay = 350
+
 	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
 	let g:ale_sign_error = '⬥ '
 	let g:ale_sign_warning = '⬥ '
+
 	let g:ale_linters = {
 		\ 'c': ['gcc', 'clang'],
 		\ 'cpp': ['clang', 'gcc']
 	\}
+
 	let g:ale_cpp_clang_options = '-Wall --std=c++11'
 	let g:ale_c_clang_options = '-Wall --std=c11'
 	let g:ale_c_gcc_options = '-Wall --std=c11'

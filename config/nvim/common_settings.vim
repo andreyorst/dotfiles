@@ -45,9 +45,7 @@
 	highlight NonText guifg=#4d4d4d
 	highlight Search guifg=#282a2e
 	highlight IncSearch guifg=#282a2e
+	highlight Ignore guifg=#969896
 
 	" this will search for all ->word and .word and color word only
 	autocmd FileType c,cpp,h,hpp syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"
-	" disable help
-	nmap <F1> <nop>
-	imap <F1> <nop>
