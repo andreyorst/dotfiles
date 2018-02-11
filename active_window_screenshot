@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rm /tmp/screenshot_window.png; spectacle -nabo /tmp/screenshot_window.png; [ -f /tmp/screenshot_window.png ] && xclip -selection clipboard -t $(file -b --mime-type /tmp/screenshot_window.png) < /tmp/screenshot_window.png; [ -f /tmp/screenshot_window.png ] && kdialog --title "Spectacle" --passivepopup "Active window screenshot has been set to clipboard" 3

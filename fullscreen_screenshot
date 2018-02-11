@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rm /tmp/screenshot.png; spectacle -nbo /tmp/screenshot.png; [ -f /tmp/screenshot.png ] && xclip -selection clipboard -t $(file -b --mime-type /tmp/screenshot.png) < /tmp/screenshot.png; [ -f /tmp/screenshot.png ] && kdialog --title "Spectacle" --passivepopup "Full screen screenshot has been set to clipboard" 3
