@@ -2,7 +2,6 @@ set nocompatible
 filetype off
 
 " Plugins
-	syntax match ErrorMsg "\v(-\>|\.)\w+"
 	set rtp+=~/.vim/bundle/Vundle.vim
 	call vundle#begin()
 	Plugin 'VundleVim/Vundle.vim'
@@ -20,6 +19,7 @@ filetype off
 		Plugin 'Shougo/deoplete.nvim'
 		Plugin 'zchee/deoplete-clang'
 		Plugin 'w0rp/ale'
+		Plugin 'junegunn/goyo.vim'
 
 	" Syntax Highlighting
 		Plugin 'octol/vim-cpp-enhanced-highlight'
