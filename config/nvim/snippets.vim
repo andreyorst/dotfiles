@@ -6,16 +6,16 @@
 	" type ,snippetName and hit Tab to expand it. Cursor will be placed
 	" accordingly to snippet context, and mode will be changed to insert
 
-	" 2. Insert mode snippets. 
-	" Snippets that are just abbreviations, yet a snippet with some cursor 
+	" 2. Insert mode snippets.
+	" Snippets that are just abbreviations, yet a snippet with some cursor
 	" positioning.
 
 	" 3. Insert mode interactive snippets.
-	" These snippets are abbreviations too, but they end with a '/' symbol. 
-	" The complicated part to understand is that these snippets must be ended 
+	" These snippets are abbreviations too, but they end with a '/' symbol.
+	" The complicated part to understand is that these snippets must be ended
 	" with double press of '/' button: first press is part of abbreviation and
 	" the second one is part of ':%s///g' command that is executed at the end.
-	" This command will be used to replace all template names in the snippet to 
+	" This command will be used to replace all template names in the snippet to
 	" desired one.
 
 " Snippet files are located in ~/.vim/snippets/
@@ -29,6 +29,10 @@
 	" in the class, and promt you a :%s///g command where you can type a class name
 	" so it could be set automatically
 	iabbr class/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>2j<S-v>j=/_Class_Name_<CR>:noh<CR>:%s//g<left><left>
+
+	" Simple empty class and struct snippets
+	iabbr class class {};<Left><Left><Cr>  <Esc>ddk0f{<left>i
+	iabbr struct struct {};<Left><Left><Cr><Esc>ddk0f{<left>i
 
 	" This is total mess. Don't try this at home. Requires ninja skills.
 	" Generates getter and setter for C++ private class items.
@@ -49,8 +53,8 @@
 	" for/ acts like a class snippet and lets you to define iterator name
 	iabbr for/ for(_Iterator_ = 0; _Iterator_ <; _Iterator_++) {}<Esc>/_Iterator_<CR>:noh<CR>:%s//g<left><left>
 	" fori and forj generates a simple for cycle and puts cursor to position where amount is being set
-	iabbr fori for(i = 0; i <; i++) {}<Esc>8hi
-	iabbr forj for(j = 0; j <; j++) {}<Esc>8hi
+	iabbr fori for(int i = 0; i <; i++) {}<left><Cr><Esc>ddk0f<a
+	iabbr forj for(int j = 0; j <; j++) {}<left><Cr><Esc>ddk0f<a
 
 	" Simple main() snip
 	nnoremap ,main<Tab> <Esc>:-1read $HOME/.vim/snippets/main.c<CR>$v%=%2ji<Tab>
