@@ -1,0 +1,15 @@
+[Document]
+ChangeColors=true
+RenderMode=BlackWhite
+
+[Main View]
+ShowBottomBar=false
+SplitterSizes=123,477
+
+[Nav Panel]
+SidebarIconSize=22
+SidebarShowText=false
+
+[PageView]
+MouseMode=TextSelect
+TrimMargins=true
