@@ -21,6 +21,10 @@ filetype off
 		Plugin 'w0rp/ale'
 		Plugin 'junegunn/goyo.vim'
 
+	" Rust
+		Plugin 'rust-lang/rust.vim'
+		Plugin 'racer-rust/vim-racer'
+
 	" Syntax Highlighting
 		Plugin 'octol/vim-cpp-enhanced-highlight'
 		Plugin 'justinmk/vim-syntax-extra'

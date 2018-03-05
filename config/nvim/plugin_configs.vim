@@ -41,7 +41,8 @@
 
 	let g:ale_linters = {
 		\ 'c': ['gcc', 'clang'],
-		\ 'cpp': ['clang', 'gcc']
+		\ 'cpp': ['clang', 'gcc'],
+		\ 'rust': ['rustc', 'cargo']
 	\}
 
 	let g:ale_cpp_clang_options = '-Wall --std=c++11'

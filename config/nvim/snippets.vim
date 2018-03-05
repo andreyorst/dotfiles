@@ -28,7 +28,7 @@
 	" It will expand class in that line and search for template _Class_Name_
 	" in the class, and promt you a :%s///g command where you can type a class name
 	" so it could be set automatically
-	iabbr class/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>2j<S-v>j=/_Class_Name_<CR>:noh<CR>:%s//g<left><left>
+	iabbr clss/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>2j<S-v>j=/_Class_Name_<CR>:noh<CR>:%s//g<left><left>
 
 	" Simple empty class and struct snippets
 	iabbr class class {};<Left><Left><Cr>  <Esc>ddk0f{<left>i
