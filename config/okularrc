@@ -7,10 +7,15 @@ FullScreen=false
 
 [MainWindow]
 Height 1080=973
-State=AAAA/wAAAAD9AAAAAAAAAwsAAAOKAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AVABvAG8AbABCAGEAcgEAAAAA/////wAAAAAAAAAA
+Height 1440=1088
+MenuBar=Disabled
+State=AAAA/wAAAAD9AAAAAAAAAwAAAAQaAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAWAG0AYQBpAG4AVABvAG8AbABCAGEAcgEAAAAA/////wAAAAAAAAAA
 ToolBarsMovable=Disabled
 Width 1920=779
+Width 2560=768
 
 [Recent Files]
-File1[$e]=$HOME/Books/The C++ Programming Language [4th Edition].djvu
-Name1[$e]=The C++ Programming Language [4th Edition].djvu
+File1[$e]=$HOME/Desktop/getcwd.c
+File2[$e]=$HOME/Documents/Documentations/Perspec/Perspec_Reference_Manual_b40.pdf
+Name1[$e]=getcwd.c
+Name2[$e]=Perspec_Reference_Manual_b40.pdf
