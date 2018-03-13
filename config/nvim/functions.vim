@@ -48,7 +48,7 @@
 		endif
 	endfunction
 
-""  Encoding
+" Encoding
 	" <F7> EOL format (dos <CR><NL>,unix <NL>,mac <CR>)
 		set  wcm=<Tab>
 		menu EOL.unix :set fileformat=unix<CR>

@@ -2,6 +2,7 @@
 	set encoding=utf-8
 	set mouse=a
 	set number
+	set relativenumber
 	syntax on
 	set path+=**
 	set wildmenu

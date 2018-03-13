@@ -1,4 +1,7 @@
 " Map Settings
+	" Searching
+		nnoremap * *``
+		nnoremap # #``
 	" Open file under cursor
 		nnoremap gf <C-w>gf
 

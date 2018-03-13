@@ -17,19 +17,23 @@ filetype off
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'zchee/deoplete-clang'
+		" Plugin 'roxma/nvim-completion-manager'
+		" Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'w0rp/ale'
-		Plugin 'junegunn/goyo.vim'
 
 	" Rust
 		Plugin 'rust-lang/rust.vim'
-		Plugin 'racer-rust/vim-racer'
+
+	" C/C++
+		Plugin 'zchee/deoplete-clang'
+		Plugin 'octol/vim-cpp-enhanced-highlight'
 
 	" Syntax Highlighting
-		Plugin 'octol/vim-cpp-enhanced-highlight'
 		Plugin 'justinmk/vim-syntax-extra'
 
 	call vundle#end()
+
+filetype plugin indent on
 
 " Settings
 	source ~/.config/nvim/common_settings.vim

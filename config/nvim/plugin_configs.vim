@@ -31,6 +31,11 @@
 	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
 	let g:deoplete#sources#clang#clang_header='/lib/clang/'
 
+" Deoplete Rust
+	"let g:deoplete#sources#rust#racer_binary='$HOME/.cargo/bin/racer'
+	"let g:deoplete#sources#rust#rust_source_path='$HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
+	"let g:deoplete#sources#rust#show_duplicates=1
+
 " ALE
 	let g:airline#extensions#ale#enabled = 1
 	let g:ale_lint_delay = 350
@@ -42,61 +47,62 @@
 	let g:ale_linters = {
 		\ 'c': ['gcc', 'clang'],
 		\ 'cpp': ['clang', 'gcc'],
-		\ 'rust': ['rustc', 'cargo']
+		\ 'rust': ['rls']
 	\}
 
-	let g:ale_cpp_clang_options = '-Wall --std=c++11'
-	let g:ale_c_clang_options = '-Wall --std=c11'
-	let g:ale_c_gcc_options = '-Wall --std=c11'
+	" C/C++
+		let g:ale_cpp_clang_options = '-Wall --std=c++11'
+		let g:ale_c_clang_options = '-Wall --std=c11'
+		let g:ale_c_gcc_options = '-Wall --std=c11'
 
-	" Weird function that generates path to librares for current
-	" platform if testkit.settings exists
-	" WARNING: you 99.9% don't need this function,
-	" delete it if you somehow got this file
-	function! GenPlatformIncludes()
-		set shell=/bin/sh
-		if filereadable("./testkit.settings")
-			silent! !echo
-				\ let g:ale_c_clang_options.= \'
-					\ -I $(pwd)/include/
-					\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
-					\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/
-				\ \'
-				\ > ./.ale_local_include_paths
-			silent! !echo
-				\ let g:ale_c_gcc_options.= \'
-					\ -I $(pwd)/include/
-					\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
-					\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/
-				\ \'
-				\ >> ./.ale_local_include_paths
-		endif
-		if filereadable("./main.c")
-			silent! !echo
-				\ let g:ale_c_clang_options.= \'
-					\ -I $(pwd)/include
-					\ -I $(pwd)/include/cp2
-					\ -I $(pwd)/include/hdrtest
-					\ -I $(pwd)../../include
-				\ \'
-				\ > ./.ale_local_include_paths
-			silent! !echo
-				\ let g:ale_c_gcc_options.= \'
-					\ -I $(pwd)/include
-					\ -I $(pwd)/include/cp2
-					\ -I $(pwd)/include/hdrtest
-					\ -I $(pwd)../../include
-				\ \'
-				\ >> ./.ale_local_include_paths
-		endif
-		if filereadable("./.ale_local_include_paths")
-			so ./.ale_local_include_paths
-			silent! !rm .ale_local_include_paths
-		endif
-		set shell=$SHELL
-	endfunction
+		" Weird function that generates path to librares for current
+		" platform if testkit.settings exists
+		" WARNING: you 99.9% don't need this function,
+		" delete it if you somehow got this file
+		function! GenPlatformIncludes()
+			set shell=/bin/sh
+			if filereadable("./testkit.settings")
+				silent! !echo
+					\ let g:ale_c_clang_options.= \'
+						\ -I $(pwd)/include/
+						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
+						\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/
+					\ \'
+					\ > ./.ale_local_include_paths
+				silent! !echo
+					\ let g:ale_c_gcc_options.= \'
+						\ -I $(pwd)/include/
+						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
+						\ -I $(pwd)/platforms/$(grep ?=.* ./testkit.settings | awk -F '?= ' '{print $NF}')/include/
+					\ \'
+					\ >> ./.ale_local_include_paths
+			endif
+			if filereadable("./main.c")
+				silent! !echo
+					\ let g:ale_c_clang_options.= \'
+						\ -I $(pwd)/include
+						\ -I $(pwd)/include/cp2
+						\ -I $(pwd)/include/hdrtest
+						\ -I $(pwd)../../include
+					\ \'
+					\ > ./.ale_local_include_paths
+				silent! !echo
+					\ let g:ale_c_gcc_options.= \'
+						\ -I $(pwd)/include
+						\ -I $(pwd)/include/cp2
+						\ -I $(pwd)/include/hdrtest
+						\ -I $(pwd)../../include
+					\ \'
+					\ >> ./.ale_local_include_paths
+			endif
+			if filereadable("./.ale_local_include_paths")
+				so ./.ale_local_include_paths
+				silent! !rm .ale_local_include_paths
+			endif
+			set shell=$SHELL
+		endfunction
 
-	call GenPlatformIncludes()
+		call GenPlatformIncludes()
 
 " DelimitMate
 	let delimitMate_expand_cr = 1
@@ -107,8 +113,25 @@
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Tagbar
-	" let g:tagbar_autofocus = 1
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
 	autocmd FileType c,cpp nested :TagbarToggle
+
+" LanguageClient-neovim
+	"nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
+	"autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+
+	"let g:LanguageClient_serverCommands = {
+	"	\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+	"\ }
+
+" nvim-completion-manager
+	"inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	"inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+	"let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
+	"let g:cm_refresh_length = 2
+
+	"let g:cm_sources_override = {
+	"\ 'cm-tags': {'enable':0}
+	"\ }
 
