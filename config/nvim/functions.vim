@@ -27,24 +27,12 @@
 			catch
 				call termopen($SHELL, {"detach": 0})
 				let g:term_buf = bufnr("")
-				set nonu
+				set nonumber
+				set norelativenumber
 				set signcolumn=no
 			endtry
 			startinsert!
 			let g:term_win = win_getid()
-		endif
-	endfunction
-
-" Toggle Netrw
-	let g:netrw_win = 0
-
-	function! Netrw_toggle()
-		if win_gotoid(g:netrw_win)
-			:q
-			let g:netrw_win = 0
-		else
-			:Lexplore 30
-			let g:netrw_win = win_getid()
 		endif
 	endfunction
 

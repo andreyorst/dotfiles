@@ -6,7 +6,7 @@ filetype off
 	call vundle#begin()
 	Plugin 'VundleVim/Vundle.vim'
 
-	" Style
+	" Look
 		Plugin 'chriskempson/base16-vim'
 		Plugin 'vim-airline/vim-airline'
 		Plugin 'vim-airline/vim-airline-themes'

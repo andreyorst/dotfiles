@@ -34,15 +34,17 @@
 		let g:ale_c_clang_options = '-Wall --std=c11'
 		let g:ale_c_gcc_options = '-Wall --std=c11'
 
+		let g:includepath = ''
+
 		if filereadable("./testkit.settings")
-			let includepath = system('echo
+			let g:includepath = system('echo
 						\ -I $(pwd)/include/
 						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
 						\ -I $(pwd)/testpacks/CAN/can_lib_src/
 						\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include/
 						\')
 		elseif filereadable("./main.c")
-			let includepath = system('echo
+			let g:includepath = system('echo
 						\ -I $(pwd)/include
 						\ -I $(pwd)/include/cp2
 						\ -I $(pwd)/include/hdrtest
