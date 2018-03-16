@@ -17,8 +17,7 @@ filetype off
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'Shougo/deoplete.nvim'
-		" Plugin 'roxma/nvim-completion-manager'
-		" Plugin 'autozimu/LanguageClient-neovim'
+		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'w0rp/ale'
 
 	" Rust
