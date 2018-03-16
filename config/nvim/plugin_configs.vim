@@ -24,27 +24,27 @@
 	let g:ale_sign_warning = '⬥ '
 
 	let g:ale_linters = {
-		\ 'c': ['gcc', 'clang'],
-		\ 'cpp': ['clang', 'gcc'],
+		\ 'c': ['clang', 'gcc'],
+		\ 'cpp': ['clang'],
 		\ 'rust': ['rls']
 	\}
 
 	" C/C++
-		let g:ale_cpp_clang_options = '-Wall --std=c++11'
-		let g:ale_c_clang_options = '-Wall --std=c11'
-		let g:ale_c_gcc_options = '-Wall --std=c11'
+		let g:ale_cpp_clang_options = '-Wall --std=c++11 '
+		let g:ale_c_clang_options = '-Wall --std=c99 '
+		let g:ale_c_gcc_options = '-Wall --std=c99 '
 
 		let g:includepath = ''
 
 		if filereadable("./testkit.settings")
-			let g:includepath = system('echo
-						\ -I $(pwd)/include/
-						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src/
-						\ -I $(pwd)/testpacks/CAN/can_lib_src/
-						\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include/
+			let g:includepath = system('echo -n
+						\ -I $(pwd)/include
+						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src
+						\ -I $(pwd)/testpacks/CAN/can_lib_src
+						\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
 						\')
 		elseif filereadable("./main.c")
-			let g:includepath = system('echo
+			let g:includepath = system('echo -n
 						\ -I $(pwd)/include
 						\ -I $(pwd)/include/cp2
 						\ -I $(pwd)/include/hdrtest
@@ -52,8 +52,8 @@
 						\')
 		endif
 
-		let g:ale_c_clang_options.= includepath
-		let g:ale_c_gcc_options.= includepath
+		let g:ale_c_clang_options.= g:includepath
+		let g:ale_c_gcc_options.= g:includepath
 
 " DelimitMate
 	let delimitMate_expand_cr = 1
@@ -71,7 +71,7 @@
 
 	if filereadable("./testkit.settings") || filereadable("./main.c")
 		redir! > ./.clang
-		silent! echon 'flags = ' includepath
+		silent! echon 'flags = ' g:includepath
 		redir END
 	endif
 

@@ -17,6 +17,7 @@ filetype off
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'Shougo/deoplete.nvim'
+		Plugin 'Shougo/neoinclude.vim'
 		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'w0rp/ale'
 
