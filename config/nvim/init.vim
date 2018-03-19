@@ -6,7 +6,7 @@ filetype off
 	call vundle#begin()
 	Plugin 'VundleVim/Vundle.vim'
 
-	" Style
+	" Look
 		Plugin 'chriskempson/base16-vim'
 		Plugin 'vim-airline/vim-airline'
 		Plugin 'vim-airline/vim-airline-themes'
@@ -17,6 +17,7 @@ filetype off
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'Shougo/deoplete.nvim'
+		Plugin 'Shougo/neoinclude.vim'
 		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'w0rp/ale'
 

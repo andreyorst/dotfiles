@@ -2,6 +2,7 @@
 	" Searching
 		nnoremap * *``
 		nnoremap # #``
+
 	" Open file under cursor
 		nnoremap gf <C-w>gf
 
@@ -9,10 +10,6 @@
 		nnoremap <A-t> :call Term_toggle(12)<CR>
 		inoremap <A-t> <Esc>:call Term_toggle(12)<CR>
 		tnoremap <A-t> <C-\><C-n>:call Term_toggle(12)<CR>
-
-	" Toggle netrw on/off
-		noremap <A-s> :call Netrw_toggle()<CR>
-		noremap <A-s> <Esc>:call Netrw_toggle()<CR>
 
 	" Terminal go back to normal mode
 		:tnoremap <Esc> <C-\><C-n>
