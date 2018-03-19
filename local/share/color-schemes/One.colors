@@ -88,7 +88,7 @@ ForegroundVisited=138,190,183
 
 [Colors:Window]
 BackgroundAlternate=47,101,202
-BackgroundNormal=29,31,33
+BackgroundNormal=33,37,43
 DecorationFocus=129,162,190
 DecorationHover=129,162,190
 ForegroundActive=240,198,116
@@ -102,16 +102,16 @@ ForegroundVisited=138,190,183
 
 [General]
 ColorScheme=Darcula
-Name=Visual Studio Code
+Name=One
 shadeSortColumn=true
 
 [KDE]
 contrast=4
 
 [WM]
-activeBackground=29,31,33
+activeBackground=33,37,43
 activeBlend=40,42,46
 activeForeground=224,224,224
-inactiveBackground=29,31,33
+inactiveBackground=33,37,43
 inactiveBlend=40,42,46
 inactiveForeground=180,183,180
