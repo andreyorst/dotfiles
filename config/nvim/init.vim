@@ -16,8 +16,9 @@ filetype off
 		Plugin 'craigemery/vim-autotag'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Raimondi/delimitMate'
-		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'Shougo/neoinclude.vim'
+		Plugin 'sirver/UltiSnips'
+		Plugin 'roxma/nvim-completion-manager'
+		Plugin 'roxma/ncm-clang'
 		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'w0rp/ale'
 

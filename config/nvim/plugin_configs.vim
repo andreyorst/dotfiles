@@ -61,19 +61,19 @@
 	let delimitMate_nesting_quotes = ['`']
 
 " Deoplete
-	set completeopt-=preview
-	let g:deoplete#enable_at_startup = 1
-	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" set completeopt-=preview
+	" let g:deoplete#enable_at_startup = 1
+	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
-	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
-	let g:deoplete#sources#clang#clang_header='/lib/clang/'
+	" let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
+	" let g:deoplete#sources#clang#clang_header='/lib/clang/'
 
-	if filereadable("./testkit.settings") || filereadable("./main.c")
-		redir! > ./.clang
-		silent! echon 'flags = ' g:includepath
-		redir END
-	endif
+	" if filereadable("./testkit.settings") || filereadable("./main.c")
+	" 	redir! > ./.clang
+	" 	silent! echon 'flags = ' g:includepath
+	" 	redir END
+	" endif
 
 " LanguageClient-neovim
 	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
@@ -90,3 +90,35 @@
 	let g:tagbar_compact = 1
 	autocmd FileType c,cpp nested :TagbarToggle
 
+" NCM
+	set shortmess+=c
+	let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'smartcase'}
+	let g:cm_refresh_length = 2
+	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+
+	let g:cm_sources_override = {
+    \ 'cm-tags': {'enable':0}
+    \ }
+
+" NCM Clang
+	if filereadable("./testkit.settings") || filereadable("./main.c")
+		redir! > ./.clang_complte
+		silent! echon 'flags = ' g:includepath
+		redir END
+	endif
+
+" Indent Guides
+	let g:indentguides_spacechar = '▏'
+	let g:indentguides_tabchar = '▏'
+
+" Ultisnips
+	let g:UltiSnipsEditSplit="vertical"
+	let g:UltiSnipsExpandTrigger        = "<Plug>(ultisnips_expand)"
+	let g:UltiSnipsJumpForwardTrigger   = "<c-j>"
+	let g:UltiSnipsJumpBackwardTrigger  = "<c-k>"
+	let g:UltiSnipsRemoveSelectModeMappings = 0
+	" optional
+	inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+	let g:UltiSnipsSnippetsDir = "~/.vim/snippets/UltiSnips"
