@@ -75,51 +75,23 @@
 	let delimitMate_nesting_quotes = ['`']
 
 " Deoplete
-	" set completeopt-=preview
-	" let g:deoplete#enable_at_startup = 1
-	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	set completeopt-=preview
+	let g:deoplete#enable_at_startup = 1
+	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
-	" let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
-	" let g:deoplete#sources#clang#clang_header='/lib/clang/'
+	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
+	let g:deoplete#sources#clang#clang_header='/lib/clang/'
 
-	" if filereadable("./testkit.settings") || filereadable("./main.c")
-	" 	redir! > ./.clang
-	" 	silent! echon 'flags = ' g:includepath
-	" 	redir END
-	" endif
+	if filereadable("./testkit.settings") || filereadable("./main.c")
+		redir! > ./.clang
+		silent! echon 'flags = ' g:includepath
+		redir END
+	endif
 
 " Indent Guides
 	let g:indentguides_spacechar = '▏'
 	let g:indentguides_tabchar = '▏'
-
-" LanguageClient-neovim
-	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
-
-	let g:LanguageClient_serverCommands = {
-		\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-	\ }
-	let g:LanguageClient_loadSettings = 1
-	"
-" NCM
-	set shortmess+=c
-	let g:cm_completed_snippet_engine = "ultisnips"
-	let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'case'}
-	let g:cm_refresh_length = 2
-	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-	inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
-
-	let g:cm_sources_override = {
-				\ 'cm-tags': {'enable':0}
-    \ }
-
-" NCM Clang
-	if filereadable("./testkit.settings") || filereadable("./main.c")
-		redir! > ./.clang_complete
-		silent! echon g:includepath
-		redir END
-	endif
 
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
