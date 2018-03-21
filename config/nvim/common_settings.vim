@@ -2,6 +2,7 @@
 	set encoding=utf-8
 	set mouse=a
 	set number
+	set cursorline
 	set relativenumber
 	syntax on
 	set path+=**
@@ -14,7 +15,8 @@
 	set linebreak
 
 " Folds
-	set foldmethod=indent
+	" set foldmethod=indent
+	set foldmethod=syntax
 	set foldlevelstart=20
 	hi Folded ctermfg=black
 	hi Folded ctermbg=white
@@ -35,10 +37,6 @@
 	" set autoindent
 	set smartindent
 
-" Netrw
-	let g:netrw_banner = 0
-	let g:netrw_liststyle = 3
-
 " Highlights
 	highlight EndOfBuffer guifg=#1D1F21
 	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
@@ -48,5 +46,10 @@
 	highlight IncSearch guifg=#282a2e
 	highlight Ignore guifg=#969896
 
+	" highlight *_t as type
+	autocmd FileType c,cpp,h,hpp syntax match Type "\v\w+_t>"
+	autocmd FileType c,cpp,h,hpp syntax match Type "\v<(u|vu)\w+\d(\d)?>"
+	autocmd FileType c,cpp,h,hpp syntax match Type "\v<(v)?u(_)?(int|short|char)>"
+	autocmd FileType c,cpp,h,hpp syntax match Type "\v<(s|u)\d(\d)?>"
 	" this will search for all ->word and .word and color word only
 	autocmd FileType c,cpp,h,hpp syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"

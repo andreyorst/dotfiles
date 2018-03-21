@@ -1,7 +1,9 @@
 " Map Settings
 	" Searching
-		nnoremap * *``
-		nnoremap # #``
+		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
+
+	" Rename symbol
+		nnoremap <F2> :noh<Cr> :%s/\<<C-r><C-w>\>//g<left><left>
 
 	" Open file under cursor
 		nnoremap gf <C-w>gf
@@ -27,8 +29,8 @@
 		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
 " Common fixes
-	nnoremap bn :bn<Cr>
-	nnoremap bN :bp<Cr>
+	nnoremap gb :bn<Cr>
+	nnoremap gB :bp<Cr>
 
 	nmap <F1> <nop>
 	imap <F1> <nop>

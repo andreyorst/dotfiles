@@ -26,7 +26,6 @@
 	let g:ale_linters = {
 		\ 'c': ['clang', 'gcc'],
 		\ 'cpp': ['clang'],
-		\ 'rust': ['rls']
 	\}
 
 	" C/C++
@@ -55,6 +54,21 @@
 		let g:ale_c_clang_options.= g:includepath
 		let g:ale_c_gcc_options.= g:includepath
 
+" CtrlP
+	let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+	let g:ctrlp_clear_cache_on_exit = 1
+	if executable('ag')
+		set grepprg=ag\ --nogroup\ --nocolor
+		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+	endif
+
+	set wildignore+=*/.git/*,*/.svn/*,*/rtlrun*/*
+				" 'dir':  '\v[\/]\.(git|hg|svn)$',
+	let g:ctrlp_custom_ignore = {
+				\ 'dir':  '\v(\.git|\.svn|rtlrun.*)$',
+				\ 'file': '\v\.(exe|so|dll|o|swp|tar.*)$',
+				\ }
+
 " DelimitMate
 	let delimitMate_expand_cr = 1
 	let delimitMate_expand_space = 0
@@ -75,12 +89,37 @@
 	" 	redir END
 	" endif
 
+" Indent Guides
+	let g:indentguides_spacechar = '▏'
+	let g:indentguides_tabchar = '▏'
+
 " LanguageClient-neovim
 	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
 
 	let g:LanguageClient_serverCommands = {
 		\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
 	\ }
+	let g:LanguageClient_loadSettings = 1
+	"
+" NCM
+	set shortmess+=c
+	let g:cm_completed_snippet_engine = "ultisnips"
+	let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'case'}
+	let g:cm_refresh_length = 2
+	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+	inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+
+	let g:cm_sources_override = {
+				\ 'cm-tags': {'enable':0}
+    \ }
+
+" NCM Clang
+	if filereadable("./testkit.settings") || filereadable("./main.c")
+		redir! > ./.clang_complete
+		silent! echon g:includepath
+		redir END
+	endif
 
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -90,35 +129,3 @@
 	let g:tagbar_compact = 1
 	autocmd FileType c,cpp nested :TagbarToggle
 
-" NCM
-	set shortmess+=c
-	let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'smartcase'}
-	let g:cm_refresh_length = 2
-	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-
-	let g:cm_sources_override = {
-    \ 'cm-tags': {'enable':0}
-    \ }
-
-" NCM Clang
-	if filereadable("./testkit.settings") || filereadable("./main.c")
-		redir! > ./.clang_complte
-		silent! echon 'flags = ' g:includepath
-		redir END
-	endif
-
-" Indent Guides
-	let g:indentguides_spacechar = '▏'
-	let g:indentguides_tabchar = '▏'
-
-" Ultisnips
-	let g:UltiSnipsEditSplit="vertical"
-	let g:UltiSnipsExpandTrigger        = "<Plug>(ultisnips_expand)"
-	let g:UltiSnipsJumpForwardTrigger   = "<c-j>"
-	let g:UltiSnipsJumpBackwardTrigger  = "<c-k>"
-	let g:UltiSnipsRemoveSelectModeMappings = 0
-	" optional
-	inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
-	let g:UltiSnipsSnippetsDir = "~/.vim/snippets/UltiSnips"

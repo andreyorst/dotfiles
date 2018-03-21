@@ -15,10 +15,9 @@ filetype off
 		Plugin 'majutsushi/tagbar'
 		Plugin 'craigemery/vim-autotag'
 		Plugin 'scrooloose/nerdtree'
+		Plugin 'ctrlpvim/ctrlp.vim'
 		Plugin 'Raimondi/delimitMate'
-		Plugin 'sirver/UltiSnips'
 		Plugin 'roxma/nvim-completion-manager'
-		Plugin 'roxma/ncm-clang'
 		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'w0rp/ale'
 
@@ -26,7 +25,7 @@ filetype off
 		Plugin 'rust-lang/rust.vim'
 
 	" C/C++
-		Plugin 'zchee/deoplete-clang'
+		Plugin 'roxma/ncm-clang'
 		Plugin 'octol/vim-cpp-enhanced-highlight'
 
 	" Syntax Highlighting
