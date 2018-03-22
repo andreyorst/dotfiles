@@ -12,21 +12,22 @@ filetype off
 		Plugin 'vim-airline/vim-airline-themes'
 
 	" Tools
-		Plugin 'majutsushi/tagbar'
+		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'craigemery/vim-autotag'
-		Plugin 'scrooloose/nerdtree'
 		Plugin 'ctrlpvim/ctrlp.vim'
+		Plugin 'majutsushi/tagbar'
 		Plugin 'Raimondi/delimitMate'
+		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'zchee/deoplete-clang'
+		Plugin 'thaerkh/vim-indentguides'
 		Plugin 'w0rp/ale'
 
 	" Rust
 		Plugin 'rust-lang/rust.vim'
 
 	" C/C++
-		Plugin 'roxma/ncm-clang'
 		Plugin 'octol/vim-cpp-enhanced-highlight'
+		Plugin 'zchee/deoplete-clang'
 
 	" Syntax Highlighting
 		Plugin 'justinmk/vim-syntax-extra'

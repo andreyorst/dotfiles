@@ -35,6 +35,17 @@
 
 		let g:includepath = ''
 
+		" NOTE: This piece of code is used to generate clang options for ALE,
+		" because we aren't using any build system. You may delete this, or
+		" rewrite to your project needs. Basically you can refer to a specific
+		" file in your project root, and automatically pass desired options to
+		" ALE, and later to Clang. But the main reason I wrote it because, we
+		" have special config file, that contains current includepath, for our
+		" own build system, so I need to pass it to ALE somehow and detect if
+		" it was changed. You can go further and have a separate if() for each
+		" project, I have two for now. I understand that this is not the most
+		" beautiful way of doing this, but, still, it works fine, and I'm kinda
+		" happy with this variant for now.
 		if filereadable("./testkit.settings")
 			let g:includepath = system('echo -n
 						\ -I $(pwd)/include
@@ -63,7 +74,6 @@
 	endif
 
 	set wildignore+=*/.git/*,*/.svn/*,*/rtlrun*/*
-				" 'dir':  '\v[\/]\.(git|hg|svn)$',
 	let g:ctrlp_custom_ignore = {
 				\ 'dir':  '\v(\.git|\.svn|rtlrun.*)$',
 				\ 'file': '\v\.(exe|so|dll|o|swp|tar.*)$',
@@ -83,6 +93,9 @@
 	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
 	let g:deoplete#sources#clang#clang_header='/lib/clang/'
 
+	" NOTE: This piece of code reuses previous code that generates clang
+	" options and exports it to file at project root. Again, you may delete
+	" it, or rewrite to your project needs.
 	if filereadable("./testkit.settings") || filereadable("./main.c")
 		redir! > ./.clang
 		silent! echon 'flags = ' g:includepath
@@ -92,6 +105,14 @@
 " Indent Guides
 	let g:indentguides_spacechar = '▏'
 	let g:indentguides_tabchar = '▏'
+
+" LanguageClient-neovim
+	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+
+	let g:LanguageClient_serverCommands = {
+				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+				\ }
+	let g:LanguageClient_loadSettings = 1
 
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif

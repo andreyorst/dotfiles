@@ -15,9 +15,8 @@
 	set linebreak
 
 " Folds
-	" set foldmethod=indent
 	set foldmethod=syntax
-	set foldlevelstart=20
+	set foldlevelstart=20    " Disables automatic closing of all folds on fileopen
 	hi Folded ctermfg=black
 	hi Folded ctermbg=white
 
@@ -34,7 +33,6 @@
 	set noexpandtab
 	set tabstop=4
 	set shiftwidth=4
-	" set autoindent
 	set smartindent
 
 " Highlights
@@ -46,10 +44,12 @@
 	highlight IncSearch guifg=#282a2e
 	highlight Ignore guifg=#969896
 
-	 autocmd FileType c,cpp,h,hpp
-				 \ syntax match Type "\v<\w+_t>" |
-				 \ syntax match Type "\v<(v|u|vu)\w+(8|16|32|64)>" |
-				 \ syntax match Type "\v<(v|u|vu)?(_)?(int|short|char)>" |
-				 \ syntax match Type "\v<(v)?(_)?(s|u)(8|16|32|64)>" |
-				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"
+	" Highlightings for C/C++ types and struct/class members.
+	autocmd FileType c,cpp,h,hpp
+				 \ syntax match Type "\v<\w+_t>"                            |
+				 \ syntax match Type "\v<__signed>"                         |
+				 \ syntax match Type "\v<(v|u|vu)\w+(8|16|32|64)>"          |
+				 \ syntax match Type "\v<(v|u|vu)?(_|__)?(int|short|char)>" |
+				 \ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"     |
+				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"           |
 
