@@ -4,7 +4,7 @@
 	" Need more time to optimize it. Dont use it for now
 	" TODO:
 	" find a way to get list of every regular expression match without moving
-	" cursor, and adding jumps. Find a way not to source it each time, but add
+	" cursor or and adding jumps. Find a way not to source it each time, but add
 	" only new ones. Possibly should store last amount of items in list
 	" somewhere.
 		function! HighlightTypes()
