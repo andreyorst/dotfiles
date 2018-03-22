@@ -28,11 +28,11 @@
 	" It will expand class in that line and search for template _Class_Name_
 	" in the class, and promt you a :%s///g command where you can type a class name
 	" so it could be set automatically
-	iabbr clss/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>2j<S-v>j=/_Class_Name_<CR>:noh<CR>:%s//g<left><left>
+	iabbr class/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>2j<S-v>j=/_Class_Name_<CR>:noh<CR>:%s//g<left><left>
 
 	" Simple empty class and struct snippets
-	iabbr class class {};<Left><Left><Cr>  <Esc>ddk0f{<left>i
-	iabbr struct struct {};<Left><Left><Cr><Esc>ddk0f{<left>i
+	iabbr class, class {};<Left><Left><Cr>  <Esc>ddk0f{<left>i
+	iabbr struct, struct {};<Left><Left><Cr><Esc>ddk0f{<left>i
 
 	" This is total mess. Don't try this at home. Requires ninja skills.
 	" Generates getter and setter for C++ private class items.
@@ -58,4 +58,5 @@
 
 	" Simple main() snip
 	nnoremap ,main<Tab> <Esc>:-1read $HOME/.vim/snippets/main.c<CR>$v%=%2ji<Tab>
+	iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>$v%=%2ji<Tab>
 
