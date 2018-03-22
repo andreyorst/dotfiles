@@ -46,10 +46,10 @@
 	highlight IncSearch guifg=#282a2e
 	highlight Ignore guifg=#969896
 
-	" highlight *_t as type
-	autocmd FileType c,cpp,h,hpp syntax match Type "\v\w+_t>"
-	autocmd FileType c,cpp,h,hpp syntax match Type "\v<(u|vu)\w+\d(\d)?>"
-	autocmd FileType c,cpp,h,hpp syntax match Type "\v<(v)?u(_)?(int|short|char)>"
-	autocmd FileType c,cpp,h,hpp syntax match Type "\v<(s|u)\d(\d)?>"
-	" this will search for all ->word and .word and color word only
-	autocmd FileType c,cpp,h,hpp syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"
+	 autocmd FileType c,cpp,h,hpp
+				 \ syntax match Type "\v<\w+_t>" |
+				 \ syntax match Type "\v<(v|u|vu)\w+(8|16|32|64)>" |
+				 \ syntax match Type "\v<(v|u|vu)?(_)?(int|short|char)>" |
+				 \ syntax match Type "\v<(v)?(_)?(s|u)(8|16|32|64)>" |
+				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"
+
