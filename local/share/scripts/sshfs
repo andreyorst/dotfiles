@@ -1,3 +1,0 @@
-#!/bin/zsh
-sshfs listopad@grid0004:/home/listopad/ ~/s183 -o IdentityFile=~/.ssh/id_rsa
-
