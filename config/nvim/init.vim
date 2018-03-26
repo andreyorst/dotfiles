@@ -19,7 +19,6 @@ filetype off
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'thaerkh/vim-indentguides'
 		Plugin 'w0rp/ale'
 
 	" Rust
