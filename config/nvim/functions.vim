@@ -10,7 +10,7 @@
 		function! HighlightTypes()
 			let a:cursor_pos = getpos(".")
 			let types = []
-			g/\v(struct\s+)@<=\w+/call add(types, matchstr(getline('.'), '\v(struct\s+)@<=\w+'))
+			g/\v((struct|class)\s+)@<=\w+/call add(types, matchstr(getline('.'), '\v((struct|class)\s+)@<=\w+'))
 			noh
 			call cursor(a:cursor_pos[1], a:cursor_pos[2])
 			for s in types
