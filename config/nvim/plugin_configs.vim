@@ -102,10 +102,6 @@
 		redir END
 	endif
 
-" Indent Guides
-	let g:indentguides_spacechar = '▏'
-	let g:indentguides_tabchar = '▏'
-
 " LanguageClient-neovim
 	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
 
