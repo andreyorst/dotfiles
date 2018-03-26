@@ -118,3 +118,10 @@
 	let g:tagbar_compact = 1
 	autocmd FileType c,cpp nested :TagbarToggle
 
+" Ultisnips
+	let g:UltiSnipsExpandTrigger="<c-k>"
+	let g:UltiSnipsJumpForwardTrigger="<c-b>"
+	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+	let g:UltiSnipsEditSplit="vertical"
+

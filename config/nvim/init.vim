@@ -19,6 +19,8 @@ filetype off
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
+		Plugin 'sirver/UltiSnips'
+		Plugin 'honza/vim-snippets'
 		Plugin 'w0rp/ale'
 
 	" Rust

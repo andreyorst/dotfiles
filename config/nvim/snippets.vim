@@ -66,5 +66,16 @@
 
 
 	" Simple main() snip
-		autocmd FileType c,cpp iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>$v%=%2ji<Tab>
+		autocmd FileType c,cpp iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>jA
 
+	" emulate jump on theese markers
+	" ${:1:text:}
+	" ${:1: :}
+	" ${:1:text text:}
+
+	inoremap <c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
+	vnoremap <c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
+	nnoremap <c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
+
+	autocmd FileType c,cpp iabbr for, for(i = 0; i < ${:1:10:}; i++) {}<left><Cr>${:0:// expression:}<Esc>kh^
+	autocmd FileType c iabbr tos, tos("${:1: :}"); ton(${:2: :}); tos("${:3:\n\r:}");${:0: :}<Esc>h^
