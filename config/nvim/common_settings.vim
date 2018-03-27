@@ -13,9 +13,12 @@
 	set signcolumn=yes
 	set wrap
 	set linebreak
+	set scrolloff=5
+	set foldcolumn=0
 
 " Folds
-	set foldmethod=indent
+	"set foldmethod=indent
+	set foldmethod=syntax
 	set foldlevelstart=20    " Disables automatic closing of all folds on fileopen
 	hi Folded ctermfg=black
 	hi Folded ctermbg=white
