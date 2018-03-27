@@ -129,8 +129,9 @@
 		let g:UltiSnipsSnippetDirectories=["~/.dotfiles/vim/UltiSnips/", "UltiSnips"]
 		let g:UltiSnipsEditSplit="vertical"
 
-	" Undefine all expand/jump triggers, because FUNCTIONS
+	" For sake of manual expanding
 		let g:UltiSnipsExpandTrigger="<C-J>"
+	" Undefine all jump triggers, because FUNCTIONS
 		let g:UltiSnipsJumpForwardTrigger = "<NUL>"
 		let g:UltiSnipsJumpBackwardTrigger = "<NUL>"
 
