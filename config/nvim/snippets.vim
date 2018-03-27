@@ -1,5 +1,5 @@
 " Some Notes About Snippets:
-"	There are 3 categories for now:
+"	There are 4 categories for now:
 "	1. Normal mode snippets:
 "	   Snippet begins with comma and ends with Tab keypress.
 "	   Basically the simplest one out there to use, all you need is to
@@ -18,7 +18,21 @@
 "	   This command will be used to replace all template names in the snippet to
 "	   desired one.
 "
-"	Snippet files are located in ~/.vim/snippets/
+"	4. *NEW* snippets with placeholders *NEW*
+"	   I bet you never seen such stupid thing in your life. This snippets
+"	   contain special markers, that can be jumped at. Markers are listed
+"	   below:
+"          a) ${:1: :}    - empty placeholder
+"          b) ${:1:text:} - placeholder containing standard text entry
+"
+"      When jump preformed with <c-j> (usable from any mode, be careful) the
+"      mapping will automatically delete all unnecessary symbols, and will
+"      leave you with placeholder text selected in visual mode. You can press
+"      `c` to modify it, or jump to next placeholder if you satisfied wit
+"      standard placeholder's text. Examples can be found on line 80 or just
+"      search for \<" for,\> pattern
+"
+"	Snippet files are located in ~/.vim/snippets/ and named *.vim
 
 " C Snippets
 
@@ -63,19 +77,12 @@
 		" fori and forj generates a simple for cycle and puts cursor to position where amount is being set
 			autocmd FileType c,cpp iabbr fori for(int i = 0; i <; i++) {}<left><Cr><Esc>ddk0f<a
 			autocmd FileType c,cpp iabbr forj for(int j = 0; j <; j++) {}<left><Cr><Esc>ddk0f<a
+		" for, contain placeholders
+			autocmd FileType c,cpp iabbr for, for(i = 0; i < ${:1:10:}; i++) {}<left><Cr>${:0:// expression:}<Cr><Esc>k==kh^
+			autocmd FileType c iabbr tos, tos("${:1: :}"); ton(${:2: :}); tos("${:3:\n\r:}");${:0: :}<Esc>h^
 
 
 	" Simple main() snip
 		autocmd FileType c,cpp iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>jA
 
-	" emulate jump on theese markers
-	" ${:1:text:}
-	" ${:1: :}
-	" ${:1:text text:}
 
-	inoremap <c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
-	vnoremap <c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
-	nnoremap <c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
-
-	autocmd FileType c,cpp iabbr for, for(i = 0; i < ${:1:10:}; i++) {}<left><Cr>${:0:// expression:}<Esc>kh^
-	autocmd FileType c iabbr tos, tos("${:1: :}"); ton(${:2: :}); tos("${:3:\n\r:}");${:0: :}<Esc>h^

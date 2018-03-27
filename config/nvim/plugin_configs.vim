@@ -87,7 +87,8 @@
 " Deoplete
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
-	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" NOTE: Deoplete is now ruled by Ultisnips, this imap is deprecated
+	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
 	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
@@ -119,9 +120,70 @@
 	autocmd FileType c,cpp nested :TagbarToggle
 
 " Ultisnips
-	let g:UltiSnipsExpandTrigger="<c-k>"
-	let g:UltiSnipsJumpForwardTrigger="<c-b>"
-	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+	" NOTE: The settings below will make Ultisnips and Deoplete play nice
+	" together. Wich means that Deoplete is configured here too. If you'll
+	" modify anything here, you'll may loose ability to use deoplete <Tab>
+	" mapping wich is also done here
 
-	let g:UltiSnipsEditSplit="vertical"
+	" Basic stuff
+		let g:UltiSnipsSnippetDirectories=["~/.dotfiles/vim/UltiSnips/", "UltiSnips"]
+		let g:UltiSnipsEditSplit="vertical"
+
+	" Undefine all expand/jump triggers, because FUNCTIONS
+		let g:UltiSnipsExpandTrigger="<NUL>"
+		let g:UltiSnipsJumpForwardTrigger = "<NUL>"
+		let g:UltiSnipsJumpBackwardTrigger = "<NUL>"
+
+	" Now onto buiseness
+		" If deoplete popup is visible <Cr> will expand or jump. If not it will
+		" just be the same thing if you hit <Cr>. If used while editing an
+		" expanded snippet it will complete the word and jump to next placeholder.
+		" Magic!
+		let g:ulti_expand_or_jump_res = 0
+		function! <SID>ExpandSnippetOrReturn()
+			let snippet = UltiSnips#ExpandSnippetOrJump()
+			if g:ulti_expand_or_jump_res > 0
+				return snippet
+			else
+				return "\<CR>"
+			endif
+		endfunction
+		inoremap <expr><CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+
+		" When deoplete popup visible <Tab> acts like <C-n> wich selects next
+		" completion item from the list. If there is no popup then <Tab> acts as
+		" jump to next snippet placeholder, if we actually editing a snippet. If
+		" no popup and no snippet <Tab> acts like <Tab>
+		function! Neotab()
+			if pumvisible() == 1
+				return "\<C-n>"
+			else
+				let snippet = UltiSnips#ExpandSnippetOrJump()
+				if g:ulti_expand_or_jump_res > 0
+					return snippet
+				else
+					return "\<Tab>"
+				endif
+			endif
+		endfunction
+
+		" The same as previous, but selects previous item and jumps backwards. Or
+		" acts like <S-Tab>
+		function! Neostab()
+			if pumvisible() == 1
+				return "\<C-p>"
+			else
+				let snippet = UltiSnips#JumpBackwards()
+				if g:ulti_expand_or_jump_res > 0
+					return snippet
+				else
+					return "\<S-Tab>"
+				endif
+		endfunction
+
+	" Ultisnips + Deoplete mappings
+		inoremap <silent><Tab>   <C-R>=Neotab()<CR>
+		snoremap <silent><Tab>   <Esc>:call UltiSnips#JumpForwards()<CR>
+		inoremap <silent><S-Tab> <C-R>=Neostab()<CR>
+		snoremap <silent><S-Tab> <Esc>:call UltiSnips#JumpBackwards()<CR>
 

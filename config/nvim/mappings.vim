@@ -35,3 +35,8 @@
 	" visual mode from insert mode
 	inoremap <C-v> <Esc>l<C-v>
 
+" My own snippets "engine"
+	" emulate jump on theese markers
+	inoremap <silent><c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
+	vnoremap <silent><c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
+	nnoremap <silent><c-j> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
