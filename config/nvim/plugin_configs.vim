@@ -130,7 +130,7 @@
 		let g:UltiSnipsEditSplit="vertical"
 
 	" Undefine all expand/jump triggers, because FUNCTIONS
-		let g:UltiSnipsExpandTrigger="<NUL>"
+		let g:UltiSnipsExpandTrigger="<C-J>"
 		let g:UltiSnipsJumpForwardTrigger = "<NUL>"
 		let g:UltiSnipsJumpBackwardTrigger = "<NUL>"
 
