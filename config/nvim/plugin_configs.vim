@@ -87,6 +87,9 @@
 " Deoplete
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
+	call deoplete#custom#source('_',
+				\ 'matchers', ['matcher_full_fuzzy'])
+
 	" NOTE: Deoplete is now ruled by Ultisnips, this imap is deprecated
 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
