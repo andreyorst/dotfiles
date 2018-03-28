@@ -126,7 +126,7 @@
 	" mapping wich is also done here
 
 	" Basic stuff
-		let g:UltiSnipsSnippetDirectories=["~/.dotfiles/vim/bundle/vim-snippets/UltiSnips", "UltiSnips"]
+		let g:UltiSnipsSnippetDirectories=["~/.vim/UltiSnips/", "UltiSnips"]
 		let g:UltiSnipsEditSplit="vertical"
 
 	" For sake of manual expanding
@@ -149,7 +149,7 @@
 				return "\<CR>"
 			endif
 		endfunction
-		inoremap <expr><CR> pumvisible() || UltiSnips#SnippetsInCurrentScope() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+		inoremap <expr><CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 		" When deoplete popup visible <Tab> acts like <C-n> wich selects next
 		" completion item from the list. If there is no popup then <Tab> acts as
