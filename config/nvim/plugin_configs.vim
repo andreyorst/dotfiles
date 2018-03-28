@@ -149,7 +149,7 @@
 				return "\<CR>"
 			endif
 		endfunction
-		inoremap <expr><CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 		" When deoplete popup visible <Tab> acts like <C-n> wich selects next
 		" completion item from the list. If there is no popup then <Tab> acts as

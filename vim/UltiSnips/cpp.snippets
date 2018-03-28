@@ -1,0 +1,32 @@
+snippet cl "class .. (class)"
+class ${1:`!p snip.rv = snip.basename or "name"`} {
+	public:
+		${1/(\w+).*/$1/}($2);
+		virtual ~${1/(\w+).*/$1/}();
+
+	private:
+		$3
+};$0
+endsnippet
+
+snippet ns "namespace .. (namespace)"
+namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
+	${VISUAL}$0
+}${1/.+/ \/* /m}$1${1/.+/ *\/ /m}
+endsnippet
+
+snippet cla "An entire .h generator" b
+#ifndef ${2:`!v substitute(vim_snippets#Filename('$1_H','ClassName'),'.*','\U&\E','')`}
+#define $2
+
+class ${1:`!v substitute(substitute(vim_snippets#Filename('$1','ClassName'),'^.','\u&',''), '_\(\w\)', '\u\1', 'g')`} {
+	public:
+		$1();
+		virtual ~$1();
+
+	private:
+		$3
+};
+
+#endif /* $2 */
+endsnippet
