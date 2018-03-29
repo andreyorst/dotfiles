@@ -87,6 +87,7 @@
 " Deoplete
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#enable_camel_case = 1
 	call deoplete#custom#source('_',
 				\ 'matchers', ['matcher_full_fuzzy'])
 
@@ -144,15 +145,15 @@
 		" expanded snippet it will complete the word and jump to next placeholder.
 		" Magic!
 		let g:ulti_expand_or_jump_res = 0
-		function! <SID>ExpandSnippetOrReturn()
+		function! <SID>ExpandOrClosePopup()
 			let snippet = UltiSnips#ExpandSnippetOrJump()
 			if g:ulti_expand_or_jump_res > 0
 				return snippet
 			else
-				return "\<CR>"
+				let close_popup = deoplete#close_popup()
+				return close_popup
 			endif
 		endfunction
-		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 		" When deoplete popup visible <Tab> acts like <C-n> wich selects next
 		" completion item from the list. If there is no popup then <Tab> acts as
@@ -186,6 +187,7 @@
 		endfunction
 
 	" Ultisnips + Deoplete mappings
+	inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
 		inoremap <silent><Tab>   <C-R>=Neotab()<CR>
 		snoremap <silent><Tab>   <Esc>:call UltiSnips#JumpForwards()<CR>
 		inoremap <silent><S-Tab> <C-R>=Neostab()<CR>
