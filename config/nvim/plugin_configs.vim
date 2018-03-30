@@ -88,11 +88,8 @@
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_camel_case = 1
-	call deoplete#custom#source('_',
-				\ 'matchers', ['matcher_full_fuzzy'])
 
-	" NOTE: Deoplete is now ruled by Ultisnips, this imap is deprecated
-	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	"inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
 	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
@@ -140,10 +137,10 @@
 		let g:UltiSnipsJumpBackwardTrigger = "<NUL>"
 
 	" Now onto buiseness
-		" If deoplete popup is visible <Cr> will expand or jump. If not it will
-		" just be the same thing if you hit <Cr>. If used while editing an
-		" expanded snippet it will complete the word and jump to next placeholder.
-		" Magic!
+	" If deoplete popup is visible <Cr> will expand or jump. If not it will
+	" close deoplete popup and leave everything as is. If used while editing an
+	" expanded snippet it will complete the word and jump to next placeholder.
+	" Magic!
 		let g:ulti_expand_or_jump_res = 0
 		function! <SID>ExpandOrClosePopup()
 			let snippet = UltiSnips#ExpandSnippetOrJump()
@@ -155,10 +152,10 @@
 			endif
 		endfunction
 
-		" When deoplete popup visible <Tab> acts like <C-n> wich selects next
-		" completion item from the list. If there is no popup then <Tab> acts as
-		" jump to next snippet placeholder, if we actually editing a snippet. If
-		" no popup and no snippet <Tab> acts like <Tab>
+	" When deoplete popup visible <Tab> acts like <C-n> wich selects next
+	" completion item from the list. If there is no popup then <Tab> acts as
+	" jump to next snippet placeholder, if we actually editing a snippet. If
+	" no popup and no snippet <Tab> acts like <Tab>
 		function! Neotab()
 			if pumvisible() == 1
 				return "\<C-n>"
@@ -172,8 +169,8 @@
 			endif
 		endfunction
 
-		" The same as previous, but selects previous item and jumps backwards. Or
-		" acts like <S-Tab>
+	" The same as previous, but selects previous item and jumps backwards. Or
+	" acts like <S-Tab>
 		function! Neostab()
 			if pumvisible() == 1
 				return "\<C-p>"
@@ -187,9 +184,9 @@
 		endfunction
 
 	" Ultisnips + Deoplete mappings
-	inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
-		inoremap <silent><Tab>   <C-R>=Neotab()<CR>
-		snoremap <silent><Tab>   <Esc>:call UltiSnips#JumpForwards()<CR>
-		inoremap <silent><S-Tab> <C-R>=Neostab()<CR>
-		snoremap <silent><S-Tab> <Esc>:call UltiSnips#JumpBackwards()<CR>
+		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+		inoremap <silent><Tab>      <C-R>=Neotab()<CR>
+		snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
+		inoremap <silent><S-Tab>    <C-R>=Neostab()<CR>
+		snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
 
