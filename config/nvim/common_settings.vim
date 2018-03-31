@@ -2,7 +2,7 @@
 	set encoding=utf-8
 	set mouse=a
 	set number
-	set cursorline
+	" set cursorline
 	set relativenumber
 	syntax on
 	set path+=**
@@ -39,14 +39,6 @@
 	set smartindent
 
 " Highlights
-	highlight EndOfBuffer guifg=#1D1F21
-	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
-	highlight LineNr guifg=#6c6d6c
-	highlight NonText guifg=#4d4d4d
-	highlight Search guifg=#282a2e
-	highlight IncSearch guifg=#282a2e
-	highlight Ignore guifg=#969896
-
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
 				 \ syntax match Type "\v<\w+_t>"                            |
@@ -56,4 +48,15 @@
 				 \ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"     |
 				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"           |
 				 \ syntax match Function "\v(-\>|\.)@<=(\s+)?\w+(\(.*\))@=" |
+				 \ syntax match EndOfBuffer "\v\$\{?[0-9]+:"                    |
+				 \ syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"
+
+	" Common highlights
+		highlight EndOfBuffer guifg=#1D1F21
+		highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
+		highlight LineNr guifg=#6c6d6c
+		highlight NonText guifg=#4d4d4d
+		highlight Search guifg=#282a2e
+		highlight IncSearch guifg=#282a2e
+		highlight Ignore guifg=#969896
 

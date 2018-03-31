@@ -22,8 +22,8 @@
 "	   I bet you never seen such stupid thing in your life. This snippets
 "	   contain special markers, that can be jumped at. Markers are listed
 "	   below:
-"          a) ${:1: :}    - empty placeholder
-"          b) ${:1:text:} - placeholder containing standard text entry
+"          a) ${1: }    - empty placeholder
+"          b) ${1:text} - placeholder containing standard text entry
 "
 "      When jump preformed with <c-j> (usable from any mode, be careful) the
 "      mapping will automatically delete all unnecessary symbols, and will
@@ -45,7 +45,7 @@
 	" in the class, and promt you a :%s///g command where you can type a class name
 	" so it could be set automatically. Cursor is positioned automatically in
 	" repace command.
-		autocmd FileType cpp,h,hpp iabbr class/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>2j<S-v>j=/_Class_Name_<CR>:noh<CR>:%s//g<left><left>
+		autocmd FileType cpp,h,hpp iabbr class/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>msf{v%=`s<c-h>
 
 	" Simple empty class and struct snippets
 		autocmd FileType cpp,h,hpp iabbr class, class {};<Left><Left><Cr>  <Esc>ddk0f{<left>i
@@ -71,15 +71,13 @@
 		autocmd FileType cpp,h,hpp nnoremap <F3> <Esc>0:set nohlsearch<CR>/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/getSet.cpp<CR>0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>>>j0>>/)<CR>bPnbb~hiestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p^:set hlsearch<CR>:noh<CR>
 
 	" Bunch of for(;;) {} snippets.
-		" for/ acts like a class snippet and lets you to define iterator name
-			autocmd FileType c,cpp,h,hpp iabbr for/ for(_Iterator_ = 0; _Iterator_ <; _Iterator_++) {}<Esc>/_Iterator_<CR>:noh<CR>:%s//g<left><left>
 		" fori and forj generates a simple for cycle and puts cursor to position where amount is being set
 			autocmd FileType c,cpp iabbr fori for(int i = 0; i <; i++) {}<left><Cr><Esc>ddk0f<a
 			autocmd FileType c,cpp iabbr forj for(int j = 0; j <; j++) {}<left><Cr><Esc>ddk0f<a
 		" for, contain placeholders
-			autocmd FileType c,cpp iabbr for, for(i = 0; i < ${:1:10:}; i++) {}<left><Cr>${:0:// expression:}<Cr><Esc>k==kh^
-			autocmd FileType c iabbr tos, tos("${:1: :}"); ton(${:2: :}); tos("${:3:\n\r:}");${:0: :}<Esc>h^
-
+			autocmd FileType c iabbr tos, tos("${1: }"); ton(${2: }); tos("${3:\n\r}");${0: }<Esc>^
+		" for/ acts like a class snippet and lets you to define iterator name
+			autocmd FileType c,cpp iabbr for/ <Esc>:-1read ~/.vim/snippets/for.c<Cr>V2j=2k<c-h>
 
 	" Simple main() snip
 		autocmd FileType c,cpp iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>jA

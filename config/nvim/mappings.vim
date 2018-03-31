@@ -3,7 +3,8 @@
 		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
 	" Rename 'symbol'
-		nnoremap <F2> :noh<Cr> :%s/\<<C-r><C-w>\>//g<left><left>
+		nnoremap <F2> <Esc>:noh<Cr>:%s/\<<C-r><C-w>\>//g<left><left>
+		inoremap <F2> <Esc>:noh<Cr>:%s/\<<C-r><C-w>\>//g<left><left>
 
 	" Open file under cursor
 		nnoremap gf <C-w>gf
@@ -35,8 +36,12 @@
 	" visual mode from insert mode
 	inoremap <C-v> <Esc>l<C-v>
 
+
 " My own snippets "engine"
 	" emulate jump on theese markers
-	inoremap <silent><c-h> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
-	vnoremap <silent><c-h> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
-	nnoremap <silent><c-h> <Esc>:set nohlsearch<Cr>/\v\$\{:[0-9]+:<Cr>:noh<Cr>vf:f:hxmsx/:}<Cr>:set hlsearch<Cr>:noh<Cr>i<Del><Del><Esc>v`s
+		inoremap <silent><c-j> <Esc>:set nohlsearch<Cr>/\v\$\{[0-9]+:.*\}<Cr>msdf:f}:set hlsearch<Cr>:noh<Cr>i<Del><Esc>me`sv`e<c-g>
+		nnoremap <silent><c-j> <Esc>:set nohlsearch<Cr>/\v\$\{[0-9]+:.*\}<Cr>msdf:f}:set hlsearch<Cr>:noh<Cr>i<Del><Esc>me`sv`e<c-g>
+		snoremap <silent><c-j> <Esc>:set nohlsearch<Cr>/\v\$\{[0-9]+:.*\}<Cr>msdf:f}:set hlsearch<Cr>:noh<Cr>i<Del><Esc>me`sv`e<c-g>
+		inoremap <silent><c-h> <Esc>:set nohlsearch<Cr>/\v\$\{[0-9]+:.*\}<Cr>msdf:f}:set hlsearch<Cr>:noh<Cr>i<Del><Esc>:noh<Cr>:%s/\<<C-r><C-w>\>/g<left><left>
+		nnoremap <silent><c-h> <Esc>:set nohlsearch<Cr>/\v\$\{[0-9]+:.*\}<Cr>msdf:f}:set hlsearch<Cr>:noh<Cr>i<Del><Esc>:noh<Cr>:%s/\<<C-r><C-w>\>/g<left><left>
+		snoremap <silent><c-h> <Esc>:set nohlsearch<Cr>/\v\$\{[0-9]+:.*\}<Cr>msdf:f}:set hlsearch<Cr>:noh<Cr>i<Del><Esc>:noh<Cr>:%s/\<<C-r><C-w>\>/g<left><left>
