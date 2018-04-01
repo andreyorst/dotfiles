@@ -30,3 +30,7 @@ class ${1:`!v substitute(substitute(vim_snippets#Filename('$1','ClassName'),'^.'
 
 #endif /* $2 */
 endsnippet
+
+snippet vector "std::vector (v)"
+${3:std::}vector<${1:char}> ${2:v};$0
+endsnippet
