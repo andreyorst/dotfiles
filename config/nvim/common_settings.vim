@@ -17,8 +17,7 @@
 	set foldcolumn=0
 
 " Folds
-	"set foldmethod=indent
-	set foldmethod=syntax
+	set foldmethod=indent
 	set foldlevelstart=20    " Disables automatic closing of all folds on fileopen
 	hi Folded ctermfg=black
 	hi Folded ctermbg=white
@@ -48,8 +47,8 @@
 				 \ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"     |
 				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"           |
 				 \ syntax match Function "\v(-\>|\.)@<=(\s+)?\w+(\(.*\))@=" |
-				 \ syntax match EndOfBuffer "\v\$\{?[0-9]+:"                    |
-				 \ syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"
+				 \ syntax match EndOfBuffer "\v\$\{?[0-9]+:"                |
+				 \ syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"        |
 
 	" Common highlights
 		highlight EndOfBuffer guifg=#1D1F21
