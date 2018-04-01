@@ -24,7 +24,6 @@ source $ZSH/oh-my-zsh.sh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 alias vimdiff="nvim -d"
-alias gentags="ctags -R $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //") $(pwd)/include $(pwd)/testpacks/SPW_TESTS/spw_lib_src $(pwd)/testpacks/CAN/can_lib_src"
 alias zshconf="nvim ~/.zshrc"
 alias vimconf="nvim ~/.config/nvim/init.vim"
 alias neofetch="clear && echo && neofetch --ascii_distro mac --disable DE WM Theme Icons Shell GPU Resolution  --color_blocks --underline_char '─' --cpu_cores --os_arch"
