@@ -70,7 +70,13 @@
 	let g:ctrlp_clear_cache_on_exit = 1
 	if executable('ag')
 		set grepprg=ag\ --nogroup\ --nocolor
-		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+		let g:ctrlp_user_command = 'ag %s -l --nocolor --nogroup --hidden
+					\ --ignore .svn
+					\ --ignore .git
+					\ --ignore .hg
+					\ --ignore .DS_Store
+					\ --ignore "**/rtlrun*"
+					\ -g ""'
 	endif
 
 	set wildignore+=*/.git/*,*/.svn/*,*/rtlrun*/*
@@ -87,7 +93,6 @@
 " Deoplete
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
-	let g:deoplete#enable_camel_case = 1
 
 	"inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
@@ -127,11 +132,11 @@
 	" mapping wich is also done here
 
 	" Basic stuff
-		let g:UltiSnipsSnippetDirectories=["~/.vim/UltiSnips/", "UltiSnips"]
+		let g:UltiSnipsSnippetDirectories=["/home/aorst/.vim/UltiSnips/", "UltiSnips"]
 		let g:UltiSnipsEditSplit="vertical"
 
 	" For sake of manual expanding
-		let g:UltiSnipsExpandTrigger="<C-J>"
+		let g:UltiSnipsExpandTrigger="<c-k>"
 	" Undefine all jump triggers, because FUNCTIONS
 		let g:UltiSnipsJumpForwardTrigger = "<NUL>"
 		let g:UltiSnipsJumpBackwardTrigger = "<NUL>"
