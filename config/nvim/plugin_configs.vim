@@ -70,20 +70,8 @@
 	let g:ctrlp_clear_cache_on_exit = 1
 	if executable('ag')
 		set grepprg=ag\ --nogroup\ --nocolor
-		let g:ctrlp_user_command = 'ag %s -l --nocolor --nogroup --hidden
-					\ --ignore .svn
-					\ --ignore .git
-					\ --ignore .hg
-					\ --ignore .DS_Store
-					\ --ignore "**/rtlrun*"
-					\ -g ""'
+		let g:ctrlp_user_command = 'ag %s -l --nocolor --nogroup --hidden -g ""'
 	endif
-
-	set wildignore+=*/.git/*,*/.svn/*,*/rtlrun*/*
-	let g:ctrlp_custom_ignore = {
-				\ 'dir':  '\v(\.git|\.svn|rtlrun.*)$',
-				\ 'file': '\v\.(exe|so|dll|o|swp|tar.*)$',
-				\ }
 
 " DelimitMate
 	let delimitMate_expand_cr = 1
