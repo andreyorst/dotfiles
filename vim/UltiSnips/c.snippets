@@ -27,11 +27,27 @@ endsnippet
 snippet tstr "typedef struct Name { ... } Name;"
 typedef struct ${1:Name} {
 	$2
-} $1;
+} $1;$0
 endsnippet
 
 snippet while "while loop (while)"
 while (${1:true}) {
 	$2
 }$0
+endsnippet
+
+snippet else "else"
+else {
+	$1
+}$0
+endsnippet
+
+snippet #include "#include <header>"
+#include <$1>
+$0
+endsnippet
+
+snippet #include0 "#include ''header''"
+#include "$1"
+$0
 endsnippet
