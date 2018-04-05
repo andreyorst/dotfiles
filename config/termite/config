@@ -52,31 +52,58 @@ cursor_foreground = #1d1f21
 #background = rgba(63, 63, 63, 0.8)
 
 # If unset, will reverse foreground and background
-highlight = #2f2f2f
+#highlight = #2f2f2f
+highlight = #504945
 
 # Colors from color0 to color254 can be set
-color0 = #1D1F21
-color1 = #CC6666
-color2 = #B5BD68
-color3 = #F0C674
-color4 = #81A2BE
-color5 = #B294BB
-color6 = #8ABEB7
-color7 = #C5C8C6
-color8 = #969896
-color9 = #CC6666
-color10 = #B5BD68
-color11 = #F0C674
-color12 = #81A2BE
-color13 = #B294BB
-color14 = #8ABEB7
-color15 = #FFFFFF
-color16 = #DE935F
-color17 = #A3685A
-color18 = #282A2E
-color19 = #373B41
-color20 = #B4B7B4
-color21 = #E0E0E0
+
+# base16 gruvbox dark soft
+color0 = #32302F
+color1 = #FB4934
+color2 = #B8BB26
+color3 = #FABD2F
+color4 = #83A598
+color5 = #D3869B
+color6 = #8EC07C
+color7 = #D5C4A1
+color8 = #665C54
+color9 = #FB4934
+color10 = #B8BB26
+color11 = #FABD2F
+color12 = #83A598
+color13 = #D3869B
+color14 = #8EC07C
+color15 = #FBF1C7
+color16 = #FE8019
+color17 = #D65D0E
+color18 = #3C3836
+color19 = #504945
+color20 = #BDAE93
+color21 = #EBDBB2
+
+#base16 tomorrow night
+#color0 = #1D1F21
+#color1 = #CC6666
+#color2 = #B5BD68
+#color3 = #F0C674
+#color4 = #81A2BE
+#color5 = #B294BB
+#color6 = #8ABEB7
+#color7 = #C5C8C6
+#color8 = #969896
+#color9 = #CC6666
+#color10 = #B5BD68
+#color11 = #F0C674
+#color12 = #81A2BE
+#color13 = #B294BB
+#color14 = #8ABEB7
+#color15 = #FFFFFF
+#color16 = #DE935F
+#color17 = #A3685A
+#color18 = #282A2E
+#color19 = #373B41
+#color20 = #B4B7B4
+#color21 = #E0E0E0
 
 [hints]
 #font = Monospace 12
