@@ -19,7 +19,6 @@
 	let g:airline#extensions#ale#enabled = 1
 	let g:ale_lint_delay = 350
 
-	highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
 	let g:ale_sign_error = '⬥ '
 	let g:ale_sign_warning = '⬥ '
 
@@ -120,7 +119,8 @@
 	" mapping wich is also done here
 
 	" Basic stuff
-		let g:UltiSnipsSnippetDirectories=["/home/aorst/.vim/UltiSnips/", "UltiSnips"]
+		" let g:UltiSnipsSnippetDirectories=["/home/aorst/.vim/UltiSnips/", "UltiSnips"]
+		let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips/']
 		let g:UltiSnipsEditSplit="vertical"
 
 	" For sake of manual expanding
