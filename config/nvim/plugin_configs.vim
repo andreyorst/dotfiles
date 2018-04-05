@@ -52,7 +52,7 @@
 						\ -I $(pwd)/testpacks/CAN/can_lib_src
 						\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
 						\')
-		elseif filereadable("./main.c")
+		elseif filereadable("./startf.S")
 			let g:includepath = system('echo -n
 						\ -I $(pwd)/include
 						\ -I $(pwd)/include/cp2
