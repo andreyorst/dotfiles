@@ -2,13 +2,14 @@
 	set encoding=utf-8
 	set mouse=a
 	set number
-	" set cursorline
+	set cursorline
 	set relativenumber
 	syntax on
 	set path+=**
 	set wildmenu
 	set termguicolors
-	colorscheme base16-tomorrow-night
+	" colorscheme base16-tomorrow-night
+	colorscheme base16-gruvbox-dark-soft
 	set updatetime=350
 	set signcolumn=yes
 	set wrap
@@ -51,10 +52,12 @@
 				 \ syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"        |
 
 	" Common highlights
-		highlight EndOfBuffer guifg=#1D1F21
-		highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
-		highlight LineNr guifg=#6c6d6c
-		highlight NonText guifg=#4d4d4d
+		" highlight EndOfBuffer guifg=#1D1F21
+		highlight EndOfBuffer guifg=#32302f
+		"highlight ALEErrorSign guibg=#282a2e guifg=#cc6666
+		highlight ALEErrorSign guibg=#3c3836 guifg=#fb4934
+		"highlight LineNr guifg=#6c6d6c
+		"highlight NonText guifg=#4d4d4d
 		highlight Search guifg=#282a2e
 		highlight IncSearch guifg=#282a2e
 		highlight Ignore guifg=#969896
