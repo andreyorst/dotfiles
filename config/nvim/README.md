@@ -93,7 +93,37 @@ Placeholders will remain in text if you forget to jump on it. You can check if t
 Other configurations may be found in config files itself. They are provided with comments, so it won't be big problem for you, if you will desire to try my setup, to figure out what is going on here and there.
 
 Some plugins have huge comments like this one:
-https://github.com/andreyorst/dotfiles/blob/65eb0dbd5e67e1aeb95eead7b463453eeb65aca4/config/nvim/plugin_configs.vim#L37-L65
+```vim
+" NOTE: This piece of code is used to generate clang options for ALE,
+" because we aren't using any build system. You may delete this, or
+" rewrite to your project needs. Basically you can refer to a specific
+" file in your project root, and automatically pass desired options to
+" ALE, and later to Clang. But the main reason I wrote it because, we
+" have special config file, that contains current includepath, for our
+" own build system, so I need to pass it to ALE somehow and detect if
+" it was changed. You can go further and have a separate if() for each
+" project, I have two for now. I understand that this is not the most
+" beautiful way of doing this, but, still, it works fine, and I'm kinda
+" happy with this variant for now.
+if filereadable("./testkit.settings")
+	let g:includepath = system('echo -n
+				\ -I $(pwd)/include
+				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src
+				\ -I $(pwd)/testpacks/CAN/can_lib_src
+				\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
+				\')
+elseif filereadable("./startf.S")
+	let g:includepath = system('echo -n
+				\ -I $(pwd)/include
+				\ -I $(pwd)/include/cp2
+				\ -I $(pwd)/include/hdrtest
+				\ -I $(pwd)../../include
+				\')
+endif
+
+let g:ale_c_clang_options.= g:includepath
+let g:ale_c_gcc_options.= g:includepath
+```
 You should pay attention to colored marks in comment sections, like `WARNING:`, `NOTE:` etc.
 
 If you encounter any problem with my setup, feel free to open issue, we'll se what we can do here.
