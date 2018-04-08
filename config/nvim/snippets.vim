@@ -1,38 +1,37 @@
 " Some Notes About Snippets:
-"	There are 4 categories for now:
-"	1. Normal mode snippets:
-"	   Snippet begins with comma and ends with Tab keypress.
-"	   Basically the simplest one out there to use, all you need is to
-"	   type ,snippetName and hit Tab to expand it. Cursor will be placed
-"	   accordingly to snippet context, and mode will be changed to insert
+"   There are 4 categories for now:
+"   1. Normal mode snippets:
+"      Snippet begins with comma and ends with Tab keypress.
+"      Basically the simplest one out there to use, all you need is to
+"      type ,snippetName and hit Tab to expand it. Cursor will be placed
+"      accordingly to snippet context, and mode will be changed to insert
 "
-"	2. Insert mode snippets:
-"	   Snippets that are just abbreviations, yet a snippet with some cursor
-"	   positioning.
+"   2. Insert mode snippets:
+"      Snippets that are just abbreviations, yet a snippet with some cursor
+"      positioning.
 "
-"	3. Insert mode interactive snippets:
-"	   These snippets are abbreviations too, but they end with a '/' symbol.
-"	   The complicated part to understand is that these snippets must be ended
-"	   with double press of '/' button: first press is part of abbreviation and
-"	   the second one is part of ':%s///g' command that is executed at the end.
-"	   This command will be used to replace all template names in the snippet to
-"	   desired one.
+"   3. Insert mode interactive snippets:
+"      These snippets are abbreviations too, but they end with a `/` symbol.
+"      The complicated part to understand is that these snippets must be ended
+"      with double press of `/` button: first press is part of abbreviation and
+"      the second one is part of `:%s///g` command that is executed at the end.
+"      This command will be used to replace all template names in the snippet to
+"      desired one.
 "
-"	4. *NEW* snippets with placeholders *NEW*
-"	   I bet you never seen such stupid thing in your life. This snippets
-"	   contain special markers, that can be jumped at. Markers are listed
-"	   below:
+"   4. Snippets with placeholders:
+"      I bet you never seen such stupid thing in your life. This snippets
+"      contain special markers, that can be jumped at. Markers are listed
+"      below:
 "          a) ${1: }    - empty placeholder
 "          b) ${1:text} - placeholder containing standard text entry
 "
 "      When jump preformed with <c-j> (usable from any mode, be careful) the
 "      mapping will automatically delete all unnecessary symbols, and will
-"      leave you with placeholder text selected in visual mode. You can press
-"      `c` to modify it, or jump to next placeholder if you satisfied wit
-"      standard placeholder's text. Examples can be found on line 80 or just
-"      search for \<" for,\> pattern
+"      leave you with placeholder text selected in visual mode. You can modify
+"      it, or jump to next placeholder if you satisfied with standard placeholder's
+"      text. Examples can be found on line 78 or just search for \<" for,\> pattern
 "
-"	Snippet files are located in ~/.vim/snippets/ and named *.vim
+"   Snippet files are located in ~/.vim/snippets/ and named *.vim
 
 " C Snippets
 

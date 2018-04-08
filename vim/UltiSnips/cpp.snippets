@@ -1,3 +1,5 @@
+extends c
+
 snippet cl "class .. (class)"
 class ${1:`!p snip.rv = snip.basename or "name"`} {
 	public:
@@ -33,4 +35,26 @@ endsnippet
 
 snippet vector "std::vector (v)"
 ${3:std::}vector<${1:char}> ${2:v};$0
+endsnippet
+
+snippet uns "using namespace std"
+using namespace ${1:std};
+$0
+endsnippet
+
+snippet class "class"
+class ${1:Name} {
+	public:
+		$1();
+		virtual ~$1();
+
+	private:
+		${0:/* data */}
+};
+endsnippet
+
+snippet namespace "namespace"
+namespace ${1:Name} {
+	$0
+}
 endsnippet
