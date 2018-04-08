@@ -88,7 +88,7 @@ I bet you never seen such stupid thing in your life. This snippets contain speci
 
 ![main_for](https://user-images.githubusercontent.com/19470159/38161066-c1d26f6c-34d0-11e8-8dcc-52c8aa5fd9d3.gif)
 
-Placeholders will remain in text if you forget to jump on it. You can check if there any by pressing jump trigger again, but I agree that this is not best practice. There are plenty of snippet engines, like Ultisnips, snipMate, neosnippet and others may exist, but I've found it funny to create this on pute vim functional. It's not even a plugin, but just a sequence of keystrokes, mapped to abbreviation. It has some limitations, but can be used when snippet manager isn't avalible.
+Placeholders will remain in text if you forget to jump on it. You can check if there any by pressing jump trigger again, but I agree that this is not best practice. There are plenty of snippet engines, like Ultisnips, snipMate, neosnippet and others may exist, but I've found it funny to create this on pure vim functional. It's not even a plugin, but just a sequence of keystrokes, mapped to abbreviations. It has some limitations, but can be used when snippet manager isn't avalible.
 
 Other configurations may be found in config files itself. They are provided with comments, so it won't be big problem for you, if you will desire to try my setup, to figure out what is going on here and there.
 
