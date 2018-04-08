@@ -6,14 +6,35 @@ Fancy screenshot for you:
 
 ### Plugins and stuff
 
-  - Linting C/C++ code via [ALE](https://github.com/w0rp/ale)
-  - Autocompleting C/C++ via [deoplete.nvim](https://github.com/Shougo/deoplete.nvim) + [deoplete-clang](https://github.com/zchee/deoplete-clang)
-  - Linting and autocompleting Rust via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) + [deoplete.nvim](https://github.com/Shougo/deoplete.nvim)
-  - Generating ctags on the fly via [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current file tags with [tagbar](https://github.com/majutsushi/tagbar)
-  - Snippets privided by [UltiSnips](https://github.com/sirver/UltiSnips), [vim-snippets](https://github.com/honza/vim-snippets) and my own ninja viml technique
-  - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree)
-  - automatically inserting delimiters with [delimitMate](https://github.com/Raimondi/delimitMate)
+#### Plugins
+  - Linting C/C++ code via [ALE](https://github.com/w0rp/ale).
+  - Autocompleting C/C++ via [deoplete.nvim](https://github.com/Shougo/deoplete.nvim) + [deoplete-clang](https://github.com/zchee/deoplete-clang).
+  - Linting and autocompleting Rust via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) + [deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
+  - Generating ctags on the fly via [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current file tags with [tagbar](https://github.com/majutsushi/tagbar).
+  - Snippets privided by [UltiSnips](https://github.com/sirver/UltiSnips), [vim-snippets](https://github.com/honza/vim-snippets) and my own ninja viml technique.
+  - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree).
+  - Automatically inserting delimiters with [delimitMate](https://github.com/Raimondi/delimitMate).
+  - Fuzzy finding any file, mru, tag via [ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim)
 
+#### Some C/C++ cool stuff
+  - Special regular expressions, to highlight language facilities like
+  ```cpp
+  typedef struct container {
+  	int item1;
+  	int item2;
+  } container_t;
+  
+  container_t c;
+  container_t* pc;
+  
+  c.item1;
+  pc->item2;
+  ```
+  will look like so:
+  
+  ![image](https://user-images.githubusercontent.com/19470159/38468381-8797eeca-3b4d-11e8-9536-e82d79df3a75.png)
+  - Some color fixes, so no end of buffer `~`s and less distracting signcolumn, and some nontext color fixes.
+  
 ### Mappings and functions
 
 #### Mappings:
