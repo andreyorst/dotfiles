@@ -90,8 +90,8 @@ containing standard text entry. When jump preformed with
 <c-j> (usable from any mode, be careful) the mapping will automatically
 delete all unnecessary symbols, and will leave you with placeholder text
 selected in select mode. You can modify it, or jump to next placeholder
-if you satisfied wit standard placeholder's text. Examples can be found
-on line 80 or just search for `\<" for,\>` pattern
+if you satisfied with standard placeholder's text. Examples can be found
+[here](https://github.com/andreyorst/dotfiles/blob/fde47c4417bd057707c2f34fbdbd366925acaf15/config/nvim/snippets.vim#L80)
 
 ### Here are some gifs:
 
