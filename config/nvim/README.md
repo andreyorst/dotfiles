@@ -82,7 +82,7 @@ the second one is part of `:%s///g` command that is executed at the end.
 This command will be used to replace all template names in the snippet to
 desired one.
                                                                              
-4. **NEW** snippets with placeholders *NEW*
+4. Snippets with placeholders:
 I bet you never seen such stupid thing in your life. This snippets
 contain special markers, that can be jumped at. Markers are listed
 below: `${1: }` - empty placeholder and `${1:text}` - placeholder
