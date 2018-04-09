@@ -10,9 +10,9 @@
 		nnoremap gf <C-w>gf
 
 	" Toggle terminal on/off (neovim)
-		nnoremap <A-t> :call Term_toggle(12)<CR>
-		inoremap <A-t> <Esc>:call Term_toggle(12)<CR>
-		tnoremap <A-t> <C-\><C-n>:call Term_toggle(12)<CR>
+		nnoremap <A-t> :call TermToggle(12)<CR>
+		inoremap <A-t> <Esc>:call TermToggle(12)<CR>
+		tnoremap <A-t> <C-\><C-n>:call TermToggle(12)<CR>
 
 	" Terminal go back to normal mode
 		tnoremap <Esc> <C-\><C-n>

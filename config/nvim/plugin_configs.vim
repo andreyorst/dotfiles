@@ -90,7 +90,7 @@
 	" NOTE: This piece of code reuses previous code that generates clang
 	" options and exports it to file at project root. Again, you may delete
 	" it, or rewrite to your project needs.
-	if filereadable("./testkit.settings") || filereadable("./main.c")
+	if filereadable("./testkit.settings") || filereadable("startf.S")
 		redir! > ./.clang
 		silent! echon 'flags = ' g:includepath
 		redir END
@@ -119,7 +119,6 @@
 	" mapping wich is also done here
 
 	" Basic stuff
-		" let g:UltiSnipsSnippetDirectories=["/home/aorst/.vim/UltiSnips/", "UltiSnips"]
 		let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips/']
 		let g:UltiSnipsEditSplit="vertical"
 
@@ -149,7 +148,7 @@
 	" completion item from the list. If there is no popup then <Tab> acts as
 	" jump to next snippet placeholder, if we actually editing a snippet. If
 	" no popup and no snippet <Tab> acts like <Tab>
-		function! Neotab()
+		function! SmartTab()
 			if pumvisible() == 1
 				return "\<C-n>"
 			else
@@ -164,7 +163,7 @@
 
 	" The same as previous, but selects previous item and jumps backwards. Or
 	" acts like <S-Tab>
-		function! Neostab()
+		function! SmartSTab()
 			if pumvisible() == 1
 				return "\<C-p>"
 			else
@@ -178,8 +177,8 @@
 
 	" Ultisnips + Deoplete mappings
 		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
-		inoremap <silent><Tab>      <C-R>=Neotab()<CR>
+		inoremap <silent><Tab>      <C-R>=SmartTab()<CR>
 		snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
-		inoremap <silent><S-Tab>    <C-R>=Neostab()<CR>
+		inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
 		snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
 
