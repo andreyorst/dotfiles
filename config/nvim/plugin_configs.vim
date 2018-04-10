@@ -78,23 +78,23 @@
 	let delimitMate_nesting_quotes = ['`']
 
 " Deoplete
-	" set completeopt-=preview
-	" let g:deoplete#enable_at_startup = 1
+	set completeopt-=preview
+	let g:deoplete#enable_at_startup = 1
 
 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
-	" let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
-	" let g:deoplete#sources#clang#clang_header='/lib/clang/'
+	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
+	let g:deoplete#sources#clang#clang_header='/lib/clang/'
 
 	" NOTE: This piece of code reuses previous code that generates clang
 	" options and exports it to file at project root. Again, you may delete
 	" it, or rewrite to your project needs.
-	" if filereadable("./testkit.settings") || filereadable("startf.S")
-	" 	redir! > ./.clang
-	" 	silent! echon 'flags = ' g:includepath
-	" 	redir END
-	" endif
+	if filereadable("./testkit.settings") || filereadable("startf.S")
+		redir! > ./.clang
+		silent! echon 'flags = ' g:includepath
+		redir END
+	endif
 
 " LanguageClient-neovim
 	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
@@ -139,8 +139,7 @@
 			if g:ulti_expand_or_jump_res > 0
 				return snippet
 			else
-				" let close_popup = deoplete#close_popup()
-				close_popup = "\<Cr>"
+				let close_popup = deoplete#close_popup()
 				return close_popup
 			endif
 		endfunction
@@ -182,20 +181,4 @@
 		snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
 		inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
 		snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
-" NCM
-	let g:cm_sources_override = {
-				\ 'cm-tags': {'enable':0},
-				\ 'cm-bufkeyword': {'enable':0},
-				\ 'cm-filepath': {'enable':0},
-				\ 'cm-tmux': {'enable':0}
-				\ }
-	set shortmess+=c
-	let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher'}
-	let g:cm_refresh_length = 2
 
-" NCM Clang
-	if filereadable("./testkit.settings") || filereadable("startf.S")
-		redir! > ./.clang_complete
-		silent! echon g:includepath
-		redir END
-	endif
