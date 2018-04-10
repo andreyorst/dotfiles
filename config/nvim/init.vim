@@ -18,7 +18,8 @@ filetype off
 		Plugin 'majutsushi/tagbar'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
-		Plugin 'Shougo/deoplete.nvim'
+		"Plugin 'Shougo/deoplete.nvim'
+		Plugin 'roxma/nvim-completion-manager'
 		Plugin 'sirver/UltiSnips'
 		Plugin 'honza/vim-snippets'
 		Plugin 'w0rp/ale'
@@ -28,7 +29,8 @@ filetype off
 
 	" C/C++
 		Plugin 'octol/vim-cpp-enhanced-highlight'
-		Plugin 'zchee/deoplete-clang'
+		Plugin 'roxma/ncm-clang'
+		"Plugin 'zchee/deoplete-clang'
 
 	" Syntax Highlighting
 		Plugin 'justinmk/vim-syntax-extra'
