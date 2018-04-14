@@ -1,6 +1,6 @@
 " Functions
 	" WARNING:
-	" Function Prototype to highlight every struct/class type for C/C++
+	" Function Prototype to highlight every struct/typedef type for C
 	" Need more time to optimize it. Dont use it for now
 	" TODO:
 	" find a way to get list of every regular expression match without moving
@@ -10,16 +10,26 @@
 		function! HighlightTypes()
 			let a:cursor_pos = getpos(".")
 			let types = []
-			g/\v((struct|class)\s+)@<=\w+/call add(types, matchstr(getline('.'), '\v((struct|class)\s+)@<=\w+'))
-			noh
+			let type_regexes = [
+						\ '\v((struct)\s+)@<=\w+',
+						\ '\v((typedef).*)@<=\w+(;)@=',
+						\ '\v((typedef).*\(\*)@<=\w+(\)\(.*\);)@=',
+						\ '\v(typedef struct\_.*)@!(\}\s+)@<=\w+'
+						\ ]
+			for regexp in type_regexes
+				let find_type = 'g/' . regexp . "/call add(types, matchstr(getline('.'),'" . regexp . "'))"
+				exec find_type
+			endfor
 			call cursor(a:cursor_pos[1], a:cursor_pos[2])
+			noh
 			for s in types
 				let syntax = 'syntax match Type "' . s . '"'
 				exec syntax
 			endfor
 		endfunction
 
-		" autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :call HighlightTypes()
+		autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :silent! call HighlightTypes()
+		autocmd FileType c,cpp,h,hpp autocmd BufEnter *  :silent! call HighlightTypes()
 
 	" Delete all trailing spaces on file open
 		function! RemoveTrailingSpaces()
