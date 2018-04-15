@@ -21,14 +21,14 @@ filetype off
 		Plugin 'Shougo/deoplete.nvim'
 		Plugin 'sirver/UltiSnips'
 		Plugin 'honza/vim-snippets'
-		"Plugin 'w0rp/ale'
+		Plugin 'w0rp/ale'
 
 	" Rust
 		Plugin 'rust-lang/rust.vim'
 
 	" C/C++
 		Plugin 'octol/vim-cpp-enhanced-highlight'
-		"Plugin 'zchee/deoplete-clang'
+		Plugin 'zchee/deoplete-clang'
 
 	" Syntax Highlighting
 		Plugin 'justinmk/vim-syntax-extra'

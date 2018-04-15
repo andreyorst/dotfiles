@@ -22,9 +22,10 @@
 	let g:ale_sign_error = '⬥ '
 	let g:ale_sign_warning = '⬥ '
 
-	"autocmd FileType rust <Esc>:ALEDisable<Cr>
+	autocmd FileType rust <Esc>:ALEDisable<Cr>
+
 	let g:ale_linters = {
-		\ 'c': ['clang'],
+		\ 'c': ['clang', 'gcc'],
 		\ 'cpp': ['clang'],
 	\}
 
@@ -33,37 +34,37 @@
 		let g:ale_c_clang_options = '-Wall --std=c99 '
 		let g:ale_c_gcc_options = '-Wall --std=c99 '
 
-		let g:ale_includes = ''
+		let g:includepath = ''
 
 		" NOTE: This piece of code is used to generate clang options for ALE,
 		" because we aren't using any build system. You may delete this, or
 		" rewrite to your project needs. Basically you can refer to a specific
 		" file in your project root, and automatically pass desired options to
 		" ALE, and later to Clang. But the main reason I wrote it because, we
-		" have special config file, that contains current ale_includes, for our
+		" have special config file, that contains current includepath, for our
 		" own build system, so I need to pass it to ALE somehow and detect if
 		" it was changed. You can go further and have a separate if() for each
 		" project, I have two for now. I understand that this is not the most
 		" beautiful way of doing this, but, still, it works fine, and I'm kinda
 		" happy with this variant for now.
 		if filereadable("./testkit.settings")
-			let g:ale_includes = system('echo -n
-						\ -I$(pwd)/include
-						\ -I$(pwd)/testpacks/SPW_TESTS/spw_lib_src
-						\ -I$(pwd)/testpacks/CAN/can_lib_src
-						\ -I$(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
+			let g:includepath = system('echo -n
+						\ -I $(pwd)/include
+						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src
+						\ -I $(pwd)/testpacks/CAN/can_lib_src
+						\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
 						\')
 		elseif filereadable("./startf.S")
-			let g:ale_includes = system('echo -n
-						\-I$(pwd)/include
-						\-I$(pwd)/include/cp2
-						\-I$(pwd)/include/hdrtest
-						\-I$(pwd)../../include
+			let g:includepath = system('echo -n
+						\ -I $(pwd)/include
+						\ -I $(pwd)/include/cp2
+						\ -I $(pwd)/include/hdrtest
+						\ -I $(pwd)../../include
 						\')
 		endif
 
-		let g:ale_c_clang_options.= g:ale_includes
-		let g:ale_c_gcc_options.= g:ale_includes
+		let g:ale_c_clang_options.= g:includepath
+		let g:ale_c_gcc_options.= g:includepath
 
 " CtrlP
 	let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
@@ -96,80 +97,18 @@
 	" it, or rewrite to your project needs.
 	if filereadable("./testkit.settings") || filereadable("startf.S")
 		redir! > ./.clang
-		silent! echon 'flags = ' g:ale_includes
+		silent! echon 'flags = ' g:includepath
 		redir END
 	endif
 
 " LanguageClient-neovim
+	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+
 	let g:LanguageClient_serverCommands = {
 				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-				\ 'c':    ['cquery', '--log-file=/tmp/cq.log'],
-				\ 'cpp':  ['cquery', '--log-file=/tmp/cqcpp.log'],
 				\ }
-
-	let g:LanguageClient_settingsPath = $HOME . '/.config/nvim/settings.json'
 	let g:LanguageClient_loadSettings = 1
 
-	autocmd FileType rust,c,cpp nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> gh :call LanguageClient_textDocument_hover()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> gr :call LanguageClient_textDocument_references()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> gs :call LanguageClient_textDocument_documentSymbol()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
-
-	let g:cquery_c_options = '-Wall --std=c99'
-	let g:cquery_cpp_options = '-Wall --std=c++11'
-
-	let g:cquery_includes = ''
-	if filereadable("./testkit.settings")
-		let g:cquery_includes = system('echo -n "
-					\-I$(pwd)/include\n
-					\-I$(pwd)/testpacks/SPW_TESTS/spw_lib_src\n
-					\-I$(pwd)/testpacks/CAN/can_lib_src\n
-					\-I$(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n
-					\"')
-	elseif filereadable("./startf.S")
-		let g:cquery_includes = system('echo -n "
-					\-I$(pwd)/include\n
-					\-I$(pwd)/include/cp2\n
-					\-I$(pwd)/include/hdrtest\n
-					\-I$(pwd)../../include\n
-					\"')
-	endif
-
-	if filereadable("./testkit.settings") || filereadable("startf.S")
-		redir! > ./.cquery
-		silent! echon "%c -Weverything" . g:cquery_c_options
-		silent! echo "# Includes"
-		silent! echo g:cquery_includes
-		redir END
-	endif
-
-	let g:LanguageClient_diagnosticsDisplay = {
-				\	1: {
-				\		"name": "Error",
-				\		"texthl": "ALEError",
-				\		"signText": "⬥ ",
-				\		"signTexthl": "ALEErrorSign",
-				\	},
-				\	2: {
-				\		"name": "Warning",
-				\		"texthl": "ALEWarning",
-				\		"signText": "⬥ ",
-				\		"signTexthl": "ALEWarningSign",
-				\	},
-				\	3: {
-				\		"name": "Information",
-				\		"texthl": "ALEInfo",
-				\		"signText": "⬥ ",
-				\		"signTexthl": "ALEInfoSign",
-				\	},
-				\	4: {
-				\		"name": "Hint",
-				\		"texthl": "ALEInfo",
-				\		"signText": "⬥ ",
-				\		"signTexthl": "ALEInfoSign",
-				\	},
-				\}
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
