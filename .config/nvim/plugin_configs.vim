@@ -22,7 +22,7 @@
 	let g:ale_sign_error = '⬥ '
 	let g:ale_sign_warning = '⬥ '
 
-	autocmd FileType rust <Esc>:ALEDisable<Cr>
+	"autocmd FileType rust <Esc>:ALEDisable<Cr>
 	let g:ale_linters = {
 		\ 'c': ['clang'],
 		\ 'cpp': ['clang'],
@@ -81,7 +81,10 @@
 " Deoplete
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
+	call deoplete#custom#source('_',
+				\ 'matchers', ['matcher_full_fuzzy'])
 
+	" NOTE: Deoplete is now ruled by UltiSnips. This imap is deprecated
 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
@@ -135,12 +138,38 @@
 
 	if filereadable("./testkit.settings") || filereadable("startf.S")
 		redir! > ./.cquery
-		silent! echon "%c " . g:cquery_c_options
+		silent! echon "%c -Weverything" . g:cquery_c_options
 		silent! echo "# Includes"
 		silent! echo g:cquery_includes
 		redir END
 	endif
 
+	let g:LanguageClient_diagnosticsDisplay = {
+				\	1: {
+				\		"name": "Error",
+				\		"texthl": "ALEError",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "ALEErrorSign",
+				\	},
+				\	2: {
+				\		"name": "Warning",
+				\		"texthl": "ALEWarning",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "ALEWarningSign",
+				\	},
+				\	3: {
+				\		"name": "Information",
+				\		"texthl": "ALEInfo",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "ALEInfoSign",
+				\	},
+				\	4: {
+				\		"name": "Hint",
+				\		"texthl": "ALEInfo",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "ALEInfoSign",
+				\	},
+				\}
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 

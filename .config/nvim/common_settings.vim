@@ -37,6 +37,8 @@
 	set shiftwidth=4
 	set smartindent
 
+				 " syntax match EndOfBuffer "\v\$\{?[0-9]+:"                |
+				 " syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"        |
 " Highlights
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
@@ -47,8 +49,6 @@
 				 \ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"     |
 				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"           |
 				 \ syntax match Function "\v(-\>|\.)@<=(\s+)?\w+(\(.*\))@=" |
-				 \ syntax match EndOfBuffer "\v\$\{?[0-9]+:"                |
-				 \ syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"        |
 
 	" Common highlights
 		highlight EndOfBuffer guifg=#32302f
