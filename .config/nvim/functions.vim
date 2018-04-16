@@ -1,11 +1,15 @@
 " Functions
-	" Parse snippet, and create jump list
+
+	let g:jumps = [['a', 'b'], ['c', 'd'], ['e', 'f']]
+	let g:amount_of_jumps = 0
 	function! ParseAndInitPlaceholders()
 		let g:matches = Count('\v\$\{[0-9]+:')
-		let i = 1
-		while i <= g:matches
-			Parse()
-			Mark()
+		let i = 0
+		exec '/\v\$\{[0-9]+:'
+		while i < g:matches
+			normal n
+			exe "normal m" . g:jumps[i][0] . "df:f}xhm" . g:jumps[i][1]
+			let g:amount_of_jumps += 1
 			let i += 1
 		endwhile
 	endfunction
