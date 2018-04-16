@@ -1,7 +1,37 @@
 " Functions
+	" Parse snippet, and create jump list
+	function! ParseAndInitPlaceholders()
+		let g:matches = Count('\v\$\{[0-9]+:')
+		let i = 1
+		while i <= g:matches
+			Parse()
+			Mark()
+			let i += 1
+		endwhile
+	endfunction
+
+	function! Count(word)
+		redir => cnt
+		silent exe '%s/' . a:word . '//gn'
+		redir END
+		let res = strpart(cnt, 0, stridx(cnt, " "))
+		let res = substitute(res,'\v%^\_s+|\_s+%$','','g')
+		return res
+	endfunction
+
+	function! Parse()
+		substitute(vaiv,'\v\$\{[0-9]+:|}','','g')
+	endfunction
+	function! Mark()
+	endfunction
+
+	function! Jump(mark)
+
+	endfunction
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
 	" Need more time to optimize it. Dont use it for now
+	" Struggles on huge files.
 	" TODO:
 	" find a way to get list of every regular expression match without moving
 	" cursor or and adding jumps. Find a way not to source it each time, but add
@@ -28,8 +58,8 @@
 			endfor
 		endfunction
 
-		autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :silent! call HighlightTypes()
-		autocmd FileType c,cpp,h,hpp autocmd BufEnter *  :silent! call HighlightTypes()
+		"autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :silent! call HighlightTypes()
+		"autocmd FileType c,cpp,h,hpp autocmd BufEnter *  :silent! call HighlightTypes()
 
 	" Delete all trailing spaces on file open
 		function! RemoveTrailingSpaces()
