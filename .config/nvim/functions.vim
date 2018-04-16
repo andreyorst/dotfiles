@@ -28,8 +28,8 @@
 			endfor
 		endfunction
 
-		autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :silent! call HighlightTypes()
-		autocmd FileType c,cpp,h,hpp autocmd BufEnter *  :silent! call HighlightTypes()
+		"autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :silent! call HighlightTypes()
+		"autocmd FileType c,cpp,h,hpp autocmd BufEnter *  :silent! call HighlightTypes()
 
 	" Delete all trailing spaces on file open
 		function! RemoveTrailingSpaces()
