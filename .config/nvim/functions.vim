@@ -1,17 +1,23 @@
 " Functions
+	" for (int _iter_ = 0; _iter_ < 10; _iter_++) {
+	" 	/* expression */
+	" }
 
-	let g:jumps = [['a', 'b'], ['c', 'd'], ['e', 'f']]
-	let g:amount_of_jumps = 0
+	let g:jumps = [['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i', 'j'], ['k', 'l'], ['m', 'n'], ['o', 'p']]
+	let g:placeholders = 0
+	let g:jumped = 0
 	function! ParseAndInitPlaceholders()
-		let g:matches = Count('\v\$\{[0-9]+:')
+		let a:cursor_pos = getpos(".")
+		let regex = '\v\$\{[0-9]+:'
+		let g:placeholders = Count(regex)
 		let i = 0
-		exec '/\v\$\{[0-9]+:'
-		while i < g:matches
+		exec '/' . regex
+		while i < g:placeholders
 			normal n
 			exe "normal m" . g:jumps[i][0] . "df:f}xhm" . g:jumps[i][1]
-			let g:amount_of_jumps += 1
 			let i += 1
 		endwhile
+		call cursor(a:cursor_pos[1], a:cursor_pos[2])
 	endfunction
 
 	function! Count(word)
@@ -23,14 +29,20 @@
 		return res
 	endfunction
 
-	function! Parse()
-		substitute(vaiv,'\v\$\{[0-9]+:|}','','g')
-	endfunction
-	function! Mark()
-	endfunction
-
-	function! Jump(mark)
-
+	let g:word_size = 0
+	function! Jump()
+		let a:start = 0
+		let a:end = 0
+		if g:jumped < g:placeholders
+			exe "normal! `" . g:jumps[g:jumped][0]
+			let a:start = virtcol('.')
+			exe "normal! `" . g:jumps[g:jumped][1]
+			let a:end = virtcol('.')
+			let g:word_size = a:end - a:start
+			exe "normal! `" . g:jumps[g:jumped][0]
+			exe "normal v`" . g:jumps[g:jumped][1] . "\<c-g>"
+			let g:jumped += 1
+		endif
 	endfunction
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
