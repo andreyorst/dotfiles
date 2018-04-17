@@ -5,10 +5,6 @@
 	let g:active = 0
 	let g:snip_start_line = 0
 	let g:snip_end_line = 0
-"	int
-"for (int ${2:i} = 0; i < ${1:10}; i${3:++}) {
-"	${0:/* expression */}
-"}
 
 	function! ParseAndInitPlaceholders()
 		let g:placeholder_contents = []
@@ -70,21 +66,14 @@
 		else
 			if g:active != 0
 				let current_placeholder = escape(g:placeholder_contents[g:jumped], '/\*')
-				if current_placeholder =~#"w"
-					echo vaiv
-					return
-					call cursor(g:snip_start_line, 1)
-					call search('\<' . current_placeholder . '\>', '', g:snip_end_line)
-					normal ms
-					call search('\<' . current_placeholder . '\>', 'ce', g:snip_end_line)
-					normal me
-				else
-					call cursor(g:snip_start_line, 1)
-					call search(current_placeholder, '', g:snip_end_line)
-					normal ms
-					call search(current_placeholder, 'ce', g:snip_end_line)
-					normal me
+				if current_placeholder !~ "\\W"
+					let current_placeholder = '\<' . current_placeholder . '\>'
 				endif
+				call cursor(g:snip_start_line, 1)
+				call search(current_placeholder, 'c', g:snip_end_line)
+				normal ms
+				call search(current_placeholder, 'ce', g:snip_end_line)
+				normal me
 				call feedkeys("`sv`e\<c-g>")
 				let g:jumped += 1
 				if g:jumped == g:placeholders
