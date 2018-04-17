@@ -77,6 +77,7 @@
 			autocmd FileType c iabbr tos, tos("${1: }"); ton(${2: }); tos("${3:\n\r}");${0: }<Esc>^
 		" for/ acts like a class snippet and lets you to define iterator name
 			autocmd FileType c,cpp iabbr for/ <Esc>:-1read ~/.vim/snippets/for.c<Cr>V2j=<c-h>
+			autocmd FileType c,cpp iabbr for, <Esc>:-1read ~/.vim/snippets/for.c<Cr>V2j=:call ParseAndInitPlaceholders()<Cr>
 
 	" Simple main() snip
 		autocmd FileType c,cpp iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>jA

@@ -1,17 +1,21 @@
 " Functions
-	" for (int _iter_ = 0; _iter_ < 10; _iter_++) {
-	" 	/* expression */
-	" }
-
-	let g:jumps = [['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i', 'j'], ['k', 'l'], ['m', 'n'], ['o', 'p']]
+	let g:placeholder_contents = []
 	let g:placeholders = 0
 	let g:jumped = 0
 	let g:active = 0
+	let g:snip_start_line = 0
+	let g:snip_end_line = 0
+"	int
+"for (int ${2:i} = 0; i < ${1:10}; i${3:++}) {
+"	${0:/* expression */}
+"}
 
 	function! ParseAndInitPlaceholders()
+		let g:placeholder_contents = []
 		let g:active = 1
+		let g:jumped = 0
 		let a:cursor_pos = getpos(".")
-		let a:regex = '\v\$\{[0-9]+:'
+		let a:regex = '\v\$(\{)?[0-9]+(:)?'
 		let g:placeholders = Count(a:regex)
 		call Parse(g:placeholders)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
@@ -28,41 +32,76 @@
 
 	function! Parse(amount)
 		let i = 1
-		let a = 1
+		let current = i
 		while i <= a:amount
 			if i == a:amount
-				let a = 0
+				let current = 0
 			endif
-			exec '\v\$\{[' . i . ']:'
+			exec '/\v\$(\{)?' . current . '(:)?'
 			normal n
-			exe "normal m" . g:jumps[a][0] . "df:f}i\<Del>\<Esc>m" . g:jumps[a][1]
+			if i == 1
+				let g:snip_start_line = line(".")
+				let g:snip_end_line = line(".")
+			endif
+			if line(".") < g:snip_start_line
+				let g:snip_start_line = line(".")
+			endif
+			if line(".") > g:snip_end_line
+				let g:snip_end_line = line(".")
+			endif
+			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
+				"short placeholder
+				exe "normal d//e\<Cr>"
+				let g:placeholders -= 1
+			else
+				" long placeholder
+				call add(g:placeholder_contents, matchstr(getline('.'), '\v(\$\{'. current . ':)@<=.{-}(\})@='))
+				exe "normal df:f}i\<Del>\<Esc>"
+			endif
 			let i += 1
-			let a += 1
+			let current = i
 		endwhile
 	endfunction
 
-	let g:word_size = 0
-	let g:prev_word_size = 0
 	function! Jump()
-		let a:start = 0
-		let a:end = 0
-		if g:active != 0
-			exe "normal! `" . g:jumps[g:jumped][0]
-			let a:start = virtcol('.')
-			exe "normal! `" . g:jumps[g:jumped][1]
-			let a:end = virtcol('.')
-			let g:word_size = a:end - a:start
-			exe "normal! `" . g:jumps[g:jumped][0]
-			exe "normal v`" . g:jumps[g:jumped][1] . "\<c-g>"
-			let g:jumped += 1
-			let g:prev_word_size = g:word_size
-			if g:jumped == g:placeholders
-				let g:active = 0
-			endif
+		if line(".") < g:snip_start_line || line(".") > g:snip_end_line
+			"let g:active = 0
+			echo "not in snippet"
 		else
-			echo "no jumps left"
+			if g:active != 0
+				let current_placeholder = escape(g:placeholder_contents[g:jumped], '/\*')
+				if current_placeholder =~#"w"
+					echo vaiv
+					return
+					call cursor(g:snip_start_line, 1)
+					call search('\<' . current_placeholder . '\>', '', g:snip_end_line)
+					normal ms
+					call search('\<' . current_placeholder . '\>', 'ce', g:snip_end_line)
+					normal me
+				else
+					call cursor(g:snip_start_line, 1)
+					call search(current_placeholder, '', g:snip_end_line)
+					normal ms
+					call search(current_placeholder, 'ce', g:snip_end_line)
+					normal me
+				endif
+				call feedkeys("`sv`e\<c-g>")
+				let g:jumped += 1
+				if g:jumped == g:placeholders
+					let g:active = 0
+					let g:jumped = 0
+				endif
+			else
+				echo "no jumps left"
+			endif
 		endif
-		endfunction
+	endfunction
+
+	inoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	vnoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	snoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	nnoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
 	" Need more time to optimize it. Dont use it for now

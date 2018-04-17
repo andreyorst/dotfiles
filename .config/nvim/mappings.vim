@@ -5,6 +5,8 @@
 	" Rename 'symbol'
 		nnoremap <F2> <Esc>:noh<Cr>:%s/\<<C-r><C-w>\>//g<left><left>
 		inoremap <F2> <Esc>:noh<Cr>:%s/\<<C-r><C-w>\>//g<left><left>
+		snoremap <F2> y:noh<Cr>:%s/\<<C-r>"\>//g<left><left>
+		vnoremap <F2> y:noh<Cr>:%s/\<<C-r>"\>//g<left><left>
 
 	" Open file under cursor
 		nnoremap gf <C-w>gf

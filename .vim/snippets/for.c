@@ -1,3 +1,3 @@
-for (int ${2:_iter_} = 0; _iter_ < ${1:10}; _iter_++) {
+for (int ${2:i} = 0; i < ${1:10}; i${3:++}) {
 	${0:/* expression */}
 }
