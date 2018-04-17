@@ -6,17 +6,14 @@
 	let g:jumps = [['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i', 'j'], ['k', 'l'], ['m', 'n'], ['o', 'p']]
 	let g:placeholders = 0
 	let g:jumped = 0
+	let g:active = 0
+
 	function! ParseAndInitPlaceholders()
+		let g:active = 1
 		let a:cursor_pos = getpos(".")
-		let regex = '\v\$\{[0-9]+:'
-		let g:placeholders = Count(regex)
-		let i = 0
-		exec '/' . regex
-		while i < g:placeholders
-			normal n
-			exe "normal m" . g:jumps[i][0] . "df:f}xhm" . g:jumps[i][1]
-			let i += 1
-		endwhile
+		let a:regex = '\v\$\{[0-9]+:'
+		let g:placeholders = Count(a:regex)
+		call Parse(g:placeholders)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
 	endfunction
 
@@ -25,15 +22,31 @@
 		silent exe '%s/' . a:word . '//gn'
 		redir END
 		let res = strpart(cnt, 0, stridx(cnt, " "))
-		let res = substitute(res,'\v%^\_s+|\_s+%$','','g')
+		let res = substitute(res, '\v%^\_s+|\_s+%$', '', 'g')
 		return res
 	endfunction
 
+	function! Parse(amount)
+		let i = 1
+		let a = 1
+		while i <= a:amount
+			if i == a:amount
+				let a = 0
+			endif
+			exec '\v\$\{[' . i . ']:'
+			normal n
+			exe "normal m" . g:jumps[a][0] . "df:f}i\<Del>\<Esc>m" . g:jumps[a][1]
+			let i += 1
+			let a += 1
+		endwhile
+	endfunction
+
 	let g:word_size = 0
+	let g:prev_word_size = 0
 	function! Jump()
 		let a:start = 0
 		let a:end = 0
-		if g:jumped < g:placeholders
+		if g:active != 0
 			exe "normal! `" . g:jumps[g:jumped][0]
 			let a:start = virtcol('.')
 			exe "normal! `" . g:jumps[g:jumped][1]
@@ -42,8 +55,14 @@
 			exe "normal! `" . g:jumps[g:jumped][0]
 			exe "normal v`" . g:jumps[g:jumped][1] . "\<c-g>"
 			let g:jumped += 1
+			let g:prev_word_size = g:word_size
+			if g:jumped == g:placeholders
+				let g:active = 0
+			endif
+		else
+			echo "no jumps left"
 		endif
-	endfunction
+		endfunction
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
 	" Need more time to optimize it. Dont use it for now
