@@ -1,19 +1,51 @@
 " Functions
-	let g:placeholder_contents = []
-	let g:placeholders = 0
-	let g:jumped = 0
+	let g:ph_contents = []
+	let g:ph_amount = 0
+	let g:jumped_ph = 0
 	let g:active = 0
-	let g:snip_start_line = 0
-	let g:snip_end_line = 0
+	let g:snip_start = 0
+	let g:snip_end = 0
+	let g:snip_search_path = $HOME . '/.vim/snippets/'
+
+	function! IsExpandable()
+		let fyletype = &ft
+		let snip = expand("<cword>")
+		let a:path = g:snip_search_path . &ft . '/' . snip
+		if filereadable(a:path)
+			return 1
+		else
+			return 0
+		endif
+	endfunction
+
+	function! ExpandSnippet()
+		let fyletype = &ft
+		let snip = expand("<cword>")
+		let a:path = g:snip_search_path . &ft . '/' . snip
+		if IsExpandable()
+			normal diw
+			silent let g:snippet_file = readfile(a:path)
+			let g:lines = 0
+			for i in g:snippet_file
+				let g:lines +=1
+			endfor
+			silent exec '-1:read' . a:path
+			silent exec 'normal V' . g:lines . 'j='
+			silent call ParseAndInitPlaceholders()
+			call Jump()
+		else
+			echo "[ERROR] Snippet " . snip . " doesn't found in spippet search path"
+		endif
+	endfunction
 
 	function! ParseAndInitPlaceholders()
-		let g:placeholder_contents = []
+		let g:ph_contents = []
 		let g:active = 1
-		let g:jumped = 0
+		let g:jumped_ph = 0
 		let a:cursor_pos = getpos(".")
 		let a:regex = '\v\$(\{)?[0-9]+(:)?'
-		let g:placeholders = Count(a:regex)
-		call Parse(g:placeholders)
+		let g:ph_amount = Count(a:regex)
+		call Parse(g:ph_amount)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
 	endfunction
 
@@ -29,29 +61,29 @@
 	function! Parse(amount)
 		let i = 1
 		let current = i
+		let g:snip_start = line(".")
+		let g:snip_end = line(".")
 		while i <= a:amount
 			if i == a:amount
 				let current = 0
 			endif
 			exec '/\v\$(\{)?' . current . '(:)?'
 			normal n
-			if i == 1
-				let g:snip_start_line = line(".")
-				let g:snip_end_line = line(".")
+			if line(".") < g:snip_start
+				let g:snip_start = line(".")
 			endif
-			if line(".") < g:snip_start_line
-				let g:snip_start_line = line(".")
-			endif
-			if line(".") > g:snip_end_line
-				let g:snip_end_line = line(".")
+			if line(".") > g:snip_end
+				let g:snip_end = line(".")
 			endif
 			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
 				"short placeholder
 				exe "normal d//e\<Cr>"
-				let g:placeholders -= 1
+				let g:ph_amount -= 1
 			else
 				" long placeholder
-				call add(g:placeholder_contents, matchstr(getline('.'), '\v(\$\{'. current . ':)@<=.{-}(\})@='))
+				call add(g:ph_contents, matchstr(
+							\ getline('.'), '\v(\$\{'. current . ':)@<=.{-}(\})@=')
+							\ )
 				exe "normal df:f}i\<Del>\<Esc>"
 			endif
 			let i += 1
@@ -60,36 +92,38 @@
 	endfunction
 
 	function! Jump()
-		if line(".") < g:snip_start_line || line(".") > g:snip_end_line
-			"let g:active = 0
-			echo "not in snippet"
+		if line(".") < g:snip_start || line(".") > g:snip_end
+			echo "[WARN]: Can't jump outside of snippet's body"
 		else
 			if g:active != 0
-				let current_placeholder = escape(g:placeholder_contents[g:jumped], '/\*')
+				let current_placeholder = escape(g:ph_contents[g:jumped_ph], '/\*')
 				if current_placeholder !~ "\\W"
 					let current_placeholder = '\<' . current_placeholder . '\>'
 				endif
-				call cursor(g:snip_start_line, 1)
-				call search(current_placeholder, 'c', g:snip_end_line)
+				call cursor(g:snip_start, 1)
+				call search(current_placeholder, 'c', g:snip_end)
 				normal ms
-				call search(current_placeholder, 'ce', g:snip_end_line)
+				call search(current_placeholder, 'ce', g:snip_end)
 				normal me
 				call feedkeys("`sv`e\<c-g>")
-				let g:jumped += 1
-				if g:jumped == g:placeholders
+				let g:jumped_ph += 1
+				if g:jumped_ph == g:ph_amount
 					let g:active = 0
-					let g:jumped = 0
+					let g:jumped_ph = 0
 				endif
 			else
-				echo "no jumps left"
+				echo "[WARN]: No jumps in current scope"
 			endif
 		endif
 	endfunction
 
-	inoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
-	vnoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
-	snoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
-	nnoremap <silent><expr><Tab> g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	inoremap <silent><F9> <Esc>:call ExpandSnippet()<Cr>
+	nnoremap <silent><F9> :call ExpandSnippet()<Cr>
+
+	inoremap <silent><expr><S-Tab> IsExpandable() ? "\<Esc>:call ExpandSnippet()\<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	vnoremap <silent><expr><S-Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	snoremap <silent><expr><S-Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	nnoremap <silent><expr><S-Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
 
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
