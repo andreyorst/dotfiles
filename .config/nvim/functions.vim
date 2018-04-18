@@ -1,5 +1,6 @@
 " Functions
 	let g:ph_contents = []
+	let g:ph_types = []
 	let g:ph_amount = 0
 	let g:jumped_ph = 0
 	let g:active = 0
@@ -18,6 +19,30 @@
 		endif
 	endfunction
 
+	function! IsInside()
+		if g:active == 1
+			if line(".") >= g:snip_start && line(".") <= g:snip_end
+				return 1
+			else
+				return 0
+			endif
+		endif
+		return 0
+	endfunction
+
+	function! ExpandOrJump()
+		if IsExpandable()
+			return ExpandSnippet()
+		else
+			if IsInside()
+				return Jump()
+			else
+				return 0
+			endif
+		endif
+	endfunction
+
+
 	function! ExpandSnippet()
 		let fyletype = &ft
 		let snip = expand("<cword>")
@@ -34,17 +59,17 @@
 			silent call ParseAndInitPlaceholders()
 			call Jump()
 		else
-			echo "[ERROR] Snippet " . snip . " doesn't found in spippet search path"
+			echo "[ERROR] Snippet " . snip . " not found in spippet search path"
 		endif
 	endfunction
 
 	function! ParseAndInitPlaceholders()
+		let a:cursor_pos = getpos(".")
 		let g:ph_contents = []
+		let g:ph_types = []
 		let g:active = 1
 		let g:jumped_ph = 0
-		let a:cursor_pos = getpos(".")
-		let a:regex = '\v\$(\{)?[0-9]+(:)?'
-		let g:ph_amount = Count(a:regex)
+		let g:ph_amount = Count('\v\$(\{)?[0-9]+(:)?')
 		call Parse(g:ph_amount)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
 	endfunction
@@ -64,23 +89,25 @@
 		let g:snip_start = line(".")
 		let g:snip_end = line(".")
 		while i <= a:amount
+			call cursor(g:snip_start, 1)
 			if i == a:amount
 				let current = 0
 			endif
-			exec '/\v\$(\{)?' . current . '(:)?'
-			normal n
-			if line(".") < g:snip_start
-				let g:snip_start = line(".")
-			endif
+			call search('\v\$(\{)?' . current . '(:)?', 'c')
 			if line(".") > g:snip_end
 				let g:snip_end = line(".")
 			endif
 			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
 				"short placeholder
-				exe "normal d//e\<Cr>"
-				let g:ph_amount -= 1
+				call add(g:ph_types, '0')
+				call search('\v(.*)@<=\$' . current . '>', 'c')
+				call search('\v(.*)@<=\$' . current . '>', 'sce')
+				exec "normal! v`'c\<esc>"
+				exec "normal! v0\<esc>"
+				call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
 			else
 				" long placeholder
+				call add(g:ph_types, '1')
 				call add(g:ph_contents, matchstr(
 							\ getline('.'), '\v(\$\{'. current . ':)@<=.{-}(\})@=')
 							\ )
@@ -92,11 +119,9 @@
 	endfunction
 
 	function! Jump()
-		if line(".") < g:snip_start || line(".") > g:snip_end
-			echo "[WARN]: Can't jump outside of snippet's body"
-		else
-			if g:active != 0
-				let current_placeholder = escape(g:ph_contents[g:jumped_ph], '/\*')
+		if IsInside()
+			let current_placeholder = escape(g:ph_contents[g:jumped_ph], '/\*')
+			if match(g:ph_types[g:jumped_ph], '1') == 0
 				if current_placeholder !~ "\\W"
 					let current_placeholder = '\<' . current_placeholder . '\>'
 				endif
@@ -106,14 +131,19 @@
 				call search(current_placeholder, 'ce', g:snip_end)
 				normal me
 				call feedkeys("`sv`e\<c-g>")
-				let g:jumped_ph += 1
-				if g:jumped_ph == g:ph_amount
-					let g:active = 0
-					let g:jumped_ph = 0
-				endif
 			else
-				echo "[WARN]: No jumps in current scope"
+				call cursor(g:snip_start, 1)
+				call search(current_placeholder, 'ce', g:snip_end)
+				exec "normal! a"
+				"exec "normal! \<right>"
 			endif
+			let g:jumped_ph += 1
+			if g:jumped_ph == g:ph_amount
+				let g:active = 0
+				let g:jumped_ph = 0
+			endif
+		else
+			echo "[WARN]: Can't jump outside of snippet's body"
 		endif
 	endfunction
 
