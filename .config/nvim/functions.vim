@@ -123,13 +123,13 @@
 				exec "normal! v`'c\<esc>"
 				exec "normal! v0\<esc>"
 				call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
-			elseif match(expand("<cWORD>"), '\v(.*\$\{[0-9]+:)@<=.{-}(:\})@=')
+			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
 				" mirrored ph
 				call add(g:ph_types, '2')
 				call add(g:ph_contents, matchstr(
 							\ getline('.'), '\v(\$\{'. current . ':)@<=.{-}(:\})@=')
 							\ )
-				exe "normal df:f}i\<Del>\<Esc>"
+				exe "normal df:f}i\<Del>\<Bs>\<Esc>"
 			else
 				" long placeholder
 				call add(g:ph_types, '1')
@@ -142,9 +142,8 @@
 			let current = i
 		endwhile
 	endfunction
-
 	" ${1:iter}
-	" ${2:iter:}
+	" ${2:i:}
 
 	function! Jump()
 		if IsInside()
@@ -208,6 +207,7 @@
 		normal ms
 		call search(ph, 'ce', g:snip_end)
 		normal me
+		execute "normal! " . g:snip_start . "," . g:snip_end . "s/" . ph . "/" . input('placeholder content: ') . "/g"
 	endfunction
 
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
