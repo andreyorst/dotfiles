@@ -18,12 +18,23 @@
 		endif
 	endfunction
 
+	function! IsExpandableInsert()
+		let l:col = col('.') - 1
+		let l:res = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
+		if filereadable($HOME.'/.vim/snippets/c/' . l:res)
+			return 1
+		else
+			return 0
+		endif
+	endfunction
+
 	function! IsJumpable()
 		if IsInside()
 			if g:active == 1
 				return 1
 			endif
 		endif
+		let g:active = 0
 		return 0
 	endfunction
 
@@ -35,6 +46,7 @@
 				return 0
 			endif
 		endif
+		let g:active = 0
 		return 0
 	endfunction
 
@@ -111,6 +123,13 @@
 				exec "normal! v`'c\<esc>"
 				exec "normal! v0\<esc>"
 				call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
+			elseif match(expand("<cWORD>"), '\v(.*\$\{[0-9]+:)@<=.{-}(:\})@=')
+				" mirrored ph
+				call add(g:ph_types, '2')
+				call add(g:ph_contents, matchstr(
+							\ getline('.'), '\v(\$\{'. current . ':)@<=.{-}(:\})@=')
+							\ )
+				exe "normal df:f}i\<Del>\<Esc>"
 			else
 				" long placeholder
 				call add(g:ph_types, '1')
@@ -123,6 +142,9 @@
 			let current = i
 		endwhile
 	endfunction
+
+	" ${1:iter}
+	" ${2:iter:}
 
 	function! Jump()
 		if IsInside()
@@ -141,7 +163,6 @@
 			echo "[WARN]: Can't jump outside of snippet's body"
 		endif
 	endfunction
-
 	function! JumpSkipAll()
 		if IsInside()
 			let g:active = 0
@@ -177,28 +198,23 @@
 		exec "normal! \<right>"
 	endfunction
 
-
-	inoremap <silent><F9> <Esc>:call ExpandSnippet()<Cr>
-	nnoremap <silent><F9> :call ExpandSnippet()<Cr>
-
-	"inoremap <silent><Tab> <Esc><C-R>=IsExpandable()<Cr> ? ":call ExpandSnippet()\<Cr>" : <C-R>=g:active<Cr> ? ":call Jump()<Cr>" : ':exec "normal! a\<Tab>"'
-	function! IsExpandableInsert()
-		let l:col = col('.')-1
-		let l:res = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
-		if filereadable($HOME.'/.vim/snippets/c/' . l:res)
-			return 1
-		else
-			return 0
+	function! MirrorPlaceholder(placeholder)
+		let ph = a:placeholder
+		if ph !~ "\\W"
+			let ph = '\<' . ph . '\>'
 		endif
+		call cursor(g:snip_start, 1)
+		call search(ph, 'c', g:snip_end)
+		normal ms
+		call search(ph, 'ce', g:snip_end)
+		normal me
 	endfunction
-	inoremap <silent><expr><Tab> IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : "\<Tab>"
 
-	vnoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
+	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
+	inoremap <silent><expr><Cr> pumvisible() ? IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>"
+
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
-	nnoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
-	vnoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
 	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
-	nnoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
 
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
