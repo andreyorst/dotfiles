@@ -10,7 +10,7 @@
 
 	function! IsExpandable()
 		let fyletype = &ft
-		let snip = expand("<cword>")
+		let snip = @.
 		let a:path = g:snip_search_path . &ft . '/' . snip
 		if filereadable(a:path)
 			return 1
@@ -30,6 +30,18 @@
 		return 0
 	endfunction
 
+	function! SmartTab()
+		if pumvisible() == 1
+			return "\<C-n>"
+		else
+			if IsExpandable()
+				return ExpandOrJump()
+			else
+				return "\<Tab>"
+			endif
+		endif
+	endfunction
+
 	function! ExpandOrJump()
 		if IsExpandable()
 			return ExpandSnippet()
@@ -37,7 +49,8 @@
 			if IsInside()
 				return Jump()
 			else
-				return 0
+				startinsert
+				return "\<Tab>"
 			endif
 		endif
 	endfunction
@@ -59,7 +72,7 @@
 			silent call ParseAndInitPlaceholders()
 			call Jump()
 		else
-			echo "[ERROR] Snippet " . snip . " not found in spippet search path"
+			echo '[ERROR] Snippet "' . snip . '" not found in spippet search path'
 		endif
 	endfunction
 
@@ -69,14 +82,14 @@
 		let g:ph_types = []
 		let g:active = 1
 		let g:jumped_ph = 0
-		let g:ph_amount = Count('\v\$(\{)?[0-9]+(:)?')
+		let g:ph_amount = CountPlaceholders('\v\$(\{)?[0-9]+(:)?')
 		call Parse(g:ph_amount)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
 	endfunction
 
-	function! Count(word)
+	function! CountPlaceholders(pattern)
 		redir => cnt
-		silent exe '%s/' . a:word . '//gn'
+		silent exe '%s/' . a:pattern . '//gn'
 		redir END
 		let res = strpart(cnt, 0, stridx(cnt, " "))
 		let res = substitute(res, '\v%^\_s+|\_s+%$', '', 'g')
@@ -148,6 +161,7 @@
 	endfunction
 
 	inoremap <silent><F9> <Esc>:call ExpandSnippet()<Cr>
+	inoremap <silent><S-Tab>      <C-R>=SmartTab()<CR>
 	nnoremap <silent><F9> :call ExpandSnippet()<Cr>
 
 	inoremap <silent><expr><S-Tab> IsExpandable() ? "\<Esc>:call ExpandSnippet()\<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
