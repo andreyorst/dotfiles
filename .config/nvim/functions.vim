@@ -156,7 +156,7 @@
 				return 0
 			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
 				return 2
-			elseif match(expand("<cWORD>"),'\v.*\$\{[0-9]+!.{-}\}')
+			elseif match(expand("<cWORD>"),'\v.*\$\{[0-9]+!') == 0
 				return 3
 			else
 				return 1
@@ -173,23 +173,26 @@
 			"exec "normal! v0\<esc>"
 			"call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
 			g:ph_amount -= 1
-		elseif a:type == '1'
+		elseif a:type == 1
 			" long placeholder
 			call add(g:ph_contents, matchstr(
 						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(\})@=')
 						\ )
 			exe "normal df:f}i\<Del>\<Esc>"
-		elseif a:type == '2'
+		elseif a:type == 2
 			call add(g:ph_contents, matchstr(
 						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(:\})@=')
 						\ )
 			exe "normal df:f}i\<Del>\<Bs>\<Esc>"
-		elseif a:type == '3'
+		elseif a:type == 3
 			let l:command = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
+			let g:debugc = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
 			let l:result = system(l:command)
 			let l:result = substitute(l:result, '\n\+$', '', '')
-			call substitute(l:command, l:result, '', '')
+			let g:debugr = substitute(l:result, '\n\+$', '', '')
+			let l:result = escape(l:result, '/\*')
 			exe "normal df!f}i\<Del>\<Esc>"
+			exe g:snip_start.",".g:snip_end."s/\\<".l:command."\\>/".l:result."/g"
 			g:ph_amount -= 1
 		endif
 	endfunction
