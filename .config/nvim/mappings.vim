@@ -2,9 +2,9 @@
 	" Highlights word under cursor by placing it in @/ register
 		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
-	" Rename 'symbol'
-		nnoremap <F2> <Esc>:noh<Cr>:%s/\<<C-r><C-w>\>//g<left><left>
-		inoremap <F2> <Esc>:noh<Cr>:%s/\<<C-r><C-w>\>//g<left><left>
+	" Rename word under cursor in whole document
+		nnoremap <silent><F2> :call RenameCWord()<Cr>
+		inoremap <silent><F2> <Esc>:call RenameCWord()<Cr>
 
 	" Open file under cursor
 		nnoremap gf <C-w>gf

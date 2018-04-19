@@ -31,6 +31,17 @@
 		"autocmd FileType c,cpp,h,hpp autocmd InsertLeave * :silent! call HighlightTypes()
 		"autocmd FileType c,cpp,h,hpp autocmd BufEnter *  :silent! call HighlightTypes()
 
+	" Rename word under cursor in whole document
+		function! RenameCWord()
+			let a:cursor_pos = getpos(".")
+			let l:word = expand("<cword>")
+			let l:rename = input('Rename "'.l:word.'" to: ')
+			if l:rename != ''
+				execute "%s/\\<".l:word."\\>/".l:rename."/g"
+			endif
+			call cursor(a:cursor_pos[1], a:cursor_pos[2])
+		endfunction
+
 	" Delete all trailing spaces on file open
 		function! RemoveTrailingSpaces()
 			normal! mzHmy
