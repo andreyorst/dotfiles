@@ -37,8 +37,6 @@
 	set shiftwidth=4
 	set smartindent
 
-				 " syntax match EndOfBuffer "\v\$\{?[0-9]+:"                |
-				 " syntax match EndOfBuffer "\v(\$\{[0-9]+:.*)@<=\}"        |
 " Highlights
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
