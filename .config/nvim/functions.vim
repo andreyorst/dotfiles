@@ -156,6 +156,8 @@
 				return 0
 			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
 				return 2
+			elseif match(expand("<cWORD>"),'\v.*\$\{[0-9]+!.{-}\}')
+				return 3
 			else
 				return 1
 			endif
@@ -182,6 +184,13 @@
 						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(:\})@=')
 						\ )
 			exe "normal df:f}i\<Del>\<Bs>\<Esc>"
+		elseif a:type == '3'
+			let l:command = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
+			let l:result = system(l:command)
+			let l:result = substitute(l:result, '\n\+$', '', '')
+			call substitute(l:command, l:result, '', '')
+			exe "normal df!f}i\<Del>\<Esc>"
+			g:ph_amount -= 1
 		endif
 	endfunction
 
