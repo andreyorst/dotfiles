@@ -18,6 +18,14 @@
 		endif
 	endfunction
 
+	function! IsActive()
+		if g:active == 1
+			return 1
+		else
+			return 0
+		endif
+	endfunction
+
 	function! IsExpandableInsert()
 		let l:col = col('.') - 1
 		let l:res = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
@@ -51,15 +59,11 @@
 	endfunction
 
 	function! ExpandOrJump()
-		let l:col = max([col('.')-1, 1])
-		let l:char = matchstr(getline('.'), '\%' . l:col . 'c.')
 		if IsExpandable()
 			return ExpandSnippet()
+		elseif IsInside()
+			return Jump()
 		else
-			if IsInside()
-				return Jump()
-			else
-				return "\<Tab>"
 	endfunction
 
 	function! ExpandSnippet()
@@ -102,48 +106,59 @@
 	endfunction
 
 	function! Parse(amount)
-		let i = 1
-		let current = i
+		let l:i = 1
+		let l:current = l:i
 		let g:snip_start = line(".")
 		let g:snip_end = line(".")
-		while i <= a:amount
+		let l:type = 0
+		while l:i <= a:amount
 			call cursor(g:snip_start, 1)
-			if i == a:amount
-				let current = 0
+			if l:i == a:amount
+				let l:current = 0
 			endif
-			call search('\v\$(\{)?' . current . '(:)?', 'c')
+			call search('\v\$(\{)?' . l:current . '(:)?', 'c')
 			if line(".") > g:snip_end
 				let g:snip_end = line(".")
 			endif
-			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
-				"short placeholder currently not handled well
-				call add(g:ph_types, '0')
-				call search('\v(.*)@<=\$' . current . '>', 'c')
-				call search('\v(.*)@<=\$' . current . '>', 'sce')
-				exec "normal! v`'c\<esc>"
-				exec "normal! v0\<esc>"
-				call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
-			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
-				" mirrored ph
-				call add(g:ph_types, '2')
-				call add(g:ph_contents, matchstr(
-							\ getline('.'), '\v(\$\{'. current . ':)@<=.{-}(:\})@=')
-							\ )
-				exe "normal df:f}i\<Del>\<Bs>\<Esc>"
-			else
-				" long placeholder
-				call add(g:ph_types, '1')
-				call add(g:ph_contents, matchstr(
-							\ getline('.'), '\v(\$\{'. current . ':)@<=.{-}(\})@=')
-							\ )
-				exe "normal df:f}i\<Del>\<Esc>"
-			endif
-			let i += 1
-			let current = i
+			let l:type = GetType()
+			call InitPlaceholder(l:current, l:type)
+			let l:i += 1
+			let l:current = l:i
 		endwhile
 	endfunction
-	" ${1:iter}
-	" ${2:i:}
+
+	function! GetType()
+			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
+				return 0
+			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
+				return 2
+			else
+				return 1
+			endif
+	endfunction
+
+	function! InitPlaceholder(current, type)
+		call add(g:ph_types, a:type)
+		if a:type == '0'
+			"short placeholder currently not handled well
+			call search('\v(.*)@<=\$' . a:current . '>', 'c')
+			call search('\v(.*)@<=\$' . a:current . '>', 'sce')
+			exec "normal! v`'c\<esc>"
+			exec "normal! v0\<esc>"
+			call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
+		elseif a:type == '1'
+			" long placeholder
+			call add(g:ph_contents, matchstr(
+						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(\})@=')
+						\ )
+			exe "normal df:f}i\<Del>\<Esc>"
+		elseif a:type == '2'
+			call add(g:ph_contents, matchstr(
+						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(:\})@=')
+						\ )
+			exe "normal df:f}i\<Del>\<Bs>\<Esc>"
+		endif
+	endfunction
 
 	function! Jump()
 		if IsInside()
@@ -209,10 +224,9 @@
 			echo '[ERROR] Placeholder "'.ph.'"'."can't be mirrored"
 		else
 			call cursor(g:snip_start, 1)
-			call search(ph, 'c', g:snip_end)
+			call search('\<' .ph .'\>', 'c', g:snip_end)
 			let a:cursor_pos = getpos(".")
-			call search(ph, 'ce', g:snip_end)
-			let l:rename = input('rename to: ')
+			let l:rename = input('Replace placeholder "'.ph.'" with: ')
 			if l:rename != ''
 				execute g:snip_start . "," . g:snip_end . "s/\\<" . ph ."\\>/" . l:rename . "/g"
 			endif
