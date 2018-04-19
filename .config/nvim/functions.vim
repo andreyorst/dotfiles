@@ -168,18 +168,19 @@
 
 	function! Jump()
 		if IsInside()
-			let current_ph = escape(g:ph_contents[g:jumped_ph], '/\*')
-			if match(g:ph_types[g:jumped_ph], '0') == 0
-				call EmptyPlaceholder(current_ph)
-			elseif match(g:ph_types[g:jumped_ph], '1') == 0
-				call NormalPlaceholder(current_ph)
-			elseif match(g:ph_types[g:jumped_ph], '2') == 0
-				call MirrorPlaceholder(current_ph)
-			endif
+			let l:current_ph = escape(g:ph_contents[g:jumped_ph], '/\*')
+			let l:current_jump = g:jumped_ph
 			let g:jumped_ph += 1
 			if g:jumped_ph == g:ph_amount
 				let g:active = 0
 				let g:jumped_ph = 0
+			endif
+			if match(g:ph_types[l:current_jump], '0') == 0
+				call EmptyPlaceholder(l:current_ph)
+			elseif match(g:ph_types[l:current_jump], '1') == 0
+				call NormalPlaceholder(l:current_ph)
+			elseif match(g:ph_types[l:current_jump], '2') == 0
+				call MirrorPlaceholder(l:current_ph)
 			endif
 		else
 			echo "[WARN]: Can't jump outside of snippet's body"
@@ -189,13 +190,13 @@
 	function! JumpSkipAll()
 		if IsInside()
 			let g:active = 0
-			let current_ph = escape(g:ph_contents[-1], '/\*')
+			let l:current_ph = escape(g:ph_contents[-1], '/\*')
 			if match(g:ph_types[-1], '0') == 0
-				call EmptyPlaceholder(current_ph)
+				call EmptyPlaceholder(l:current_ph)
 			elseif match(g:ph_types[-1], '1') == 0
-				call NormalPlaceholder(current_ph)
+				call NormalPlaceholder(l:current_ph)
 			elseif match(g:ph_types[-1], '2') == 0
-				call MirrorPlaceholder(current_ph)
+				call MirrorPlaceholder(l:current_ph)
 			endif
 			let g:jumped_ph = 0
 			let g:active = 0
@@ -232,12 +233,13 @@
 			call cursor(g:snip_start, 1)
 			call search('\<' .ph .'\>', 'c', g:snip_end)
 			let a:cursor_pos = getpos(".")
+			redraw
 			let l:rename = input('Replace placeholder "'.ph.'" with: ')
 			if l:rename != ''
 				execute g:snip_start . "," . g:snip_end . "s/\\<" . ph ."\\>/" . l:rename . "/g"
 			endif
 			call cursor(a:cursor_pos[1], a:cursor_pos[2])
-			startinsert
+			call Jump()
 		endif
 	endfunction
 
