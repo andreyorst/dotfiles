@@ -6,6 +6,8 @@
 	let g:active = 0
 	let g:snip_start = 0
 	let g:snip_end = 0
+	let g:snippet_line_count = 0
+	let g:currently_edited_file = ''
 	let g:snip_search_path = $HOME . '/.vim/snippets/'
 
 	function! IsExpandable()
@@ -29,7 +31,7 @@
 	function! IsExpandableInsert()
 		let l:col = col('.') - 1
 		let l:res = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
-		if filereadable($HOME.'/.vim/snippets/c/' . l:res)
+		if filereadable($HOME.'/.vim/snippets/' . &ft . '/' . l:res)
 			return 1
 		else
 			return 0
@@ -38,7 +40,7 @@
 
 	function! IsJumpable()
 		if IsInside()
-			if g:active == 1
+			if IsActive()
 				return 1
 			endif
 		endif
@@ -47,11 +49,15 @@
 	endfunction
 
 	function! IsInside()
-		if g:active == 1
-			if line(".") >= g:snip_start && line(".") <= g:snip_end
-				return 1
+		if IsActive()
+			if g:currently_edited_file == @%
+				if line(".") >= g:snip_start && line(".") <= g:snip_end
+					return 1
+				else
+					return 0
+				endif
 			else
-				return 0
+				let g:active = 0
 			endif
 		endif
 		let g:active = 0
@@ -71,13 +77,13 @@
 		let a:path = g:snip_search_path . &ft . '/' . snip
 		if IsExpandable()
 			normal diw
-			let g:lines = 0
+			let g:snippet_line_count = 0
 			for i in readfile(a:path)
-				let g:lines +=1
+				let g:snippet_line_count +=1
 			endfor
 			silent exec ':read' . a:path
 			silent exec "normal! i\<Bs>"
-			silent exec 'normal V' . g:lines . 'j='
+			silent exec 'normal V' . g:snippet_line_count . 'j='
 			silent call ParseAndInitPlaceholders()
 			call Jump()
 		else
@@ -91,6 +97,8 @@
 		let g:ph_types = []
 		let g:active = 1
 		let g:jumped_ph = 0
+		let g:snippet_end = 0
+		let g:currently_edited_file = @%
 		let g:ph_amount = CountPlaceholders('\v\$(\{)?[0-9]+(:)?')
 		call Parse(g:ph_amount)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
@@ -109,7 +117,7 @@
 		let l:i = 1
 		let l:current = l:i
 		let g:snip_start = line(".")
-		let g:snip_end = line(".")
+		let g:snip_end = g:snip_start + g:snippet_line_count - 1
 		let l:type = 0
 		while l:i <= a:amount
 			call cursor(g:snip_start, 1)
@@ -117,17 +125,14 @@
 				let l:current = 0
 			endif
 			call search('\v\$(\{)?' . l:current . '(:)?', 'c')
-			if line(".") > g:snip_end
-				let g:snip_end = line(".")
-			endif
-			let l:type = GetType()
+			let l:type = GetPhType()
 			call InitPlaceholder(l:current, l:type)
 			let l:i += 1
 			let l:current = l:i
 		endwhile
 	endfunction
 
-	function! GetType()
+	function! GetPhType()
 			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
 				return 0
 			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
@@ -144,8 +149,9 @@
 			call search('\v(.*)@<=\$' . a:current . '>', 'c')
 			call search('\v(.*)@<=\$' . a:current . '>', 'sce')
 			exec "normal! v`'c\<esc>"
-			exec "normal! v0\<esc>"
-			call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
+			"exec "normal! v0\<esc>"
+			"call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
+			g:ph_amount -= 1
 		elseif a:type == '1'
 			" long placeholder
 			call add(g:ph_contents, matchstr(
@@ -235,8 +241,22 @@
 		endif
 	endfunction
 
+	function! RenameWord()
+		let a:cursor_pos = getpos(".")
+		let l:word = expand("<cword>")
+		let l:rename = input('Rename "'.l:word.'" to: ')
+		if l:rename != ''
+			execute "%s/\\<".l:word."\\>/".l:rename."/g"
+		endif
+		call cursor(a:cursor_pos[1], a:cursor_pos[2])
+	endfunction
+
+	nnoremap <silent><F2> :call RenameWord()<Cr>
+
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
-	inoremap <silent><expr><Cr> pumvisible() ? "\<Cr>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>"
+	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : "\<Nop>"
+
+	inoremap <silent><expr><Cr> pumvisible() ? IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>" : "\<Cr>"
 
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
 	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
