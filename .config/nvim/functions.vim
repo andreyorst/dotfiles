@@ -148,10 +148,12 @@
 	function! Jump()
 		if IsInside()
 			let current_ph = escape(g:ph_contents[g:jumped_ph], '/\*')
-			if match(g:ph_types[g:jumped_ph], '1') == 0
-				call NormalPlaceholder(current_ph)
-			else
+			if match(g:ph_types[g:jumped_ph], '0') == 0
 				call EmptyPlaceholder(current_ph)
+			elseif match(g:ph_types[g:jumped_ph], '1') == 0
+				call NormalPlaceholder(current_ph)
+			elseif match(g:ph_types[g:jumped_ph], '2') == 0
+				call MirrorPlaceholder(current_ph)
 			endif
 			let g:jumped_ph += 1
 			if g:jumped_ph == g:ph_amount
@@ -162,16 +164,20 @@
 			echo "[WARN]: Can't jump outside of snippet's body"
 		endif
 	endfunction
+
 	function! JumpSkipAll()
 		if IsInside()
 			let g:active = 0
 			let current_ph = escape(g:ph_contents[-1], '/\*')
-			if match(g:ph_types[-1], '1') == 0
-				call NormalPlaceholder(current_ph)
-			else
+			if match(g:ph_types[-1], '0') == 0
 				call EmptyPlaceholder(current_ph)
+			elseif match(g:ph_types[-1], '1') == 0
+				call NormalPlaceholder(current_ph)
+			elseif match(g:ph_types[-1], '2') == 0
+				call MirrorPlaceholder(current_ph)
 			endif
 			let g:jumped_ph = 0
+			let g:active = 0
 		else
 			echo "[WARN]: Can't jump outside of snippet's body"
 		endif
@@ -199,19 +205,24 @@
 
 	function! MirrorPlaceholder(placeholder)
 		let ph = a:placeholder
-		if ph !~ "\\W"
-			let ph = '\<' . ph . '\>'
+		if ph =~ "\\W"
+			echo '[ERROR] Placeholder "'.ph.'"'."can't be mirrored"
+		else
+			call cursor(g:snip_start, 1)
+			call search(ph, 'c', g:snip_end)
+			let a:cursor_pos = getpos(".")
+			call search(ph, 'ce', g:snip_end)
+			let l:rename = input('rename to: ')
+			if l:rename != ''
+				execute g:snip_start . "," . g:snip_end . "s/\\<" . ph ."\\>/" . l:rename . "/g"
+			endif
+			call cursor(a:cursor_pos[1], a:cursor_pos[2])
+			startinsert
 		endif
-		call cursor(g:snip_start, 1)
-		call search(ph, 'c', g:snip_end)
-		normal ms
-		call search(ph, 'ce', g:snip_end)
-		normal me
-		execute "normal! " . g:snip_start . "," . g:snip_end . "s/" . ph . "/" . input('placeholder content: ') . "/g"
 	endfunction
 
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
-	inoremap <silent><expr><Cr> pumvisible() ? IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>"
+	inoremap <silent><expr><Cr> pumvisible() ? "\<Cr>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>"
 
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
 	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
