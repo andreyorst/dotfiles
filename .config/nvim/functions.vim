@@ -11,9 +11,11 @@
 	let g:snip_search_path = $HOME . '/.vim/snippets/'
 
 	function! IsExpandable()
-		let snip = expand("<cWORD>")
-		let a:path = g:snip_search_path . &ft . '/' . snip
-		if filereadable(a:path)
+		let l:filetype = &ft
+		let l:snip = expand("<cWORD>")
+		if filereadable(g:snip_search_path . l:filetype . '/' . l:snip)
+			return 1
+		elseif filereadable(g:snip_search_path . 'all/' . l:snip)
 			return 1
 		else
 			return 0
@@ -30,8 +32,11 @@
 
 	function! IsExpandableInsert()
 		let l:col = col('.') - 1
-		let l:res = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
-		if filereadable($HOME.'/.vim/snippets/' . &ft . '/' . l:res)
+		let l:snip = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
+		let l:filetype = &ft
+		if filereadable($HOME.'/.vim/snippets/' . l:filetype . '/' . l:snip)
+			return 1
+		elseif filereadable(g:snip_search_path . 'all/' . l:snip)
 			return 1
 		else
 			return 0
@@ -73,9 +78,10 @@
 	endfunction
 
 	function! ExpandSnippet()
-		let snip = expand("<cword>")
-		let a:path = g:snip_search_path . &ft . '/' . snip
+		let l:snip = expand("<cword>")
 		if IsExpandable()
+			let l:filetype = GetFileType(l:snip)
+			let a:path = g:snip_search_path . l:filetype . '/' . l:snip
 			normal diw
 			let g:snippet_line_count = 0
 			for i in readfile(a:path)
@@ -87,7 +93,19 @@
 			silent call ParseAndInitPlaceholders()
 			call Jump()
 		else
-			echo '[ERROR] No "' . snip . '" snippet in ' . g:snip_search_path . &ft . '/'
+			echo '[ERROR] No "' . l:snip . '" snippet in ' . g:snip_search_path . &ft . '/'
+		endif
+	endfunction
+
+	function! GetFileType(snip)
+		let l:filetype = &ft
+		if filereadable(g:snip_search_path . l:filetype . '/' . a:snip)
+			return l:filetype
+		elseif filereadable(g:snip_search_path . 'all/' . a:snip)
+			return 'all'
+		else
+			echo "[ERROR] can't find snippet"
+			return -1
 		endif
 	endfunction
 
@@ -108,9 +126,9 @@
 		redir => cnt
 		silent exe '%s/' . a:pattern . '//gn'
 		redir END
-		let res = strpart(cnt, 0, stridx(cnt, " "))
-		let res = substitute(res, '\v%^\_s+|\_s+%$', '', 'g')
-		return res
+		let l:count = strpart(cnt, 0, stridx(cnt, " "))
+		let l:count = substitute(l:count, '\v%^\_s+|\_s+%$', '', 'g')
+		return l:count
 	endfunction
 
 	function! Parse(amount)
@@ -243,11 +261,10 @@
 		endif
 	endfunction
 
+	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : ":\<Esc>"
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
-	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : "\<Nop>"
-
+	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : IsJumpable() ? "<esc>:call JumpSkipAll()<Cr>" : "\<S-Tab>"
 	inoremap <silent><expr><Cr> pumvisible() ? IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>" : "\<Cr>"
-
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
 	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
 
