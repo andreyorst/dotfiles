@@ -11,11 +11,8 @@
 	let g:snip_search_path = $HOME . '/.vim/snippets/'
 
 	function! IsExpandable()
-		let l:filetype = &ft
 		let l:snip = expand("<cWORD>")
-		if filereadable(g:snip_search_path . l:filetype . '/' . l:snip)
-			return 1
-		elseif filereadable(g:snip_search_path . 'all/' . l:snip)
+		if GetFileType(l:snip) != -1
 			return 1
 		else
 			return 0
@@ -33,10 +30,7 @@
 	function! IsExpandableInsert()
 		let l:col = col('.') - 1
 		let l:snip = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
-		let l:filetype = &ft
-		if filereadable($HOME.'/.vim/snippets/' . l:filetype . '/' . l:snip)
-			return 1
-		elseif filereadable(g:snip_search_path . 'all/' . l:snip)
+		if GetFileType(l:snip) != -1
 			return 1
 		else
 			return 0
@@ -89,7 +83,12 @@
 			endfor
 			silent exec ':read' . a:path
 			silent exec "normal! i\<Bs>"
-			silent exec 'normal V' . g:snippet_line_count . 'j='
+			if g:snippet_line_count != 1
+				let l:indent_lines = g:snippet_line_count - 1
+				silent exec 'normal V' . l:indent_lines . 'j='
+			else
+				normal ==
+			endif
 			silent call ParseAndInitPlaceholders()
 			call Jump()
 		else
@@ -97,6 +96,8 @@
 		endif
 	endfunction
 
+	"Checks if snippet availible via current filetype, if not searches in all
+	"snippets. If snippet still not found returns -1
 	function! GetFileType(snip)
 		let l:filetype = &ft
 		if filereadable(g:snip_search_path . l:filetype . '/' . a:snip)
