@@ -1,0 +1,2 @@
+hi ${1:Hello, Snippets!}
+${0:daun:}
