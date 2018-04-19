@@ -243,18 +243,6 @@
 		endif
 	endfunction
 
-	function! RenameWord()
-		let a:cursor_pos = getpos(".")
-		let l:word = expand("<cword>")
-		let l:rename = input('Rename "'.l:word.'" to: ')
-		if l:rename != ''
-			execute "%s/\\<".l:word."\\>/".l:rename."/g"
-		endif
-		call cursor(a:cursor_pos[1], a:cursor_pos[2])
-	endfunction
-
-	nnoremap <silent><F2> :call RenameWord()<Cr>
-
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
 	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : "\<Nop>"
 
@@ -328,6 +316,19 @@
 				let g:term_win = win_getid()
 			endif
 		endfunction
+
+	function! RenameCWord()
+		let a:cursor_pos = getpos(".")
+		let l:word = expand("<cword>")
+		let l:rename = input('Rename "'.l:word.'" to: ')
+		if l:rename != ''
+			execute "%s/\\<".l:word."\\>/".l:rename."/g"
+		endif
+		call cursor(a:cursor_pos[1], a:cursor_pos[2])
+	endfunction
+
+	nnoremap <silent><F2> :call RenameCWord()<Cr>
+	inoremap <silent><F2> <Esc>:call RenameCWord()<Cr>
 
 	" Encoding
 		" <F7> EOL format (dos <CR><NL>,unix <NL>,mac <CR>)
