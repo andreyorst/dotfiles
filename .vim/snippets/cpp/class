@@ -1,7 +1,7 @@
-class ${1:_Class_Name_} {
+class ${1:Name:} {
 public:
-	_Class_Name_();
-	virtual ~_Class_Name_();
+	Name();
+	virtual ~Name();
 
 private:
 	${0:/* data */}
