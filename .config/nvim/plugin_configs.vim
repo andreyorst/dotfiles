@@ -181,9 +181,9 @@
 		endfunction
 
 	" Ultisnips + Deoplete mappings
-		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
-		inoremap <silent><Tab>      <C-R>=SmartTab()<CR>
-		snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
-		inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
-		snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
+		"inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+		"inoremap <silent><Tab>      <C-R>=SmartTab()<CR>
+		"snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
+		"inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
+		"snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
 
