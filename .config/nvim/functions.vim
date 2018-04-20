@@ -151,6 +151,23 @@
 		endwhile
 	endfunction
 
+	function! EditSnippet()
+		let l:filetype = &ft
+		if l:filetype == ''
+			let l:filetype = 'all'
+		endif
+		let l:path = g:snip_search_path . l:filetype
+		if !isdirectory(l:path)
+			call mkdir(l:path, "p")
+		endif
+		let l:trigger = input('Define a trigger: ')
+		if l:trigger != ''
+			execute "vsplit"
+			execute "edit " . l:path . '/' . l:trigger
+		endif
+	endfunction
+	command! EditSnippet call EditSnippet()
+
 	function! GetPhType()
 			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
 				return 0
