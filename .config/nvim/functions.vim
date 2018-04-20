@@ -247,7 +247,7 @@
 		endif
 	endfunction
 
-	function! JumpSkipAll()
+	function! JumpToLast()
 		if IsInside()
 			let g:active = 0
 			let l:current_ph = escape(g:ph_contents[-1], '/\*')
@@ -305,9 +305,20 @@
 		endif
 	endfunction
 
-	function! FlashSnippet(trigger, snippet_defenition)
+	function! FlashSnippet(snippet_defenition, line_count)
 		" Expands snippet that defined by user, for example by iabbr
-		" iabbr tag <esc>:call FlashSnippet('tag', 'Tag N${1:1}: ${0:Name}')<Cr>
+		" iabbr tag <esc>:call FlashSnippet('Tag N${1:1}: ${0:Name}', 1)<Cr>
+			normal diw
+			exec "normal a " . a:snippet_defenition
+			let g:snippet_line_count = a:line_count
+			if g:snippet_line_count != 1
+				let l:indent_lines = g:snippet_line_count - 1
+				silent exec 'normal V' . l:indent_lines . 'j='
+			else
+				normal ==
+			endif
+			silent call ParseAndInitPlaceholders()
+			call Jump()
 	endfunction
 
 	function! ShellPlaceholder(placeholder)
@@ -316,10 +327,10 @@
 
 	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : ":\<Esc>"
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
-	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : IsJumpable() ? "<esc>:call JumpSkipAll()<Cr>" : "\<S-Tab>"
+	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : IsJumpable() ? "<esc>:call JumpToLast()<Cr>" : "\<S-Tab>"
 	inoremap <silent><expr><Cr> pumvisible() ? IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>" : "\<Cr>"
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
-	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpSkipAll()<Cr>" : "\<Tab>"
+	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpToLast()<Cr>" : "\<Tab>"
 
 	" WARNING:
 	" Function Prototype to highlight every struct/typedef type for C
