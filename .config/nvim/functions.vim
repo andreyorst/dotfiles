@@ -118,7 +118,7 @@
 		let g:jumped_ph = 0
 		let g:snippet_end = 0
 		let g:currently_edited_file = @%
-		let g:ph_amount = CountPlaceholders('\v\$(\{)?[0-9]+(:)?')
+		let g:ph_amount = CountPlaceholders('\v\$(\{)?[0-9]+(:|!|\|)?')
 		call Parse(g:ph_amount)
 		call cursor(a:cursor_pos[1], a:cursor_pos[2])
 	endfunction
@@ -171,47 +171,57 @@
 	function! GetPhType()
 			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
 				return 0
-			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+:.{-}:\}') == 0
+			elseif match(expand("<cWORD>"),'\v.*\$\{[0-9]+:') == 0
+				return 1
+			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+\|') == 0
 				return 2
 			elseif match(expand("<cWORD>"),'\v.*\$\{[0-9]+!') == 0
 				return 3
-			else
-				return 1
 			endif
 	endfunction
 
 	function! InitPlaceholder(current, type)
 		call add(g:ph_types, a:type)
-		if a:type == '0'
-			"short placeholder currently not handled well
-			call search('\v(.*)@<=\$' . a:current . '>', 'c')
-			call search('\v(.*)@<=\$' . a:current . '>', 'sce')
-			exec "normal! v`'c\<esc>"
-			"exec "normal! v0\<esc>"
-			"call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
-			g:ph_amount -= 1
+		if a:type == 0
+			call InitShortPh(a:current)
 		elseif a:type == 1
-			" long placeholder
-			call add(g:ph_contents, matchstr(
-						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(\})@=')
-						\ )
-			exe "normal df:f}i\<Del>\<Esc>"
+			call InitNormalPh(a:current)
 		elseif a:type == 2
-			call add(g:ph_contents, matchstr(
-						\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(:\})@=')
-						\ )
-			exe "normal df:f}i\<Del>\<Bs>\<Esc>"
+			call InitMirrorPh(a:current)
 		elseif a:type == 3
-			let l:command = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
-			let g:debugc = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
-			let l:result = system(l:command)
-			let l:result = substitute(l:result, '\n\+$', '', '')
-			let g:debugr = substitute(l:result, '\n\+$', '', '')
-			let l:result = escape(l:result, '/\*')
-			exe "normal df!f}i\<Del>\<Esc>"
-			exe g:snip_start.",".g:snip_end."s/\\<".l:command."\\>/".l:result."/g"
-			g:ph_amount -= 1
+			call InitShellPh(a:current)
 		endif
+	endfunction
+
+	function! InitShortPh(current)
+		call search('\v(.*)@<=\$' . a:current . '>', 'c')
+		call search('\v(.*)@<=\$' . a:current . '>', 'sce')
+		exec "normal! v`'c\<esc>"
+		"exec "normal! v0\<esc>"
+		"call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
+		g:ph_amount -= 1
+	endfunction
+
+	function! InitNormalPh(current)
+		call add(g:ph_contents, matchstr(
+					\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(\})@=')
+					\ )
+		exe "normal df:f}i\<Del>\<Esc>"
+	endfunction
+
+	function! InitMirrorPh(current)
+		call add(g:ph_contents, matchstr(
+					\ getline('.'), '\v(\$\{'. a:current . '\|)@<=.{-}(\})@=')
+					\ )
+		exe "normal df|f}i\<Del>\<Esc>"
+	endfunction
+
+	function! InitShellPh(current)
+		let l:command = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
+		let l:result = system(l:command)
+		let l:result = substitute(l:result, '\n\+$', '', '')
+		exe "normal df}a".l:result."\<Esc>"
+		call add(g:ph_contents, l:result)
 	endfunction
 
 	function! Jump()
@@ -229,6 +239,8 @@
 				call NormalPlaceholder(l:current_ph)
 			elseif match(g:ph_types[l:current_jump], '2') == 0
 				call MirrorPlaceholder(l:current_ph)
+			elseif match(g:ph_types[l:current_jump], '3') == 0
+				call ShellPlaceholder(l:current_ph)
 			endif
 		else
 			echo "[WARN]: Can't jump outside of snippet's body"
@@ -245,6 +257,8 @@
 				call NormalPlaceholder(l:current_ph)
 			elseif match(g:ph_types[-1], '2') == 0
 				call MirrorPlaceholder(l:current_ph)
+			elseif match(g:ph_types[-1], '3') == 0
+				call ShellPlaceholder(l:current_ph)
 			endif
 			let g:jumped_ph = 0
 			let g:active = 0
@@ -289,6 +303,15 @@
 			call cursor(a:cursor_pos[1], a:cursor_pos[2])
 			call Jump()
 		endif
+	endfunction
+
+	function! FlashSnippet(trigger, snippet_defenition)
+		" Expands snippet that defined by user, for example by iabbr
+		" iabbr tag <esc>:call FlashSnippet('tag', 'Tag N${1:1}: ${0:Name}')<Cr>
+	endfunction
+
+	function! ShellPlaceholder(placeholder)
+		call NormalPlaceholder(a:placeholder)
 	endfunction
 
 	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : ":\<Esc>"
