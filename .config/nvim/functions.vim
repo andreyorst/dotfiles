@@ -96,10 +96,19 @@
 		endif
 	endfunction
 
+	function! FiletypeWrapper()
+		let l:filetype = &ft
+		if l:filetype == ''
+			return 'all'
+		elseif l:filetype == 'tex' || l:filetype == 'plaintex'
+			return 'tex'
+		endif
+		return l:filetype
+	endfunction
 	"Checks if snippet availible via current filetype, if not searches in all
 	"snippets. If snippet still not found returns -1
 	function! GetFileType(snip)
-		let l:filetype = &ft
+		let l:filetype = FiletypeWrapper()
 		if filereadable(g:snip_search_path . l:filetype . '/' . a:snip)
 			return l:filetype
 		elseif filereadable(g:snip_search_path . 'all/' . a:snip)
@@ -152,10 +161,7 @@
 	endfunction
 
 	function! EditSnippet()
-		let l:filetype = &ft
-		if l:filetype == ''
-			let l:filetype = 'all'
-		endif
+		let l:filetype = FiletypeWrapper()
 		let l:path = g:snip_search_path . l:filetype
 		if !isdirectory(l:path)
 			call mkdir(l:path, "p")
@@ -202,15 +208,18 @@
 						\ )
 			exe "normal df:f}i\<Del>\<Bs>\<Esc>"
 		elseif a:type == 3
+			"shell placeholder
 			let l:command = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
-			let g:debugc = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
+			call search('\v\$\{'. a:current . '!', 'c', g:snip_end)
 			let l:result = system(l:command)
 			let l:result = substitute(l:result, '\n\+$', '', '')
-			let g:debugr = substitute(l:result, '\n\+$', '', '')
-			let l:result = escape(l:result, '/\*')
-			exe "normal df!f}i\<Del>\<Esc>"
+			call search('\v\$\{'. a:current . '!', 'c', g:snip_end)
+			call feedkeys("df}i".l:result."\<Esc>")
 			exe g:snip_start.",".g:snip_end."s/\\<".l:command."\\>/".l:result."/g"
 			g:ph_amount -= 1
+			if g:ph_amount <= 0
+				g:active = 0
+			endif
 		endif
 	endfunction
 
