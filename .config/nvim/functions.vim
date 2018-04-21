@@ -169,6 +169,9 @@
 		endwhile
 	endfunction
 
+	let g:snip_edit_buf = 0
+	let g:snip_edit_win = 0
+
 	function! EditSnippet()
 		let l:filetype = FiletypeWrapper()
 		let l:path = g:snip_search_path . l:filetype
@@ -177,10 +180,21 @@
 		endif
 		let l:trigger = input('Select a trigger: ')
 		if l:trigger != ''
-			execute "vsplit"
-			execute "edit " . l:path . '/' . l:trigger
+			if win_gotoid(g:snip_edit_win)
+				execute "edit " . l:path . '/' . l:trigger
+			else
+				vertical new
+				try
+					exec "buffer " . g:snip_edit_buf
+				catch
+					execute "edit " . l:path . '/' . l:trigger
+					let g:term_buf = bufnr("")
+				endtry
+				let g:snip_edit_win = win_getid()
+			endif
 		endif
 	endfunction
+
 	command! EditSnippet call EditSnippet()
 
 	function! GetPhType()
@@ -353,7 +367,7 @@
 	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : ":\<Esc>"
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
 	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : IsJumpable() ? "<esc>:call JumpToLast()<Cr>" : "\<S-Tab>"
-	inoremap <silent><expr><Cr> pumvisible() ? IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>" : "\<Cr>"
+	inoremap <silent><expr><Cr> pumvisible() ? IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
 	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpToLast()<Cr>" : "\<Tab>"
 
