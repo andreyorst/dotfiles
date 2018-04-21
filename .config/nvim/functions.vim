@@ -11,7 +11,14 @@
 	let g:snip_search_path = $HOME . '/.vim/snippets/'
 
 	function! IsExpandable()
-		let l:snip = expand("<cWORD>")
+		let l:mode = mode()
+		let l:snip = ''
+		if l:mode == 'i'
+			let l:col = col('.') - 1
+			let l:snip = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
+		else
+			let l:snip = expand("<cword>")
+		endif
 		if GetFileType(l:snip) != -1
 			return 1
 		else
@@ -21,16 +28,6 @@
 
 	function! IsActive()
 		if g:active == 1
-			return 1
-		else
-			return 0
-		endif
-	endfunction
-
-	function! IsExpandableInsert()
-		let l:col = col('.') - 1
-		let l:snip = matchstr(getline('.'), '\v\w+%' . l:col . 'c.')
-		if GetFileType(l:snip) != -1
 			return 1
 		else
 			return 0
@@ -76,21 +73,24 @@
 		if IsExpandable()
 			let l:filetype = GetFileType(l:snip)
 			let a:path = g:snip_search_path . l:filetype . '/' . l:snip
-			normal diw
 			let g:snippet_line_count = 0
 			for i in readfile(a:path)
 				let g:snippet_line_count +=1
 			endfor
-			silent exec ':read' . a:path
-			silent exec "normal! i\<Bs>"
-			if g:snippet_line_count != 1
-				let l:indent_lines = g:snippet_line_count - 1
-				silent exec 'normal V' . l:indent_lines . 'j='
+			if g:snippet_line_count != 0
+				normal diw
+				silent exec ':read' . a:path
+				silent exec "normal! i\<Bs>"
+				if g:snippet_line_count != 1
+					let l:indent_lines = g:snippet_line_count - 1
+					silent exec 'normal V' . l:indent_lines . 'j='
+				else
+					normal ==
+				endif
+				silent call ParseAndInitPlaceholders()
 			else
-				normal ==
+				echo '[ERROR] Snippet body is empty'
 			endif
-			silent call ParseAndInitPlaceholders()
-			call Jump()
 		else
 			echo '[ERROR] No "' . l:snip . '" snippet in ' . g:snip_search_path . &ft . '/'
 		endif
@@ -99,15 +99,27 @@
 	"Checks if snippet availible via current filetype, if not searches in all
 	"snippets. If snippet still not found returns -1
 	function! GetFileType(snip)
-		let l:filetype = &ft
+		let l:filetype = FiletypeWrapper()
 		if filereadable(g:snip_search_path . l:filetype . '/' . a:snip)
 			return l:filetype
 		elseif filereadable(g:snip_search_path . 'all/' . a:snip)
 			return 'all'
 		else
-			echo "[ERROR] can't find snippet"
+			echo "[ERROR] Can't".' find "'.a:snip.'" snippet in '.g:snip_search_path.l:filetype.'/'.a:snip
 			return -1
 		endif
+	endfunction
+
+	function! FiletypeWrapper()
+		let l:ft = &ft
+		if l:ft == ''
+			return 'all'
+		elseif l:ft == 'tex' || l:ft == 'plaintex'
+			 return 'tex'
+		elseif l:ft == 'sh' || l:ft == 'bash' || l:ft == 'zsh'
+			 return 'bash'
+		endif
+		return l:ft
 	endfunction
 
 	function! ParseAndInitPlaceholders()
@@ -119,15 +131,21 @@
 		let g:snippet_end = 0
 		let g:currently_edited_file = @%
 		let g:ph_amount = CountPlaceholders('\v\$(\{)?[0-9]+(:|!|\|)?')
-		call Parse(g:ph_amount)
-		call cursor(a:cursor_pos[1], a:cursor_pos[2])
+		if g:ph_amount != 0
+			call Parse(g:ph_amount)
+			call cursor(a:cursor_pos[1], a:cursor_pos[2])
+			call Jump()
+		else
+			let g:active = 0
+			call cursor(a:cursor_pos[1], a:cursor_pos[2])
+		endif
 	endfunction
 
 	function! CountPlaceholders(pattern)
-		redir => cnt
-		silent exe '%s/' . a:pattern . '//gn'
+		redir => l:cnt
+		silent! exe '%s/' . a:pattern . '//gn'
 		redir END
-		let l:count = strpart(cnt, 0, stridx(cnt, " "))
+		let l:count = strpart(l:cnt, 0, stridx(l:cnt, " "))
 		let l:count = substitute(l:count, '\v%^\_s+|\_s+%$', '', 'g')
 		return l:count
 	endfunction
@@ -152,15 +170,12 @@
 	endfunction
 
 	function! EditSnippet()
-		let l:filetype = &ft
-		if l:filetype == ''
-			let l:filetype = 'all'
-		endif
+		let l:filetype = FiletypeWrapper()
 		let l:path = g:snip_search_path . l:filetype
 		if !isdirectory(l:path)
 			call mkdir(l:path, "p")
 		endif
-		let l:trigger = input('Define a trigger: ')
+		let l:trigger = input('Select a trigger: ')
 		if l:trigger != ''
 			execute "vsplit"
 			execute "edit " . l:path . '/' . l:trigger
@@ -169,9 +184,7 @@
 	command! EditSnippet call EditSnippet()
 
 	function! GetPhType()
-			if match(expand("<cWORD>"), '\v.*\$[0-9]+>') == 0
-				return 0
-			elseif match(expand("<cWORD>"),'\v.*\$\{[0-9]+:') == 0
+			if match(expand("<cWORD>"),'\v.*\$\{[0-9]+:') == 0
 				return 1
 			elseif match(expand("<cWORD>"), '\v.*\$\{[0-9]+\|') == 0
 				return 2
@@ -182,9 +195,7 @@
 
 	function! InitPlaceholder(current, type)
 		call add(g:ph_types, a:type)
-		if a:type == 0
-			call InitShortPh(a:current)
-		elseif a:type == 1
+		if a:type == 1
 			call InitNormalPh(a:current)
 		elseif a:type == 2
 			call InitMirrorPh(a:current)
@@ -193,34 +204,26 @@
 		endif
 	endfunction
 
-	function! InitShortPh(current)
-		call search('\v(.*)@<=\$' . a:current . '>', 'c')
-		call search('\v(.*)@<=\$' . a:current . '>', 'sce')
-		exec "normal! v`'c\<esc>"
-		"exec "normal! v0\<esc>"
-		"call add(g:ph_contents, getline("'<")[getpos("'<")[2]-1:getpos("'>")[2]])
-		g:ph_amount -= 1
-	endfunction
-
 	function! InitNormalPh(current)
-		call add(g:ph_contents, matchstr(
-					\ getline('.'), '\v(\$\{'. a:current . ':)@<=.{-}(\})@=')
-					\ )
+		let l:placeholder = '\v(\$\{'. a:current . ':)@<=.{-}(\})@='
+		call add(g:ph_contents, matchstr(getline('.'), l:placeholder))
 		exe "normal df:f}i\<Del>\<Esc>"
 	endfunction
 
 	function! InitMirrorPh(current)
-		call add(g:ph_contents, matchstr(
-					\ getline('.'), '\v(\$\{'. a:current . '\|)@<=.{-}(\})@=')
-					\ )
+		let l:placeholder = '\v(\$\{'. a:current . '\|)@<=.{-}(\})@='
+		call add(g:ph_contents, matchstr(getline('.'), l:placeholder))
 		exe "normal df|f}i\<Del>\<Esc>"
 	endfunction
 
 	function! InitShellPh(current)
-		let l:command = matchstr(getline('.'), '\v(\$\{'. a:current . '!)@<=.{-}(\})@=')
+		let l:placeholder = '\v(\$\{'. a:current . '!)@<=.{-}(\})@='
+		let l:command = matchstr(getline('.'), l:placeholder)
 		let l:result = system(l:command)
 		let l:result = substitute(l:result, '\n\+$', '', '')
-		exe "normal df}a".l:result."\<Esc>"
+		let @s = l:result
+		exe "normal df}"
+		normal "sp
 		call add(g:ph_contents, l:result)
 	endfunction
 
@@ -233,9 +236,7 @@
 				let g:active = 0
 				let g:jumped_ph = 0
 			endif
-			if match(g:ph_types[l:current_jump], '0') == 0
-				call EmptyPlaceholder(l:current_ph)
-			elseif match(g:ph_types[l:current_jump], '1') == 0
+			if match(g:ph_types[l:current_jump], '1') == 0
 				call NormalPlaceholder(l:current_ph)
 			elseif match(g:ph_types[l:current_jump], '2') == 0
 				call MirrorPlaceholder(l:current_ph)
@@ -292,6 +293,23 @@
 		if ph =~ "\\W"
 			echo '[ERROR] Placeholder "'.ph.'"'."can't be mirrored"
 		else
+			redir => l:cnt
+			silent! exe g:snip_start.','.g:snip_end.'s/\<' . a:placeholder . '\>//gn'
+			redir END
+			noh
+			let l:count = strpart(l:cnt, 0, stridx(l:cnt, " "))
+			let l:count = substitute(l:count, '\v%^\_s+|\_s+%$', '', 'g')
+			let l:i = 0
+			let l:matchpositions = []
+			while l:i < l:count
+				call search('\<' .ph .'\>', '', g:snip_end)
+				let l:line = line('.')
+				let l:start = col('.')
+				call search('\<' .ph .'\>', 'ce', g:snip_end)
+				let l:length = col('.') - l:start + 1
+				call add(l:matchpositions, matchaddpos('Visual', [[l:line, l:start, l:length]]))
+				let l:i += 1
+			endwhile
 			call cursor(g:snip_start, 1)
 			call search('\<' .ph .'\>', 'c', g:snip_end)
 			let a:cursor_pos = getpos(".")
@@ -299,7 +317,14 @@
 			let l:rename = input('Replace placeholder "'.ph.'" with: ')
 			if l:rename != ''
 				execute g:snip_start . "," . g:snip_end . "s/\\<" . ph ."\\>/" . l:rename . "/g"
+				noh
 			endif
+			let l:i = 0
+			while l:i < l:count
+				call matchdelete(l:matchpositions[l:i])
+				let l:i += 1
+			endwhile
+			redraw
 			call cursor(a:cursor_pos[1], a:cursor_pos[2])
 			call Jump()
 		endif
@@ -326,9 +351,9 @@
 	endfunction
 
 	nnoremap <silent><expr><F9> IsExpandable() ? ":call ExpandSnippet()<Cr>" : ":\<Esc>"
-	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
+	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Tab>"
 	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : IsJumpable() ? "<esc>:call JumpToLast()<Cr>" : "\<S-Tab>"
-	inoremap <silent><expr><Cr> pumvisible() ? IsExpandableInsert() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>" : "\<Cr>"
+	inoremap <silent><expr><Cr> pumvisible() ? IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : IsJumpable() ? "<esc>:call Jump()<Cr>" : "\<Cr>" : "\<Cr>"
 	snoremap <silent><expr><Tab> IsExpandable() ? "<Esc>:call ExpandSnippet()<Cr>" : g:active ? "<Esc>:call Jump()<Cr>" : "\<Tab>"
 	snoremap <silent><expr><S-Tab> IsJumpable() ? "<Esc>:call JumpToLast()<Cr>" : "\<Tab>"
 
