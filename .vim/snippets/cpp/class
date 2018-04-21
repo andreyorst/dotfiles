@@ -1,4 +1,4 @@
-class ${1:Name:} {
+class ${1|Name} {
 public:
 	Name();
 	virtual ~Name();
