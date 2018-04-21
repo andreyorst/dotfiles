@@ -16,7 +16,7 @@ filetype off
 		"Plugin 'craigemery/vim-autotag'
 		"Plugin 'ctrlpvim/ctrlp.vim'
 		"Plugin 'majutsushi/tagbar'
-		"Plugin 'Raimondi/delimitMate'
+		Plugin 'Raimondi/delimitMate'
 		"Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
 		"Plugin 'sirver/UltiSnips'
@@ -24,11 +24,11 @@ filetype off
 		"Plugin 'w0rp/ale'
 
 	" Rust
-		"Plugin 'rust-lang/rust.vim'
+		Plugin 'rust-lang/rust.vim'
 
 	" C/C++
 		Plugin 'octol/vim-cpp-enhanced-highlight'
-		"Plugin 'zchee/deoplete-clang'
+		Plugin 'zchee/deoplete-clang'
 
 	" Syntax Highlighting
 		Plugin 'justinmk/vim-syntax-extra'
