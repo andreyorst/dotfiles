@@ -12,16 +12,16 @@ filetype off
 		Plugin 'vim-airline/vim-airline-themes'
 
 	" Tools
-		"Plugin 'autozimu/LanguageClient-neovim'
-		"Plugin 'craigemery/vim-autotag'
-		"Plugin 'ctrlpvim/ctrlp.vim'
-		"Plugin 'majutsushi/tagbar'
+		Plugin 'autozimu/LanguageClient-neovim'
+		Plugin 'craigemery/vim-autotag'
+		Plugin 'ctrlpvim/ctrlp.vim'
+		Plugin 'majutsushi/tagbar'
 		Plugin 'Raimondi/delimitMate'
-		"Plugin 'scrooloose/nerdtree'
+		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
 		"Plugin 'sirver/UltiSnips'
 		"Plugin 'honza/vim-snippets'
-		"Plugin 'w0rp/ale'
+		Plugin 'w0rp/ale'
 
 	" Rust
 		Plugin 'rust-lang/rust.vim'
