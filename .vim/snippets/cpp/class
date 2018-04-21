@@ -1,0 +1,8 @@
+class ${1|Name} {
+public:
+	Name();
+	virtual ~Name();
+
+private:
+	${0:/* data */}
+};

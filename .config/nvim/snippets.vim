@@ -1,84 +1,56 @@
 " Some Notes About Snippets:
-"   There are 4 categories for now:
-"   1. Normal mode snippets:
-"      Snippet begins with comma and ends with Tab keypress.
-"      Basically the simplest one out there to use, all you need is to
-"      type ,snippetName and hit Tab to expand it. Cursor will be placed
-"      accordingly to snippet context, and mode will be changed to insert
+"   Snippets are located at `$HOME/.vim/snippets/fyletype/trigger`. So for
+"   example `for` snippet for `c` fyletype will be defined in
+"   `$HOME/.vim/snippets/c/for`
+"   Currently only one type of placeholder is supported, basic jumps are
+"   avalible via mappings, and engine has lot of limitations rightnow. Better
+"   avoiding placeholders with same text inside one snippet, and avoid using
+"   empty placeholders for now.
 "
-"   2. Insert mode snippets:
-"      Snippets that are just abbreviations, yet a snippet with some cursor
-"      positioning.
+"       a) $1         - empty placeholder, Not supported for now
+"       b) ${1:text}  - placeholder containing standard text entry
+"       c) ${1:text:} - "mirrored placeholder. See note below
 "
-"   3. Insert mode interactive snippets:
-"      These snippets are abbreviations too, but they end with a `/` symbol.
-"      The complicated part to understand is that these snippets must be ended
-"      with double press of `/` button: first press is part of abbreviation and
-"      the second one is part of `:%s///g` command that is executed at the end.
-"      This command will be used to replace all template names in the snippet to
-"      desired one.
+"   Mirrored placeholders works not exactly the same like in other plugins,
+"   such as UltiSnips. It is a placeholder, wich cotained text will be replaced
+"   ower all current snippet. You will be promted in command line to replace
+"   your placeholder text like so:
 "
-"   4. Snippets with placeholders:
-"      I bet you never seen such stupid thing in your life. This snippets
-"      contain special markers, that can be jumped at. Markers are listed
-"      below:
-"          a) ${1: }    - empty placeholder
-"          b) ${1:text} - placeholder containing standard text entry
+"       Replace placeholder "Name" with: |
 "
-"      When jump preformed with <c-j> (usable from any mode, be careful) the
-"      mapping will automatically delete all unnecessary symbols, and will
-"      leave you with placeholder text selected in visual mode. You can modify
-"      it, or jump to next placeholder if you satisfied with standard placeholder's
-"      text. Examples can be found on line 78 or just search for \<" for,\> pattern
+"   Where '|' is your cursor. Pressing <Esc> will return you to insert mode
+"   and leaving text unchanged and pressing <Cr> will act the same. If text is
+"   changed it will be applied to every match of placeholders content inside
+"   snippet body.
 "
-"   Snippet files are located in ~/.vim/snippets/ and named *.vim
+"   Snippet Example:
+"   Simple `for` snippet. Place this at the beginning of snippet file.
+"
+"       for (int ${2:i} = 0; i < ${1:count}; i++) {
+"           ${0:code}
+"       }
+"
+"   It will be expanded and jumped firstly to count marker, then to iterator
+"   palceholder, and lastly to code placeholder.
 
-" C Snippets
-
-	" Creates empty class template with public constructor and
-	" virtual destructor, and empty private section
-	"
-	" USAGE: in insert mode type class and press / twice e.g class//
-	"
-	" It will expand class in that line and search for template _Class_Name_
-	" in the class, and promt you a :%s///g command where you can type a class name
-	" so it could be set automatically. Cursor is positioned automatically in
-	" repace command.
-		autocmd FileType cpp,h,hpp iabbr class/ <Esc>:-1read $HOME/.vim/snippets/class.cpp<CR>msf{v%=`s<c-h>
-
-	" Simple empty class and struct snippets
-		autocmd FileType cpp,h,hpp iabbr class, class {};<Left><Left><Cr>  <Esc>ddk0f{<left>i
-		autocmd FileType c,cpp,h,hpp iabbr struct, struct {};<Left><Left><Cr><Esc>ddk0f{<left>i
-
-
-	" WARN: This is total mess. Don't try this at home. Requires ninja skills.
-	"
-	" Generates getter and setter for C++ private class items.
-	" Input  Format: type name;
-	" Output Format: type obtainName() {return name;}
-	"                void establishName(type Name) {name = Name;}
-	"
-	" For example: 'unsigned char* letter;' will produce:
-	" unsigned char* obtainLetter() {return letter;}
-	" void establishLetter(unsigned char* Letter) {letter = Letter;}
-	"
-	" just above 'private:' keyword
-	" You can change function names in this string only
-	" Search for hiobtain and hiestablish and change
-	" to higet hiset or to any hi* pattern
-	" WARNING: must be used below 'private' keyword in a class scope
+" Getter and setter generation
+"
+" TODO: Make a function of it
+" WARN: This is total mess. Don't try this at home. Requires ninja skills.
+"
+" Generates getter and setter for C++ private class items.
+"
+"     Input  Format: type name;
+"     Output Format: type obtainName() {return name;}
+"                    void establishName(type Name) {name = Name;}
+"
+" For example: 'unsigned char* letter;' will produce:
+" unsigned char* obtainLetter() {return letter;}
+" void establishLetter(unsigned char* Letter) {letter = Letter;}
+" just above 'private:' keyword.
+" You can change function names in this string only
+" Search for hiobtain and hiestablish and change
+" to higet hiset or to any hi* pattern
+" WARNING: must be used *below* 'private' keyword in a class scope
 		autocmd FileType cpp,h,hpp nnoremap <F3> <Esc>0:set nohlsearch<CR>/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/getSet.cpp<CR>0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>==j0==/)<CR>bPnbb~hiestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p^:set hlsearch<CR>:noh<CR>
-
-	" Bunch of for(;;) {} snippets.
-		" fori and forj generates a simple for cycle and puts cursor to position where amount is being set
-			autocmd FileType c,cpp iabbr fori for(int i = 0; i <; i++) {}<left><Cr><Esc>ddk0f<a
-			autocmd FileType c,cpp iabbr forj for(int j = 0; j <; j++) {}<left><Cr><Esc>ddk0f<a
-		" for, contain placeholders
-			autocmd FileType c iabbr tos, tos("${1: }"); ton(${2: }); tos("${3:\n\r}");${0: }<Esc>^
-		" for/ acts like a class snippet and lets you to define iterator name
-			autocmd FileType c,cpp iabbr for/ <Esc>:-1read ~/.vim/snippets/for.c<Cr>V2j=<c-h>
-
-	" Simple main() snip
-		autocmd FileType c,cpp iabbr main, <Esc>:-1read $HOME/.vim/snippets/main.c<CR>jA
-
 

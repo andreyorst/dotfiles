@@ -82,8 +82,6 @@
 " Deoplete
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
-	call deoplete#custom#source('_',
-				\ 'matchers', ['matcher_full_fuzzy'])
 
 	" NOTE: Deoplete is now ruled by UltiSnips. This imap is deprecated
 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
@@ -115,7 +113,7 @@
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
-	autocmd FileType c,cpp nested :TagbarToggle
+	"autocmd FileType c,cpp nested :TagbarToggle
 
 " Ultisnips
 	" NOTE: The settings below will make Ultisnips and Deoplete play nice
@@ -181,9 +179,9 @@
 		endfunction
 
 	" Ultisnips + Deoplete mappings
-		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
-		inoremap <silent><Tab>      <C-R>=SmartTab()<CR>
-		snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
-		inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
-		snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
+		"inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+		"inoremap <silent><Tab>      <C-R>=SmartTab()<CR>
+		"snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
+		"inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
+		"snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
 
