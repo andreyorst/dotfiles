@@ -22,7 +22,7 @@
 	let g:ale_sign_error = '⬥ '
 	let g:ale_sign_warning = '⬥ '
 
-	autocmd FileType rust <Esc>:ALEDisable<Cr>
+	"autocmd FileType rust <Esc>:ALEDisable<Cr>
 
 	let g:ale_linters = {
 		\ 'c': ['clang', 'gcc'],
@@ -185,3 +185,10 @@
 		"inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
 		"snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
 
+	" SimpleSnippets.vim
+	let g:SimpleSnippets_dont_remap_tab = 1
+	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : SimpleSnippets#isExpandableOrJumpable() ? "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : SimpleSnippets#isJumpable() ? "\<esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" : "\<S-Tab>"
+	inoremap <silent><expr><Cr> pumvisible() ? SimpleSnippets#isExpandableOrJumpable() ? "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>" : "<Cr>"
+	snoremap <silent><expr><Tab> SimpleSnippets#isExpandableOrJumpable() ? "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	snoremap <silent><expr><S-Tab> SimpleSnippets#isJumpable() ? "\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" : "\<S-Tab>"
