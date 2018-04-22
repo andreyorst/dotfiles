@@ -19,9 +19,10 @@ filetype off
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
-		"Plugin 'sirver/UltiSnips'
-		"Plugin 'honza/vim-snippets'
+		Plugin 'sirver/UltiSnips'
+		Plugin 'honza/vim-snippets'
 		Plugin 'w0rp/ale'
+		Plugin 'andreyorst/SimpleSnippets.vim'
 
 	" Rust
 		Plugin 'rust-lang/rust.vim'
@@ -42,5 +43,4 @@ filetype plugin indent on
 	source ~/.config/nvim/plugin_configs.vim
 	source ~/.config/nvim/mappings.vim
 	source ~/.config/nvim/functions.vim
-	source ~/.config/nvim/snippets.vim
 
