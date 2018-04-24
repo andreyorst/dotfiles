@@ -12,6 +12,8 @@ filetype off
 		Plugin 'vim-airline/vim-airline-themes'
 
 	" Tools
+		Plugin 'andreyorst/SimpleSnippets.vim'
+		Plugin 'andreyorst/SimpleSnippets-snippets'
 		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'craigemery/vim-autotag'
 		Plugin 'ctrlpvim/ctrlp.vim'
@@ -19,10 +21,9 @@ filetype off
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'sirver/UltiSnips'
-		Plugin 'honza/vim-snippets'
+		"Plugin 'sirver/UltiSnips'
+		"Plugin 'honza/vim-snippets'
 		Plugin 'w0rp/ale'
-		Plugin 'andreyorst/SimpleSnippets.vim'
 
 	" Rust
 		Plugin 'rust-lang/rust.vim'
