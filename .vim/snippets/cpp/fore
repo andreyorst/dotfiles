@@ -1,3 +1,0 @@
-for (${3:auto} ${2:i} : ${1:container}) {
-	${0:/* expression */}
-}
