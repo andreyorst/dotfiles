@@ -6,7 +6,7 @@
 			let g:airline_symbols = {}
 		endif
 		let g:airline_symbols.linenr = '≣'
-		"set noshowmode
+		set noshowmode
 
 	" Tabs
 		let g:airline#extensions#tabline#enabled = 1
