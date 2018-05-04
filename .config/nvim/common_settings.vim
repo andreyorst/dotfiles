@@ -40,13 +40,13 @@
 " Highlights
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
-				 \ syntax match Type "\v<\w+_t>"                            |
-				 \ syntax match Type "\v<__signed>"                         |
-				 \ syntax match Type "\v<(v|u|vu)\w+(8|16|32|64)>"          |
-				 \ syntax match Type "\v<(v|u|vu)?(_|__)?(int|short|char)>" |
-				 \ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"     |
-				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"           |
-				 \ syntax match Function "\v(-\>|\.)@<=(\s+)?\w+(\(.*\))@=" |
+				 \ syntax match Type "\v<\w+_t>"                                  |
+				 \ syntax match Type "\v<__signed>"                               |
+				 \ syntax match Type "\v<(v|u|vu)\w+(8|16|32|64)>"                |
+				 \ syntax match Type "\v<(v|u|vu)?(_|__)?(int|short|char)>"       |
+				 \ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"           |
+				 \ syntax match ErrorMsg "\v(-\>|\.)@<=(\s+)?\w+"                 |
+				 \ syntax match Function "\v(-\>|\.)@<=(\s+)?\w+(\s+)?(\(.*\))@=" |
 
 	" Common highlights
 		highlight EndOfBuffer guifg=#32302f

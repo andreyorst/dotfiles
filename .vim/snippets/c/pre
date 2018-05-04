@@ -1,0 +1,5 @@
+/**
+ * ${1v!@%}
+ *
+ * Written by${2!getent passwd "$USER" | cut -d : -f 5}  ${0!date +%d/%m/%Y}
+ */
