@@ -1,5 +1,5 @@
 [Appearance]
-ColorScheme=Tomorrow Night
+ColorScheme=Gruvbox
 LineSpacing=0
 
 [General]
