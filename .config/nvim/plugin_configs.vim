@@ -6,6 +6,7 @@
 			let g:airline_symbols = {}
 		endif
 		let g:airline_symbols.linenr = '≣'
+		let g:airline#extensions#keymap#enabled = 0
 		set noshowmode
 
 	" Tabs

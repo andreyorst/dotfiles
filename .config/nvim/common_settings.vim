@@ -37,6 +37,14 @@
 	set shiftwidth=4
 	set smartindent
 
+" Keymap fixes
+	set keymap=russian-jcukenwin
+	set iminsert=0
+	set imsearch=0
+
+" Spell
+	set spelllang=ru_yo,en_us
+
 " Highlights
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
