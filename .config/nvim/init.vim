@@ -17,6 +17,7 @@ filetype off
 		Plugin 'autozimu/LanguageClient-neovim'
 		Plugin 'craigemery/vim-autotag'
 		Plugin 'ctrlpvim/ctrlp.vim'
+		Plugin 'junegunn/goyo.vim'
 		Plugin 'majutsushi/tagbar'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
