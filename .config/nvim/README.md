@@ -40,7 +40,7 @@ Fancy screenshot for you:
 #### Mappings:
 
   - <kbd>F1</kbd> - NOTHING
-  - <kbd>F2</kbd> - Search and replace word under cursor
+  - <kbd>F2</kbd> - Search and replace word under cursor with `RenameCWord()`
   - <kbd>*</kbd> - Highlight all occuriences of word under cursor, but dont move. No jumps added to jumplist.
   - <kbd>g</kbd><kbd>f</kbd> - Open file under cursor in new tab
   - <kbd>Alt</kbd>+<kbd>t</kbd> - Toggle bottom terminal window
@@ -49,47 +49,13 @@ Fancy screenshot for you:
   - <kbd>g</kbd><kbd>b</kbd> - Go to next buffer
   - <kbd>g</kbd><kbd>B</kbd> - Go to privious buffer
   
-  Danger zone:
-  - <kbd>Ctrl</kbd>+<kbd>j</kbd> - Jump to next placeholder (my own snippets only)
-  - <kbd>Ctrl</kbd>+<kbd>h</kbd> - Jump to next placeholder and replace all occurences (my own snippets only)
-
 #### Functions:
   - `HighlightTypes()` - **WIP** not ready to use. Automatically highlights C/C++ user types as vim Type highlight group.
   - `RemoveTrailingSpaces()` - Removes all trailing whitespace on filesave
   - `Term_toggle(height)` - Toggless terminal on and off
   - `ExecuteMacroOverVisualRange()` - allows to execute <kbd>@</kbd> macro over visual selection
-  - `ExpandOrClosePopup()` - allows to use <kbd>Enter</kbd> to expand UltiSnips snippet.
-  - `SmartTab()` and `SmartSTab()` - allows to use <kbd>Tab</kbd> to jump through UltiSnips placeholders, and complete via deoplete.
-
-
-## My snippets:
-My snippets are based on abbreviations. It wasn't mentioned to use by enione else, but since i'm hosting my dotfiles on github, I think hat I should provide some explanations. That's main reason why my neovim dotfiles are filled up with comments.  
-There are 4 categories for now:
-
-1. Normal mode snippets:  
-Snippet begins with comma and ends with Tab keypress. Basically the simplest one out there to use, all you need is to type ,snippetName and hit Tab to expand it. Cursor will be placed accordingly to snippet context, and mode will be changed to insert
-                                                                             
-2. Insert mode snippets:  
-Snippets that are just abbreviations, yet a snippet with some cursor positioning.
-                                                                             
-3. Insert mode interactive snippets:  
-These snippets are abbreviations too, but they end with a `/` symbol. The complicated part to understand is that these snippets must be ended with double press of `/` button: first press is part of abbreviation and the second one is part of `:%s///g` command that is executed at the end. This command will be used to replace all template names in the snippet to desired one.
-                                                                             
-4. Snippets with placeholders:  
-I bet you never seen such stupid thing in your life. This snippets contain special markers, that can be jumped at. Markers are: `${1: }` - empty placeholder and `${1:text}` - placeholder containing standard text entry. When jump preformed with <kbd>Ctrl</kbd>+<kbd>j</kbd> (usable from any mode, be careful) the mapping will automatically delete all unnecessary symbols, and will leave you with placeholder text selected in select mode. You can modify it, or jump to next placeholder if you satisfied with standard placeholder's text. Examples can be found [here](https://github.com/andreyorst/dotfiles/blob/fde47c4417bd057707c2f34fbdbd366925acaf15/config/nvim/snippets.vim#L80)
-
-### Here are some gifs:
-
-#### Class snippet and getter+setter snippets:
-
-![class](https://user-images.githubusercontent.com/19470159/38161104-1f8ef1c0-34d1-11e8-9ef6-3f4d6756b768.gif)
-
-#### Main and for snippets:
-
-![main_for](https://user-images.githubusercontent.com/19470159/38161066-c1d26f6c-34d0-11e8-8dcc-52c8aa5fd9d3.gif)
-
-Placeholders will remain in text if you forget to jump on it. You can check if there any by pressing jump trigger again, but I agree that this is not best practice. There are plenty of snippet engines, like Ultisnips, snipMate, neosnippet and others may exist, but I've found it funny to create this on pure vim functional. It's not even a plugin, but just a sequence of keystrokes, mapped to abbreviations. It has some limitations, but can be used when snippet manager isn't avalible.
-
+  - `RenameCWord()` - Renames all occuriences of word under cursor in current file.\
+  
 Other configurations may be found in config files itself. They are provided with comments, so it won't be big problem for you, if you will desire to try my setup, to figure out what is going on here and there.
 
 Some plugins have huge comments like this one:
