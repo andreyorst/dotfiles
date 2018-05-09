@@ -11,7 +11,7 @@ Fancy screenshot for you:
   - Autocompleting C/C++ via [deoplete.nvim](https://github.com/Shougo/deoplete.nvim) + [deoplete-clang](https://github.com/zchee/deoplete-clang).
   - Linting and autocompleting Rust via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) + [deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
   - Generating ctags on the fly via [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current file tags with [tagbar](https://github.com/majutsushi/tagbar).
-  - Snippets privided by [UltiSnips](https://github.com/sirver/UltiSnips), [vim-snippets](https://github.com/honza/vim-snippets) and my own ninja viml technique.
+  - Snippets provided by [SimpleSnippets](https://github.com/andreyorst/SimpleSnippets.vim)
   - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree).
   - Automatically inserting delimiters with [delimitMate](https://github.com/Raimondi/delimitMate).
   - Fuzzy finding any file, mru, tag via [ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim)
