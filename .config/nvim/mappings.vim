@@ -36,3 +36,8 @@
 	" visual mode from insert mode
 	inoremap <C-v> <Esc>l<C-v>
 
+" Troll section
+	nnoremap jj <Nop>
+	nnoremap kk <Nop>
+	nnoremap hh <Nop>
+	nnoremap ll <Nop>
