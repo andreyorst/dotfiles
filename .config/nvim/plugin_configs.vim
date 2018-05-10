@@ -117,77 +117,6 @@
 	let g:tagbar_compact = 1
 	autocmd FileType c,cpp nested :TagbarOpen
 
-" Ultisnips
-	" NOTE: The settings below will make Ultisnips and Deoplete play nice
-	" together. Wich means that Deoplete is configured here too. If you'll
-	" modify anything here, you'll may loose ability to use deoplete <Tab>
-	" mapping wich is also done here
-
-	" Basic stuff
-""		let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips/']
-""		let g:UltiSnipsEditSplit="vertical"
-""
-""	" For sake of manual expanding
-""		let g:UltiSnipsExpandTrigger="<c-k>"
-""	" Undefine all jump triggers, because FUNCTIONS
-""		let g:UltiSnipsJumpForwardTrigger = "<NUL>"
-""		let g:UltiSnipsJumpBackwardTrigger = "<NUL>"
-""
-""	" Now onto buiseness
-""	" If deoplete popup is visible <Cr> will expand or jump. If not it will
-""	" close deoplete popup and leave everything as is. If used while editing an
-""	" expanded snippet it will complete the word and jump to next placeholder.
-""	" Magic!
-""		let g:ulti_expand_or_jump_res = 0
-""		function! <SID>ExpandOrClosePopup()
-""			let snippet = UltiSnips#ExpandSnippetOrJump()
-""			if g:ulti_expand_or_jump_res > 0
-""				return snippet
-""			else
-""				let close_popup = deoplete#close_popup()
-""				return close_popup
-""			endif
-""		endfunction
-""
-""	" When deoplete popup visible <Tab> acts like <C-n> wich selects next
-""	" completion item from the list. If there is no popup then <Tab> acts as
-""	" jump to next snippet placeholder, if we actually editing a snippet. If
-""	" no popup and no snippet <Tab> acts like <Tab>
-""		function! SmartTab()
-""			if pumvisible() == 1
-""				return "\<C-n>"
-""			else
-""				let snippet = UltiSnips#ExpandSnippetOrJump()
-""				if g:ulti_expand_or_jump_res > 0
-""					return snippet
-""				else
-""					return "\<Tab>"
-""				endif
-""			endif
-""		endfunction
-""
-""	" The same as previous, but selects previous item and jumps backwards. Or
-""	" acts like <S-Tab>
-""		function! SmartSTab()
-""			if pumvisible() == 1
-""				return "\<C-p>"
-""			else
-""				let snippet = UltiSnips#JumpBackwards()
-""				if g:ulti_expand_or_jump_res > 0
-""					return snippet
-""				else
-""					return "\<S-Tab>"
-""				endif
-""			endif
-""		endfunction
-""
-""	" Ultisnips + Deoplete mappings
-""		inoremap <silent><expr><CR> pumvisible() ? "<C-R>=<SID>ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
-""		inoremap <silent><Tab>      <C-R>=SmartTab()<CR>
-""		snoremap <silent><Tab>      <Esc>:call UltiSnips#JumpForwards()<CR>
-""		inoremap <silent><S-Tab>    <C-R>=SmartSTab()<CR>
-""		snoremap <silent><S-Tab>    <Esc>:call UltiSnips#JumpBackwards()<CR>
-
 " SimpleSnippets.vim
 	let g:SimpleSnippets_dont_remap_tab = 1
 	function! ExpandOrClosePopup()
@@ -199,8 +128,19 @@
 		endif
 	endfunction
 
-	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" : SimpleSnippets#isExpandableOrJumpable() ? "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
-	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" : SimpleSnippets#isJumpable() ? "\<esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" : "\<S-Tab>"
-	snoremap <silent><expr><Tab> SimpleSnippets#isExpandableOrJumpable() ? "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
-	snoremap <silent><expr><S-Tab> SimpleSnippets#isJumpable() ? "\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" : "\<S-Tab>"
-	inoremap <silent><expr><CR> pumvisible() ? "<C-R>=ExpandOrClosePopup()<CR>" : delimitMate#WithinEmptyPair() ? "\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" :
+				\SimpleSnippets#isExpandableOrJumpable() ?
+				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" :
+				\SimpleSnippets#isJumpable() ?
+				\"\<esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
+				\"\<S-Tab>"
+	snoremap <silent><expr><Tab> SimpleSnippets#isExpandableOrJumpable() ?
+				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	snoremap <silent><expr><S-Tab> SimpleSnippets#isJumpable() ?
+				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
+				\"\<S-Tab>"
+	inoremap <silent><expr><CR> pumvisible() ?
+				\"<C-R>=ExpandOrClosePopup()<CR>" :
+				\delimitMate#WithinEmptyPair() ?
+				\"\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
