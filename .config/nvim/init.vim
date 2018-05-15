@@ -18,10 +18,12 @@ filetype off
 		Plugin 'craigemery/vim-autotag'
 		Plugin 'ctrlpvim/ctrlp.vim'
 		Plugin 'junegunn/goyo.vim'
+		Plugin 'justinmk/vim-sneak'
 		Plugin 'majutsushi/tagbar'
 		Plugin 'Raimondi/delimitMate'
 		Plugin 'scrooloose/nerdtree'
 		Plugin 'Shougo/deoplete.nvim'
+		Plugin 'tpope/vim-surround'
 		Plugin 'w0rp/ale'
 
 	" Rust

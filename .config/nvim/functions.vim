@@ -55,9 +55,9 @@
 
 	" Delete all trailing spaces on file open
 		function! RemoveTrailingSpaces()
-			normal! mzHmy
 			execute '%s:\s\+$::ge'
-			normal! 'yzt`z
+			normal! ``
+			call histdel("/", -1)
 		endfunction
 
 		autocmd BufWritePre *.* :call RemoveTrailingSpaces()

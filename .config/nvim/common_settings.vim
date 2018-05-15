@@ -45,6 +45,9 @@
 " Spell
 	set spelllang=ru_yo,en_us
 
+" Justify text
+	runtime macros/justify.vim
+
 " Highlights
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
