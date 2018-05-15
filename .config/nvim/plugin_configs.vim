@@ -119,6 +119,7 @@
 
 " SimpleSnippets.vim
 	let g:SimpleSnippets_dont_remap_tab = 1
+
 	function! ExpandOrClosePopup()
 		if SimpleSnippets#isExpandableOrJumpable()
 			return "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>"
