@@ -145,3 +145,12 @@
 				\"<C-R>=ExpandOrClosePopup()<CR>" :
 				\delimitMate#WithinEmptyPair() ?
 				\"\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+	inoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
+				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"J"
+	snoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
+				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"J"
+	nnoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
+				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"\<S-j>"
