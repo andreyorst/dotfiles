@@ -120,6 +120,10 @@
 " SimpleSnippets.vim
 	let g:SimpleSnippets_dont_remap_tab = 1
 
+	let g:SimpleSnippetsExpandOrJumpTrigger = "<Tab>"
+	let g:SimpleSnippetsJumpBackwardTrigger = "<S-Tab>"
+	let g:SimpleSnippetsJumpToLastTrigger = "<S-j>"
+
 	function! ExpandOrClosePopup()
 		if SimpleSnippets#isExpandableOrJumpable()
 			return "\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>"
@@ -129,28 +133,34 @@
 		endif
 	endfunction
 
-	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" :
-				\SimpleSnippets#isExpandableOrJumpable() ?
-				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
-	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" :
-				\SimpleSnippets#isJumpable() ?
-				\"\<esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
-				\"\<S-Tab>"
-	snoremap <silent><expr><Tab> SimpleSnippets#isExpandableOrJumpable() ?
-				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
-	snoremap <silent><expr><S-Tab> SimpleSnippets#isJumpable() ?
-				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
-				\"\<S-Tab>"
 	inoremap <silent><expr><CR> pumvisible() ?
 				\"<C-R>=ExpandOrClosePopup()<CR>" :
 				\delimitMate#WithinEmptyPair() ?
 				\"\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
-	inoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
+	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" :
+				\SimpleSnippets#isExpandableOrJumpable() ?
+				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	snoremap <silent><expr><Tab> SimpleSnippets#isExpandableOrJumpable() ?
+				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	nnoremap <silent><expr><Tab> SimpleSnippets#isExpandableOrJumpable() ?
+				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
+	inoremap <silent><expr><S-Tab> pumvisible() ? "\<c-p>" :
+				\SimpleSnippets#isJumpable() ?
+				\"\<esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"\<S-Tab>"
+	snoremap <silent><expr><S-Tab> SimpleSnippets#isJumpable() ?
 				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"\<S-Tab>"
+	nnoremap <silent><expr><S-Tab> SimpleSnippets#isJumpable() ?
+				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"\<S-Tab>"
+	inoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
+				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
 				\"J"
 	snoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
-				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
 				\"J"
 	nnoremap <silent><expr><S-j> SimpleSnippets#isJumpable() ?
-				\"\<Esc>:call SimpleSnippets#jumpBackwards()\<Cr>" :
+				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
 				\"\<S-j>"
+
