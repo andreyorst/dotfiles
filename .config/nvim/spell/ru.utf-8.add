@@ -82,3 +82,4 @@ SimpleSnippetsJumpBackwardTrigger
 SimpleSnippetsJumpToLastTrigger
 j
 cnoremap
+#tc
