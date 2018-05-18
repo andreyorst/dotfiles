@@ -77,3 +77,8 @@ vim
 signcolumn
 F1
 F2
+SimpleSnippetsExpandOrJumpTrigger
+SimpleSnippetsJumpBackwardTrigger
+SimpleSnippetsJumpToLastTrigger
+j
+cnoremap
