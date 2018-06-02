@@ -122,7 +122,7 @@
 
 	let g:SimpleSnippetsExpandOrJumpTrigger = "<Tab>"
 	let g:SimpleSnippetsJumpBackwardTrigger = "<S-Tab>"
-	let g:SimpleSnippetsJumpToLastTrigger = "<S-j>"
+	let g:SimpleSnippetsJumpToLastTrigger = "<C-j>"
 
 	function! ExpandOrClosePopup()
 		if SimpleSnippets#isExpandableOrJumpable()

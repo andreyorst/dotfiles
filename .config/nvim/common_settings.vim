@@ -2,8 +2,8 @@
 	set encoding=utf-8
 	set mouse=a
 	set number
-	set cursorline
 	set relativenumber
+	set cursorline
 	syntax on
 	set path+=**
 	set wildmenu
@@ -16,6 +16,9 @@
 	set scrolloff=5
 	set foldcolumn=0
 
+" Eeegh....
+	set lazyredraw
+
 " Folds
 	set foldmethod=indent
 	set foldlevelstart=20    " Disables automatic closing of all folds on fileopen
@@ -23,7 +26,7 @@
 	hi Folded ctermbg=white
 
 " Tabs, trailing spaces
-	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:\ ,trail:⋅
+	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:⋅,trail:⋅
 	set list
 
 " Splits
