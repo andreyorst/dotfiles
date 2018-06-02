@@ -82,3 +82,13 @@ SimpleSnippetsJumpBackwardTrigger
 SimpleSnippetsJumpToLastTrigger
 j
 cnoremap
+testrc
+redir
+tmux
+u
+func
+ggdGitest
+otest
+endQq
+Qq
+Qw
