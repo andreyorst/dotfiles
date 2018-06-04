@@ -26,7 +26,7 @@
 	hi Folded ctermbg=white
 
 " Tabs, trailing spaces
-	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:⋅,trail:⋅
+	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:\ ,trail:⋅
 	set list
 
 " Splits
