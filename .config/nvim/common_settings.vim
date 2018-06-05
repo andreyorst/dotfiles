@@ -14,9 +14,7 @@
 	set wrap
 	set linebreak
 	set scrolloff=5
-	set foldcolumn=0
-
-" Eeegh....
+	set shortmess+=c
 	set lazyredraw
 
 " Folds
@@ -26,7 +24,7 @@
 	hi Folded ctermbg=white
 
 " Tabs, trailing spaces
-	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:⋅,trail:⋅
+	set listchars=tab:▏\ ,eol:\ ,extends:,precedes:,space:\ ,trail:⋅
 	set list
 
 " Splits
