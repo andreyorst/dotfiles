@@ -83,3 +83,4 @@ SimpleSnippetsJumpToLastTrigger
 j
 cnoremap
 #tc
+tmux
