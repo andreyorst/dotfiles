@@ -14,8 +14,6 @@ filetype off
 	" Tools
 		Plugin 'andreyorst/SimpleSnippets.vim'
 		Plugin 'andreyorst/SimpleSnippets-snippets'
-		Plugin 'autozimu/LanguageClient-neovim'
-		Plugin 'Chiel92/vim-autoformat'
 		Plugin 'craigemery/vim-autotag'
 		Plugin 'ctrlpvim/ctrlp.vim'
 		Plugin 'junegunn/goyo.vim'
