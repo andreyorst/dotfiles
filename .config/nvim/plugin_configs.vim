@@ -88,8 +88,13 @@
 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Deoplete Clang
-	let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
-	let g:deoplete#sources#clang#clang_header='/lib/clang/'
+	if match(execute("!echo $PATH"), "termux") != -1
+		let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
+		let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
+	else
+		let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
+		let g:deoplete#sources#clang#clang_header='/lib/clang/'
+	endif
 
 	" NOTE: This piece of code reuses previous code that generates clang
 	" options and exports it to file at project root. Again, you may delete
