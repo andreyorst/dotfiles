@@ -7,7 +7,7 @@
 		inoremap <silent><F2> <Esc>:call RenameCWord()<Cr>
 
 	" Open file under cursor
-		nnoremap gf <C-w>gf
+		"nnoremap gf <C-w>gf
 
 	" Toggle terminal on/off (neovim)
 		nnoremap <silent><A-t> :call TermToggle(12)<CR>
@@ -75,8 +75,11 @@
 		menu FEnc.koi8-u  :set fenc=koi8-u<CR>
 		noremap  <F20> :emenu FEnc.<Tab>
 
-" Mapjitsu
+" Commands
+	command! Wq w|bd
+	command! Q bd
 
+" Mapjitsu
 	" Getter and setter generation
 
 	" WARN: This is total mess. Don't try this at home. Requires ninja skills.

@@ -16,6 +16,7 @@
 	set scrolloff=5
 	set shortmess+=c
 	set lazyredraw
+	set hidden
 
 " Folds
 	set foldmethod=indent

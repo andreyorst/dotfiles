@@ -12,6 +12,7 @@
 
 	" Tabs
 		let g:airline#extensions#tabline#enabled = 1
+		let g:airline#extensions#tabline#fnamemod = ':t'
 		let g:airline#extensions#tabline#left_sep = ''
 		let g:airline#extensions#tabline#left_alt_sep = ''
 
@@ -67,20 +68,19 @@
 		let g:ale_c_clang_options.= g:includepath
 		let g:ale_c_gcc_options.= g:includepath
 
-" CtrlP
-	let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-	let g:ctrlp_clear_cache_on_exit = 1
-	if executable('ag')
-		set grepprg=ag\ --nogroup\ --nocolor
-		let g:ctrlp_user_command = 'ag %s -l --nocolor --nogroup --hidden -g ""'
-	endif
-
 " DelimitMate
 	let delimitMate_expand_cr = 1
 	let delimitMate_expand_space = 0
 	let delimitMate_nesting_quotes = ['`']
 
-" Deoplete
+" Denite.nvim
+	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
+	call denite#custom#option('_', 'highlight_matched_range', 'None')
+	call denite#custom#option('_', 'highlight_matched_char', 'ErrorMsg')
+	call denite#custom#var('file/rec', 'command',
+				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+
+" Deoplete.nvim
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
 
@@ -99,14 +99,6 @@
 		silent! echon 'flags = ' g:includepath
 		redir END
 	endif
-
-" LanguageClient-neovim
-	autocmd FileType rust nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
-
-	let g:LanguageClient_serverCommands = {
-				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-				\ }
-	let g:LanguageClient_loadSettings = 1
 
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
