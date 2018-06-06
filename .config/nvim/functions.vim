@@ -19,10 +19,11 @@
 			if win_gotoid(s:term_win)
 				hide
 			else
-				new
+				new terminal
 				exec "resize " . a:height
 				try
 					exec "buffer " . s:term_buf
+					exec "bd terminal"
 				catch
 					call termopen($SHELL, {"detach": 0})
 					let s:term_buf = bufnr("")
