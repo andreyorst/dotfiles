@@ -2,38 +2,41 @@ set nocompatible
 filetype off
 
 " Plugins
+	let github = 'https://github.com/'
+	let gitlag = 'https://gitlab.com/'
+
 	set rtp+=~/.vim/bundle/Vundle.vim
 	call vundle#begin()
 	Plugin 'VundleVim/Vundle.vim'
 
 	" Look
-		Plugin 'chriskempson/base16-vim'
-		Plugin 'vim-airline/vim-airline'
-		Plugin 'vim-airline/vim-airline-themes'
+		Plugin github.'chriskempson/base16-vim'
+		Plugin github.'vim-airline/vim-airline'
+		Plugin github.'vim-airline/vim-airline-themes'
 
 	" Tools
-		Plugin 'andreyorst/SimpleSnippets.vim'
-		Plugin 'andreyorst/SimpleSnippets-snippets'
-		Plugin 'craigemery/vim-autotag'
-		Plugin 'junegunn/goyo.vim'
-		Plugin 'justinmk/vim-sneak'
-		Plugin 'majutsushi/tagbar'
-		Plugin 'Raimondi/delimitMate'
-		Plugin 'scrooloose/nerdtree'
-		Plugin 'Shougo/deoplete.nvim'
-		Plugin 'Shougo/denite.nvim'
-		Plugin 'tpope/vim-surround'
-		Plugin 'w0rp/ale'
+		Plugin github.'andreyorst/SimpleSnippets.vim'
+		Plugin github.'andreyorst/SimpleSnippets-snippets'
+		Plugin github.'craigemery/vim-autotag'
+		Plugin github.'junegunn/goyo.vim'
+		Plugin github.'justinmk/vim-sneak'
+		Plugin github.'majutsushi/tagbar'
+		Plugin github.'Raimondi/delimitMate'
+		Plugin github.'scrooloose/nerdtree'
+		Plugin github.'Shougo/deoplete.nvim'
+		Plugin github.'Shougo/denite.nvim'
+		Plugin github.'tpope/vim-surround'
+		Plugin github.'w0rp/ale'
 
 	" Rust
-		Plugin 'rust-lang/rust.vim'
+		Plugin github.'rust-lang/rust.vim'
 
 	" C/C++
-		Plugin 'octol/vim-cpp-enhanced-highlight'
-		Plugin 'zchee/deoplete-clang'
+		Plugin github.'octol/vim-cpp-enhanced-highlight'
+		Plugin github.'zchee/deoplete-clang'
 
 	" Syntax Highlighting
-		Plugin 'justinmk/vim-syntax-extra'
+		Plugin github.'justinmk/vim-syntax-extra'
 
 	call vundle#end()
 
@@ -41,7 +44,6 @@ filetype plugin indent on
 
 " Settings
 	source ~/.config/nvim/common_settings.vim
-	source ~/.config/nvim/commands.vim
 	source ~/.config/nvim/plugin_configs.vim
 	source ~/.config/nvim/mappings.vim
 	source ~/.config/nvim/functions.vim
