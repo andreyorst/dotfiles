@@ -6,8 +6,8 @@
 		nnoremap <silent><F2> :call RenameCWord()<Cr>
 		inoremap <silent><F2> <Esc>:call RenameCWord()<Cr>
 
-	" Open file under cursor
-		"nnoremap gf <C-w>gf
+	" Denite
+		nnoremap <silent><C-P> :Denite file/rec<Cr>
 
 	" Toggle terminal on/off (neovim)
 		nnoremap <silent><A-t> :call TermToggle(12)<CR>
@@ -16,7 +16,6 @@
 
 	" Terminal go back to normal mode
 		tnoremap <Esc> <C-\><C-n>
-		tnoremap :q! <C-\><C-n>:q!<CR>
 
 	" Tagbar
 		noremap <A-b> <Esc>:TagbarToggle<CR>
@@ -27,8 +26,8 @@
 		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
 " Common fixes
-	nnoremap gb :bn<Cr>
-	nnoremap gB :bp<Cr>
+	nnoremap <silent>gb :bn<Cr>
+	nnoremap <silent>gB :bp<Cr>
 
 	nmap <F1> <nop>
 	imap <F1> <nop>
@@ -74,10 +73,6 @@
 		menu FEnc.ucs-2le :set fenc=ucs-2le<CR>
 		menu FEnc.koi8-u  :set fenc=koi8-u<CR>
 		noremap  <F20> :emenu FEnc.<Tab>
-
-" Commands
-	command! Wq w|bd
-	command! Q bd
 
 " Mapjitsu
 	" Getter and setter generation

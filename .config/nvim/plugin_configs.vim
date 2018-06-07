@@ -74,9 +74,10 @@
 	let delimitMate_nesting_quotes = ['`']
 
 " Denite.nvim
+	call denite#custom#option('_', 'highlight_mode_normal', 'CursorLine')
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
 	call denite#custom#option('_', 'highlight_matched_range', 'None')
-	call denite#custom#option('_', 'highlight_matched_char', 'ErrorMsg')
+	call denite#custom#option('_', 'highlight_matched_char', 'DiffDelete')
 	call denite#custom#var('file/rec', 'command',
 				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
 

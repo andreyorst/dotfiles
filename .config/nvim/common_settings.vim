@@ -67,3 +67,4 @@
 		highlight Search guifg=#282a2e
 		highlight IncSearch guifg=#282a2e
 		highlight Ignore guifg=#969896
+

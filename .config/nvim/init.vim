@@ -26,6 +26,7 @@ filetype off
 		Plugin github.'Shougo/deoplete.nvim'
 		Plugin github.'Shougo/denite.nvim'
 		Plugin github.'tpope/vim-surround'
+		Plugin github.'tpope/vim-fugitive'
 		Plugin github.'w0rp/ale'
 
 	" Rust
