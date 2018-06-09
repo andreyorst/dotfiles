@@ -15,15 +15,19 @@
 		tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
 
 	" Terminal go back to normal mode
-		tnoremap <Esc> <C-\><C-n>
+		tnoremap <silent><Esc> <C-\><C-n>
 
 	" Tagbar
-		noremap <A-b> <Esc>:TagbarToggle<CR>
-		tnoremap <A-b> <C-\><C-n>:TagbarToggle<CR>
+		noremap <silent><A-b> <Esc>:TagbarToggle<CR>
+		tnoremap <silent><A-b> <C-\><C-n>:TagbarToggle<CR>
 
 	" NERDTree
-		noremap <A-n> <Esc>:NERDTreeToggle<CR>
-		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
+		noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
+		tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
+
+	" Buffers
+		nnoremap <silent><A-q> <Esc>:bd!<Cr>
+		nnoremap <silent><A-w> <Esc>:w<Cr>
 
 " Common fixes
 	nnoremap <silent>gb :bn<Cr>
@@ -32,16 +36,13 @@
 	nmap <F1> <nop>
 	imap <F1> <nop>
 
-	" visual mode from insert mode
-	inoremap <C-v> <Esc>l<C-v>
-
 " Move lines around
-	nnoremap <A-j> :m .+1<CR>==
-	nnoremap <A-k> :m .-2<CR>==
-	inoremap <A-j> <Esc>:m .+1<CR>==gi
-	inoremap <A-k> <Esc>:m .-2<CR>==gi
-	vnoremap <A-j> :m '>+1<CR>gv=gv
-	vnoremap <A-k> :m '<-2<CR>gv=gv
+	nnoremap <silent><A-j> :m .+1<CR>==
+	nnoremap <silent><A-k> :m .-2<CR>==
+	inoremap <silent><A-j> <Esc>:m .+1<CR>==gi
+	inoremap <silent><A-k> <Esc>:m .-2<CR>==gi
+	vnoremap <silent><A-j> :m '>+1<CR>gv=gv
+	vnoremap <silent><A-k> :m '<-2<CR>gv=gv
 
 " Visual Selection Macro
 	xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
