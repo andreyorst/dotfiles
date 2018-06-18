@@ -4,3 +4,4 @@ tos:    tos(string)
 tob:    tos(byte)
 ton:    ton(number)
 tonf:   tonf(number, format)
+mark:   print current line to stdout
