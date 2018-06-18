@@ -84,9 +84,6 @@
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
 
-	" NOTE: Deoplete is now ruled by UltiSnips. This imap is deprecated
-	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-
 " Deoplete Clang
 	if match(execute("!echo $PATH"), "termux") != -1
 		let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
@@ -111,7 +108,9 @@
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
-	autocmd FileType c,cpp nested :TagbarOpen
+	if match(execute("!echo $PATH"), "termux") == -1
+		autocmd FileType c,cpp nested :TagbarOpen
+	endif
 
 " SimpleSnippets.vim
 	let g:SimpleSnippets_dont_remap_tab = 1
