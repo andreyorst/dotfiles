@@ -89,6 +89,7 @@ Color=197,200,198
 Color=197,200,198
 
 [General]
+Blur=true
 Description=Tomorrow Night
 Opacity=0.7
 Wallpaper=
