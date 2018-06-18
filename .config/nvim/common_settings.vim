@@ -17,6 +17,7 @@
 	set shortmess+=c
 	set lazyredraw
 	set hidden
+	set inccommand=nosplit
 
 " Folds
 	set foldmethod=indent
@@ -63,8 +64,13 @@
 
 	" Common highlights
 		highlight EndOfBuffer guifg=#32302f
-		highlight ALEErrorSign guibg=#3c3836 guifg=#fb4934
+		highlight ErrorSign guibg=#3c3836 guifg=#fb4934
+		highlight WarningSign guibg=#3c3836 guifg=#fabd2f
+		highlight InfoSign guibg=#3c3836 guifg=#8ec07c
 		highlight Search guifg=#282a2e
 		highlight IncSearch guifg=#282a2e
 		highlight Ignore guifg=#969896
+
+	" vim-sneak
+		highlight Sneak guifg=black guibg=orange
 

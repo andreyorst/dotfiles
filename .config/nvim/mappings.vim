@@ -75,6 +75,13 @@
 		menu FEnc.koi8-u  :set fenc=koi8-u<CR>
 		noremap  <F20> :emenu FEnc.<Tab>
 
+" LanguageClient-Neovim
+	autocmd FileType rust,c,cpp nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+	autocmd FileType rust,c,cpp nnoremap <silent> gh :call LanguageClient_textDocument_hover()<CR>
+	autocmd FileType rust,c,cpp nnoremap <silent> gr :call LanguageClient_textDocument_references()<CR>
+	autocmd FileType rust,c,cpp nnoremap <silent> gs :call LanguageClient_textDocument_documentSymbol()<CR>
+	autocmd FileType rust,c,cpp nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
+
 " Mapjitsu
 	" Getter and setter generation
 
