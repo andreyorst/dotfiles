@@ -17,6 +17,7 @@ filetype off
 	" Tools
 		Plugin github.'andreyorst/SimpleSnippets.vim'
 		Plugin github.'andreyorst/SimpleSnippets-snippets'
+		Plugin github.'autozimu/LanguageClient-neovim'
 		Plugin github.'craigemery/vim-autotag'
 		Plugin github.'junegunn/goyo.vim'
 		Plugin github.'justinmk/vim-sneak'
@@ -26,14 +27,12 @@ filetype off
 		Plugin github.'Shougo/deoplete.nvim'
 		Plugin github.'Shougo/denite.nvim'
 		Plugin github.'tpope/vim-surround'
-		Plugin github.'w0rp/ale'
 
 	" Rust
 		Plugin github.'rust-lang/rust.vim'
 
 	" C/C++
 		Plugin github.'octol/vim-cpp-enhanced-highlight'
-		Plugin github.'zchee/deoplete-clang'
 
 	" Syntax Highlighting
 		Plugin github.'justinmk/vim-syntax-extra'

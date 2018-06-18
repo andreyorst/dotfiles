@@ -19,55 +19,6 @@
 	" Theme
 		let g:airline_powerline_fonts = 1
 
-" ALE
-	let g:airline#extensions#ale#enabled = 1
-	let g:ale_lint_delay = 350
-
-	let g:ale_sign_error = '⬥ '
-	let g:ale_sign_warning = '⬥ '
-
-	let g:ale_linters = {
-		\ 'c': ['clang', 'gcc'],
-		\ 'cpp': ['clang'],
-	\}
-
-	" C/C++
-		let g:ale_cpp_clang_options = '-Wall --std=c++11 '
-		let g:ale_c_clang_options = '-Wall --std=c99 '
-		let g:ale_c_gcc_options = '-Wall --std=c99 '
-
-		let g:includepath = ''
-
-		" NOTE: This piece of code is used to generate clang options for ALE,
-		" because we aren't using any build system. You may delete this, or
-		" rewrite to your project needs. Basically you can refer to a specific
-		" file in your project root, and automatically pass desired options to
-		" ALE, and later to Clang. But the main reason I wrote it because, we
-		" have special config file, that contains current includepath, for our
-		" own build system, so I need to pass it to ALE somehow and detect if
-		" it was changed. You can go further and have a separate if() for each
-		" project, I have two for now. I understand that this is not the most
-		" beautiful way of doing this, but, still, it works fine, and I'm kinda
-		" happy with this variant for now.
-		if filereadable("./testkit.settings")
-			let g:includepath = system('echo -n
-						\ -I $(pwd)/include
-						\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src
-						\ -I $(pwd)/testpacks/CAN/can_lib_src
-						\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
-						\')
-		elseif filereadable("./startf.S")
-			let g:includepath = system('echo -n
-						\ -I $(pwd)/include
-						\ -I $(pwd)/include/cp2
-						\ -I $(pwd)/include/hdrtest
-						\ -I $(pwd)../../include
-						\')
-		endif
-
-		let g:ale_c_clang_options.= g:includepath
-		let g:ale_c_gcc_options.= g:includepath
-
 " DelimitMate
 	let delimitMate_expand_cr = 1
 	let delimitMate_expand_space = 0
@@ -85,23 +36,67 @@
 	set completeopt-=preview
 	let g:deoplete#enable_at_startup = 1
 
-" Deoplete Clang
-	if match(execute("!echo $PATH"), "termux") != -1
-		let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
-		let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
-	else
-		let g:deoplete#sources#clang#libclang_path='/usr/lib/libclang.so'
-		let g:deoplete#sources#clang#clang_header='/lib/clang/'
+" LanguageClient-neovim
+	let g:LanguageClient_serverCommands = {
+				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+				\ 'c':    ['cquery', '--log-file=/tmp/cq.log'],
+				\ 'cpp':  ['cquery', '--log-file=/tmp/cqcpp.log'],
+				\ }
+
+	let g:LanguageClient_settingsPath = $HOME . '/.config/nvim/settings.json'
+	let g:LanguageClient_loadSettings = 1
+
+	let g:cquery_c_options = '-Wall --std=c99'
+	let g:cquery_cpp_options = '-Wall --std=c++11'
+
+	let g:cquery_includes = ''
+	if filereadable("./testkit.settings")
+		let g:cquery_includes = system('echo -n "
+					\-I$(pwd)/include\n
+					\-I$(pwd)/testpacks/SPW_TESTS/spw_lib_src\n
+					\-I$(pwd)/testpacks/CAN/can_lib_src\n
+					\-I$(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n
+					\"')
+	elseif filereadable("./startf.S")
+		let g:cquery_includes = system('echo -n "
+					\-I$(pwd)/include\n
+					\-I$(pwd)/include/cp2\n
+					\-I$(pwd)/include/hdrtest\n
+					\-I$(pwd)/../../include\n
+					\"')
 	endif
 
-	" NOTE: This piece of code reuses previous code that generates clang
-	" options and exports it to file at project root. Again, you may delete
-	" it, or rewrite to your project needs.
 	if filereadable("./testkit.settings") || filereadable("startf.S")
-		redir! > ./.clang
-		silent! echon 'flags = ' g:includepath
+		redir! > ./.cquery
+		silent! echon "%c -Weverything" . g:cquery_c_options
+		silent! echo "# Includes"
+		silent! echo g:cquery_includes
 		redir END
 	endif
+
+						"texthl": "WarningSign",
+	let g:LanguageClient_diagnosticsDisplay = {
+				\	1: {
+				\		"name": "Error",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "ErrorSign",
+				\	},
+				\	2: {
+				\		"name": "Warning",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "WarningSign",
+				\	},
+				\	3: {
+				\		"name": "Information",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "InfoSign",
+				\	},
+				\	4: {
+				\		"name": "Hint",
+				\		"signText": "⬥ ",
+				\		"signTexthl": "InfoSign",
+				\	},
+				\}
 
 " NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
