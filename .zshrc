@@ -26,7 +26,8 @@ source $ZSH/oh-my-zsh.sh
 alias vimdiff="nvim -d"
 alias zshconf="nvim ~/.zshrc"
 alias vimconf="nvim ~/.config/nvim/init.vim"
-alias neofetch="clear && echo && neofetch --ascii_distro mac --disable DE WM Theme Icons Shell GPU Resolution  --color_blocks --underline_char '─' --cpu_cores --os_arch"
+#alias neofetch="clear && echo && neofetch --ascii_distro mac --disable DE WM Theme Icons Shell GPU Resolution  --color_blocks --underline_char '─' --cpu_cores --os_arch"
+alias neofetch="clear && echo && neofetch --disable DE WM Theme Icons Shell GPU Resolution  --color_blocks --underline_char '─' --cpu_cores --os_arch"
 alias stopwatch='while true; do echo -ne "$(date | sed -E "s/.*12 //" | sed -E "s/ MS.*//"):$(date +%-N)\r"; done'
 
 # Blur konsole

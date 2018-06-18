@@ -6,8 +6,8 @@
 		nnoremap <silent><F2> :call RenameCWord()<Cr>
 		inoremap <silent><F2> <Esc>:call RenameCWord()<Cr>
 
-	" Open file under cursor
-		"nnoremap gf <C-w>gf
+	" Denite
+		nnoremap <silent><C-P> :Denite file/rec<Cr>
 
 	" Toggle terminal on/off (neovim)
 		nnoremap <silent><A-t> :call TermToggle(12)<CR>
@@ -15,34 +15,34 @@
 		tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
 
 	" Terminal go back to normal mode
-		tnoremap <Esc> <C-\><C-n>
-		tnoremap :q! <C-\><C-n>:q!<CR>
+		tnoremap <silent><Esc> <C-\><C-n>
 
 	" Tagbar
-		noremap <A-b> <Esc>:TagbarToggle<CR>
-		tnoremap <A-b> <C-\><C-n>:TagbarToggle<CR>
+		noremap <silent><A-b> <Esc>:TagbarToggle<CR>
+		tnoremap <silent><A-b> <C-\><C-n>:TagbarToggle<CR>
 
 	" NERDTree
-		noremap <A-n> <Esc>:NERDTreeToggle<CR>
-		tnoremap <A-n> <C-\><C-n>:NERDTreeToggle<CR>
+		noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
+		tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
+
+	" Buffers
+		nnoremap <silent><A-q> <Esc>:bd!<Cr>
+		nnoremap <silent><A-w> <Esc>:w<Cr>
 
 " Common fixes
-	nnoremap gb :bn<Cr>
-	nnoremap gB :bp<Cr>
+	nnoremap <silent>gb :bn<Cr>
+	nnoremap <silent>gB :bp<Cr>
 
 	nmap <F1> <nop>
 	imap <F1> <nop>
 
-	" visual mode from insert mode
-	inoremap <C-v> <Esc>l<C-v>
-
 " Move lines around
-	nnoremap <A-j> :m .+1<CR>==
-	nnoremap <A-k> :m .-2<CR>==
-	inoremap <A-j> <Esc>:m .+1<CR>==gi
-	inoremap <A-k> <Esc>:m .-2<CR>==gi
-	vnoremap <A-j> :m '>+1<CR>gv=gv
-	vnoremap <A-k> :m '<-2<CR>gv=gv
+	nnoremap <silent><A-j> :m .+1<CR>==
+	nnoremap <silent><A-k> :m .-2<CR>==
+	inoremap <silent><A-j> <Esc>:m .+1<CR>==gi
+	inoremap <silent><A-k> <Esc>:m .-2<CR>==gi
+	vnoremap <silent><A-j> :m '>+1<CR>gv=gv
+	vnoremap <silent><A-k> :m '<-2<CR>gv=gv
 
 " Visual Selection Macro
 	xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
@@ -74,10 +74,6 @@
 		menu FEnc.ucs-2le :set fenc=ucs-2le<CR>
 		menu FEnc.koi8-u  :set fenc=koi8-u<CR>
 		noremap  <F20> :emenu FEnc.<Tab>
-
-" Commands
-	command! Wq w|bd
-	command! Q bd
 
 " Mapjitsu
 	" Getter and setter generation
