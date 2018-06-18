@@ -68,3 +68,6 @@
 		highlight IncSearch guifg=#282a2e
 		highlight Ignore guifg=#969896
 
+	" vim-sneak
+		highlight Sneak guifg=black guibg=orange
+
