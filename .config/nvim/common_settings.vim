@@ -17,6 +17,7 @@
 	set shortmess+=c
 	set lazyredraw
 	set hidden
+	set inccommand=nosplit
 
 " Folds
 	set foldmethod=indent
