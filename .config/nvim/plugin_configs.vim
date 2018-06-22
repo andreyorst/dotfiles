@@ -50,14 +50,34 @@
 	let g:cquery_cpp_options = '-Wall --std=c++11'
 
 	let g:cquery_includes = ''
-	if filereadable("./testkit.settings")
-		let g:cquery_includes = system('echo -n "
-					\-I$(pwd)/include\n
-					\-I$(pwd)/testpacks/SPW_TESTS/spw_lib_src\n
-					\-I$(pwd)/testpacks/CAN/can_lib_src\n
-					\-I$(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n
-					\"')
-	elseif filereadable("./startf.S")
+
+	function! FindProjectRootByFile(filename)
+		let l:path = getcwd()
+		while l:path != ''
+			if filereadable(l:path.'/'.a:filename)
+				return l:path
+			else
+				let l:path = substitute(l:path, '\v(.*)\/.*', '\1', 'g')
+			endif
+		endwhile
+		return -1
+	endfunction
+
+	let s:prj_root = FindProjectRootByFile('testkit.settings')
+	if s:prj_root != -1
+		let g:cquery_includes  = "-I".s:prj_root."/include\n"
+		let g:cquery_includes .= "-I".s:prj_root."/testpacks/SPW_TESTS/spw_lib_src\n"
+		let g:cquery_includes .= "-I".s:prj_root."/testpacks/CAN/can_lib_src\n"
+		let g:cquery_includes .= "-I".s:prj_root."/testpacks/MKIO/mkio_lib_src\n"
+		let g:cquery_includes .= system('echo -n "-I'.s:prj_root.'/platforms/$(cat '.s:prj_root.'/testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n"')
+
+		call execute('!echo "\%c -Weverything '.g:cquery_c_options.'" > '.s:prj_root.'/.cquery')
+		call execute('!echo "" >> '.s:prj_root.'/.cquery')
+		call execute('!echo "\# Includes" >> '.s:prj_root.'/.cquery')
+		call execute('!echo "'.join(split(g:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
+	endif
+
+	if match(execute("!echo $(pwd)"), "testms") != -1
 		let g:cquery_includes = system('echo -n "
 					\-I$(pwd)/include\n
 					\-I$(pwd)/include/cp2\n
@@ -67,14 +87,8 @@
 	endif
 
 	if filereadable("./testkit.settings") || filereadable("startf.S")
-		redir! > ./.cquery
-		silent! echon "%c -Weverything" . g:cquery_c_options
-		silent! echo "# Includes"
-		silent! echo g:cquery_includes
-		redir END
 	endif
 
-						"texthl": "WarningSign",
 	let g:LanguageClient_diagnosticsDisplay = {
 				\	1: {
 				\		"name": "Error",
