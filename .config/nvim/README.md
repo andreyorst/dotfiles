@@ -15,7 +15,8 @@ List of plugins (not all, but essential) that extend or change workflow in some 
   - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree).
   - Automatically inserting delimiters with [delimitMate](https://github.com/Raimondi/delimitMate).
   - Fuzzy finding, and doing lots of other cool stuff with [Denite](https://github.com/Shougo/denite.nvim)
-  - Distracting free typing of Markdown with [Goyo](https://github.com/junegunn/goyo.vim)
+  - Distraction-free typing of Markdown with [Goyo](https://github.com/junegunn/goyo.vim)
+  - Jump to any location specified by two characters with [vim-sneak](https://github.com/justinmk/vim-sneak)
 
 #### Some C/C++ cool stuff
   - Special regular expressions, to highlight language facilities like  
