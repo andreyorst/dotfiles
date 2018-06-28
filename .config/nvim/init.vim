@@ -43,7 +43,7 @@ filetype plugin indent on
 
 " Settings
 	source ~/.config/nvim/common_settings.vim
-	source ~/.config/nvim/plugin_configs.vim
-	source ~/.config/nvim/mappings.vim
 	source ~/.config/nvim/functions.vim
+	source ~/.config/nvim/mappings.vim
+	source ~/.config/nvim/plugin_configs.vim
 

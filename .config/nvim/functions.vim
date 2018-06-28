@@ -53,3 +53,25 @@
 			echo "@".getcmdline()
 			execute ":'<,'>normal @".nr2char(getchar())
 		endfunction
+
+	" Search upwards for file, and return its path
+		function! FindProjectRootByFile(filename)
+			let l:path = getcwd()
+			while l:path != ''
+				if filereadable(l:path.'/'.a:filename)
+					return l:path
+				else
+					let l:path = substitute(l:path, '\v(.*)\/.*', '\1', 'g')
+				endif
+			endwhile
+			return -1
+		endfunction
+
+	" Check if nvim running in Termux
+	" TODO: Find a better way to check it
+		function! IsTermux()
+			if match(execute("!echo $PATH"), "termux") != -1
+				return 1
+			endif
+			return 0
+		endfunction

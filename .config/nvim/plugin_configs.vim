@@ -51,18 +51,6 @@
 
 	let g:cquery_includes = ''
 
-	function! FindProjectRootByFile(filename)
-		let l:path = getcwd()
-		while l:path != ''
-			if filereadable(l:path.'/'.a:filename)
-				return l:path
-			else
-				let l:path = substitute(l:path, '\v(.*)\/.*', '\1', 'g')
-			endif
-		endwhile
-		return -1
-	endfunction
-
 	let s:prj_root = FindProjectRootByFile('testkit.settings')
 	if s:prj_root != -1
 		let g:cquery_includes  = "-I".s:prj_root."/include\n"
@@ -118,7 +106,7 @@
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
-	if match(execute("!echo $PATH"), "termux") == -1
+	if !IsTermux()
 		autocmd FileType c,cpp nested :TagbarOpen
 	endif
 
