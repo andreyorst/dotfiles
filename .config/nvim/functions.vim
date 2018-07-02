@@ -41,7 +41,7 @@
 		function! RenameCWord()
 			let a:cursor_pos = getpos(".")
 			let l:word = expand("<cword>")
-			let l:rename = input('Rename "'.l:word.'" to: ')
+			let l:rename = input("Rename: ", l:word)
 			if l:rename != ''
 				execute "%s/\\<".l:word."\\>/".l:rename."/g"
 			endif
