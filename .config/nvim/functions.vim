@@ -72,11 +72,3 @@
 			return -1
 		endfunction
 
-	" Check if nvim running in Termux
-	" TODO: Find a better way to check it
-		function! IsTermux()
-			if match(execute("!echo $PATH"), "termux") != -1
-				return 1
-			endif
-			return 0
-		endfunction
