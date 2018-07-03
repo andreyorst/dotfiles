@@ -65,16 +65,17 @@
 		call execute('!echo "'.join(split(g:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
 	endif
 
-	if match(execute("!echo $(pwd)"), "testms") != -1
-		let g:cquery_includes = system('echo -n "
-					\-I$(pwd)/include\n
-					\-I$(pwd)/include/cp2\n
-					\-I$(pwd)/include/hdrtest\n
-					\-I$(pwd)/../../include\n
-					\"')
-	endif
+	let s:testms_root = FindProjectRootByFile('startf.S')
+	if s:testms_root != -1
+		let g:cquery_includes  = "-I".s:testms_root."/include\n"
+		let g:cquery_includes .= "-I".s:testms_root."/include/cp2\n"
+		let g:cquery_includes .= "-I".s:testms_root."/include/hdrtest\n"
+		let g:cquery_includes .= "-I".s:testms_root."/../../include\n"
 
-	if filereadable("./testkit.settings") || filereadable("startf.S")
+		call execute('!echo "\%c -Weverything '.g:cquery_c_options.'" > '.s:testms_root.'/.cquery')
+		call execute('!echo "" >> '.s:testms_root.'/.cquery')
+		call execute('!echo "\# Includes" >> '.s:testms_root.'/.cquery')
+		call execute('!echo "'.join(split(g:cquery_includes, '\n'), '\n').'" >> '.s:testms_root.'/.cquery')
 	endif
 
 	let g:LanguageClient_diagnosticsDisplay = {
@@ -101,6 +102,12 @@
 				\}
 
 " NERDTree
+	let NERDTreeMinimalUI = 1
+	let g:NERDTreeDirArrowExpandable = '🗀'
+	"let g:NERDTreeDirArrowExpandable = '📁'
+	let g:NERDTreeDirArrowCollapsible = '🗁'
+	let g:NERDTreeHighlightFolders = 1
+	let g:NERDTreeHighlightFoldersFullName = 1
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Tagbar
