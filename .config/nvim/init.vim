@@ -38,6 +38,7 @@ endfunction
 			Plugin github.'majutsushi/tagbar'
 			Plugin github.'junegunn/goyo.vim'
 		endif
+
 	" Rust
 		Plugin github.'rust-lang/rust.vim'
 

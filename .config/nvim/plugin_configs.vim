@@ -19,6 +19,15 @@
 	" Theme
 		let g:airline_powerline_fonts = 1
 
+" DelimitMate
+	let delimitMate_expand_cr = 1
+	let delimitMate_expand_space = 0
+	let delimitMate_nesting_quotes = ['`']
+
+" Deoplete.nvim
+	set completeopt-=preview
+	let g:deoplete#enable_at_startup = 1
+
 if IsTermux()
 " ALE
 	highlight ALEErrorSign guibg=#3c3836 guifg=#fb4934
@@ -37,15 +46,11 @@ if IsTermux()
 	" C/C++
 		let g:ale_cpp_clang_options = '-Wall --std=c++11 '
 		let g:ale_c_clang_options = '-Wall --std=c99 '
-endif
 
-
-" DelimitMate
-	let delimitMate_expand_cr = 1
-	let delimitMate_expand_space = 0
-	let delimitMate_nesting_quotes = ['`']
-
-if !IsTermux()
+" deoplete-clang
+	let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
+	let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
+else
 " Denite.nvim
 	call denite#custom#option('_', 'highlight_mode_normal', 'CursorLine')
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
@@ -53,19 +58,7 @@ if !IsTermux()
 	call denite#custom#option('_', 'highlight_matched_char', 'DiffDelete')
 	call denite#custom#var('file/rec', 'command',
 				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
-endif
 
-" Deoplete.nvim
-	set completeopt-=preview
-	let g:deoplete#enable_at_startup = 1
-
-if IsTermux()
-" deoplete-clang
-	let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
-	let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
-endif
-
-if !IsTermux()
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
 				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
@@ -136,9 +129,8 @@ if !IsTermux()
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
-	if !IsTermux()
-		autocmd FileType c,cpp nested :TagbarOpen
-	endif
+
+	autocmd FileType c,cpp nested :TagbarOpen
 endif
 
 " SimpleSnippets.vim
