@@ -64,43 +64,40 @@ else " Not in Termux
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
 				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-				\ 'c':    ['cquery', '--log-file=/tmp/cq.log'],
-				\ 'cpp':  ['cquery', '--log-file=/tmp/cqcpp.log'],
+				\ 'c':    ['cquery', '--log-file=/tmp/cq.log ', '--init={"cacheDirectory": "'.$HOME.'/.cache/cquery"}'],
+				\ 'cpp':  ['cquery', '--log-file=/tmp/cq.log ', '--init={"cacheDirectory": "'.$HOME.'/.cache/cquery"}'],
 				\ }
 
-	let g:LanguageClient_settingsPath = $HOME . '/.config/nvim/settings.json'
-	let g:LanguageClient_loadSettings = 1
+	let s:cquery_c_options = '-Wall --std=c99'
+	let s:cquery_cpp_options = '-Wall --std=c++11'
 
-	let g:cquery_c_options = '-Wall --std=c99'
-	let g:cquery_cpp_options = '-Wall --std=c++11'
-
-	let g:cquery_includes = ''
+	let s:cquery_includes = ''
 
 	let s:prj_root = FindProjectRootByFile('testkit.settings')
 	if s:prj_root != -1
-		let g:cquery_includes  = "-I".s:prj_root."/include\n"
-		let g:cquery_includes .= "-I".s:prj_root."/testpacks/SPW_TESTS/spw_lib_src\n"
-		let g:cquery_includes .= "-I".s:prj_root."/testpacks/CAN/can_lib_src\n"
-		let g:cquery_includes .= "-I".s:prj_root."/testpacks/MKIO/mkio_lib_src\n"
-		let g:cquery_includes .= system('echo -n "-I'.s:prj_root.'/platforms/$(cat '.s:prj_root.'/testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n"')
+		let s:cquery_includes  = "-I".s:prj_root."/include\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/SPW_TESTS/spw_lib_src\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/CAN/can_lib_src\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/MKIO/mkio_lib_src\n"
+		let s:cquery_includes .= system('echo -n "-I'.s:prj_root.'/platforms/$(cat '.s:prj_root.'/testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n"')
 
-		call execute('!echo "\%c -Weverything '.g:cquery_c_options.'" > '.s:prj_root.'/.cquery')
+		call execute('!echo "\%c -Weverything '.s:cquery_c_options.'" > '.s:prj_root.'/.cquery')
 		call execute('!echo "" >> '.s:prj_root.'/.cquery')
 		call execute('!echo "\# Includes" >> '.s:prj_root.'/.cquery')
-		call execute('!echo "'.join(split(g:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
+		call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
 	endif
 
 	let s:testms_root = FindProjectRootByFile('startf.S')
 	if s:testms_root != -1
-		let g:cquery_includes  = "-I".s:testms_root."/include\n"
-		let g:cquery_includes .= "-I".s:testms_root."/include/cp2\n"
-		let g:cquery_includes .= "-I".s:testms_root."/include/hdrtest\n"
-		let g:cquery_includes .= "-I".s:testms_root."/../../include\n"
+		let s:cquery_includes  = "-I".s:testms_root."/include\n"
+		let s:cquery_includes .= "-I".s:testms_root."/include/cp2\n"
+		let s:cquery_includes .= "-I".s:testms_root."/include/hdrtest\n"
+		let s:cquery_includes .= "-I".s:testms_root."/../../include\n"
 
-		call execute('!echo "\%c -Weverything '.g:cquery_c_options.'" > '.s:testms_root.'/.cquery')
+		call execute('!echo "\%c -Weverything '.s:cquery_c_options.'" > '.s:testms_root.'/.cquery')
 		call execute('!echo "" >> '.s:testms_root.'/.cquery')
 		call execute('!echo "\# Includes" >> '.s:testms_root.'/.cquery')
-		call execute('!echo "'.join(split(g:cquery_includes, '\n'), '\n').'" >> '.s:testms_root.'/.cquery')
+		call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:testms_root.'/.cquery')
 	endif
 
 	let g:LanguageClient_diagnosticsDisplay = {
