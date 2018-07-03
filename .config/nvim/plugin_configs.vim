@@ -50,7 +50,9 @@ if IsTermux()
 " deoplete-clang
 	let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
 	let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
-else
+
+else " Not in Termux
+
 " Denite.nvim
 	call denite#custom#option('_', 'highlight_mode_normal', 'CursorLine')
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
@@ -127,10 +129,10 @@ else
 " NERDTree
 	let NERDTreeMinimalUI = 1
 	let g:NERDTreeDirArrowExpandable = '🗀'
-	"let g:NERDTreeDirArrowExpandable = '📁'
 	let g:NERDTreeDirArrowCollapsible = '🗁'
 	let g:NERDTreeHighlightFolders = 1
 	let g:NERDTreeHighlightFoldersFullName = 1
+
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Tagbar
