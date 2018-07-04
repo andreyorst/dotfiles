@@ -3,10 +3,10 @@
 		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
 	" Rename word under cursor in whole document
-		nnoremap <silent><F2> :call RenameCWord("cword")<Cr>
-		inoremap <silent><F2> <Esc>:call RenameCWord("cword")<Cr>
-		nnoremap <silent><F3> :call RenameCWord("cWORD")<Cr>
-		inoremap <silent><F3> <Esc>:call RenameCWord("cWORD")<Cr>
+		nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
+		inoremap <silent><F3> <Esc>:call RenameCWord("cword")<Cr>
+		nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
+		inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
 
 	" Denite
 		nnoremap <silent><C-P> :Denite file/rec<Cr>
