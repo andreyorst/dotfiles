@@ -3,8 +3,10 @@
 		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
 	" Rename word under cursor in whole document
-		nnoremap <silent><F2> :call RenameCWord()<Cr>
-		inoremap <silent><F2> <Esc>:call RenameCWord()<Cr>
+		nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
+		inoremap <silent><F3> <Esc>:call RenameCWord("cword")<Cr>
+		nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
+		inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
 
 	" Denite
 		nnoremap <silent><C-P> :Denite file/rec<Cr>
@@ -76,11 +78,13 @@
 		noremap  <F20> :emenu FEnc.<Tab>
 
 " LanguageClient-Neovim
+if !IsTermux()
 	autocmd FileType rust,c,cpp nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
 	autocmd FileType rust,c,cpp nnoremap <silent> gh :call LanguageClient_textDocument_hover()<CR>
 	autocmd FileType rust,c,cpp nnoremap <silent> gr :call LanguageClient_textDocument_references()<CR>
 	autocmd FileType rust,c,cpp nnoremap <silent> gs :call LanguageClient_textDocument_documentSymbol()<CR>
 	autocmd FileType rust,c,cpp nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
+endif
 
 " Mapjitsu
 	" Getter and setter generation

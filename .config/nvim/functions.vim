@@ -38,14 +38,19 @@
 		endfunction
 
 	" Rename word under cursor in whole file
-		function! RenameCWord()
-			let a:cursor_pos = getpos(".")
-			let l:word = expand("<cword>")
-			let l:rename = input('Rename "'.l:word.'" to: ')
+		function! RenameCWord(cword)
+			let l:cursor_pos = getpos(".")
+			let l:word = expand("<".a:cword.">")
+			let l:rename = input('Rename: ', l:word)
 			if l:rename != ''
-				execute "%s/\\<".l:word."\\>/".l:rename."/g"
+				if a:cword == "cword"
+					execute "%s/\\<".l:word."\\>/".l:rename."/g"
+				elseif a:cword == "cWORD"
+					let l:word = escape(l:word, '/')
+					execute "%s/".l:word."/".l:rename."/g"
+				endif
 			endif
-			call cursor(a:cursor_pos[1], a:cursor_pos[2])
+			call cursor(l:cursor_pos[1], l:cursor_pos[2])
 		endfunction
 
 	" Visual Selection Macro
@@ -53,3 +58,17 @@
 			echo "@".getcmdline()
 			execute ":'<,'>normal @".nr2char(getchar())
 		endfunction
+
+	" Search upwards for file, and return its path
+		function! FindProjectRootByFile(filename)
+			let l:path = getcwd()
+			while l:path != ''
+				if filereadable(l:path.'/'.a:filename)
+					return l:path
+				else
+					let l:path = substitute(l:path, '\v(.*)\/.*', '\1', 'g')
+				endif
+			endwhile
+			return -1
+		endfunction
+

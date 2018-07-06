@@ -9,14 +9,14 @@ Fancy screenshot for you:
 #### Plugins
 
 List of plugins (not all, but essential) that extend or change workflow in some way. Basically, I've tried to make nvim as close to IDE as possible with my tasks.
-  - Linting C/C++ code via [ALE](https://github.com/w0rp/ale).
-  - Autocompleting C/C++ via [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim) + [Deoplete-clang](https://github.com/zchee/deoplete-clang).
-  - Linting and autocompleting Rust via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) + [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
+  - Linting and autocompleting C/C++/Rust via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) + [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
   - Generating ctags on the fly via [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current file tags with [tagbar](https://github.com/majutsushi/tagbar).
   - Snippets provided by [SimpleSnippets.vim](https://github.com/andreyorst/SimpleSnippets.vim)
   - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree).
   - Automatically inserting delimiters with [delimitMate](https://github.com/Raimondi/delimitMate).
-  - Fuzzy finding any file, mru, tag via [ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim)
+  - Fuzzy finding, and doing lots of other cool stuff with [Denite](https://github.com/Shougo/denite.nvim)
+  - Distraction-free typing of Markdown with [Goyo](https://github.com/junegunn/goyo.vim)
+  - Jump to any location specified by two characters with [vim-sneak](https://github.com/justinmk/vim-sneak)
 
 #### Some C/C++ cool stuff
   - Special regular expressions, to highlight language facilities like  
@@ -44,7 +44,6 @@ List of plugins (not all, but essential) that extend or change workflow in some 
   - <kbd>F1</kbd> - NOTHING.
   - <kbd>F2</kbd> - Search and replace word under cursor with `RenameCWord()` function.
   - <kbd>\*</kbd> - Highlight all occurrences of word under cursor, but dont move. No jumps added to jumplist.
-  - <kbd>g</kbd><kbd>f</kbd> - Open file under cursor in new tab.
   - <kbd>Alt</kbd>+<kbd>t</kbd> - Toggle bottom terminal window.
   - <kbd>Alt</kbd>+<kbd>b</kbd> - Toggle Tagbar window.
   - <kbd>Alt</kbd>+<kbd>n</kbd> - Toggle Nerdtree window.
@@ -54,48 +53,14 @@ List of plugins (not all, but essential) that extend or change workflow in some 
 #### Functions:
 
 Some functions, that I use. Some of which i've created myself, some were taken from other Vim users. Feel free to use, modify, extend them.
-  - `HighlightTypes()` - **WIP** not ready to use. Automatically highlights C/C++ user types as Vim Type highlight group.
   - `RemoveTrailingSpaces()` - Removes all trailing whitespace on file-save.
   - `Term_toggle(height)` - Toggles terminal on and off.
   - `ExecuteMacroOverVisualRange()` - allows to execute <kbd>@</kbd> macro over visual selection.
   - `RenameCWord()` - Renames all occurrences of word under cursor in current file.
+  - `FindProjectRootByFile(filename)` - goes up from current directory untill it reaches root, and returns path to the file if found.
 
----
+# 
   
-Other configurations may be found in configuration files itself. They are provided with comments, so it won't be big problem for you, if you will desire to try my setup, to figure out what is going on here and there.
-
-Some plugins have huge comments like this one:
-```vim
-" NOTE: This piece of code is used to generate clang options for ALE,
-" because we aren't using any build system. You may delete this, or
-" rewrite to your project needs. Basically you can refer to a specific
-" file in your project root, and automatically pass desired options to
-" ALE, and later to Clang. But the main reason I wrote it because, we
-" have special config file, that contains current includepath, for our
-" own build system, so I need to pass it to ALE somehow and detect if
-" it was changed. You can go further and have a separate if() for each
-" project, I have two for now. I understand that this is not the most
-" beautiful way of doing this, but, still, it works fine, and I'm kinda
-" happy with this variant for now.
-if filereadable("./testkit.settings")
-	let g:includepath = system('echo -n
-				\ -I $(pwd)/include
-				\ -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src
-				\ -I $(pwd)/testpacks/CAN/can_lib_src
-				\ -I $(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include
-				\')
-elseif filereadable("./startf.S")
-	let g:includepath = system('echo -n
-				\ -I $(pwd)/include
-				\ -I $(pwd)/include/cp2
-				\ -I $(pwd)/include/hdrtest
-				\ -I $(pwd)../../include
-				\')
-endif
-
-let g:ale_c_clang_options.= g:includepath
-let g:ale_c_gcc_options.= g:includepath
-```
-You should pay attention to colored marks in comment sections, like `WARNING:`, `NOTE:` etc.
+Other configurations may be found in configuration files itself. They are provided with comments, so it won't be big problem for you, if you will desire to try my setup, to figure out what is going on here and there. You should pay attention to colored marks in comment sections, like `WARNING:`, `NOTE:` etc.
 
 If you encounter any problem with my setup, feel free to open issue, we'll see what we can do here.

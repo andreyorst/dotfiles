@@ -24,6 +24,35 @@
 	let delimitMate_expand_space = 0
 	let delimitMate_nesting_quotes = ['`']
 
+" Deoplete.nvim
+	set completeopt-=preview
+	let g:deoplete#enable_at_startup = 1
+
+if IsTermux()
+" ALE
+	highlight ALEErrorSign guibg=#3c3836 guifg=#fb4934
+
+	let g:airline#extensions#ale#enabled = 1
+	let g:ale_lint_delay = 350
+
+	let g:ale_sign_error = '⬥ '
+	let g:ale_sign_warning = '⬥ '
+
+	let g:ale_linters = {
+		\ 'c': ['clang'],
+		\ 'cpp': ['clang'],
+	\}
+
+	" C/C++
+		let g:ale_cpp_clang_options = '-Wall --std=c++11 '
+		let g:ale_c_clang_options = '-Wall --std=c99 '
+
+" deoplete-clang
+	let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
+	let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
+
+else " Not in Termux
+
 " Denite.nvim
 	call denite#custom#option('_', 'highlight_mode_normal', 'CursorLine')
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
@@ -32,61 +61,43 @@
 	call denite#custom#var('file/rec', 'command',
 				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
 
-" Deoplete.nvim
-	set completeopt-=preview
-	let g:deoplete#enable_at_startup = 1
-
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
 				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-				\ 'c':    ['cquery', '--log-file=/tmp/cq.log'],
-				\ 'cpp':  ['cquery', '--log-file=/tmp/cqcpp.log'],
+				\ 'c':    ['cquery', '--log-file=/tmp/cq.log ', '--init={"cacheDirectory": "'.$HOME.'/.cache/cquery"}'],
+				\ 'cpp':  ['cquery', '--log-file=/tmp/cq.log ', '--init={"cacheDirectory": "'.$HOME.'/.cache/cquery"}'],
 				\ }
 
-	let g:LanguageClient_settingsPath = $HOME . '/.config/nvim/settings.json'
-	let g:LanguageClient_loadSettings = 1
+	let s:cquery_c_options = '-Wall --std=c99'
+	let s:cquery_cpp_options = '-Wall --std=c++11'
 
-	let g:cquery_c_options = '-Wall --std=c99'
-	let g:cquery_cpp_options = '-Wall --std=c++11'
-
-	let g:cquery_includes = ''
-
-	function! FindProjectRootByFile(filename)
-		let l:path = getcwd()
-		while l:path != ''
-			if filereadable(l:path.'/'.a:filename)
-				return l:path
-			else
-				let l:path = substitute(l:path, '\v(.*)\/.*', '\1', 'g')
-			endif
-		endwhile
-		return -1
-	endfunction
+	let s:cquery_includes = ''
 
 	let s:prj_root = FindProjectRootByFile('testkit.settings')
 	if s:prj_root != -1
-		let g:cquery_includes  = "-I".s:prj_root."/include\n"
-		let g:cquery_includes .= "-I".s:prj_root."/testpacks/SPW_TESTS/spw_lib_src\n"
-		let g:cquery_includes .= "-I".s:prj_root."/testpacks/CAN/can_lib_src\n"
-		let g:cquery_includes .= "-I".s:prj_root."/testpacks/MKIO/mkio_lib_src\n"
-		let g:cquery_includes .= system('echo -n "-I'.s:prj_root.'/platforms/$(cat '.s:prj_root.'/testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n"')
+		let s:cquery_includes  = "-I".s:prj_root."/include\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/SPW_TESTS/spw_lib_src\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/CAN/can_lib_src\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/MKIO/mkio_lib_src\n"
+		let s:cquery_includes .= system('echo -n "-I'.s:prj_root.'/platforms/$(cat '.s:prj_root.'/testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n"')
 
-		call execute('!echo "\%c -Weverything '.g:cquery_c_options.'" > '.s:prj_root.'/.cquery')
+		call execute('!echo "\%c -Weverything '.s:cquery_c_options.'" > '.s:prj_root.'/.cquery')
 		call execute('!echo "" >> '.s:prj_root.'/.cquery')
 		call execute('!echo "\# Includes" >> '.s:prj_root.'/.cquery')
-		call execute('!echo "'.join(split(g:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
+		call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
 	endif
 
-	if match(execute("!echo $(pwd)"), "testms") != -1
-		let g:cquery_includes = system('echo -n "
-					\-I$(pwd)/include\n
-					\-I$(pwd)/include/cp2\n
-					\-I$(pwd)/include/hdrtest\n
-					\-I$(pwd)/../../include\n
-					\"')
-	endif
+	let s:testms_root = FindProjectRootByFile('startf.S')
+	if s:testms_root != -1
+		let s:cquery_includes  = "-I".s:testms_root."/include\n"
+		let s:cquery_includes .= "-I".s:testms_root."/include/cp2\n"
+		let s:cquery_includes .= "-I".s:testms_root."/include/hdrtest\n"
+		let s:cquery_includes .= "-I".s:testms_root."/../../include\n"
 
-	if filereadable("./testkit.settings") || filereadable("startf.S")
+		call execute('!echo "\%c -Weverything '.s:cquery_c_options.'" > '.s:testms_root.'/.cquery')
+		call execute('!echo "" >> '.s:testms_root.'/.cquery')
+		call execute('!echo "\# Includes" >> '.s:testms_root.'/.cquery')
+		call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:testms_root.'/.cquery')
 	endif
 
 	let g:LanguageClient_diagnosticsDisplay = {
@@ -113,14 +124,20 @@
 				\}
 
 " NERDTree
+	let NERDTreeMinimalUI = 1
+	let g:NERDTreeDirArrowExpandable = '🗀'
+	let g:NERDTreeDirArrowCollapsible = '🗁'
+	let g:NERDTreeHighlightFolders = 1
+	let g:NERDTreeHighlightFoldersFullName = 1
+
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
-	if match(execute("!echo $PATH"), "termux") == -1
-		autocmd FileType c,cpp nested :TagbarOpen
-	endif
+
+	autocmd FileType c,cpp nested :TagbarOpen
+endif
 
 " SimpleSnippets.vim
 	let g:SimpleSnippets_dont_remap_tab = 1
