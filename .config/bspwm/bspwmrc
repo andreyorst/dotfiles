@@ -1,14 +1,12 @@
 #! /bin/sh
 
-xfce4-panel &
 sxhkd &
-redshift -l 55.5:37.5 &
 setxkbmap -layout us,ru -option grp:alt_shift_toggle &
 
-bspc monitor -d ⚫ ⚫ ⚫ ⚫
+bspc monitor -d ⚫ ⚫ ⚫ ⚫ ⚫ ⚫ ⚫ ⚫ ⚫ ⚫
 
-bspc config border_width          4
-bspc config window_gap           14
+bspc config border_width          6
+bspc config window_gap           24
 bspc config click_to_focus     true
 
 bspc config presel_feedback_color '#32302f'
@@ -21,8 +19,10 @@ bspc config borderless_monocle   true
 bspc config gapless_monocle      true
 
 bspc rule -a Xfce4-appfinder state=floating
-bspc rule -a Termite state=pseudo_tiled
+#bspc rule -a Termite state=pseudo_tiled
 bspc rule -a Gnome-terminal state=pseudo_tiled
 bspc rule -a TelegramDesktop desktop='^2' state=pseudo_tiled
-bspc rule -a Thunderbird desktop='^2' state=pseudo_tiled
 bspc rule -a Screenkey manage=off
+bspc rule -a Wrapper-2.0 manage=off
+bspc rule -a Xfce4-panel state=floating
+bspc rule -a Thunar state=pseudo_tiled
