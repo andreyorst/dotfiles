@@ -1,45 +1,53 @@
-" Plugins
-	filetype off
 
-	let github = 'https://github.com/'
-	let gitlag = 'https://gitlab.com/'
+" ╭─────────────╥──────────────────╮
+" │ Author:     ║ File:            │
+" │ Andrey Orst ║ plufins.vim      │
+" ╞═════════════╩══════════════════╡
+" │ Rest of .dotfiles:             │
+" │ GitHub.com/andreyorst/dotfiles │
+" ╰────────────────────────────────╯
 
-	set rtp+=~/.vim/bundle/Vundle.vim
+filetype off
 
-	call vundle#begin()
-	Plugin 'VundleVim/Vundle.vim'
+let github = 'https://github.com/'
+let gitlag = 'https://gitlab.com/'
 
-	" Look
-		Plugin github.'chriskempson/base16-vim'
-		Plugin github.'vim-airline/vim-airline'
-		Plugin github.'vim-airline/vim-airline-themes'
+set rtp+=~/.vim/bundle/Vundle.vim
 
-	" Tools
-		Plugin github.'andreyorst/SimpleSnippets.vim'
-		Plugin github.'andreyorst/SimpleSnippets-snippets'
-		Plugin github.'craigemery/vim-autotag'
-		Plugin github.'justinmk/vim-sneak'
-		Plugin github.'Raimondi/delimitMate'
-		Plugin github.'Shougo/deoplete.nvim'
-		Plugin github.'tpope/vim-surround'
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
 
-		if IsTermux()
-			Plugin github.'w0rp/ale'
-			Plugin github.'zchee/deoplete-clang'
-		else
-			Plugin github.'autozimu/LanguageClient-neovim'
-			Plugin github.'Shougo/denite.nvim'
-			Plugin github.'scrooloose/nerdtree'
-			Plugin github.'majutsushi/tagbar'
-			Plugin github.'junegunn/goyo.vim'
-		endif
+" Look
+	Plugin github.'chriskempson/base16-vim'
+	Plugin github.'vim-airline/vim-airline'
+	Plugin github.'vim-airline/vim-airline-themes'
 
-	" Rust
-		Plugin github.'rust-lang/rust.vim'
+" Tools
+	Plugin github.'andreyorst/SimpleSnippets.vim'
+	Plugin github.'andreyorst/SimpleSnippets-snippets'
+	Plugin github.'craigemery/vim-autotag'
+	Plugin github.'justinmk/vim-sneak'
+	Plugin github.'Raimondi/delimitMate'
+	Plugin github.'Shougo/deoplete.nvim'
+	Plugin github.'tpope/vim-surround'
 
-	" Syntax Highlighting
-		Plugin github.'justinmk/vim-syntax-extra'
-		Plugin github.'octol/vim-cpp-enhanced-highlight'
+	if IsTermux()
+		Plugin github.'w0rp/ale'
+		Plugin github.'zchee/deoplete-clang'
+	else
+		Plugin github.'autozimu/LanguageClient-neovim'
+		Plugin github.'Shougo/denite.nvim'
+		Plugin github.'scrooloose/nerdtree'
+		Plugin github.'majutsushi/tagbar'
+		Plugin github.'junegunn/goyo.vim'
+	endif
 
-	call vundle#end()
+" Rust
+	Plugin github.'rust-lang/rust.vim'
+
+" Syntax Highlighting
+	Plugin github.'justinmk/vim-syntax-extra'
+	Plugin github.'octol/vim-cpp-enhanced-highlight'
+
+call vundle#end()
 

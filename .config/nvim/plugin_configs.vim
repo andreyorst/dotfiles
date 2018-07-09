@@ -1,3 +1,12 @@
+
+" ╭─────────────╥──────────────────╮
+" │ Author:     ║ File:            │
+" │ Andrey Orst ║ plufin_conf.vim  │
+" ╞═════════════╩══════════════════╡
+" │ Rest of .dotfiles:             │
+" │ GitHub.com/andreyorst/dotfiles │
+" ╰────────────────────────────────╯
+
 " Airline
 	set laststatus=2
 
