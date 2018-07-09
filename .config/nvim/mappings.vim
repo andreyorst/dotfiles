@@ -1,4 +1,5 @@
 " Map Settings:
+let mapleader = "\<Alt>"
 	" Highlights word under cursor by placing it in @/ register
 		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
@@ -58,7 +59,6 @@
 		noremap  <F7> :emenu EOL.<Tab>
 
 	" <F8> Change encoding
-		set  wcm=<Tab>
 		menu Enc.cp1251  :e! ++enc=cp1251<CR>
 		menu Enc.koi8-r  :e! ++enc=koi8-r<CR>
 		menu Enc.cp866   :e! ++enc=ibm866<CR>
@@ -68,7 +68,6 @@
 		noremap  <F8> :emenu Enc.<Tab>
 
 	" <F20> Convert file encoding
-		set  wcm=<Tab>
 		menu FEnc.cp1251  :set fenc=cp1251<CR>
 		menu FEnc.koi8-r  :set fenc=koi8-r<CR>
 		menu FEnc.cp866   :set fenc=ibm866<CR>
