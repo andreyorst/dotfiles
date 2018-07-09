@@ -1,3 +1,11 @@
+" ╭─────────────╥──────────────────╮
+" │ Author:     ║ File:            │
+" │ Andrey Orst ║ mappings.vim     │
+" ╞═════════════╩══════════════════╡
+" │ Rest of .dotfiles:             │
+" │ GitHub.com/andreyorst/dotfiles │
+" ╰────────────────────────────────╯
+
 " Map Settings:
 let mapleader = "\<Alt>"
 	" Highlights word under cursor by placing it in @/ register
