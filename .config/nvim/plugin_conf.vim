@@ -57,8 +57,9 @@ if IsTermux()
 		let g:ale_c_clang_options = '-Wall --std=c99 '
 
 " deoplete-clang
-	let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
-	let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
+	let s:termux_root = '/data/data/com.termux/files'
+	let g:deoplete#sources#clang#libclang_path = s:termux_root.'/usr/lib/libclang.so'
+	let g:deoplete#sources#clang#clang_header = s:termux_root.'/usr/lib/clang/'
 
 else " Not in Termux
 
