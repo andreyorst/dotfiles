@@ -66,7 +66,7 @@ This NeoVim config can be adjusted between powerful PC and less powerful phone, 
 ```vim
 if IsTermux()
 	" Do some less CPU hungry actions here if we're in termux
-esle
+else
 	" Or go full out when you're on your powerful PC
 endif
 ```
