@@ -4,11 +4,9 @@ Fancy screenshot for you:
 ![NeoVim](https://user-images.githubusercontent.com/19470159/38351495-64efb4da-38b8-11e8-8454-f2e3d597b82c.png)
 ## Features:
 
-### Plugins and stuff
+### Plugins:
 
-#### Plugins
-
-List of plugins (not all, but essential) that extend or change workflow in some way. Basically, I've tried to make nvim as close to IDE as possible with my tasks.
+List of plugins (not all, but essential ones) that extend or change workflow in some way. Basically, I've tried to make nvim as close to C/C++ IDE as possible.
   - Linting and autocompleting C/C++/Rust via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) + [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
   - Generating ctags on the fly via [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current file tags with [tagbar](https://github.com/majutsushi/tagbar).
   - Snippets provided by [SimpleSnippets.vim](https://github.com/andreyorst/SimpleSnippets.vim)
@@ -18,7 +16,8 @@ List of plugins (not all, but essential) that extend or change workflow in some 
   - Distraction-free typing of Markdown with [Goyo](https://github.com/junegunn/goyo.vim)
   - Jump to any location specified by two characters with [vim-sneak](https://github.com/justinmk/vim-sneak)
 
-#### Some C/C++ cool stuff
+### Some C/C++ cool stuff:
+
   - Special regular expressions, to highlight language facilities like  
   ```cpp
   typedef struct container {
@@ -37,26 +36,26 @@ List of plugins (not all, but essential) that extend or change workflow in some 
   ![image](https://user-images.githubusercontent.com/19470159/38468381-8797eeca-3b4d-11e8-9536-e82d79df3a75.png)
   - Some color fixes, so no end of buffer `~`s and less distracting `signcolumn`, and some `nontext` color fixes.
   
-### Mappings and functions
 
-#### Mappings:
+### Mappings:
 
   - <kbd>F1</kbd> - NOTHING.
-  - <kbd>F2</kbd> - Search and replace word under cursor with `RenameCWord()` function.
+  - <kbd>F3</kbd>/<kbd>F4</kbd> - Search and replace word under cursor with `RenameCWord()` function.
   - <kbd>\*</kbd> - Highlight all occurrences of word under cursor, but dont move. No jumps added to jumplist.
   - <kbd>Alt</kbd>+<kbd>t</kbd> - Toggle bottom terminal window.
   - <kbd>Alt</kbd>+<kbd>b</kbd> - Toggle Tagbar window.
   - <kbd>Alt</kbd>+<kbd>n</kbd> - Toggle Nerdtree window.
+  - <kbd>Alt</kbd>+<kbd>j</kbd>/<kbd>k</kbd> - Move current line or visual block accordingly to cursor movements
   - <kbd>g</kbd><kbd>b</kbd> - Go to next buffer.
   - <kbd>g</kbd><kbd>B</kbd> - Go to previous buffer.
-  
-#### Functions:
+
+### Functions:
 
 Some functions, that I use. Some of which i've created myself, some were taken from other Vim users. Feel free to use, modify, extend them.
   - `RemoveTrailingSpaces()` - Removes all trailing whitespace on file-save.
   - `Term_toggle(height)` - Toggles terminal on and off.
   - `ExecuteMacroOverVisualRange()` - allows to execute <kbd>@</kbd> macro over visual selection.
-  - `RenameCWord()` - Renames all occurrences of word under cursor in current file.
+  - `RenameCWord(word type)` - Renames all occurrences of word under cursor in current file. For `word type` see `:h word` and `:h WORD`
   - `FindProjectRootByFile(filename)` - goes up from current directory untill it reaches root, and returns path to the file if found.
 
 # 
