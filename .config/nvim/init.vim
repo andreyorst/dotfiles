@@ -53,8 +53,17 @@ endfunction
 filetype plugin indent on
 
 " Settings
-	source ~/.config/nvim/common_settings.vim
-	source ~/.config/nvim/functions.vim
-	source ~/.config/nvim/mappings.vim
-	source ~/.config/nvim/plugin_configs.vim
+	let s:config_path = $HOME.'/.config/nvim/'
+	let s:config_files = [
+		\ 'common_settings.vim',
+		\ 'functions.vim',
+		\ 'mappings.vim',
+		\ 'plugin_configs.vim'
+	\]
+
+	for file in s:config_files
+		if filereadable(s:config_path.file)
+			exec "so ".s:config_path.file
+		endif
+	endfor
 
