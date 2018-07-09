@@ -6,44 +6,43 @@
 " │ GitHub.com/andreyorst/dotfiles │
 " ╰────────────────────────────────╯
 
-" Map Settings:
-let mapleader = "\<Alt>"
-	" Highlights word under cursor by placing it in @/ register
-		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
+" Highlights word under cursor by placing it in @/ register
+	nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
-	" Rename word under cursor in whole document
-		nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
-		inoremap <silent><F3> <Esc>:call RenameCWord("cword")<Cr>
-		nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
-		inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
+" Rename word under cursor in whole document
+	nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
+	inoremap <silent><F3> <Esc>:call RenameCWord("cword")<Cr>
+	nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
+	inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
 
-	" Denite
-		nnoremap <silent><C-P> :Denite file/rec<Cr>
+" Denite
+	nnoremap <silent><C-p> :Denite file/rec<Cr>
+	nnoremap <C-d> :Denite <Tab>
 
-	" Toggle terminal on/off (neovim)
-		nnoremap <silent><A-t> :call TermToggle(12)<CR>
-		inoremap <silent><A-t> <Esc>:call TermToggle(12)<CR>
-		tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
-
+" Toggle terminal on/off (neovim)
+	nnoremap <silent><A-t> :call TermToggle(12)<CR>
+	inoremap <silent><A-t> <Esc>:call TermToggle(12)<CR>
+	tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
 	" Terminal go back to normal mode
-		tnoremap <silent><Esc> <C-\><C-n>
+	tnoremap <silent><Esc> <C-\><C-n>
 
-	" Tagbar
-		noremap <silent><A-b> <Esc>:TagbarToggle<CR>
-		tnoremap <silent><A-b> <C-\><C-n>:TagbarToggle<CR>
+" Tagbar
+	noremap <silent><A-b> <Esc>:TagbarToggle<CR>
+	tnoremap <silent><A-b> <C-\><C-n>:TagbarToggle<CR>
 
-	" NERDTree
-		noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
-		tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
+" NERDTree
+	noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
+	tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
-	" Buffers
-		nnoremap <silent><A-q> <Esc>:bd!<Cr>
-		nnoremap <silent><A-w> <Esc>:w<Cr>
+" Buffers
+	nnoremap <silent><A-q> <Esc>:bd!<Cr>
+	nnoremap <silent><A-w> <Esc>:w<Cr>
 
 " Common fixes
 	nnoremap <silent>gb :bn<Cr>
 	nnoremap <silent>gB :bp<Cr>
 
+	" The most important fix
 	nmap <F1> <nop>
 	imap <F1> <nop>
 

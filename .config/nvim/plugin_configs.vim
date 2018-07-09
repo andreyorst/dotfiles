@@ -164,9 +164,9 @@ endif
 	endfunction
 
 	inoremap <silent><expr><CR> pumvisible() ?
-				\"<C-R>=ExpandOrClosePopup()<CR>" :
+				\"<C-r>=ExpandOrClosePopup()<CR>" :
 				\delimitMate#WithinEmptyPair() ?
-				\"\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+				\"\<C-r>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" :
 				\SimpleSnippets#isExpandableOrJumpable() ?
 				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"

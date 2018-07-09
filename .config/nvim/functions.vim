@@ -6,7 +6,7 @@
 " │ GitHub.com/andreyorst/dotfiles │
 " ╰────────────────────────────────╯
 
-" Delete all trailing spaces on file open
+" Delete all trailing spaces
 	function! RemoveTrailingSpaces()
 		let l:win_view = winsaveview()
 		let l:save_slash = getreg('/')
@@ -15,7 +15,6 @@
 		call winrestview(l:win_view)
 		call setreg('/', l:save_slash)
 	endfunction
-
 
 " Terminal Function
 	let s:term_buf = 0
@@ -33,10 +32,10 @@
 			catch
 				call termopen($SHELL, {"detach": 0})
 				let s:term_buf = bufnr("")
-				set nonumber
-				set norelativenumber
-				set signcolumn=no
-				set nocursorline
+				setlocal nonumber
+				setlocal norelativenumber
+				setlocal signcolumn=no
+				setlocal nocursorline
 			endtry
 			startinsert!
 			let s:term_win = win_getid()

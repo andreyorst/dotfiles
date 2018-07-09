@@ -5,6 +5,7 @@
 	let gitlag = 'https://gitlab.com/'
 
 	set rtp+=~/.vim/bundle/Vundle.vim
+
 	call vundle#begin()
 	Plugin 'VundleVim/Vundle.vim'
 
@@ -36,11 +37,9 @@
 	" Rust
 		Plugin github.'rust-lang/rust.vim'
 
-	" C/C++
-		Plugin github.'octol/vim-cpp-enhanced-highlight'
-
 	" Syntax Highlighting
 		Plugin github.'justinmk/vim-syntax-extra'
+		Plugin github.'octol/vim-cpp-enhanced-highlight'
 
 	call vundle#end()
 
