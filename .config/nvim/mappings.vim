@@ -112,7 +112,7 @@ endif
 	" Search for hiobtain and hiestablish and change
 	" to higet hiset or to any hi* pattern
 	" WARNING: must be used *below* 'private' keyword in a class scope
-		autocmd FileType cpp,h,hpp nnoremap <F3> <Esc>0:set nohlsearch<CR>
+		autocmd FileType cpp,h,hpp nnoremap <F5> <Esc>0:set nohlsearch<CR>
 					\/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/getSet.cpp<CR>
 					\0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>==j0==/)<CR>bPnbb~h
 					\iestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p^
