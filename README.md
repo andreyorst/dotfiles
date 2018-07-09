@@ -1,9 +1,8 @@
 # .dotfiles
 Constantly improving my neovim setup.
+Neovim config has it's own [README.md](https://github.com/andreyorst/dotfiles/blob/master/.config/nvim/README.md).
 
-Also includes settings for Termite, KDE Scripts, Colorschemes and more misc stuff.
-
-#### Neovim config has it's own [README.md](https://github.com/andreyorst/dotfiles/blob/master/.config/nvim/README.md) now.
+Also includes settings for Termite, KDE Scripts, KDE Colorschemes, some config for bspwm and other misc stuff.
 
 ### Owerall look:
 ![owerall](https://user-images.githubusercontent.com/19470159/38469313-6b9e558e-3b5b-11e8-989f-807f000a1daa.png)
