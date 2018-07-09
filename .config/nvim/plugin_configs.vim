@@ -30,7 +30,7 @@
 
 if IsTermux()
 " ALE
-	highlight ALEErrorSign guibg=#3c3836 guifg=#fb4934
+	highlight ALEErrorSign guibg=NONE guifg=#fb4934
 
 	let g:airline#extensions#ale#enabled = 1
 	let g:ale_lint_delay = 350
@@ -57,9 +57,11 @@ else " Not in Termux
 	call denite#custom#option('_', 'highlight_mode_normal', 'CursorLine')
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
 	call denite#custom#option('_', 'highlight_matched_range', 'None')
-	call denite#custom#option('_', 'highlight_matched_char', 'DiffDelete')
-	call denite#custom#var('file/rec', 'command',
+	call denite#custom#option('_', 'highlight_matched_char', 'Child')
+	call denite#custom#var('file_rec', 'command',
 				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+	call denite#custom#var('file/rec', 'command',
+				\ ['rg', '--color', 'never', '--files'])
 
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
