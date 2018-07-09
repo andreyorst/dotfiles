@@ -7,13 +7,12 @@
 " ╰────────────────────────────────╯
 
 set nocompatible
-filetype off
 
 let s:config_path = $HOME.'/.config/nvim/'
 let s:config_files = [
 	\'functions.vim',
 	\'plugins.vim',
-	\'common_settings.vim',
+	\'common.vim',
 	\'mappings.vim',
 	\'plugin_configs.vim',
 \]

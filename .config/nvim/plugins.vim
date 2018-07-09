@@ -1,4 +1,6 @@
 " Plugins
+	filetype off
+
 	let github = 'https://github.com/'
 	let gitlag = 'https://gitlab.com/'
 
@@ -41,6 +43,4 @@
 		Plugin github.'justinmk/vim-syntax-extra'
 
 	call vundle#end()
-
-filetype plugin indent on
 
