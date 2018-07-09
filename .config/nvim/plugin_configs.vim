@@ -58,10 +58,16 @@ else " Not in Termux
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
 	call denite#custom#option('_', 'highlight_matched_range', 'None')
 	call denite#custom#option('_', 'highlight_matched_char', 'Child')
-	call denite#custom#var('file_rec', 'command',
-				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
-	call denite#custom#var('file/rec', 'command',
-				\ ['rg', '--color', 'never', '--files'])
+	if executable('rg')
+		call denite#custom#var('file/rec', 'command',
+					\ ['rg', '--color', 'never', '--files'])
+	elseif executable('ag')
+		call denite#custom#var('file/rec', 'command',
+					\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+	endif
+	call denite#custom#map('insert', '<Esc>', '<denite:enter_mode:normal>', 'noremap')
+	call denite#custom#map('normal', 'i', '<denite:enter_mode:insert>', 'noremap')
+	call denite#custom#map('normal', '<Esc>', '<denite:quit>', 'noremap')
 
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
