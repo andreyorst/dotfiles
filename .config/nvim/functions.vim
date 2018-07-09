@@ -1,3 +1,4 @@
+
 " ╭─────────────╥──────────────────╮
 " │ Author:     ║ File:            │
 " │ Andrey Orst ║ functions.vim    │

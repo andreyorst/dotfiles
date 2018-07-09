@@ -1,3 +1,4 @@
+
 " ╭─────────────╥──────────────────╮
 " │ Author:     ║ File:            │
 " │ Andrey Orst ║ init.vim         │
@@ -14,7 +15,7 @@ let s:config_files = [
 	\'plugins.vim',
 	\'common.vim',
 	\'mappings.vim',
-	\'plugin_configs.vim',
+	\'plugin_conf.vim',
 \]
 
 for file in s:config_files
