@@ -204,3 +204,8 @@ endif
 				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
 				\"\<S-j>"
 
+" TComment
+	let g:tcomment_maps = 0
+	nnoremap <silent><C-_> :TComment<Cr>
+	inoremap <silent><C-_> <Esc>:TComment<Cr>a
+	vnoremap <silent><C-_> :'<,'>TComment<Cr>
