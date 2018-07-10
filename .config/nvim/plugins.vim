@@ -9,45 +9,41 @@
 
 filetype off
 
-let github = 'https://github.com/'
-let gitlag = 'https://gitlab.com/'
-
-set rtp+=~/.vim/bundle/Vundle.vim
-
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
+call plug#begin('~/.vim/bundle')
 
 " Look
-	Plugin github.'chriskempson/base16-vim'
-	Plugin github.'vim-airline/vim-airline'
-	Plugin github.'vim-airline/vim-airline-themes'
+	Plug 'chriskempson/base16-vim'
+	Plug 'vim-airline/vim-airline'
+	Plug 'vim-airline/vim-airline-themes'
 
 " Tools
-	Plugin github.'andreyorst/SimpleSnippets.vim'
-	Plugin github.'andreyorst/SimpleSnippets-snippets'
-	Plugin github.'craigemery/vim-autotag'
-	Plugin github.'justinmk/vim-sneak'
-	Plugin github.'Raimondi/delimitMate'
-	Plugin github.'Shougo/deoplete.nvim'
-	Plugin github.'tpope/vim-surround'
+	Plug 'andreyorst/SimpleSnippets-snippets'
+	Plug 'andreyorst/SimpleSnippets.vim'
+	Plug 'craigemery/vim-autotag'
+	Plug 'justinmk/vim-sneak'
+	Plug 'raimondi/delimitMate'
+	Plug 'shougo/deoplete.nvim'
+	Plug 'tomtom/tcomment_vim'
+	Plug 'tpope/vim-surround'
+	Plug 'wellle/targets.vim'
 
 	if IsTermux()
-		Plugin github.'w0rp/ale'
-		Plugin github.'zchee/deoplete-clang'
+		Plug 'w0rp/ale'
+		Plug 'zchee/deoplete-clang'
 	else
-		Plugin github.'autozimu/LanguageClient-neovim'
-		Plugin github.'Shougo/denite.nvim'
-		Plugin github.'scrooloose/nerdtree'
-		Plugin github.'majutsushi/tagbar'
-		Plugin github.'junegunn/goyo.vim'
+		Plug 'autozimu/LanguageClient-neovim'
+		Plug 'junegunn/goyo.vim'
+		Plug 'majutsushi/tagbar'
+		Plug 'scrooloose/nerdtree'
+		Plug 'shougo/denite.nvim'
 	endif
 
 " Rust
-	Plugin github.'rust-lang/rust.vim'
+	Plug 'rust-lang/rust.vim'
 
 " Syntax Highlighting
-	Plugin github.'justinmk/vim-syntax-extra'
-	Plugin github.'octol/vim-cpp-enhanced-highlight'
+	Plug 'justinmk/vim-syntax-extra'
+	Plug 'octol/vim-cpp-enhanced-highlight'
 
-call vundle#end()
+call plug#end()
 
