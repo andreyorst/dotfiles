@@ -80,6 +80,6 @@
 
 " Check if we in termux
 	function! IsTermux()
-		return match(execute("!echo $PATH"), "termux") >= 0
+		return match($PATH, "termux") >= 0
 	endfunction
 
