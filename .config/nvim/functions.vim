@@ -26,9 +26,9 @@
 			hide
 		else
 			new terminal
-			exec "resize " . a:height
+			exec "resize ".a:height
 			try
-				exec "buffer " . s:term_buf
+				exec "buffer ".s:term_buf
 				exec "bd terminal"
 			catch
 				call termopen($SHELL, {"detach": 0})
