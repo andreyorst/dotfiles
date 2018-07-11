@@ -1,40 +1,49 @@
-" Map Settings:
-	" Highlights word under cursor by placing it in @/ register
-		nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
-	" Rename word under cursor in whole document
-		nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
-		inoremap <silent><F3> <Esc>:call RenameCWord("cword")<Cr>
-		nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
-		inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
+" ╭─────────────╥──────────────────╮
+" │ Author:     ║ File:            │
+" │ Andrey Orst ║ mappings.vim     │
+" ╞═════════════╩══════════════════╡
+" │ Rest of .dotfiles:             │
+" │ GitHub.com/andreyorst/dotfiles │
+" ╰────────────────────────────────╯
 
-	" Denite
-		nnoremap <silent><C-P> :Denite file/rec<Cr>
+" Highlights word under cursor by placing it in @/ register
+	nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
 
-	" Toggle terminal on/off (neovim)
-		nnoremap <silent><A-t> :call TermToggle(12)<CR>
-		inoremap <silent><A-t> <Esc>:call TermToggle(12)<CR>
-		tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
+" Rename word under cursor in whole document
+	nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
+	inoremap <silent><F3> <Esc>:call RenameCWord("cword")<Cr>
+	nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
+	inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
 
+" Denite
+	nnoremap <silent><C-p> :Denite file/rec<Cr>
+	nnoremap <C-d> :Denite <Tab>
+
+" Toggle terminal on/off (neovim)
+	nnoremap <silent><A-t> :call TermToggle(12)<CR>
+	inoremap <silent><A-t> <Esc>:call TermToggle(12)<CR>
+	tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
 	" Terminal go back to normal mode
-		tnoremap <silent><Esc> <C-\><C-n>
+	tnoremap <silent><Esc> <C-\><C-n>
 
-	" Tagbar
-		noremap <silent><A-b> <Esc>:TagbarToggle<CR>
-		tnoremap <silent><A-b> <C-\><C-n>:TagbarToggle<CR>
+" Tagbar
+	noremap <silent><A-b> <Esc>:TagbarToggle<CR>
+	tnoremap <silent><A-b> <C-\><C-n>:TagbarToggle<CR>
 
-	" NERDTree
-		noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
-		tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
+" NERDTree
+	noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
+	tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
 
-	" Buffers
-		nnoremap <silent><A-q> <Esc>:bd!<Cr>
-		nnoremap <silent><A-w> <Esc>:w<Cr>
+" Buffers
+	nnoremap <silent><A-q> <Esc>:bd!<Cr>
+	nnoremap <silent><A-w> <Esc>:w<Cr>
 
 " Common fixes
 	nnoremap <silent>gb :bn<Cr>
 	nnoremap <silent>gB :bp<Cr>
 
+	" The most important fix
 	nmap <F1> <nop>
 	imap <F1> <nop>
 
@@ -46,6 +55,9 @@
 	vnoremap <silent><A-j> :m '>+1<CR>gv=gv
 	vnoremap <silent><A-k> :m '<-2<CR>gv=gv
 
+" Move across lines as they appear on display
+	nnoremap <expr> j v:count ? (v:count > 5 ? "m'" . v:count : '') . 'j' : 'gj'
+	nnoremap <expr> k v:count ? (v:count > 5 ? "m'" . v:count : '') . 'k' : 'gk'
 " Visual Selection Macro
 	xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
 
@@ -58,7 +70,6 @@
 		noremap  <F7> :emenu EOL.<Tab>
 
 	" <F8> Change encoding
-		set  wcm=<Tab>
 		menu Enc.cp1251  :e! ++enc=cp1251<CR>
 		menu Enc.koi8-r  :e! ++enc=koi8-r<CR>
 		menu Enc.cp866   :e! ++enc=ibm866<CR>
@@ -68,7 +79,6 @@
 		noremap  <F8> :emenu Enc.<Tab>
 
 	" <F20> Convert file encoding
-		set  wcm=<Tab>
 		menu FEnc.cp1251  :set fenc=cp1251<CR>
 		menu FEnc.koi8-r  :set fenc=koi8-r<CR>
 		menu FEnc.cp866   :set fenc=ibm866<CR>
@@ -105,7 +115,7 @@ endif
 	" Search for hiobtain and hiestablish and change
 	" to higet hiset or to any hi* pattern
 	" WARNING: must be used *below* 'private' keyword in a class scope
-		autocmd FileType cpp,h,hpp nnoremap <F3> <Esc>0:set nohlsearch<CR>
+		autocmd FileType cpp,h,hpp nnoremap <F5> <Esc>0:set nohlsearch<CR>
 					\/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/getSet.cpp<CR>
 					\0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>==j0==/)<CR>bPnbb~h
 					\iestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p^

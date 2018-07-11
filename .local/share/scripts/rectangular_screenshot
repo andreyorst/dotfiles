@@ -1,3 +1,0 @@
-#!/bin/bash
-
-rm /tmp/screenshot_region.png; spectacle -nrbo /tmp/screenshot_region.png; [ -f /tmp/screenshot_region.png ] && xclip -selection clipboard -t $(file -b --mime-type /tmp/screenshot_region.png) < /tmp/screenshot_region.png; [ -f /tmp/screenshot_region.png ] && kdialog --title "Spectacle" --passivepopup "Region screenshot has been set to clipboard" 3

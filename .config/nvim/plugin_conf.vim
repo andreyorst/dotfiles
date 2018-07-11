@@ -1,3 +1,12 @@
+
+" ╭─────────────╥──────────────────╮
+" │ Author:     ║ File:            │
+" │ Andrey Orst ║ plufin_conf.vim  │
+" ╞═════════════╩══════════════════╡
+" │ Rest of .dotfiles:             │
+" │ GitHub.com/andreyorst/dotfiles │
+" ╰────────────────────────────────╯
+
 " Airline
 	set laststatus=2
 
@@ -30,7 +39,7 @@
 
 if IsTermux()
 " ALE
-	highlight ALEErrorSign guibg=#3c3836 guifg=#fb4934
+	highlight ALEErrorSign guibg=NONE guifg=#fb4934
 
 	let g:airline#extensions#ale#enabled = 1
 	let g:ale_lint_delay = 350
@@ -48,8 +57,9 @@ if IsTermux()
 		let g:ale_c_clang_options = '-Wall --std=c99 '
 
 " deoplete-clang
-	let g:deoplete#sources#clang#libclang_path='/data/data/com.termux/files/usr/lib/libclang.so'
-	let g:deoplete#sources#clang#clang_header='/data/data/com.termux/files/usr/lib/clang/'
+	let s:termux_root = '/data/data/com.termux/files'
+	let g:deoplete#sources#clang#libclang_path = s:termux_root.'/usr/lib/libclang.so'
+	let g:deoplete#sources#clang#clang_header = s:termux_root.'/usr/lib/clang/'
 
 else " Not in Termux
 
@@ -57,9 +67,17 @@ else " Not in Termux
 	call denite#custom#option('_', 'highlight_mode_normal', 'CursorLine')
 	call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
 	call denite#custom#option('_', 'highlight_matched_range', 'None')
-	call denite#custom#option('_', 'highlight_matched_char', 'DiffDelete')
-	call denite#custom#var('file/rec', 'command',
-				\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+	call denite#custom#option('_', 'highlight_matched_char', 'Child')
+	if executable('rg')
+		call denite#custom#var('file/rec', 'command',
+					\ ['rg', '--color', 'never', '--files'])
+	elseif executable('ag')
+		call denite#custom#var('file/rec', 'command',
+					\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+	endif
+	call denite#custom#map('insert', '<Esc>', '<denite:enter_mode:normal>', 'noremap')
+	call denite#custom#map('normal', 'i', '<denite:enter_mode:insert>', 'noremap')
+	call denite#custom#map('normal', '<Esc>', '<denite:quit>', 'noremap')
 
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
@@ -156,9 +174,9 @@ endif
 	endfunction
 
 	inoremap <silent><expr><CR> pumvisible() ?
-				\"<C-R>=ExpandOrClosePopup()<CR>" :
+				\"<C-r>=ExpandOrClosePopup()<CR>" :
 				\delimitMate#WithinEmptyPair() ?
-				\"\<C-R>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
+				\"\<C-r>=delimitMate#ExpandReturn()\<CR>" : "\<Cr>"
 	inoremap <silent><expr><Tab> pumvisible() ? "\<c-n>" :
 				\SimpleSnippets#isExpandableOrJumpable() ?
 				\"\<Esc>:call SimpleSnippets#expandOrJump()\<Cr>" : "\<Tab>"
@@ -186,3 +204,8 @@ endif
 				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
 				\"\<S-j>"
 
+" TComment
+	let g:tcomment_maps = 0
+	nnoremap <silent><C-_> :TComment<Cr>
+	inoremap <silent><C-_> <Esc>:TComment<Cr>a
+	vnoremap <silent><C-_> :'<,'>TComment<Cr>
