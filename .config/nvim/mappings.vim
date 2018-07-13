@@ -89,11 +89,14 @@
 
 " LanguageClient-Neovim
 if !IsTermux()
-	autocmd FileType rust,c,cpp nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> gh :call LanguageClient_textDocument_hover()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> gr :call LanguageClient_textDocument_references()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> gs :call LanguageClient_textDocument_documentSymbol()<CR>
-	autocmd FileType rust,c,cpp nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
+	augroup LCN
+		autocmd!
+		autocmd FileType rust,c,cpp nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+		autocmd FileType rust,c,cpp nnoremap <silent> gh :call LanguageClient_textDocument_hover()<CR>
+		autocmd FileType rust,c,cpp nnoremap <silent> gr :call LanguageClient_textDocument_references()<CR>
+		autocmd FileType rust,c,cpp nnoremap <silent> gs :call LanguageClient_textDocument_documentSymbol()<CR>
+		autocmd FileType rust,c,cpp nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
+	augroup end
 endif
 
 " Mapjitsu
@@ -115,9 +118,12 @@ endif
 	" Search for hiobtain and hiestablish and change
 	" to higet hiset or to any hi* pattern
 	" WARNING: must be used *below* 'private' keyword in a class scope
+	augroup CPP
+		autocmd!
 		autocmd FileType cpp,h,hpp nnoremap <F5> <Esc>0:set nohlsearch<CR>
 					\/;<CR>y^?private<CR>:-1read $HOME/.vim/snippets/getSet.cpp<CR>
 					\0Pa()<Esc>bbyw~hiobtain<Esc>/;<CR>P:noh<CR>==j0==/)<CR>bPnbb~h
 					\iestablish<Esc>nPnb~/ =<CR>P/;<CR>Pnb~?obtain<CR>y^j/(<CR>p^
 					\:set hlsearch<CR>:noh<CR>
+	augroup end
 

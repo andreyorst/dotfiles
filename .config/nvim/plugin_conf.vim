@@ -148,13 +148,20 @@ else " Not in Termux
 	let g:NERDTreeHighlightFolders = 1
 	let g:NERDTreeHighlightFoldersFullName = 1
 
-	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	augroup NERDTree
+		autocmd!
+		autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	augroup end
+
 
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
 
-	autocmd FileType c,cpp nested :TagbarOpen
+	augroup Tagbar
+		autocmd!
+		autocmd FileType c,cpp nested :TagbarOpen
+	augroup end
 endif
 
 " SimpleSnippets.vim
