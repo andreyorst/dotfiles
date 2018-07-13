@@ -31,7 +31,7 @@ call plug#begin('~/.vim/bundle')
 		Plug 'w0rp/ale'
 		Plug 'zchee/deoplete-clang'
 	else
-		Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'install.sh'}
+		Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
 		Plug 'junegunn/goyo.vim'
 		Plug 'majutsushi/tagbar'
 		Plug 'scrooloose/nerdtree'
