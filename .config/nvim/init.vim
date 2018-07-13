@@ -14,6 +14,7 @@ let s:config_files = [
 	\'functions.vim',
 	\'plugins.vim',
 	\'common.vim',
+	\'languages.vim',
 	\'mappings.vim',
 	\'plugin_conf.vim',
 \]
