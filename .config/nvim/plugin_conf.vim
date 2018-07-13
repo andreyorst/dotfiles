@@ -216,3 +216,6 @@ endif
 	nnoremap <silent><C-_> :TComment<Cr>
 	inoremap <silent><C-_> <Esc>:TComment<Cr>a
 	vnoremap <silent><C-_> :'<,'>TComment<Cr>
+
+" vim-plug
+	command PluginUpdate PlugUpdate | PlugUpgrade
