@@ -164,6 +164,19 @@ else " Not in Termux
 	augroup end
 endif
 
+" SimpleClangFormat.vim
+	let g:SimpleClangFormat#useShiftWidth = 1
+	let g:SimpleClangFormat#options = {
+		\ "BasedOnStyle": "webkit",
+		\ "IndentWidth": 4,
+		\ "PointerAlignment": "Left",
+		\ "AlignAfterOpenBracket": "DontAlign",
+		\ "AlignConsecutiveAssignments": "true",
+		\ "AlignConsecutiveDeclarations": "true",
+		\ "AlignTrailingComments": "true",
+		\ "BreakBeforeBraces": "Stroustrup",
+	\}
+
 " SimpleSnippets.vim
 	let g:SimpleSnippets_dont_remap_tab = 1
 
