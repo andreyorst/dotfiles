@@ -17,6 +17,7 @@ call plug#begin('~/.vim/bundle')
 	Plug 'vim-airline/vim-airline-themes'
 
 " Tools
+	Plug 'andreyorst/SimpleClangFormat.vim'
 	Plug 'andreyorst/SimpleSnippets-snippets'
 	Plug 'andreyorst/SimpleSnippets.vim'
 	Plug 'craigemery/vim-autotag'
