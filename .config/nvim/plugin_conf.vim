@@ -81,7 +81,7 @@ else " Not in Termux
 
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
-				\ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+				\ 'rust': ['rustup', 'run', 'stable', 'rls'],
 				\ 'c':    ['cquery', '--log-file=/tmp/cq.log ', '--init={"cacheDirectory": "'.$HOME.'/.cache/cquery"}'],
 				\ 'cpp':  ['cquery', '--log-file=/tmp/cq.log ', '--init={"cacheDirectory": "'.$HOME.'/.cache/cquery"}'],
 				\ }
