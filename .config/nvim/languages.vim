@@ -33,3 +33,14 @@ augroup Vimdoc
 		\ setlocal spell     |
 		\ setlocal expandtab |
 augroup end
+
+augroup Rust
+	autocmd!
+	autocmd FileType rust
+				\ set listchars+=space:⋅                           |
+				\ highlight WhiteSpaceBol guifg=#665c54 guibg=NONE |
+				\ highlight WhiteSpaceMol guifg=#32302f guibg=NONE |
+				\ match WhiteSpaceMol / /                          |
+				\ 2match WhiteSpaceBol /^ \+/                      |
+augroup end
+

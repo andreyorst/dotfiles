@@ -81,3 +81,9 @@
 		autocmd BufWritePre *.* :call RemoveTrailingSpaces()
 	augroup end
 
+	" Enter insert mode when terminal shows up
+	augroup Term
+		autocmd!
+		autocmd TermOpen * startinsert
+	augroup end
+
