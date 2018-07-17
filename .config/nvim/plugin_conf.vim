@@ -153,7 +153,6 @@ else " Not in Termux
 		autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 	augroup end
 
-
 " Tagbar
 	let g:tagbar_sort = 0
 	let g:tagbar_compact = 1
@@ -166,15 +165,20 @@ endif
 
 " SimpleClangFormat.vim
 	let g:SimpleClangFormat#useShiftWidth = 1
+	let g:SimpleClangFormat#useTabStop = 1
+
 	let g:SimpleClangFormat#options = {
 		\ "BasedOnStyle": "webkit",
 		\ "IndentWidth": 4,
+		\ "TabWidth": 4,
 		\ "PointerAlignment": "Left",
 		\ "AlignAfterOpenBracket": "DontAlign",
 		\ "AlignConsecutiveAssignments": "true",
 		\ "AlignConsecutiveDeclarations": "true",
 		\ "AlignTrailingComments": "true",
 		\ "BreakBeforeBraces": "Stroustrup",
+		\ "UseTab": "ForIndentation",
+		\ "SortIncludes": "false",
 	\}
 
 " SimpleSnippets.vim
@@ -229,6 +233,8 @@ endif
 	nnoremap <silent><C-_> :TComment<Cr>
 	inoremap <silent><C-_> <Esc>:TComment<Cr>a
 	vnoremap <silent><C-_> :'<,'>TComment<Cr>
+
+	call tcomment#type#Define('c', '// %s')
 
 " vim-plug
 	command PluginUpdate PlugUpdate | PlugUpgrade
