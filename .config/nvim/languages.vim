@@ -23,13 +23,13 @@ augroup end
 augroup Markdown
 	autocmd!
 	autocmd FileType markdown
-		\ setlocal spell
-		\ setlocal expandtab
+		\ setlocal spell     |
+		\ setlocal expandtab |
 augroup end
 
 augroup Vimdoc
 	autocmd!
 	autocmd FileType help
-		\ setlocal spell
-		\ setlocal expandtab
+		\ setlocal spell     |
+		\ setlocal expandtab |
 augroup end
