@@ -83,3 +83,25 @@
 		return match($PATH, "termux") >= 0
 	endfunction
 
+" Add syntax blocks
+	function! DefineSyntaxRegion(filetype,start,end,textSnipHl) abort
+		let l:ft = toupper(a:filetype)
+		if exists('b:current_syntax')
+			let l:current_syntax = b:current_syntax
+			unlet b:current_syntax
+		endif
+		execute 'syntax include @'.l:ft.' syntax/'.a:filetype.'.vim'
+		try
+			execute 'syntax include @'.l:ft.' after/syntax/'.a:filetype.'.vim'
+		catch
+		endtry
+		if exists('l:current_syntax')
+			let b:current_syntax = l:current_syntax
+		else
+			unlet b:current_syntax
+		endif
+		execute 'syntax region textSnip'.l:ft.'
+					\ matchgroup='.a:textSnipHl.'
+					\ start="'.a:start.'" end="'.a:end.'"
+					\ contains=@'.l:ft
+	endfunction

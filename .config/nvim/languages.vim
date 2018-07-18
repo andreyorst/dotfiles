@@ -23,8 +23,12 @@ augroup end
 augroup Markdown
 	autocmd!
 	autocmd FileType markdown
-		\ setlocal spell     |
-		\ setlocal expandtab |
+		\ setlocal spell                                                      |
+		\ setlocal expandtab                                                  |
+		\ call DefineSyntaxRegion('rust', '```rust', '```', 'SpecialComment') |
+		\ call DefineSyntaxRegion(   'c',    '```c', '```', 'SpecialComment') |
+		\ call DefineSyntaxRegion( 'cpp',  '```cpp', '```', 'SpecialComment') |
+		\ call DefineSyntaxRegion( 'vim',  '```vim', '```', 'SpecialComment') |
 augroup end
 
 augroup Vimdoc
