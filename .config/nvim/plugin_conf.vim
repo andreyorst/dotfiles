@@ -176,7 +176,7 @@ endif
 		\ "AlignConsecutiveAssignments": "true",
 		\ "AlignConsecutiveDeclarations": "true",
 		\ "AlignTrailingComments": "true",
-		\ "BreakBeforeBraces": "Stroustrup",
+		\ "BreakBeforeBraces": "Linux",
 		\ "UseTab": "ForIndentation",
 		\ "SortIncludes": "false",
 	\}
@@ -237,4 +237,4 @@ endif
 	call tcomment#type#Define('c', '// %s')
 
 " vim-plug
-	command PluginUpdate PlugUpdate | PlugUpgrade
+	command! PluginUpdate PlugUpdate | PlugUpgrade
