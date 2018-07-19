@@ -84,13 +84,16 @@
 	endfunction
 
 " Add syntax blocks
-	function! DefineSyntaxRegion(filetype,start,end,textSnipHl) abort
+	function! DefineSyntaxRegion(filetype, start, end, Highlight) abort
 		let l:ft = toupper(a:filetype)
 		if exists('b:current_syntax')
 			let l:current_syntax = b:current_syntax
 			unlet b:current_syntax
 		endif
-		execute 'syntax include @'.l:ft.' syntax/'.a:filetype.'.vim'
+		try
+			execute 'syntax include @'.l:ft.' syntax/'.a:filetype.'.vim'
+		catch
+		endtry
 		try
 			execute 'syntax include @'.l:ft.' after/syntax/'.a:filetype.'.vim'
 		catch
@@ -100,8 +103,9 @@
 		else
 			unlet b:current_syntax
 		endif
-		execute 'syntax region textSnip'.l:ft.'
-					\ matchgroup='.a:textSnipHl.'
+		execute 'syntax region Region'.l:ft.'
+					\ matchgroup='.a:Highlight.'
+					\ keepend
 					\ start="'.a:start.'" end="'.a:end.'"
 					\ contains=@'.l:ft
 	endfunction
