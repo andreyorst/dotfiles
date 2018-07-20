@@ -26,11 +26,11 @@ augroup Markdown
 		\ setlocal spell                                                      |
 		\ setlocal expandtab                                                  |
 		\ setlocal colorcolumn=80                                             |
-		\ call DefineSyntaxRegion('rust', '```rust', '```', 'SpecialComment') |
 		\ call DefineSyntaxRegion(   'c',    '```c', '```', 'SpecialComment') |
 		\ call DefineSyntaxRegion( 'cpp',  '```cpp', '```', 'SpecialComment') |
 		\ call DefineSyntaxRegion( 'vim',  '```vim', '```', 'SpecialComment') |
 		\ call DefineSyntaxRegion(  'sh',   '```sh', '```', 'SpecialComment') |
+		\ call DefineSyntaxRegion('rust', '```rust', '```', 'SpecialComment') |
 augroup end
 
 augroup Vimdoc
