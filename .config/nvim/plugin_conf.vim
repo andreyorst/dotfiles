@@ -168,7 +168,7 @@ endif
 	let g:SimpleClangFormat#useTabStop = 1
 
 	let g:SimpleClangFormat#options = {
-		\ "BasedOnStyle": "webkit",
+		\ "BasedOnStyle": "Chromium",
 		\ "IndentWidth": 4,
 		\ "TabWidth": 4,
 		\ "PointerAlignment": "Left",
