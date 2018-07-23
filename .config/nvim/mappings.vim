@@ -42,6 +42,7 @@
 " Common fixes
 	nnoremap <silent>gb :bn<Cr>
 	nnoremap <silent>gB :bp<Cr>
+	nnoremap <silent>ge :exec "e ".expand("<cWORD>")<Cr>
 
 	" The most important fix
 	nmap <F1> <nop>
