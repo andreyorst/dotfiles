@@ -25,6 +25,12 @@ file tags with [tagbar](https://github.com/majutsushi/tagbar).
   [Goyo](https://github.com/junegunn/goyo.vim)
 - Jump to any location specified by two characters with
   [vim-sneak](https://github.com/justinmk/vim-sneak)
+- Using various textobjects with
+  [targets-vim](https://github.com/wellle/targets.vim)
+- Surrounding stuff with
+  [vim-surround](https://github.com/tpope/vim-surround)
+- Commenting in and out blocks of code with
+  [TComment](https://github.com/tomtom/tcomment_vim)
 
 ## Mappings
 
@@ -98,31 +104,35 @@ may want to use some autogroups in some languages.
 
 ### Cpp autogroup
 
-- Special regular expressions, to highlight language facilities like
-  ```cpp
-  typedef struct container {
-  	int item1;
-  	int item2;
-  } container_t;
+Cpp  autogroup  defines  special  regular  expressions,  to  highlight  language
+facilities like:
+```cpp
+typedef struct container {
+	int item1;
+	int item2;
+} container_t;
 
-  container_t c;
-  container_t* pc;
+container_t c;
+container_t* pc;
 
-  c.item1;
-  pc->item2;
-  ```
-  will look like so:
+c.item1;
+pc->item2;
+```
 
-  ![image](https://user-images.githubusercontent.com/19470159/38468381-8797eeca-3b4d-11e8-9536-e82d79df3a75.png)
+Will look like so:
+
+![image](https://user-images.githubusercontent.com/19470159/38468381-8797eeca-3b4d-11e8-9536-e82d79df3a75.png)
 
 ### Rust autogroup
 
-This autogroup add highlighting of leading spaces.
+Rust autogroup add highlighting of leading spaces.
 
 ### Markdown autogroup
 
 Markdown autogroup defines some nested highlightings for languages that I'm
-using when writing my notes.
+using when writing my notes:
+
+![image](https://user-images.githubusercontent.com/19470159/43099218-24295600-8eca-11e8-847b-bc7e9da29c81.png)
 
 #
 
