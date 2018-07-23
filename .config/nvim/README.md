@@ -8,23 +8,23 @@ Fancy screenshot for you:
 List of plugins (not all, but essential ones) that extend or change workflow in
 some way. Basically, I've tried to make nvim as close to C/C++ IDE as possible.
 
-- Linting and autocompleting C/C++/Rust via  
-[LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) +  
-[Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
+- Linting and autocompleting C/C++/Rust via
+  [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) +
+  [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
 - Generating ctags on the fly via
-[vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current  
+  [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current
 file tags with [tagbar](https://github.com/majutsushi/tagbar).
-- Snippets provided by  
-[SimpleSnippets.vim](https://github.com/andreyorst/SimpleSnippets.vim)
+- Snippets provided by
+  [SimpleSnippets.vim](https://github.com/andreyorst/SimpleSnippets.vim)
 - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree).
-- Automatically inserting delimiters with  
-[delimitMate](https://github.com/Raimondi/delimitMate).
-- Fuzzy finding, and doing lots of other cool stuff with  
-[Denite](https://github.com/Shougo/denite.nvim)
-- Distraction-free typing of Markdown with  
-[Goyo](https://github.com/junegunn/goyo.vim)
-- Jump to any location specified by two characters with  
-[vim-sneak](https://github.com/justinmk/vim-sneak)
+- Automatically inserting delimiters with
+  [delimitMate](https://github.com/Raimondi/delimitMate).
+- Fuzzy finding, and doing lots of other cool stuff with
+  [Denite](https://github.com/Shougo/denite.nvim)
+- Distraction-free typing of Markdown with
+  [Goyo](https://github.com/junegunn/goyo.vim)
+- Jump to any location specified by two characters with
+  [vim-sneak](https://github.com/justinmk/vim-sneak)
 
 ## Mappings
 
@@ -51,18 +51,18 @@ from other Vim users. Feel free to use, modify, extend them.
 
 - `RemoveTrailingSpaces()` - Removes all trailing whitespace on file-save.
 - `Term_toggle(height)` - Toggles terminal on and off.
-- `ExecuteMacroOverVisualRange()` - allows to execute <kbd>@</kbd> macro over  
-visual selection.
-- `RenameCWord(word type)` - Renames all occurrences of word under cursor in  
-current file. For `word type` see `:h word` and `:h WORD`
-- `FindProjectRootByFile(filename)` - goes up from current directory until it  
-reaches root, and returns path to the file if found.
-- `IsTermux()` - Determinate if nvim is running inside  
-[Termux](https://github.com/termux/termux-app)
-- `DefineSyntaxRegion(lang, start, end, hl)` - define nested highlighting  
-region for different language.
-- `HlUnderCursor()` - Highlight all occurrences of a word under a cursor.  
-Ignores special words.
+- `ExecuteMacroOverVisualRange()` - allows to execute <kbd>@</kbd> macro over
+  visual selection.
+- `RenameCWord(word type)` - Renames all occurrences of word under cursor in
+  current file. For `word type` see `:h word` and `:h WORD`
+- `FindProjectRootByFile(filename)` - goes up from current directory until it
+  reaches root, and returns path to the file if found.
+- `IsTermux()` - Determinate if nvim is running inside
+  [Termux](https://github.com/termux/termux-app)
+- `DefineSyntaxRegion(lang, start, end, hl)` - define nested highlighting
+  region for different language.
+- `HlUnderCursor()` - Highlight all occurrences of a word under a cursor.
+  Ignores special words.
 - `GetHlGroupName()` - Returns the name of highlight group of word under cursor.
 
 ## Termux support
@@ -98,22 +98,22 @@ may want to use some autogroups in some languages.
 
 ### Cpp autogroup
 
-- Special regular expressions, to highlight language facilities like  
-```cpp
-typedef struct container {
-	int item1;
-	int item2;
-} container_t;
+- Special regular expressions, to highlight language facilities like
+  ```cpp
+  typedef struct container {
+  	int item1;
+  	int item2;
+  } container_t;
 
-container_t c;
-container_t* pc;
+  container_t c;
+  container_t* pc;
 
-c.item1;
-pc->item2;
-```  
-will look like so:  
+  c.item1;
+  pc->item2;
+  ```
+  will look like so:
 
-![image](https://user-images.githubusercontent.com/19470159/38468381-8797eeca-3b4d-11e8-9536-e82d79df3a75.png)
+  ![image](https://user-images.githubusercontent.com/19470159/38468381-8797eeca-3b4d-11e8-9536-e82d79df3a75.png)
 
 ### Rust autogroup
 
