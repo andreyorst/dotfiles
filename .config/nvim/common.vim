@@ -87,3 +87,7 @@
 		autocmd TermOpen * startinsert
 	augroup end
 
+	augroup HlUnderCur
+		autocmd!
+		autocmd CursorHold * call HlUnderCursor()
+	augroup end
