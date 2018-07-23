@@ -109,3 +109,18 @@
 					\ start="'.a:start.'" end="'.a:end.'"
 					\ contains=@'.l:ft
 	endfunction
+
+	" Highlights word under cursor, and all occurences
+	function! HlUnderCursor()
+		let l:ignore = ["Statement", "Comment", "Type", "PreProc", "Keyword", "StorageClass", "Macro", "Function"]
+		let l:syntaxgroup = GetHlGroupName()
+		if index(l:ignore, l:syntaxgroup) == -1
+			silent! exe printf('match Visual /\V\<%s\>/', escape(expand('<cword>'), '/\'))
+		else
+			exe 'match Visual /\V\<\>/'
+		endif
+	endfunction
+
+	function! GetHlGroupName()
+		return synIDattr(synIDtrans(synID(line("."), stridx(getline("."), expand('<cword>')) + 1, 1)), "name")
+	endfunction
