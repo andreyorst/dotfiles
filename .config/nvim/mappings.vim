@@ -101,7 +101,7 @@ if !IsTermux()
 endif
 
 " HlWordUnderCursor
-	nnoremap <C-h> :call ToggleCursorWordHl()<Cr>
+	nnoremap <silent><C-h> :call ToggleCursorWordHl()<Cr>
 
 " Mapjitsu
 	" Getter and setter generation
