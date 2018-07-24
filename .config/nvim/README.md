@@ -49,6 +49,7 @@ file tags with [tagbar](https://github.com/majutsushi/tagbar).
 - <kbd>g</kbd><kbd>B</kbd> - Go to previous buffer.
 - <kbd>g</kbd><kbd>e</kbd> - Create and edit file under cursor.
 - <kbd>Ctrl</kbd>+<kbd>/</kbd> - Un/Comment current line
+- <kbd>Ctrl</kbd>+<kbd>p</kbd> - Invoke `:Denite file/rec`
 
 ## Functions
 
