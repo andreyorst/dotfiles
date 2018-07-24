@@ -90,4 +90,5 @@
 	augroup HlUnderCur
 		autocmd!
 		autocmd CursorHold * call HlUnderCursor()
+		autocmd CursorMoved * call HangleCursorMovedForHl()
 	augroup end

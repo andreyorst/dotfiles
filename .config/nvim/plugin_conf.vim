@@ -95,6 +95,7 @@ else " Not in Termux
 	if s:prj_root != -1
 		let s:cquery_includes  = "-I".s:prj_root."/include\n"
 		let s:cquery_includes .= "-I".s:prj_root."/testpacks/SPW_TESTS/spw_lib_src\n"
+		let s:cquery_includes .= "-I".s:prj_root."/testpacks/SK_VG11/pci_master_slave_cross_test\n"
 		let s:cquery_includes .= "-I".s:prj_root."/testpacks/CAN/can_lib_src\n"
 		let s:cquery_includes .= "-I".s:prj_root."/testpacks/MKIO/mkio_lib_src\n"
 		let s:cquery_includes .= system('echo -n "-I'.s:prj_root.'/platforms/$(cat '.s:prj_root.'/testkit.settings | grep "?=" |  sed -E "s/.*= //")/include\n"')
