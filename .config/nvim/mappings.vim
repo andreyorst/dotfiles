@@ -100,6 +100,9 @@ if !IsTermux()
 	augroup end
 endif
 
+" HlWordUnderCursor
+	nnoremap <C-h> :call ToggleCursorWordHl()<Cr>
+
 " Mapjitsu
 	" Getter and setter generation
 
