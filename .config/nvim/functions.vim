@@ -112,10 +112,11 @@
 
 	" Highlights word under cursor, and all occurences
 	function! HlUnderCursor()
-		let l:ignore = ["Statement", "Type", "PreProc", "Keyword", "StorageClass", "Repeat", "Label", "Conditional"]
-		let l:syntaxgroup = GetHlGroupName()
+		if !exists("b:IgnoreCursorHl")
+			let b:IgnoreCursorHl = []
+		endif
 		if !exists("s:HlUnderCursor")
-			if index(l:ignore, l:syntaxgroup) == -1
+			if index(b:IgnoreCursorHl, GetHlGroupName()) == -1 && mode() == 'n'
 				silent! exe printf('match Visual /\V\<%s\>/', escape(expand('<cword>'), '/\'))
 			else
 				exe 'match Visual /\V\<\>/'
