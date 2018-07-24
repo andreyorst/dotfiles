@@ -17,6 +17,7 @@ augroup Cpp
 		\	"StorageClass",
 		\	"String",
 		\	"PreProc",
+		\	"cPreCondit",
 		\	"Keyword",
 		\	"Repeat",
 		\	"Include",
