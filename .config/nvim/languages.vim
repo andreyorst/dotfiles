@@ -18,6 +18,19 @@ augroup Cpp
 		\ syntax match Type "\v<(v)?(_|__)?(s|u)(8|16|32|64)>"           |
 		\ syntax match Child "\v(-\>|\.)@<=(\s+)?\w+"                    |
 		\ syntax match Function "\v(-\>|\.)@<=(\s+)?\w+(\s+)?(\(.*\))@=" |
+		\ let b:IgnoreCursorHl = [
+		\	"Statement",
+		\	"Type",
+		\	"StorageClass",
+		\	"String",
+		\	"PreProc",
+		\	"Keyword",
+		\	"Repeat",
+		\	"Include",
+		\	"Label",
+		\	"Conditional",
+		\	"Structure"
+		\]                                                               |
 augroup end
 
 augroup Markdown
@@ -45,9 +58,19 @@ augroup end
 augroup Rust
 	autocmd!
 	autocmd FileType rust
-				\ set listchars+=space:⋅                           |
-				\ highlight WhiteSpaceBol guifg=#665c54 guibg=NONE |
-				\ highlight WhiteSpaceMol guifg=#32302f guibg=NONE |
-				\ match WhiteSpaceMol / /                          |
-				\ 2match WhiteSpaceBol /^ \+/                      |
+		\ set listchars+=space:⋅                           |
+		\ highlight WhiteSpaceBol guifg=#665c54 guibg=NONE |
+		\ highlight WhiteSpaceMol guifg=#32302f guibg=NONE |
+		\ match WhiteSpaceMol / /                          |
+		\ 2match WhiteSpaceBol /^ \+/                      |
+		\ let b:IgnoreCursorHl = [
+		\	"Statement",
+		\	"Type",
+		\	"PreProc",
+		\	"Keyword",
+		\	"Repeat",
+		\	"Label",
+		\	"Conditional",
+		\	"Structure"
+		\]                                                 |
 augroup end
