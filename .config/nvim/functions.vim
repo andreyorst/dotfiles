@@ -118,7 +118,7 @@
 		if !exists("s:HlUnderCursor")
 			if index(b:IgnoreCursorHl, GetHlGroupName()) == -1
 				let b:highlighted_word = escape(expand('<cword>'),'/\')
-				silent! exe printf('match Visual /\V\<%s\>/', b:highlighted_word)
+				silent! exe 'match Visual /\V\<'.b:highlighted_word.'\>/'
 			else
 				exe 'match Visual /\V\<\>/'
 			endif
@@ -128,7 +128,7 @@
 	function! HangleCursorMovedForHl()
 		if !exists("s:HlUnderCursor") && exists("b:highlighted_word")
 			if b:highlighted_word == escape(expand('<cword>'),'/\')
-				silent! exe printf('match Visual /\V\<%s\>/', b:highlighted_word)
+				silent! exe 'match Visual /\V\<'.b:highlighted_word.'\>/'
 			else
 				exe 'match Visual /\V\<\>/'
 			endif
