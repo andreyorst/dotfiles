@@ -90,5 +90,6 @@
 	augroup HlUnderCur
 		autocmd!
 		autocmd CursorHold * call HlUnderCursor()
-		autocmd CursorMoved * call HangleCursorMovedForHl()
+		autocmd CursorMoved * call HandleCursorMovedForHl()
+		autocmd InsertEnter * call DisableHlInInsertMode()
 	augroup end

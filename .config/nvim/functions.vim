@@ -125,7 +125,7 @@
 		endif
 	endfunction
 
-	function! HangleCursorMovedForHl()
+	function! HandleCursorMovedForHl()
 		if !exists("s:HlUnderCursor") && exists("b:highlighted_word")
 			if b:highlighted_word == escape(expand('<cword>'),'/\')
 				silent! exe 'match Visual /\V\<'.b:highlighted_word.'\>/'
@@ -133,6 +133,10 @@
 				exe 'match Visual /\V\<\>/'
 			endif
 		endif
+	endfunction
+
+	function! DisableHlInInsertMode()
+		exe 'match Visual /\V\<\>/'
 	endfunction
 
 	function! GetHlGroupName()
