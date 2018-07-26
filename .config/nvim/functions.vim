@@ -113,7 +113,7 @@
 	" Highlights word under cursor, and all occurences
 	function! HlUnderCursor()
 		if !exists("b:IgnoreCursorHl")
-			let b:IgnoreCursorHl = []
+			let b:IgnoreCursorHl = ["Statement", "Type", "String"]
 		endif
 		if !exists("s:HlUnderCursor")
 			if index(b:IgnoreCursorHl, GetHlGroupName()) == -1
@@ -137,6 +137,7 @@
 
 	function! DisableHlInInsertMode()
 		exe 'match Visual /\V\<\>/'
+		let b:highlighted_word = ''
 	endfunction
 
 	function! GetHlGroupName()
