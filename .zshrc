@@ -1,6 +1,6 @@
-export ZSH=/home/aorst/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 
-ZSH_THEME="classyTouch"
+ZSH_THEME="classyTouch/classyTouch"
 
 # CASE_SENSITIVE="true"
 # HYPHEN_INSENSITIVE="true"
@@ -27,3 +27,9 @@ alias neofetch="clear && echo && neofetch --ascii_distro mac --disable DE WM The
 alias stopwatch='while true; do echo -ne "\r$(date +%-M:%S:%N)"; done'
 
 export EDITOR="nvim -u NORC"
+
+# Base16 Shell
+BASE16_SHELL="$HOME/.config/base16-shell/"
+[ -n "$PS1" ] && \
+    [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
+        eval "$("$BASE16_SHELL/profile_helper.sh")"
