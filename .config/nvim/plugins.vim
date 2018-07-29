@@ -20,6 +20,7 @@ call plug#begin('~/.vim/bundle')
 	Plug 'andreyorst/SimpleClangFormat.vim'
 	Plug 'andreyorst/SimpleSnippets-snippets'
 	Plug 'andreyorst/SimpleSnippets.vim'
+	Plug 'andreyorst/SimpleWorkspaces.vim'
 	Plug 'craigemery/vim-autotag'
 	Plug 'justinmk/vim-sneak'
 	Plug 'raimondi/delimitMate'
