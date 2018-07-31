@@ -87,9 +87,3 @@
 		autocmd TermOpen * startinsert
 	augroup end
 
-	augroup HlUnderCur
-		autocmd!
-		autocmd CursorHold * call HlUnderCursor()
-		autocmd CursorMoved * call HandleCursorMovedForHl()
-		autocmd InsertEnter * call DisableHlInInsertMode()
-	augroup end
