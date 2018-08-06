@@ -22,9 +22,10 @@ call plug#begin('~/.vim/bundle')
 	Plug 'andreyorst/SimpleSnippets.vim'
 	Plug 'andreyorst/SimpleWorkspaces.vim'
 	Plug 'craigemery/vim-autotag'
+	Plug 'junegunn/vim-easy-align'
 	Plug 'justinmk/vim-sneak'
 	Plug 'raimondi/delimitMate'
-	Plug 'shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	Plug 'shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
 	Plug 'tomtom/tcomment_vim'
 	Plug 'tpope/vim-surround'
 	Plug 'wellle/targets.vim'
@@ -37,7 +38,7 @@ call plug#begin('~/.vim/bundle')
 		Plug 'junegunn/goyo.vim'
 		Plug 'majutsushi/tagbar'
 		Plug 'scrooloose/nerdtree'
-		Plug 'shougo/denite.nvim', { 'do': ':UpdateRemotePlugins' }
+		Plug 'shougo/denite.nvim', {'do': ':UpdateRemotePlugins'}
 	endif
 
 " Rust
