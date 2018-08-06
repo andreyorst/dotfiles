@@ -70,7 +70,7 @@ else " Not in Termux
 	call denite#custom#option('_', 'highlight_matched_char', 'Child')
 	if executable('rg')
 		call denite#custom#var('file/rec', 'command',
-					\ ['rg', '--color', 'never', '--files'])
+					\ ['rg', '--color', 'never', '--files', '-L', '--no-messages'])
 	elseif executable('ag')
 		call denite#custom#var('file/rec', 'command',
 					\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
@@ -78,6 +78,8 @@ else " Not in Termux
 	call denite#custom#map('insert', '<Esc>', '<denite:enter_mode:normal>', 'noremap')
 	call denite#custom#map('normal', 'i', '<denite:enter_mode:insert>', 'noremap')
 	call denite#custom#map('normal', '<Esc>', '<denite:quit>', 'noremap')
+	call denite#custom#map('normal', '<C-p>', '<denite:quit>', 'noremap')
+	call denite#custom#map('insert', '<C-p>', '<denite:quit>', 'noremap')
 
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
