@@ -71,15 +71,30 @@ else " Not in Termux
 	if executable('rg')
 		call denite#custom#var('file/rec', 'command',
 					\ ['rg', '--color', 'never', '--files', '-L', '--no-messages'])
+		call denite#custom#var('grep', 'command', ['rg'])
+		call denite#custom#var('grep', 'default_opts',
+					\ ['--vimgrep', '--no-heading'])
+		call denite#custom#var('grep', 'recursive_opts', [])
+		call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+		call denite#custom#var('grep', 'separator', ['--'])
+		call denite#custom#var('grep', 'final_opts', [])
 	elseif executable('ag')
 		call denite#custom#var('file/rec', 'command',
 					\ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+		call denite#custom#var('grep', 'command', ['ag'])
+		call denite#custom#var('grep', 'default_opts',
+					\ ['-i', '--vimgrep'])
+		call denite#custom#var('grep', 'recursive_opts', [])
+		call denite#custom#var('grep', 'pattern_opt', [])
+		call denite#custom#var('grep', 'separator', ['--'])
+		call denite#custom#var('grep', 'final_opts', [])
 	endif
 	call denite#custom#map('insert', '<Esc>', '<denite:enter_mode:normal>', 'noremap')
 	call denite#custom#map('normal', 'i', '<denite:enter_mode:insert>', 'noremap')
 	call denite#custom#map('normal', '<Esc>', '<denite:quit>', 'noremap')
 	call denite#custom#map('normal', '<C-p>', '<denite:quit>', 'noremap')
 	call denite#custom#map('insert', '<C-p>', '<denite:quit>', 'noremap')
+
 
 " LanguageClient-neovim
 	let g:LanguageClient_serverCommands = {
