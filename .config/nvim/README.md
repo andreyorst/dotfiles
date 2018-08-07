@@ -9,8 +9,13 @@ List of plugins (not all, but essential ones) that extend or change workflow in
 some way. Basically, I've tried to make nvim as close to C/C++ IDE as possible.
 
 - Linting and autocompleting C/C++/Rust via
-  [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) +
-  [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
+  - On PC:
+    [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) +
+    [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
+  - In Termux:
+    [ALE](https://github.com/wr0p/ale),
+    [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim) +
+    [deoplete-clang](https://github.com/zchee/deoplete-clang)
 - Generating ctags on the fly via
   [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current
 file tags with [tagbar](https://github.com/majutsushi/tagbar).
@@ -31,6 +36,10 @@ file tags with [tagbar](https://github.com/majutsushi/tagbar).
   [vim-surround](https://github.com/tpope/vim-surround)
 - Commenting in and out blocks of code with
   [TComment](https://github.com/tomtom/tcomment_vim)
+- Aligning stuff with
+  [vim-easy-align](https://github.com/junegunn/vim-easy-align)
+- Managing workspaces with
+  [SimpleWorkspaces.vim](https://github.com/andreyorst/SimpleWorkspaces.vim)
 
 ## Mappings
 
