@@ -84,6 +84,7 @@
 	" Enter insert mode when terminal shows up
 	augroup Term
 		autocmd!
+		autocmd TermOpen * setlocal nonu nornu signcolumn=no
 		autocmd TermOpen * startinsert
 	augroup end
 
