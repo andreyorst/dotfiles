@@ -1,3 +1,2 @@
-hook global WinCreate .* %{addhl number_lines -relative}
 set global tabstop 4
 set global indentwidth 4

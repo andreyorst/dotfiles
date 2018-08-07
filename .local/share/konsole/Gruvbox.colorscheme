@@ -1,5 +1,5 @@
 [Background]
-Color=49,48,47
+Color=50,48,47
 
 [BackgroundFaint]
 Color=29,31,33
@@ -89,7 +89,7 @@ Color=235,219,178
 Color=235,219,178
 
 [General]
-Blur=true
+Blur=false
 Description=Gruvbox
-Opacity=0.8
+Opacity=1
 Wallpaper=
