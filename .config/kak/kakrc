@@ -1,2 +1,3 @@
 set global tabstop 4
 set global indentwidth 4
+colorscheme gruvbox
