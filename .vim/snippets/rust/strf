@@ -1,0 +1,1 @@
+String::from("${0:string}")
