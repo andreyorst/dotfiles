@@ -254,5 +254,3 @@ endif
 
 	call tcomment#type#Define('c', '// %s')
 
-" vim-plug
-	command! PluginUpdate PlugUpdate | PlugUpgrade
