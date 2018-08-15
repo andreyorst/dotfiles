@@ -21,8 +21,6 @@ call plug#begin('~/.vim/bundle')
 	Plug 'andreyorst/SimpleSnippets-snippets'
 	Plug 'andreyorst/SimpleSnippets.vim'
 	Plug 'andreyorst/SimpleWorkspaces.vim'
-	Plug 'craigemery/vim-autotag'
-	Plug 'junegunn/vim-easy-align'
 	Plug 'justinmk/vim-sneak'
 	Plug 'raimondi/delimitMate'
 	Plug 'shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
@@ -35,7 +33,6 @@ call plug#begin('~/.vim/bundle')
 		Plug 'zchee/deoplete-clang'
 	else
 		Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
-		Plug 'junegunn/goyo.vim'
 		Plug 'majutsushi/tagbar'
 		Plug 'scrooloose/nerdtree'
 		Plug 'shougo/denite.nvim', {'do': ':UpdateRemotePlugins'}
