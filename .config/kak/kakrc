@@ -1,4 +1,27 @@
 set global tabstop 4
 set global indentwidth 4
+
 colorscheme gruvbox
+
 add-highlighter global number_lines -relative -hlcursor
+add-highlighter global show_matching
+add-highlighter global show_whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
+
+map global normal '' :comment-line<ret>
+
+hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
+hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
+
+map global normal <a-b> 'f{m<a-;>;'
+
+def plug -params 1..2 %{
+	%sh{
+		if [[ ! -d $HOME/build/$1 ]]; then
+			(cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
+		fi
+		for file in $(echo $HOME/build/$(basename $1)/$2*.kak); do
+			echo source "$file"
+		done
+	}
+}
+
