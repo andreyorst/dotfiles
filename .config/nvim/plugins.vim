@@ -42,8 +42,8 @@ call plug#begin('~/.vim/bundle')
 	Plug 'rust-lang/rust.vim'
 
 " Syntax Highlighting
-	Plug 'bfrg/vim-cpp-modern'
 	Plug 'justinmk/vim-syntax-extra'
+	Plug 'bfrg/vim-cpp-modern'
 
 call plug#end()
 

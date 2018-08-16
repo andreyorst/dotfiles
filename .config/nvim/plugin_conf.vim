@@ -254,3 +254,4 @@ endif
 
 	call tcomment#type#Define('c', '// %s')
 
+	let g:cpp_no_function_highlight = 1
