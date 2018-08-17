@@ -22,8 +22,8 @@
     fg4="rgb:a89984"
     fg4_256="rgb:a89984"
 
-	# Normal Colors
-    red="rgb:fb4934"
+    # Normal Colors
+    red="rgb:cc241d"
     green="rgb:b8bb26"
     yellow="rgb:fabd2f"
     blue="rgb:83a598"
@@ -31,16 +31,16 @@
     aqua="rgb:8ec07c"
     orange="rgb:fe8019"
 
-	# Normal Colors
-    b_red="rgb:cc241d"
-    b_green="rgb:98971a"
-    b_yellow="rgb:d79921"
-    b_blue="rgb:458588"
-    b_purple="rgb:b16286"
-    b_aqua="rgb:689d6a"
-    b_orange="rgb:d65d0e"
+    # Darker Colors
+    d_red="rgb:fb4934"
+    d_green="rgb:98971a"
+    d_yellow="rgb:d79921"
+    d_blue="rgb:458588"
+    d_purple="rgb:b16286"
+    d_aqua="rgb:689d6a"
+    d_orange="rgb:d65d0e"
 
-	# Faded Colors
+    # Faded Colors
     f_red="rgb:9d0006"
     f_green="rgb:79740e"
     f_yellow="rgb:b57614"
@@ -53,10 +53,9 @@
         # Custom faces
         set-face global Child ${red},default+b
         set-face global Condition ${purple},default
-        set-face global Delimiters ${f_orange},default
-
+        set-face global Delimiters ${orange},default
         # Code highlighting
-        face global value     ${purple}
+        face global value     ${orange}
         face global type      ${yellow}
         face global variable  ${blue}
         face global module    ${green}
@@ -98,7 +97,7 @@
         face global StatusCursor       ${bg0},${fg0}
         face global Prompt             ${yellow}
         face global MatchingChar       default+b
-        face global BufferPadding      ${bg2},${bg0}
+        face global BufferPadding      ${bg0_s},${bg0_s}
         face global Whitespace         ${bg2}
     "
 }
