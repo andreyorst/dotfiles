@@ -23,7 +23,7 @@
     fg4_256="rgb:a89984"
 
     # Normal Colors
-    red="rgb:cc241d"
+    red="rgb:fb4934"
     green="rgb:b8bb26"
     yellow="rgb:fabd2f"
     blue="rgb:83a598"
@@ -31,8 +31,8 @@
     aqua="rgb:8ec07c"
     orange="rgb:fe8019"
 
-    # Darker Colors
-    d_red="rgb:fb4934"
+    # Bright Colors
+    d_red="rgb:cc241d"
     d_green="rgb:98971a"
     d_yellow="rgb:d79921"
     d_blue="rgb:458588"
@@ -53,7 +53,8 @@
         # Custom faces
         set-face global Child ${red},default+b
         set-face global Condition ${purple},default
-        set-face global Delimiters ${orange},default
+        set-face global Delimiters ${f_orange},default
+
         # Code highlighting
         face global value     ${orange}
         face global type      ${yellow}
@@ -61,7 +62,7 @@
         face global module    ${green}
         face global function  ${blue}
         face global string    ${green}
-        face global keyword   ${red}
+        face global keyword   ${purple}
         face global operator  ${aqua}
         face global attribute ${orange}
         face global comment   ${gray_245}
