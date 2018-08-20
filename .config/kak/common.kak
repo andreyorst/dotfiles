@@ -12,9 +12,10 @@ map global normal '' :comment-line<ret>
 hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
 hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
 
-add-highlighter global regex \w+(\h+)?(?=\() 0:function
-add-highlighter global regex (?<=\.)\w+(?!=\() 0:Child
-add-highlighter global regex (?<=->)\w+(?!=\() 0:Child
-add-highlighter global regex (\+|\*|=|\\|\?|\%|\|-|!|\|) 0:operator
+hook global WinSetOption filetype=(c|cpp) %{
+    add-highlighter global regex \w+(\h+)?(?=\() 0:function
+    add-highlighter global regex (?<=\.)\w+(?!\()(?!>)(?!") 0:Child
+    add-highlighter global regex (?<=->)\w+(?!\()(?!>)(?!") 0:Child
+}
+add-highlighter global regex (\+|\*|=|\\|\?|\%|\|-|!|\||->|\.|,) 0:operator
 add-highlighter global regex (\(|\)|\[|\]|\{|\}|\;|') 0:Delimiters
-
