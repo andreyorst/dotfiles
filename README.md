@@ -2,7 +2,7 @@
 Constantly improving my neovim setup.
 Neovim config has it's own [README.md](https://github.com/andreyorst/dotfiles/tree/master/.config/nvim).
 
-Also includes settings for Termite, KDE Scripts, KDE Colorschemes, some config for bspwm and other misc stuff.
+Also includes settings for Termite, Tmux, [Kakoune](https://github.com/andreyorst/dotfiles/tree/master/.config/kak), KDE Scripts, KDE Colorschemes, some config for bspwm and other misc stuff.
 
 ### Owerall look:
 ![owerall](https://user-images.githubusercontent.com/19470159/38469313-6b9e558e-3b5b-11e8-989f-807f000a1daa.png)
