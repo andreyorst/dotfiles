@@ -1,3 +1,6 @@
+declare-option -docstring "path where plugins should be installed" \
+    str plugin_install_dir '$HOME/.config/kak/plugins'
+
 define-command plug -params 1..2 %{
     %sh{
         if [[ -d $HOME/.config/kak/plugins/$(basename $1)/rc ]]; then
@@ -11,15 +14,13 @@ define-command plug -params 1..2 %{
 define-command plug-install -docstring 'Install all uninstalled plugins' %{
     echo -markup "{Information}Installing plugins in the background"
     nop %sh{ (
-        plugin_install_dir=$HOME/.config/kak/plugins
-
-        if [[ ! -d $plugin_install_dir ]]; then
-            mkdir $plugin_install_dir
+        if [[ ! -d %opt{plugin_install_dir} ]]; then
+            mkdir %opt{plugin_install_dir}
         fi
 
         for plugin in $(grep -oP "(?<=plug\s).*" $HOME/.config/kak/kakrc); do
-            if [[ ! -d $plugin_install_dir/$(basename $plugin) ]]; then
-                (cd $plugin_install_dir; git clone https://github.com/$plugin >&2) &
+            if [[ ! -d %opt{plugin_install_dir}/$(basename $plugin) ]]; then
+                (cd %opt{plugin_install_dir}; git clone https://github.com/$plugin >&2) &
             fi
         done
         wait
