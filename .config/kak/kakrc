@@ -1,10 +1,14 @@
 %sh{
-	for file in $(echo $HOME/.config/kak/*.kak); do
-		echo source "$file"
-	done
+    config_files=(
+        "plug.kak"
+        "common.kak"
+        "plugins.kak"
+    )
+    for file in ${config_files[*]}; do
+        echo source "$HOME/.config/kak/$file"
+    done
 }
 
-plug alexherbo2/snippets.kak
 
 hook global WinCreate .* %{
     snippets-enable
