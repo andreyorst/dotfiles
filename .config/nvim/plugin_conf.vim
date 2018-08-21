@@ -8,6 +8,7 @@
 " ╰────────────────────────────────╯
 
 " Airline
+if !IsTermux()
 	set laststatus=2
 
 	" Bottom row
@@ -27,6 +28,7 @@
 
 	" Theme
 		let g:airline_powerline_fonts = 1
+endif
 
 " DelimitMate
 	let delimitMate_expand_cr = 1
@@ -254,4 +256,5 @@ endif
 
 	call tcomment#type#Define('c', '// %s')
 
+" vim-cpp-modern
 	let g:cpp_no_function_highlight = 1
