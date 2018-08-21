@@ -13,8 +13,10 @@ call plug#begin('~/.vim/bundle')
 
 " Look
 	Plug 'chriskempson/base16-vim'
-	Plug 'vim-airline/vim-airline'
-	Plug 'vim-airline/vim-airline-themes'
+	if !IsTermux()
+		Plug 'vim-airline/vim-airline'
+		Plug 'vim-airline/vim-airline-themes'
+	endif
 
 " Tools
 	Plug 'andreyorst/SimpleClangFormat.vim'
@@ -36,10 +38,10 @@ call plug#begin('~/.vim/bundle')
 		Plug 'majutsushi/tagbar'
 		Plug 'scrooloose/nerdtree'
 		Plug 'shougo/denite.nvim', {'do': ':UpdateRemotePlugins'}
-	endif
 
-" Rust
-	Plug 'rust-lang/rust.vim'
+	" Rust
+		Plug 'rust-lang/rust.vim'
+	endif
 
 " Syntax Highlighting
 	Plug 'justinmk/vim-syntax-extra'
