@@ -16,9 +16,8 @@ some way. Basically, I've tried to make nvim as close to C/C++ IDE as possible.
     [ALE](https://github.com/wr0p/ale),
     [Deoplete.nvim](https://github.com/Shougo/deoplete.nvim) +
     [deoplete-clang](https://github.com/zchee/deoplete-clang)
-- Generating ctags on the fly via
-  [vim-autotag](https://github.com/craigemery/vim-autotag) and browsing current
-file tags with [tagbar](https://github.com/majutsushi/tagbar).
+- Browsing current file tags with
+  [tagbar](https://github.com/majutsushi/tagbar).
 - Snippets provided by
   [SimpleSnippets.vim](https://github.com/andreyorst/SimpleSnippets.vim)
 - Browsing files with [Nerdtree](https://github.com/scrooloose/nerdtree).
@@ -26,8 +25,6 @@ file tags with [tagbar](https://github.com/majutsushi/tagbar).
   [delimitMate](https://github.com/Raimondi/delimitMate).
 - Fuzzy finding, and doing lots of other cool stuff with
   [Denite](https://github.com/Shougo/denite.nvim)
-- Distraction-free typing of Markdown with
-  [Goyo](https://github.com/junegunn/goyo.vim)
 - Jump to any location specified by two characters with
   [vim-sneak](https://github.com/justinmk/vim-sneak)
 - Using various textobjects with
@@ -36,8 +33,6 @@ file tags with [tagbar](https://github.com/majutsushi/tagbar).
   [vim-surround](https://github.com/tpope/vim-surround)
 - Commenting in and out blocks of code with
   [TComment](https://github.com/tomtom/tcomment_vim)
-- Aligning stuff with
-  [vim-easy-align](https://github.com/junegunn/vim-easy-align)
 - Managing workspaces with
   [SimpleWorkspaces.vim](https://github.com/andreyorst/SimpleWorkspaces.vim)
 
@@ -47,7 +42,7 @@ file tags with [tagbar](https://github.com/majutsushi/tagbar).
 - <kbd>F2</kbd> - LanguageClient-neovim rename symbol.
 - <kbd>F3</kbd>/<kbd>F4</kbd> - Search and replace word under cursor with
   `RenameCWord()` function.
-- <kbd>\*</kbd> - Highlight all occurrences of word under cursor, but don't
+- <kbd>\*</kbd> - Search for all occurrences of word under cursor, but don't
   move. No jumps added to jumplist.
 - <kbd>Alt</kbd>+<kbd>t</kbd> - Toggle bottom terminal window.
 - <kbd>Alt</kbd>+<kbd>b</kbd> - Toggle Tagbar window.
@@ -77,9 +72,6 @@ from other Vim users. Feel free to use, modify, extend them.
   [Termux](https://github.com/termux/termux-app)
 - `DefineSyntaxRegion(lang, start, end, hl)` - define nested highlighting
   region for different language.
-- `HlUnderCursor()` - Highlight all occurrences of a word under a cursor.
-  Ignores special words.
-- `GetHlGroupName()` - Returns the name of highlight group of word under cursor.
 
 ## Termux support
 
