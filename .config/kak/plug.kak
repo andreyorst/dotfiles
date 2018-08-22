@@ -6,8 +6,8 @@ declare-option -hidden -docstring "Array of plugins" \
 define-command plug -params 1..2 %{
     %sh{
         if [[ -d $(eval echo $kak_opt_plugin_install_dir) ]]; then
-            if [[ -d $HOME/.config/kak/plugins/$(basename $1) ]]; then
-                for file in $(find -L $(eval echo $kak_opt_plugin_install_dir) -type f -name '*.kak'); do
+            if [[ -d $(eval echo $kak_opt_plugin_install_dir)/$(basename $1) ]]; then
+                for file in $(find -L $(eval echo $kak_opt_plugin_install_dir/$(basename $1)) -type f -name '*.kak'); do
                     echo source "$file"
                 done
             fi
@@ -25,14 +25,13 @@ define-command plug-install -docstring 'Install all uninstalled plugins' %{
         fi
 
         for plugin in $kak_opt_plugins; do
-            if [[ ! -d $(eval echo $kak_opt_plugin_install_dir)/$(basename $plugin) ]]; then
+            if [[ ! -d $($(eval echo $kak_opt_plugin_install_dir)/$(basename $plugin)) ]]; then
                 (cd $(eval echo $kak_opt_plugin_install_dir); git clone https://github.com/$plugin >&2) &
             fi
         done
         wait
+        printf %s\\n "evaluate-commands -client $kak_client echo -markup '{Information}Done installing plugins'" | kak -p ${kak_session}
     ) > /dev/null 2>&1 < /dev/null & } 
-    
-    echo -markup "{Information}Done installing plugins"
 }
 
 define-command plug-update -docstring 'Update all installed plugins' %{
@@ -42,7 +41,7 @@ define-command plug-update -docstring 'Update all installed plugins' %{
            (cd $(eval echo $kak_opt_plugin_install_dir)/$(basename $plugin) && git pull >&2) &
         done
         wait
+        printf %s\\n "evaluate-commands -client $kak_client echo -markup '{Information}Done updating plugins'" | kak -p ${kak_session}
     ) > /dev/null 2>&1 < /dev/null & }
-    echo -markup "{Information}Done updating plugins"
 }
 
