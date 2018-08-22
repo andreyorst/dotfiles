@@ -6,6 +6,9 @@ colorscheme base16-guvbox-dark-soft
 add-highlighter global number_lines -relative -hlcursor
 add-highlighter global show_matching
 add-highlighter global show_whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
+add-highlighter global wrap -word -indent
+
+set global ui_options ncurses_assistant=none
 
 map global normal '' :comment-line<ret>
 
