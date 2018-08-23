@@ -81,22 +81,22 @@
         face global list      default
 
         face global Default            ${fg0},${bg0_s}
-        face global PrimarySelection   ${fg0},${blue}
-        face global SecondarySelection ${bg0},${blue}
+        face global PrimarySelection   default,${bg2}
+        face global SecondarySelection default,${bg1}
         face global PrimaryCursor      ${bg0},${fg0}
-        face global SecondaryCursor    ${bg0},${fg0}
+        face global SecondaryCursor    ${bg0},${fg3}
         face global PrimaryCursorEol   ${bg0},${fg2}
-        face global SecondaryCursorEol ${bg0},${fg2}
+        face global SecondaryCursorEol ${bg0},${fg4}
         face global LineNumbers        ${gray_245},rgb:3c3836
         face global LineNumberCursor   ${fg0},${bg2}
         face global MenuForeground     ${bg2},${blue}
         face global MenuBackground     default,${bg2}
-        face global StatusLine         default
-        face global StatusLineMode     ${yellow}+b
+        face global StatusLine         ${fg1},${bg1}
+        face global StatusLineMode     ${blue}+b
         face global StatusLineInfo     ${purple}
         face global StatusLineValue    ${red}
         face global StatusCursor       ${bg0},${fg0}
-        face global Prompt             ${yellow}
+        face global Prompt             default
         face global MatchingChar       default+b
         face global BufferPadding      ${bg0_s},${bg0_s}
         face global Whitespace         ${bg2}
