@@ -48,6 +48,12 @@
 	nmap <F1> <nop>
 	imap <F1> <nop>
 
+" Kakoune moving
+	noremap gj G
+	noremap gk gg
+	noremap gh 0
+	noremap gl $
+
 " Move lines around
 	nnoremap <silent><A-j> :m .+1<CR>==
 	nnoremap <silent><A-k> :m .-2<CR>==
