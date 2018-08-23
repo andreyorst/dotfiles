@@ -24,7 +24,7 @@ define-command plug-install -docstring 'Install all uninstalled plugins' %{
 			trap 'rmdir .plug.kaklock' EXIT
 
 		if [ ! -d $(eval echo $kak_opt_plug_install_dir) ]; then
-			mkdir $(eval echo $kak_opt_plug_install_dir)
+			mkdir -p $(eval echo $kak_opt_plug_install_dir)
 		fi
 
 		for plugin in $kak_opt_plug_plugins; do
