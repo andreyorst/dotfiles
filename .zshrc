@@ -26,6 +26,7 @@ alias vimconf="nvim ~/.config/nvim/init.vim"
 alias kakconf="kak ~/.config/kak/kakrc"
 alias neofetch="clear && echo && neofetch --ascii_distro mac --disable DE WM Theme Icons Shell GPU Resolution  --color_blocks --underline_char '─' --cpu_cores --os_arch"
 alias stopwatch='while true; do echo -ne "\r$(date +%-M:%S:%N)"; done'
+alias mc="mc -x"
 
 export EDITOR="nvim -u NORC"
 
