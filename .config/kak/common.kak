@@ -21,8 +21,12 @@ hook global WinSetOption filetype=(c|cpp) %{
     add-highlighter global regex \w+(\h+)?(?=\() 0:function
     add-highlighter global regex (?<=\.)\w+(?!\()(?!>)(?!") 0:Child
     add-highlighter global regex (?<=->)\w+(?!\()(?!>)(?!") 0:Child
+    add-highlighter global regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
+    add-highlighter global regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
+    add-highlighter global regex \b(v|u|vu)?(_|__)?(int|short|char|long)(_t)?\b 0:type
+    add-highlighter global regex \b\w+_t\b 0:type
 }
-add-highlighter global regex (\+|\*|=|\\|\?|\%|\|-|!|\||->|\.|,) 0:operator
+add-highlighter global regex (\+|-|\*|=|\\|\?|\%|\|-|!|\||->|\.|,) 0:operator
 add-highlighter global regex (\(|\)|\[|\]|\{|\}|\;|') 0:Delimiters
 
 set-option global modelinefmt '%val{bufname} {blue}{rgb:3c3836,blue} %opt{filetype} {rgb:3c3836,blue}{default,default} {{context_info}}{{mode_info}} {blue}{rgb:3c3836,blue} %val{cursor_line}:%val{cursor_char_column} {rgb:3c3836,blue}{default,default} %val{client}@[%val{session}] '
