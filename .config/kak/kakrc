@@ -1,27 +1,12 @@
 %sh{
     config_files=(
-        "plug.kak"
+        "plugins/plug.kak/rc/plug.kak"
         "common.kak"
         "plugins.kak"
+        "plugin_settings.kak"
     )
     for file in ${config_files[*]}; do
         echo source "$HOME/.config/kak/$file"
     done
 }
 
-
-#hook global WinCreate .* %{
-    #snippets-enable
-#}
-
-#set-option global snippets %{{
-    #"->": "→",
-    #"ttt": "tos(\"$1\"); ton($2); tos(\"${3:\n\r}\");",
-#}}
-
-hook global WinSetOption filetype=(c|cpp) %{
-    clang-enable-autocomplete 
-    clang-enable-diagnostics
-    alias window lint clang-parse
-    alias window lint-next-error clang-diagnostics-next
-}
