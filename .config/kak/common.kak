@@ -29,5 +29,3 @@ hook global WinSetOption filetype=(c|cpp) %{
 add-highlighter global regex (\+|-|\*|=|\\|\?|\%|\|-|!|\||->|\.|,) 0:operator
 add-highlighter global regex (\(|\)|\[|\]|\{|\}|\;|') 0:Delimiters
 
-set-option global modelinefmt '%val{bufname} {blue}{rgb:3c3836,blue} %opt{filetype} {rgb:3c3836,blue}{default,default} {{context_info}}{{mode_info}} {blue}{rgb:3c3836,blue} %val{cursor_line}:%val{cursor_char_column} {rgb:3c3836,blue}{default,default} %val{client}@[%val{session}] '
-
