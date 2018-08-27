@@ -256,5 +256,3 @@ endif
 
 	call tcomment#type#Define('c', '// %s')
 
-" vim-cpp-modern
-	let g:cpp_no_function_highlight = 1
