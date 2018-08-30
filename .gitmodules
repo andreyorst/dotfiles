@@ -1,0 +1,3 @@
+[submodule ".config/kak"]
+	path = .config/kak
+	url = https://github.com/andreyorst/kak
