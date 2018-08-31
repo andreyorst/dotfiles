@@ -8,7 +8,8 @@
 " ╰────────────────────────────────╯
 
 " Highlights word under cursor by placing it in @/ register
-	nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<".expand("<cword>")."\\>'"<Cr>
+	nnoremap <silent> * :set hlsearch<Cr>:exe "let @/='\\<'.expand('<cword>').'\\>'"<Cr>
+	nnoremap <silent> <a-*> :set hlsearch<Cr>:exe 'let @/=expand("<cWORD>")'<Cr>
 
 " Rename word under cursor in whole document
 	nnoremap <silent><F3> :call RenameCWord("cword")<Cr>
@@ -16,16 +17,19 @@
 	nnoremap <silent><F4> :call RenameCWord("cWORD")<Cr>
 	inoremap <silent><F4> <Esc>:call RenameCWord("cWORD")<Cr>
 
-" Denite
-	nnoremap <silent><C-p> :Denite file/rec<Cr>
-	nnoremap <C-d> :Denite <Tab>
-
 " Toggle terminal on/off (neovim)
+if has('nvim')
 	nnoremap <silent><A-t> :call TermToggle(12)<CR>
 	inoremap <silent><A-t> <Esc>:call TermToggle(12)<CR>
 	tnoremap <silent><A-t> <C-\><C-n>:call TermToggle(12)<CR>
 	" Terminal go back to normal mode
 	tnoremap <silent><Esc> <C-\><C-n>
+endif
+
+if !IsTermux()
+" Denite
+	nnoremap <silent><C-p> :Denite file/rec<Cr>
+	nnoremap <C-d> :Denite <Tab>
 
 " Tagbar
 	noremap <silent><A-b> <Esc>:TagbarToggle<CR>
@@ -34,11 +38,8 @@
 " NERDTree
 	noremap <silent><A-n> <Esc>:NERDTreeToggle<CR>
 	tnoremap <silent><A-n> <C-\><C-n>:NERDTreeToggle<CR>
-
-" Buffers
-	nnoremap <silent><A-q> <Esc>:bd!<Cr>
-	nnoremap <silent><A-w> <Esc>:w<Cr>
-
+endif
+"
 " Common fixes
 	nnoremap <silent>gb :bn<Cr>
 	nnoremap <silent>gB :bp<Cr>
