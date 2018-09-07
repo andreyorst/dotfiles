@@ -18,7 +18,11 @@
 	set path+=**
 	set wildmenu
 	set termguicolors
-	colorscheme base16-gruvbox-dark-soft
+	if !IsTermux()
+		colorscheme base16-gruvbox-dark-soft
+	else
+		colorscheme base16-default-dark
+	endif
 	set updatetime=350
 	set signcolumn=yes
 	set wrap
@@ -63,13 +67,12 @@
 
 " Highlights
 	" Common highlights
-		highlight EndOfBuffer guifg=#32302f guibg=NONE
+		highlight EndOfBuffer guifg=bg guibg=NONE
 		highlight ErrorSign guibg=#3c3836 guifg=#fb4934
 		highlight WarningSign guibg=#3c3836 guifg=#fabd2f
 		highlight InfoSign guibg=#3c3836 guifg=#8ec07c
 		highlight Search guifg=#282a2e
 		highlight IncSearch guifg=#282a2e
-		highlight Ignore guifg=#969896
 		highlight Child guifg=#fb4934 guibg=NONE cterm=bold gui=bold
 
 	" vim-sneak
