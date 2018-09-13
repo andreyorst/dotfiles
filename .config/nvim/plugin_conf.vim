@@ -248,6 +248,9 @@ endif
 				\"\<Esc>:call SimpleSnippets#jumpToLastPlaceholder()\<Cr>" :
 				\"\<S-j>"
 
+	" inoremap <silent><expr><Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	" inoremap <silent><expr><S-Tab> pumvisible() ? "\<C-p>" : "\<Tab>"
+
 " TComment
 	let g:tcomment_maps = 0
 	nnoremap <silent><C-_> :TComment<Cr>
