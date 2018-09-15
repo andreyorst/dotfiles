@@ -26,6 +26,6 @@ hook global WinSetOption filetype=(c|cpp) %{
     add-highlighter buffer/ regex \b(v|u|vu)?(_|__)?(int|short|char|long)(_t)?\b 0:type
     add-highlighter buffer/ regex \b\w+_t\b 0:type
 }
-add-highlighter global/ regex (\+|-|\*|=|\\|\?|%|\|-|!|\||->|\.|,) 0:operator
+add-highlighter global/ regex (\+|-|\*|=|\\|\?|%|\|-|!|\||->|\.|,|<|>) 0:operator
 add-highlighter global/ regex (\(|\)|\[|\]|\{|\}|\;|') 0:Delimiters
 
