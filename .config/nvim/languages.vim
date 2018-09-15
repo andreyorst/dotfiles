@@ -11,20 +11,6 @@ augroup Cpp
 	autocmd!
 	" Highlightings for C/C++ types and struct/class members.
 	autocmd FileType c,cpp,h,hpp
-		\ let b:IgnoreCursorHl = [
-		\	"Statement",
-		\	"Type",
-		\	"StorageClass",
-		\	"String",
-		\	"PreProc",
-		\	"cPreCondit",
-		\	"Keyword",
-		\	"Repeat",
-		\	"Include",
-		\	"Label",
-		\	"Conditional",
-		\	"Structure"
-		\]                                                               |
 		\ syntax match Type "\v<\w+_t>"                                  |
 		\ syntax match Type "\v<__signed>"                               |
 		\ syntax match Type "\v<(v|u|vu)\w+(8|16|32|64)>"                |
@@ -37,10 +23,7 @@ augroup end
 augroup Markdown
 	autocmd!
 	autocmd FileType markdown
-		\ setlocal spell                                                      |
-		\ setlocal expandtab                                                  |
-		\ setlocal colorcolumn=80                                             |
-		\ setlocal tw=80                                                      |
+		\ setlocal spell expandtab colorcolumn=80 tw=80                       |
 		\ call DefineSyntaxRegion(   'c',    '```c', '```', 'SpecialComment') |
 		\ call DefineSyntaxRegion( 'cpp',  '```cpp', '```', 'SpecialComment') |
 		\ call DefineSyntaxRegion( 'vim',  '```vim', '```', 'SpecialComment') |
@@ -59,16 +42,6 @@ augroup end
 augroup Rust
 	autocmd!
 	autocmd FileType rust
-		\ let b:IgnoreCursorHl = [
-		\	"Statement",
-		\	"Type",
-		\	"PreProc",
-		\	"Keyword",
-		\	"Repeat",
-		\	"Label",
-		\	"Conditional",
-		\	"Structure"
-		\]                                                 |
 		\ set listchars+=space:⋅                           |
 		\ highlight WhiteSpaceBol guifg=#665c54 guibg=NONE |
 		\ highlight WhiteSpaceMol guifg=#32302f guibg=NONE |
