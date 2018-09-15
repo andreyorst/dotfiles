@@ -69,10 +69,16 @@
 	function! FindProjectRootByFile(filename)
 		let l:path = getcwd()
 		while l:path != ''
-			if filereadable(l:path.'/'.a:filename)
-				return l:path
+			let l:res = findfile(a:filename, l:path.'/**')
+			if l:res != ''
+				let l:res = substitute(l:res, '\v(.*)\/.*', '\1', &gd ? 'gg' : 'g')
+				if match(l:res, l:path) == 0
+					return fnameescape(l:res)
+				else
+					return fnameescape(l:path.'/'.l:res)
+				endif
 			else
-				let l:path = substitute(l:path, '\v(.*)\/.*', '\1', 'g')
+				let l:path = substitute(l:path, '\v(.*)\/.*', '\1', &gd ? 'gg' : 'g')
 			endif
 		endwhile
 		return -1
