@@ -6,7 +6,7 @@ colorscheme base16-guvbox-dark-soft
 add-highlighter global/ number-lines -relative -hlcursor
 add-highlighter global/ show-matching
 add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
-add-highlighter global/ wrap -word -indent
+add-highlighter global/ wrap -word -indent -marker ↪
 set-option global scrolloff 3,3
 set-option global grepcmd 'rg -L --with-filename --column'
 
