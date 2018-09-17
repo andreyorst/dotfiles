@@ -4,6 +4,7 @@ eval %sh{
         common.kak
         plugins.kak
         plugin_settings.kak
+        languages.kak
     "
 
     for file in $config_files; do
