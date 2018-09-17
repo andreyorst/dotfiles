@@ -11,6 +11,10 @@ Name=Default
 Parent=FALLBACK/
 ShowTerminalSizeHint=false
 
+[Interaction Options]
+TrimLeadingSpacesInSelectedText=false
+TrimTrailingSpacesInSelectedText=true
+
 [Scrolling]
 HistoryMode=2
 ScrollBarPosition=2
