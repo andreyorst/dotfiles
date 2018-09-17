@@ -50,11 +50,6 @@ eval %sh{
     f_orange="rgb:af3a03"
 
     echo "
-        # Custom faces
-        set-face global Child ${red},default+b
-        set-face global Condition ${purple},default
-        set-face global Delimiters ${f_orange},default
-
         # Code highlighting
         face global value     ${orange}
         face global type      ${yellow}
