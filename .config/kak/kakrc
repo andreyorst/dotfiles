@@ -1,13 +1,13 @@
 eval %sh{
-	config_files="
-		plugins/plug.kak/rc/plug.kak
-		common.kak
-		plugins.kak
-		plugin_settings.kak
-	"
+    config_files="
+        plugins/plug.kak/rc/plug.kak
+        common.kak
+        plugins.kak
+        plugin_settings.kak
+    "
 
-	for file in $config_files; do
-		echo source "$HOME/.config/kak/$file"
-	done
+    for file in $config_files; do
+        echo source "$HOME/.config/kak/$file"
+    done
 }
 
