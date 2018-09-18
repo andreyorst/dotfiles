@@ -30,7 +30,10 @@
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
 
     hook global NormalIdle .* %{nop %sh{command tmux rename-window ${kak_bufname##*/}}}
-    hook global KakEnd .* %{nop %sh{command tmux rename-window zsh}}
+    hook global KakBegin .* %{nop %sh{command tmux set-option -g status-position top}}
+    hook global KakEnd .* %{nop %sh{
+    command tmux rename-window zsh
+    command tmux set-option -g status-position bottom}}
 
 # Aliases
     alias global vert tmux-new-vertical
