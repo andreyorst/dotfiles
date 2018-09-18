@@ -68,7 +68,7 @@
 " Search upwards for file, and return its path
 	function! FindProjectRootByFile(filename)
 		let l:path = getcwd()
-		while l:path != ''
+		while l:path != $HOME
 			let l:res = findfile(a:filename, l:path.'/**')
 			if l:res != ''
 				let l:res = substitute(l:res, '\v(.*)\/.*', '\1', &gd ? 'gg' : 'g')
