@@ -7,7 +7,7 @@
 # UI
     colorscheme base16-guvbox-dark-soft
     set-option global ui_options ncurses_status_on_top=yes ncurses_assistant=none
-    set-option global modelinefmt '{blue}{rgb:3c3836,blue+b} %val{bufname}{{context_info}} {default,rgb:3c3836} {{mode_info}} {blue+b}%val{cursor_line}{default}:{blue+b}%val{cursor_char_column} {blue}{rgb:3c3836,blue+b} %opt{filetype} {rgb:3c3836,blue}{blue} {blue,default+b}%val{client}{default} at {magenta,default+b}[%val{session}] '
+    set-option global modelinefmt '{rgb:83a598}{rgb:3c3836,rgb:83a598+b} %val{bufname}{{context_info}} {default,rgb:3c3836} {{mode_info}} {rgb:83a598+b}%val{cursor_line}{default}:{rgb:83a598+b}%val{cursor_char_column} {rgb:83a598}{rgb:3c3836,rgb:83a598+b} %opt{filetype} {rgb:3c3836,rgb:83a598}{rgb:83a598} {rgb:83a598,default+b}%val{client}{default} at {magenta,default+b}[%val{session}] '
 
 # Highlighters
     set-face global delimiters rgb:af3a03,default
