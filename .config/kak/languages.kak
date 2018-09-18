@@ -16,12 +16,16 @@
         add-highlighter buffer/ regex \b\w+_t\b 0:type
     }
 
-# Make rust use spaces instead of tabs
-    hook global WinSetOption filetype=(rust) %{
-        hook global InsertChar \t %{
+# Expandtab hooks
+    hook global WinSetOption filetype=(rust|kak) %{
+        hook -group expandtab global InsertChar \t %{
             exec -draft h@
         }
-        hook global InsertDelete ' ' %{ try %{
+        hook -group expandtab global InsertDelete ' ' %{ try %{
           execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
         }}
     }
+    hook global WinSetOption filetype=makefile %{
+        remove-hooks global expandtab
+    }
+
