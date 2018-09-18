@@ -29,3 +29,8 @@
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
 
+    hook global WinDisplay .* %{nop %sh{command tmux rename-window ${kak_bufname##*/}}}
+    hook global KakEnd .* %{nop %sh{command tmux rename-window zsh}}
+
+# Aliases
+    alias global vnew tmux-new-vertical
