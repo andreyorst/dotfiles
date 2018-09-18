@@ -15,18 +15,10 @@ hook global WinSetOption filetype=(c|cpp) %{
 }
 
 hook global WinSetOption filetype=(rust) %{
-    map global insert <backspace> '<a-;>:insert-bs<ret>'
-
     hook global InsertChar \t %{
         exec -draft h@
     }
-
-    define-command -hidden insert-bs %{
-        try %{
-            # delete indentwidth spaces before cursor
-            exec -draft h %opt{indentwidth}HL <a-k>\A<space>+\z<ret> d
-        } catch %{
-            exec <backspace>
-        }
-    }
+    hook global InsertDelete ' ' %{ try %{
+      execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
+    }}
 }
