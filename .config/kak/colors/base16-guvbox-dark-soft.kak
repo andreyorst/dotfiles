@@ -10,8 +10,6 @@ eval %sh{
     bg4="rgb:7c6f64"
     bg4_256="rgb:7c6f64"
 
-    gray_245="rgb:928374"
-    gray_244="rgb:928374"
 
     fg0_h="rgb:f9f5d7"
     fg0="rgb:fbf1c7"
@@ -30,6 +28,7 @@ eval %sh{
     purple="rgb:d3869b"
     aqua="rgb:8ec07c"
     orange="rgb:fe8019"
+    gray="rgb:928374"
 
     # Bright Colors
     d_red="rgb:cc241d"
@@ -48,6 +47,7 @@ eval %sh{
     f_purple="rgb:8f3f71"
     f_aqua="rgb:427b58"
     f_orange="rgb:af3a03"
+    f_gray="rgb:828374"
 
     echo "
         # Code highlighting
@@ -60,7 +60,7 @@ eval %sh{
         face global keyword   ${purple}
         face global operator  ${aqua}
         face global attribute ${orange}
-        face global comment   ${gray_245}
+        face global comment   ${gray}
         face global meta      ${aqua}
         face global builtin   default+b
 
@@ -71,9 +71,9 @@ eval %sh{
         face global italic    ${fg1}
         face global mono      ${fg2}
         face global block     default
-        face global link      default
-        face global bullet    default
-        face global list      default
+        face global link      ${blue}
+        face global bullet    ${red}
+        face global list      ${red}
 
         face global Default            ${fg0},${bg0_s}
         face global PrimarySelection   default,${bg2}
@@ -82,10 +82,14 @@ eval %sh{
         face global SecondaryCursor    ${bg0},${fg3}
         face global PrimaryCursorEol   ${bg0},${fg2}
         face global SecondaryCursorEol ${bg0},${fg4}
-        face global LineNumbers        ${gray_245},rgb:3c3836
+        face global LineNumbers        ${gray},${bg2}
         face global LineNumberCursor   ${fg0},${bg2}
+        face global LineNumbersWrapped ${bg2},${bg2}
         face global MenuForeground     ${bg2},${blue}
         face global MenuBackground     default,${bg2}
+        face global MenuInfo           ${blue}
+        face global Information        ${bg0_s},${blue}+b
+        face global Error              ${red},default+b
         face global StatusLine         ${fg1},${bg1}
         face global StatusLineMode     ${blue}+b
         face global StatusLineInfo     ${purple}
@@ -95,6 +99,5 @@ eval %sh{
         face global MatchingChar       default,${bg3}
         face global BufferPadding      ${bg0_s},${bg0_s}
         face global Whitespace         ${bg2}
-        face global Information        ${bg0_s},${blue}+b
     "
 }
