@@ -3,7 +3,6 @@ eval %sh{
         plugins/plug.kak/rc/plug.kak
         common.kak
         plugins.kak
-        plugin_settings.kak
         languages.kak
     "
 
