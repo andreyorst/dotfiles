@@ -95,5 +95,6 @@ eval %sh{
         face global MatchingChar       default,${bg3}
         face global BufferPadding      ${bg0_s},${bg0_s}
         face global Whitespace         ${bg2}
+        face global Information        ${bg0_s},${blue}+b
     "
 }
