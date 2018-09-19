@@ -29,8 +29,3 @@
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
 
-# Aliases
-    alias global vert tmux-new-vertical
-    alias global vertical tmux-new-vertical
-    alias global win tmux-new-window
-    alias global window tmux-new-window
