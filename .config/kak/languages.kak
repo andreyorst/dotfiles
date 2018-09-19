@@ -1,11 +1,6 @@
 # Custom faces
     set-face global child rgb:fb4934,default+b
 
-    # ->vaiv = ()
-    #  .vaiv = ()
-    # ->vaiv() = ()
-    #  .vaiv() = ()
-
 # C/Cpp/Rust syntax fixes
     hook global WinSetOption filetype=(c|cpp|rust) %{
         add-highlighter buffer/ regex \w+(\h+)?(?=\() 0:function

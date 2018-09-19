@@ -14,7 +14,7 @@
     }}
 
     define-command -docstring "restore tmux statusline look, and move it to the bottom." \
-    restore-tmux  %{nop %sh{
+    restore-tmux  %{ nop %sh{
         command tmux set -g status-left ""
         command tmux set-option -g status-style ""
         command tmux set -g pane-border-style "fg=#3b3735"
@@ -29,7 +29,7 @@
     }}
 
     define-command -docstring "rename tmux window to current buffer filename" \
-    rename-tmux  %{nop %sh{ command tmux rename-window "${kak_bufname##*/}" }}
+    rename-tmux  %{ nop %sh{ command tmux rename-window "${kak_bufname##*/}" }}
 
     define-command -docstring "Create horisontal split with terminal in it." \
     tmux-new-terminal  %{tmux-repl-vertical}
