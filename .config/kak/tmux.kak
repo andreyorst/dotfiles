@@ -8,8 +8,8 @@
         command tmux set -ga pane-active-border-style "bg=#3c3836"
         command tmux set -g status-left "#[fg=#3c3836]#[bg=#83a598] tabs #[fg=#83a598]#[bg=#3c3836]"
         command tmux set -g status-right "#[fg=#83a598]#[bg=#3c3836]#[fg=#3c3836]#[bg=#83a598] #{session_name} "
-        command tmux setw -g window-status-format ' #[fg=colour7]#[bg=#3c3836]#(echo "#W")'
-        command tmux setw -g window-status-current-format '#[fg=#3c3836]#[bg=#83a598]#[fg=#3c3836]#[bg=#83a598] #(echo "#W") #[fg=#83a598]#[bg=#3c3836]'
+        command tmux setw -g window-status-format ' #[fg=colour7]#[bg=#3c3836]#{window_panes} #(echo "#W")'
+        command tmux setw -g window-status-current-format '#[fg=#3c3836]#[bg=#83a598]#[fg=#3c3836]#[bg=#83a598] #{window_panes} #(echo "#W") #[fg=#83a598]#[bg=#3c3836]'
     }}
     define-command restore-tmux %{nop %sh{
         command tmux set -g status-left ""
