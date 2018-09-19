@@ -52,10 +52,10 @@
 
 # Maps
     unmap global goto b
-    map -docstring "next buffer" global goto b ':bn<ret>'
+    map -docstring "next buffer" global goto b '<esc>:bn<ret>'
     unmap global goto B
-    map -docstring "previous buffer" global goto B ':bp<ret>'
+    map -docstring "previous buffer" global goto B '<esc>:bp<ret>'
     unmap global goto t
-    map -docstring "next tab" global goto t ':execute-keys <c-w>n<ret>'
+    map -docstring "next tab" global goto t '<esc>:nop %sh{command tmux next-window}<ret>'
     unmap global goto T
-    map -docstring "previous tab" global goto T ':execute-keys <c-w>p<ret>'
+    map -docstring "previous tab" global goto T '<esc>:nop %sh{command tmux previous-window}<ret>'
