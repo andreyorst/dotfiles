@@ -14,7 +14,7 @@
 
     add-highlighter global/ number-lines -relative -hlcursor
     add-highlighter global/ show-matching
-    add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
+    # add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
     add-highlighter global/ wrap -word -indent -marker ↪
 
     # Highlight operators and delimiters
