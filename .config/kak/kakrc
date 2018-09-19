@@ -1,5 +1,6 @@
 eval %sh{
     config_files="
+        tmux.kak
         plugins/plug.kak/rc/plug.kak
         common.kak
         plugins.kak
