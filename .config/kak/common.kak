@@ -29,14 +29,13 @@
     define-command -docstring "find file recursively searching for it under path" \
     find -params 1 -file-completion %{ edit -existing %sh{
         for path in $kak_opt_path; do
-            >&2 echo "path = $path"
+            if [ -z "${path##\'*\'}" ]; then
+                path="${path%\'}"
+                path="${path#\'}"
+            fi
             case $path in
-                "'%/'") path=${kak_buffile%/*};;
-                "'./'") path=$(pwd);;
-                "'*'")
-                    path="${path%\'}"
-                    path="${path#\'}"
-                    ;;
+                "%/") path=${kak_buffile%/*};;
+                "./") path=$(pwd);;
             esac
             if [ -z "${1##*/*}" ]; then
                 file=$(find -xdev -readable -samefile $(eval echo "$path/$1"))
