@@ -55,10 +55,10 @@
                 [ -e "$test" ] && file=$test
             else
                 # recursively search for file under $path
-                file=$(find -L $path  -xdev -type f -name $(eval echo $1) | head -n 1)
+                file=$(find -L $path -xdev -type f -name $(eval echo $1) | head -n 1)
             fi
             if [ ! "x$file" = "x" ]; then
-                echo "edit -existing $file"
+                echo "edit -existing '$file'"
                 exit
             fi
         done
