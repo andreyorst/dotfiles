@@ -31,30 +31,27 @@
         # check if file is already in buffer list
         for buffer in $kak_buflist; do
             if [ -z "${buffer##*$1}" ]; then
-                echo "b $buffer"
+                echo "buffer $buffer"
                 exit
             fi
         done
+        if [ -e "$1" ]; then
+            echo "edit -existing '$1'"
+            exit
+        fi
         for path in $kak_opt_path; do
             if [ -z "${path##\'*\'}" ]; then
-                # removing "'" because every path is surrounded with them for some reason
                 path="${path%\'}"
                 path="${path#\'}"
             fi
             case $path in
-                # since './' is first in $kak_opt_path, but has wider scope
-                # swapping those pathes allows to search in less directories first
-                # and then search whole tree and in other places
-                # If your $kak_opt_path configuration differs you should swap them back
                 "./") path=${kak_buffile%/*};;
                 "%/") path=$(pwd);;
             esac
             if [ -z "${1##*/*}" ]; then
-                # if filename contains '/' then work with it as it has needed path already
                 test=$(eval echo "$path/$1")
                 [ -e "$test" ] && file=$test
             else
-                # recursively search for file under $path
                 file=$(find -L $path -xdev -type f -name $(eval echo $1) | head -n 1)
             fi
             if [ ! "x$file" = "x" ]; then
