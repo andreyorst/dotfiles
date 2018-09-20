@@ -34,6 +34,7 @@
     define-command -docstring "Create horisontal split with terminal in it." \
     tmux-new-terminal  %{tmux-repl-vertical}
 
+    hook -group tmux global FocusIn .* %{rename-tmux}
     hook -group tmux global WinDisplay .* %{rename-tmux}
     hook -group tmux global KakBegin .* %{init-tmux}
     hook -group tmux global KakEnd .* %{restore-tmux}
