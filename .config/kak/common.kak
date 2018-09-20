@@ -24,8 +24,8 @@
 # Maps and hooks
     # maps <c-/> to comment/uncomment line
     map global normal '' :comment-line<ret>
-    map -docstring "file non-recursive" global goto '<a-f>' 'f'
-    map -docstring "file" global goto 'f' '<esc>:open-file-rec<ret>'
+    map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
+    map -docstring "file" global goto 'f' '<esc><a-i><a-w>:open-file-rec<ret>'
 
     # tab-completion
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
