@@ -123,19 +123,19 @@ else " Not in Termux
 		call execute('!echo "" >> '.s:prj_root.'/.cquery')
 		call execute('!echo "\# Includes" >> '.s:prj_root.'/.cquery')
 		call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:prj_root.'/.cquery')
-	endif
+	else
+		let s:testms_root = FindProjectRootByFile('startf.S')
+		if s:testms_root != -1
+			let s:cquery_includes  = "-I".s:testms_root."/include\n"
+			let s:cquery_includes .= "-I".s:testms_root."/include/cp2\n"
+			let s:cquery_includes .= "-I".s:testms_root."/include/hdrtest\n"
+			let s:cquery_includes .= "-I".s:testms_root."/../../include\n"
 
-	let s:testms_root = FindProjectRootByFile('startf.S')
-	if s:testms_root != -1
-		let s:cquery_includes  = "-I".s:testms_root."/include\n"
-		let s:cquery_includes .= "-I".s:testms_root."/include/cp2\n"
-		let s:cquery_includes .= "-I".s:testms_root."/include/hdrtest\n"
-		let s:cquery_includes .= "-I".s:testms_root."/../../include\n"
-
-		call execute('!echo "\%c -Weverything '.s:cquery_c_options.'" > '.s:testms_root.'/.cquery')
-		call execute('!echo "" >> '.s:testms_root.'/.cquery')
-		call execute('!echo "\# Includes" >> '.s:testms_root.'/.cquery')
-		call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:testms_root.'/.cquery')
+			call execute('!echo "\%c -Weverything '.s:cquery_c_options.'" > '.s:testms_root.'/.cquery')
+			call execute('!echo "" >> '.s:testms_root.'/.cquery')
+			call execute('!echo "\# Includes" >> '.s:testms_root.'/.cquery')
+			call execute('!echo "'.join(split(s:cquery_includes, '\n'), '\n').'" >> '.s:testms_root.'/.cquery')
+		endif
 	endif
 
 	let g:LanguageClient_diagnosticsDisplay = {
