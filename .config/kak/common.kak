@@ -32,8 +32,11 @@
             echo "${kak_buffile%/*}/$kak_opt_file_rec_name"
         else
             for path in $kak_opt_path; do
-                [ "$path" = "'%/'" ] && path=${kak_buffile%/*}
-                file=$(find -L $path -type f -name $(eval echo $kak_reg_dot))
+                case $path in
+                    "'%/'") path=${kak_buffile%/*};;
+                    "'./'") path=$(pwd);;
+                esac
+                file=$(find -L $path  -xdev -type f -name $(eval echo $kak_reg_dot) | head -n 1)
                 if [ ! "x$file" = "x" ]; then
                     echo $file
                     break
