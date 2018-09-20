@@ -30,7 +30,7 @@
     find -params 1 -file-completion %{ evaluate-commands %sh{
         # check if file is already in buffer list
         for buffer in $kak_buflist; do
-            if [ -z "${buffer##*$1*}" ]; then
+            if [ -z "${buffer##*$1}" ]; then
                 echo "b $buffer"
                 exit
             fi
