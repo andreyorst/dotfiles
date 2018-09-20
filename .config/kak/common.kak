@@ -24,8 +24,23 @@
 # Maps and hooks
     # maps <c-/> to comment/uncomment line
     map global normal '' :comment-line<ret>
+    map -docstring "file non-recursive" global goto '<a-f>' 'f'
+    map -docstring "file" global goto 'f' '<esc>:open-file-rec<ret>'
 
     # tab-completion
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
+
+# Commands
+    define-command -docstring "open file recursively searching for it under path" \
+    open-file-rec %{ edit -existing %sh{
+        for path in $kak_opt_path; do
+            [ "$path" = "'%/'" ] && path=$(echo $kak_buffile | sed -E "s/\/[^\/]*$/\//")
+            file=$(find -L $path -type f -name $(eval echo $kak_reg_dot))
+            if [ ! "x$file" = "x" ]; then
+                break
+            fi
+        done
+        [ ! "x$file" = "x" ] && echo $file
+    }}
 
