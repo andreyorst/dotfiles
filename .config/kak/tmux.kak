@@ -21,8 +21,8 @@
         command tmux set -ga pane-border-style "bg=default"
         command tmux set -g pane-active-border-style "fg=#665c54"
         command tmux set -ga pane-active-border-style "bg=default"
-        command tmux setw -g window-status-format '#[fg=colour8] #(echo "#W") '
-        command tmux setw -g window-status-current-format '#[fg=colour7] #(echo "#W") '
+        command tmux setw -g window-status-format '#[fg=colour8] #(echo "#{pane_current_command}")'
+        command tmux setw -g window-status-current-format '#[fg=colour7] #(echo "#{pane_current_command}")'
         command tmux set -g status-right "#{session_name} "
         command tmux rename-window zsh
         command tmux set-option -g status-position bottom
