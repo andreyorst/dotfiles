@@ -32,15 +32,19 @@
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
 
 # Commands
-    define-command -docstring "open file recursively searching for it under path" \
-    open-file-rec %{ edit -existing %sh{
-        for path in $kak_opt_path; do
-            [ "$path" = "'%/'" ] && path=$(echo $kak_buffile | sed -E "s/\/[^\/]*$/\//")
-            file=$(find -L $path -type f -name $(eval echo $kak_reg_dot))
-            if [ ! "x$file" = "x" ]; then
-                break
-            fi
-        done
-        [ ! "x$file" = "x" ] && echo $file
+    define-command -hidden -docstring "open file recursively searching for it under path" \
+    open-file-rec %{ declare-option str file_rec_name %reg{dot}; edit -existing %sh{
+        if [ -z "${kak_reg_dot##*/*}" ]; then
+            echo "${kak_buffile%/*}/$kak_opt_file_rec_name"
+        else
+            for path in $kak_opt_path; do
+                [ "$path" = "'%/'" ] && path=${kak_buffile%/*}
+                file=$(find -L $path -type f -name $(eval echo $kak_reg_dot))
+                if [ ! "x$file" = "x" ]; then
+                    echo $file
+                    break
+                fi
+            done
+        fi
     }}
 
