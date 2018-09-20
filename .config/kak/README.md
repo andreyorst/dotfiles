@@ -13,6 +13,8 @@ Fancy screenshot for you:
 ## Mappings:
 - <kbd>Ctrl</kbd>+<kbd>/</kbd> - comment/uncomment lines
 - <kbd>g</kbd><kbd>b</kbd>/<kbd>g</kbd><kbd>B</kbd> - next/previous buffer
+- <kbd>g</kbd><kbd>f</kbd> - Search file recursively in path
+- <kbd>g</kbd><kbd>alt+f</kbd> - standard Kakoune goto file
 - <kbd>Alt</kbd>+<kbd>s</kbd> - surround selection with delimiters
 
 ## Tmux support
