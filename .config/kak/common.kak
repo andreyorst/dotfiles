@@ -38,7 +38,8 @@
                 "./") path=$(pwd);;
             esac
             if [ -z "${1##*/*}" ]; then
-                file=$(find -xdev -readable -samefile $(eval echo "$path/$1"))
+                test=$(eval echo "$path/$1")
+                [ -e "$test" ] && file=$test
             else
                 file=$(find -L $path  -xdev -type f -name $(eval echo $1) | head -n 1)
             fi
