@@ -19,29 +19,34 @@
     # maps <c-/> to comment/uncomment line
     map global normal '' :comment-line<ret>
     map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
-    map -docstring "file" global goto 'f' '<esc><a-i><a-w>:open-file-rec<ret>'
+    map -docstring "file" global goto 'f' '<esc><a-i><a-w>:find %reg{dot}<ret>'
 
     # tab-completion
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
 
 # Commands
-    define-command -hidden -docstring "open file recursively searching for it under path" \
-    open-file-rec %{ declare-option str file_rec_name %reg{dot}; edit -existing %sh{
-        if [ -z "${kak_reg_dot##*/*}" ]; then
-            echo "${kak_buffile%/*}/$kak_opt_file_rec_name"
-        else
-            for path in $kak_opt_path; do
-                case $path in
-                    "'%/'") path=${kak_buffile%/*};;
-                    "'./'") path=$(pwd);;
-                esac
-                file=$(find -L $path  -xdev -type f -name $(eval echo $kak_reg_dot) | head -n 1)
-                if [ ! "x$file" = "x" ]; then
-                    echo $file
-                    break
-                fi
-            done
-        fi
+    define-command -docstring "find file recursively searching for it under path" \
+    find -params 1 -file-completion %{ edit -existing %sh{
+        for path in $kak_opt_path; do
+            >&2 echo "path = $path"
+            case $path in
+                "'%/'") path=${kak_buffile%/*};;
+                "'./'") path=$(pwd);;
+                "'*'")
+                    path="${path%\'}"
+                    path="${path#\'}"
+                    ;;
+            esac
+            if [ -z "${1##*/*}" ]; then
+                file=$(find -xdev -readable -samefile $(eval echo "$path/$1"))
+            else
+                file=$(find -L $path  -xdev -type f -name $(eval echo $1) | head -n 1)
+            fi
+            if [ ! "x$file" = "x" ]; then
+                echo $file
+                break
+            fi
+        done
     }}
 
