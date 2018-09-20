@@ -10,16 +10,10 @@
     set-option global modelinefmt '{rgb:83a598}{rgb:3c3836,rgb:83a598+b} %val{bufname}{{context_info}} {default,rgb:3c3836} {{mode_info}} {rgb:83a598+b}%val{cursor_line}{default}:{rgb:83a598+b}%val{cursor_char_column} {rgb:83a598}{rgb:3c3836,rgb:83a598+b} %opt{filetype} {rgb:3c3836,rgb:83a598}{rgb:83a598} {rgb:83a598,default+b}%val{client}{default} at {magenta,default+b}[%val{session}] '
 
 # Highlighters
-    set-face global delimiters rgb:af3a03,default
-
     add-highlighter global/ number-lines -relative -hlcursor
     add-highlighter global/ show-matching
     # add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
     add-highlighter global/ wrap -word -indent -marker ↪
-
-    # Highlight operators and delimiters
-    add-highlighter global/ regex (\+|-|\*|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^) 0:operator
-    add-highlighter global/ regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
 
 # Maps and hooks
     # maps <c-/> to comment/uncomment line

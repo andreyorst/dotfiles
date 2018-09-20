@@ -1,5 +1,12 @@
 # Custom faces
     set-face global child rgb:fb4934,default+b
+    set-face global delimiters rgb:af3a03,default
+
+# Highlight operators and delimiters
+    hook -group ope_delim global WinCreate .* %{
+        add-highlighter buffer/operators regex (\+|-|\*|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^) 0:operator
+        add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+    }
 
 # C/Cpp/Rust syntax fixes
     hook global WinSetOption filetype=(c|cpp|rust) %{
@@ -34,4 +41,10 @@
 # Rust
     hook global WinSetOption filetype=rust %{
         set window formatcmd 'rustfmt'
+    }
+
+# Markdown
+    hook global WinSetOption filetype=markdown %{
+        remove-highlighter buffer/operators
+        remove-highlighter buffer/delimiters
     }
