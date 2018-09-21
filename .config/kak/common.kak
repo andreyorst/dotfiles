@@ -20,6 +20,7 @@
     map global normal '' :comment-line<ret>
     map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
     map -docstring "file" global goto 'f' '<esc><a-i><a-w>:find %reg{dot}<ret>'
+    map -docstring "fuzzy finder" global normal '<c-p>' ':fzf-edit<ret>'
 
     # tab-completion
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
@@ -27,7 +28,7 @@
 
 # Commands
     define-command -docstring "find file recursively searching for it under path" \
-    find -params 1 -file-completion %{ evaluate-commands %sh{
+    find -params 1 -shell-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -print } %{ evaluate-commands %sh{
         for buffer in $kak_buflist; do
             buffer="${buffer%\'}"; buffer="${buffer#\'}"
             if [ -z "${buffer##*$1}" ]; then
@@ -59,3 +60,15 @@
         echo "echo -markup '{Error}unable to find file ''$1'''"
     }}
 
+    define-command -docstring 'Invoke fzf to open a file' -params 0 fzf-edit %{
+        evaluate-commands %sh{
+            if [ -z "${kak_client_env_TMUX}" ]; then
+                printf 'fail "client was not started under tmux"\n'
+            else
+                file="$(find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -print | TMUX="${kak_client_env_TMUX}" fzf-tmux -d 15)"
+                if [ -n "$file" ]; then
+                    printf 'edit "%s"\n' "$file"
+                fi
+            fi
+        }
+    }
