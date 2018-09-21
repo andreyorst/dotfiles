@@ -51,7 +51,7 @@
             else
                 file=$(find -L $path -xdev -type f -name $(eval echo $1) | head -n 1)
             fi
-            if [ ! "x$file" = "x" ]; then
+            if [ ! -z "$file" ]; then
                 echo "edit -existing '$file'"
                 exit
             fi
