@@ -3,6 +3,7 @@ eval %sh{
         tmux.kak
         plugins/plug.kak/rc/plug.kak
         common.kak
+        fzf.kak
         plugins.kak
         languages.kak
     "

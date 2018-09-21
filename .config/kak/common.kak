@@ -60,15 +60,3 @@
         echo "echo -markup '{Error}unable to find file ''$1'''"
     }}
 
-    define-command -docstring 'Invoke fzf to open a file' -params 0 fzf-edit %{
-        evaluate-commands %sh{
-            if [ -z "${kak_client_env_TMUX}" ]; then
-                printf 'fail "client was not started under tmux"\n'
-            else
-                file="$(find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -print | TMUX="${kak_client_env_TMUX}" fzf-tmux -d 15)"
-                if [ -n "$file" ]; then
-                    printf 'edit "%s"\n' "$file"
-                fi
-            fi
-        }
-    }
