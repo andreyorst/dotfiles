@@ -20,10 +20,12 @@
     set-option global modelinefmt '{rgb:83a598}{rgb:3c3836,rgb:83a598+b} %val{bufname}{{context_info}} {default,rgb:3c3836} {{mode_info}} {rgb:83a598+b}%val{cursor_line}{default}:{rgb:83a598+b}%val{cursor_char_column} {rgb:83a598}{rgb:3c3836,rgb:83a598+b} %opt{filetype} {rgb:3c3836,rgb:83a598}{rgb:83a598} {rgb:83a598,default+b}%val{client}{default} at {magenta,default+b}[%val{session}] '
 
 # Highlighters
-    add-highlighter global/ number-lines -relative -hlcursor
-    add-highlighter global/ show-matching
-    # add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
-    add-highlighter global/ wrap -word -indent -marker ↪
+    hook global KakBegin .* %{
+        add-highlighter global/ number-lines -relative -hlcursor
+        add-highlighter global/ show-matching
+        # add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
+        add-highlighter global/ wrap -word -indent -marker ↪
+    }
 
 # Maps and hooks
     # maps <c-/> to comment/uncomment line
