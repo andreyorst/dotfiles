@@ -45,20 +45,26 @@
         # Custom C/Cpp types highlighing
         add-highlighter window/ regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
         add-highlighter window/ regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
-        add-highlighter window/ regex \b(v|u|vu)?(_|__)?(int|short|char|long)(_t)?\b 0:type
+        add-highlighter window/ regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
         add-highlighter window/ regex \b\w+_t\b 0:type
-        set window formatcmd 'clang-format'
+        set-option window formatcmd 'clang-format'
         clang-enable-autocomplete
         clang-enable-diagnostics
-        set-option global clang_options  %sh{
-            options='-Wall --std=c99'
-            options=$(eval echo $options' -I$(pwd)/include')
-            options=$(eval echo $options' -I$(pwd)/testpacks/SPW_TESTS/spw_lib_src')
-            options=$(eval echo $options' -I$(pwd)/testpacks/SK_VG11/pci_master_slave_cross_test')
-            options=$(eval echo $options' -I$(pwd)/testpacks/CAN/can_lib_src')
-            options=$(eval echo $options' -I$(pwd)/testpacks/MKIO/mkio_lib_src')
-            options=$(eval echo $options' -I$(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include')
-            echo $options
+        hook window NormalBegin .* clang-parse
+    }
+
+    hook global WinSetOption filetype=c %{
+        set-option global clang_options '-Wall --std=c99 -I./include'
+        evaluate-commands  %sh{
+            if [ -f "./testkit.settings" ]; then
+                options=$(eval echo $options' -I$(pwd)/include')
+                options=$(eval echo $options' -I$(pwd)/testpacks/SPW_TESTS/spw_lib_src')
+                options=$(eval echo $options' -I$(pwd)/testpacks/SK_VG11/pci_master_slave_cross_test')
+                options=$(eval echo $options' -I$(pwd)/testpacks/CAN/can_lib_src')
+                options=$(eval echo $options' -I$(pwd)/testpacks/MKIO/mkio_lib_src')
+                options=$(eval echo $options' -I$(pwd)/platforms/$(cat ./testkit.settings | grep "?=" |  sed -E "s/.*= //")/include')
+                eval echo "set-option -add global clang_options '$options'"
+            fi
         }
     }
 
