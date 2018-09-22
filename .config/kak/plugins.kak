@@ -20,7 +20,7 @@ plug occivink/kakoune-gdb
 
 # fzf mode
 plug andreyorst/fzf.kak
-    map -docstring "fzf mode" global normal '<c-p>' ':fzf-mode<ret>'
+    map -docstring "fzf mode" global normal '<c-p>' ': fzf-mode<ret>'
     evaluate-commands %sh{
         case $PATH in
         *termux*)
