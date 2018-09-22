@@ -24,7 +24,7 @@ plug andreyorst/fzf.kak
     evaluate-commands %sh{
         case $PATH in
         *termux*)
-            echo "set-option fzf_tmp /data/data/com.termux/files/usr/tmp"
+            echo "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp"
             ;;
         *)
             echo "set-option global fzf_file_command 'rg'"
