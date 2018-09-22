@@ -24,7 +24,8 @@ plug andreyorst/fzf.kak
     evaluate-commands %sh{
         case $PATH in
         *termux*)
-            echo "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp"
+            echo "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp/"
+            echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print\""
             ;;
         *)
             echo "set-option global fzf_file_command 'rg'"
