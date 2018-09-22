@@ -1,3 +1,13 @@
+# ╭─────────────╥───────────────────╮
+# │ Author:     ║ File:             │
+# │ Andrey Orst ║ common.kak        │
+# ╞═════════════╩═══════════════════╡
+# │ Common settings for Kakoune     │
+# ╞═════════════════════════════════╡
+# │ Rest of .dotfiles:              │
+# │ GitHub.com/andreyorst/dotfiles  │
+# ╰─────────────────────────────────╯
+ 
 # Common options
     set-option global scrolloff 3,3
     set-option global grepcmd 'rg -L --with-filename --column'
@@ -20,43 +30,8 @@
     map global normal '' :comment-line<ret>
     map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
     map -docstring "file" global goto 'f' '<esc><a-i><a-w>:find %reg{dot}<ret>'
-    map -docstring "fuzzy finder" global normal '<c-p>' ':fzf-edit<ret>'
 
     # tab-completion
     hook global InsertCompletionShow .* %{map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p>}
     hook global InsertCompletionHide .* %{unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p>}
-
-# Commands
-    define-command -docstring "find file recursively searching for it under path" \
-    find -params 1 -shell-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -print } %{ evaluate-commands %sh{
-        for buffer in $kak_buflist; do
-            buffer="${buffer%\'}"; buffer="${buffer#\'}"
-            if [ -z "${buffer##*$1}" ]; then
-                echo "buffer $buffer"
-                exit
-            fi
-        done
-        if [ -e "'$1'" ]; then
-            echo "edit -existing '$1'"
-            exit
-        fi
-        for path in $kak_opt_path; do
-            path="${path%\'}"; path="${path#\'}"
-            case $path in
-                "./") path=${kak_buffile%/*};;
-                "%/") path=$(pwd);;
-            esac
-            if [ -z "${1##*/*}" ]; then
-                test=$(eval echo "'$path/$1'")
-                [ -e "$test" ] && file=$test
-            else
-                file=$(find -L $path -xdev -type f -name $(eval echo $1) | head -n 1)
-            fi
-            if [ ! -z "$file" ]; then
-                echo "edit -existing '$file'"
-                exit
-            fi
-        done
-        echo "echo -markup '{Error}unable to find file ''$1'''"
-    }}
 

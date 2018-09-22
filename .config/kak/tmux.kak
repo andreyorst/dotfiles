@@ -1,3 +1,14 @@
+# ╭─────────────╥───────────────────╮
+# │ Author:     ║ File:             │
+# │ Andrey Orst ║ tmux.kak          │
+# ╞═════════════╩═══════════════════╡
+# │ Tmux scripts that change the    │
+# │ look of tmux inside kakoune     │
+# ╞═════════════════════════════════╡
+# │ Rest of .dotfiles:              │
+# │ GitHub.com/andreyorst/dotfiles  │
+# ╰─────────────────────────────────╯
+ 
 # tmux tricks
     define-command -docstring "recolor tmux statusline to look like it is part of kakoune, and move it to the top." \
     init-tmux  %{ nop %sh{
