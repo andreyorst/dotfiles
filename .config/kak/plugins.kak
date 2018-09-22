@@ -21,7 +21,16 @@ plug occivink/kakoune-gdb
 # fzf mode
 plug andreyorst/fzf.kak
     map -docstring "fzf mode" global normal '<c-p>' ':fzf-mode<ret>'
-    set-option global fzf_file_command 'rg'
+    evaluate-commands %sh{
+        case $PATH in
+        *termux*)
+            echo "set-option fzf_tmp /data/data/com.termux/files/usr/tmp"
+            ;;
+        *)
+            echo "set-option global fzf_file_command 'rg'"
+            ;;
+    }
+
 
 # automatic pair insertion and surroundig
 plug alexherbo2/auto-pairs.kak
