@@ -10,7 +10,7 @@
 # ╰─────────────────────────────────╯
  
 # tmux tricks
-    define-command -docstring "recolor tmux statusline to look like it is part of kakoune, and move it to the top." \
+    define-command -override -docstring "recolor tmux statusline to look like it is part of kakoune, and move it to the top." \
     init-tmux  %{ nop %sh{
         command tmux set-option -g status-position top
         command tmux set-option -g status-style "bg=#3c3836"
@@ -24,7 +24,7 @@
         command tmux setw -g window-status-current-format '#[fg=#3c3836]#[bg=#83a598]#[fg=#3c3836,bold]#[bg=#83a598] #{window_panes} #(echo "#W") #[fg=#83a598]#[bg=#3c3836]'
     }}
 
-    define-command -docstring "restore tmux statusline look, and move it to the bottom." \
+    define-command -override -docstring "restore tmux statusline look, and move it to the bottom." \
     restore-tmux  %{ nop %sh{
         command tmux set -g status-left ""
         command tmux set-option -g status-style ""
@@ -39,10 +39,10 @@
         command tmux set-option -g status-position bottom
     }}
 
-    define-command -docstring "rename tmux window to current buffer filename" \
+    define-command -override -docstring "rename tmux window to current buffer filename" \
     rename-tmux  %{ nop %sh{ command tmux rename-window "${kak_bufname##*/}" }}
 
-    define-command -docstring "Create horisontal split with terminal in it." \
+    define-command -override -docstring "Create horisontal split with terminal in it." \
     tmux-new-terminal  %{tmux-repl-vertical}
 
     hook -group tmux global FocusIn .* %{rename-tmux}
