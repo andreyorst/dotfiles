@@ -29,6 +29,7 @@ plug andreyorst/fzf.kak
         *)
             echo "set-option global fzf_file_command 'rg'"
             ;;
+        esac
     }
 
 
