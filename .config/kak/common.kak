@@ -32,6 +32,10 @@
     map global normal '' ': comment-line<ret>'
     map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
     map -docstring "file" global goto 'f' '<esc><a-i><a-w>: find %reg{dot}<ret>'
+    unmap global goto b
+    map -docstring "next buffer" global goto b '<esc>:bn<ret>'
+    unmap global goto B
+    map -docstring "previous buffer" global goto B '<esc>:bp<ret>'
 
     # tab-completion
     hook global InsertCompletionShow .* %{ map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p> }

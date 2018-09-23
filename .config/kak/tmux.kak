@@ -12,6 +12,7 @@
 # tmux tricks
     define-command -override -docstring "recolor tmux statusline to look like it is part of kakoune, and move it to the top." \
     init-tmux  %{ nop %sh{
+        [ -z "$TMUX" ] && exit
         command tmux set-option -g status-position top
         command tmux set-option -g status-style "bg=#3c3836"
         command tmux set -g pane-border-style "fg=#3b3735"
@@ -26,6 +27,7 @@
 
     define-command -override -docstring "restore tmux statusline look, and move it to the bottom." \
     restore-tmux  %{ nop %sh{
+        [ -z "$TMUX" ] && exit
         command tmux set -g status-left ""
         command tmux set-option -g status-style ""
         command tmux set -g pane-border-style "fg=#3b3735"
@@ -40,36 +42,34 @@
     }}
 
     define-command -override -docstring "rename tmux window to current buffer filename" \
-    rename-tmux  %{ nop %sh{ command tmux rename-window "${kak_bufname##*/}" }}
-
-    define-command -override -docstring "Create horisontal split with terminal in it." \
-    tmux-new-terminal  %{tmux-repl-vertical}
+    rename-tmux  %{ nop %sh{ [ -z "$TMUX" ] && exit; command tmux rename-window "${kak_bufname##*/}" }}
 
     hook -group tmux global FocusIn .* %{rename-tmux}
     hook -group tmux global WinDisplay .* %{rename-tmux}
-    # hook -group tmux global KakBegin .* %{init-tmux}
+    hook -group tmux global KakBegin .* %{init-tmux}
     hook -group tmux global KakEnd .* %{restore-tmux}
 
-# Aliases
-    alias global vsplit   tmux-new-horizontal
-    alias global vspl     tmux-new-horizontal
-    alias global vert     tmux-new-horizontal
-    alias global vertical tmux-new-horizontal
-    alias global split    tmux-new-vertical
-    alias global spl      tmux-new-vertical
-    alias global tabnew   tmux-new-window
-    alias global tabn     tmux-new-window
-    alias global terminal tmux-new-terminal
-    alias global term     tmux-new-terminal
+    evaluate-commands %sh{
+        if  [ -z "$TMUX" ]; then
+            echo "nop"
+            exit
+        fi
+        # Aliases
+        echo "alias global vsplit   tmux-new-horizontal"
+        echo "alias global vspl     tmux-new-horizontal"
+        echo "alias global vert     tmux-new-horizontal"
+        echo "alias global vertical tmux-new-horizontal"
+        echo "alias global split    tmux-new-vertical"
+        echo "alias global spl      tmux-new-vertical"
+        echo "alias global tabnew   tmux-new-window"
+        echo "alias global tabn     tmux-new-window"
+        echo "alias global terminal tmux-repl-vertical"
+        echo "alias global term     tmux-repl-vertical"
+        # Maps
+        echo "unmap global goto t"
+        echo "map -docstring 'next tab' global goto t '<esc>:nop %sh{command tmux next-window}<ret>'"
+        echo "unmap global goto T"
+        echo "map -docstring 'previous tab' global goto T '<esc>:nop %sh{command tmux previous-window}<ret>'"
+    }
 
-# Maps
-    unmap global goto b
-    map -docstring "next buffer" global goto b '<esc>:bn<ret>'
-    unmap global goto B
-    map -docstring "previous buffer" global goto B '<esc>:bp<ret>'
-    unmap global goto t
-    map -docstring "next tab" global goto t '<esc>:nop %sh{command tmux next-window}<ret>'
-    unmap global goto T
-    map -docstring "previous tab" global goto T '<esc>:nop %sh{command tmux previous-window}<ret>'
 
-    init-tmux
