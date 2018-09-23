@@ -47,7 +47,7 @@
 
     hook -group tmux global FocusIn .* %{rename-tmux}
     hook -group tmux global WinDisplay .* %{rename-tmux}
-    hook -group tmux global KakBegin .* %{init-tmux}
+    # hook -group tmux global KakBegin .* %{init-tmux}
     hook -group tmux global KakEnd .* %{restore-tmux}
 
 # Aliases
@@ -71,3 +71,5 @@
     map -docstring "next tab" global goto t '<esc>:nop %sh{command tmux next-window}<ret>'
     unmap global goto T
     map -docstring "previous tab" global goto T '<esc>:nop %sh{command tmux previous-window}<ret>'
+
+    init-tmux

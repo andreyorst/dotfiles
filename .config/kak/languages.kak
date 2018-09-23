@@ -71,6 +71,8 @@
 # Rust
     hook global WinSetOption filetype=rust %{
         set window formatcmd 'rustfmt'
+        racer-enable-autocomplete
+        map -docstring "racer goto definitiom" global goto 'd' '<esc><a-i>w: racer-go-definition<ret>'
     }
 
 # Markdown
