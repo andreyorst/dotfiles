@@ -18,7 +18,7 @@ plug "Delapouite/kakoune-text-objects"
 # Wrapper for GDB
 plug "occivink/kakoune-gdb"
 
-# fzf mode
+# fzf integration
 plug "andreyorst/fzf.kak"
     map -docstring "fzf mode" global normal '<c-p>' ': fzf-mode<ret>'
     in-termux "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp/"
