@@ -1,6 +1,6 @@
 # gruvbox theme
 
-eval %sh{
+evaluate-commands %sh{
     bg0_h="rgb:1d2021"
     bg0="rgb:282828"
     bg0_s="rgb:32302f"
