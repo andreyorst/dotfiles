@@ -30,6 +30,8 @@
 # Maps and hooks
     # maps <c-/> to comment/uncomment line
     map global normal '' ': comment-line<ret>'
+    # Vim-like redo
+    map global normal '<c-r>' 'U'
     map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
     map -docstring "file" global goto 'f' '<esc><a-i><a-w>: find %reg{dot}<ret>'
     unmap global goto b

@@ -41,14 +41,14 @@ find -params 1 -shell-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*'
     echo "echo -markup '{Error}unable to find file ''$1'''"
 }}
 
-define-command -override -docstring "run command if Kakoune was launched in termux" in-termux -params 1 %{
+define-command -override -docstring "run command if Kakoune was launched in termux" in-termux -params 2 %{
     evaluate-commands %sh{
         case $PATH in
         *termux*)
             echo "$1"
             ;;
         *)
-            echo "nop"
+            echo "$2"
             ;;
         esac
     }

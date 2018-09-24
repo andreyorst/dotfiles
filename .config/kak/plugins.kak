@@ -18,14 +18,20 @@ plug "Delapouite/kakoune-text-objects"
 # Wrapper for GDB
 plug "occivink/kakoune-gdb"
 
-# fzf mode
+# fzf integration
 plug "andreyorst/fzf.kak"
-    map -docstring "fzf mode" global normal '<c-p>' ': fzf-mode<ret>'
-    in-termux "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp/"
-    set-option global fzf_file_command "find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print"
+    evaluate-commands %sh{
+        [ -z "${kak_opt_plug_loaded_plugins##*fzf.kak*}" ] || exit
+        echo "map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'"
+        echo 'in-termux "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp/" "nop"'
+        echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print\""
+    }
 
 
 # automatic pair insertion and surroundig
 plug "alexherbo2/auto-pairs.kak"
-    hook global WinCreate .* %{ auto-pairs-enable }
-    map global normal <a-s> :auto-pairs-surround<ret>
+    evaluate-commands %sh{
+        [ -z "${kak_opt_plug_loaded_plugins##*auto-pairs.kak*}" ] || exit
+        echo "hook global WinCreate .* %{ auto-pairs-enable }"
+        echo "map global normal <a-s> ': auto-pairs-surround<ret>'"
+    }
