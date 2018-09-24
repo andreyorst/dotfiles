@@ -12,8 +12,9 @@
 # Plugin manager
 plug "andreyorst/plug.kak" "branch: master"
 
-# Extended text objects
+# Extended text objects and selections
 plug "Delapouite/kakoune-text-objects"
+plug "occivink/kakoune-vertical-selection"
 
 # Wrapper for GDB
 plug "occivink/kakoune-gdb"
