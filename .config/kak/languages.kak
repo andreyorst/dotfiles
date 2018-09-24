@@ -50,7 +50,7 @@
         set-option window formatcmd 'clang-format'
         clang-enable-autocomplete
         clang-enable-diagnostics
-        hook window NormalBegin .* clang-parse
+        hook window InsertEnd .* clang-parse
     }
 
     hook global WinSetOption filetype=c %{
