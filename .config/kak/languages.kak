@@ -28,7 +28,7 @@
 	}
 
 # Expandtab hooks
-	hook global WinSetOption filetype=(rust|kak) %{
+	hook global WinSetOption filetype=(rust) %{
 		hook -group expandtab global InsertChar \t %{
 			exec -draft h@
 		}
