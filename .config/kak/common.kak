@@ -21,25 +21,24 @@
 
 # Highlighters
     hook global KakBegin .* %{
-        add-highlighter global/ number-lines -relative -hlcursor
-        add-highlighter global/ show-matching
-        # add-highlighter global/ show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
-        add-highlighter global/ wrap -word -indent -marker ↪
+        add-highlighter global/numbers number-lines -relative -hlcursor
+        add-highlighter global/matching show-matching
+        add-highlighter global/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
+        add-highlighter global/wrap wrap -word -indent -marker ↪
     }
 
 # Maps and hooks
-    # maps <c-/> to comment/uncomment line
-    map global normal '' ': comment-line<ret>'
-    # Vim-like redo
-    map global normal '<c-r>' 'U'
-    map -docstring "file non-recursive" global goto '<a-f>' '<esc><a-i><a-w>gf'
-    map -docstring "file" global goto 'f' '<esc><a-i><a-w>: find %reg{dot}<ret>'
-    unmap global goto b
-    map -docstring "next buffer" global goto b '<esc>:bn<ret>'
-    unmap global goto B
-    map -docstring "previous buffer" global goto B '<esc>:bp<ret>'
+    map global normal ''     ': comment-line<ret>'                  -docstring "<c-/> to comment/uncomment selection"
+    map global normal '<c-r>' 'U'                                    -docstring "vim-like redo"
+    map global goto   '<a-f>' '<esc><a-i><a-w>gf'                    -docstring "file non-recursive"
+    map global goto   'f'     '<esc><a-i><a-w>: find %reg{dot}<ret>' -docstring "file recursive"
+    map global normal '*'     '<a-i>w*'                              -docstring "search word under cursor"
+    map global normal '<a-*>' '<a-i><a-w>*'                          -docstring "search WORD under cursor"
+    map global goto   'b'     '<esc>:bn<ret>'                        -docstring "next buffer"
+    map global goto   'B'     '<esc>:bp<ret>'                        -docstring "previous buffer"
 
-    # tab-completion
     hook global InsertCompletionShow .* %{ map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p> }
     hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
 
+    hook global BufOpenFile .* %{ editorconfig-load }
+    hook global BufNewFile .* %{ editorconfig-load }

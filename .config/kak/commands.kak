@@ -53,3 +53,4 @@ define-command -override -docstring "run command if Kakoune was launched in term
         esac
     }
 }
+
