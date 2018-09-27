@@ -38,3 +38,8 @@ evaluate-commands %sh{
 }
 
 plug "TeddyDD/kakoune-edit-or-dir"
+evaluate-commands %sh{
+	[ -z "${kak_opt_plug_loaded_plugins##*kakoune-edit-or-dir*}" ] || exit
+	echo "unalias global e"
+	echo "alias global e edit-or-dir"
+}
