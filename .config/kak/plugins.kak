@@ -37,23 +37,4 @@ evaluate-commands %sh{
 	echo "map global normal <a-s> ': auto-pairs-surround<ret>'"
 }
 
-plug 'andreyorst/SimpleClangFormat.vim'
-plug 'andreyorst/SimpleSnippets-snippets'
-plug 'andreyorst/SimpleSnippets.vim'
-plug 'andreyorst/SimpleWorkspaces.vim'
-plug 'justinmk/vim-sneak'
-plug 'raimondi/delimitMate'
-plug 'shougo/deoplete.nvim'
-plug 'tomtom/tcomment_vim'
-plug 'tpope/vim-surround'
-plug 'wellle/targets.vim'
-plug 'w0rp/ale'
-plug 'zchee/deoplete-clang'
-plug 'autozimu/LanguageClient-neovim'
-plug 'majutsushi/tagbar'
-plug 'scrooloose/nerdtree'
-plug 'shougo/denite.nvim'
-plug 'rust-lang/rust.vim'
-plug 'justinmk/vim-syntax-extra'
-plug 'bfrg/vim-cpp-modern'
-
+plug "TeddyDD/kakoune-edit-or-dir"
