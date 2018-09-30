@@ -20,14 +20,12 @@ plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-gdb"
 
 # fzf integration
-plug "andreyorst/fzf.kak" "branch: fuzzy_buffer_search"
-	evaluate-commands %sh{
-		[ -z "${kak_opt_plug_loaded_plugins##*fzf.kak*}" ] || exit
-		echo "map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'"
-		echo 'in-termux "set-option global fzf_tmp /data/data/com.termux/files/usr/tmp/" "nop"'
-		echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print\""
-	}
-
+plug "andreyorst/fzf.kak"
+evaluate-commands %sh{
+	[ -z "${kak_opt_plug_loaded_plugins##*fzf.kak*}" ] || exit
+	echo "map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'"
+	echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print\""
+}
 
 # automatic pair insertion and surroundig
 plug "alexherbo2/auto-pairs.kak"
