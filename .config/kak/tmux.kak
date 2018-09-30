@@ -23,7 +23,6 @@
 		tmux set -g status-right "#[fg=#83a598]#[bg=#3c3836]#[fg=#3c3836,bold]#[bg=#83a598] #{session_name} "
 		tmux setw -g window-status-format ' #[fg=colour7]#[bg=#3c3836]#{window_panes} #(echo "#W")'
 		tmux setw -g window-status-current-format '#[fg=#3c3836]#[bg=#83a598]#[fg=#3c3836,bold]#[bg=#83a598] #{window_panes} #(echo "#W") #[fg=#83a598]#[bg=#3c3836]'
-		tmux setw -g window-style "bg=#32302f fg=#fbf1c7"
 	}}
 
 	define-command -override -docstring "restore tmux statusline look, and move it to the bottom." \
@@ -40,7 +39,6 @@
 		tmux set -g status-right "#{session_name} "
 		tmux rename-window zsh
 		tmux set-option -g status-position bottom
-		tmux setw -g window-style "bg=default fg=default"
 	}}
 
 	define-command -override -docstring "rename tmux window to current buffer filename" \
