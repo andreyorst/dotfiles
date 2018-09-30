@@ -16,7 +16,7 @@
 
 # UI
 	colorscheme base16-guvbox-dark-soft
-	set-option global ui_options ncurses_status_on_top=no ncurses_assistant=none
+	set-option global ui_options ncurses_status_on_top=no
 	set-option global modelinefmt '{rgb:83a598}{rgb:3c3836,rgb:83a598+b} %val{bufname}{{context_info}} {default,rgb:3c3836} {{mode_info}} {rgb:83a598+b}%val{cursor_line}{default}:{rgb:83a598+b}%val{cursor_char_column} {rgb:83a598}{rgb:3c3836,rgb:83a598+b} %opt{filetype} {rgb:3c3836,rgb:83a598}{rgb:83a598} {rgb:83a598,default+b}%val{client}{default} at {magenta,default+b}[%val{session}] '
 
 # Highlighters
