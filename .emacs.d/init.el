@@ -1,30 +1,40 @@
 (require 'package)
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/") t)
+
 (package-initialize)
 
-;; disable distracting gui features:
+(require 'use-package)
+
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (fset 'menu-bar-open nil)
 
-;; default font:
-
 (set-face-attribute 'default nil :font "Source Code Pro-10")
-;; theme
 (load-theme 'spacemacs-dark t nil)
-;; (load-theme 'gruvbox-dark-soft t nil)
 
-(custom-set-variables
- '(custom-safe-themes
-   (quote
-    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" "06239857eba54280977d62190690bef6d58f9653465c71b0fe279c560fdcac80" default)))
- '(package-selected-packages (quote (spacemacs-theme helm gruvbox-theme monokai-theme))))
-(custom-set-faces
- )
+(use-package highlight-indent-guides
+  :init
+  (setq highlight-indent-guides-method 'character)
+  (setq highlight-indent-guides-character ?▏)
+  (setq highlight-indent-guides-responsive 'top)
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
+;; C settings
+(setq indent-tabs-mode t)
+(setq c-basic-offset 4)
+(setq-default tab-width 4)
+
+(use-package helm
+  :bind (("M-x" . helm-M-x)
+         ("M-<f5>" . helm-find-files)
+         ([f10] . helm-buffers-list)
+         ([S-f10] . helm-recentf)))
+
+(use-package spaceline-config
+  :init
+  (spaceline-spacemacs-theme)
+  (spaceline-helm-mode))
