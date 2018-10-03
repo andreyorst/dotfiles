@@ -7,3 +7,5 @@ saved_workspaces
 plugins
 elpa
 *~
+.emacs.d/games
+.emacs.d/session*

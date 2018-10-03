@@ -11,19 +11,19 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+(fset 'menu-bar-open nil)
 
 ;; default font:
-(set-frame-font "Source Code Pro-10" nil t)
+
+(set-face-attribute 'default nil :font "Source Code Pro-10")
+;; theme
+(load-theme 'spacemacs-dark t nil)
+;; (load-theme 'gruvbox-dark-soft t nil)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (orgtbl-show-header use-package))))
+ '(custom-safe-themes
+   (quote
+    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" "06239857eba54280977d62190690bef6d58f9653465c71b0fe279c560fdcac80" default)))
+ '(package-selected-packages (quote (spacemacs-theme helm gruvbox-theme monokai-theme))))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  )
