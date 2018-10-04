@@ -15,7 +15,7 @@
 
 (require 'package)
 (add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
+             '("melpa" . "https://melpa.org/packages/") t)
 
 (package-initialize)
 (when (not package-archive-contents)
@@ -31,8 +31,8 @@
 (use-package highlight-indent-guides
   :init
   (setq highlight-indent-guides-method 'character
-	highlight-indent-guides-character ?▏
-	highlight-indent-guides-responsive 'top)
+        highlight-indent-guides-character ?▏
+        highlight-indent-guides-responsive 'top)
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
@@ -59,9 +59,9 @@
 
 ;; C specific settings
 (add-hook 'c-or-c++-mode
-	  (setq indent-tabs-mode t)
-	  (setq c-basic-offset 4)
-	  (setq-default tab-width 4))
+          (setq indent-tabs-mode t)
+          (setq c-basic-offset 4)
+          (setq-default tab-width 4))
 
 (ensure-installed 'yasnippet-snippets)
 (use-package yasnippet-snippets)
