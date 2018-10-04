@@ -1,11 +1,3 @@
-(require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
-
-(package-initialize)
-
-(require 'use-package)
-
 ;; Common settings
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -13,6 +5,14 @@
 (tooltip-mode -1)
 (fset 'menu-bar-open nil)
 (set-face-attribute 'default nil :font "Source Code Pro-10")
+
+(require 'package)
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/") t)
+
+(package-initialize)
+
+(require 'use-package)
 
 (load-theme 'spacemacs-dark t nil)
 
@@ -45,3 +45,8 @@
 (setq indent-tabs-mode t)
 (setq c-basic-offset 4)
 (setq-default tab-width 4)
+
+(use-package yasnippet-snippets)
+(use-package yasnippet
+  :config
+  (add-hook 'prog-mode-hook 'yas-minor-mode))
