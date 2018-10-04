@@ -9,4 +9,5 @@ elpa
 *~
 .emacs.d/games
 .emacs.d/session*
+.emacs.d/recentf*
 **#*

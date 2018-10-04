@@ -6,13 +6,14 @@
 
 (require 'use-package)
 
+;; Common settings
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (fset 'menu-bar-open nil)
-
 (set-face-attribute 'default nil :font "Source Code Pro-10")
+
 (load-theme 'spacemacs-dark t nil)
 
 (use-package highlight-indent-guides
@@ -23,18 +24,24 @@
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
-;; C settings
+(use-package helm
+  :bind (("M-x" . helm-M-x)
+         ("C-x C-f" . helm-find-files)
+         ("C-x C-b" . helm-buffers-list)
+         ("C-x M-f" . helm-recentf)))
+
+(use-package spaceline-config
+  :config
+  (spaceline-spacemacs-theme)
+  (spaceline-helm-mode))
+
+(use-package iedit
+  :bind
+  ("C-;" . iedit-mode))
+
+(use-package markdown-mode)
+
+;; C specific settings
 (setq indent-tabs-mode t)
 (setq c-basic-offset 4)
 (setq-default tab-width 4)
-
-(use-package helm
-  :bind (("M-x" . helm-M-x)
-         ("M-<f5>" . helm-find-files)
-         ([f10] . helm-buffers-list)
-         ([S-f10] . helm-recentf)))
-
-(use-package spaceline-config
-  :init
-  (spaceline-spacemacs-theme)
-  (spaceline-helm-mode))
