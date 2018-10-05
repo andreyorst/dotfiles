@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (highlight-ident-guides yasnippet-snippets use-package spacemacs-theme spaceline markdown-mode linum-relative iedit highlight-indent-guides helm autothemer))))
+	(yasnippet-snippets markdown-mode iedit spaceline helm highlight-indent-guides spacemacs-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
