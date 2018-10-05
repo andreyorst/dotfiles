@@ -13,7 +13,7 @@
 (load custom-file :noerror)
 
 (defun ensure-installed (pkg)
-  "Ensure that plugin is installed while loading Emacs"
+  "Ensure that package is installed"
   (when (not (package-installed-p pkg))
     (package-install pkg)))
 
@@ -31,8 +31,8 @@
 (ensure-installed 'spacemacs-theme)
 (load-theme 'spacemacs-dark t nil)
 
-(ensure-installed 'highlight-indent-guides)
 (use-package highlight-indent-guides
+  :ensure highlight-indent-guides
   :init
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?▏
@@ -40,26 +40,28 @@
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
-(ensure-installed 'helm)
 (use-package helm
+  :ensure helm
   :bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files)
          ("C-x C-b" . helm-buffers-list)
          ("C-x M-f" . helm-recentf)))
 
-(ensure-installed 'spaceline)
 (use-package spaceline-config
+  :ensure spaceline
   :config
-  (spaceline-spacemacs-theme)
-  (spaceline-helm-mode))
+  (spaceline-emacs-theme)
+  (spaceline-helm-mode)
+  :init
+  (setq powerline-default-separator 'wave))
 
-(ensure-installed 'iedit)
 (use-package iedit
+  :ensure iedit
   :bind
   ("C-;" . iedit-mode))
 
-(ensure-installed 'markdown-mode)
-(use-package markdown-mode)
+(use-package markdown-mode
+  :ensure markdown-mode)
 
 ;; C specific settings
 (add-hook 'c-or-c++-mode
@@ -69,9 +71,10 @@
              (defvaralias 'c-basic-offset 'tab-width)
              (defvaralias 'cperl-indent-level 'tab-width)))
 
-(ensure-installed 'yasnippet-snippets)
-(use-package yasnippet-snippets)
-(ensure-installed 'yasnippet)
+(use-package yasnippet-snippets
+  :ensure yasnippet-snippets)
+
 (use-package yasnippet
+  :ensure yasnippet
   :config
   (add-hook 'prog-mode-hook 'yas-minor-mode))
