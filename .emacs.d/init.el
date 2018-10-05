@@ -7,6 +7,8 @@
   (fset 'menu-bar-open nil)
   (set-face-attribute 'default nil :font "Source Code Pro-10"))
 
+(setq-default indent-tabs-mode nil)
+
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
 
@@ -61,9 +63,11 @@
 
 ;; C specific settings
 (add-hook 'c-or-c++-mode
-          (setq indent-tabs-mode t)
-          (setq c-basic-offset 4)
-          (setq-default tab-width 4))
+          '(lambda()
+             (setq indent-tabs-mode t)
+             (setq tab-width 4)
+             (defvaralias 'c-basic-offset 'tab-width)
+             (defvaralias 'cperl-indent-level 'tab-width)))
 
 (ensure-installed 'yasnippet-snippets)
 (use-package yasnippet-snippets)
