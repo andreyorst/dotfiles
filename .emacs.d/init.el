@@ -27,37 +27,31 @@
 
 (ensure-installed 'use-package)
 (require 'use-package)
-(use-package use-package-ensure-system-package
-  :ensure t)
 
 (ensure-installed 'spacemacs-theme)
 (load-theme 'spacemacs-dark t nil)
 
-(use-package helm
-  :ensure helm
+(use-package helm :ensure t
   :bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files)
          ("C-x C-b" . helm-buffers-list)
          ("C-x M-f" . helm-recentf)))
 
-(use-package spaceline-config
-  :ensure spaceline
+(use-package spaceline-config :ensure spaceline
   :config
   (spaceline-emacs-theme)
   (spaceline-helm-mode)
   :init
   (setq powerline-default-separator 'wave))
 
-(use-package iedit
-  :ensure iedit
+(use-package iedit :ensure t
   :bind
   ("C-;" . iedit-mode))
 
 (use-package markdown-mode
   :ensure markdown-mode)
 
-(use-package company
-  :ensure company
+(use-package company :ensure t
   :init
   (setq company-auto-complete t
         company-require-match 'never
@@ -80,25 +74,20 @@
   (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 
-(use-package yasnippet
-  :ensure yasnippet
+(use-package yasnippet :ensure t
   :config
   (add-hook 'prog-mode-hook 'yas-minor-mode))
 
-(use-package yasnippet-snippets
-  :ensure yasnippet-snippets)
+(use-package yasnippet-snippets :ensure t)
 
-(use-package company-lsp
-  :ensure company-lsp
+(use-package company-lsp :ensure t
   :config
   (push '(company-lsp :with company-yasnippet) company-backends))
 
 (use-package lsp-mode
   :ensure lsp-mode)
 
-(use-package cquery
-  :ensure-system-package cquery
-  :ensure cquery
+(use-package cquery :ensure t
   :init
   (setq cquery-executable "/usr/bin/cquery"
         cquery-cache-dir "~/.cache/cquery"
