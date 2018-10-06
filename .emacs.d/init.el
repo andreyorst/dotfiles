@@ -27,18 +27,11 @@
 
 (ensure-installed 'use-package)
 (require 'use-package)
+(use-package use-package-ensure-system-package
+  :ensure t)
 
 (ensure-installed 'spacemacs-theme)
 (load-theme 'spacemacs-dark t nil)
-
-(use-package highlight-indent-guides
-  :ensure highlight-indent-guides
-  :init
-  (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-character ?▏
-        highlight-indent-guides-responsive 'top)
-  :config
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
 (use-package helm
   :ensure helm
@@ -63,18 +56,60 @@
 (use-package markdown-mode
   :ensure markdown-mode)
 
-;; C specific settings
-(add-hook 'c-or-c++-mode
-          '(lambda()
-             (setq indent-tabs-mode t)
-             (setq tab-width 4)
-             (defvaralias 'c-basic-offset 'tab-width)
-             (defvaralias 'cperl-indent-level 'tab-width)))
-
-(use-package yasnippet-snippets
-  :ensure yasnippet-snippets)
+(use-package company
+  :ensure company
+  :init
+  (setq company-auto-complete t
+        company-require-match 'never
+        company-transformers nil
+        company-minimum-prefix-length 2
+        company-lsp-async t
+        company-lsp-cache-candidates nil
+        company-frontends
+        '(company-pseudo-tooltip-unless-just-one-frontend
+          company-preview-frontend
+          company-echo-metadata-frontend))
+  :config
+  (setq company-backends (remove 'company-clang company-backends)
+        company-backends (remove 'company-xcode company-backends)
+        company-backends (remove 'company-gtags company-backends)
+        company-backends (remove 'company-cmake company-backends))
+  (add-hook 'after-init-hook 'global-company-mode)
+  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 
 (use-package yasnippet
   :ensure yasnippet
   :config
   (add-hook 'prog-mode-hook 'yas-minor-mode))
+
+(use-package yasnippet-snippets
+  :ensure yasnippet-snippets)
+
+(use-package company-lsp
+  :ensure company-lsp
+  :config
+  (push '(company-lsp :with company-yasnippet) company-backends))
+
+(use-package lsp-mode
+  :ensure lsp-mode)
+
+(use-package cquery
+  :ensure-system-package cquery
+  :ensure cquery
+  :init
+  (setq cquery-executable "/usr/bin/cquery"
+        cquery-cache-dir "~/.cache/cquery"
+        cquery-sem-highlight-method 'font-lock)
+  (add-hook 'c-mode-hook '(lambda() (lsp-cquery-enable))
+            'c++-mode-hook '(lambda() (lsp-cquery-enable))))
+
+;; C specific settings
+(add-hook 'c-mode-common-hook
+          '(lambda()
+             (setq indent-tabs-mode t
+                   c-basic-offset 4
+                   tab-width 4)
+             (lsp-cquery-enable)))
