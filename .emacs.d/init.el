@@ -7,7 +7,10 @@
   (fset 'menu-bar-open nil)
   (set-face-attribute 'default nil :font "Source Code Pro-10"))
 
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil
+              scroll-step 1
+              scroll-conservatively 10000
+              auto-window-vscroll nil)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
@@ -42,7 +45,7 @@
   (spaceline-emacs-theme)
   (spaceline-helm-mode)
   :init
-  (setq powerline-default-separator 'wave))
+  (setq powerline-default-separator 'slant))
 
 (use-package iedit :ensure t
   :bind
@@ -51,11 +54,18 @@
 (use-package markdown-mode
   :ensure markdown-mode)
 
+(use-package multiple-cursors
+  :bind
+  ("C-c >" . mc/mark-next-like-this)
+  ("C-c <" . mc/mark-previous-like-this)
+  ("C-c w" . mc/mark-next-word-like-this)
+  ("C-c M-w" . mc/mark-previous-word-like-this))
+
 (use-package company :ensure t
   :init
   (setq company-auto-complete t
         company-require-match 'never
-        company-transformers nil
+        company-transformers 'nil
         company-minimum-prefix-length 2
         company-lsp-async t
         company-lsp-cache-candidates nil
@@ -84,8 +94,11 @@
   :config
   (push '(company-lsp :with company-yasnippet) company-backends))
 
-(use-package lsp-mode
-  :ensure lsp-mode)
+(use-package lsp-mode :ensure t)
+
+(use-package nlinum :ensure t
+  :config
+  (global-nlinum-mode t))
 
 (use-package cquery :ensure t
   :init

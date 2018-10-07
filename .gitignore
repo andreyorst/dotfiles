@@ -10,4 +10,5 @@ elpa
 .emacs.d/games
 .emacs.d/session*
 .emacs.d/recentf*
+.emacs.d/.mc-lists.el
 **#*
