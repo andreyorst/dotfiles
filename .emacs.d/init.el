@@ -4,13 +4,15 @@
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
   (tooltip-mode -1)
-  (fset 'menu-bar-open nil)
-  (set-face-attribute 'default nil :font "Source Code Pro-10"))
+  (fset 'menu-bar-open nil))
+(set-face-attribute 'default nil :font "Source Code Pro-10")
+(set-face-attribute 'fringe nil :background nil)
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
               scroll-conservatively 10000
-              auto-window-vscroll nil)
+              auto-window-vscroll nil
+              cursor-type 'bar)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
@@ -63,8 +65,7 @@
 
 (use-package company :ensure t
   :init
-  (setq company-auto-complete t
-        company-require-match 'never
+  (setq company-require-match 'never
         company-transformers 'nil
         company-minimum-prefix-length 2
         company-lsp-async t
@@ -98,7 +99,8 @@
 
 (use-package nlinum :ensure t
   :config
-  (global-nlinum-mode t))
+  (global-nlinum-mode t)
+  (set-face-attribute 'linum nil :background nil))
 
 (use-package cquery :ensure t
   :init
@@ -115,3 +117,4 @@
                    c-basic-offset 4
                    tab-width 4)
              (lsp-cquery-enable)))
+
