@@ -9,7 +9,7 @@
 # ╰─────────────────────────────────╯
  
 define-command -override -docstring "find file recursively searching for it under path" \
-find -params 1 -shell-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ evaluate-commands %sh{
+find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ evaluate-commands %sh{
 	for buffer in $kak_buflist; do
 		buffer="${buffer%\'}"; buffer="${buffer#\'}"
 		if [ -z "${buffer##*$1}" ]; then
