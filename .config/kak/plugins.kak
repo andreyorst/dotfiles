@@ -41,3 +41,4 @@ evaluate-commands %sh{
 	echo "unalias global e"
 	echo "alias global e edit-or-dir"
 }
+

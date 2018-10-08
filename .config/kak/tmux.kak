@@ -22,7 +22,6 @@
 		tmux set -g status-left "#[fg=#3c3836,bold]#[bg=#83a598] tabs #[fg=#83a598]#[bg=#3c3836]"
 		tmux set -g status-right "#[fg=#83a598]#[bg=#3c3836]#[fg=#3c3836,bold]#[bg=#83a598] #{session_name} "
 		tmux setw -g window-status-format ' #[fg=colour7]#[bg=#3c3836]#{window_panes} #(echo "#W")'
-		tmux setw -g window-status-current-format '#[fg=#3c3836]#[bg=#83a598]#[fg=#3c3836,bold]#[bg=#83a598] #{window_panes} #(echo "#W") #[fg=#83a598]#[bg=#3c3836]'
 	}}
 
 	define-command -override -docstring "restore tmux statusline look, and move it to the bottom." \
