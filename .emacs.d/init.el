@@ -1,23 +1,28 @@
+;;; package --- Summary
+;;; Commentary:
+;;; Emacs config by Andrey Orst
+;;; Code:
+
 (ignore-errors
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
   (tooltip-mode -1)
   (fset 'menu-bar-open nil))
-(set-face-attribute 'default nil :font "Source Code Pro-10")
+(set-face-attribute 'default nil :font "Source Code Pro-11")
 (set-face-attribute 'fringe nil :background nil)
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
-              scroll-conservatively 10000
               auto-window-vscroll nil
               cursor-type 'bar)
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory)
+      ring-bell-function 'ignore)
 (load custom-file :noerror)
 
 (defun ensure-installed (pkg)
-  "Ensure that package is installed"
+  "Ensure that PKG is installed."
   (when (not (package-installed-p pkg))
     (package-install pkg)))
 
@@ -35,6 +40,13 @@
 (ensure-installed 'spacemacs-theme)
 (load-theme 'spacemacs-dark t nil)
 
+(use-package highlight-indent-guides :ensure t
+  :init
+  (setq highlight-indent-guides-method 'character
+        highlight-indent-guides-character ?▏)
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
 (use-package ivy :ensure t
   :ensure swiper
   :ensure counsel
@@ -46,6 +58,7 @@
          ("<f6>" . ivy-resume)
          ("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
+         ("C-x M-f" . counsel-recentf)
          ("<f1> f" . counsel-describe-function)
          ("<f1> v" . counsel-describe-variable)
          ("<f1> l" . counsel-find-library)
@@ -63,7 +76,6 @@
 (use-package spaceline-config :ensure spaceline
   :config
   (spaceline-emacs-theme)
-  ;; (spaceline-helm-mode)
   :init
   (setq powerline-default-separator 'slant))
 
@@ -76,14 +88,28 @@
   :bind
   ("C-d" . mc/mark-next-like-this))
 
+(use-package projectile :ensure t
+  :init
+  (setq projectile-svn-command "fd . -0"
+        projectile-require-project-root nil
+        projectile-enable-caching t
+        projectile-completion-system 'ivy)
+  :config
+  (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
+  (projectile-mode 1))
+
+(use-package flycheck :ensure t
+  :init
+  (add-hook 'emacs-lisp-mode 'flycheck-mode))
+
 (use-package lsp-mode :ensure t)
+
+(use-package lsp-ui :ensure t)
 
 (use-package company :ensure t
   :init
   (setq company-require-match 'never
         company-minimum-prefix-length 2
-        company-lsp-async t
-        company-lsp-cache-candidates nil
         company-frontends
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-frontend
@@ -116,13 +142,13 @@
 
 (use-package nlinum :ensure t
   :config
-  (global-nlinum-mode t)
+  (add-hook 'prog-mode-hook 'nlinum-mode)
   (set-face-attribute 'linum nil :background nil))
 
 (use-package cquery :ensure t
   :init
   (setq cquery-executable "/usr/bin/cquery"
-        cquery-cache-dir "~/.cache/cquery"
+        ;; cquery-cache-dir "~/.cache/cquery"
         cquery-sem-highlight-method 'font-lock)
   (add-hook 'c-mode-hook '(lambda() (lsp-cquery-enable))
             'c++-mode-hook '(lambda() (lsp-cquery-enable))))
@@ -133,5 +159,10 @@
              (setq indent-tabs-mode t
                    c-basic-offset 4
                    tab-width 4)
-             (lsp-cquery-enable)))
+             (lsp-cquery-enable)
+             (lsp-ui-mode)
+             (lsp-ui-doc-mode -1)
+             (flycheck-mode)))
 
+(provide 'init)
+;;; init.el ends here
