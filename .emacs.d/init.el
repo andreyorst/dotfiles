@@ -100,9 +100,7 @@
   (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
   (projectile-mode 1))
 
-(use-package flycheck :ensure t
-  :init
-  (add-hook 'emacs-lisp-mode 'flycheck-mode))
+(use-package flycheck :ensure t)
 
 (use-package lsp-mode :ensure t)
 
@@ -163,6 +161,10 @@
              (lsp-cquery-enable)
              (lsp-ui-mode)
              (lsp-ui-doc-mode -1)
+             (flycheck-mode)))
+
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda()
              (flycheck-mode)))
 
 (provide 'init)
