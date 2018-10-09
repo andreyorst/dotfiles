@@ -90,7 +90,9 @@
 
 (use-package projectile :ensure t
   :init
-  (setq projectile-svn-command "fd . -0"
+  (setq projectile-svn-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
+        projectile-generic-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
+        projectile-git-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
         projectile-require-project-root nil
         projectile-enable-caching t
         projectile-completion-system 'ivy)
