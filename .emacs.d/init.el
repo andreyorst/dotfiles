@@ -3,6 +3,15 @@
 ;;; Emacs config by Andrey Orst
 ;;; Code:
 
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+
+(package-initialize)
+(when (not package-archive-contents)
+  (package-refresh-contents))
+
 ;;; Common settings:
 (ignore-errors
   (menu-bar-mode -1)
@@ -28,14 +37,6 @@
   "Ensure that PKG is installed."
   (when (not (package-installed-p pkg))
     (package-install pkg)))
-
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
-
-(package-initialize)
-(when (not package-archive-contents)
-  (package-refresh-contents))
 
 (ensure-installed 'use-package)
 (require 'use-package)
@@ -81,8 +82,6 @@
   (spaceline-emacs-theme)
   :init
   (setq powerline-default-separator 'slant))
-
-(use-package iedit :ensure t)
 
 (use-package markdown-mode
   :ensure markdown-mode)
