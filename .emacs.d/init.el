@@ -1,4 +1,4 @@
-;;; package --- Summary
+;;; init.el --- Main configuration file
 ;;; Commentary:
 ;;; Emacs config by Andrey Orst
 ;;; Code:
@@ -119,7 +119,6 @@
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends))
         company-backends (remove 'company-gtags company-backends)
-        company-transformers 'company-sort-prefer-same-case-prefix
   (add-hook 'after-init-hook 'global-company-mode)
   (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
