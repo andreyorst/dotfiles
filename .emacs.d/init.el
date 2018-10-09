@@ -3,6 +3,7 @@
 ;;; Emacs config by Andrey Orst
 ;;; Code:
 
+;;; Common settings:
 (ignore-errors
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
@@ -17,10 +18,12 @@
               auto-window-vscroll nil
               cursor-type 'bar)
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory)
-      ring-bell-function 'ignore)
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups"))
+      ring-bell-function 'ignore
+      custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
 
+;;; Packages
 (defun ensure-installed (pkg)
   "Ensure that PKG is installed."
   (when (not (package-installed-p pkg))
@@ -85,8 +88,21 @@
   :ensure markdown-mode)
 
 (use-package multiple-cursors :ensure t
+  :init
+  (define-key mc/keymap (kbd "<return>") nil)
+  (global-unset-key (kbd "M-<down-mouse-1>"))
+  (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
   :bind
-  ("C-d" . mc/mark-next-like-this))
+  ("s-d" . mc/mark-next-like-this-word)
+  ("s-D" . mc/mark-previous-like-this-word)
+  :config
+  (add-hook 'multiple-cursors-mode-enabled-hook
+            '(lambda()
+               (setq blink-matching-paren nil)))
+
+  (add-hook 'multiple-cursors-mode-disabled-hook
+            '(lambda()
+               (setq blink-matching-paren t))))
 
 (use-package projectile :ensure t
   :init
@@ -102,7 +118,9 @@
 
 (use-package flycheck :ensure t)
 
-(use-package lsp-mode :ensure t)
+(use-package lsp-mode :ensure t
+  :config
+  (setq lsp-highlight-symbol-at-point nil))
 
 (use-package lsp-ui :ensure t)
 
@@ -147,12 +165,18 @@
 (use-package cquery :ensure t
   :init
   (setq cquery-executable "/usr/bin/cquery"
-        ;; cquery-cache-dir "~/.cache/cquery"
+        cquery-cache-dir "~/.cache/cquery"
         cquery-sem-highlight-method 'font-lock)
   (add-hook 'c-mode-hook '(lambda() (lsp-cquery-enable))
             'c++-mode-hook '(lambda() (lsp-cquery-enable))))
 
-;; C specific settings
+(use-package sr-speedbar :ensure t
+  :init
+  (setq speedbar-use-images nil))
+
+;;; Language settings
+
+;;; C specific settings
 (add-hook 'c-mode-common-hook
           '(lambda()
              (setq indent-tabs-mode t
@@ -163,6 +187,7 @@
              (lsp-ui-doc-mode -1)
              (flycheck-mode)))
 
+;;; eLisp specific settings
 (add-hook 'emacs-lisp-mode-hook
           '(lambda()
              (flycheck-mode)))
