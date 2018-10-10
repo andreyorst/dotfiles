@@ -20,7 +20,6 @@
   (tooltip-mode -1)
   (fset 'menu-bar-open nil))
 (set-face-attribute 'default nil :font "Source Code Pro-11")
-(set-face-attribute 'fringe nil :background nil)
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
@@ -43,20 +42,31 @@
 
 (ensure-installed 'spacemacs-theme)
 (load-theme 'spacemacs-dark t nil)
+(set-face-attribute 'fringe nil :background nil)
+
+(use-package diminish :ensure t)
 
 (use-package highlight-indent-guides :ensure t
+  :diminish highlight-indent-guides-mode
   :init
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?▏)
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
+(use-package flx :ensure t)
+
+(use-package company-flx :ensure t)
+
+(use-package counsel :ensure t)
+
+(use-package swiper :ensure t)
+
 (use-package ivy :ensure t
-  :ensure swiper
-  :ensure counsel
+  :diminish ivy-mode
   :init
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
+  (setq ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t)
   :bind (("C-s" . swiper)
          ("C-c C-r" . ivy-resume)
          ("<f6>" . ivy-resume)
@@ -74,6 +84,10 @@
          ("C-x l" . counsel-locate)
          ("C-S-o" . counsel-rhythmbox))
   :config
+  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+        ivy-count-format ""
+        ivy-display-style nil
+        ivy-minibuffer-faces nil)
   (ivy-mode 1)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
@@ -102,6 +116,7 @@
                (setq blink-matching-paren t))))
 
 (use-package projectile :ensure t
+  :diminish projectile-mode
   :init
   (setq projectile-svn-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
         projectile-generic-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
@@ -132,8 +147,9 @@
   :config
   (setq company-backends (remove 'company-clang company-backends)
         company-backends (remove 'company-xcode company-backends)
-        company-backends (remove 'company-cmake company-backends))
-        company-backends (remove 'company-gtags company-backends)
+        company-backends (remove 'company-cmake company-backends)
+        company-backends (remove 'company-elisp company-backends)
+        company-backends (remove 'company-gtags company-backends))
   (add-hook 'after-init-hook 'global-company-mode)
   (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
@@ -149,6 +165,7 @@
   (company-quickhelp-mode))
 
 (use-package yasnippet :ensure t
+  :diminish yas-minor-mode
   :config
   (add-hook 'prog-mode-hook 'yas-minor-mode))
 
@@ -187,7 +204,8 @@
 ;;; eLisp specific settings
 (add-hook 'emacs-lisp-mode-hook
           '(lambda()
-             (flycheck-mode)))
+             (flycheck-mode)
+             (push '(company-elisp :with company-yasnippet) company-backends)))
 
 (provide 'init)
 ;;; init.el ends here
