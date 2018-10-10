@@ -83,18 +83,16 @@
   :init
   (setq powerline-default-separator 'slant))
 
-(use-package markdown-mode
-  :ensure markdown-mode)
+(use-package markdown-mode :ensure t)
 
 (use-package multiple-cursors :ensure t
-  :init
-  (define-key mc/keymap (kbd "<return>") nil)
-  (global-unset-key (kbd "M-<down-mouse-1>"))
-  (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
   :bind
   ("s-d" . mc/mark-next-like-this-word)
   ("s-D" . mc/mark-previous-like-this-word)
   :config
+  (define-key mc/keymap (kbd "<return>") nil)
+  (global-unset-key (kbd "M-<down-mouse-1>"))
+  (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
   (add-hook 'multiple-cursors-mode-enabled-hook
             '(lambda()
                (setq blink-matching-paren nil)))
