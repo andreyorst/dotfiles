@@ -10,8 +10,8 @@
  
 evaluate-commands %sh{
 	config_files="
-		tmux.kak
 		plugins/plug.kak/rc/plug.kak
+		tmux.kak
 		commands.kak
 		plugins.kak
 		common.kak
