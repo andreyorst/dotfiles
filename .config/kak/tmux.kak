@@ -50,8 +50,8 @@
 
 	hook -group tmux global FocusIn .* %{rename-tmux}
 	hook -group tmux global WinDisplay .* %{rename-tmux}
-	hook -group tmux global KakBegin .* %{init-tmux}
-	hook -group tmux global KakEnd .* %{restore-tmux}
+	# hook -group tmux global KakBegin .* %{init-tmux}
+	# hook -group tmux global KakEnd .* %{restore-tmux}
 
 	evaluate-commands %sh{
 		if  [ -z "$TMUX" ]; then
