@@ -52,18 +52,13 @@
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?▏)
   :config
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
-
+;;  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+)
 (use-package flx :ensure t)
 
 (use-package company-flx :ensure t)
 
-(use-package counsel :ensure t)
-
-(use-package swiper :ensure t)
-
 (use-package ivy :ensure t
-  :diminish ivy-mode
   :init
   (setq ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
@@ -83,6 +78,7 @@
          ("C-c k" . counsel-ag)
          ("C-x l" . counsel-locate)
          ("C-S-o" . counsel-rhythmbox))
+  :diminish ivy-mode
   :config
   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format ""
@@ -90,6 +86,10 @@
         ivy-minibuffer-faces nil)
   (ivy-mode 1)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+
+(use-package counsel :ensure t)
+
+(use-package swiper :ensure t)
 
 (use-package spaceline-config :ensure spaceline
   :config
