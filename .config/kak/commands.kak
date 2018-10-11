@@ -8,8 +8,7 @@
 # │ GitHub.com/andreyorst/dotfiles  │
 # ╰─────────────────────────────────╯
  
-define-command -override -docstring "find file recursively searching for it under path" \
-find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ evaluate-commands %sh{
+define-command -hidden -params 1 smart-f %{ evaluate-commands %sh{
 	for buffer in $kak_buflist; do
 		buffer="${buffer%\'}"; buffer="${buffer#\'}"
 		if [ -z "${buffer##*$1}" ]; then
@@ -54,3 +53,5 @@ define-command -override -docstring "run command if Kakoune was launched in term
 	}
 }
 
+define-command -override -docstring "find file recursively searching for it under path" \
+find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ edit %arg{1} }
