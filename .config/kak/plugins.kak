@@ -24,7 +24,7 @@ plug "andreyorst/fzf.kak"
 evaluate-commands %sh{
 	[ -z "${kak_opt_plug_loaded_plugins##*fzf.kak*}" ] || exit
 	echo "map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'"
-	echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print\""
+	echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print\""
 	echo "set-option global fzf_tmux_height 65%"
 }
 
