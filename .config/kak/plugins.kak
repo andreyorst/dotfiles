@@ -25,7 +25,7 @@ evaluate-commands %sh{
 	[ -z "${kak_opt_plug_loaded_plugins##*fzf.kak*}" ] || exit
 	echo "map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'"
 	if [ ! -z "$(command -v fd)" ]; then
-		echo "set-option global fzf_file_command 'fd'"
+		echo "set-option global fzf_file_command 'fd . --type f --follow --hidden --exclude .git --exclude .svn'"
 	else
 		echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print\""
 	fi
