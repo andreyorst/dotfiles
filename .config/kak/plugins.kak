@@ -24,6 +24,7 @@ plug "andreyorst/fzf.kak"
 evaluate-commands %sh{
 	[ -z "${kak_opt_plug_loaded_plugins##*fzf.kak*}" ] || exit
 	echo "map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'"
+	echo "set-option global fzf_preview_width '65%'"
 	if [ ! -z "$(command -v fd)" ]; then
 		echo "set-option global fzf_file_command 'fd . --type f --follow --hidden --exclude .git --exclude .svn'"
 	else
