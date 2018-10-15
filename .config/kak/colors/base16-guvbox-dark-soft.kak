@@ -85,7 +85,7 @@ evaluate-commands %sh{
         face global LineNumbers        ${gray},${bg2}
         face global LineNumberCursor   ${fg0},${bg2}
         face global LineNumbersWrapped ${bg2},${bg2}
-        face global MenuForeground     ${bg2},${blue}
+        face global MenuForeground     ${fg1},${bg3}+b
         face global MenuBackground     default,${bg2}
         face global MenuInfo           ${blue}
         face global Information        ${bg0_s},${blue}+b
