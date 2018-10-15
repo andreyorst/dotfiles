@@ -8,7 +8,7 @@
 # │ GitHub.com/andreyorst/dotfiles  │
 # ╰─────────────────────────────────╯
  
-define-command -hidden -params 1 smart-f %{ evaluate-commands %sh{
+define-command -override -hidden -params 1 smart-f %{ evaluate-commands %sh{
 	for buffer in $kak_buflist; do
 		buffer="${buffer%\'}"; buffer="${buffer#\'}"
 		if [ -z "${buffer##*$1}" ]; then
@@ -55,3 +55,12 @@ define-command -override -docstring "run command if Kakoune was launched in term
 
 define-command -override -docstring "find file recursively searching for it under path" \
 find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ edit %arg{1} }
+
+define-command -override -docstring "select a word under cursor, or add cursor on next occurence of current selection" \
+select-or-add-cursor %{ execute-keys -save-regs '' %sh{
+	if [ "$(expr $(echo $kak_selection | wc -m) - 1)" = "1" ]; then
+		echo "<a-i>w*"
+	else
+		echo "*<s-n>"
+	fi
+}}
