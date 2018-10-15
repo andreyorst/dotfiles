@@ -54,19 +54,27 @@
 	}
 
 	hook global WinSetOption filetype=c %{
-		set-option global clang_options '-Wall --std=c99 -I ./include'
-		evaluate-commands  %sh{
-			if [ -f "./testkit.settings" ]; then
-				options=$(eval echo $options" -I $(pwd)/include")
-				options=$(eval echo $options" -I $(pwd)/testpacks/SPW_TESTS/spw_lib_src")
-				options=$(eval echo $options" -I $(pwd)/testpacks/SK_VG11/pci_master_slave_cross_test")
-				options=$(eval echo $options" -I $(pwd)/testpacks/CAN/can_lib_src")
-				options=$(eval echo $options" -I $(pwd)/testpacks/MKIO/mkio_lib_src")
-				options=$(eval echo $options" -I $(pwd)/platforms/$(cat ./testkit.settings | grep '?=' |  sed -E 's/.*= //')/include")
-				eval echo "set-option -add global clang_options %{ $options }"
-				echo $options > .clang
-			fi
-		}
+		set-option global clang_options '-Wall --std=c99 -I./include'
+		evaluate-commands  %sh{ (
+			while [ $(pwd) != $HOME ]; do
+    			if [ -f "./testkit.settings" ]; then
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/include}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/SPW_TESTS/spw_lib_src}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/SK_VG11/pci_master_slave_cross_test}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/CAN/can_lib_src}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/MKIO/mkio_lib_src}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/platforms/$(cat ./testkit.settings | grep '?=' |  sed -E 's/.*= //')/include}"
+    				break
+    			elif [ -f "./startf.S" ]; then
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/include}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/include/cp2}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/include/hdrtest}"
+    				eval echo "set-option -add global clang_options %{ -I$(pwd)/../../include}"
+    				break
+    			fi
+    			cd ..
+			done
+		) }
 	}
 
 # Rust
