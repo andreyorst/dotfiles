@@ -53,9 +53,6 @@ define-command -override -docstring "run command if Kakoune was launched in term
 	}
 }
 
-define-command -override -docstring "find file recursively searching for it under path" \
-find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ edit %arg{1} }
-
 define-command -override -docstring "select a word under cursor, or add cursor on next occurence of current selection" \
 select-or-add-cursor %{ execute-keys -save-regs '' %sh{
 	if [ "$(expr $(echo $kak_selection | wc -m) - 1)" = "1" ]; then
@@ -64,3 +61,7 @@ select-or-add-cursor %{ execute-keys -save-regs '' %sh{
 		echo "*<s-n>"
 	fi
 }}
+
+define-command -override -docstring "find file recursively searching for it under path" \
+find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ edit %arg{1} }
+
