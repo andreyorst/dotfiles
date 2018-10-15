@@ -31,6 +31,7 @@ alias stopwatch='while true; do echo -ne "\r$(date +%-M:%S:%N)"; done'
 alias mc="command mc -x"
 alias tmux="command tmux new -s \>_"
 alias "tmux-attach"="command tmux a -t \>_"
+alias less="less --tabs 4"
 
 export EDITOR="nvim -u NORC"
 
