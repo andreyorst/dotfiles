@@ -1,6 +1,6 @@
 # ╭─────────────╥───────────────────╮
 # │ Author:     ║ File:             │
-# │ Andrey Orst ║ common.kak        │
+# │ Andrey Orst ║ commands.kak      │
 # ╞═════════════╩═══════════════════╡
 # │ Custom commands for Kakoune     │
 # ╞═════════════════════════════════╡
