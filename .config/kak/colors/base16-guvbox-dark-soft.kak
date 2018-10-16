@@ -1,8 +1,8 @@
-# gruvbox theme
+# Base16 Gruvbox Dark Soft Theme
 
 evaluate-commands %sh{
-    bg0_h="rgb:1d2021"
     bg0="rgb:282828"
+    bg0_h="rgb:1d2021"
     bg0_s="rgb:32302f"
     bg1="rgb:3c3836"
     bg2="rgb:504945"
@@ -10,9 +10,8 @@ evaluate-commands %sh{
     bg4="rgb:7c6f64"
     bg4_256="rgb:7c6f64"
 
-
-    fg0_h="rgb:f9f5d7"
     fg0="rgb:fbf1c7"
+    fg0_h="rgb:f9f5d7"
     fg0_s="rgb:f2e5bc"
     fg1="rgb:ebdbb2"
     fg2="rgb:d5c4a1"
@@ -20,24 +19,24 @@ evaluate-commands %sh{
     fg4="rgb:a89984"
     fg4_256="rgb:a89984"
 
-    # Normal Colors
-    red="rgb:fb4934"
-    green="rgb:b8bb26"
-    yellow="rgb:fabd2f"
-    blue="rgb:83a598"
-    purple="rgb:d3869b"
-    aqua="rgb:8ec07c"
-    orange="rgb:fe8019"
-    gray="rgb:928374"
-
     # Bright Colors
-    d_red="rgb:cc241d"
-    d_green="rgb:98971a"
-    d_yellow="rgb:d79921"
-    d_blue="rgb:458588"
-    d_purple="rgb:b16286"
-    d_aqua="rgb:689d6a"
-    d_orange="rgb:d65d0e"
+    b_red="rgb:fb4934"
+    b_green="rgb:b8bb26"
+    b_yellow="rgb:fabd2f"
+    b_blue="rgb:83a598"
+    b_purple="rgb:d3869b"
+    b_aqua="rgb:8ec07c"
+    b_orange="rgb:fe8019"
+    b_gray="rgb:928374"
+
+    # Normal Colors
+    red="rgb:cc241d"
+    green="rgb:98971a"
+    yellow="rgb:d79921"
+    blue="rgb:458588"
+    purple="rgb:b16286"
+    aqua="rgb:689d6a"
+    orange="rgb:d65d0e"
 
     # Faded Colors
     f_red="rgb:9d0006"
@@ -51,29 +50,29 @@ evaluate-commands %sh{
 
     echo "
         # Code highlighting
-        face global value     ${orange}
-        face global type      ${yellow}
-        face global variable  ${blue}
-        face global module    ${green}
-        face global function  ${blue}
-        face global string    ${green}
-        face global keyword   ${purple}
-        face global operator  ${aqua}
-        face global attribute ${orange}
-        face global comment   ${gray}
-        face global meta      ${aqua}
+        face global value     ${b_orange}
+        face global type      ${b_yellow}
+        face global variable  ${b_blue}
+        face global module    ${b_green}
+        face global function  ${b_blue}
+        face global string    ${b_green}
+        face global keyword   ${b_purple}
+        face global operator  ${b_aqua}
+        face global attribute ${b_orange}
+        face global comment   ${b_gray}
+        face global meta      ${b_aqua}
         face global builtin   default+b
 
         # Markdown highlighting
-        face global title     ${green}+b
-        face global header    ${orange}
+        face global title     ${b_green}+b
+        face global header    ${b_orange}
         face global bold      ${fg0}+b
         face global italic    ${fg1}
         face global mono      ${fg2}
         face global block     default
-        face global link      ${blue}
-        face global bullet    ${red}
-        face global list      ${red}
+        face global link      ${b_blue}
+        face global bullet    ${b_red}
+        face global list      ${b_red}
 
         face global Default            ${fg0},${bg0_s}
         face global PrimarySelection   default,${bg2}
@@ -82,18 +81,18 @@ evaluate-commands %sh{
         face global SecondaryCursor    ${bg0},${fg3}
         face global PrimaryCursorEol   ${bg0},${fg2}
         face global SecondaryCursorEol ${bg0},${fg4}
-        face global LineNumbers        ${gray},${bg0_s}
+        face global LineNumbers        ${b_gray},${bg0_s}
         face global LineNumberCursor   ${fg0},${bg0_s}
         face global LineNumbersWrapped ${bg0_s},${bg0_s}
         face global MenuForeground     ${fg1},${bg3}+b
         face global MenuBackground     default,${bg2}
-        face global MenuInfo           ${blue}
-        face global Information        ${bg0_s},${blue}+b
-        face global Error              ${red},default+b
+        face global MenuInfo           ${b_blue}
+        face global Information        ${bg0_s},${b_blue}+b
+        face global Error              ${b_red},default+b
         face global StatusLine         ${fg1},${bg0_s}
-        face global StatusLineMode     ${blue}+b
-        face global StatusLineInfo     ${purple}
-        face global StatusLineValue    ${red}
+        face global StatusLineMode     ${b_blue}+b
+        face global StatusLineInfo     ${b_purple}
+        face global StatusLineValue    ${b_red}
         face global StatusCursor       ${bg0},${fg0}
         face global Prompt             default
         face global MatchingChar       default,${bg3}
