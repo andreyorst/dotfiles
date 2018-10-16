@@ -18,30 +18,27 @@
 	endfunction
 
 " Terminal Function
-	let s:term_buf = 0
-	let s:term_win = 0
+    let s:term_buf = 0
+    let s:term_win = 0
 
-	function! TermToggle(height)
-		if win_gotoid(s:term_win)
-			hide
-		else
-			new terminal
-			exec "resize ".a:height
-			try
-				exec "buffer ".s:term_buf
-				exec "bd terminal"
-			catch
-				call termopen($SHELL, {"detach": 0})
-				let s:term_buf = bufnr("")
-				setlocal nonumber
-				setlocal norelativenumber
-				setlocal signcolumn=no
-				setlocal nocursorline
-			endtry
-			startinsert!
-			let s:term_win = win_getid()
-		endif
-	endfunction
+    function! TermToggle(height)
+        if win_gotoid(s:term_win)
+            hide
+        else
+            new terminal
+            exec "resize ".a:height
+            try
+                exec "buffer ".s:term_buf
+                exec "bd terminal"
+            catch
+                call termopen($SHELL, {"detach": 0})
+                let s:term_buf = bufnr("")
+                setlocal nonu nornu scl=no nocul
+            endtry
+            startinsert!
+            let s:term_win = win_getid()
+        endif
+    endfunction
 
 " Rename word under cursor in whole file
 	function! RenameCWord(cword)
