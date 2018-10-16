@@ -8,7 +8,16 @@
 # │ GitHub.com/andreyorst/dotfiles  │
 # ╰─────────────────────────────────╯
  
-define-command -override -hidden -params 1 smart-f %{ evaluate-commands %sh{
+define-command -override -docstring "call recursive-search for selection, if selection is only one character selects WORD under cursor" \
+smart-gf %{ execute-keys -with-hooks %sh{
+	if [ "$(expr $(echo $kak_selection | wc -m) - 1)" = "1" ]; then
+		echo "<a-i><a-w>:<space>recursive-search<space>%reg{dot}<ret>"
+	else
+		echo ":<space>recursive-search<space>%reg{dot}<ret>"
+	fi
+}}
+
+define-command -override -hidden -params 1 recursive-search %{ evaluate-commands %sh{
 	for buffer in $kak_buflist; do
 		buffer="${buffer%\'}"; buffer="${buffer#\'}"
 		if [ -z "${buffer##*$1}" ]; then

@@ -30,17 +30,15 @@
 	}
 
 # Maps and hooks
-	map global normal ''     ': comment-line<ret>'                     -docstring "<c-/> to comment/uncomment selection"
-	map global normal '<c-r>' 'U'                                       -docstring "vim-like redo"
-	map global goto   '<a-f>' '<esc><a-i><a-w>gf'                       -docstring "file non-recursive"
-	map global goto   'f'     '<esc><a-i><a-w>: smart-f %reg{dot}<ret>' -docstring "file recursive"
-	map global normal '*'     '<a-i>w*'                                 -docstring "search word under cursor"
-	map global normal '<a-*>' '<a-i><a-w>*'                             -docstring "search WORD under cursor"
-	map global goto   'b'     '<esc>:bn<ret>'                           -docstring "next buffer"
-	map global goto   'B'     '<esc>:bp<ret>'                           -docstring "previous buffer"
-	map global normal '<c-d>' ': select-or-add-cursor<ret>'             -docstring "add currsor on current word, and jump to the next match"
-	map global user   't'     ': leading-spaces-to-tabs<ret>'                -docstring "convert leading spaces to tabs"
-	map global user   'T'     ': leading-tabs-to-spaces<ret>'                -docstring "convert leading tabs to spaces"
+	map global normal ''     ': comment-line<ret>'           -docstring "<c-/> to comment/uncomment selection"
+	map global normal '<c-r>' 'U'                             -docstring "vim-like redo"
+	map global goto   '<a-f>' '<esc><a-i><a-w>gf'             -docstring "file non-recursive"
+	map global goto   'f'     '<esc>: smart-gf<ret>'          -docstring "file recursive"
+	map global goto   'b'     '<esc>:bn<ret>'                 -docstring "next buffer"
+	map global goto   'B'     '<esc>:bp<ret>'                 -docstring "previous buffer"
+	map global normal '<c-d>' ': select-or-add-cursor<ret>'   -docstring "add currsor on current word, and jump to the next match"
+	map global user   't'     ': leading-spaces-to-tabs<ret>' -docstring "convert leading spaces to tabs"
+	map global user   'T'     ': leading-tabs-to-spaces<ret>' -docstring "convert leading tabs to spaces"
 
 	hook global InsertCompletionShow .* %{ map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p> }
 	hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
