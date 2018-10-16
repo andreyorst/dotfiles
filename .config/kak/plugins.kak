@@ -30,7 +30,7 @@ plug "andreyorst/fzf.kak" %{
 			echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print\""
 		fi
 		if [ ! -z "$(command -v bat)" ]; then
-			echo "set-option global fzf_highlighter 'bat'"
+			echo "set-option global fzf_highlighter 'bat --color=always {}'"
 		elif [ ! -z "$(command -v highlight)" ]; then
 			echo "set-option global fzf_highlighter 'highlight'"
 		fi
