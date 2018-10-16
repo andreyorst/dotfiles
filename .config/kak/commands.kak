@@ -71,9 +71,6 @@ select-or-add-cursor %{ execute-keys -save-regs '' %sh{
 	fi
 }}
 
-define-command -override -docstring "find file recursively searching for it under path" \
-find -params 1 -shell-script-candidates %{ find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -print } %{ edit %arg{1} }
-
 define-command -override leading-spaces-to-tabs %{ declare-option -hidden int cline %val{cursor_line}; declare-option -hidden int ccol %val{cursor_column}; execute-keys %{ %s^\h+<ret><a-@>}; execute-keys %opt{cline}g %opt{ccol}lh }
 define-command -override leading-tabs-to-spaces %{ declare-option -hidden int cline %val{cursor_line}; declare-option -hidden int ccol %val{cursor_column}; execute-keys %{ %s^\h+<ret>@}; execute-keys %opt{cline}g %opt{ccol}lh }
 
