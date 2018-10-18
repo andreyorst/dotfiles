@@ -28,7 +28,8 @@ alias kakconf="kak ~/.config/kak/kakrc"
 alias emacsconf="emacs ~/.emacs.d/init.el"
 alias stopwatch='while true; do echo -ne "\r$(date +%-M:%S:%N)"; done'
 alias mc="command mc -x"
-alias tmux="command tmux new-session -A -s \>_"
+# alias tmux="command tmux new-session -A -s \>_"
+alias tmux="tmux new-session -d -s \>_; tmux new-session -t \>_ \; set-option destroy-unattached"
 alias less="less --tabs 4"
 
 export EDITOR="kak"
