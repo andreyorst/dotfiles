@@ -9,17 +9,17 @@
 # ╰─────────────────────────────────╯
  
 evaluate-commands %sh{
-	config_files="
-		plugins/plug.kak/rc/plug.kak
-		tmux.kak
-		commands.kak
-		plugins.kak
-		common.kak
-		languages.kak
-	"
+    config_files="
+        plugins/plug.kak/rc/plug.kak
+        tmux.kak
+        commands.kak
+        plugins.kak
+        common.kak
+        languages.kak
+    "
 
-	for file in $config_files; do
-		echo "try %{ source '$HOME/.config/kak/$file' } catch %{ echo -debug 'Error sourcing $file' }"
-	done
+    for file in $config_files; do
+        echo "try %{ source '$HOME/.config/kak/$file' } catch %{ echo -debug 'Error sourcing $file' }"
+    done
 }
 
