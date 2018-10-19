@@ -13,7 +13,7 @@ command = "rls"
 
 [language.c_cpp]
 extensions = ["c", "h", "cc", "hh", "cpp", "hpp"]
-roots = ["compile_commands.json", ".cquery"]
+roots = [".cquery", "compile_commands.json"]
 command = "cquery"
-args = ["--init={\"cacheDirectory\":\"~/.cache/cquery\"}"]
+args = ["--log-file=/tmp/cq.log", "--init={\"cacheDirectory\": \"/home/andreyorst/.cache/cquery\"}"]
 
