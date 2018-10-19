@@ -9,7 +9,7 @@
 # │ Rest of .dotfiles:              │
 # │ GitHub.com/andreyorst/dotfiles  │
 # ╰─────────────────────────────────╯
- 
+
 # Custom faces
     set-face global child rgb:fb4934,default+b
     set-face global delimiters rgb:af3a03,default
@@ -70,8 +70,8 @@
 # Rust
     hook global WinSetOption filetype=rust %{
         set window formatcmd 'rustfmt'
-        racer-enable-autocomplete
-        map -docstring "racer goto definitiom" global goto 'd' '<esc><a-i>w: racer-go-definition<ret>'
+        # racer-enable-autocomplete
+        # map -docstring "racer goto definitiom" global goto 'd' '<esc><a-i>w: racer-go-definition<ret>'
         expandtab
     }
 

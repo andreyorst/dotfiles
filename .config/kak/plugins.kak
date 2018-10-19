@@ -48,6 +48,4 @@ plug "TeddyDD/kakoune-edit-or-dir" %{
     alias global e edit-or-dir
 }
 
-plug "ul/kak-lsp" %{
-    evaluate-commands %sh{kak-lsp --kakoune -s $kak_session}
-}
+nop plug "ul/kak-lsp"
