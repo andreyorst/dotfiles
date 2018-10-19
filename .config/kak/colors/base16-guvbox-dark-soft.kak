@@ -60,7 +60,8 @@ evaluate-commands %sh{
         face global operator  ${b_aqua}
         face global attribute ${b_orange}
         face global comment   ${b_gray}
-        face global meta      ${b_aqua}
+ try %{ face global comment   ${b_gray}+a }
+        face global meta      ${b_red}
         face global builtin   default+b
 
         # Markdown highlighting
@@ -98,6 +99,6 @@ evaluate-commands %sh{
         face global MatchingChar       default,${bg3}
         face global BufferPadding      ${bg0_s},${bg0_s}
         face global Whitespace         ${bg2}
-        try %{ face global Whitespace  ${bg2}+f }
+ try %{ face global Whitespace         ${bg2}+f }
     "
 }
