@@ -35,9 +35,9 @@
         add-highlighter window/ regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
         add-highlighter window/ regex \b\w+_t\b 0:type
         set-option window formatcmd 'clang-format'
-        clang-enable-autocomplete
-        clang-enable-diagnostics
-        hook window InsertEnd .* clang-parse
+        # clang-enable-autocomplete
+        # clang-enable-diagnostics
+        # hook window InsertEnd .* clang-parse
         noexpandtab
     }
 
