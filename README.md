@@ -1,6 +1,7 @@
 # .dotfiles
 Constantly improving my Kakoune setup.
-Neovim config has it's own [README.md](https://github.com/andreyorst/dotfiles/tree/master/.config/kak).
+
+Kakoune config has it's own [README.md](https://github.com/andreyorst/dotfiles/tree/master/.config/kak).
 
 Also includes settings for Termite, Tmux, [Neovim](https://github.com/andreyorst/dotfiles/tree/master/.config/nvim), KDE Scripts, KDE Colorschemes, some config for bspwm and other misc stuff.
 
