@@ -48,4 +48,10 @@ plug "TeddyDD/kakoune-edit-or-dir" %{
     alias global e edit-or-dir
 }
 
-nop plug "ul/kak-lsp"
+plug "ul/kak-lsp" "noload" %{
+    hook global WinSetOption filetype=(c|cpp|rust) %{
+        evaluate-commands %sh{ kak-lsp --kakoune -s $kak_session }
+        lsp-auto-hover-enable
+        set-option global lsp_hover_anchor true
+    }
+}
