@@ -30,7 +30,7 @@ plug "andreyorst/fzf.kak" %{
             echo "set-option global fzf_file_command \"find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print\""
         fi
         if [ ! -z "$(command -v bat)" ]; then
-            echo "set-option global fzf_highlighter 'bat --theme=gruvbox\ \(Dark\)\ \(Soft\) --color=always --style=plain {}'"
+            echo "set-option global fzf_highlighter 'bat --theme gruvbox\ \(Dark\)\ \(Soft\) --color=always --style=plain {}'"
         elif [ ! -z "$(command -v highlight)" ]; then
             echo "set-option global fzf_highlighter 'highlight'"
         fi
@@ -48,7 +48,7 @@ plug "TeddyDD/kakoune-edit-or-dir" %{
     alias global e edit-or-dir
 }
 
-plug "ul/kak-lsp" "noload" do %{cargo build --release} %{
+plug "ul/kak-lsp" noload do %{cargo build --release} %{
     hook global WinSetOption filetype=(c|cpp|rust) %{
         evaluate-commands %sh{ kak-lsp --kakoune -s $kak_session }
         lsp-auto-hover-enable
