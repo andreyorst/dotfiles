@@ -10,7 +10,7 @@
 # ╰─────────────────────────────────╯
 
 # Plugin manager
-plug "andreyorst/plug.kak" "noload"
+plug "andreyorst/plug.kak" noload
 
 # Extended text objects and selections
 plug "delapouite/kakoune-text-objects"
