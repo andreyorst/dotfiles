@@ -7,13 +7,13 @@
 # │ Rest of .dotfiles:              │
 # │ GitHub.com/andreyorst/dotfiles  │
 # ╰─────────────────────────────────╯
- 
+
 evaluate-commands %sh{
     config_files="
         plugins/plug.kak/rc/plug.kak
+        plugins.kak
         tmux.kak
         commands.kak
-        plugins.kak
         common.kak
         languages.kak
     "
