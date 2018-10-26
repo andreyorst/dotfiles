@@ -1,12 +1,12 @@
-# ╭─────────────╥───────────────────╮
-# │ Author:     ║ File:             │
-# │ Andrey Orst ║ kakrc             │
-# ╞═════════════╩═══════════════════╡
-# │ Initial script for Kakoune      │
-# ╞═════════════════════════════════╡
-# │ Rest of .dotfiles:              │
-# │ GitHub.com/andreyorst/dotfiles  │
-# ╰─────────────────────────────────╯
+# ╭─────────────╥──────────────────╮
+# │ Author:     ║ File:            │
+# │ Andrey Orst ║ kakrc            │
+# ╞═════════════╩══════════════════╡
+# │ Initial script for Kakoune     │
+# ╞════════════════════════════════╡
+# │ Rest of .dotfiles:             │
+# │ GitHub.com/andreyorst/dotfiles │
+# ╰────────────────────────────────╯
 
 evaluate-commands %sh{
     config_files="
@@ -22,4 +22,4 @@ evaluate-commands %sh{
         echo "try %{ source '$HOME/.config/kak/$file' } catch %{ echo -debug 'Error sourcing $file' }"
     done
 }
-
+if-termux %{colorscheme default} else %{colorscheme gruvbox}

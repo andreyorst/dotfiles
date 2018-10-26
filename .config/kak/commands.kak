@@ -1,12 +1,12 @@
-# ╭─────────────╥───────────────────╮
-# │ Author:     ║ File:             │
-# │ Andrey Orst ║ commands.kak      │
-# ╞═════════════╩═══════════════════╡
-# │ Custom commands for Kakoune     │
-# ╞═════════════════════════════════╡
-# │ Rest of .dotfiles:              │
-# │ GitHub.com/andreyorst/dotfiles  │
-# ╰─────────────────────────────────╯
+# ╭─────────────╥──────────────────╮
+# │ Author:     ║ File:            │
+# │ Andrey Orst ║ commands.kak     │
+# ╞═════════════╩══════════════════╡
+# │ Custom commands for Kakoune    │
+# ╞════════════════════════════════╡
+# │ Rest of .dotfiles:             │
+# │ GitHub.com/andreyorst/dotfiles │
+# ╰────────────────────────────────
  
 define-command -override -docstring "call recursive-search for selection, if selection is only one character selects WORD under cursor" \
 smart-gf %{ execute-keys -with-hooks %sh{
@@ -49,16 +49,36 @@ define-command -override -hidden -params 1 recursive-search %{ evaluate-commands
     echo "echo -markup '{Error}unable to find file ''$1'''"
 }}
 
-define-command -override -docstring "run command if Kakoune was launched in termux" in-termux -params 2 %{
+
+hook global WinSetOption filetype=kak %{ try %{
+    add-highlighter window/if_termux        regex \bplug\b\h+((?=")|(?=')|(?=%)|(?=\w)) 0:keyword
+    add-highlighter window/else     regex \bdo\b\h+((?=")|(?=')|(?=%)|(?=\w)) 0:keyword
+}}
+
+hook  global WinSetOption filetype=(?!kak).* %{ try %{
+    remove-highlighter window/if_termux
+    remove-highlighter window/else
+}}
+define-command -override -docstring "run command if Kakoune was launched in termux" if-termux -params 3 %{
     evaluate-commands %sh{
         case $PATH in
         *termux*)
-            echo "$1"
-            ;;
+            commands=$1 ;;
         *)
-            echo "$2"
+            if [ "$2" = "else" ]; then
+                commands=$3
+            else
+                skip=1
+            fi
             ;;
         esac
+        if [ -z $skip ]; then
+            IFS='
+'
+            for cmd in "$commands"; do
+                echo "$cmd"
+            done
+        fi
     }
 }
 
