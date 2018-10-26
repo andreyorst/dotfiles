@@ -1,16 +1,18 @@
-# ╭─────────────╥───────────────────╮
-# │ Author:     ║ File:             │
-# │ Andrey Orst ║ plugins.kak       │
-# ╞═════════════╩═══════════════════╡
-# │ plugins for Kakoune with        │
-# │ settings                        │
-# ╞═════════════════════════════════╡
-# │ Rest of .dotfiles:              │
-# │ GitHub.com/andreyorst/dotfiles  │
-# ╰─────────────────────────────────╯
+# ╭─────────────╥──────────────────╮
+# │ Author:     ║ File:            │
+# │ Andrey Orst ║ plugins.kak      │
+# ╞═════════════╩══════════════════╡
+# │ plugins for Kakoune with their │
+# │ settings handled by plug.kak   │
+# ╞════════════════════════════════╡
+# │ Rest of .dotfiles:             │
+# │ GitHub.com/andreyorst/dotfiles │
+# ╰────────────────────────────────╯
 
 # Plugin manager
-plug "andreyorst/plug.kak" noload
+plug "andreyorst/plug.kak" noload %{
+    set-option global plug_profiler false
+}
 
 # Extended text objects and selections
 plug "delapouite/kakoune-text-objects"

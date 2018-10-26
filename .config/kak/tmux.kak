@@ -1,13 +1,14 @@
-# ╭─────────────╥───────────────────╮
-# │ Author:     ║ File:             │
-# │ Andrey Orst ║ tmux.kak          │
-# ╞═════════════╩═══════════════════╡
-# │ Tmux scripts that change the    │
-# │ look of tmux inside kakoune     │
-# ╞═════════════════════════════════╡
-# │ Rest of .dotfiles:              │
-# │ GitHub.com/andreyorst/dotfiles  │
-# ╰─────────────────────────────────╯
+# ╭─────────────╥──────────────────╮
+# │ Author:     ║ File:            │
+# │ Andrey Orst ║ tmux.kak         │
+# ╞═════════════╩══════════════════╡
+# │ Tmux scripts that adds some    │
+# │ new commands to handle splits  │
+# │ and handle window names.       │
+# ╞════════════════════════════════╡
+# │ Rest of .dotfiles:             │
+# │ GitHub.com/andreyorst/dotfiles │
+# ╰────────────────────────────────╯
 
 # tmux tricks
     define-command -override -docstring "rename tmux window to current buffer filename" \

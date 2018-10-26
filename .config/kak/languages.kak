@@ -1,14 +1,14 @@
-# ╭─────────────╥───────────────────╮
-# │ Author:     ║ File:             │
-# │ Andrey Orst ║ languages.kak     │
-# ╞═════════════╩═══════════════════╡
-# │ Custom language settings for    │
-# │ different filetypes that change │
-# │ how Kakoune works.              │
-# ╞═════════════════════════════════╡
-# │ Rest of .dotfiles:              │
-# │ GitHub.com/andreyorst/dotfiles  │
-# ╰─────────────────────────────────╯
+# ╭─────────────╥──────────────────╮
+# │ Author:     ║ File:            │
+# │ Andrey Orst ║ languages.kak    │
+# ╞═════════════╩══════════════════╡
+# │ Custom language settings for   │
+# │ different filetypes that       │
+# │ change how Kakoune works.      │
+# ╞════════════════════════════════╡
+# │ Rest of .dotfiles:             │
+# │ GitHub.com/andreyorst/dotfiles │
+# ╰────────────────────────────────╯
 
 # Custom faces
     set-face global child rgb:fb4934,default+b
