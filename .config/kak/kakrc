@@ -22,4 +22,3 @@ evaluate-commands %sh{
         echo "try %{ source '$HOME/.config/kak/$file' } catch %{ echo -debug 'Error sourcing $file' }"
     done
 }
-if-termux %{colorscheme default} else %{colorscheme gruvbox}

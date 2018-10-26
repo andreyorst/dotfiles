@@ -7,7 +7,7 @@
 # │ Rest of .dotfiles:             │
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────
- 
+
 define-command -override -docstring "call recursive-search for selection, if selection is only one character selects WORD under cursor" \
 smart-gf %{ execute-keys -with-hooks %sh{
     if [ "$(expr $(echo $kak_selection | wc -m) - 1)" = "1" ]; then
@@ -48,39 +48,6 @@ define-command -override -hidden -params 1 recursive-search %{ evaluate-commands
     done
     echo "echo -markup '{Error}unable to find file ''$1'''"
 }}
-
-
-hook global WinSetOption filetype=kak %{ try %{
-    add-highlighter window/if_termux        regex \bplug\b\h+((?=")|(?=')|(?=%)|(?=\w)) 0:keyword
-    add-highlighter window/else     regex \bdo\b\h+((?=")|(?=')|(?=%)|(?=\w)) 0:keyword
-}}
-
-hook  global WinSetOption filetype=(?!kak).* %{ try %{
-    remove-highlighter window/if_termux
-    remove-highlighter window/else
-}}
-define-command -override -docstring "run command if Kakoune was launched in termux" if-termux -params 3 %{
-    evaluate-commands %sh{
-        case $PATH in
-        *termux*)
-            commands=$1 ;;
-        *)
-            if [ "$2" = "else" ]; then
-                commands=$3
-            else
-                skip=1
-            fi
-            ;;
-        esac
-        if [ -z $skip ]; then
-            IFS='
-'
-            for cmd in "$commands"; do
-                echo "$cmd"
-            done
-        fi
-    }
-}
 
 define-command -override -docstring "select a word under cursor, or add cursor on next occurence of current selection" \
 select-or-add-cursor %{ execute-keys -save-regs '' %sh{
