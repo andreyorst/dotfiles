@@ -72,14 +72,14 @@ define-command -override leading-tabs-to-spaces %{
     execute-keys %opt{cline}g %opt{ccol}lh
 }
 
-define-command noexpandtab %{
+define-command -override noexpandtab %{
     hook -group noexpandtab global NormalKey <gt> %{
         execute-keys -draft "xs^\h+<ret><a-@>"
     }
     remove-hooks global expandtab
 }
 
-define-command expandtab %{
+define-command -override expandtab %{
     hook -group expandtab global InsertChar \t %{
         execute-keys -draft h@
     }
@@ -89,3 +89,27 @@ define-command expandtab %{
     remove-hooks global noexpandtab
 }
 
+define-command -override -docstring "change position of statusline to another side of the screen" \
+toggle-statusline-position %{
+    set-option -add global ui_options %sh{
+        if [ -z "${kak_opt_ui_options##*ncurses_status_on_top=yes*}" ]; then
+            echo "ncurses_status_on_top=no"
+        else
+            echo "ncurses_status_on_top=yes"
+        fi
+    }
+    try %{ generate-statusline }
+}
+
+define-command -override -docstring "generate statusline" \
+generate-statusline %{ set-option global modelinefmt %sh{
+    blue="rgb:83a598"
+    black="rgb:32302f"
+    magenta="rgb:d3869b"
+    if [ -z "${kak_opt_ui_options##*ncurses_status_on_top=yes*}" ]; then
+        left="{$blue}{$black,$blue+b}"; right="{$blue,$black}"
+    else
+        left="{$blue}{$black,$blue+b}"; right="{$blue,$black}"
+    fi
+    echo "$left %val{bufname} {{context_info}} $right {{mode_info}} {$blue+b}%val{cursor_line}{default}:{$blue+b}%val{cursor_char_column} $left %opt{filetype} $right {$magenta,default}%val{client} $left %val{session} {$blue,$black}$right "
+}}
