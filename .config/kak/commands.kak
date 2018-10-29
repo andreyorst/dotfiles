@@ -111,5 +111,5 @@ generate-statusline %{ set-option global modelinefmt %sh{
     else
         left="{$blue}{$black,$blue+b}"; right="{$blue,$black}"
     fi
-    echo "$left %val{bufname} {{context_info}} $right {{mode_info}} {$blue+b}%val{cursor_line}{default}:{$blue+b}%val{cursor_char_column} $left %opt{filetype} $right {$magenta,default}%val{client} $left %val{session} {$blue,$black}$right "
+    echo "$left %val{bufname}{{context_info}} $right {{mode_info}} {$blue+b}%val{cursor_line}{default}:{$blue+b}%val{cursor_char_column} $left %opt{filetype} $right {$magenta,default}%val{client} $left %val{session} {$blue,$black}$right "
 }}
