@@ -6,7 +6,7 @@
 # ╞════════════════════════════════╡
 # │ Rest of .dotfiles:             │
 # │ GitHub.com/andreyorst/dotfiles │
-# ╰────────────────────────────────
+# ╰────────────────────────────────╯
 
 define-command -override -docstring "call recursive-search for selection, if selection is only one character selects WORD under cursor" \
 smart-gf %{ execute-keys -with-hooks %sh{
@@ -89,27 +89,3 @@ define-command -override expandtab %{
     remove-hooks global noexpandtab
 }
 
-define-command -override -docstring "change position of statusline to another side of the screen" \
-toggle-statusline-position %{
-    set-option -add global ui_options %sh{
-        if [ -z "${kak_opt_ui_options##*ncurses_status_on_top=yes*}" ]; then
-            echo "ncurses_status_on_top=no"
-        else
-            echo "ncurses_status_on_top=yes"
-        fi
-    }
-    try %{ generate-statusline }
-}
-
-define-command -override -docstring "generate statusline" \
-generate-statusline %{ set-option global modelinefmt %sh{
-    blue="rgb:83a598"
-    black="rgb:32302f"
-    magenta="rgb:d3869b"
-    if [ -z "${kak_opt_ui_options##*ncurses_status_on_top=yes*}" ]; then
-        left="{$blue}{$black,$blue+b}"; right="{$blue,$black}"
-    else
-        left="{$blue}{$black,$blue+b}"; right="{$blue,$black}"
-    fi
-    echo "$left %val{bufname}{{context_info}} $right {{mode_info}} {$blue+b}%val{cursor_line}{default}:{$blue+b}%val{cursor_char_column} $left %opt{filetype} $right {$magenta,default}%val{client} $left %val{session} {$blue,$black}$right "
-}}

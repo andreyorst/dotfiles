@@ -21,7 +21,7 @@ hook -group ope_delim global WinCreate .* %{
 }
 
 # C/Cpp/Rust syntax fixes
-hook global WinSetOption filetype=(c|cpp|rust) %{
+hook global WinSetOption filetype=(c|cpp|rust|java) %{
     add-highlighter buffer/ regex \w+(\h+)?(?=\() 0:function
     add-highlighter buffer/ regex ((?<=\.)|(?<=->))\w+\b(?![>"\(]) 0:child
     add-highlighter buffer/ regex ((?<=\.)|(?<=->))\w+(\h+)?(?=\() 0:function
