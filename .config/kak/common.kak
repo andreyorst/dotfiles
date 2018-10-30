@@ -18,15 +18,18 @@ set-option global indentwidth 4
 
 # UI
 colorscheme base16-guvbox-dark-soft
-set-option global ui_options ncurses_status_on_top=yes
-try %{ generate-statusline }
-
+set-option global modelinefmt %sh{
+    blue="rgb:83a598"
+    black="rgb:32302f"
+    purple="rgb:d3869b"
+    echo "{$blue}{$black,$blue+b} %val{bufname}{{context_info}} {$blue,$black} {{mode_info}} {$blue+b} {$blue+b}%val{cursor_line}{default+b}:{$blue+b}{$blue+b}%val{cursor_char_column} {$blue}{$black,$blue+b} %opt{filetype} {$black,$blue}{default,default} {$purple,default}%val{client} {$blue}{$black,$blue+b} %val{session} "
+}
 
 # Highlighters
 hook global KakBegin .* %{
     add-highlighter global/numbers number-lines -relative -hlcursor -separator '  '
     add-highlighter global/matching show-matching
-    add-highlighter global/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc "⋅"
+    add-highlighter global/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
     add-highlighter global/wrap wrap -word -indent -marker ↪
 }
 
