@@ -89,20 +89,3 @@ define-command -override expandtab %{
     remove-hooks global noexpandtab
 }
 
-declare-option str statusline_pos_percent
-
-define-command -override update-statusline-pos-percent %{ evaluate-commands %sh{
-    echo "set-option window statusline_pos_percent $(($kak_cursor_line * 100 / $kak_buf_line_count))%"
-}}
-
-declare-option str statusline_git_branch
-
-define-command -override update-statusline-git-branch %{ set-option global statusline_git_branch %sh{
-    branch=$(cd "${kak_buffile%/*}" 2>/dev/null && git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    if [ ! -z $branch ]; then
-        echo " $branch  "
-    else
-        echo ""
-    fi
-}}
-

@@ -16,35 +16,6 @@ evaluate-commands %sh{
 set-option global tabstop 4
 set-option global indentwidth 4
 
-hook global WinCreate .* %{
-    update-statusline-pos-percent
-    hook window NormalKey (j|k) update-statusline-pos-percent
-    hook window NormalIdle .* update-statusline-pos-percent
-}
-
-hook global FocusIn .* %{update-statusline-git-branch}
-hook global WinDisplay .* %{update-statusline-git-branch}
-
-# UI
-colorscheme base16-guvbox-dark-soft
-set-option global modelinefmt %sh{
-    bg0="rgb:282828"
-    bg1="rgb:3c3836"
-    bg2="rgb:504945"
-    bg3="rgb:665c54"
-    bg4="rgb:7c6f64"
-
-    fg0="rgb:fbf1c7"
-    fg1="rgb:ebdbb2"
-    fg2="rgb:d5c4a1"
-    fg3="rgb:bdae93"
-    fg4="rgb:a89984"
-
-    echo "{$fg2}%opt{statusline_git_branch}{$fg4}{$bg0,$fg4} %val{bufname}{{context_info}} {$fg4,$bg2}{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2},{$fg2,$bg2}%val{cursor_char_column} {$bg2,default} {{mode_info}} {$bg2}{$fg2,$bg2} %opt{filetype} {$bg3,$bg2}{$fg1,$bg3} %val{client} {$bg4,$bg3}{$fg0,$bg4} %val{session} {$fg4,$bg4}{$bg0,$fg4} %opt{statusline_pos_percent} "
-
-#{$fg3,$bg4}{$bg4,$fg3}  "
-}
-
 # Highlighters
 hook global KakBegin .* %{
     add-highlighter global/numbers number-lines -relative -hlcursor -separator '  '
@@ -52,6 +23,9 @@ hook global KakBegin .* %{
     add-highlighter global/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
     add-highlighter global/wrap wrap -word -indent -marker ↪
 }
+
+# Theme
+colorscheme base16-guvbox-dark-soft
 
 # Maps
 map global normal ''     ': comment-line<ret>'               -docstring "<c-/> to comment/uncomment selection"
