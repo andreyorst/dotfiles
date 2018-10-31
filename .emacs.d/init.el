@@ -56,6 +56,10 @@
 
 (use-package flx :ensure t)
 
+(use-package evil :ensure t
+  :config
+  (evil-mode 1))
+
 (use-package company-flx :ensure t)
 
 (use-package ivy :ensure t
@@ -193,4 +197,3 @@
 
 (provide 'init)
 ;;; init.el ends here
-
