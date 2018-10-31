@@ -59,8 +59,7 @@ evaluate-commands %sh{
         face global keyword   ${b_purple}
         face global operator  ${b_aqua}
         face global attribute ${b_orange}
-        face global comment   ${b_gray}
- try %{ face global comment   ${b_gray}+a }
+        face global comment   ${b_gray}+af
         face global meta      ${b_red}
         face global builtin   default+b
 
@@ -88,17 +87,16 @@ evaluate-commands %sh{
         face global MenuForeground     ${fg1},${bg3}+b
         face global MenuBackground     default,${bg2}
         face global MenuInfo           ${b_blue}
-        face global Information        ${bg0_s},${b_blue}+b
+        face global Information        ${bg1},${fg4}+b
         face global Error              ${b_red},default+b
-        face global StatusLine         ${fg1},${bg0_s}
-        face global StatusLineMode     ${b_blue}+b
-        face global StatusLineInfo     ${b_purple}
+        face global StatusLine         ${fg1},${bg1}
+        face global StatusLineMode     ${fg1},${bg1}
+        face global StatusLineInfo     ${fg3}
         face global StatusLineValue    ${b_red}
         face global StatusCursor       ${bg0},${fg0}
         face global Prompt             default
         face global MatchingChar       default,${bg3}
         face global BufferPadding      ${bg0_s},${bg0_s}
-        face global Whitespace         ${bg2}
- try %{ face global Whitespace         ${bg2}+f }
+        face global Whitespace         ${bg2}+f
     "
 }
