@@ -49,9 +49,9 @@ define-command -override -hidden -params 1 recursive-search %{ evaluate-commands
     echo "echo -markup '{Error}unable to find file ''$1'''"
 }}
 
-define-command -override -docstring "select a word under cursor, or add cursor on next occurence of current selection" \
+define-command -override -docstring "select a word under cursor, or add cursor on next occurrence of current selection" \
 select-or-add-cursor %{ execute-keys -save-regs '' %sh{
-    if [ "$(expr $(echo $kak_selection | wc -m) - 1)" = "1" ]; then
+    if [ $(expr $(echo $kak_selection | wc -m) - 1) -eq 1 ]; then
         echo "<a-i>w*"
     else
         echo "*<s-n>"
