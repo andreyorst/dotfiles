@@ -22,18 +22,18 @@ hook -group ope_delim global WinCreate .* %{
 
 # C/Cpp/Rust syntax fixes
 hook global WinSetOption filetype=(c|cpp|rust|java) %{
-    add-highlighter buffer/ regex \w+(\h+)?(?=\() 0:function
-    add-highlighter buffer/ regex ((?<=\.)|(?<=->))\w+\b(?![>"\(]) 0:child
-    add-highlighter buffer/ regex ((?<=\.)|(?<=->))\w+(\h+)?(?=\() 0:function
+    add-highlighter buffer/functions      regex \w+(\h+)?(?=\() 0:function
+    add-highlighter buffer/child          regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>"\(]) 0:child
+    add-highlighter buffer/child_function regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
 }
 
 # C/Cpp
 hook global WinSetOption filetype=(c|cpp) %{
     # Custom C/Cpp types highlighing
-    add-highlighter window/ regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
-    add-highlighter window/ regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
-    add-highlighter window/ regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
-    add-highlighter window/ regex \b\w+_t\b 0:type
+    add-highlighter window/c_types      regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
+    add-highlighter window/c_types2     regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
+    add-highlighter window/c_types3     regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
+    add-highlighter window/c_user_types regex \b(\w+_t|lambda)\b 0:type
     set-option window formatcmd 'clang-format'
     noexpandtab
 }
