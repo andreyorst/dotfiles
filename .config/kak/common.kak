@@ -16,9 +16,6 @@ evaluate-commands %sh{
 set-option global tabstop 4
 set-option global indentwidth 4
 
-declare-option str statusline_pos_percent
-declare-option str statusline_git_branch
-
 hook global WinCreate .* %{
     update-statusline-pos-percent
     hook window NormalKey (j|k) update-statusline-pos-percent
@@ -27,19 +24,6 @@ hook global WinCreate .* %{
 
 hook global FocusIn .* %{update-statusline-git-branch}
 hook global WinDisplay .* %{update-statusline-git-branch}
-
-define-command -override update-statusline-pos-percent %{ evaluate-commands %sh{
-    echo "set-option window statusline_pos_percent $(($kak_cursor_line * 100 / $kak_buf_line_count))%"
-}}
-
-define-command -override update-statusline-git-branch %{ set-option global statusline_git_branch %sh{
-    branch=$(cd "${kak_buffile%/*}" 2>/dev/null && git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    if [ ! -z $branch ]; then
-        echo " $branch  "
-    else
-        echo ""
-    fi
-}}
 
 # UI
 colorscheme base16-guvbox-dark-soft
@@ -56,7 +40,9 @@ set-option global modelinefmt %sh{
     fg3="rgb:bdae93"
     fg4="rgb:a89984"
 
-    echo "{$fg3}%opt{statusline_git_branch}{$fg4}{$bg0,$fg4+b} %val{bufname}{{context_info}} {$fg4,default} {{mode_info}} {$bg4+b}| {$fg3}%val{cursor_line}{$fg3},{$fg3}%val{cursor_char_column} {$bg4+b}| {$fg3}%opt{statusline_pos_percent} {$bg2}{$fg2,$bg2} %opt{filetype} {$bg3,$bg2}{$fg1,$bg3} %val{client} {$bg4,$bg3}{$fg0,$bg4} %val{session} "
+    echo "{$fg2}%opt{statusline_git_branch}{$fg4}{$bg0,$fg4} %val{bufname}{{context_info}} {$fg4,$bg2}{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2},{$fg2,$bg2}%val{cursor_char_column} {$bg2,default} {{mode_info}} {$bg2}{$fg2,$bg2} %opt{filetype} {$bg3,$bg2}{$fg1,$bg3} %val{client} {$bg4,$bg3}{$fg0,$bg4} %val{session} {$fg4,$bg4}{$bg0,$fg4} %opt{statusline_pos_percent} "
+
+#{$fg3,$bg4}{$bg4,$fg3}  "
 }
 
 # Highlighters
