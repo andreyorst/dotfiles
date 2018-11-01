@@ -77,11 +77,45 @@ modeline-rebuild %{
             right1="{$bg2,$fg4}$kak_opt_modeline_separator_left{$bg2}"
             right2="{$bg1,$bg2}$kak_opt_modeline_separator_left{$bg2}"
         fi
-        echo "{$fg3}%opt{modeline_git_branch}{$fg4}$left{$bg0,$fg4} %val{bufname}{{context_info}}%opt{modeline_readonly} {$fg4,$bg2}$right1{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2},{$fg2,$bg2}%val{cursor_char_column} {$bg2,default}$right2 {{mode_info}} {$bg2}$left{$fg2,$bg2} %opt{filetype} {$bg3,$bg2}$left{$fg1,$bg3} %val{client} {$bg4,$bg3}$left{$fg0,$bg4} %val{session} {$fg4,$bg4}$left{$bg0,$fg4} %opt{modeline_pos_percent} "
+        echo "{$fg3}%opt{modeline_git_branch}{$fg4}$left{$bg0,$fg4} %val{bufname}{{context_info}}%opt{modeline_readonly} {$fg4,$bg2}$right1{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2}:{$fg2,$bg2}%val{cursor_char_column} {$bg2,default}$right2 {{mode_info}} {$bg2}$left{$fg2,$bg2} %opt{filetype} {$bg3,$bg2}$left{$fg1,$bg3} %val{client} {$bg4,$bg3}$left{$fg0,$bg4} %val{session} {$fg4,$bg4}$left{$bg0,$fg4} ≣ %opt{modeline_pos_percent} "
     }
     update-modeline-branch
     check-readonly
 }
+
+define-command -override -docstring "change separators for modeline" \
+modeline-separator -params 1 -shell-script-candidates %{ echo "arrow
+curve
+flame
+triangle"} %{ evaluate-commands %sh{
+    separator=$1
+    case $separator in
+    arrow)
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_bidirectional_separators false"
+        ;;
+    curve)
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_bidirectional_separators false"
+        ;;
+    triangle)
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_separator_right ''"
+        echo "set-option window modeline_bidirectional_separators true"
+        ;;
+    flame)
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_bidirectional_separators false"
+        ;;
+    *)
+        ;;
+    esac
+    echo "modeline-rebuild"
+}}
 
 modeline-rebuild
 
