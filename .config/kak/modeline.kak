@@ -196,73 +196,26 @@ session
 position"} %{ evaluate-commands %sh{
     separator=$1
     case $separator in
-    git)
-        if [ "$kak_opt_modeline_module_git" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_git $value"
-        ;;
-    bufname)
-        if [ "$kak_opt_modeline_module_bufname" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_bufname $value"
-        ;;
-    line_column)
-        if [ "$kak_opt_modeline_module_line_column" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_line_column $value"
-        ;;
-    mode_info)
-        if [ "$kak_opt_modeline_module_mode_info" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_mode_info $value"
-        ;;
-    filetype)
-        if [ "$kak_opt_modeline_module_filetype" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_filetype $value"
-        ;;
-    client)
-        if [ "$kak_opt_modeline_module_client" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_client $value"
-        ;;
-    session)
-        if [ "$kak_opt_modeline_module_session" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_session $value"
-        ;;
-    position)
-        if [ "$kak_opt_modeline_module_position" = "true" ]; then
-            value=false
-        else
-            value=true
-        fi
-        echo "set-option window modeline_module_position $value"
-        ;;
-    *)
-        ;;
+        git)
+            [ "$kak_opt_modeline_module_git" = "true" ] && value=false || value=true ;;
+        bufname)
+            [ "$kak_opt_modeline_module_bufname" = "true" ] && value=false || value=true ;;
+        line_column)
+            [ "$kak_opt_modeline_module_line_column" = "true" ] && value=false || value=true ;;
+        mode_info)
+            [ "$kak_opt_modeline_module_mode_info" = "true" ] && value=false || value=true ;;
+        filetype)
+            [ "$kak_opt_modeline_module_filetype" = "true" ] && value=false || value=true ;;
+        client)
+            [ "$kak_opt_modeline_module_client" = "true" ] && value=false || value=true ;;
+        session)
+            [ "$kak_opt_modeline_module_session" = "true" ] && value=false || value=true ;;
+        position)
+            [ "$kak_opt_modeline_module_position" = "true" ] && value=false || value=true ;;
+        *)
+            ;;
     esac
+    echo "set-option global modeline_module_$1 $value"
     echo "modeline-rebuild"
 }}
 
