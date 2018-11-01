@@ -121,7 +121,7 @@ modeline-rebuild %{
             position="{$fg4,$next_bg}$left{$bg0,$fg4} ≣ %opt{modeline_pos_percent} "
         fi
 
-        echo "$git$bufname$line_column$mode_info$filetype$client$session$position "
+        echo "$git$bufname$line_column$mode_info$filetype$client$session$position"
     }
     modeline-update-branch
     modeline-update-readonly
@@ -161,5 +161,84 @@ triangle"} %{ evaluate-commands %sh{
     echo "modeline-rebuild"
 }}
 
-modeline-rebuild
+define-command -override -docstring "toggle parts of modeline" \
+modeline-toggle -params 1 -shell-script-candidates %{ echo "git
+bufname
+line_column
+mode_info
+filetype
+client
+session
+position"} %{ evaluate-commands %sh{
+    separator=$1
+    case $separator in
+    git)
+        if [ "$kak_opt_modeline_module_git" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_git $value"
+        ;;
+    bufname)
+        if [ "$kak_opt_modeline_module_bufname" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_bufname $value"
+        ;;
+    line_column)
+        if [ "$kak_opt_modeline_module_line_column" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_line_column $value"
+        ;;
+    mode_info)
+        if [ "$kak_opt_modeline_module_mode_info" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_mode_info $value"
+        ;;
+    filetype)
+        if [ "$kak_opt_modeline_module_filetype" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_filetype $value"
+        ;;
+    client)
+        if [ "$kak_opt_modeline_module_client" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_client $value"
+        ;;
+    session)
+        if [ "$kak_opt_modeline_module_session" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_session $value"
+        ;;
+    position)
+        if [ "$kak_opt_modeline_module_position" = "true" ]; then
+            value=false
+        else
+            value=true
+        fi
+        echo "set-option global modeline_module_position $value"
+        ;;
+    *)
+        ;;
+    esac
+    echo "modeline-rebuild"
+}}
 
