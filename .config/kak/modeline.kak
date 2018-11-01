@@ -59,7 +59,7 @@ hook global WinCreate .* %{
     hook window NormalIdle .* modeline-update-position
 }
 
-hook global WinDisplay .* %{modeline-update-branch; modeline-update-readonly}
+hook global WinDisplay .* %{modeline-rebuild}
 
 # Modeline
 define-command -override -docstring "Build modeline with new separators" \
@@ -135,25 +135,25 @@ triangle"} %{ evaluate-commands %sh{
     separator=$1
     case $separator in
     arrow)
-        echo "set-option global modeline_separator_left ''"
-        echo "set-option global modeline_separator_left_thin ''"
-        echo "set-option global modeline_bidirectional_separators false"
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_bidirectional_separators false"
         ;;
     curve)
-        echo "set-option global modeline_separator_left ''"
-        echo "set-option global modeline_separator_left_thin ''"
-        echo "set-option global modeline_bidirectional_separators false"
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_bidirectional_separators false"
         ;;
     triangle)
-        echo "set-option global modeline_separator_left ''"
-        echo "set-option global modeline_separator_left_thin ''"
-        echo "set-option global modeline_separator_right ''"
-        echo "set-option global modeline_bidirectional_separators true"
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_separator_right ''"
+        echo "set-option window modeline_bidirectional_separators true"
         ;;
     flame)
-        echo "set-option global modeline_separator_left ''"
-        echo "set-option global modeline_separator_left_thin ''"
-        echo "set-option global modeline_bidirectional_separators false"
+        echo "set-option window modeline_separator_left ''"
+        echo "set-option window modeline_separator_left_thin ''"
+        echo "set-option window modeline_bidirectional_separators false"
         ;;
     *)
         ;;
@@ -178,7 +178,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_git $value"
+        echo "set-option window modeline_module_git $value"
         ;;
     bufname)
         if [ "$kak_opt_modeline_module_bufname" = "true" ]; then
@@ -186,7 +186,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_bufname $value"
+        echo "set-option window modeline_module_bufname $value"
         ;;
     line_column)
         if [ "$kak_opt_modeline_module_line_column" = "true" ]; then
@@ -194,7 +194,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_line_column $value"
+        echo "set-option window modeline_module_line_column $value"
         ;;
     mode_info)
         if [ "$kak_opt_modeline_module_mode_info" = "true" ]; then
@@ -202,7 +202,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_mode_info $value"
+        echo "set-option window modeline_module_mode_info $value"
         ;;
     filetype)
         if [ "$kak_opt_modeline_module_filetype" = "true" ]; then
@@ -210,7 +210,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_filetype $value"
+        echo "set-option window modeline_module_filetype $value"
         ;;
     client)
         if [ "$kak_opt_modeline_module_client" = "true" ]; then
@@ -218,7 +218,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_client $value"
+        echo "set-option window modeline_module_client $value"
         ;;
     session)
         if [ "$kak_opt_modeline_module_session" = "true" ]; then
@@ -226,7 +226,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_session $value"
+        echo "set-option window modeline_module_session $value"
         ;;
     position)
         if [ "$kak_opt_modeline_module_position" = "true" ]; then
@@ -234,7 +234,7 @@ position"} %{ evaluate-commands %sh{
         else
             value=true
         fi
-        echo "set-option global modeline_module_position $value"
+        echo "set-option window modeline_module_position $value"
         ;;
     *)
         ;;

@@ -26,7 +26,11 @@ hook global KakBegin .* %{
 
 # Theme
 colorscheme base16-guvbox-dark-soft
-try %{modeline-separator triangle}
+
+set-option global modeline_separator_left ''
+set-option global modeline_separator_left_thin ''
+set-option global modeline_separator_right ''
+set-option global modeline_bidirectional_separators true
 
 # Maps
 map global normal ''     ': comment-line<ret>'               -docstring "<c-/> to comment/uncomment selection"
