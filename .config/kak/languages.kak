@@ -82,3 +82,10 @@ hook global WinSetOption filetype=kak %{
     expandtab
 }
 
+# Makefile
+hook global BufCreate .*\.mk$ %{
+    set-option buffer filetype makefile
+}
+hook global WinSetOption filetype=makefile %{
+    noexpandtab
+}
