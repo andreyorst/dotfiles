@@ -57,3 +57,4 @@ plug "ul/kak-lsp" noload do %{cargo build --release} %{
         set-option global lsp_hover_anchor true
     }
 }
+

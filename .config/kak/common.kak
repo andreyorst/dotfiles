@@ -18,7 +18,7 @@ set-option global indentwidth 4
 
 # Highlighters
 hook global KakBegin .* %{
-    add-highlighter global/numbers number-lines -relative -hlcursor -separator '  '
+    add-highlighter global/numbers number-lines -relative -hlcursor -separator ' '
     add-highlighter global/matching show-matching
     add-highlighter global/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
     add-highlighter global/wrap wrap -word -indent -marker ↪

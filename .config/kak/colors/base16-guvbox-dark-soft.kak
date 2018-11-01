@@ -81,9 +81,9 @@ evaluate-commands %sh{
         face global SecondaryCursor    ${bg0},${fg3}
         face global PrimaryCursorEol   ${bg0},${fg2}
         face global SecondaryCursorEol ${bg0},${fg4}
-        face global LineNumbers        ${b_gray},${bg0_s}
-        face global LineNumberCursor   ${fg0},${bg0_s}
-        face global LineNumbersWrapped ${bg0_s},${bg0_s}
+        face global LineNumbers        ${bg3}
+        face global LineNumberCursor   ${fg3}
+        face global LineNumbersWrapped ${bg0_s}
         face global MenuForeground     ${fg1},${bg3}+b
         face global MenuBackground     default,${bg2}
         face global MenuInfo           ${b_blue}
