@@ -32,6 +32,12 @@ set-option global modeline_separator_left_thin ''
 set-option global modeline_separator_right ''
 set-option global modeline_bidirectional_separators true
 
+# hook global BufCreate .* %{
+#     hook -once global WinDisplay .* %{
+#         modeline-separator random
+#     }
+# }
+
 # Maps
 map global normal ''     ': comment-line<ret>'               -docstring "<c-/> to comment/uncomment selection"
 map global normal '<c-r>' 'U'                                 -docstring "vim-like redo"
