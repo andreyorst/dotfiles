@@ -97,17 +97,29 @@ modeline-rebuild %{
             next_fg=$fg4
         fi
         if [ "$kak_opt_modeline_module_line_column" = "true" ]; then
+            if [ "$kak_opt_modeline_module_bufname" = "false" ]; then
+                right1="{$bg2,$bg1}$kak_opt_modeline_separator_left{$bg2}"
+            fi
             line_column="{${next_fg:-$bg1},${next_bg:-$bg2}}$right1{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2}:{$fg2,$bg2}%val{cursor_char_column} "
             next_bg=$bg2
             next_fg=$bg2
         fi
         if [ "$kak_opt_modeline_module_mode_info" = "true" ]; then
+            if [ "$kak_opt_modeline_module_line_column" = "false" ]; then
+                if [ "$kak_opt_modeline_module_bufname" = "true" ]; then
+                    if [ "$kak_opt_modeline_bidirectional_separators" = "false" ]; then
+                        right2="{$bg1,$fg4}$kak_opt_modeline_separator_left{$bg2}"
+                    fi
+                fi
+            fi
             mode_info="{${next_fg:-default},default}$right2 {{mode_info}} "
-            next_bg=default
+            next_bg="default"
         fi
         if [ "$kak_opt_modeline_module_filetype" = "true" ]; then
-            filetype="{$bg2,$next_bg}$left{$fg2,$bg2} %opt{filetype} "
-            next_bg=$bg2
+            if [ ! -z "$kak_opt_filetype" ]; then
+                filetype="{$bg2,$next_bg}$left{$fg2,$bg2} %opt{filetype} "
+                next_bg=$bg2
+            fi
         fi
         if [ "$kak_opt_modeline_module_client" = "true" ]; then
             client="{$bg3,$next_bg}$left{$fg1,$bg3} %val{client} "
