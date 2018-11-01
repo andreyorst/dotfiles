@@ -12,10 +12,10 @@ evaluate-commands %sh{
     config_files="
         plugins/plug.kak/rc/plug.kak
         plugins.kak
+        modeline.kak
         tmux.kak
         commands.kak
         common.kak
-        modeline.kak
         languages.kak
     "
 

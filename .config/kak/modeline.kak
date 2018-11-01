@@ -9,14 +9,14 @@
 # ╰────────────────────────────────╯
 
 # Options
-declare-option str modeline_separator_left ''
-declare-option str modeline_separator_left_thin ''
-declare-option str modeline_separator_right ''
-declare-option bool modeline_bidirectional_separators true
+declare-option -hidden str modeline_separator_left ''
+declare-option -hidden str modeline_separator_left_thin ''
+declare-option -hidden str modeline_separator_right ''
+declare-option -hidden bool modeline_bidirectional_separators false
 
-declare-option str modeline_pos_percent
-declare-option str modeline_git_branch
-declare-option str modeline_readonly
+declare-option -hidden str modeline_pos_percent
+declare-option -hidden str modeline_git_branch
+declare-option -hidden str modeline_readonly
 
 declare-option bool modeline_module_git true
 declare-option bool modeline_module_bufname true
@@ -29,12 +29,12 @@ declare-option bool modeline_module_position true
 
 # Commands
 define-command -override -hidden \
-update-modeline-pos %{ evaluate-commands %sh{
+modeline-update-position %{ evaluate-commands %sh{
     echo "set-option window modeline_pos_percent $(($kak_cursor_line * 100 / $kak_buf_line_count))%"
 }}
 
 define-command -override -hidden \
-check-readonly %{ set-option global modeline_readonly %sh{
+modeline-update-readonly %{ set-option global modeline_readonly %sh{
     if [ -w ${kak_buffile} ]; then
         echo ''
     else
@@ -43,7 +43,7 @@ check-readonly %{ set-option global modeline_readonly %sh{
 }}
 
 define-command -override -hidden \
-update-modeline-branch %{ set-option global modeline_git_branch %sh{
+modeline-update-branch %{ set-option global modeline_git_branch %sh{
     branch=$(cd "${kak_buffile%/*}" 2>/dev/null && git rev-parse --abbrev-ref HEAD 2>/dev/null)
     if [ ! -z $branch ]; then
         echo "$kak_opt_modeline_separator_left_thin $branch "
@@ -54,15 +54,14 @@ update-modeline-branch %{ set-option global modeline_git_branch %sh{
 
 # Hooks
 hook global WinCreate .* %{
-    update-modeline-pos
-    hook window NormalKey (j|k) update-modeline-pos
-    hook window NormalIdle .* update-modeline-pos
+    modeline-update-position
+    hook window NormalKey (j|k) modeline-update-position
+    hook window NormalIdle .* modeline-update-position
 }
 
-hook global WinDisplay .* %{update-modeline-branch; check-readonly}
+hook global WinDisplay .* %{modeline-update-branch; modeline-update-readonly}
 
 # Modeline
-
 define-command -override -docstring "Build modeline with new separators" \
 modeline-rebuild %{
         set-option global modelinefmt %sh{
@@ -89,33 +88,43 @@ modeline-rebuild %{
 
         if [ "$kak_opt_modeline_module_git" = "true" ]; then
             git="{$fg3}%opt{modeline_git_branch} "
+            next_bg=$bg2
+            next_fg=$bg1
         fi
         if [ "$kak_opt_modeline_module_bufname" = "true" ]; then
-            bufname="{$fg4}$left{$bg0,$fg4} %val{bufname}{{context_info}}%opt{modeline_readonly} {$fg4,$bg2}$right1{default,$bg2} "
+            bufname="{$fg4}$left{$bg0,$fg4} %val{bufname}{{context_info}}%opt{modeline_readonly} "
+            next_bg=$bg2
+            next_fg=$fg4
         fi
         if [ "$kak_opt_modeline_module_line_column" = "true" ]; then
-            line_column="{$fg2,$bg2}%val{cursor_line}{$fg2,$bg2}:{$fg2,$bg2}%val{cursor_char_column} "
+            line_column="{${next_fg:-$bg1},${next_bg:-$bg2}}$right1{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2}:{$fg2,$bg2}%val{cursor_char_column} "
+            next_bg=$bg2
+            next_fg=$bg2
         fi
         if [ "$kak_opt_modeline_module_mode_info" = "true" ]; then
-            mode_info="{$bg2,default}$right2 {{mode_info}} "
+            mode_info="{${next_fg:-default},default}$right2 {{mode_info}} "
+            next_bg=default
         fi
         if [ "$kak_opt_modeline_module_filetype" = "true" ]; then
-            filetype="{$bg2}$left{$fg2,$bg2} %opt{filetype} "
+            filetype="{$bg2,$next_bg}$left{$fg2,$bg2} %opt{filetype} "
+            next_bg=$bg2
         fi
         if [ "$kak_opt_modeline_module_client" = "true" ]; then
-            client="{$bg3,$bg2}$left{$fg1,$bg3} %val{client} "
+            client="{$bg3,$next_bg}$left{$fg1,$bg3} %val{client} "
+            next_bg=$bg3
         fi
         if [ "$kak_opt_modeline_module_session" = "true" ]; then
-            session="{$bg4,$bg3}$left{$fg0,$bg4} %val{session} "
+            session="{$bg4,$next_bg}$left{$fg0,$bg4} %val{session} "
+            next_bg=$bg4
         fi
         if [ "$kak_opt_modeline_module_position" = "true" ]; then
-            position="{$fg4,$bg4}$left{$bg0,$fg4} ≣ %opt{modeline_pos_percent} "
+            position="{$fg4,$next_bg}$left{$bg0,$fg4} ≣ %opt{modeline_pos_percent} "
         fi
 
         echo "$git$bufname$line_column$mode_info$filetype$client$session$position "
     }
-    update-modeline-branch
-    check-readonly
+    modeline-update-branch
+    modeline-update-readonly
 }
 
 define-command -override -docstring "change separators for modeline" \
@@ -126,25 +135,25 @@ triangle"} %{ evaluate-commands %sh{
     separator=$1
     case $separator in
     arrow)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_bidirectional_separators false"
+        echo "set-option global modeline_separator_left ''"
+        echo "set-option global modeline_separator_left_thin ''"
+        echo "set-option global modeline_bidirectional_separators false"
         ;;
     curve)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_bidirectional_separators false"
+        echo "set-option global modeline_separator_left ''"
+        echo "set-option global modeline_separator_left_thin ''"
+        echo "set-option global modeline_bidirectional_separators false"
         ;;
     triangle)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_separator_right ''"
-        echo "set-option window modeline_bidirectional_separators true"
+        echo "set-option global modeline_separator_left ''"
+        echo "set-option global modeline_separator_left_thin ''"
+        echo "set-option global modeline_separator_right ''"
+        echo "set-option global modeline_bidirectional_separators true"
         ;;
     flame)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_bidirectional_separators false"
+        echo "set-option global modeline_separator_left ''"
+        echo "set-option global modeline_separator_left_thin ''"
+        echo "set-option global modeline_bidirectional_separators false"
         ;;
     *)
         ;;
