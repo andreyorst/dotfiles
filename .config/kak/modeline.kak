@@ -18,6 +18,15 @@ declare-option str modeline_pos_percent
 declare-option str modeline_git_branch
 declare-option str modeline_readonly
 
+declare-option bool modeline_module_git true
+declare-option bool modeline_module_bufname true
+declare-option bool modeline_module_line_column true
+declare-option bool modeline_module_mode_info true
+declare-option bool modeline_module_filetype true
+declare-option bool modeline_module_client true
+declare-option bool modeline_module_session true
+declare-option bool modeline_module_position true
+
 # Commands
 define-command -override -hidden \
 update-modeline-pos %{ evaluate-commands %sh{
@@ -37,7 +46,7 @@ define-command -override -hidden \
 update-modeline-branch %{ set-option global modeline_git_branch %sh{
     branch=$(cd "${kak_buffile%/*}" 2>/dev/null && git rev-parse --abbrev-ref HEAD 2>/dev/null)
     if [ ! -z $branch ]; then
-        echo "$kak_opt_modeline_separator_left_thin $branch  "
+        echo "$kak_opt_modeline_separator_left_thin $branch "
     else
         echo ""
     fi
@@ -77,7 +86,33 @@ modeline-rebuild %{
             right1="{$bg2,$fg4}$kak_opt_modeline_separator_left{$bg2}"
             right2="{$bg1,$bg2}$kak_opt_modeline_separator_left{$bg2}"
         fi
-        echo "{$fg3}%opt{modeline_git_branch}{$fg4}$left{$bg0,$fg4} %val{bufname}{{context_info}}%opt{modeline_readonly} {$fg4,$bg2}$right1{default,$bg2} {$fg2,$bg2}%val{cursor_line}{$fg2,$bg2}:{$fg2,$bg2}%val{cursor_char_column} {$bg2,default}$right2 {{mode_info}} {$bg2}$left{$fg2,$bg2} %opt{filetype} {$bg3,$bg2}$left{$fg1,$bg3} %val{client} {$bg4,$bg3}$left{$fg0,$bg4} %val{session} {$fg4,$bg4}$left{$bg0,$fg4} ≣ %opt{modeline_pos_percent} "
+
+        if [ "$kak_opt_modeline_module_git" = "true" ]; then
+            git="{$fg3}%opt{modeline_git_branch} "
+        fi
+        if [ "$kak_opt_modeline_module_bufname" = "true" ]; then
+            bufname="{$fg4}$left{$bg0,$fg4} %val{bufname}{{context_info}}%opt{modeline_readonly} {$fg4,$bg2}$right1{default,$bg2} "
+        fi
+        if [ "$kak_opt_modeline_module_line_column" = "true" ]; then
+            line_column="{$fg2,$bg2}%val{cursor_line}{$fg2,$bg2}:{$fg2,$bg2}%val{cursor_char_column} "
+        fi
+        if [ "$kak_opt_modeline_module_mode_info" = "true" ]; then
+            mode_info="{$bg2,default}$right2 {{mode_info}} "
+        fi
+        if [ "$kak_opt_modeline_module_filetype" = "true" ]; then
+            filetype="{$bg2}$left{$fg2,$bg2} %opt{filetype} "
+        fi
+        if [ "$kak_opt_modeline_module_client" = "true" ]; then
+            client="{$bg3,$bg2}$left{$fg1,$bg3} %val{client} "
+        fi
+        if [ "$kak_opt_modeline_module_session" = "true" ]; then
+            session="{$bg4,$bg3}$left{$fg0,$bg4} %val{session} "
+        fi
+        if [ "$kak_opt_modeline_module_position" = "true" ]; then
+            position="{$fg4,$bg4}$left{$bg0,$fg4} ≣ %opt{modeline_pos_percent} "
+        fi
+
+        echo "$git$bufname$line_column$mode_info$filetype$client$session$position "
     }
     update-modeline-branch
     check-readonly
