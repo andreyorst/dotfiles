@@ -131,8 +131,20 @@ define-command -override -docstring "change separators for modeline" \
 modeline-separator -params 1 -shell-script-candidates %{ echo "arrow
 curve
 flame
-triangle"} %{ evaluate-commands %sh{
-    separator=$1
+triangle
+random
+"} %{ evaluate-commands %sh{
+    if [ "$1" = "random" ]; then
+        seed=$(($(date +%N | sed s:^\[0\]:1:) % 4))
+        case $seed in
+        0) separator=arrow ;;
+        1) separator=curve ;;
+        2) separator=triangle ;;
+        3) separator=flame ;;
+        esac
+    else
+        separator=$1
+    fi
     case $separator in
     arrow)
         echo "set-option window modeline_separator_left ''"
