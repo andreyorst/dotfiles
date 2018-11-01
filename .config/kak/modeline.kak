@@ -2,7 +2,7 @@
 # │ Author:     ║ File:            │
 # │ Andrey Orst ║ modeline.kak     │
 # ╞═════════════╩══════════════════╡
-# │ Custom modeline for Kakoune    │
+# │ Advanced modeline for Kakoune  │
 # ╞════════════════════════════════╡
 # │ Rest of .dotfiles:             │
 # │ GitHub.com/andreyorst/dotfiles │
@@ -18,14 +18,14 @@ declare-option -hidden str modeline_pos_percent
 declare-option -hidden str modeline_git_branch
 declare-option -hidden str modeline_readonly
 
-declare-option bool modeline_module_git true
-declare-option bool modeline_module_bufname true
-declare-option bool modeline_module_line_column true
-declare-option bool modeline_module_mode_info true
-declare-option bool modeline_module_filetype true
-declare-option bool modeline_module_client true
-declare-option bool modeline_module_session true
-declare-option bool modeline_module_position true
+declare-option -docstring "if set to 'true' display git module in modeline"         bool modeline_module_git         true
+declare-option -docstring "if set to 'true' display bufname module in modeline"     bool modeline_module_bufname     true
+declare-option -docstring "if set to 'true' display line_column module in modeline" bool modeline_module_line_column true
+declare-option -docstring "if set to 'true' display mode_info module in modeline"   bool modeline_module_mode_info   true
+declare-option -docstring "if set to 'true' display filetype module in modeline"    bool modeline_module_filetype    true
+declare-option -docstring "if set to 'true' display client module in modeline"      bool modeline_module_client      true
+declare-option -docstring "if set to 'true' display session module in modeline"     bool modeline_module_session     true
+declare-option -docstring "if set to 'true' display position module in modeline"    bool modeline_module_position    true
 
 # Commands
 define-command -override -hidden \
@@ -62,7 +62,7 @@ hook global WinCreate .* %{
 hook global WinDisplay .* %{modeline-rebuild}
 
 # Modeline
-define-command -override -docstring "Build modeline with new separators" \
+define-command -override -docstring "construct modeline acorrdingly to configuration options" \
 modeline-rebuild %{
         set-option global modelinefmt %sh{
         bg0="rgb:282828"
@@ -140,80 +140,42 @@ modeline-rebuild %{
 }
 
 define-command -override -docstring "change separators for modeline" \
-modeline-separator -params 1 -shell-script-candidates %{ echo "arrow
-curve
-flame
-triangle
-random
-"} %{ evaluate-commands %sh{
+-shell-script-candidates %{ for i in "arrow curve flame triangle random"; do printf %s\\n $i; done } \
+modeline-separator -params 1 %{ evaluate-commands %sh{
     if [ "$1" = "random" ]; then
-        seed=$(($(date +%N | sed s:^\[0\]:1:) % 4))
-        case $seed in
-        0) separator=arrow ;;
-        1) separator=curve ;;
-        2) separator=triangle ;;
-        3) separator=flame ;;
-        esac
+        seed=$(($(date +%N | sed s:^\[0\]:1:) % 4 + 1)) # a posix compliant very-pseudo-random number generation
+        separator=$(eval echo "arrow curve flame triangle | awk '{print \$$seed}'")
     else
         separator=$1
     fi
     case $separator in
-    arrow)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_bidirectional_separators false"
-        ;;
-    curve)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_bidirectional_separators false"
-        ;;
-    triangle)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_separator_right ''"
-        echo "set-option window modeline_bidirectional_separators true"
-        ;;
-    flame)
-        echo "set-option window modeline_separator_left ''"
-        echo "set-option window modeline_separator_left_thin ''"
-        echo "set-option window modeline_bidirectional_separators false"
-        ;;
-    *)
-        ;;
+        arrow)    left=''; thin=''; bidirectional="false" ;;
+        curve)    left=''; thin=''; bidirectional="false" ;;
+        flame)    left=''; thin=''; bidirectional="false" ;;
+        triangle) left=''; thin=''; bidirectional="true"; right='' ;;
+        *) exit ;;
     esac
+    echo "set-option window modeline_separator_left '$left'"
+    echo "set-option window modeline_separator_left_thin '$thin'"
+    [ -n "$right" ] && echo "set-option window modeline_separator_right '$right'"
+    echo "set-option window modeline_bidirectional_separators '$bidirectional'"
     echo "modeline-rebuild"
 }}
 
-define-command -override -docstring "toggle parts of modeline" \
-modeline-toggle -params 1 -shell-script-candidates %{ echo "git
-bufname
-line_column
-mode_info
-filetype
-client
-session
-position"} %{ evaluate-commands %sh{
+define-command -override -docstring "toggle on and off displaying of modeline parts" \
+-shell-script-candidates %{ for i in "git bufname line_column mode_info filetype client session position"; do printf %s\\n $i; done} \
+modeline-toggle -params 1 %{ evaluate-commands %sh{
     separator=$1
     case $separator in
-        git)
-            [ "$kak_opt_modeline_module_git" = "true" ] && value=false || value=true ;;
-        bufname)
-            [ "$kak_opt_modeline_module_bufname" = "true" ] && value=false || value=true ;;
-        line_column)
-            [ "$kak_opt_modeline_module_line_column" = "true" ] && value=false || value=true ;;
-        mode_info)
-            [ "$kak_opt_modeline_module_mode_info" = "true" ] && value=false || value=true ;;
-        filetype)
-            [ "$kak_opt_modeline_module_filetype" = "true" ] && value=false || value=true ;;
-        client)
-            [ "$kak_opt_modeline_module_client" = "true" ] && value=false || value=true ;;
-        session)
-            [ "$kak_opt_modeline_module_session" = "true" ] && value=false || value=true ;;
-        position)
-            [ "$kak_opt_modeline_module_position" = "true" ] && value=false || value=true ;;
-        *)
-            ;;
+        git)         [ "$kak_opt_modeline_module_git"         = "true" ] && value=false || value=true ;;
+        bufname)     [ "$kak_opt_modeline_module_bufname"     = "true" ] && value=false || value=true ;;
+        line_column) [ "$kak_opt_modeline_module_line_column" = "true" ] && value=false || value=true ;;
+        mode_info)   [ "$kak_opt_modeline_module_mode_info"   = "true" ] && value=false || value=true ;;
+        filetype)    [ "$kak_opt_modeline_module_filetype"    = "true" ] && value=false || value=true ;;
+        client)      [ "$kak_opt_modeline_module_client"      = "true" ] && value=false || value=true ;;
+        session)     [ "$kak_opt_modeline_module_session"     = "true" ] && value=false || value=true ;;
+        position)    [ "$kak_opt_modeline_module_position"    = "true" ] && value=false || value=true ;;
+        *) exit ;;
     esac
     echo "set-option global modeline_module_$1 $value"
     echo "modeline-rebuild"
