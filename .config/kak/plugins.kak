@@ -58,3 +58,4 @@ plug "ul/kak-lsp" noload do %{cargo build --release} %{
     }
 }
 
+plug "git@gitlab.com:andreyorst/powerline.kak"

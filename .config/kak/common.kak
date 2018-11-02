@@ -27,14 +27,14 @@ hook global KakBegin .* %{
 # Theme
 colorscheme base16-guvbox-dark-soft
 
-set-option global modeline_separator_left ''
-set-option global modeline_separator_left_thin ''
-set-option global modeline_separator_right ''
-set-option global modeline_bidirectional_separators true
+set-option global powerline_separator_left ''
+set-option global powerline_separator_left_thin ''
+set-option global powerline_separator_right ''
+set-option global powerline_bidirectional_separators true
 
 # hook global BufCreate .* %{
 #     hook -once global WinDisplay .* %{
-#         modeline-separator random
+#         powerline-separator random
 #     }
 # }
 
