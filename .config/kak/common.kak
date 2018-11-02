@@ -27,11 +27,6 @@ hook global KakBegin .* %{
 # Theme
 colorscheme base16-guvbox-dark-soft
 
-set-option global powerline_separator_left ''
-set-option global powerline_separator_left_thin ''
-set-option global powerline_separator_right ''
-set-option global powerline_bidirectional_separators true
-
 # hook global BufCreate .* %{
 #     hook -once global WinDisplay .* %{
 #         powerline-separator random
