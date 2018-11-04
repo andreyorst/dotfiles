@@ -27,12 +27,6 @@ hook global KakBegin .* %{
 # Theme
 colorscheme base16-guvbox-dark-soft
 
-# hook global BufCreate .* %{
-#     hook -once global WinDisplay .* %{
-#         powerline-separator random
-#     }
-# }
-
 # Maps
 map global normal ''     ': comment-line<ret>'               -docstring "<c-/> to comment/uncomment selection"
 map global normal '<c-r>' 'U'                                 -docstring "vim-like redo"
