@@ -46,3 +46,11 @@ hook global BufNewFile  .* editorconfig-load
 
 # Aliases
 alias global h doc
+
+# Spell
+declare-user-mode spell
+map global spell 'n' ': spell-next<ret>' -docstring "next error"
+map global spell 'r' ': spell-replace<ret>' -docstring "replace word"
+map global spell 'c' ': spell-clear<ret>' -docstring "exit spell mode"
+map global user 'S' ': enter-user-mode -lock spell; spell en-US<ret>' -docstring "spell mode"
+
