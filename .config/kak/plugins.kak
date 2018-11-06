@@ -9,22 +9,17 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-# Plugin manager
 plug "andreyorst/plug.kak" noload %{
     set-option global plug_profiler false
 }
 
-# Extended text objects and selections
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 
-# Wrapper for GDB
 plug "occivink/kakoune-gdb"
 
-# Base16 Gruvbox Dark Soft colorscheme
 plug "andreyorst/base16-gruvbox.kak"
 
-# fzf integration
 plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
@@ -42,8 +37,7 @@ plug "andreyorst/fzf.kak" %{
     }
 }
 
-# automatic pair insertion and surroundig
-plug "alexherbo2/auto-pairs.kak" %{
+nop  plug "alexherbo2/auto-pairs.kak" %{
     hook global WinCreate .* %{ auto-pairs-enable }
     map global user -docstring 'surround selection' 's' ': auto-pairs-surround<ret>'
 }
