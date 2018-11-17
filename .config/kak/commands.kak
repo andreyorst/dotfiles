@@ -73,19 +73,23 @@ define-command -override leading-tabs-to-spaces %{
 }
 
 define-command -override noexpandtab %{
-    hook -group noexpandtab global NormalKey <gt> %{
-        execute-keys -draft "xs^\h+<ret><a-@>"
-    }
+    hook -group noexpandtab global NormalKey <gt> %{ execute-keys -draft "xs^\h+<ret><a-@>" }
+    unmap global insert <backspace>
     remove-hooks global expandtab
 }
 
-define-command -override expandtab %{
-    hook -group expandtab global InsertChar \t %{
-        execute-keys -draft h@
+define-command -hidden -override smart-backspace %{
+    try %{
+        execute-keys -draft <a-h><a-k> "^\h+.\z" <ret><esc><lt>
+    } catch %{
+        execute-keys <backspace>
     }
-    hook -group expandtab global InsertDelete ' ' %{ try %{
-        execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
-    }}
-    remove-hooks global noexpandtab
 }
 
+define-command -override expandtab %{
+    hook -group expandtab global InsertChar '\t' %{
+            execute-keys -draft h@
+    }
+    map global insert <backspace> '<a-;>:smart-backspace<ret>'
+    remove-hooks global noexpandtab
+}
