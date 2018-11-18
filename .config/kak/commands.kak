@@ -78,7 +78,7 @@ define-command -override noexpandtab %{
     remove-hooks global expandtab
 }
 
-define-command -hidden -override smart-backspace %{
+define-command -hidden -override deindent-or-backspace %{
     try %{
         execute-keys -draft <a-h><a-k> "^\h+.\z" <ret><esc><lt>
     } catch %{
@@ -90,6 +90,6 @@ define-command -override expandtab %{
     hook -group expandtab global InsertChar '\t' %{
             execute-keys -draft h@
     }
-    map global insert <backspace> '<a-;>:smart-backspace<ret>'
+    map global insert <backspace> '<a-;>: deindent-or-backspace<ret>'
     remove-hooks global noexpandtab
 }
