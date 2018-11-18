@@ -37,11 +37,6 @@ plug "andreyorst/fzf.kak" %{
     }
 }
 
-nop plug "alexherbo2/auto-pairs.kak" %{
-    hook global WinCreate .* %{ auto-pairs-enable }
-    map global user -docstring 'surround selection' 's' ': auto-pairs-surround<ret>'
-}
-
 plug "TeddyDD/kakoune-edit-or-dir" %{
     unalias global e
     alias global e edit-or-dir
