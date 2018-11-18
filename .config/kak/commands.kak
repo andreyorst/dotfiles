@@ -59,46 +59,45 @@ select-or-add-cursor %{ execute-keys -save-regs '' %sh{
 }}
 
 define-command -override leading-spaces-to-tabs %{
-    declare-option -hidden int cline %val{cursor_line}
-    declare-option -hidden int ccol %val{cursor_column}
-    execute-keys %{ %s^\h+<ret><a-@>}
-    execute-keys %opt{cline}g %opt{ccol}lh
+    execute-keys -draft %{%s^\h+<ret><a-@>}
 }
 
 define-command -override leading-tabs-to-spaces %{
-    declare-option -hidden int cline %val{cursor_line}
-    declare-option -hidden int ccol %val{cursor_column}
-    execute-keys %{ %s^\h+<ret>@}
-    execute-keys %opt{cline}g %opt{ccol}lh
+    execute-keys -draft %{%s^\h+<ret>@}
 }
 
 define-command -override noexpandtab %{
-    hook -group noexpandtab global NormalKey <gt> %{ execute-keys -draft "xs^\h+<ret><a-@>" }
-    unmap global insert <backspace>
+    remove-hooks global noexpandtab
+    hook -group noexpandtab global NormalKey <gt> %{ try %{
+        execute-keys -draft "<a-x>s^\h+<ret><a-@>"
+    }}
+    set-option global aligntab true
     remove-hooks global expandtab
     remove-hooks global smarttab
 }
 
-define-command -override -hidden deindent-or-backspace %{
-    try %{ execute-keys -draft <a-h><a-k> "^\h+.\z" <ret><lt>
-    } catch %{ execute-keys <backspace> }
-}
-
 define-command -override expandtab %{
-    hook -group expandtab global InsertChar '\t' %{
-        execute-keys -draft h@
-    }
-    map global insert <backspace> '<a-;>: deindent-or-backspace<ret>'
+    remove-hooks global expandtab
+    hook -group expandtab global InsertChar '\t' %{ execute-keys -draft h@ }
+    hook -group expandtab global InsertKey <backspace> %{ try %{
+        execute-keys -draft <a-h><a-k> "^\h+.\z" <ret>I<space><esc><lt>
+    }}
+    set-option global aligntab false
     remove-hooks global noexpandtab
     remove-hooks global smarttab
 }
 
 define-command -override smarttab %{
-    hook -group smarttab global InsertKey <tab> %{
-        try %{ execute-keys -draft <a-h><a-k> "^\h*.\z" <ret>
-        } catch %{ execute-keys -draft h@ }
-    }
-    hook -group smarttab global NormalKey <gt> %{ execute-keys -draft "xs^\h+<ret><a-@>" }
+    remove-hooks global smarttab
+    hook -group smarttab global InsertKey <tab> %{ try %{
+        execute-keys -draft <a-h><a-k> "^\h*.\z" <ret>
+    } catch %{
+        execute-keys -draft h@
+    }}
+    hook -group smarttab global NormalKey <gt> %{ try %{
+        execute-keys -draft "<a-x>s^\h+<ret><a-@>"
+    }}
+    set-option global aligntab false
     remove-hooks global expandtab
     remove-hooks global noexpandtab
 }
