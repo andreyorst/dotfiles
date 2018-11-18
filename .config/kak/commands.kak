@@ -76,20 +76,29 @@ define-command -override noexpandtab %{
     hook -group noexpandtab global NormalKey <gt> %{ execute-keys -draft "xs^\h+<ret><a-@>" }
     unmap global insert <backspace>
     remove-hooks global expandtab
+    remove-hooks global smarttab
 }
 
-define-command -hidden -override deindent-or-backspace %{
-    try %{
-        execute-keys -draft <a-h><a-k> "^\h+.\z" <ret><esc><lt>
-    } catch %{
-        execute-keys <backspace>
-    }
+define-command -override -hidden deindent-or-backspace %{
+    try %{ execute-keys -draft <a-h><a-k> "^\h+.\z" <ret><lt>
+    } catch %{ execute-keys <backspace> }
 }
 
 define-command -override expandtab %{
     hook -group expandtab global InsertChar '\t' %{
-            execute-keys -draft h@
+        execute-keys -draft h@
     }
     map global insert <backspace> '<a-;>: deindent-or-backspace<ret>'
+    remove-hooks global noexpandtab
+    remove-hooks global smarttab
+}
+
+define-command -override smarttab %{
+    hook -group smarttab global InsertKey <tab> %{
+        try %{ execute-keys -draft <a-h><a-k> "^\h*.\z" <ret>
+        } catch %{ execute-keys -draft h@ }
+    }
+    hook -group smarttab global NormalKey <gt> %{ execute-keys -draft "xs^\h+<ret><a-@>" }
+    remove-hooks global expandtab
     remove-hooks global noexpandtab
 }
