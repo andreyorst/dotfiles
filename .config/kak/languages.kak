@@ -15,6 +15,11 @@ set-face global child rgb:fb4934,default+bf
 set-face global delimiters rgb:af3a03,default
 set-face global namespace rgb:b57614,default
 
+# Never.
+hook global WinCreate .* %{
+    set-option window aligntab false
+}
+
 # Highlight operators and delimiters
 hook -group ope_delim global WinCreate .* %{
     add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
