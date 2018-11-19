@@ -13,11 +13,13 @@
 # Custom faces
 set-face global child rgb:fb4934,default+bf
 set-face global delimiters rgb:af3a03,default
+set-face global namespace rgb:b57614,default
 
 # Highlight operators and delimiters
 hook -group ope_delim global WinCreate .* %{
-    add-highlighter buffer/operators regex (\+|-|\*|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
+    add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
     add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+    add-highlighter buffer/namespace  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
 }
 
 # C/Cpp/Rust syntax fixes
@@ -36,33 +38,7 @@ hook global WinSetOption filetype=(c|cpp) %{
     add-highlighter window/c_user_types regex \b(\w+_t|lambda)\b 0:type
     add-highlighter buffer/return       regex return 0:child
     set-option window formatcmd 'clang-format'
-    noexpandtab
-}
-
-hook global WinSetOption filetype=c %{
-    set-option global clang_options '-Wall --std=c99 -I./include'
-    evaluate-commands  %sh{ (
-        while [ $(pwd) != $HOME ]; do
-            if [ -f "./testkit.settings" ]; then
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/include}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/SPW_TESTS/spw_lib_src}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/SK_VG11/pci_master_slave_cross_test}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/CAN/can_lib_src}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/testpacks/MKIO/mkio_lib_src}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/platforms/$(cat ./testkit.settings | grep '?=' |  sed -E 's/.*= //')/include}"
-                break
-            elif [ -f "./startf.S" ]; then
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/include}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/include/cp2}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/include/hdrtest}"
-                eval echo "set-option -add global clang_options %{ -I$(pwd)/../../include}"
-                echo "set-option global tabstop 8"
-                echo "set-option global indentwidth 8"
-                break
-            fi
-            cd ..
-        done
-    ) }
+    smarttab
 }
 
 # Rust
