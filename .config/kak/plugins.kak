@@ -59,6 +59,8 @@ plug "andreyorst/powerline.kak" %{
     }
 }
 
+plug "andreyorst/smarttab.kak"
+
 plug "eraserhd/parinfer-rust" do %{
     cargo build --release
     cargo install
