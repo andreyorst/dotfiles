@@ -59,11 +59,11 @@ plug "andreyorst/powerline.kak" %{
     }
 }
 
-plug "andreyorst/smarttab.kak" "branch: smartsofttab" %{
+plug "andreyorst/smarttab.kak" %{
     set-option global softtabstop 4
 }
 
-# plug "eraserhd/parinfer-rust" do %{
-#     cargo build --release
-#     cargo install
-# }
+nop plug "eraserhd/parinfer-rust" do %{
+    cargo build --release
+    cargo install
+}
