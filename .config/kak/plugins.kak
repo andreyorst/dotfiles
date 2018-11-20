@@ -20,7 +20,7 @@ plug "occivink/kakoune-gdb"
 
 plug "andreyorst/base16-gruvbox.kak"
 
-plug "andreyorst/fzf.kak" %{
+plug "andreyorst/fzf.kak" "branch: v1.0.0" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
@@ -59,9 +59,11 @@ plug "andreyorst/powerline.kak" %{
     }
 }
 
-plug "andreyorst/smarttab.kak"
-
-plug "eraserhd/parinfer-rust" do %{
-    cargo build --release
-    cargo install
+plug "andreyorst/smarttab.kak" "branch: smartsofttab" %{
+    set-option global softtabstop 4
 }
+
+# plug "eraserhd/parinfer-rust" do %{
+#     cargo build --release
+#     cargo install
+# }

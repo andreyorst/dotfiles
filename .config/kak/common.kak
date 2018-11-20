@@ -40,7 +40,8 @@ map global user   'T'     ': leading-tabs-to-spaces<ret>' -docstring "convert le
 map global user   'y'     '<a-|> xclip -selection c<ret>' -docstring "copy to system clipboard"
 
 # Hooks
-hook global InsertCompletionShow .* %{ map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p> }
+hook global InsertCompletionShow .* %{ try %{ execute-keys -draft 'h<a-K>\h<ret>'; map window insert <tab> <c-n>; map window insert <s-tab> <c-p> } }
+# hook global InsertCompletionShow .* %{ map   window insert <tab> <c-n>; map   window insert <s-tab> <c-p> }
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
 hook global BufOpenFile .* editorconfig-load
 hook global BufNewFile  .* editorconfig-load
