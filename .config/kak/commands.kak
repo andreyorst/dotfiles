@@ -17,6 +17,8 @@ smart-gf %{ execute-keys -with-hooks %sh{
     fi
 }}
 
+define-command -override -docstring "find <fuzzystring>: fuzzy match through filenames" find -params 1 -shell-script-candidates %{ find -type f } %{ edit %arg{1} }
+
 define-command -override -hidden -params 1 recursive-search %{ evaluate-commands %sh{
     for buffer in $kak_buflist; do
         buffer="${buffer%\'}"; buffer="${buffer#\'}"
