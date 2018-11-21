@@ -31,7 +31,7 @@ hook -group ope_delim global WinCreate .* %{
 hook global WinSetOption filetype=(c|cpp|rust|java) %{
     add-highlighter window/functions      regex \w+(\h+)?(?=\() 0:function
     add-highlighter window/child          regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>"\(]) 0:child
-    add-highlighter window/child_function regex ((?<=\.)|(?<=->))?[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
+    add-highlighter window/child_function regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
 }
 
 # C/Cpp
