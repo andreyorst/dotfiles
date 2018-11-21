@@ -43,7 +43,7 @@ hook global WinSetOption filetype=(c|cpp) %{
     add-highlighter buffer/c_types2     regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
     add-highlighter buffer/c_types3     regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
     add-highlighter buffer/c_user_types regex \b(\w+_t|lambda)\b 0:type
-    add-highlighter buffer/return       regex return 0:child
+    add-highlighter window/return       regex return 0:child
 }
 
 # Rust
