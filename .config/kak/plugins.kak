@@ -63,7 +63,6 @@ plug "andreyorst/smarttab.kak" "branch: smartsofttab" %{
     set-option global softtabstop 4
 }
 
-# plug "eraserhd/parinfer-rust" do %{
-#     cargo build --release
-#     cargo install
-# }
+plug "alexherbo2/auto-pairs.kak" %{
+    map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
+}
