@@ -11,7 +11,7 @@
 # ╰────────────────────────────────╯
 
 # Custom faces
-set-face global child rgb:fb4934,default+bf
+set-face global child rgb:fb4934,default+b
 set-face global delimiters rgb:af3a03,default
 set-face global namespace rgb:b57614,default
 
