@@ -35,9 +35,11 @@ map global user   't'     ': leading-spaces-to-tabs<ret>' -docstring "convert le
 map global user   'T'     ': leading-tabs-to-spaces<ret>' -docstring "convert leading tabs to spaces"
 
 # System clipboard
-map global user   'y'     '<a-|> xsel -b -i<ret>' -docstring "copy to system clipboard"
-map global user   'd'     '|     xsel -b -i<ret>' -docstring "cut to system clipboard"
-map global user   'p'     '|     xsel -b -o<ret>' -docstring "paste from system clipboard"
+map global user 'y' '<a-|>xsel -b -i<ret>' -docstring "copy to system clipboard"
+map global user 'd' '|xsel -b -i<ret>' -docstring "cut to system clipboard"
+map global user 'c' '|xsel -b -i<ret>i' -docstring "cut to system clipboard"
+map global user 'P' '!xsel --output --clipboard<ret>' -docstring "paste from system clipboard"
+map global user 'p' '<a-!>xsel --output --clipboard<ret>' -docstring "paste from system clipboard"
 
 # Hooks
 hook global InsertCompletionShow .* %{ try %{ execute-keys -draft 'h<a-K>\h<ret>'; map window insert <tab> <c-n>; map window insert <s-tab> <c-p> } }

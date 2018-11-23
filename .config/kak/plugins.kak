@@ -9,9 +9,7 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-plug "andreyorst/plug.kak" noload %{
-    set-option global plug_profiler false
-}
+plug "andreyorst/plug.kak" noload
 
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
@@ -20,7 +18,7 @@ plug "occivink/kakoune-gdb"
 
 plug "andreyorst/base16-gruvbox.kak"
 
-plug "andreyorst/fzf.kak" "branch: v1.0.0" %{
+plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
