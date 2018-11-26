@@ -68,3 +68,21 @@ define-command -override leading-tabs-to-spaces %{
     execute-keys -draft %{%s^\h+<ret>@}
 }
 
+define-command -override symbol -params 1 -shell-script-candidates %{
+    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    ctags -f $tags $kak_buffile
+    readtags -t $tags -l | cut -f 1 | awk '!x[$0]++' | grep -v -e "__anon.*"
+    } %{ evaluate-commands %sh{
+    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    readtags -t $tags $1 | awk -F '\t|\n' '
+        /^!TAGROOT\t/ { tagroot=$2 }
+        /[^\t]+\t[^\t]+\t\/\^.*\$?\// {
+            re=$0;
+            sub(".*\t/\\^", "", re); sub("\\$?/$", "", re); gsub("(\\{|\\}|\\\\E).*$", "", re);
+            keys=re; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys);
+            out = out " %{" $2 " {MenuInfo}" re "} %{evaluate-commands %{ try %{ edit %{" tagroot $2 "}; execute-keys %{/\\Q" keys "<ret>vc} } catch %{ echo %{unable to find tag} } } }"
+        }
+        /[^\t]+\t[^\t]+\t[0-9]+/ { out = out " %{" $2 ":" $3 "} %{evaluate-commands %{ edit %{" tagroot $2 "} %{" $3 "}}}" }
+        END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
+    rm $tags
+}}
