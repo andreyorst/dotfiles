@@ -43,8 +43,6 @@ plug "TeddyDD/kakoune-edit-or-dir" %{
 plug "ul/kak-lsp" noload do %{cargo build --release} %{
     hook global WinSetOption filetype=(c|cpp|rust) %{
         evaluate-commands %sh{ kak-lsp --kakoune -s $kak_session }
-        lsp-auto-hover-enable
-        set-option global lsp_hover_anchor true
     }
 }
 
@@ -63,4 +61,5 @@ plug "andreyorst/smarttab.kak" %{
 
 plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
+    hook global WinCreate .* %{ auto-pairs-enable }
 }
