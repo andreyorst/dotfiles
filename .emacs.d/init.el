@@ -91,12 +91,6 @@
 
 (use-package swiper :ensure t)
 
-(use-package spaceline-config :ensure spaceline
-  :config
-  (spaceline-emacs-theme)
-  :init
-  (setq powerline-default-separator 'slant))
-
 (use-package markdown-mode :ensure t)
 
 (use-package projectile :ensure t
