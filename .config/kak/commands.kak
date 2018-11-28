@@ -20,35 +20,38 @@ smart-gf %{ execute-keys -with-hooks %sh{
 define-command -override -docstring "find <fuzzystring>: fuzzy match through filenames" find -params 1 -shell-script-candidates %{ find -type f } %{ edit %arg{1} }
 
 define-command -override -hidden -params 1 recursive-search %{ evaluate-commands %sh{
-    for buffer in $kak_buflist; do
-        buffer="${buffer%\'}"; buffer="${buffer#\'}"
-        if [ -z "${buffer##*$1}" ]; then
-            echo "buffer $buffer"
+    file=$1
+    eval "set -- $kak_buflist"
+    while [ $# -gt 0 ]; do
+        if [ "$file" = "$1" ]; then
+            printf "%s\n" "buffer $buffer"
             exit
         fi
+        shift
     done
-    if [ -e "'$1'" ]; then
-        echo "edit -existing '$1'"
+    if [ -e "$file" ]; then
+        printf "%s\n" "edit -existing %{$file}"
         exit
     fi
-    for path in $kak_opt_path; do
-        path="${path%\'}"; path="${path#\'}"
+    eval "set -- $kak_opt_path"
+    while [ $# -gt 0 ]; do
+        path=$1
         case $path in
-            "./") path=${kak_buffile%/*};;
-            "%/") path=$(pwd);;
+            ./) path=${kak_buffile%/*} ;;
+            %/) path=$(pwd) ;;
         esac
-        if [ -z "${1##*/*}" ]; then
-            test=$(eval echo "'$path/$1'")
-            [ -e "$test" ] && file=$test
+        if [ -z "${file##*/*}" ]; then
+            [ -e "$path/$file" ] && file="$path/$file"
         else
-            file=$(find -L $path -xdev -type f -name $(eval echo $1) | head -n 1)
+            file=$(find -L $path -xdev -type f -name "$file" | head -n 1)
         fi
         if [ ! -z "$file" ]; then
-            echo "edit -existing '$file'"
+            printf "%s\n" "edit -existing %{$file}"
             exit
         fi
+        shift
     done
-    echo "echo -markup '{Error}unable to find file ''$1'''"
+    printf "%s\n" "echo -markup %{{Error}unable to find file '$1'}"
 }}
 
 define-command -override -docstring "select a word under cursor, or add cursor on next occurrence of current selection" \
