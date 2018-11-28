@@ -69,12 +69,10 @@ plug "eraserhd/parinfer-rust" do %{
     cargo install --force
 } config %{
     hook global WinSetOption filetype=(lisp|scheme) %{
-        hook window InsertChar   \h %{parinfer -indent}
-        hook window InsertDelete \h %{parinfer -indent}
-        hook window InsertChar   [\(\)\{\}\[\]] %{parinfer -indent}
-        hook window InsertDelete [\(\)\{\}\[\]] %{parinfer -indent}
-        hook window InsertChar   [^\(\)\{\}\[\]] %{parinfer -paren}
-        hook window InsertDelete [^\(\)\{\}\[\]] %{parinfer -paren}
+        parinfer -if-enabled -paren
+        hook -group parinfer window NormalKey    .* %{parinfer -if-enabled -smart}
+        hook -group parinfer window InsertChar   .* %{parinfer -if-enabled -smart}
+        hook -group parinfer window InsertDelete .* %{parinfer -if-enabled -smart}
     }
 }
 
