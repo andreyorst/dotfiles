@@ -63,3 +63,18 @@ plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
     hook global WinCreate .* %{ auto-pairs-enable }
 }
+
+plug "eraserhd/parinfer-rust" noload do %{
+    cargo build --release
+    cargo install --force
+} config %{
+    hook global WinSetOption filetype=(lisp|scheme) %{
+        source "%opt{plug_install_dir}/parinfer-rust/rc/parinfer.kak"
+        hook window InsertChar   \h %{parinfer -indent}
+        hook window InsertDelete \h %{parinfer -indent}
+        hook window InsertChar   [\(\)\{\}\[\]] %{parinfer -indent}
+        hook window InsertDelete [\(\)\{\}\[\]] %{parinfer -indent}
+        hook window NormalIdle   .* %{parinfer -indent}
+    }
+}
+
