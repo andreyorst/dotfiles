@@ -72,3 +72,8 @@ hook global BufCreate .*\.mk$ %{
 hook global WinSetOption filetype=makefile %{
     noexpandtab
 }
+
+# Lisp, Scheme
+hook global WinSetOption filetype=(lisp|scheme) %{
+    expandtab
+}
