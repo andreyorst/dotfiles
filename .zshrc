@@ -8,7 +8,7 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
-alias vimdiff="nvim -d"
+alias vimdiff="nvim -u ~/.dotfiles/.vimdiffrc -d"
 alias zshconf="kak ~/.zshrc"
 alias tmuxconf="kak ~/.tmux.conf"
 alias vimconf="nvim ~/.config/nvim/init.vim"
