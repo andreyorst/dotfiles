@@ -56,14 +56,6 @@
 (load-theme 'spacemacs-dark t nil)
 (set-face-attribute 'fringe nil :background nil)
 
-(ensure-installed 'telephone-line)
-(defvar telephone-line-primary-left-separator 'telephone-line-cubed-left)
-(defvar telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left)
-(defvar telephone-line-primary-right-separator 'telephone-line-cubed-right)
-(defvar telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
-(defvar telephone-line-height 24)
-(telephone-line-mode 1)
-
 (use-package diminish :ensure t)
 
 (use-package parinfer :ensure t
