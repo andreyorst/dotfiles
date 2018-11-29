@@ -27,7 +27,7 @@ hook global KakBegin .* %{
 # Maps
 map global normal ''     ': comment-line<ret>'            -docstring "<c-/> to comment/uncomment selection"
 map global goto   '<a-f>' '<esc><a-i><a-w>gf'              -docstring "file non-recursive"
-map global goto   'f'     '<esc><a-i><a-w>: smart-gf<ret>' -docstring "file recursive"
+map global goto   'f'     '<esc><a-i><a-w>: recursive-file-search %val{selection}<ret>' -docstring "file recursive"
 map global goto   'b'     '<esc>:bn<ret>'                  -docstring "next buffer"
 map global goto   'B'     '<esc>:bp<ret>'                  -docstring "previous buffer"
 map global normal '<c-d>' ': select-or-add-cursor<ret>'    -docstring "add currsor on current word, and jump to the next match"

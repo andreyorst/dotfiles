@@ -8,50 +8,45 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-define-command -override -docstring "call recursive-search for selection, if selection is only one character selects WORD under cursor" \
-smart-gf %{ execute-keys -with-hooks %sh{
-    if [ "$(expr $(echo $kak_selection | wc -m) - 1)" = "1" ]; then
-        echo "<a-i><a-w>:<space>recursive-search<space>%reg{dot}<ret>"
-    else
-        echo ":<space>recursive-search<space>%reg{dot}<ret>"
-    fi
-}}
+define-command -override -docstring "find <fuzzystring>: fuzzy match through filenames" find -params 1 -shell-script-candidates %{ find -L -type f } %{ edit %arg{1} }
 
-define-command -override -docstring "find <fuzzystring>: fuzzy match through filenames" find -params 1 -shell-script-candidates %{ find -type f } %{ edit %arg{1} }
-
-define-command -override -hidden -params 1 recursive-search %{ evaluate-commands %sh{
+define-command -override -docstring \
+"recursive-search <filename>: search file recusively under %opt{path}" \
+recursive-file-search -params 1 %{ evaluate-commands %sh{
     file=$1
     eval "set -- $kak_buflist"
-    while [ $# -gt 0 ]; do
-        if [ "$file" = "$1" ]; then
-            printf "%s\n" "buffer $buffer"
+    while [ $# -gt 0 ]; do            # Check if buffer with this
+        if [ "$file" = "$1" ]; then   # file already exists. Basically
+            printf "%s\n" "buffer $1" # emulating what edit command does
             exit
         fi
         shift
     done
-    if [ -e "$file" ]; then
-        printf "%s\n" "edit -existing %{$file}"
-        exit
-    fi
+    if [ -e "$file" ]; then                     # Test if file exists under 
+        printf "%s\n" "edit -existing %{$file}" # servers' working directory
+        exit                                    # this is last resort until
+    fi                                          # we start recursive searchimg
+
+    # if everthing  above fails - search for file under path
     eval "set -- $kak_opt_path"
     while [ $# -gt 0 ]; do
-        path=$1
-        case $path in
-            ./) path=${kak_buffile%/*} ;;
-            %/) path=$(pwd) ;;
+        case $1 in                        # Since we want to check fewer places
+            ./) path=${kak_buffile%/*} ;; # I've swapped ./ and %/ because
+            %/) path=$PWD ;;              # %/ usually has smaller scope. So
+            *)  path=$1 ;;                # this trick is a speedi-up hack.
         esac
-        if [ -z "${file##*/*}" ]; then
-            [ -e "$path/$file" ] && file="$path/$file"
+        if [ -z "${file##*/*}" ]; then # test if filename contains path
+            [ -e "$path/$file" ] && result="$path/$file"
         else
-            file=$(find -L $path -xdev -type f -name "$file" | head -n 1)
+            result=$(find -L $path -mount -type f -name "$file" | head -n 1)
         fi
-        if [ ! -z "$file" ]; then
-            printf "%s\n" "edit -existing %{$file}"
+        if [ ! -z "$result" ]; then
+            printf "%s\n" "edit -existing %{$result}"
             exit
         fi
         shift
     done
-    printf "%s\n" "echo -markup %{{Error}unable to find file '$1'}"
+    printf "%s\n" "echo -markup %{{Error}unable to find file '$file'}"
 }}
 
 define-command -override -docstring "select a word under cursor, or add cursor on next occurrence of current selection" \
