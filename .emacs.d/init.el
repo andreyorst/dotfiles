@@ -13,12 +13,15 @@
   (package-refresh-contents))
 
 ;;; Common settings:
+(setq inhibit-splash-screen t)
+
 (ignore-errors
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
   (tooltip-mode -1)
   (fset 'menu-bar-open nil))
+
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
 (setq-default indent-tabs-mode nil
@@ -26,10 +29,18 @@
               auto-window-vscroll nil
               cursor-type 'bar)
 
-(setq backup-directory-alist '(("." . "~/.emacs.d/backups"))
-      ring-bell-function 'ignore
-      custom-file (expand-file-name "custom.el" user-emacs-directory))
+;; disable bell
+(setq ring-bell-function 'ignore)
+
+;; move custom settings to separate custom file
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
+
+;; store backups in different place and disable lockfiles
+(setq backup-by-copying t
+      create-lockfiles nil
+      backup-directory-alist '(("." . "~/.cache/emacs-backups"))
+      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
 
 ;;; Packages
 (defun ensure-installed (pkg)
@@ -74,8 +85,6 @@
 
 (use-package flx :ensure t)
 
-(use-package company-flx :ensure t)
-
 (use-package ivy :ensure t
   :init
   (setq ivy-use-virtual-buffers t
@@ -111,26 +120,7 @@
 
 (use-package markdown-mode :ensure t)
 
-(use-package projectile :ensure t
-  :diminish projectile-mode
-  :init
-  (setq projectile-svn-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
-        projectile-generic-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
-        projectile-git-command "find . \\( -path '*/.svn*' -o -path '*/.git*' \\) -prune -o -type f -print0"
-        projectile-require-project-root nil
-        projectile-enable-caching t
-        projectile-completion-system 'ivy)
-  :config
-  (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
-  (projectile-mode 1))
-
 (use-package flycheck :ensure t)
-
-(use-package lsp-mode :ensure t
-  :config
-  (setq lsp-highlight-symbol-at-point nil))
-
-(use-package lsp-ui :ensure t)
 
 (use-package company :ensure t
   :init
@@ -144,13 +134,14 @@
   (setq company-backends (remove 'company-clang company-backends)
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends)
-        company-backends (remove 'company-elisp company-backends)
         company-backends (remove 'company-gtags company-backends))
   (add-hook 'after-init-hook 'global-company-mode)
   (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
+
+(use-package company-flx :ensure t)
 
 (use-package company-lsp :ensure t
   :config
@@ -167,35 +158,7 @@
 
 (use-package yasnippet-snippets :ensure t)
 
-(use-package nlinum :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'nlinum-mode)
-  (set-face-attribute 'linum nil :background nil))
-
-(use-package cquery :ensure t
-  :init
-  (setq cquery-executable "/usr/bin/cquery"
-        cquery-cache-dir "~/.cache/cquery"
-        cquery-sem-highlight-method 'font-lock)
-  (add-hook 'c-mode-hook '(lambda() (lsp-cquery-enable))
-            'c++-mode-hook '(lambda() (lsp-cquery-enable))))
-
-(use-package sr-speedbar :ensure t
-  :init
-  (setq speedbar-use-images nil))
-
 ;;; Language settings
-
-;;; C specific settings
-(add-hook 'c-mode-common-hook
-          '(lambda()
-             (setq indent-tabs-mode t
-                   c-basic-offset 4
-                   tab-width 4)
-             (lsp-cquery-enable)
-             (lsp-ui-mode)
-             (lsp-ui-doc-mode -1)
-             (flycheck-mode)))
 
 ;;; eLisp specific settings
 (add-hook 'emacs-lisp-mode-hook
