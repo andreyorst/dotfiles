@@ -8,11 +8,12 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-define-command -override -docstring "find <fuzzystring>: fuzzy match through filenames" find -params 1 -shell-script-candidates %{ find -L -type f } %{ edit %arg{1} }
+define-command -override -docstring "find <name>: fuzzy match through filenames" \
+find -params 1 -shell-script-candidates %{ find -L -type f } %{ edit %arg{1} }
 
 define-command -override -docstring \
-"recursive-search <filename>: search file recusively under %opt{path}" \
-recursive-file-search -params 1 %{ evaluate-commands %sh{
+"file-search-rec <filename>: search for file recusively under path option: %opt{path}" \
+file-search-rec -params 1 %{ evaluate-commands %sh{
     file=$1
     eval "set -- $kak_buflist"
     while [ $# -gt 0 ]; do            # Check if buffer with this
@@ -22,7 +23,7 @@ recursive-file-search -params 1 %{ evaluate-commands %sh{
         fi
         shift
     done
-    if [ -e "$file" ]; then                     # Test if file exists under 
+    if [ -e "$file" ]; then                     # Test if file exists under
         printf "%s\n" "edit -existing %{$file}" # servers' working directory
         exit                                    # this is last resort until
     fi                                          # we start recursive searchimg
@@ -37,7 +38,7 @@ recursive-file-search -params 1 %{ evaluate-commands %sh{
         esac
         if [ -z "${file##*/*}" ]; then # test if filename contains path
             [ -e "$path/$file" ] && result="$path/$file"
-        else
+        else # get first match with find
             result=$(find -L $path -mount -type f -name "$file" | head -n 1)
         fi
         if [ ! -z "$result" ]; then
@@ -49,7 +50,8 @@ recursive-file-search -params 1 %{ evaluate-commands %sh{
     printf "%s\n" "echo -markup %{{Error}unable to find file '$file'}"
 }}
 
-define-command -override -docstring "select a word under cursor, or add cursor on next occurrence of current selection" \
+define-command -override -docstring \
+"select a word under cursor, or add cursor on next occurrence of current selection" \
 select-or-add-cursor %{ execute-keys -save-regs '' %sh{
     if [ $(expr $(echo $kak_selection | wc -m) - 1) -eq 1 ]; then
         echo "<a-i>w*"
@@ -58,19 +60,22 @@ select-or-add-cursor %{ execute-keys -save-regs '' %sh{
     fi
 }}
 
-define-command -override leading-spaces-to-tabs %{
+define-command -override -docstring "Convert all leading spaces to tabs" \
+leading-spaces-to-tabs %{
     execute-keys -draft %{%s^\h+<ret><a-@>}
 }
 
-define-command -override leading-tabs-to-spaces %{
+define-command -override -docstring "Convert all leading tabs to spaces" \
+leading-tabs-to-spaces %{
     execute-keys -draft %{%s^\h+<ret>@}
 }
 
-define-command -override symbol -params 1 -shell-script-candidates %{
+define-command -override -docstring "jump to symbol definition in current file" \
+-shell-script-candidates %{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
     ctags -f $tags $kak_buffile
     readtags -t $tags -l | cut -f 1 | awk '!x[$0]++' | grep -v -e "__anon.*"
-    } %{ evaluate-commands %sh{
+} symbol -params 1 %{ evaluate-commands %sh{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
     readtags -t $tags $1 | awk -F '\t|\n' '
         /^!TAGROOT\t/ { tagroot=$2 }
@@ -84,3 +89,4 @@ define-command -override symbol -params 1 -shell-script-candidates %{
         END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
     rm $tags
 }}
+
