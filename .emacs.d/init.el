@@ -15,6 +15,8 @@
 ;;; Common settings:
 (setq inhibit-splash-screen t)
 
+(global-display-line-numbers-mode)
+
 (ignore-errors
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
