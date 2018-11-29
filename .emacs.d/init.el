@@ -15,9 +15,8 @@
 ;;; Common settings:
 (setq inhibit-splash-screen t)
 
-(global-display-line-numbers-mode)
-
 (ignore-errors
+  (global-display-line-numbers-mode)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
@@ -57,8 +56,17 @@
 (load-theme 'spacemacs-dark t nil)
 (set-face-attribute 'fringe nil :background nil)
 
-(use-package parinfer
-  :ensure t
+(ensure-installed 'telephone-line)
+(defvar telephone-line-primary-left-separator 'telephone-line-cubed-left)
+(defvar telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left)
+(defvar telephone-line-primary-right-separator 'telephone-line-cubed-right)
+(defvar telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
+(defvar telephone-line-height 24)
+(telephone-line-mode 1)
+
+(use-package diminish :ensure t)
+
+(use-package parinfer :ensure t
   :bind
   (("C-," . parinfer-toggle-mode))
   :init
@@ -74,8 +82,6 @@
     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
     (add-hook 'scheme-mode-hook #'parinfer-mode)
     (add-hook 'lisp-mode-hook #'parinfer-mode)))
-
-(use-package diminish :ensure t)
 
 (use-package highlight-indent-guides :ensure t
   :diminish highlight-indent-guides-mode
@@ -141,13 +147,7 @@
   (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
-
-(use-package company-flx :ensure t)
-
-(use-package company-lsp :ensure t
-  :config
-  (push '(company-lsp :with company-yasnippet) company-backends))
+  (define-key company-active-map (kbd "<backtab>") 'company-select-))
 
 (use-package company-quickhelp :ensure t
   :config
