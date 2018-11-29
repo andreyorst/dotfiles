@@ -56,7 +56,12 @@
 (load-theme 'spacemacs-dark t nil)
 (set-face-attribute 'fringe nil :background nil)
 
-(use-package diminish :ensure t)
+(use-package geiser :ensure t
+  :init
+  (defvar geiser-active-implementations '(chicken guile)))
+
+(use-package diminish :ensure t
+  :diminish eldoc-mode)
 
 (use-package parinfer :ensure t
   :bind
@@ -74,14 +79,6 @@
     (add-hook 'scheme-mode-hook #'parinfer-mode)
     (add-hook 'lisp-mode-hook #'parinfer-mode)))
 
-(use-package highlight-indent-guides :ensure t
-  :diminish highlight-indent-guides-mode
-  :init
-  (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-character ?▏)
-  :config
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
-
 (use-package flx :ensure t)
 
 (use-package ivy :ensure t
@@ -94,16 +91,10 @@
          ("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x M-f" . counsel-recentf)
-         ("<f1> f" . counsel-describe-function)
-         ("<f1> v" . counsel-describe-variable)
-         ("<f1> l" . counsel-find-library)
-         ("<f2> i" . counsel-info-lookup-symbol)
-         ("<f2> u" . counsel-unicode-char)
-         ("C-c g" . counsel-git)
-         ("C-c j" . counsel-git-grep)
-         ("C-c k" . counsel-ag)
-         ("C-x l" . counsel-locate)
-         ("C-S-o" . counsel-rhythmbox))
+         ("C-x C-b" . counsel-ibuffer)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)
+         ("C-h l" . counsel-find-library))
   :diminish ivy-mode
   :config
   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
@@ -122,6 +113,7 @@
 (use-package flycheck :ensure t)
 
 (use-package company :ensure t
+  :diminish company-mode
   :init
   (setq company-require-match 'never
         company-minimum-prefix-length 2
@@ -140,10 +132,6 @@
   (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   (define-key company-active-map (kbd "<backtab>") 'company-select-))
 
-(use-package company-quickhelp :ensure t
-  :config
-  (company-quickhelp-mode))
-
 (use-package yasnippet :ensure t
   :diminish yas-minor-mode
   :config
@@ -158,6 +146,11 @@
           '(lambda()
              (flycheck-mode)
              (push '(company-elisp :with company-yasnippet) company-backends)))
+
+(add-hook 'scheme-mode-hook
+          'lambda()
+          (flycheck-mode
+           (push '(company-scheme :with company-yasnippet) company-backends)))
 
 (provide 'init)
 ;;; init.el ends here

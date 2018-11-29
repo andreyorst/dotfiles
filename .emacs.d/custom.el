@@ -6,7 +6,7 @@
  '(display-line-numbers-type (quote visual))
  '(package-selected-packages
    (quote
-    (yasnippet-snippets yasnippet company-quickhelp company flycheck markdown-mode counsel ivy flx highlight-indent-guides parinfer diminish telephone-line spacemacs-theme use-package))))
+    (geiser yasnippet-snippets yasnippet company-quickhelp company flycheck markdown-mode counsel ivy flx highlight-indent-guides parinfer diminish telephone-line spacemacs-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
