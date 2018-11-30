@@ -114,7 +114,9 @@
 
 (use-package markdown-mode :ensure t)
 
-(use-package flycheck :ensure t)
+(use-package flycheck :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'flycheck-mode))
 
 (use-package company :ensure t
   :diminish company-mode
@@ -142,19 +144,6 @@
   (add-hook 'prog-mode-hook 'yas-minor-mode))
 
 (use-package yasnippet-snippets :ensure t)
-
-;;; Language settings
-
-;;; eLisp specific settings
-(add-hook 'emacs-lisp-mode-hook
-          '(lambda()
-             (flycheck-mode)
-             (push '(company-elisp :with company-yasnippet) company-backends)))
-
-(add-hook 'scheme-mode-hook
-          'lambda()
-          (flycheck-mode
-           (push '(company-scheme :with company-yasnippet) company-backends)))
 
 (provide 'init)
 ;;; init.el ends here
