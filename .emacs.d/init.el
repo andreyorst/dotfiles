@@ -27,6 +27,7 @@
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
+              scroll-conservatively 10000
               auto-window-vscroll nil
               cursor-type 'bar)
 
@@ -59,12 +60,9 @@
 (use-package geiser :ensure t
   :init
   (defvar geiser-active-implementations '(mit guile)))
-  
 
 (use-package diminish :ensure t
   :diminish eldoc-mode)
-
-(use-package paredit :ensure t)
 
 (use-package parinfer :ensure t
   :bind
@@ -72,11 +70,10 @@
   :init
   (progn
     (setq parinfer-extensions
-          '(defaults        ;; should be included.
-             pretty-parens  ;; different paren styles for different modes.
-             smart-tab      ;; C-b & C-f jump positions and smart shift with tab & S-tab.
-             paredit
-             smart-yank))   ;; Yank behavior depend on mode.
+          '(defaults
+             pretty-parens
+             smart-tab
+             smart-yank))
     (add-hook 'clojure-mode-hook #'parinfer-mode)
     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
@@ -112,8 +109,6 @@
 
 (use-package swiper :ensure t)
 
-(use-package markdown-mode :ensure t)
-
 (use-package flycheck :ensure t
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode))
@@ -136,7 +131,7 @@
   (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  (define-key company-active-map (kbd "<backtab>") 'company-select-))
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 
 (use-package yasnippet :ensure t
   :diminish yas-minor-mode
