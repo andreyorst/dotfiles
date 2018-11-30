@@ -58,10 +58,13 @@
 
 (use-package geiser :ensure t
   :init
-  (defvar geiser-active-implementations '(chicken guile)))
+  (defvar geiser-active-implementations '(mit guile)))
+  
 
 (use-package diminish :ensure t
   :diminish eldoc-mode)
+
+(use-package paredit :ensure t)
 
 (use-package parinfer :ensure t
   :bind
@@ -72,6 +75,7 @@
           '(defaults        ;; should be included.
              pretty-parens  ;; different paren styles for different modes.
              smart-tab      ;; C-b & C-f jump positions and smart shift with tab & S-tab.
+             paredit
              smart-yank))   ;; Yank behavior depend on mode.
     (add-hook 'clojure-mode-hook #'parinfer-mode)
     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
