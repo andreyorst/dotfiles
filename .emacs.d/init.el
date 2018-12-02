@@ -23,7 +23,7 @@
   (tooltip-mode -1)
   (fset 'menu-bar-open nil))
 
-(set-face-attribute 'default nil :font "Source Code Pro-10")
+(set-face-attribute 'default nil :font "Source Code Pro-12")
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
@@ -139,6 +139,8 @@
   (add-hook 'prog-mode-hook 'yas-minor-mode))
 
 (use-package yasnippet-snippets :ensure t)
+
+(add-hook 'prog-mode-hook 'show-paren-mode)
 
 (provide 'init)
 ;;; init.el ends here
