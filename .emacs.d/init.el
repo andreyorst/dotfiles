@@ -23,7 +23,10 @@
   (tooltip-mode -1)
   (fset 'menu-bar-open nil))
 
-(set-face-attribute 'default nil :font "Source Code Pro-12")
+;; show matching parens in every programming language
+(add-hook 'prog-mode-hook 'show-paren-mode)
+
+(set-face-attribute 'default nil :font "Source Code Pro-11")
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
@@ -140,7 +143,7 @@
 
 (use-package yasnippet-snippets :ensure t)
 
-(add-hook 'prog-mode-hook 'show-paren-mode)
+(use-package markdown-mode :ensure t)
 
 (provide 'init)
 ;;; init.el ends here
