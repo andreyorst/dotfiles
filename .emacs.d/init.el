@@ -26,7 +26,7 @@
 ;; show matching parens in every programming language
 (add-hook 'prog-mode-hook 'show-paren-mode)
 
-(set-face-attribute 'default nil :font "Source Code Pro-11")
+(set-face-attribute 'default nil :font "Source Code Pro-10")
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
@@ -94,7 +94,6 @@
          ("<f6>" . ivy-resume)
          ("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
-         ("C-x M-f" . counsel-recentf)
          ("C-x C-b" . counsel-ibuffer)
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
@@ -136,15 +135,7 @@
   (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 
-(use-package yasnippet :ensure t
-  :diminish yas-minor-mode
-  :config
-  (add-hook 'prog-mode-hook 'yas-minor-mode))
-
-(use-package yasnippet-snippets :ensure t)
-
-(use-package markdown-mode
-  :ensure t
+(use-package markdown-mode :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
