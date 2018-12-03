@@ -8,6 +8,9 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+unset LS_COLORS
+unset LSCOLORS
+
 alias vimdiff="nvim -u ~/.dotfiles/.vimdiffrc -d"
 alias zshconf="kak ~/.zshrc"
 alias tmuxconf="kak ~/.tmux.conf"
