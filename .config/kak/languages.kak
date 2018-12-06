@@ -21,7 +21,7 @@ hook global WinCreate .* %{
 }
 
 # Highlight operators and delimiters
-hook -group ope_delim global WinCreate .* %{
+hook -group ope-delim global WinCreate .* %{
     add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
     add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
     add-highlighter buffer/namespace  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
