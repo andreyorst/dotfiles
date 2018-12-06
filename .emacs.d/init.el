@@ -141,5 +141,10 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (defvar markdown-command "multimarkdown"))
 
+(use-package yasnippet :ensure t
+  :diminish yas-minor-mode
+  :config
+  (add-hook 'prog-mode-hook 'yas-minor-mode))
+
 (provide 'init)
 ;;; init.el ends here
