@@ -146,5 +146,13 @@
   :config
   (add-hook 'prog-mode-hook 'yas-minor-mode))
 
+(use-package projectile :ensure t
+  :init
+  (projectile-mode +1)
+  :bind
+  (("C-c p" . projectile-command-map)))
+
+(use-package counsel-projectile :ensure t)
+
 (provide 'init)
 ;;; init.el ends here
