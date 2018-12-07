@@ -14,7 +14,7 @@
  '(mode-line-percent-position nil)
  '(package-selected-packages
    (quote
-    (counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish spacemacs-theme use-package))))
+    (yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish spacemacs-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
