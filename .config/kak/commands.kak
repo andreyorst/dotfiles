@@ -8,12 +8,19 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-define-command -override -docstring "find <name>: fuzzy match through filenames" \
-find -params 1 -shell-script-candidates %{ find -L -type f } %{ edit %arg{1} }
+define-command -override -hidden \
+-docstring "smart-gf: select WORD if current selection is only one character" \
+smart-gf %{ evaluate-commands %sh{
+    if [ $(expr $(printf "%s\n" $kak_selection | wc -m) - 1) -eq 1 ]; then
+        printf "%s\n%s\n" "execute-keys -save-regs '' <a-i><a-w>" "find %val{selection}"
+    else
+        printf "%s\n" "find %val{selection}"
+    fi
+}}
 
 define-command -override -docstring \
-"file-search-rec <filename>: search for file recusively under path option: %opt{path}" \
-file-search-rec -params 1 %{ evaluate-commands %sh{
+"find <filename>: search for file recusively under path option: %opt{path}" \
+find -params 1 %{ evaluate-commands %sh{
     file=$1
     eval "set -- $kak_buflist"
     while [ $# -gt 0 ]; do            # Check if buffer with this
@@ -37,13 +44,20 @@ file-search-rec -params 1 %{ evaluate-commands %sh{
             *)  path=$1 ;;                # this trick is a speedi-up hack.
         esac
         if [ -z "${file##*/*}" ]; then # test if filename contains path
-            [ -e "$path/$file" ] && result="$path/$file"
-        else # get first match with find
-            result=$(find -L $path -mount -type f -name "$file" | head -n 1)
-        fi
-        if [ ! -z "$result" ]; then
-            printf "%s\n" "edit -existing %{$result}"
-            exit
+            if [ -e "$path/$file" ]; then
+                printf "%s\n" "edit -existing %{$path/$file}"
+                exit
+            fi
+        else # build list of candidates or automatically select if only one found
+            for candidate in $(find -L $path -mount -type f -name "$file"); do
+                if [ -n "$candidate" ]; then
+                    candidates="$candidates %{$candidate} %{evaluate-commands %{edit -existing %{$candidate}}}"
+                fi
+            done
+            if [ -n "$candidates" ]; then
+                printf "%s\n" "menu -auto-single $candidates"
+                exit
+            fi
         fi
         shift
     done
@@ -53,10 +67,10 @@ file-search-rec -params 1 %{ evaluate-commands %sh{
 define-command -override -docstring \
 "select a word under cursor, or add cursor on next occurrence of current selection" \
 select-or-add-cursor %{ execute-keys -save-regs '' %sh{
-    if [ $(expr $(echo $kak_selection | wc -m) - 1) -eq 1 ]; then
-        echo "<a-i>w*"
+    if [ $(expr $(printf "%s\n" $kak_selection | wc -m) - 1) -eq 1 ]; then
+        printf "%s\n" "<a-i>w*"
     else
-        echo "*<s-n>"
+        printf "%s\n" "*<s-n>"
     fi
 }}
 

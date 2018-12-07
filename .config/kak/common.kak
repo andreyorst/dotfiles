@@ -31,8 +31,8 @@ map -docstring "convert leading spaces to tabs"       global user   't'     ': l
 map -docstring "convert leading tabs to spaces"       global user   'T'     ': leading-tabs-to-spaces<ret>'
 
 ## Goto
-map -docstring "file non-recursive" global goto   '<a-f>' '<esc><a-i><a-w>gf'
-map -docstring "file recursive"     global goto   'f'     '<esc><a-i><a-w>: file-search-rec %val{selection}<ret>'
+map -docstring "file non-recursive" global goto   '<a-f>' '<esc>gf'
+map -docstring "file recursive"     global goto   'f'     '<esc>: smart-gf<ret>'
 map -docstring "next buffer"        global goto   'b'     '<esc>:bn<ret>'
 map -docstring "previous buffer"    global goto   'B'     '<esc>:bp<ret>'
 
