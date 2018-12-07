@@ -91,13 +91,18 @@ define-command -override -docstring "jump to symbol definition in current file" 
     readtags -t $tags -l | cut -f 1 | awk '!x[$0]++' | grep -v -e "__anon.*"
 } symbol -params 1 %{ evaluate-commands %sh{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
-    menu=$(readtags -t $tags "$1" | while read tag; do
+    menu=$(readtags -t $tags "$1" |
+    while read tag; do
         file=$(printf "%s\n" "$tag" | cut -f 2)
         search=$(printf "%s\n" "$tag" | cut -f 3 | sed -E 's:^/\^|\$/$::g;')
-        menu="$menu %{$file {MenuInfo}$search} %{ evaluate-commands %{ try %{ edit %{$file}; execute-keys %{/\Q$search<ret>vc} } catch %{ echo -markup %{{Error}unable to find tag} } } }"
-        printf "%s\n" "$menu"
+        if [ -n "$file" ] && [ -n "$search" ]; then
+            menu="$menu %{$file {MenuInfo}$search} %{ evaluate-commands %{ try %{ edit %{$file}; execute-keys %{/\Q$search<ret>vc} } catch %{ echo -markup %{{Error}unable to find tag} } } }"
+            printf "%s\n" "$menu"
+        fi
     done | tail -n 1)
-    printf "%s\n" "menu -markup -auto-single $menu"
+    if [ -n "$menu" ]; then
+        printf "%s\n" "menu -markup -auto-single $menu"
+    fi
     rm $tags
 }}
 
