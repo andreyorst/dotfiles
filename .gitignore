@@ -4,9 +4,10 @@ ssfhs
 settings.json
 spell
 saved_workspaces
-plugins
-elpa
+.config/kak/plugins
+.config/kak/colors
 *~
+.emacs.d/elpa
 .emacs.d/games
 .emacs.d/session*
 .emacs.d/recentf*
