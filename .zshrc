@@ -8,8 +8,11 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
-unset LS_COLORS
-unset LSCOLORS
+if [ -n "$(command -v exa)" ]; then
+    unset LS_COLORS
+    unset LSCOLORS
+    alias ls=exa
+fi
 
 alias vimdiff="nvim -u ~/.dotfiles/.vimdiffrc -d"
 alias zshconf="kak ~/.zshrc"
