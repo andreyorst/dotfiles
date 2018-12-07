@@ -86,20 +86,19 @@ leading-tabs-to-spaces %{
 
 define-command -override -docstring "jump to symbol definition in current file" \
 -shell-script-candidates %{
-    # tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
-    # ctags -f $tags $kak_buffile
-    readtags -t ./tags -l | cut -f 1 | awk '!x[$0]++' | grep -v -e "__anon.*"
+    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    ctags -f $tags $kak_buffile
+    readtags -t $tags -l | cut -f 1 | awk '!x[$0]++' | grep -v -e "__anon.*"
 } symbol -params 1 %{ evaluate-commands %sh{
-    # tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
-    menu=$(readtags -t ./tags "$1" |
+    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    menu=$(readtags -t $tags "$1" |
     while read tag; do
-        file=$(printf "%s\n" "$tag" | cut -f 2)
-        search=$(printf "%s\n" "$tag" | cut -f 3 | sed -E 's:^/\^|\$/$::g;')
-        if [ -n "$file" ] && [ -n "$search" ]; then
-            name=$(printf "%s\n" "$file" | sed "s:':'':g")
-            file=$(printf "%s\n" "$file" | sed "s:':'''''''''''''''':g")
-            search=$(printf "%s\n" "$search" | sed "s:':'''''''''''''''':g")
-            command="evaluate-commands '' try '''' edit ''''''''$file''''''''; execute-keys ''''''''/\Q$search<ret>vc'''''''' '''' catch '''' echo ''''''''unable to find tag'''''''' '''' ''"
+        file=$(printf "%s\n" "$tag"  | cut -f 2)
+        keys=$(printf "%s\n" "$tag"  | sed "s:.*/\^::;s:\$/$::;s:':'''''''''''''''':g")
+        name=$(printf "%s\n" "$file" | sed "s:':'':g")
+        file=$(printf "%s\n" "$file" | sed "s:':'''''''''''''''':g")
+        command="evaluate-commands '' try '''' edit ''''''''$file''''''''; execute-keys ''''''''/\Q$keys<ret>vc'''''''' '''' catch '''' echo ''''''''unable to find tag'''''''' '''' ''"
+        if [ -n "$file" ] && [ -n "$keys" ]; then
             menu="$menu '$name' '$command'"
             printf "%s\n" "$menu"
         fi
@@ -109,3 +108,4 @@ define-command -override -docstring "jump to symbol definition in current file" 
     fi
     rm $tags
 }}
+
