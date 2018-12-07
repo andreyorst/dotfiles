@@ -16,7 +16,11 @@ plug "occivink/kakoune-vertical-selection"
 
 plug "occivink/kakoune-gdb"
 
-plug "andreyorst/base16-gruvbox.kak"
+plug "andreyorst/base16-gruvbox.kak" noload do %{
+    ln -sf $PWD/colors/base16-gruvbox-dark-soft.kak $HOME/.config/kak/colors
+} config %{
+    colorscheme base16-gruvbox-dark-soft
+}
 
 plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
