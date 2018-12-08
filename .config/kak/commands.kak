@@ -104,8 +104,8 @@ define-command -override -docstring "jump to symbol definition in current file" 
             printf "%s " "'$name {MenuInfo}$menuinfo' '$command'" >> $menu
         fi
     done
-    if [ -n "$menu" ]; then
-        printf "%s\n" "menu -markup $(cat '$menu')"
+    if [ -s "$menu" ]; then
+        printf "%s\n" "menu -auto-single -markup $(cat $menu)"
     fi
     rm $menu $tags
 }}
