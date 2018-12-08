@@ -93,10 +93,9 @@ define-command -override -docstring "jump to symbol definition in current file" 
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
     menu=$(readtags -t $tags "$1" |
     while read tag; do
-        file=$(printf "%s\n" "$tag"  | cut -f 2)
+        name=$(printf "%s\n" "$tag"  | cut -f 2 | sed "s:':'':g")
         keys=$(printf "%s\n" "$tag"  | sed "s:.*/\^::;s:\$/$::;s:':'''''''''''''''':g")
-        name=$(printf "%s\n" "$file" | sed "s:':'':g")
-        file=$(printf "%s\n" "$file" | sed "s:':'''''''''''''''':g")
+        file=$(printf "%s\n" "$name" | sed "s:'':'''''''''''''''':g")
         command="evaluate-commands '' try '''' edit ''''''''$file''''''''; execute-keys ''''''''/\Q$keys<ret>vc'''''''' '''' catch '''' echo ''''''''unable to find tag'''''''' '''' ''"
         if [ -n "$file" ] && [ -n "$keys" ]; then
             menu="$menu '$name' '$command'"
