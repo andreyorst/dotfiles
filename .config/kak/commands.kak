@@ -87,7 +87,7 @@ leading-tabs-to-spaces %{
 define-command -override -docstring "jump to symbol definition in current file" \
 -shell-script-candidates %{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
-    ctags -f $tags $kak_buffile
+    ctags -f "$tags" "$kak_buffile"
     cut -f 1 "$tags" | grep -v '^!' | awk '!x[$0]++'
 } symbol -params 1 %{ evaluate-commands %sh{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
@@ -96,8 +96,8 @@ define-command -override -docstring "jump to symbol definition in current file" 
     readtags -t "$tags" "$1" |
     while read tag; do
         name=$(printf "%s\n" "$tag" | cut -f 2 | sed "s:':'':g")
-        menuinfo=$(printf "%s\n" "$tag" | sed "s:.*/\^\(\s\+\)\?::;s:\(\$\)\?/$::;s:':'':g;s:$open:\\\\$open:g")
-        keys=$(printf "%s\n" "$tag" | sed "s:.*/\^::;s:\(\$\)\?/$::;s:':'''''''''''''''':g;s:<:<lt>:g")
+        menuinfo=$(printf "%s\n" "$tag" | sed "s:.*/\^\(\s\+\)\?::;s:\(\\\$\)\?/$::;s:':'':g;s:$open:\\\\$open:g")
+        keys=$(printf "%s\n" "$tag" | sed "s:.*/\^::;s:\(\\\$\)\?/$::;s:':'''''''''''''''':g;s:<:<lt>:g")
         file=$(printf "%s\n" "$name" | sed "s:'':'''''''''''''''':g")
         command="evaluate-commands '' try '''' edit ''''''''$file''''''''; execute-keys ''''''''/\Q$keys<ret>vc'''''''' '''' catch '''' echo -markup ''''''''{Error}unable to find tag'''''''' '''' ''"
         if [ -n "$file" ] && [ -n "$keys" ]; then
@@ -105,7 +105,7 @@ define-command -override -docstring "jump to symbol definition in current file" 
         fi
     done
     if [ -n "$menu" ]; then
-        printf "%s\n" "menu -markup $(cat $menu)"
+        printf "%s\n" "menu -markup $(cat '$menu')"
     fi
     rm $menu $tags
 }}
