@@ -31,10 +31,12 @@ map -docstring "convert leading spaces to tabs"       global user   't'     ': l
 map -docstring "convert leading tabs to spaces"       global user   'T'     ': leading-tabs-to-spaces<ret>'
 
 ## Goto
-map -docstring "file non-recursive" global goto   '<a-f>' '<esc>gf'
-map -docstring "file recursive"     global goto   'f'     '<esc>: smart-gf<ret>'
-map -docstring "next buffer"        global goto   'b'     '<esc>:bn<ret>'
-map -docstring "previous buffer"    global goto   'B'     '<esc>:bp<ret>'
+map -docstring "file non-recursive"             global goto   '<a-f>' '<esc>gf'
+map -docstring "file recursive"                 global goto   'f'     '<esc>: smart-select; find %val{selection}<ret>'
+map -docstring "next buffer"                    global goto   'b'     '<esc>:bn<ret>'
+map -docstring "previous buffer"                global goto   'B'     '<esc>:bp<ret>'
+map -docstring "search tag in current file"     global goto   '['     '<esc>: smart-select word; symbol<ret>'
+map -docstring "search tag in global tags file" global goto   ']'     '<esc>: smart-select word; ctags-search<ret>'
 
 ## System clipboard
 map -docstring "copy to system clipboard"    global user 'y' '<a-|>xsel -b -i<ret>'
