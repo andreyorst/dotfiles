@@ -9,12 +9,15 @@
 # ╰────────────────────────────────╯
 
 define-command -override -hidden \
--docstring "smart-gf: select WORD if current selection is only one character" \
-smart-gf %{ evaluate-commands %sh{
+-docstring "smart-select: select WORD if current selection is only one character" \
+smart-select -params ..1 %{ execute-keys -save-regs '' %sh{
+    if [ "$1" = "WORD" ]; then
+        keys="<a-w>"
+    elif [ "$1" = "word" ]; then
+        keys="w"
+    fi
     if [ $(expr $(printf "%s\n" $kak_selection | wc -m) - 1) -eq 1 ]; then
-        printf "%s\n%s\n" "execute-keys -save-regs '' <a-i><a-w>" "find %val{selection}"
-    else
-        printf "%s\n" "find %val{selection}"
+        printf "%s\n" "<a-i>${keys:-<a-w>}"
     fi
 }}
 
@@ -84,16 +87,20 @@ leading-tabs-to-spaces %{
     execute-keys -draft %{%s^\h+<ret>@}
 }
 
-define-command -override -docstring "jump to symbol definition in current file" \
+define-command -override -docstring "symbol [<symbol>]: jump to symbol definition in current file.
+If no symbol given, current selection is used as a symbol name" \
 -shell-script-candidates %{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
     ctags -f "$tags" "$kak_buffile"
     cut -f 1 "$tags" | grep -v '^!' | awk '!x[$0]++'
-} symbol -params 1 %{ evaluate-commands %sh{
+} symbol -params ..1 %{ evaluate-commands %sh{
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    if [ ! -s "$tags" ]; then
+        ctags -f "$tags" "$kak_buffile"
+    fi
     menu="${TMPDIR:-/tmp}/ctags-menu"
     open='{'; close='}'
-    readtags -t "$tags" "$1" |
+    readtags -t "$tags" "${1:-$kak_selection}" |
     while read tag; do
         name=$(printf "%s\n" "$tag" | cut -f 2 | sed "s:':'':g")
         menuinfo=$(printf "%s\n" "$tag" | sed "s:.*/\^\(\s\+\)\?::;s:\(\\\$\)\?/$::;s:':'':g;s:$open:\\\\$open:g")
@@ -106,6 +113,8 @@ define-command -override -docstring "jump to symbol definition in current file" 
     done
     if [ -s "$menu" ]; then
         printf "%s\n" "menu -auto-single -markup $(cat $menu)"
+    else
+        printf "%s\n" "echo -markup %{{Error}tag '${1:-$kak_selection}' not found}"
     fi
     rm $menu $tags
 }}
