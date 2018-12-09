@@ -113,9 +113,10 @@ If no symbol given, current selection is used as a symbol name" \
     done
     if [ -s "$menu" ]; then
         printf "%s\n" "menu -auto-single -markup $(cat $menu)"
+        rm $menu
     else
         printf "%s\n" "echo -markup %{{Error}tag '${1:-$kak_selection}' not found}"
     fi
-    rm $menu $tags
+    rm $tags
 }}
 
