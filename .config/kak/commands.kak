@@ -90,12 +90,12 @@ leading-tabs-to-spaces %{
 define-command -override -docstring "symbol [<symbol>]: jump to symbol definition in current file.
 If no symbol given, current selection is used as a symbol name" \
 -shell-script-candidates %{
-    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    tags="${TMPDIR:-/tmp}/tags-tmp"
     ctags -f "$tags" "$kak_buffile"
     cut -f 1 "$tags" | grep -v '^!' | awk '!x[$0]++'
 } symbol -params ..1 %{ evaluate-commands %sh{
-    tagname=${1:-${kak_selection}}
-    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    tagname=${1:-$kak_selection}
+    tags="${TMPDIR:-/tmp}/tags-tmp"
     if [ ! -s "$tags" ]; then
         ctags -f "$tags" "$kak_buffile"
     fi
@@ -113,12 +113,12 @@ If no symbol given, current selection is used as a symbol name" \
             printf "%s " "'$name {MenuInfo}$menuinfo' '$command'" >> $menu
         fi
     done
+    rm $tags
     if [ -s "$menu" ]; then
         printf "%s\n" "menu -auto-single -markup $(cat $menu)"
         rm $menu
     else
         printf "%s\n" "echo -markup %{{Error}tag '${1:-$kak_selection}' not found}"
     fi
-    rm $tags
 }}
 
