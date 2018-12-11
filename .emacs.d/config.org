@@ -140,6 +140,25 @@ Anyway it's awesome.
 (set-face-attribute 'fringe nil :background nil)
 #+END_SRC
 
+** Diminish
+Emacs, please stop cluttering my modeline with all those modes I already know about.
+
+#+BEGIN_SRC emacs-lisp
+(use-package diminish :ensure t
+  :diminish eldoc-mode)
+#+END_SRC
+
+** Markdown
+Who needs markdown when you have Org? Well, I need. Kinda. I still do most of writing with it. Shame on me.
+
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode :ensure t
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (defvar markdown-command "multimarkdown"))
+#+END_SRC
+
 ** Geiser
 Since I mostly use Emacs for studying LISP, and I'm reading SICP which uses Scheme
 as main LISP flavor for explanations and excersises, I need a tool to run Scheme, and
@@ -149,14 +168,6 @@ Geiser seems like the most vuable option here.
 (use-package geiser :ensure t
   :init
   (defvar geiser-active-implementations '(mit guile)))
-#+END_SRC
-
-** Diminish
-Emacs, please stop cluttering my modeline with all those modes I already know about.
-
-#+BEGIN_SRC emacs-lisp
-(use-package diminish :ensure t
-  :diminish eldoc-mode)
 #+END_SRC
 
 ** Parinfer
@@ -254,17 +265,6 @@ Complete anything framework. Nothing much to say. Does it's job.
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 #+END_SRC
 
-** Markdown
-Who needs markdown when you have Org? Well, I need. Kinda. I still do most of writing with it. Shame on me.
-
-#+BEGIN_SRC emacs-lisp
-(use-package markdown-mode :ensure t
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (defvar markdown-command "multimarkdown"))
-#+END_SRC
-
 ** Yasnippet
 Another very handy package, that helps insert templates of code
 
@@ -293,3 +293,4 @@ It makes using projectile easier by allowing fuzzy matching.
 #+BEGIN_SRC emacs-lisp
 (use-package counsel-projectile :ensure t)
 #+END_SRC
+
