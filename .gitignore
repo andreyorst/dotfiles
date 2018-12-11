@@ -13,5 +13,6 @@ saved_workspaces
 .emacs.d/recentf*
 .emacs.d/.mc-lists.el
 .emacs.d/projectile*
+.emacs.d/config.el
 .emacs.d/url
 **#*
