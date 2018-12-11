@@ -1,10 +1,124 @@
-* Preamble
-So I've decided to reimplement my configuration file with
-the package, called Org Mode. This is what I've got so far.
+* Emacs configuration with Org Mode
+This is my Emacs configuration file written as Org document. The purpose of
+this file is to learn basics of Org Mode and Emacs in general. I try to
+keep my configuration simple and fast and I mostly use Emacs as environment
+for studying LISP, currently Scheme, so this configuration is pretty much
+about it.
 
-* Melpa
-Melpa is a package repository, that I use to get packages.
-(Note for Windows: change =https= to =http=
+** Common settings
+I tend to split my configurations of Editors to sections. The basic
+sections are:
+
+1. Common settings - which is used to configure basic editor facilities.
+2. Custom user commands - which stores my custom commands that I use.
+3. Plugins - the set of used plugins and it's configurations
+4. Language specific settings - everything needed to feel comfortable while
+working with some language.
+
+This configuration is mostly about Emacs itself and studying LISP, and
+I'm not elisp guru yet, so for now not every of shown categories is listed
+here.
+
+*** Startup screen
+I like to keep my starting process straightforward, so I tend to disable
+startup screen and start with lisp interaction buffer instead.
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-splash-screen t)
+#+END_SRC
+
+*** Ui defaults
+These are some defaults for user interface. I don't like those
+bars, buttons, tooltips, scrollbars, etc.
+
+#+BEGIN_SRC emacs-lisp
+  (ignore-errors
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1)
+    (tooltip-mode -1)
+    (fset 'menu-bar-open nil))
+#+END_SRC
+
+*** Font
+I like this Adobe Source Code Pro font. Even if I use Hack in every other
+editor, for some reason I find this font just right for Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :font "Source Code Pro-10")
+#+END_SRC
+
+*** Common behaviors
+I don't like how Emacs handles scrolling, and that it uses tab characters
+by default. I need tab characters only when I work with C code and Makefile
+rules. And Just because I can, enable bar cursor. It's not Kakoune, there's
+no need for big rectangle to be honest.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default indent-tabs-mode nil
+                scroll-step 1
+                scroll-conservatively 10000
+                auto-window-vscroll nil
+                cursor-type 'bar)
+#+END_SRC
+
+*** Line numbers
+For some reason Emacs has long history of being not capable to display line
+numbers properly, but now native line numbers are shipped with Emacs
+starting with version 26. However even this implementation is slow on large
+files in my experience, but I need them, and therefore I'm enabling them in
+all programming modes.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'global-display-line-numbers-mode)
+#+END_SRC
+
+*** Matching parens
+One feature that I think is really important, especially when working
+with lisp code, is ability to see matching paren when cursor stands near
+the other paren. So I enable it for every language.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'show-paren-mode)
+#+END_SRC
+
+*** Fixing dumb Emacs stuff
+This is just some fixes of things I found kind of strange.
+
+**** Bell
+I'm not trying to insult on anyone, but these things are just insane. It's
+not 1980's, computers have their own speakers and rich displays, why would
+anyone want to use builtin speaker?
+Why everyone should know when I'm mistaken? Disable bell.
+
+#+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+END_SRC
+
+**** Custom
+I don't like custom, and especially would like to stop it from
+interfering to my configuration files, so lets move it to separate file.
+
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (load custom-file :noerror)
+#+END_SRC
+
+**** Backups
+I don't know who decided that having backups all over the place is good
+idea, but I don't think alike.
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-by-copying t
+        create-lockfiles nil
+        backup-directory-alist '(("." . "~/.cache/emacs-backups"))
+        auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
+#+END_SRC
+
+*** Melpa
+Melpa is a package repository, that I use to get packages. Since all
+packages that I need can be obtained from there, I didn't bothered with
+different methods of installation.
 
 #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -13,284 +127,232 @@ Melpa is a package repository, that I use to get packages.
                '("melpa" . "https://melpa.org/packages/") t)
 #+END_SRC
 
-** Package initialization
-This piece of code is used to update package list if there's none.
+Note for Windows users: change =https= to =http=
+
+**** Package initialization
+This basic piece of code is used to update package list if there's none.
 
 #+BEGIN_SRC emacs-lisp
-(package-initialize)
-(when (not package-archive-contents)
-  (package-refresh-contents))
+  (package-initialize)
+  (when (not package-archive-contents)
+    (package-refresh-contents))
 #+END_SRC
 
-* Common settings
-** Ui defaults
-These are some defaults for user interface. I don't like those
-bars, buttons, tooltips, scrollbars, etc.
+** Functions
+This section should contain functions that I've wrote for personal use
+here and there, but there's only one function at the moment unfortunately.
+But I still gonna give it it's own category.
+
+*** =ensure-installed=
+To ensure that some essential packages are installed I've wrote this small
+lisp function that checks if package exists and if not downloads it from
+Melpa.
 
 #+BEGIN_SRC emacs-lisp
-(ignore-errors
-  (global-display-line-numbers-mode)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (tooltip-mode -1)
-  (fset 'menu-bar-open nil))
+  (defun ensure-installed (package)
+    "Ensure that PACKAGE is installed."
+    (when (not (package-installed-p package))
+      (package-install package)))
 #+END_SRC
 
-** Matching parens
-One feature that I think is really important, especially when working
-with lisp code, is ability to see matching paren when cursor stands near
-the other paren. So I enable it for every language.
+** Packages
+Now that's where fun starts. I try to keep my Emacs configuration simple,
+and fast but I still think that I need some essential packages.
+
+*** use-package
+I use package, named =use-package= to install, load and configure my
+packages. I find this way very consistent and easy to understand and
+maintain. Since =use-package= can't install itseld, let's use
+=ensure-installed= function for it.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook 'show-paren-mode)
+  (ensure-installed 'use-package)
+  (require 'use-package)
 #+END_SRC
 
-** Startup screen
-I like to keep my starting screen simple, so I tend to disable
-startup screen and start with lisp interaction buffer instead.
+*** Spacemacs theme
+I really like this theme. It's something like Atom's One Dark, but little
+more purple. Anyway it's awesome, and colors are really nice.
+
+I don't know why, but I had troubles with installing this theme with
+=use-package= so it is installed with =ensure-installed= instead.
 
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-splash-screen t)
+  (ensure-installed 'spacemacs-theme)
+  (load-theme 'spacemacs-dark t nil)
+  (set-face-attribute 'fringe nil :background nil)
 #+END_SRC
 
-** Font
-I like this Adobe Source Code Pro font.
+*** Diminish
+Emacs, please stop cluttering my modeline with all those modes I already
+know about. Since =eldoc-mode= is builtin, I've put it to =diminish=
+configuration.
 
 #+BEGIN_SRC emacs-lisp
-(set-face-attribute 'default nil :font "Source Code Pro-10")
+  (use-package diminish :ensure t
+    :diminish eldoc-mode)
 #+END_SRC
 
-** Common behaviors
-#+BEGIN_SRC emacs-lisp
-(setq-default indent-tabs-mode nil
-              scroll-step 1
-              scroll-conservatively 10000
-              auto-window-vscroll nil
-              cursor-type 'bar)
-#+END_SRC
-
-** Fixing dumb Emacs stuff
-*** Bell
-Why everyone should know when I'm mistaken? Disable bell.
+*** Markdown
+Who needs markdown when you have Org? Well, I need. Kinda. I still do most
+of writing with it. Shame on me.
 
 #+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
+  (use-package markdown-mode :ensure t
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (defvar markdown-command "multimarkdown"))
 #+END_SRC
 
-*** Custom
-I don't like custom, and especially would like to stop it from interfiering to
-my configuration files, so lets move it to separate file.
+*** Geiser
+Since I mostly use Emacs for studying LISP, and I'm reading SICP which uses
+Scheme as main LISP flavor for explanations and exercises, I need a tool
+to run Scheme, and Geiser seems like the most viable option here, since it
+also provides completion for it.
 
 #+BEGIN_SRC emacs-lisp
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file :noerror)
+  (use-package geiser :ensure t
+    :init
+    (defvar geiser-active-implementations '(mit guile)))
 #+END_SRC
 
-*** Backups
-I don't know who decided that having backups all over the place is good idea,
-but I don't think alike.
+*** Parinfer
+Now that's a quality package. It makes writing LISP so easy, that I've
+never thought it could be.
+
+There's a lot of configuration here, but it was taken as is from Parinfer
+Mode repository.
 
 #+BEGIN_SRC emacs-lisp
-;; store backups in different place and disable lockfiles
-(setq backup-by-copying t
-      create-lockfiles nil
-      backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
+  (use-package parinfer :ensure t
+    :bind
+    (("C-," . parinfer-toggle-mode))
+    :init
+    (progn
+      (setq parinfer-extensions
+            '(defaults
+               pretty-parens
+               smart-tab
+               smart-yank))
+      (add-hook 'clojure-mode-hook #'parinfer-mode)
+      (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+      (add-hook 'common-lisp-mode-hook #'parinfer-mode)
+      (add-hook 'scheme-mode-hook #'parinfer-mode)
+      (add-hook 'lisp-mode-hook #'parinfer-mode)))
 #+END_SRC
 
-*** Splash screen
-I like to keep my starting screen simple, so I tend to disable
-startup screen and start with lisp interaction buffer instead.
-#+BEGIN_SRC emacs-lisp
-(setq inhibit-splash-screen t)
-#+END_SRC
-
-* Packages
-Now that's where fun starts. I try to keep my Emacs configuration simple, and fast
-but I still think that I need some essential packages.
-
-** use-package
-I use package, named =use-package= to install, load and configure my packages. I find
-this way very consistent and easy to understand and maintain.
-
-To ensure that =use-package= is installed I've wrote this small lisp function
-that checks if package exists and if not it downloads it from Melpa.
+*** Flx
+This package provides some kind of fuzzy matching for Emacs.
 
 #+BEGIN_SRC emacs-lisp
-(defun ensure-installed (pkg)
-  "Ensure that PKG is installed."
-  (when (not (package-installed-p pkg))
-    (package-install pkg)))
+  (use-package flx :ensure t)
 #+END_SRC
 
-So let's install and load =use-package=
-#+BEGIN_SRC emacs-lisp
-(ensure-installed 'use-package)
-(require 'use-package)
-#+END_SRC
-
-** Spacemacs theme
-I really like this theme. It's something like Atom's One Dark, but little more purple.
-Anyway it's awesome.
-
-#+BEGIN_SRC emacs-lisp
-(ensure-installed 'spacemacs-theme)
-(load-theme 'spacemacs-dark t nil)
-(set-face-attribute 'fringe nil :background nil)
-#+END_SRC
-
-** Diminish
-Emacs, please stop cluttering my modeline with all those modes I already know about.
-
-#+BEGIN_SRC emacs-lisp
-(use-package diminish :ensure t
-  :diminish eldoc-mode)
-#+END_SRC
-
-** Markdown
-Who needs markdown when you have Org? Well, I need. Kinda. I still do most of writing with it. Shame on me.
-
-#+BEGIN_SRC emacs-lisp
-(use-package markdown-mode :ensure t
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (defvar markdown-command "multimarkdown"))
-#+END_SRC
-
-** Geiser
-Since I mostly use Emacs for studying LISP, and I'm reading SICP which uses Scheme
-as main LISP flavor for explanations and excersises, I need a tool to run Scheme, and
-Geiser seems like the most vuable option here.
-
-#+BEGIN_SRC emacs-lisp
-(use-package geiser :ensure t
-  :init
-  (defvar geiser-active-implementations '(mit guile)))
-#+END_SRC
-
-** Parinfer
-Now that's a quolity package. It makes wtriting LISP so easy, that I've never thought
-it could be.
-
-#+BEGIN_SRC emacs-lisp
-(use-package parinfer :ensure t
-  :bind
-  (("C-," . parinfer-toggle-mode))
-  :init
-  (progn
-    (setq parinfer-extensions
-          '(defaults
-             pretty-parens
-             smart-tab
-             smart-yank))
-    (add-hook 'clojure-mode-hook #'parinfer-mode)
-    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'common-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'scheme-mode-hook #'parinfer-mode)
-    (add-hook 'lisp-mode-hook #'parinfer-mode)))
-#+END_SRC
-
-** Flx
-Fuzzy matching for Emacs
-
-#+BEGIN_SRC emacs-lisp
-(use-package flx :ensure t)
-#+END_SRC
-
-** Ivy, Counsel, Swiper
+*** Ivy
 Ivy is a narrowing framework like Helm, but much lighter in my experience.
-It comes with Counsel that handles minibuffer and swiper that handles searching in the file.
+It integrates with Counsel that handles minibuffer and swiper that handles
+searching in the file.
 
 #+BEGIN_SRC emacs-lisp
-(use-package ivy :ensure t
-  :init
-  (setq ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t)
-  :bind (("C-s" . swiper)
-         ("C-c C-r" . ivy-resume)
-         ("<f6>" . ivy-resume)
-         ("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-x C-b" . counsel-ibuffer)
-         ("C-h f" . counsel-describe-function)
-         ("C-h v" . counsel-describe-variable)
-         ("C-h l" . counsel-find-library))
-  :diminish ivy-mode
-  :config
-  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
-        ivy-count-format ""
-        ivy-display-style nil
-        ivy-minibuffer-faces nil)
-  (ivy-mode 1)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+  (use-package ivy :ensure t
+    :init
+    (setq ivy-use-virtual-buffers t
+          enable-recursive-minibuffers t)
+    :bind (("C-s" . swiper)
+           ("C-c C-r" . ivy-resume)
+           ("<f6>" . ivy-resume)
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("C-x C-b" . counsel-ibuffer)
+           ("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-h l" . counsel-find-library))
+    :diminish ivy-mode
+    :config
+    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+          ivy-count-format ""
+          ivy-display-style nil
+          ivy-minibuffer-faces nil)
+    (ivy-mode 1)
+    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
-(use-package counsel :ensure t)
+  (use-package counsel :ensure t)
 
-(use-package swiper :ensure t)
+  (use-package swiper :ensure t)
 #+END_SRC
 
-** Flycheck
-A linting package that helps me track errors in most of languages.
+*** Flycheck
+A really nice linting package that helps me track errors in most of
+languages.
 
 #+BEGIN_SRC emacs-lisp
-(use-package flycheck :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'flycheck-mode))
+  (use-package flycheck :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'flycheck-mode))
 #+END_SRC
 
-** Company
+*** Company
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
-(use-package company :ensure t
-  :diminish company-mode
-  :init
-  (setq company-require-match 'never
-        company-minimum-prefix-length 2
-        company-frontends
-        '(company-pseudo-tooltip-unless-just-one-frontend
-          company-preview-frontend
-          company-echo-metadata-frontend))
-  :config
-  (setq company-backends (remove 'company-clang company-backends)
-        company-backends (remove 'company-xcode company-backends)
-        company-backends (remove 'company-cmake company-backends)
-        company-backends (remove 'company-gtags company-backends))
-  (add-hook 'after-init-hook 'global-company-mode)
-  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
+  (use-package company :ensure t
+    :diminish company-mode
+    :init
+    (setq company-require-match 'never
+          company-minimum-prefix-length 2
+          company-frontends
+          '(company-pseudo-tooltip-unless-just-one-frontend
+            company-preview-frontend
+            company-echo-metadata-frontend))
+    :config
+    (setq company-backends (remove 'company-clang company-backends)
+          company-backends (remove 'company-xcode company-backends)
+          company-backends (remove 'company-cmake company-backends)
+          company-backends (remove 'company-gtags company-backends))
+    (add-hook 'after-init-hook 'global-company-mode)
+    (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+    (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+    (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+    (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 #+END_SRC
 
-** Yasnippet
-Another very handy package, that helps insert templates of code
+*** Yasnippet
+Another very handy package, that helps insert templates of code. Now I
+really need to write some snippets to use...
 
 #+BEGIN_SRC emacs-lisp
-(use-package yasnippet :ensure t
-  :diminish yas-minor-mode
-  :config
-  (add-hook 'prog-mode-hook 'yas-minor-mode))
+  (use-package yasnippet :ensure t
+    :diminish yas-minor-mode
+    :config
+    (add-hook 'prog-mode-hook 'yas-minor-mode))
 #+END_SRC
 
-** Projectile
-Since emacs is stupid, it changes working directory to current file location. So
-I need a whole plugin to workaround this silli issue.
+*** Projectile
+Since emacs is stupid, it changes working directory to current file
+location. So I need a whole plugin to workaround this silly issue.
+
+However this plugin is quite useful with Git repositories.
 
 #+BEGIN_SRC emacs-lisp
-(use-package projectile :ensure t
-  :init
-  (projectile-mode +1)
-  :bind
-  (("C-c p" . projectile-command-map)))
+  (use-package projectile :ensure t
+    :init
+    (projectile-mode +1)
+    :bind
+    (("C-c p" . projectile-command-map)))
 #+END_SRC
 
-*** Counsel projectile
+**** Counsel projectile
 It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
-(use-package counsel-projectile :ensure t)
+  (use-package counsel-projectile :ensure t)
 #+END_SRC
 
+** TODO Languages
+I should add some language specific settings, but there's none at the
+moment.
+
+** Notes
+This configuration is in public domain, everyone is free to download,
+modify and share it with others.
