@@ -94,19 +94,21 @@ If no symbol given, current selection is used as a symbol name" \
     ctags -f "$tags" "$kak_buffile"
     cut -f 1 "$tags" | grep -v '^!' | awk '!x[$0]++'
 } symbol -params ..1 %{ evaluate-commands %sh{
+    tagname=${1:-${kak_selection}}
     tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
     if [ ! -s "$tags" ]; then
         ctags -f "$tags" "$kak_buffile"
     fi
     menu="${TMPDIR:-/tmp}/ctags-menu"
     open='{'; close='}'
-    readtags -t "$tags" "${1:-$kak_selection}" |
+    readtags -t "$tags" "$tagname" |
     while read tag; do
         name=$(printf "%s\n" "$tag" | cut -f 2 | sed "s:':'':g")
         menuinfo=$(printf "%s\n" "$tag" | sed "s:.*/\^\(\s\+\)\?::;s:\(\\\$\)\?/$::;s:':'':g;s:$open:\\\\$open:g")
-        keys=$(printf "%s\n" "$tag" | sed "s:.*/\^::;s:\(\\\$\)\?/$::;s:':'''''''''''''''':g;s:<:<lt>:g")
+        keys=$(printf "%s\n" "$tag" | sed "s:.*/\^::;s:\(\\\$\)\?/$::;s:':'''''''''''''''':g;s:<:<lt>:g;s:\\t:<c-v><c-i>:g")
         file=$(printf "%s\n" "$name" | sed "s:'':'''''''''''''''':g")
-        command="evaluate-commands '' try '''' edit ''''''''$file''''''''; execute-keys ''''''''/\Q$keys<ret>vc'''''''' '''' catch '''' echo -markup ''''''''{Error}unable to find tag'''''''' '''' ''"
+        select=$(printf "%s\n" "$tagname" | sed "s:':'''''''''''''''':g;s:<:<lt>:g;s:\\t:<c-v><c-i>:g")
+        command="evaluate-commands '' try '''' edit ''''''''$tagroot/$file''''''''; execute-keys ''''''''/\Q$keys<ret>vcs\Q$select<ret>'''''''' '''' catch '''' echo -markup ''''''''{Error}unable to find tag'''''''' '''' ''"
         if [ -n "$file" ] && [ -n "$keys" ]; then
             printf "%s " "'$name {MenuInfo}$menuinfo' '$command'" >> $menu
         fi
