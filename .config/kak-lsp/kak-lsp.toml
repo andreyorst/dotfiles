@@ -7,12 +7,12 @@ verbosity = 2
 timeout = 1800 # seconds = 30 minutes
 
 [language.rust]
-extensions = ["rs"]
+filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "rls"
 
 [language.c_cpp]
-extensions = ["c", "h", "cc", "hh", "cpp", "hpp"]
+filetypes = ["c", "cpp"]
 roots = [".cquery", "compile_commands.json"]
 command = "cquery"
 args = ["--log-file=/tmp/cq.log", "--init={\"cacheDirectory\": \"/home/andreyorst/.cache/cquery\"}"]
