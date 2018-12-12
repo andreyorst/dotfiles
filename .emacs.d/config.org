@@ -1,4 +1,7 @@
 * Emacs configuration with Org Mode
+
+[[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
+
 This is my Emacs configuration file written as Org document. The purpose of
 this file is to learn basics of Org Mode and Emacs in general. I try to
 keep my configuration simple and fast and I mostly use Emacs as environment
