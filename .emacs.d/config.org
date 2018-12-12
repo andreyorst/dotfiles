@@ -3,21 +3,20 @@ This is my Emacs configuration file written as Org document. The purpose of
 this file is to learn basics of Org Mode and Emacs in general. I try to
 keep my configuration simple and fast and I mostly use Emacs as environment
 for studying LISP, currently Scheme, so this configuration is pretty much
-about it.
+about it. I'm not elisp guru yet, so I don't think that this document can be really
+interesting for anyone.
 
-** Common settings
 I tend to split my configurations of Editors to sections. The basic
 sections are:
 
-1. Common settings - which is used to configure basic editor facilities.
+1. Common settings - lists configurations of basic editor facilities.
 2. Custom user commands - which stores my custom commands that I use.
 3. Plugins - the set of used plugins and it's configurations
 4. Language specific settings - everything needed to feel comfortable while
 working with some language.
 
-This configuration is mostly about Emacs itself and studying LISP, and
-I'm not elisp guru yet, so for now not every of shown categories is listed
-here.
+** Common settings
+This section is all about basic configurations of builtin features.
 
 *** Startup screen
 I like to keep my starting process straightforward, so I tend to disable
@@ -353,6 +352,3 @@ It makes using projectile easier by allowing fuzzy matching.
 I should add some language specific settings, but there's none at the
 moment.
 
-** Notes
-This configuration is in public domain, everyone is free to download,
-modify and share it with others.
