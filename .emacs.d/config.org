@@ -29,6 +29,23 @@ disable startup screen and start with lisp interaction buffer instead.
   (setq inhibit-splash-screen t)
 #+END_SRC
 
+I also would like to start Emacs  in Org mode by default, so
+
+#+BEGIN_SRC emacs-lisp
+  (setq initial-buffer-choice (lambda()
+                                (org-mode)
+                                (flyspell-mode)
+                                (yas-minor-mode)
+                                (yas-reload-all)))
+#+END_SRC
+
+And since cratch buffer is  no longer in =lisp-interaction= mode, it's
+better to change its message to something more /appropriate/
+
+#+BEGIN_SRC emacs-lisp
+  (setq initial-scratch-message "")
+#+END_SRC
+
 *** UI defaults
 These are some  defaults for user interface. I don't  like those bars,
 buttons, tooltips, scrollbars, etc.
@@ -353,13 +370,6 @@ It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
   (use-package counsel-projectile :ensure t)
-#+END_SRC
-
-*** Magit
-Magit is a Emacs interface to Git.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package magit :ensure t)
 #+END_SRC
 
 ** Modes
