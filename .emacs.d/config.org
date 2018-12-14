@@ -21,7 +21,7 @@ while working with some language.
 ** Common settings
 This section is all about basic configurations of builtin features.
 
-*** Startup screen
+*** Startup
 I  like to  keep my  starting process  straightforward, so  I tend  to
 disable startup screen and start with lisp interaction buffer instead.
 
@@ -29,23 +29,25 @@ disable startup screen and start with lisp interaction buffer instead.
   (setq inhibit-splash-screen t)
 #+END_SRC
 
-I also would like to start Emacs  in Org mode by default, so
+I also  would like  to start  Emacs in  Org mode  by default,  so I'll
+change the default major mode for Emacs startup.
 
 #+BEGIN_SRC emacs-lisp
-  (setq initial-buffer-choice (lambda()
-                                (org-mode)
-                                (flyspell-mode)
-                                (yas-minor-mode)
-                                (yas-reload-all)))
+  (setq initial-major-mode 'org-mode)
 #+END_SRC
 
-And since cratch buffer is  no longer in =lisp-interaction= mode, it's
-better to change its message to something more /appropriate/
+And since scratch buffer is  no longer in =lisp-interaction= mode, it's
+better to change its message to something more /appropriate/ (nothing)
 
 #+BEGIN_SRC emacs-lisp
   (setq initial-scratch-message "")
 #+END_SRC
 
+Also I'd like to start in Org mode when file has no extension
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default major-mode 'org-mode)
+#+END_SRC
 *** UI defaults
 These are some  defaults for user interface. I don't  like those bars,
 buttons, tooltips, scrollbars, etc.
