@@ -92,7 +92,7 @@ slow on large  files in my experience, but I  need them, and therefore
 I'm enabling them in all programming modes.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'global-display-line-numbers-mode)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
 *** Matching parens
