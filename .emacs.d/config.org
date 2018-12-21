@@ -179,6 +179,30 @@ it from Melpa.
       (package-install package)))
 #+END_SRC
 
+*** =autokill-when-no-processes=
+This function should be used as advice to any exit handle function
+
+#+BEGIN_SRC emacs-lisp
+  (defun autokill-when-no-processes (&rest args)
+    (when (null (get-buffer-process (current-buffer)))
+      ;(ignore-errors
+        (kill-buffer (current-buffer))
+        (delete-window)))
+#+END_SRC
+
+Let's define some advices with it. First, term buffer should be killed
+when I exit terminal:
+
+#+BEGIN_SRC emacs-lisp
+  (advice-add 'term-handle-exit :after #'autokill-when-no-processes)
+#+END_SRC
+
+I'd also would like to do this for [[Geiser]]:
+
+#+BEGIN_SRC emacs-lisp
+  (advice-add 'geiser-repl-exit :after #'autokill-when-no-processes)
+#+END_SRC
+
 ** Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
@@ -340,6 +364,34 @@ Complete anything framework. Nothing much to say. Does it's job.
     (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
     (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
     (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
+#+END_SRC
+
+**** Company Flx
+This will allow to use fuzzy matching with company. Probably...
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company-flx :ensute t
+    :config
+    (company-flx-mode +1))
+#+END_SRC
+
+*** Undo Tree
+This is more familiar undo mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree :ensure t
+    :diminish (undo-tree-mode . "")
+    :config
+    (global-undo-tree-mode 1))
+#+END_SRC
+
+*** Move Text
+Allows to move line or region up and down
+
+#+BEGIN_SRC emacs-lisp
+  (use-package move-text :ensure t
+    :bind (("<C-M-up>" . move-text-up)
+           ("<C-M-down>" . move-text-down)))
 #+END_SRC
 
 *** Yasnippet
