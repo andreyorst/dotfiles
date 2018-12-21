@@ -217,6 +217,7 @@ maintain.  Since   =use-package=  can't  install  itseld,   let's  use
 #+BEGIN_SRC emacs-lisp
   (ensure-installed 'use-package)
   (require 'use-package)
+  (setq use-package-always-ensure t)
 #+END_SRC
 
 *** Spacemacs theme
@@ -238,7 +239,7 @@ already  know about.  Since =eldoc-mode=  is builtin,  I've put  it to
 =diminish= configuration.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish :ensure t
+  (use-package diminish
     :diminish eldoc-mode)
 #+END_SRC
 
@@ -247,7 +248,7 @@ Who needs markdown when you have Org?  Well, I need. Kinda. I still do
 most of writing with it. Shame on me.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode :ensure t
+  (use-package markdown-moed
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
@@ -261,7 +262,7 @@ a tool  to run Scheme,  and Geiser seems  like the most  viable option
 here, since it also provides completion for it.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package geiser :ensure t
+  (use-package geiser
     :init
     (defvar geiser-active-implementations '(mit guile)))
 #+END_SRC
@@ -274,7 +275,7 @@ There's  a lot  of configuration  here, but  it was  taken as  is from
 Parinfer Mode repository.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package parinfer :ensure t
+  (use-package parinfer
     :bind
     (("C-," . parinfer-toggle-mode))
     :init
@@ -295,7 +296,7 @@ Parinfer Mode repository.
 This package provides some kind of fuzzy matching for Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package flx :ensure t)
+  (use-package flx)
 #+END_SRC
 
 *** Ivy
@@ -304,7 +305,7 @@ experience.  It  integrates with  Counsel that handles  minibuffer and
 swiper that handles searching in the file.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy :ensure t
+  (use-package ivy
     :init
     (setq ivy-use-virtual-buffers t
           enable-recursive-minibuffers t)
@@ -326,9 +327,9 @@ swiper that handles searching in the file.
     (ivy-mode 1)
     (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
-  (use-package counsel :ensure t)
+  (use-package counsel)
 
-  (use-package swiper :ensure t)
+  (use-package swiper)
 #+END_SRC
 
 *** Flycheck
@@ -336,7 +337,7 @@ A really  nice linting package that  helps me track errors  in most of
 languages.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck :ensure t
+  (use-package flycheck
     :config
     (add-hook 'prog-mode-hook 'flycheck-mode))
 #+END_SRC
@@ -345,7 +346,7 @@ languages.
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package company :ensure t
+  (use-package company
     :diminish company-mode
     :init
     (setq company-require-match 'never
@@ -370,7 +371,7 @@ Complete anything framework. Nothing much to say. Does it's job.
 This will allow to use fuzzy matching with company. Probably...
 
 #+BEGIN_SRC emacs-lisp
-  (use-package company-flx :ensute t
+  (use-package company-flx
     :config
     (company-flx-mode +1))
 #+END_SRC
@@ -379,7 +380,7 @@ This will allow to use fuzzy matching with company. Probably...
 This is more familiar undo mode
 
 #+BEGIN_SRC emacs-lisp
-  (use-package undo-tree :ensure t
+  (use-package undo-tree
     :diminish (undo-tree-mode . "")
     :config
     (global-undo-tree-mode 1))
@@ -389,7 +390,7 @@ This is more familiar undo mode
 Allows to move line or region up and down
 
 #+BEGIN_SRC emacs-lisp
-  (use-package move-text :ensure t
+  (use-package move-text
     :bind (("<C-M-up>" . move-text-up)
            ("<C-M-down>" . move-text-down)))
 #+END_SRC
@@ -399,7 +400,7 @@ Another very handy package, that helps insert templates of code. Now I
 really need to write some snippets to use...
 
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet :ensure t
+  (use-package yasnippet
     :diminish yas-minor-mode
     :config
     (add-hook 'prog-mode-hook 'yas-minor-mode))
@@ -412,7 +413,7 @@ location. So I need a whole plugin to workaround this silly issue.
 However this plugin is quite useful with Git repositories.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package projectile :ensure t
+  (use-package projectile
     :init
     (projectile-mode +1)
     :bind
@@ -423,7 +424,7 @@ However this plugin is quite useful with Git repositories.
 It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel-projectile :ensure t)
+  (use-package counsel-projectile)
 #+END_SRC
 
 ** Modes
