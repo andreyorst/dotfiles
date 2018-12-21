@@ -211,7 +211,7 @@ packages.
 *** use-package
 I use package,  named =use-package= to install, load  and configure my
 packages. I find  this way very consistent and easy  to understand and
-maintain.  Since   =use-package=  can't  install  itseld,   let's  use
+maintain.  Since   =use-package=  can't  install  itself,   let's  use
 =ensure-installed= function for it.
 
 #+BEGIN_SRC emacs-lisp
@@ -248,7 +248,7 @@ Who needs markdown when you have Org?  Well, I need. Kinda. I still do
 most of writing with it. Shame on me.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package markdown-moed
+  (use-package markdown-mode
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
