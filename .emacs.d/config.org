@@ -18,6 +18,15 @@ sections are:
 4. Language specific settings - everything needed to feel comfortable
 while working with some language.
 
+Since  Emacs  configuration and  Emacs  in  general is  more  complex,
+compared  to  configurations of  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]]  or  [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]]  there may  be  more
+sections, or  some may be missing  completely. I can't figure  out the
+best way of splitting entire configuration  with Org mode so this list
+may update or  disappear if I'll realize that this  isn't necessary to
+have those sections.
+
+Now to the configuration itself.
+
 ** Common settings
 This section is all about basic configurations of builtin features.
 
@@ -48,6 +57,7 @@ Also I'd like to start in Org mode when file has no extension
 #+BEGIN_SRC emacs-lisp
   (setq-default major-mode 'org-mode)
 #+END_SRC
+
 *** UI defaults
 These are some  defaults for user interface. I don't  like those bars,
 buttons, tooltips, scrollbars, etc.
@@ -60,6 +70,10 @@ buttons, tooltips, scrollbars, etc.
     (tooltip-mode -1)
     (fset 'menu-bar-open nil))
 #+END_SRC
+
+I user =ignore-errors= here because I use both GUI and TUI versions of
+Emacs, and since  TUI version doesn't have some of  those features the
+startup process will fail.
 
 *** Font
 I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
@@ -108,7 +122,7 @@ near the other paren. So I enable it for every language.
 This is just some fixes of things I found kind of strange.
 
 **** Bell
-I'm  not  trying to  insult  on  anyone,  but  these things  are  just
+I'm  not  trying to  insult  on  anyone,  but usage of the bell is just
 insane. It's  not 1980's, computers  have their own speakers  and rich
 displays, why would anyone want  to use builtin speaker?  Why everyone
 should know when I'm mistaken? Disable bell.
@@ -164,8 +178,9 @@ none.
 
 ** Functions
 This section should contain functions that I've wrote for personal use
-here  and  there,  but  there's   only  one  function  at  the  moment
-unfortunately.  But I still gonna give it it's own category.
+here and  there. I'm  not elisp expert,  so code may  be not  the best
+quality. If  you feel that this  code should be improved  you can open
+issue and blame on me all you want.
 
 *** =ensure-installed=
 To ensure that  some essential packages are installed  I've wrote this
@@ -184,6 +199,7 @@ This function should be used as advice to any exit handle function
 
 #+BEGIN_SRC emacs-lisp
   (defun autokill-when-no-processes (&rest args)
+    "Kill buffer and its window automatically when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
       ;(ignore-errors
         (kill-buffer (current-buffer))
@@ -211,8 +227,9 @@ packages.
 *** use-package
 I use package,  named =use-package= to install, load  and configure my
 packages. I find  this way very consistent and easy  to understand and
-maintain.  Since   =use-package=  can't  install  itself,   let's  use
-=ensure-installed= function for it.
+maintain.   Since  =use-package=  can't   install  itself,  let's  use
+=ensure-installed= function for it. The  only thing I miss is updating
+those packages, but I think I'll come up with something someday.
 
 #+BEGIN_SRC emacs-lisp
   (ensure-installed 'use-package)
@@ -225,7 +242,9 @@ I really  like this theme.  It's something  like Atom's One  Dark, but
 little more purple. Anyway it's awesome, and colors are really nice.
 
 I don't know  why, but I had troubles with  installing this theme with
-=use-package= so it is installed with =ensure-installed= instead.
+=use-package= so  it is  installed with =ensure-installed=  instead. I
+also set  =fringe= face  to =nil=  because in this  theme it  has dark
+background and I don't want to see it.
 
 #+BEGIN_SRC emacs-lisp
   (ensure-installed 'spacemacs-theme)
@@ -301,8 +320,7 @@ This package provides some kind of fuzzy matching for Emacs.
 
 *** Ivy
 Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
-experience.  It  integrates with  Counsel that handles  minibuffer and
-swiper that handles searching in the file.
+experience.
 
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
@@ -326,9 +344,13 @@ swiper that handles searching in the file.
           ivy-minibuffer-faces nil)
     (ivy-mode 1)
     (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+#+END_SRC
 
+It integrates  with Counsel  that handles  minibuffer and  swiper that
+handles searching in the file, so let's install those too.
+
+#+BEGIN_SRC emacs-lisp
   (use-package counsel)
-
   (use-package swiper)
 #+END_SRC
 
@@ -377,17 +399,18 @@ This will allow to use fuzzy matching with company. Probably...
 #+END_SRC
 
 *** Undo Tree
-This is more familiar undo mode
+This is more familiar  undo mode. It adds C-/ mapping  to undo and C-?
+mapping to redo.
 
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :diminish (undo-tree-mode . "")
+    :diminish undo-tree-mode
     :config
     (global-undo-tree-mode 1))
 #+END_SRC
 
 *** Move Text
-Allows to move line or region up and down
+Allows to move line or region up and down.
 
 #+BEGIN_SRC emacs-lisp
   (use-package move-text
