@@ -389,15 +389,6 @@ Complete anything framework. Nothing much to say. Does it's job.
     (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 #+END_SRC
 
-**** Company Flx
-This will allow to use fuzzy matching with company. Probably...
-
-#+BEGIN_SRC emacs-lisp
-  (use-package company-flx
-    :config
-    (company-flx-mode +1))
-#+END_SRC
-
 *** Undo Tree
 This is more familiar  undo mode. It adds C-/ mapping  to undo and C-?
 mapping to redo.
