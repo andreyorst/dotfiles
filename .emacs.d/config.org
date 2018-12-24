@@ -456,3 +456,20 @@ could expand some useful things like =SRC= blocks.
                              (yas-reload-all)))
 #+END_SRC
 
+To  highlight code  blocks when  exporting to  LaTeX we  need =minted=
+package   installed   system-wide   and    this   code   (taken   from
+[[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
+
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (setq org-latex-listings 'minted) 
+#+END_SRC
+
+This will make =pdflatex= use these escape sequences for proper colors.
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
