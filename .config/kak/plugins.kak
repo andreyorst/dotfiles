@@ -68,15 +68,6 @@ plug "alexherbo2/auto-pairs.kak" %{
     hook global WinCreate .* %{ auto-pairs-enable }
 }
 
-plug "eraserhd/parinfer-rust" do %{
-    cargo build --release
-    cargo install --force
-} config %{
-    hook global WinSetOption filetype=(lisp|scheme) %{
-        parinfer -if-enabled -paren
-        hook -group parinfer window NormalKey    .* %{parinfer -if-enabled -smart}
-        hook -group parinfer window InsertChar   .* %{parinfer -if-enabled -smart}
-        hook -group parinfer window InsertDelete .* %{parinfer -if-enabled -smart}
-    }
+plug "alexherbo2/replace.kak" config %{
+    map global user r -docstring 'Replace mode' ':<space>replace<ret>'
 }
-
