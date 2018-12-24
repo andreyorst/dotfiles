@@ -7,12 +7,9 @@ saved_workspaces
 .config/kak/plugins
 .config/kak/colors
 *~
-.emacs.d/elpa
-.emacs.d/games
-.emacs.d/session*
-.emacs.d/recentf*
-.emacs.d/.mc-lists.el
-.emacs.d/projectile*
-.emacs.d/config.el
-.emacs.d/url
 **#*
+.emacs.d/*
+!.emacs.d/config.org
+!.emacs.d/init.el
+!.emacs.d/custom.el
+!.emacs.d/snippets/
