@@ -1,222 +1,243 @@
 * Emacs configuration with Org Mode
 
-[[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
+  [[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
 
-This  is my  Emacs configuration  file  written as  Org document.  The
-purpose of  this file  is to  learn basics  of Org  Mode and  Emacs in
-general. I try  to keep my configuration simple and  fast and I mostly
-use Emacs as environment for  studying LISP, currently Scheme, so this
-configuration is  pretty much about it.  I'm not elisp guru  yet, so I
-don't think that this document can be really interesting for anyone.
+  This is  my Emacs configuration  file written as Org  document.  The
+  purpose of  this file is  to learn basics of  Org Mode and  Emacs in
+  general. I try to keep my configuration simple and fast and I mostly
+  use Emacs  as environment  for studying  LISP, currently  Scheme, so
+  this configuration is pretty much about it.  I'm not elisp guru yet,
+  so I  don't think that this  document can be really  interesting for
+  anyone.
 
-I tend  to split my configurations  of Editors to sections.  The basic
-sections are:
+  I tend to split my configurations of Editors to sections.  The basic
+  sections are:
 
-1. Common settings - lists configurations of basic editor facilities.
-2. Custom user commands - which stores my custom commands that I use.
-3. Plugins - the set of used plugins and it's configurations.
-4. Language specific settings - everything needed to feel comfortable
-while working with some language.
+  1. Common settings - configuration of basic editor facilities.
+  2. Custom commands - which stores my custom commands that I use.
+  3. Plugins - the set of used plugins and it's configurations.
+  4. Language specific  settings  -  everything  that  needed to  feel
+     comfortable while working with some language.
 
-Since  Emacs  configuration and  Emacs  in  general is  more  complex,
-compared  to  configurations of  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]]  or  [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]]  there may  be  more
-sections, or  some may be missing  completely. I can't figure  out the
-best way of splitting entire configuration  with Org mode so this list
-may update or  disappear if I'll realize that this  isn't necessary to
-have those sections.
+  Since  Emacs configuration  and Emacs  in general  is more  complex,
+  compared  to configurations  of [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]]  or  [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]] there  may be  more
+  sections, or some may be missing  completely. I can't figure out the
+  best way  of splitting  entire configuration with  Org mode  so this
+  list  may  update or  disappear  if  I'll  realize that  this  isn't
+  necessary to have those sections.
 
-Now to the configuration itself.
+  Now to the configuration itself.
 
 ** Common settings
-This section is all about basic configurations of builtin features.
+   This section is all about basic configurations of builtin features.
 
 *** Startup
-I  like to  keep my  starting process  straightforward, so  I tend  to
-disable startup screen and start with lisp interaction buffer instead.
+    I like to  keep my starting process straightforward, so  I tend to
+    disable  startup screen  and  start with  lisp interaction  buffer
+    instead.
 
-#+BEGIN_SRC emacs-lisp
-  (setq inhibit-splash-screen t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq inhibit-splash-screen t)
+    #+END_SRC
 
-I also  would like  to start  Emacs in  Org mode  by default,  so I'll
-change the default major mode for Emacs startup.
+    I also would like  to start Emacs in Org mode  by default, so I'll
+    change the default major mode for Emacs startup.
 
-#+BEGIN_SRC emacs-lisp
-  (setq initial-major-mode 'org-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq initial-major-mode 'org-mode)
+    #+END_SRC
 
-And since scratch buffer is  no longer in =lisp-interaction= mode, it's
-better to change its message to something more /appropriate/ (nothing)
+    And since scratch buffer is  no longer in =lisp-interaction= mode,
+    it's better to change its  message to something more /appropriate/
+    (nothing).
 
-#+BEGIN_SRC emacs-lisp
-  (setq initial-scratch-message "")
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq initial-scratch-message "")
+    #+END_SRC
 
-Also I'd like to start in Org mode when file has no extension
+    Also I'd like to start in Org mode when file has no extension.
 
-#+BEGIN_SRC emacs-lisp
-  (setq-default major-mode 'org-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq-default major-mode 'org-mode)
+    #+END_SRC
 
 *** UI defaults
-These are some  defaults for user interface. I don't  like those bars,
-buttons, tooltips, scrollbars, etc.
+    These are  some defaults  for user interface.  I don't  like those
+    bars, buttons, tooltips, scrollbars, etc.
 
-#+BEGIN_SRC emacs-lisp
-  (ignore-errors
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (tooltip-mode -1)
-    (fset 'menu-bar-open nil))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (ignore-errors
+        (menu-bar-mode -1)
+        (scroll-bar-mode -1)
+        (tool-bar-mode -1)
+        (tooltip-mode -1)
+        (fset 'menu-bar-open nil))
+    #+END_SRC
 
-I user =ignore-errors= here because I use both GUI and TUI versions of
-Emacs, and since  TUI version doesn't have some of  those features the
-startup process will fail.
+    I'm  using =ignore-errors=  here because  I use  both GUI  and TUI
+    versions  of Emacs,  and since  TUI version  doesn't have  some of
+    those features the startup process will fail.
 
 *** Font
-I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
-other editor, for some reason I find this font just right for Emacs.
+    I like  this Adobe  Source Code Pro  font. Even if  I use  Hack in
+    every other  editor, for some reason  I find this font  just right
+    for Emacs.
 
-#+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Source Code Pro-10")
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (set-face-attribute 'default nil :font "Source Code Pro-10")
+    #+END_SRC
 
 *** Common behaviors
-I  don't like  how  Emacs  handles scrolling,  and  that  it uses  tab
-characters by default.  I need tab characters only when  I work with C
-code  and  Makefile  rules.  And   Just  because  I  can,  enable  bar
-cursor. It's  not Kakoune,  there's no  need for  big rectangle  to be
-honest.
+    I don't  like how Emacs  handles scrolling,  and that it  uses tab
+    characters by  default.  I  need tab characters  only when  I work
+    with C  code and Makefile rules.   And Just because I  can, enable
+    bar cursor. It's not Kakoune, there's no need for big rectangle to
+    be honest.
 
-#+BEGIN_SRC emacs-lisp
-  (setq-default indent-tabs-mode nil
-                scroll-step 1
-                scroll-conservatively 10000
-                auto-window-vscroll nil
-                cursor-type 'bar)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq-default indent-tabs-mode nil
+                    scroll-step 1
+                    scroll-conservatively 10000
+                    auto-window-vscroll nil
+                    cursor-type 'bar)
+    #+END_SRC
 
 *** Line numbers
-For some reason Emacs has long history of being not capable to display
-line numbers  properly, but now  native line numbers are  shipped with
-Emacs starting  with version 26.  However even this  implementation is
-slow on large  files in my experience, but I  need them, and therefore
-I'm enabling them in all programming modes.
+    For some  reason Emacs has  long history  of being not  capable to
+    display line  numbers properly,  but now  native line  numbers are
+    shipped with  Emacs starting with  version 26.  However  even this
+    implementation is slow on large files in my experience, but I need
+    them, and therefore I'm enabling them in all programming modes.
 
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+    #+END_SRC
 
-*** Matching parens
-One feature that I think  is really important, especially when working
-with lisp  code, is ability to  see matching paren when  cursor stands
-near the other paren. So I enable it for every language.
+*** Matching parentheses
+    One  feature that  I think  is really  important, especially  when
+    working  with lisp  code, is  ability to  see matching  paren when
+    cursor  stands near  the other  paren. So  I enable  it for  every
+    language.
 
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'show-paren-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'prog-mode-hook 'show-paren-mode)
+    #+END_SRC
 
 *** Fixing dumb Emacs stuff
-This is just some fixes of things I found kind of strange.
+    This is just some fixes of things I found kind of strange.
 
 **** Bell
-I'm  not  trying to  insult  on  anyone,  but usage of the bell is just
-insane. It's  not 1980's, computers  have their own speakers  and rich
-displays, why would anyone want  to use builtin speaker?  Why everyone
-should know when I'm mistaken? Disable bell.
+     I'm not trying to insult on anyone, but usage of the bell is just
+     insane. It's  not 1980's, computers  have their own  speakers and
+     rich displays, why would anyone want to use builtin speaker?  Why
+     everyone should know when I'm mistaken? Disable bell.
 
-#+BEGIN_SRC emacs-lisp
-  (setq ring-bell-function 'ignore)
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (setq ring-bell-function 'ignore)
+     #+END_SRC
 
 **** Custom
-I  don't like  custom,  and  especially would  like  to  stop it  from
-interfering to  my configuration  files, so lets  move it  to separate
-file.
+     I don't  like custom, and especially  would like to stop  it from
+     interfering  to  my  configuration  files, so  lets  move  it  to
+     separate file.
 
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file :noerror)
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+       (load custom-file :noerror)
+     #+END_SRC
 
 **** Backups
-I don't  know who decided  that having backups  all over the  place is
-good idea, but I don't think alike.
+     I don't know  who decided that having backups all  over the place
+     is good idea, but I don't think alike.
 
-#+BEGIN_SRC emacs-lisp
-  (setq backup-by-copying t
-        create-lockfiles nil
-        backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-        auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (setq backup-by-copying t
+             create-lockfiles nil
+             backup-directory-alist '(("." . "~/.cache/emacs-backups"))
+             auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
+     #+END_SRC
 
-*** Melpa
-Melpa is a  package repository, that I use to  get packages. Since all
-packages that  I need can  be obtained  from there, I  didn't bothered
-with different methods of installation.
+*** MELPA
+    Melpa is a  package repository, that I use to  get packages. Since
+    all packages  that I  need can  be obtained  from there,  I didn't
+    bothered with different methods of installation.
 
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/") t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (require 'package)
+      (setq package-enable-at-startup nil)
+      (add-to-list 'package-archives
+                   '("melpa" . "https://melpa.org/packages/") t)
+    #+END_SRC
 
-Note for Windows users: change =https= to =http=
-
+    Note for Windows users: change =https= to =http=
 **** Package initialization
-This basic  piece of code  is used to  update package list  if there's
-none.
+     This basic  piece of code  is used to  update package list  if there's
+     none.
 
-#+BEGIN_SRC emacs-lisp
-  (package-initialize)
-  (when (not package-archive-contents)
-    (package-refresh-contents))
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (package-initialize)
+       (when (not package-archive-contents)
+         (package-refresh-contents))
+     #+END_SRC
 
+*** Org
+    Since  this  file  contains  org-related  functions,  we  need  to
+    =require= Org package.
+
+    #+BEGIN_SRC emacs-lisp
+      (require 'org)
+    #+END_SRC
 ** Functions
-This section should contain functions that I've wrote for personal use
-here and  there. I'm  not elisp expert,  so code may  be not  the best
-quality. If  you feel that this  code should be improved  you can open
-issue and blame on me all you want.
+   This section should contain functions that I've wrote for personal
+   use here and there. I'm not elisp expert, so code may be not the
+   best quality. If you feel that this code should be improved you can
+   open issue and blame on me all you want.
 
 *** =ensure-installed=
-To ensure that  some essential packages are installed  I've wrote this
-small lisp function that checks if package exists and if not downloads
-it from Melpa.
+    To ensure  that some essential  packages are installed  I've wrote
+    this small lisp function that checks  if package exists and if not
+    downloads it from Melpa.
 
-#+BEGIN_SRC emacs-lisp
-  (defun ensure-installed (package)
-    "Ensure that PACKAGE is installed."
-    (when (not (package-installed-p package))
-      (package-install package)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (defun ensure-installed (package)
+        "Ensure that PACKAGE is installed."
+        (when (not (package-installed-p package))
+          (package-install package)))
+    #+END_SRC
 
 *** =autokill-when-no-processes=
-This function should be used as advice to any exit handle function
+    This function should be used as advice to any exit handle function
+
+    #+BEGIN_SRC emacs-lisp
+      (defun autokill-when-no-processes (&rest args)
+        "Kill buffer and its window automatically when there's no processes left."
+        (when (null (get-buffer-process (current-buffer)))
+            (kill-buffer (current-buffer))
+            (delete-window)))
+    #+END_SRC
+
+    Let's define  some advices with  it. First, term buffer  should be
+    killed when I exit terminal:
+
+    #+BEGIN_SRC emacs-lisp
+      (advice-add 'term-handle-exit :after #'autokill-when-no-processes)
+    #+END_SRC
+
+    I'd also would like to do this for [[Geiser]]:
+
+    #+BEGIN_SRC emacs-lisp
+      (advice-add 'geiser-repl-exit :after #'autokill-when-no-processes)
+    #+END_SRC
+
+*** =update-inline-images=
+    This function is supposed to automatically update inline images in
+    org buffers, when for some reason image was changed.
 
 #+BEGIN_SRC emacs-lisp
-  (defun autokill-when-no-processes (&rest args)
-    "Kill buffer and its window automatically when there's no processes left."
-    (when (null (get-buffer-process (current-buffer)))
-      ;(ignore-errors
-        (kill-buffer (current-buffer))
-        (delete-window)))
-#+END_SRC
-
-Let's define some advices with it. First, term buffer should be killed
-when I exit terminal:
-
-#+BEGIN_SRC emacs-lisp
-  (advice-add 'term-handle-exit :after #'autokill-when-no-processes)
-#+END_SRC
-
-I'd also would like to do this for [[Geiser]]:
-
-#+BEGIN_SRC emacs-lisp
-  (advice-add 'geiser-repl-exit :after #'autokill-when-no-processes)
+        (defun update-inline-images ()
+          "Update inline images in Org-mode."
+          (when org-inline-image-overlays
+            (org-redisplay-inline-images)))
 #+END_SRC
 
 ** Packages
@@ -225,214 +246,218 @@ simple,  and  fast but  I  still  think  that  I need  some  essential
 packages.
 
 *** use-package
-I use package,  named =use-package= to install, load  and configure my
-packages. I find  this way very consistent and easy  to understand and
-maintain.   Since  =use-package=  can't   install  itself,  let's  use
-=ensure-installed= function for it. The  only thing I miss is updating
-those packages, but I think I'll come up with something someday.
+    I use package, named =use-package=  to install, load and configure
+    my  packages.  I  find  this  way  very  consistent  and  easy  to
+    understand  and  maintain.    Since  =use-package=  can't  install
+    itself,  let's use  =ensure-installed= function  for it.  The only
+    thing I miss is updating those  packages, but I think I'll come up
+    with something someday.
 
-#+BEGIN_SRC emacs-lisp
-  (ensure-installed 'use-package)
-  (require 'use-package)
-  (setq use-package-always-ensure t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (ensure-installed 'use-package)
+      (require 'use-package)
+      (setq use-package-always-ensure t)
+    #+END_SRC
 
 *** Spacemacs theme
-I really  like this theme.  It's something  like Atom's One  Dark, but
-little more purple. Anyway it's awesome, and colors are really nice.
+    I really  like this theme.   It's something like Atom's  One Dark,
+    but little more purple. Anyway it's awesome, and colors are really
+    nice.
 
-I don't know  why, but I had troubles with  installing this theme with
-=use-package= so  it is  installed with =ensure-installed=  instead. I
-also set  =fringe= face  to =nil=  because in this  theme it  has dark
-background and I don't want to see it.
+    I don't  know why, but I  had troubles with installing  this theme
+    with  =use-package= so  it  is  installed with  =ensure-installed=
+    instead. I also  set =fringe= face to =nil= because  in this theme
+    it has dark background and I don't want to see it.
 
-#+BEGIN_SRC emacs-lisp
-  (ensure-installed 'spacemacs-theme)
-  (load-theme 'spacemacs-dark t nil)
-  (set-face-attribute 'fringe nil :background nil)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (ensure-installed 'spacemacs-theme)
+      (load-theme 'spacemacs-dark t nil)
+      (set-face-attribute 'fringe nil :background nil)
+    #+END_SRC
 
 *** Diminish
-Emacs,  please stop  cluttering my  modeline  with all  those modes  I
-already  know about.  Since =eldoc-mode=  is builtin,  I've put  it to
-=diminish= configuration.
+    Emacs, please stop  cluttering my modeline with all  those modes I
+    already know about.  Since =eldoc-mode= is builtin, I've put it to
+    =diminish= configuration.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :diminish eldoc-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package diminish
+        :diminish eldoc-mode)
+    #+END_SRC
 
 *** Markdown
-Who needs markdown when you have Org?  Well, I need. Kinda. I still do
-most of writing with it. Shame on me.
+    Who needs  markdown when  you have  Org?  Well,  I need.  Kinda. I
+    still do most of writing with it. Shame on me.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode))
-    :init (defvar markdown-command "multimarkdown"))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package markdown-mode
+        :mode (("README\\.md\\'" . gfm-mode)
+               ("\\.md\\'" . markdown-mode)
+               ("\\.markdown\\'" . markdown-mode))
+        :init (defvar markdown-command "multimarkdown"))
+    #+END_SRC
+    
+    But I hope, that Org-mode will replace it eventually.
 
 *** Geiser
-Since I mostly use Emacs for studying LISP, and I'm reading SICP which
-uses Scheme as main LISP flavor for explanations and exercises, I need
-a tool  to run Scheme,  and Geiser seems  like the most  viable option
-here, since it also provides completion for it.
+    Since I mostly  use Emacs for studying LISP, and  I'm reading SICP
+    which  uses  Scheme  as  main LISP  flavor  for  explanations  and
+    exercises, I need a tool to  run Scheme, and Geiser seems like the
+    most viable option here, since it also provides completion for it.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package geiser
-    :init
-    (defvar geiser-active-implementations '(mit guile)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package geiser
+        :init
+        (defvar geiser-active-implementations '(mit guile)))
+    #+END_SRC
 
 *** Parinfer
-Now that's a quality package. It makes writing LISP so easy, that I've
-never thought it could be.
+    Now that's a quality package. It  makes writing LISP so easy, that
+    I've never thought it could be.
 
-There's  a lot  of configuration  here, but  it was  taken as  is from
-Parinfer Mode repository.
+    There's a lot  of configuration here, but it was  taken as is from
+    Parinfer Mode repository.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package parinfer
-    :bind
-    (("C-," . parinfer-toggle-mode))
-    :init
-    (progn
-      (setq parinfer-extensions
-            '(defaults
-               pretty-parens
-               smart-tab
-               smart-yank))
-      (add-hook 'clojure-mode-hook #'parinfer-mode)
-      (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-      (add-hook 'common-lisp-mode-hook #'parinfer-mode)
-      (add-hook 'scheme-mode-hook #'parinfer-mode)
-      (add-hook 'lisp-mode-hook #'parinfer-mode)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package parinfer
+        :bind
+        (("C-," . parinfer-toggle-mode))
+        :init
+        (progn
+          (setq parinfer-extensions
+                '(defaults
+                   pretty-parens
+                   smart-tab
+                   smart-yank))
+          (add-hook 'clojure-mode-hook #'parinfer-mode)
+          (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+          (add-hook 'common-lisp-mode-hook #'parinfer-mode)
+          (add-hook 'scheme-mode-hook #'parinfer-mode)
+          (add-hook 'lisp-mode-hook #'parinfer-mode)))
+    #+END_SRC
 
 *** Flx
-This package provides some kind of fuzzy matching for Emacs.
+    This package provides some kind of fuzzy matching for Emacs.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package flx)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package flx)
+    #+END_SRC
 
 *** Ivy
-Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
-experience.
+    Ivy is  a narrowing framework  like Helm,  but much lighter  in my
+    experience.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :init
-    (setq ivy-use-virtual-buffers t
-          enable-recursive-minibuffers t)
-    :bind (("C-s" . swiper)
-           ("C-c C-r" . ivy-resume)
-           ("<f6>" . ivy-resume)
-           ("M-x" . counsel-M-x)
-           ("C-x C-f" . counsel-find-file)
-           ("C-x C-b" . counsel-ibuffer)
-           ("C-h f" . counsel-describe-function)
-           ("C-h v" . counsel-describe-variable)
-           ("C-h l" . counsel-find-library))
-    :diminish ivy-mode
-    :config
-    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
-          ivy-count-format ""
-          ivy-display-style nil
-          ivy-minibuffer-faces nil)
-    (ivy-mode 1)
-    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package ivy
+        :init
+        (setq ivy-use-virtual-buffers t
+              enable-recursive-minibuffers t)
+        :bind (("C-s" . swiper)
+               ("C-c C-r" . ivy-resume)
+               ("<f6>" . ivy-resume)
+               ("M-x" . counsel-M-x)
+               ("C-x C-f" . counsel-find-file)
+               ("C-x C-b" . counsel-ibuffer)
+               ("C-h f" . counsel-describe-function)
+               ("C-h v" . counsel-describe-variable)
+               ("C-h l" . counsel-find-library))
+        :diminish ivy-mode
+        :config
+        (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+              ivy-count-format ""
+              ivy-display-style nil
+              ivy-minibuffer-faces nil)
+        (ivy-mode 1)
+        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+    #+END_SRC
 
-It integrates  with Counsel  that handles  minibuffer and  swiper that
-handles searching in the file, so let's install those too.
+    It integrates with Counsel that handles minibuffer and swiper that
+    handles searching in the file, so let's install those too.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel)
-  (use-package swiper)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package counsel)
+      (use-package swiper)
+    #+END_SRC
 
 *** Flycheck
-A really  nice linting package that  helps me track errors  in most of
-languages.
+    A really nice  linting package that helps me track  errors in most
+    of languages.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :config
-    (add-hook 'prog-mode-hook 'flycheck-mode))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package flycheck
+        :config
+        (add-hook 'prog-mode-hook 'flycheck-mode))
+    #+END_SRC
 
 *** Company
-Complete anything framework. Nothing much to say. Does it's job.
+    Complete anything framework. Nothing much to say. Does it's job.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    :diminish company-mode
-    :init
-    (setq company-require-match 'never
-          company-minimum-prefix-length 2
-          company-frontends
-          '(company-pseudo-tooltip-unless-just-one-frontend
-            company-preview-frontend
-            company-echo-metadata-frontend))
-    :config
-    (setq company-backends (remove 'company-clang company-backends)
-          company-backends (remove 'company-xcode company-backends)
-          company-backends (remove 'company-cmake company-backends)
-          company-backends (remove 'company-gtags company-backends))
-    (add-hook 'after-init-hook 'global-company-mode)
-    (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-    (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-    (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-    (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package company
+        :diminish company-mode
+        :init
+        (setq company-require-match 'never
+              company-minimum-prefix-length 2
+              company-frontends
+              '(company-pseudo-tooltip-unless-just-one-frontend
+                company-preview-frontend
+                company-echo-metadata-frontend))
+        :config
+        (setq company-backends (remove 'company-clang company-backends)
+              company-backends (remove 'company-xcode company-backends)
+              company-backends (remove 'company-cmake company-backends)
+              company-backends (remove 'company-gtags company-backends))
+        (add-hook 'after-init-hook 'global-company-mode)
+        (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+        (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+        (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+        (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
+    #+END_SRC
 
 *** Undo Tree
-This is more familiar  undo mode. It adds C-/ mapping  to undo and C-?
-mapping to redo.
+    This is more  familiar undo mode. It adds C-/  mapping to undo and
+    C-?  mapping to redo.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-    :diminish undo-tree-mode
-    :config
-    (global-undo-tree-mode 1))
-#+END_SRC
-
-*** Move Text
-Allows to move line or region up and down.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package move-text
-    :bind (("<C-M-up>" . move-text-up)
-           ("<C-M-down>" . move-text-down)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package undo-tree
+        :diminish undo-tree-mode
+        :config
+        (global-undo-tree-mode 1))
+    #+END_SRC
 
 *** Yasnippet
-Another very handy package, that helps insert templates of code. Now I
-really need to write some snippets to use...
+    Another  very  handy  package,  that  helps  insert  templates  of
+    code. Now I really need to write some snippets to use...
 
-#+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :diminish yas-minor-mode
-    :config
-    (add-hook 'prog-mode-hook 'yas-minor-mode))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package yasnippet
+        :diminish yas-minor-mode
+        :config
+        (add-hook 'prog-mode-hook 'yas-minor-mode))
+    #+END_SRC
+
+    Since  we need  snippets in  all programming  modes, and  I didn't
+    found a proper way to load them without extra snippets package, to
+    load my own snippets lets use this hook.
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'prog-mode-hook 'yas-reload-all)
+    #+END_SRC
 
 *** Projectile
-Since emacs  is stupid, it  changes working directory to  current file
-location. So I need a whole plugin to workaround this silly issue.
+    Since emacs  is stupid,  it changes  working directory  to current
+    file location. So  I need a whole plugin to  workaround this silly
+    issue.
 
-However this plugin is quite useful with Git repositories.
+    However this plugin is quite useful with Git repositories.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package projectile
-    :init
-    (projectile-mode +1)
-    :bind
-    (("C-c p" . projectile-command-map)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package projectile
+        :init
+        (projectile-mode +1)
+        :bind
+        (("C-c p" . projectile-command-map)))
+    #+END_SRC
 
 **** Counsel projectile
 It makes using projectile easier by allowing fuzzy matching.
@@ -442,51 +467,60 @@ It makes using projectile easier by allowing fuzzy matching.
 #+END_SRC
 
 *** GNU Plot
-This is  a package needed for  making plots with gnuplot.  Required by
-Org mode.
+    This is a package needed  for making plots with gnuplot.  Required
+    by Org mode.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package gnuplot)
-#+END_SRC
-
-Since it  is needed  for Org-mode, and  especially babel,  lets enable
-gnuplot language in it.
-
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((gnuplot . t)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package gnuplot)
+    #+END_SRC
 
 ** Modes
-This section will contain some settings for various modes that are not
-handled within package configurations.
+   This section will contain some  settings for various modes that are
+   not handled within package configurations.
 
 *** Org Mode
-For Org Mode I  need spell checking to be default,  and yasnippet so I
-could expand some useful things like =SRC= blocks.
+    For Org Mode I need spell checking to be default, and yasnippet so
+    I could expand some useful things like =SRC= blocks.
 
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-mode-hook (lambda()
-                             (flyspell-mode)
-                             (yas-minor-mode)
-                             (yas-reload-all)))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'org-mode-hook (lambda()
+                                 (flyspell-mode)
+                                 (yas-minor-mode)
+                                 (yas-reload-all)))
+    #+END_SRC
 
-To  highlight code  blocks when  exporting to  LaTeX we  need =minted=
-package   installed   system-wide   and    this   code   (taken   from
-[[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
+    To highlight code blocks when  exporting to LaTeX we need =minted=
+    package   installed  system-wide   and  this   code  (taken   from
+    [[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
 
-#+BEGIN_SRC emacs-lisp
-  (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "minted" nil))
-  (setq org-latex-listings 'minted) 
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (require 'ox-latex)
+      (add-to-list 'org-latex-packages-alist '("" "minted" nil))
+      (setq org-latex-listings 'minted) 
+    #+END_SRC
 
-This will make =pdflatex= use these escape sequences for proper colors.
+    This will  make =pdflatex=  use these  escape sequence  for proper
+    colors.
 
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-latex-pdf-process
+            '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+    #+END_SRC
+
+    Since Org-mode allows inline images, we need a way to update them,
+    if image changes  for some reason. We will use  hook after loading
+    Org-mode.
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'org-babel-after-execute-hook 'update-inline-images)
+    #+END_SRC
+
+    This will  come in handy  when using Org  with GNU Plot.  Lets add
+    support for it to Org-mode.
+
+    #+BEGIN_SRC emacs-lisp
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((gnuplot . t)))
+    #+END_SRC
 
