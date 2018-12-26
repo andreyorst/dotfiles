@@ -40,10 +40,12 @@
       (setq inhibit-splash-screen t)
     #+END_SRC
 
-    I also would like  to start Emacs in Org mode  by default, so I'll
-    change the default major mode for Emacs startup.
+    I also would like  to start Emacs in Org mode  by default, so lets
+    =require= the  =org-mode= and  change the  default major  mode for
+    Emacs startup.
 
     #+BEGIN_SRC emacs-lisp
+      (require 'org)
       (setq initial-major-mode 'org-mode)
     #+END_SRC
 
@@ -180,13 +182,6 @@
          (package-refresh-contents))
      #+END_SRC
 
-*** Org
-    Since  this  file  contains  org-related  functions,  we  need  to
-    =require= Org package.
-
-    #+BEGIN_SRC emacs-lisp
-      (require 'org)
-    #+END_SRC
 ** Functions
    This section should contain functions that I've wrote for personal
    use here and there. I'm not elisp expert, so code may be not the
@@ -296,7 +291,7 @@ packages.
                ("\\.markdown\\'" . markdown-mode))
         :init (defvar markdown-command "multimarkdown"))
     #+END_SRC
-    
+
     But I hope, that Org-mode will replace it eventually.
 
 *** Geiser
@@ -496,7 +491,7 @@ It makes using projectile easier by allowing fuzzy matching.
     #+BEGIN_SRC emacs-lisp
       (require 'ox-latex)
       (add-to-list 'org-latex-packages-alist '("" "minted" nil))
-      (setq org-latex-listings 'minted) 
+      (setq org-latex-listings 'minted)
     #+END_SRC
 
     This will  make =pdflatex=  use these  escape sequence  for proper
@@ -522,5 +517,12 @@ It makes using projectile easier by allowing fuzzy matching.
       (org-babel-do-load-languages
        'org-babel-load-languages
        '((gnuplot . t)))
+    #+END_SRC
+
+    To  prevent Emacs  from constantly  asking  if I  want to  execute
+    source code, lets set =org-confirm-babel-evaluate= to =nil=
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-confirm-babel-evaluate nil)
     #+END_SRC
 
