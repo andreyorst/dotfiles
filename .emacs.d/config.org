@@ -469,6 +469,14 @@ It makes using projectile easier by allowing fuzzy matching.
       (use-package gnuplot)
     #+END_SRC
 
+*** org-bullets
+    Pretty bullets for Org headings.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-bullets)
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    #+END_SRC
+
 ** Modes
    This section will contain some  settings for various modes that are
    not handled within package configurations.
