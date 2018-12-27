@@ -526,3 +526,17 @@ It makes using projectile easier by allowing fuzzy matching.
       (setq org-confirm-babel-evaluate nil)
     #+END_SRC
 
+*** C/Cpp Mode
+    I don't think that I'm gonna  use Emacs for C/C++ development, but
+    sometimes  I'm just  in the  mood of  opening some  sources inside
+    Emacs. For  such reasons I  just want  to have sane  defaults that
+    match my workflow.
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'c-mode-common-hook
+                '(lambda()
+                   (setq indent-tabs-mode t
+                         c-basic-offset 4
+                         tab-width 4)))
+    #+END_SRC
+
