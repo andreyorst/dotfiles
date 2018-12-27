@@ -44,14 +44,13 @@ plug "TeddyDD/kakoune-edit-or-dir" %{
     alias global e edit-or-dir
 }
 
-plug "ul/kak-lsp" load %{lsp.kak} do %{
+plug "andreyorst/kak-lsp" do %{
     cargo build --release --locked
     cargo install
 } config %{
     hook global WinSetOption filetype=(c|cpp|rust) %{
         lsp-start
         lsp-enable
-        # set-option window lsp_hover_anchor true
     }
 }
 
