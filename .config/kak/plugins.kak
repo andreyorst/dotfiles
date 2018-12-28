@@ -44,9 +44,9 @@ plug "TeddyDD/kakoune-edit-or-dir" %{
     alias global e edit-or-dir
 }
 
-plug "andreyorst/kak-lsp" do %{
+plug "ul/kak-lsp" do %{
     cargo build --release --locked
-    cargo install
+    cargo install --force
 } config %{
     hook global WinSetOption filetype=(c|cpp|rust) %{
         lsp-start
