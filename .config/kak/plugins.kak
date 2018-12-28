@@ -76,10 +76,4 @@ plug "alexherbo2/replace.kak" config %{
     map global user r -docstring 'Replace mode' ':<space>replace<ret>'
 }
 
-plug "occivink/kakoune-snippets" "branch: refactor" config %{
-set global snippets 'for-loop' %{
-snippets-insert %{for (int ${1:i}; $1 < $2; $1++) {
-${indent}$0
-}}}
-set global snippets_auto_expand 'fl' 'for-loop'
-}
+plug "occivink/kakoune-snippets"
