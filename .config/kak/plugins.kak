@@ -68,6 +68,7 @@ plug "andreyorst/smarttab.kak" %{
     hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme) %{ expandtab }
     hook global WinSetOption filetype=(makefile) %{ noexpandtab }
     hook global WinSetOption filetype=(c|cpp) %{ smarttab }
+}
 
 plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
@@ -76,6 +77,11 @@ plug "alexherbo2/auto-pairs.kak" %{
 
 plug "alexherbo2/replace.kak" config %{
     map global user r -docstring 'Replace mode' ':<space>replace<ret>'
+}
+
+plug "alexherbo2/move-line.kak" config %{
+    map global normal "<c-b>" ': move-line-below %val{count}<ret>'
+    map global normal "<c-a>" ': move-line-above %val{count}<ret>'
 }
 
 plug "occivink/kakoune-snippets"
