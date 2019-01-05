@@ -21,10 +21,10 @@ hook global WinCreate .* %{
 }
 
 # Highlight operators and delimiters
-hook -group ope-delim global WinCreate .* %{
-    add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
-    add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
-    add-highlighter buffer/namespace  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
+hook -once -group ope-delim global WinCreate .* %{
+    add-highlighter global/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
+    add-highlighter global/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+    add-highlighter global/namespace  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
 }
 
 # C/Cpp/Rust syntax fixes
@@ -37,7 +37,6 @@ hook global WinSetOption filetype=(c|cpp|rust|java) %{
 # C/Cpp
 hook global WinSetOption filetype=(c|cpp) %{
     set-option window formatcmd 'clang-format'
-    smarttab
     # Custom C/Cpp types highlighing
     add-highlighter buffer/c_types      regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
     add-highlighter buffer/c_types2     regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
@@ -49,31 +48,15 @@ hook global WinSetOption filetype=(c|cpp) %{
 # Rust
 hook global WinSetOption filetype=rust %{
     set window formatcmd 'rustfmt'
-    expandtab
 }
 
 # Markdown
 hook global WinSetOption filetype=markdown %{
     remove-highlighter buffer/operators
     remove-highlighter buffer/delimiters
-    expandtab
-}
-
-# Kakoune
-hook global WinSetOption filetype=kak %{
-    expandtab
 }
 
 # Makefile
 hook global BufCreate .*\.mk$ %{
     set-option buffer filetype makefile
-}
-
-hook global WinSetOption filetype=makefile %{
-    noexpandtab
-}
-
-# Lisp, Scheme
-hook global WinSetOption filetype=(lisp|scheme) %{
-    expandtab
 }

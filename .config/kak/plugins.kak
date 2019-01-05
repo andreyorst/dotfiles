@@ -17,7 +17,7 @@ plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-gdb"
 
 plug "andreyorst/base16-gruvbox.kak" noload do %{
-    ln -sf $PWD/colors/base16-gruvbox-dark-soft.kak $HOME/.config/kak/colors
+    find -name "*.kak" -exec cp {} $HOME/.config/kak/colors \;
 } config %{
     colorscheme base16-gruvbox-dark-soft
 }
@@ -26,14 +26,14 @@ plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
-        if [ ! -z "$(command -v fd)" ]; then
+        if [ -n "$(command -v fd)" ]; then
             echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
         else
             echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
         fi
-        if [ ! -z "$(command -v bat)" ]; then
+        if [ -n "$(command -v bat)" ]; then
             echo "set-option global fzf_highlighter %{bat --theme gruvbox\ \(Dark\)\ \(Soft\) --color=always --style=plain {}}"
-        elif [ ! -z "$(command -v highlight)" ]; then
+        elif [ -n "$(command -v highlight)" ]; then
             echo "set-option global fzf_highlighter highlight"
         fi
     }
@@ -65,7 +65,9 @@ plug "andreyorst/powerline.kak" %{
 
 plug "andreyorst/smarttab.kak" %{
     set-option global softtabstop 4
-}
+    hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme) %{ expandtab }
+    hook global WinSetOption filetype=(makefile) %{ noexpandtab }
+    hook global WinSetOption filetype=(c|cpp) %{ smarttab }
 
 plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
