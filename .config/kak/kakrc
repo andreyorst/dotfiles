@@ -16,6 +16,7 @@ evaluate-commands %sh{
         tmux.kak
         common.kak
         languages.kak
+        hlcursor.kak
     "
 
     for file in $config_files; do
