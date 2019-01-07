@@ -1,4 +1,4 @@
-set-face global cursorline default,rgb:3C3836+d
+set-face global cursorline default,rgb:3a3633
 declare-option bool cursorline true
 
 hook global -group cursorline RawKey .* update-cursorline

@@ -12,25 +12,22 @@
 
 # tmux tricks
 define-command -override -docstring "rename tmux window to current buffer filename" \
-rename-tmux %{ nop %sh{ [ -z "$TMUX" ] && exit; tmux rename-window "kak: ${kak_bufname##*/}" } }
+rename-tmux %{ nop %sh{ [ -n "$kak_client_env_TMUX" ] && tmux rename-window "kak: ${kak_bufname##*/}" } }
 
 hook -group tmux global FocusIn .* %{rename-tmux}
 hook -group tmux global WinDisplay .* %{rename-tmux}
-hook -group tmux global KakEnd .* %{ %sh{ [ -z "$TMUX" ] && exit; tmux rename-window 'zsh' } }
+hook -group tmux global KakEnd .* %{ %sh{ [ -n "$TMUX" ] && tmux rename-window 'zsh' } }
 
 evaluate-commands %sh{
-    if  [ -z "$TMUX" ]; then
-        printf "%s\n" "nop"
-        exit
+    if  [ -n "$kak_client_env_TMUX" ]; then
+        printf "%s\n" "alias global vsplit   tmux-new-horizontal"
+        printf "%s\n" "alias global vspl     tmux-new-horizontal"
+        printf "%s\n" "alias global vert     tmux-new-horizontal"
+        printf "%s\n" "alias global vertical tmux-new-horizontal"
+        printf "%s\n" "alias global split    tmux-new-vertical"
+        printf "%s\n" "alias global spl      tmux-new-vertical"
+        printf "%s\n" "alias global tabnew   tmux-new-window"
+        printf "%s\n" "alias global tabn     tmux-new-window"
     fi
-    # Aliases
-    printf "%s\n" "alias global vsplit   tmux-new-horizontal"
-    printf "%s\n" "alias global vspl     tmux-new-horizontal"
-    printf "%s\n" "alias global vert     tmux-new-horizontal"
-    printf "%s\n" "alias global vertical tmux-new-horizontal"
-    printf "%s\n" "alias global split    tmux-new-vertical"
-    printf "%s\n" "alias global spl      tmux-new-vertical"
-    printf "%s\n" "alias global tabnew   tmux-new-window"
-    printf "%s\n" "alias global tabn     tmux-new-window"
 }
 
