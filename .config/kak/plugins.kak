@@ -85,5 +85,5 @@ plug "alexherbo2/move-line.kak" config %{
 }
 
 plug "occivink/kakoune-snippets"
-
 plug "occivink/kakoune-find"
+
