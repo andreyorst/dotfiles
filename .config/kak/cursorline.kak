@@ -1,14 +1,14 @@
-declare-option str cursorline_face default,rgb:3C3836+d
+set-face global cursorline default,rgb:3C3836+d
 declare-option bool cursorline true
 
 hook global -group cursorline RawKey .* update-cursorline
 
 define-command -hidden update-cursorline -docstring "Highlight current line" %{
     try %{ remove-highlighter window/cursorline }
-    try %{ add-highlighter window/cursorline line %val{cursor_line} %opt{cursorline_face} }
+    try %{ add-highlighter window/cursorline line %val{cursor_line} cursorline }
 }
 
-define-command cursorline -docstring "Toggle Highlighting for current line" %{
+define-command cursorline-toggle -docstring "Toggle highlighting of current line" %{
     evaluate-commands %sh{
         if [ "$kak_opt_cursorline" = true ] ; then
             printf "%s\n" "set-option global cursorline false"
