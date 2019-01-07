@@ -22,8 +22,8 @@ smart-select -params ..1 %{ execute-keys -save-regs '' %sh{
 }}
 
 define-command -override -docstring \
-"find <filename>: search for file recusively under path option: %opt{path}" \
-find -params 1 %{ evaluate-commands %sh{
+"search-file <filename>: search for file recusively under path option: %opt{path}" \
+search-file -params 1 %{ evaluate-commands %sh{
     file=$1
     eval "set -- $kak_buflist"
     while [ $# -gt 0 ]; do            # Check if buffer with this
