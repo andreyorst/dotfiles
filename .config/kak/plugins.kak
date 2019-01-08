@@ -48,10 +48,18 @@ plug "ul/kak-lsp" do %{
     cargo build --release --locked
     cargo install --force
 } config %{
+    set-option global lsp_diagnostic_line_error_sign "!"
+    set-option global lsp_diagnostic_line_warning_sign "?"
     hook global WinSetOption filetype=(c|cpp|rust) %{
+        map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
+        lsp-auto-hover-enable
         lsp-start
         lsp-enable
     }
+    hook global WinSetOption filetype=rust %{
+        set-option window lsp_server_configuration rust.clippy_preference="on"
+    }
+    hook global KakEnd .* lsp-exit
 }
 
 plug "andreyorst/powerline.kak" %{
