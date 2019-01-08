@@ -8,13 +8,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(display-line-numbers-type (quote visual))
  '(line-number-mode nil)
  '(mode-line-in-non-selected-windows nil)
  '(mode-line-percent-position nil)
  '(package-selected-packages
    (quote
-    (org-bullets gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish spacemacs-theme use-package))))
+    (cquery company-lsp lsp-ui lsp-mode rust-mode org-bullets gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish spacemacs-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

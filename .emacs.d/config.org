@@ -448,6 +448,7 @@ packages.
 
     #+BEGIN_SRC emacs-lisp
       (use-package projectile
+        :diminish projectile-mode
         :init
         (projectile-mode +1)
         :bind
@@ -476,6 +477,46 @@ It makes using projectile easier by allowing fuzzy matching.
       (use-package org-bullets)
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
     #+END_SRC
+
+*** Rust
+    I'd  like  to  have  Rust   syntax  highlighting  and  some  basic
+    facilities, since I'm planning to write my exercises in org mode.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package rust-mode)
+    #+END_SRC
+
+*** lsp-mode
+    To provide nice IDE-like features, I like to use language servers,
+    that can be handled with language server protocol mode for Emacs.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package lsp-mode
+        :commands lsp)
+    #+END_SRC
+
+    LSP can provide lots of information  to observe, so it's useful to
+    be able to view it. Luckily there's a package for it.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package lsp-ui :commands lsp-ui-mode)
+    #+END_SRC
+
+    This mode also can be used with company, so lets install a backend
+    for it.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package company-lsp :commands company-lsp)
+    #+END_SRC
+**** cquery
+     =cquery= is a  language server for C/C++ code.  It interacts with
+     [[lsp-mode]].
+
+     #+BEGIN_SRC emacs-lisp
+       (use-package cquery
+         :init
+         (setq cquery-executable "cquery"))
+     #+END_SRC
 
 ** Modes
    This section will contain some  settings for various modes that are
