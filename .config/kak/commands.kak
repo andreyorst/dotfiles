@@ -52,6 +52,8 @@ search-file -params 1 %{ evaluate-commands %sh{
                 exit
             fi
         else # build list of candidates or automatically select if only one found
+            IFS='
+'
             for candidate in $(find -L $path -mount -type f -name "$file"); do
                 if [ -n "$candidate" ]; then
                     candidates="$candidates %{$candidate} %{evaluate-commands %{edit -existing %{$candidate}}}"
