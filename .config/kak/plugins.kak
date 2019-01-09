@@ -17,7 +17,7 @@ plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-gdb"
 
 plug "andreyorst/base16-gruvbox.kak" noload do %{
-    find -name "*.kak" -exec cp {} $HOME/.config/kak/colors \;
+    find -type f -name "*.kak" -exec cp {} $HOME/.config/kak/colors \\;
 } config %{
     colorscheme base16-gruvbox-dark-soft
 }
@@ -32,7 +32,7 @@ plug "andreyorst/fzf.kak" %{
             echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
         fi
         if [ -n "$(command -v bat)" ]; then
-            echo "set-option global fzf_highlighter %{bat --theme gruvbox\ \(Dark\)\ \(Soft\) --color=always --style=plain {}}"
+            echo "set-option global fzf_highlighter bat"
         elif [ -n "$(command -v highlight)" ]; then
             echo "set-option global fzf_highlighter highlight"
         fi
