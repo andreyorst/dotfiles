@@ -409,6 +409,19 @@ packages.
         (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
     #+END_SRC
 
+**** Company flx
+     This   actually  makes   company  behave   as  fuzzy   completion
+     framework. It's kind of slow though.
+
+     #+BEGIN_SRC emacs-lisp
+       (use-package company-flx
+         :init
+         (add-hook 'company-mode-hook (lambda ()
+                                        (add-to-list 'company-backends 'company-capf)))
+         :config
+         (company-flx-mode +1))
+     #+END_SRC
+
 *** Undo Tree
     This is more  familiar undo mode. It adds C-/  mapping to undo and
     C-?  mapping to redo.
@@ -508,6 +521,7 @@ It makes using projectile easier by allowing fuzzy matching.
     #+BEGIN_SRC emacs-lisp
       (use-package company-lsp :commands company-lsp)
     #+END_SRC
+
 **** cquery
      =cquery= is a  language server for C/C++ code.  It interacts with
      [[lsp-mode]].
