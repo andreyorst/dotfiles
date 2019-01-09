@@ -52,9 +52,8 @@ plug "ul/kak-lsp" do %{
     set-option global lsp_diagnostic_line_warning_sign "?"
     hook global WinSetOption filetype=(c|cpp|rust) %{
         map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
+        lsp-enable-window
         lsp-auto-hover-enable
-        lsp-start
-        lsp-enable
     }
     hook global WinSetOption filetype=rust %{
         set-option window lsp_server_configuration rust.clippy_preference="on"
@@ -73,9 +72,9 @@ plug "andreyorst/powerline.kak" %{
 
 plug "andreyorst/smarttab.kak" %{
     set-option global softtabstop 4
-    hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme) %{ expandtab }
-    hook global WinSetOption filetype=(makefile) %{ noexpandtab }
-    hook global WinSetOption filetype=(c|cpp) %{ smarttab }
+    hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme) expandtab
+    hook global WinSetOption filetype=(makefile) noexpandtab
+    hook global WinSetOption filetype=(c|cpp) smarttab
 }
 
 plug "alexherbo2/auto-pairs.kak" %{
