@@ -422,6 +422,13 @@ packages.
          (company-flx-mode +1))
      #+END_SRC
 
+**** Company lsp
+     To make compay understand completions from language servers we need this backend.
+
+     #+BEGIN_SRC emacs-lisp
+       (use-package company-lsp)
+     #+END_SRC
+
 *** Undo Tree
     This is more  familiar undo mode. It adds C-/  mapping to undo and
     C-?  mapping to redo.
@@ -469,11 +476,11 @@ packages.
     #+END_SRC
 
 **** Counsel projectile
-It makes using projectile easier by allowing fuzzy matching.
+     It makes using projectile easier by allowing fuzzy matching.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel-projectile)
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (use-package counsel-projectile)
+     #+END_SRC
 
 *** GNU Plot
     This is a package needed  for making plots with gnuplot.  Required
@@ -505,7 +512,9 @@ It makes using projectile easier by allowing fuzzy matching.
 
     #+BEGIN_SRC emacs-lisp
       (use-package lsp-mode
-        :commands lsp)
+        :commands lsp
+        :config
+        (setq lsp-highlight-symbol-at-point nil))
     #+END_SRC
 
     LSP can provide lots of information  to observe, so it's useful to
@@ -529,7 +538,11 @@ It makes using projectile easier by allowing fuzzy matching.
      #+BEGIN_SRC emacs-lisp
        (use-package cquery
          :init
-         (setq cquery-executable "cquery"))
+         (setq cquery-executable "/usr/bin/cquery"
+               cquery-cache-dir "~/.cache/cquery"
+               cquery-sem-highlight-method 'font-lock)
+         (add-hook 'c-mode-hook '(lambda() (lsp-cquery-enable))
+                   'c++-mode-hook '(lambda() (lsp-cquery-enable))))
      #+END_SRC
 
 ** Modes
@@ -600,6 +613,8 @@ It makes using projectile easier by allowing fuzzy matching.
                 '(lambda()
                    (setq indent-tabs-mode t
                          c-basic-offset 4
-                         tab-width 4)))
+                         tab-width 4)
+                   (lsp-cquery-enable)
+                   (lsp-ui-mode)))
     #+END_SRC
 
