@@ -17,7 +17,7 @@ plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-gdb"
 
 plug "andreyorst/base16-gruvbox.kak" noload do %{
-    find -type f -name "*.kak" -exec cp {} $HOME/.config/kak/colors \\;
+    find -type f -name "*.kak" -print0 | xargs -0 cp -t $HOME/.config/kak/colors
 } config %{
     colorscheme base16-gruvbox-dark-soft
 }
