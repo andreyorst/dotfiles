@@ -19,15 +19,10 @@ hook -group tmux global WinDisplay .* %{rename-tmux}
 hook -group tmux global KakEnd .* %{ %sh{ [ -n "$TMUX" ] && tmux rename-window 'zsh' } }
 
 evaluate-commands %sh{
-    if  [ -n "$kak_client_env_TMUX" ]; then
-        printf "%s\n" "alias global vsplit   tmux-new-horizontal"
-        printf "%s\n" "alias global vspl     tmux-new-horizontal"
-        printf "%s\n" "alias global vert     tmux-new-horizontal"
-        printf "%s\n" "alias global vertical tmux-new-horizontal"
-        printf "%s\n" "alias global split    tmux-new-vertical"
-        printf "%s\n" "alias global spl      tmux-new-vertical"
-        printf "%s\n" "alias global tabnew   tmux-new-window"
-        printf "%s\n" "alias global tabn     tmux-new-window"
+    if  [ -n "$TMUX" ]; then
+        printf "%s\n" "define-command vsplit -params .. -command-completion %{ tmux-terminal-horizontal kak -c %val{session} -e \"%arg{@}\" }"
+        printf "%s\n" "define-command split -params .. -command-completion %{ tmux-terminal-vertical kak -c %val{session} -e \"%arg{@}\" }"
+        printf "%s\n" "define-command tabnew -params .. -command-completion %{ tmux-terminal-window kak -c %val{session} -e \"%arg{@}\" }"
     fi
 }
 
