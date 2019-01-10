@@ -18,11 +18,19 @@ hook -group tmux global FocusIn .* %{rename-tmux}
 hook -group tmux global WinDisplay .* %{rename-tmux}
 hook -group tmux global KakEnd .* %{ %sh{ [ -n "$TMUX" ] && tmux rename-window 'zsh' } }
 
-evaluate-commands %sh{
-    if  [ -n "$TMUX" ]; then
-        printf "%s\n" "define-command vsplit -params .. -command-completion %{ tmux-terminal-horizontal kak -c %val{session} -e \"%arg{@}\" }"
-        printf "%s\n" "define-command split -params .. -command-completion %{ tmux-terminal-vertical kak -c %val{session} -e \"%arg{@}\" }"
-        printf "%s\n" "define-command tabnew -params .. -command-completion %{ tmux-terminal-window kak -c %val{session} -e \"%arg{@}\" }"
-    fi
+define-command -override -docstring "split tmux vertically" \
+vsplit -params .. -command-completion %{
+    tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
+
+define-command -override  -docstring "split tmux horizontally" \
+split -params .. -command-completion %{
+    tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
+}
+
+define-command -override -docstring "create new tmux window" \
+tabnew -params .. -command-completion %{
+    tmux-terminal-window kak -c %val{session} -e "%arg{@}"
+}
+
 
