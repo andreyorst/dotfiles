@@ -3,6 +3,8 @@ declare-option bool cursorline true
 
 hook global -group cursorline RawKey .* update-cursorline
 
+map global user 'l' ': cursorline-toggle<ret>' -docstring "toggle cursorline"
+
 define-command -hidden update-cursorline -docstring "Highlight current line" %{
     try %{ remove-highlighter window/cursorline }
     try %{ add-highlighter window/cursorline line %val{cursor_line} cursorline }
