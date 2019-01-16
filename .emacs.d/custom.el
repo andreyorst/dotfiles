@@ -13,7 +13,7 @@
  '(mode-line-percent-position nil)
  '(package-selected-packages
    (quote
-    (company-flx cquery company-lsp lsp-ui lsp-mode rust-mode org-bullets gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish spacemacs-theme use-package))))
+    (toml-mode company-flx cquery company-lsp lsp-ui lsp-mode rust-mode org-bullets gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish spacemacs-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

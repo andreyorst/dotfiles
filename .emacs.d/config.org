@@ -506,6 +506,14 @@ packages.
       (use-package rust-mode)
     #+END_SRC
 
+*** TOML
+    =toml-mode= helps  with highlighting of TOML files,  which Rust uses
+    to configure project.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package toml-mode)
+    #+END_SRC
+
 *** lsp-mode
     To provide nice IDE-like features, I like to use language servers,
     that can be handled with language server protocol mode for Emacs.
