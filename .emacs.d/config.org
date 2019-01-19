@@ -353,6 +353,7 @@ packages.
                ("M-x" . counsel-M-x)
                ("C-x C-f" . counsel-find-file)
                ("C-x C-b" . counsel-ibuffer)
+               ("C-x b" . counsel-ibuffer)
                ("C-h f" . counsel-describe-function)
                ("C-h v" . counsel-describe-variable)
                ("C-h l" . counsel-find-library))
@@ -379,9 +380,7 @@ packages.
     of languages.
 
     #+BEGIN_SRC emacs-lisp
-      (use-package flycheck
-        :config
-        (add-hook 'prog-mode-hook 'flycheck-mode))
+      (use-package flycheck)
     #+END_SRC
 
 *** Company
@@ -626,3 +625,14 @@ packages.
                    (lsp-ui-mode)))
     #+END_SRC
 
+*** Rust Mode
+    These are  settings for  Rust buffers,  that will  enable language
+    server and Flycheck.
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'rust-mode-hook
+                '(lambda()
+                   (lsp)
+                   (flycheck-mode)))
+    #+END_SRC
+    
