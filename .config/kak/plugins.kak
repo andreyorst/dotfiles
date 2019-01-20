@@ -93,45 +93,34 @@ plug "alexherbo2/move-line.kak" config %{
 }
 
 plug "occivink/kakoune-snippets" config %{
-set-option global snippets_auto_expand false
-set-option -add global snippets 'For' %{
-snippets-insert %{for (int ${1:i}; $1 < $2; $1++) {
-${indent}$0
-}}}
-set-option -add global snippets_triggers 'for' 'For'
+    set-option global snippets_auto_expand false
+    map global insert '<tab>' "<a-;>: snippets-expand-or-jump 'tab'<ret>"
 
-set-option -add global snippets 'Main' %{
-snippets-insert %{int main() {
-${indent}$0
-}}}
-set-option -add global snippets_triggers 'main' 'Main'
+    hook global InsertCompletionShow .* %{
+        try %{
+            execute-keys -draft 'h<a-K>\h<ret>'
+            map window insert '<ret>' "<a-;>: snippets-expand-or-jump 'ret'<ret>"
+        }
+    }
 
-map global insert '<tab>' "<a-;>: snippets-expand-or-jump 'tab'<ret>"
+    hook global InsertCompletionHide .* %{
+        unmap window insert '<ret>' "<a-;>: snippets-expand-or-jump 'ret'<ret>"
+    }
 
-hook global InsertCompletionShow .* %{
-    try %{
-        execute-keys -draft 'h<a-K>\h<ret>'
-        map window insert '<ret>' "<a-;>: snippets-expand-or-jump 'ret'<ret>"
+    define-command snippets-expand-or-jump -params 1 %{
+        try %{
+            snippets-expand-trigger b
+        } catch %{
+            snippets-select-next-placeholders
+        } catch %sh{
+            case $1 in
+                ret|tab)
+                    printf "%s\n" "execute-keys -with-hooks <$1>" ;;
+                *)
+                    printf "%s\n" "execute-keys -with-hooks $1" ;;
+            esac
+        }
     }
 }
-
-hook global InsertCompletionHide .* %{
-    unmap window insert '<ret>' "<a-;>: snippets-expand-or-jump 'ret'<ret>"
-}
-
-define-command snippets-expand-or-jump -params 1 %{
-    try %{
-        snippets-expand-trigger b
-    } catch %{
-        snippets-select-next-placeholders
-    } catch %sh{
-        case $1 in
-            ret|tab)
-                printf "%s\n" "execute-keys -with-hooks <$1>" ;;
-            *)
-                printf "%s\n" "execute-keys -with-hooks $1" ;;
-        esac
-    }
-}}
 
 plug "occivink/kakoune-find"
