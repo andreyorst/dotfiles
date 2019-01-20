@@ -109,7 +109,7 @@ plug "occivink/kakoune-snippets" config %{
 
     define-command snippets-expand-or-jump -params 1 %{
         try %{
-            snippets-expand-trigger b
+            snippets-expand-trigger
         } catch %{
             snippets-select-next-placeholders
         } catch %sh{
