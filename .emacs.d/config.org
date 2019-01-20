@@ -267,6 +267,11 @@ packages.
     #+BEGIN_SRC emacs-lisp
       (ensure-installed 'spacemacs-theme)
       (load-theme 'spacemacs-dark t nil)
+    #+END_SRC
+
+    Also let's disable fringe background color, if theme changes it.
+
+    #+BEGIN_SRC emacs-lisp
       (set-face-attribute 'fringe nil :background nil)
     #+END_SRC
 
@@ -352,8 +357,8 @@ packages.
                ("<f6>" . ivy-resume)
                ("M-x" . counsel-M-x)
                ("C-x C-f" . counsel-find-file)
-               ("C-x C-b" . counsel-ibuffer)
-               ("C-x b" . counsel-ibuffer)
+               ("C-x C-b" . ivy-switch-buffer)
+               ("C-x b" . ivy-switch-buffer)
                ("C-h f" . counsel-describe-function)
                ("C-h v" . counsel-describe-variable)
                ("C-h l" . counsel-find-library))
@@ -564,7 +569,9 @@ packages.
       (add-hook 'org-mode-hook (lambda()
                                  (flyspell-mode)
                                  (yas-minor-mode)
-                                 (yas-reload-all)))
+                                 (yas-reload-all)
+                                 (setq default-justification 'fullscreen)
+                                 (auto-fill-mode)))
     #+END_SRC
 
     To highlight code blocks when  exporting to LaTeX we need =minted=
@@ -635,4 +642,4 @@ packages.
                    (lsp)
                    (flycheck-mode)))
     #+END_SRC
-    
+
