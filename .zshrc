@@ -27,6 +27,10 @@ alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; s
 
 export EDITOR="kak"
 
+if [ -n "$(command -v /bin/dash)" ]; then
+    export KAKOUNE_POSIX_SHELL=/bin/dash
+fi
+
 if [ -z "$TMUX" ]; then
     tmux
 fi
