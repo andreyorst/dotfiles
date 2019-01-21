@@ -93,21 +93,24 @@ plug "alexherbo2/move-line.kak" config %{
 }
 
 plug "occivink/kakoune-snippets" config %{
+    source "~/.config/kak/snippets.kak"
+
     set-option global snippets_auto_expand false
-    map global insert '<tab>' "<a-;>: snippets-expand-or-jump 'tab'<ret>"
+    map global insert '<tab>' "z<a-;>: snippets-expand-or-jump 'tab'<ret>"
 
     hook global InsertCompletionShow .* %{
         try %{
             execute-keys -draft 'h<a-K>\h<ret>'
-            map window insert '<ret>' "<a-;>: snippets-expand-or-jump 'ret'<ret>"
+            map window insert '<ret>' "z<a-;>: snippets-expand-or-jump 'ret'<ret>"
         }
     }
 
     hook global InsertCompletionHide .* %{
-        unmap window insert '<ret>' "<a-;>: snippets-expand-or-jump 'ret'<ret>"
+        unmap window insert '<ret>' "z<a-;>: snippets-expand-or-jump 'ret'<ret>"
     }
 
     define-command snippets-expand-or-jump -params 1 %{
+        execute-keys <backspace>
         try %{
             snippets-expand-trigger
         } catch %{

@@ -17,7 +17,6 @@ evaluate-commands %sh{
         common.kak
         languages.kak
         cursorline.kak
-        snippets.kak
     "
 
     for file in $config_files; do
