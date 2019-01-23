@@ -159,6 +159,14 @@
              auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
      #+END_SRC
 
+*** Trailing whitespaces
+    I don't  want my  files to contain  trailing whitespaces,  so this
+    hook will get rid of those automatically for me.
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'before-save-hook 'delete-trailing-whitespace)
+    #+END_SRC
+
 *** MELPA
     Melpa is a  package repository, that I use to  get packages. Since
     all packages  that I  need can  be obtained  from there,  I didn't
