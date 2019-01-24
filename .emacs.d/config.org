@@ -291,8 +291,9 @@ packages.
     it has dark background and I don't want to see it.
 
     #+BEGIN_SRC emacs-lisp
-      (ensure-installed 'spacemacs-theme)
-      (load-theme 'spacemacs-dark t nil)
+      (use-package spacemacs-common
+          :ensure spacemacs-theme
+          :config (load-theme 'spacemacs-dark t))
     #+END_SRC
 
     Also let's disable fringe background color and line numbers color,
