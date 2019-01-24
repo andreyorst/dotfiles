@@ -603,11 +603,13 @@ packages.
 
     #+BEGIN_SRC emacs-lisp
       (add-hook 'org-mode-hook (lambda()
+                                 (org-indent-mode)
                                  (flyspell-mode)
                                  (yas-minor-mode)
                                  (yas-reload-all)
                                  (setq default-justification 'full
-                                       org-startup-with-inline-images t)
+                                       org-startup-with-inline-images t
+                                       org-startup-folded 'content)
                                  (auto-fill-mode)))
     #+END_SRC
 
@@ -665,15 +667,5 @@ packages.
                    (setq indent-tabs-mode t
                          c-basic-offset 4
                          tab-width 4)
-                   (lsp)))
-    #+END_SRC
-
-*** Rust Mode
-    These are  settings for  Rust buffers,  that will  enable language
-    server.
-
-    #+BEGIN_SRC emacs-lisp
-      (add-hook 'rust-mode-hook
-                '(lambda()
                    (lsp)))
     #+END_SRC
