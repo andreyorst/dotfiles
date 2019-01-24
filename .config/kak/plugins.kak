@@ -80,7 +80,7 @@ plug "andreyorst/smarttab.kak" %{
 
 plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
-    hook global WinCreate .* %{ auto-pairs-enable }
+    # hook global WinCreate .* %{ auto-pairs-enable }
 }
 
 plug "alexherbo2/replace.kak" config %{
