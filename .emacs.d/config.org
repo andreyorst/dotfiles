@@ -63,7 +63,7 @@
       (setq-default major-mode 'org-mode)
     #+END_SRC
 
-*** UI defaults
+*** UI
     These are  some defaults  for user interface.  I don't  like those
     bars, buttons, tooltips, scrollbars, etc.
 
@@ -79,6 +79,14 @@
     I'm  using =ignore-errors=  here because  I use  both GUI  and TUI
     versions  of Emacs,  and since  TUI version  doesn't have  some of
     those features the startup process will fail.
+
+    Emacs uses weird method of naming a window, I'd like to see a file
+    I'm currently  working on  in the  task bar in  case my  Emacs was
+    minimized for some reason.
+
+    #+BEGIN_SRC emacs-lisp
+      (setq-default frame-title-format '("%b — Emacs"))
+    #+END_SRC
 
 *** Font
     I like  this Adobe  Source Code Pro  font. Even if  I use  Hack in
@@ -101,6 +109,7 @@
                     scroll-step 1
                     scroll-conservatively 10000
                     auto-window-vscroll nil
+                    scroll-margin 3
                     cursor-type 'bar)
     #+END_SRC
 
@@ -157,6 +166,15 @@
              create-lockfiles nil
              backup-directory-alist '(("." . "~/.cache/emacs-backups"))
              auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
+     #+END_SRC
+
+**** Shorter confirmation dialogues
+     For some reason in some situations Emacs asks for typing =yes= or
+     =no= explicitly,  instead of  accepting =y= or  =n=. This  can be
+     fixed with this.
+
+     #+BEGIN_SRC emacs-lisp
+       (fset 'yes-or-no-p 'y-or-n-p)
      #+END_SRC
 
 *** Trailing whitespaces
@@ -277,10 +295,12 @@ packages.
       (load-theme 'spacemacs-dark t nil)
     #+END_SRC
 
-    Also let's disable fringe background color, if theme changes it.
+    Also let's disable fringe background color and line numbers color,
+    if theme changes it.
 
     #+BEGIN_SRC emacs-lisp
       (set-face-attribute 'fringe nil :background nil)
+      (set-face-attribute 'line-number nil :background nil)
     #+END_SRC
 
 *** Diminish
@@ -557,13 +577,20 @@ packages.
 
      #+BEGIN_SRC emacs-lisp
        (use-package cquery
-         :init
+         :after lsp-mode
+         :config
          (setq cquery-executable "/usr/bin/cquery"
                cquery-cache-dir "~/.cache/cquery"
-               cquery-sem-highlight-method 'font-lock)
-         (add-hook 'c-mode-hook '(lambda() (lsp-cquery-enable))
-                   'c++-mode-hook '(lambda() (lsp-cquery-enable))))
+               cquery-sem-highlight-method 'font-lock
+               cquery-extra-args '("--log-file=/tmp/cq.log")))
      #+END_SRC
+
+*** clang-format
+    I use clang-format tool to format my C/C++ code.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package clang-format)
+    #+END_SRC
 
 ** Modes
    This section will contain some  settings for various modes that are
@@ -578,7 +605,8 @@ packages.
                                  (flyspell-mode)
                                  (yas-minor-mode)
                                  (yas-reload-all)
-                                 (setq default-justification 'fullscreen)
+                                 (setq default-justification 'full
+                                       org-startup-with-inline-images t)
                                  (auto-fill-mode)))
     #+END_SRC
 
@@ -636,18 +664,15 @@ packages.
                    (setq indent-tabs-mode t
                          c-basic-offset 4
                          tab-width 4)
-                   (lsp-cquery-enable)
-                   (lsp-ui-mode)))
+                   (lsp)))
     #+END_SRC
 
 *** Rust Mode
     These are  settings for  Rust buffers,  that will  enable language
-    server and Flycheck.
+    server.
 
     #+BEGIN_SRC emacs-lisp
       (add-hook 'rust-mode-hook
                 '(lambda()
-                   (lsp)
-                   (flycheck-mode)))
+                   (lsp)))
     #+END_SRC
-
