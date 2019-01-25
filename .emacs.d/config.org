@@ -285,11 +285,6 @@ I really  like this theme.   It's something like Atom's  One Dark,
 but little more purple. Anyway it's awesome, and colors are really
 nice.
 
-I don't  know why, but I  had troubles with installing  this theme
-with  =use-package= so  it  is  installed with  =ensure-installed=
-instead. I also  set =fringe= face to =nil= because  in this theme
-it has dark background and I don't want to see it.
-
 #+BEGIN_SRC emacs-lisp
   (use-package spacemacs-common
       :ensure spacemacs-theme
