@@ -1,63 +1,22 @@
 [options]
 allow_bold = true
-#audible_bell = false
-#clickable_url = true
-#dynamic_title = true
 font = Hack 9
-#fullscreen = true
-#geometry = 640x480
 icon_name = utilities-terminal
 mouse_autohide = false
-#scroll_on_output = false
 scroll_on_keystroke = true
-# Length of the scrollback buffer, 0 disabled the scrollback buffer
-# and setting it to a negative value means "infinite scrollback"
 scrollback_lines = -1
-#search_wrap = true
-#urgent_on_bell = true
-#hyperlinks = false
-
-# $BROWSER is used by default if set, with xdg-open as a fallback
-#browser = xdg-open
-
-# "system", "on" or "off"
 cursor_blink = on
-
-# "block", "underline" or "ibeam"
 cursor_shape = block
-
-# Hide links that are no longer valid in url select overlay mode
-#filter_unmatched_urls = true
-
-# Emit escape sequences for extra modified keys
-#modify_other_keys = false
-
-# set size hints for the window
-#size_hints = false
-
-# "off", "left" or "right"
 scrollbar = off
 
 [colors]
-# If both of these are unset, cursor falls back to the foreground color,
-# and cursor_foreground falls back to the background color.
+base16 gruvbox dark soft
 cursor = #e0e0e0
 cursor_foreground = #1d1f21
-
+background = #312f2e
 #foreground = #dcdccc
 #foreground_bold = #ffffff
-background = #312f2e
-
-# 20% background transparency (requires a compositor)
-#background = rgba(63, 63, 63, 0.8)
-
-# If unset, will reverse foreground and background
-#highlight = #2f2f2f
 highlight = #504945
-
-# Colors from color0 to color254 can be set
-
-# base16 gruvbox dark soft
 color0 = #32302F
 color1 = #FB4934
 color2 = #B8BB26
@@ -80,39 +39,4 @@ color18 = #3C3836
 color19 = #504945
 color20 = #BDAE93
 color21 = #EBDBB2
-
-# base16 tomorrow night
-# color0 = #1D1F21
-# color1 = #CC6666
-# color2 = #B5BD68
-# color3 = #F0C674
-# color4 = #81A2BE
-# color5 = #B294BB
-# color6 = #8ABEB7
-# color7 = #C5C8C6
-# color8 = #969896
-# color9 = #CC6666
-# color10 = #B5BD68
-# color11 = #F0C674
-# color12 = #81A2BE
-# color13 = #B294BB
-# color14 = #8ABEB7
-# color15 = #FFFFFF
-# color16 = #DE935F
-# color17 = #A3685A
-# color18 = #282A2E
-# color19 = #373B41
-# color20 = #B4B7B4
-# color21 = #E0E0E0
-
-[hints]
-#font = Monospace 12
-#foreground = #dcdccc
-#background = #3f3f3f
-#active_foreground = #e68080
-#active_background = #3f3f3f
-#padding = 2
-#border = #3f3f3f
-#border_width = 0.5
-#roundness = 2.0
 
