@@ -10,7 +10,6 @@ cursor_shape = block
 scrollbar = off
 
 [colors]
-base16 gruvbox dark soft
 cursor = #e0e0e0
 cursor_foreground = #1d1f21
 background = #312f2e
