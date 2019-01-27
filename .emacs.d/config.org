@@ -612,8 +612,9 @@ Latex  preview feature  is really  awesome,  but I  don't want  my
 images stored in plain sight. At least use hidden folder.
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-latex-preview-ltxpng-directory ".ltximg")
+  (setq org-latex-preview-ltxpng-directory ".ltximg/")
 #+END_SRC
+
 To highlight code blocks when  exporting to LaTeX we need =minted=
 package   installed  system-wide   and  this   code  (taken   from
 [[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
