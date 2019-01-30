@@ -16,7 +16,6 @@ evaluate-commands %sh{
         tmux.kak
         common.kak
         languages.kak
-        cursorline.kak
     "
 
     for file in $config_files; do
