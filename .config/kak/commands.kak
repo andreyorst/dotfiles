@@ -96,31 +96,31 @@ If no symbol given, current selection is used as a symbol name" \
     ctags -f "$tags" "$kak_buffile"
     cut -f 1 "$tags" | grep -v '^!' | awk '!x[$0]++'
 } symbol -params ..1 %{ evaluate-commands %sh{
-    tagname=${1:-$kak_selection}
+    export tagname=${1:-$kak_selection}
     tags="${TMPDIR:-/tmp}/tags-tmp"
     if [ ! -s "$tags" ]; then
         ctags -f "$tags" "$kak_buffile"
     fi
-    menu="${TMPDIR:-/tmp}/ctags-menu"
-    open='{'; close='}'
-    readtags -t "$tags" "$tagname" |
-    while read tag; do
-        name=$(printf "%s\n" "$tag" | cut -f 2 | sed "s:':'':g")
-        menuinfo=$(printf "%s\n" "$tag" | sed "s:.*/\^\(\s\+\)\?::;s:\(\\\$\)\?/$::;s:':'':g;s:$open:\\\\$open:g")
-        keys=$(printf "%s\n" "$tag" | sed "s:.*/\^::;s:\(\\\$\)\?/$::;s:':'''''''''''''''':g;s:<:<lt>:g;s:\\t:<c-v><c-i>:g")
-        file=$(printf "%s\n" "$name" | sed "s:'':'''''''''''''''':g")
-        select=$(printf "%s\n" "$tagname" | sed "s:':'''''''''''''''':g;s:<:<lt>:g;s:\\t:<c-v><c-i>:g")
-        command="evaluate-commands '' try '''' edit ''''''''$tagroot/$file''''''''; execute-keys ''''''''/\Q$keys<ret>vcs\Q$select<ret>'''''''' '''' catch '''' echo -markup ''''''''{Error}unable to find tag'''''''' '''' ''"
-        if [ -n "$file" ] && [ -n "$keys" ]; then
-            printf "%s " "'$name {MenuInfo}$menuinfo' '$command'" >> $menu
-        fi
-    done
-    rm $tags
-    if [ -s "$menu" ]; then
-        printf "%s\n" "menu -auto-single -markup $(cat $menu)"
-        rm $menu
-    else
-        printf "%s\n" "echo -markup %{{Error}tag '${1:-$kak_selection}' not found}"
-    fi
+    readtags -t "$tags" "$tagname" | awk -F '\t|\n' '
+        /[^\t]+\t[^\t]+\t\/\^.*\$?\// {
+            opener = "{"; closer = "}"
+            line = $0; sub(".*\t/\\^", "", line); sub("\\$?/$", "", line);
+            menu_info = line; gsub("!", "!!", menu_info); gsub(/^[\t+ ]+/, "", menu_info); gsub(opener, "\\"opener, menu_info); gsub(/\t/, " ", menu_info);
+            keys = line; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys); gsub("!", "!!", keys); gsub("&", "&&", keys); gsub("?", "??", keys); gsub("\\|", "||", keys);
+            menu_item = $2; gsub("!", "!!", menu_item);
+            edit_path = $2; gsub("&", "&&", edit_path); gsub("?", "??", edit_path); gsub("\\|", "||", edit_path);
+            select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("!", "!!", select); gsub("&", "&&", select); gsub("?", "??", select); gsub("\\|", "||", select);
+            out = out "%!" menu_item ": {MenuInfo}" menu_info "! %!evaluate-commands %? try %& edit -existing %|" edit_path "|; execute-keys %|/\\Q" keys "<ret>vc| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & ? !"
+        }
+        /[^\t]+\t[^\t]+\t[0-9]+/ {
+            opener = "{"; closer = "}"
+            menu_item = $2; gsub("!", "!!", menu_item);
+            select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("!", "!!", select); gsub("&", "&&", select); gsub("?", "??", select); gsub("\\|", "||", select);
+            menu_info = $3; gsub("!", "!!", menu_info); gsub(opener, "\\"opener, menu_info);
+            edit_path = $2; gsub("!", "!!", edit_path); gsub("?", "??", edit_path); gsub("&", "&&", edit_path); gsub("\\|", "||", keys);
+            line_number = $3;
+            out = out "%!" menu_item ": {MenuInfo}" menu_info "! %!evaluate-commands %? try %& edit -existing %|" edit_path "|; execute-keys %|" line_number "gx| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & ? !"
+        }
+        END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
 }}
 
