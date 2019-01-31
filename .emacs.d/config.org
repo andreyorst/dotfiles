@@ -518,14 +518,6 @@ by Org mode.
   (use-package gnuplot)
 #+END_SRC
 
-*** org-bullets
-Pretty bullets for Org headings.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-#+END_SRC
-
 *** Rust
 I'd  like  to  have  Rust   syntax  highlighting  and  some  basic
 facilities, since I'm planning to write my exercises in org mode.
