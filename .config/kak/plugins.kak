@@ -92,7 +92,7 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal "<c-a>" ': move-line-above %val{count}<ret>'
 }
 
-plug "occivink/kakoune-snippets" config %{
+plug "occivink/kakoune-snippets" branch "breaking-changes" config %{
     source "~/.config/kak/snippets.kak"
 
     set-option global snippets_auto_expand false
@@ -109,21 +109,21 @@ plug "occivink/kakoune-snippets" config %{
         unmap window insert '<ret>' "z<a-;>: snippets-expand-or-jump 'ret'<ret>"
     }
 
-    define-command snippets-expand-or-jump -params 1 %{
-        execute-keys <backspace>
-        try %{
-            snippets-expand-trigger
-        } catch %{
-            snippets-select-next-placeholders
-        } catch %sh{
-            case $1 in
-                ret|tab)
-                    printf "%s\n" "execute-keys -with-hooks <$1>" ;;
-                *)
-                    printf "%s\n" "execute-keys -with-hooks $1" ;;
-            esac
-        }
+define-command snippets-expand-or-jump -params 1 %{
+    execute-keys <backspace>
+    try %{
+        snippets-expand-trigger 'exec <a-b>'
+    } catch %{
+        snippets-select-next-placeholders
+    } catch %sh{
+        case $1 in
+            ret|tab)
+                printf "%s\n" "execute-keys -with-hooks <$1>" ;;
+            *)
+                printf "%s\n" "execute-keys -with-hooks $1" ;;
+        esac
     }
+}
 }
 
 plug "occivink/kakoune-find"

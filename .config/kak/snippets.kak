@@ -1,7 +1,9 @@
 set-option global snippets \
 'snippet' 'snip' %{
-    snippets-insert '''$1'' ''$2'' %{
-    ${indent}snippets-insert ''$0''
+    snippets-insert \
+'''$1'' ''$2'' %{
+    	snippets-insert \
+''$0''
     }'
 }
 
@@ -10,102 +12,135 @@ hook global WinSetOption filetype=(c|cpp) %{
 
     set-option -add window snippets \
     'for (i) {}' 'for' %{
-        snippets-insert 'for (int $1 = 0; $1 < $2; $1++) {
-                         ${indent}$0
-                         }'
+        snippets-insert \
+'for (int $1 = 0; $1 < $2; $1++) {
+	$0
+}'
     } \
     'if {}' 'if' %{
-        snippets-insert 'if ($1) {
-                         ${indent}$0
-                         }'
+        snippets-insert \
+'if ($1) {
+	$0
+}'
     } \
     'if {} else {}' 'ifel' %{
-        snippets-insert 'if ($1) {
-                         ${indent}$2
-                         } else {
-                         ${indent}$0
-                         }'
+        snippets-insert \
+'if ($1) {
+	$2
+} else {
+	$0
+}'
     } \
     'else if {}' 'elif' %{
-        snippets-insert 'else if ($1) {
-                         ${indent}$0
-                         }'
+        snippets-insert \
+'else if ($1) {
+	$0
+}'
     } \
     'tos ton tos' 'ttt' %{
-        snippets-insert 'tos("$1"); ton($2); tos(${3:endl});$0'
+        snippets-insert \
+'tos("$1"); ton($2); tos(${3:endl});$0'
     } \
     'Terminal out string' 'ton' %{
-        snippets-insert 'tos("${0:text}");'
+        snippets-insert \
+'tos("${0:text}");'
     } \
     'Terminal out byte' 'tob' %{
-        snippets-insert 'tob(''$0'');'
+        snippets-insert \
+'tob(''$0'');'
     } \
     'Terminal out decimal' 'ton10' %{
-        snippets-insert 'ton10($0);'
+        snippets-insert \
+'ton10($0);'
     } \
     'Terminal out hexadecimal' 'ton' %{
-        snippets-insert 'ton($0);'
+        snippets-insert \
+'ton($0);'
     } \
     'Terminal out formatted' 'tonf' %{
-        snippets-insert 'tonf($1, $0);'
+        snippets-insert \
+'tonf($1, $0);'
     } \
     'Main function' 'main' %{
-        snippets-insert 'int main()
-                         {
-                         ${indent}$0
-                         }'
+        snippets-insert \
+'int main()
+{
+	$0
+}'
     } \
     'Case block' 'case' %{
-        snippets-insert 'case $1:
-                         ${indent}$0
-                         ${indent}break;'
+        snippets-insert \
+'case $1:
+	$0
+	break;'
     } \
     'Switch block' 'switch' %{
-        snippets-insert 'switch ($1) {
-                         ${indent}case $2:
-                         ${indent}${indent}$3
-                         ${indent}${indent}break;
-                         ${indent}default:
-                         ${indent}${indent}$0
-                         ${indent}${indent}break;
-                         }'
+        snippets-insert \
+'switch ($1) {
+	case $2:
+		$3
+		break;
+	default:
+		$0
+		break;
+}'
     } \
     'Enum' 'enum' %{
-        snippets-insert 'enum ${1:name} { ${2:constant} };'
+        snippets-insert \
+'enum ${1:name} { ${2:constant} };'
     } \
     'Typedef enum' 'tenum' %{
-        snippets-insert 'typedef enum ${1:name} { ${2:constant} } $1;'
+        snippets-insert \
+'typedef enum ${1:name} { ${2:constant} } $1;'
     } \
-    '#ifdef __cplusplus' 'nocxx' %{
-        snippets-insert '#ifdef __cplusplus
-                         extern "C" {
-                         #endif
+    '#ifdef __cplusplus' '#nocxx' %{
+        snippets-insert \
+'#ifdef __cplusplus
+extern "C" {
+#endif
 
-                         $0
+$0
 
-                         #ifdef __cplusplus
-                         } /* extern "C" */
-                         #endif'
-     } \
-     'include' 'inc' %{
-         snippets-insert '#include <${0:stdio}.h>'
-     } \
-     'ifndef directive' 'ifndef' %{
-         snippets-insert '#ifndef $1
-                          #define NAME $0
-                          #endif /* ifndef $1 */'
-     } \
-     'define' 'def' %{
-         snippets-insert '#define $1 $0'
-     }
+#ifdef __cplusplus
+} /* extern "C" */
+#endif'
+    } \
+    'include' '#inc' %{
+        snippets-insert \
+'#include <${0:stdio}.h>'
+    } \
+    'ifndef directive' '#ifndef' %{
+        snippets-insert \
+'#ifndef $1
+#define $2 $0
+#endif /* ifndef $1 */'
+    } \
+    'ifdef directive' '#ifdef' %{
+        snippets-insert \
+'#ifndef $1
+#define $2 $0
+#endif /* ifndef $1 */'
+    } \
+    'if directive' '#if' %{
+        snippets-insert \
+'#if $1
+	$0
+#endif /* if $1 */'
+    } \
+    'define' '#def' %{
+        snippets-insert \
+'#define $1 $0'
+    }
 }
 
 hook global WinSetOption filetype=(rust) %{
     unset-option window snippets
 
-    set-option -add window snippets 'Main function' 'main' %{
-    snippets-insert 'fn main() {
-                     ${indent}$0
-                     }'
+    set-option -add window snippets \
+    'Main function' 'main' %{
+        snippets-insert \
+'fn main() {
+	$0
+}'
     }
 }
