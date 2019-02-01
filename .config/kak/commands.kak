@@ -24,7 +24,7 @@ smart-select -params ..1 %{ execute-keys -save-regs '' %sh{
 define-command -override -docstring \
 "search-file <filename>: search for file recusively under path option: %opt{path}" \
 search-file -params 1 %{ evaluate-commands %sh{
-    file=$1
+    file=$(printf "%s\n" $1 | sed -E "s:^~/:$HOME/:")
     eval "set -- $kak_buflist"
     while [ $# -gt 0 ]; do            # Check if buffer with this
         if [ "$file" = "$1" ]; then   # file already exists. Basically
