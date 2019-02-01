@@ -93,7 +93,7 @@ hook global WinSetOption filetype=(c|cpp) %{
         snippets-insert \
 'typedef enum ${1:name} { ${2:constant} } $1;'
     } \
-    '#ifdef __cplusplus' '#nocxx' %{
+    '#ifdef __cplusplus' '^#nocxx' %{
         snippets-insert \
 '#ifdef __cplusplus
 extern "C" {
@@ -105,29 +105,29 @@ $0
 } /* extern "C" */
 #endif'
     } \
-    'include' '#inc' %{
+    'include' '^#inc' %{
         snippets-insert \
 '#include <${0:stdio}.h>'
     } \
-    'ifndef directive' '#ifndef' %{
+    'ifndef directive' '^#ifndef' %{
         snippets-insert \
 '#ifndef $1
 #define $2 $0
 #endif /* ifndef $1 */'
     } \
-    'ifdef directive' '#ifdef' %{
+    'ifdef directive' '^#ifdef' %{
         snippets-insert \
 '#ifndef $1
 #define $2 $0
 #endif /* ifndef $1 */'
     } \
-    'if directive' '#if' %{
+    'if directive' '^#if' %{
         snippets-insert \
 '#if $1
 	$0
 #endif /* if $1 */'
     } \
-    'define' '#def' %{
+    'define' '^#def' %{
         snippets-insert \
 '#define $1 $0'
     }
