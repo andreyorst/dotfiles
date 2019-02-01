@@ -28,21 +28,34 @@ hook -once -group ope-delim global WinCreate .* %{
 
 # C/Cpp/Rust syntax fixes
 hook global WinSetOption filetype=(c|cpp|rust|java) %{
-    add-highlighter buffer/functions      regex \w+(\h+)?(?=\() 0:function
-    add-highlighter buffer/child          regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>"\(]) 0:child
-    add-highlighter buffer/child_function regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
+    add-highlighter "buffer/%val{hook_param_capture_1}_functions"      regex \w+(\h+)?(?=\() 0:function
+    add-highlighter "buffer/%val{hook_param_capture_1}_child"          regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>"\(]) 0:child
+    add-highlighter "buffer/%val{hook_param_capture_1}_child_function" regex ((?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
+    hook -always -once window WinSetOption filetype=.* "
+        remove-highlighter buffer/%val{hook_param_capture_1}_functions
+        remove-highlighter buffer/%val{hook_param_capture_1}_child
+        remove-highlighter buffer/%val{hook_param_capture_1}_child_function
+    "
 }
 
 # C/Cpp
 hook global WinSetOption filetype=(c|cpp) %{
     set-option window formatcmd 'clang-format'
     # Custom C/Cpp types highlighing
-    add-highlighter buffer/c_types      regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
-    add-highlighter buffer/c_types2     regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
-    add-highlighter buffer/c_types3     regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
-    add-highlighter buffer/c_user_types regex \b(\w+_t|lambda)\b 0:type
-    add-highlighter buffer/return       regex \breturn\b 0:child
-    add-highlighter buffer/namespace    regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
+    add-highlighter "buffer/%val{hook_param_capture_1}_types"      regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
+    add-highlighter "buffer/%val{hook_param_capture_1}_types2"     regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
+    add-highlighter "buffer/%val{hook_param_capture_1}_types3"     regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
+    add-highlighter "buffer/%val{hook_param_capture_1}_user_types" regex \b(\w+_t|lambda)\b 0:type
+    add-highlighter "buffer/%val{hook_param_capture_1}_return"     regex \breturn\b 0:child
+    add-highlighter "buffer/%val{hook_param_capture_1}_namespace"  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
+    hook -always -once window WinSetOption filetype=.* "
+        remove-highlighter buffer/%val{hook_param_capture_1}_types
+        remove-highlighter buffer/%val{hook_param_capture_1}_types2
+        remove-highlighter buffer/%val{hook_param_capture_1}_types3
+        remove-highlighter buffer/%val{hook_param_capture_1}_user_types
+        remove-highlighter buffer/%val{hook_param_capture_1}_return
+        remove-highlighter buffer/%val{hook_param_capture_1}_namespace
+    "
 }
 
 # Rust
