@@ -112,7 +112,10 @@ plug "occivink/kakoune-snippets" branch "breaking-changes" config %{
 define-command snippets-expand-or-jump -params 1 %{
     execute-keys <backspace>
     try %{
-        snippets-expand-trigger 'exec <a-b>'
+        snippets-expand-trigger %{
+            set-register / "%opt{snippets_triggers_regex}\z"
+            execute-keys 'hGhs<ret>'
+        }
     } catch %{
         snippets-select-next-placeholders
     } catch %sh{
