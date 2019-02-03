@@ -92,7 +92,7 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal "<c-a>" ': move-line-above %val{count}<ret>'
 }
 
-plug "occivink/kakoune-snippets" branch "breaking-changes" config %{
+plug "occivink/kakoune-snippets" config %{
     source "~/.config/kak/snippets.kak"
 
     set-option global snippets_auto_expand false
