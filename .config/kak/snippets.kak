@@ -2,9 +2,9 @@ set-option global snippets \
 'snippet' 'snip' %{
     snippets-insert \
 '''$1'' ''$2'' %{
-    	snippets-insert \
+	snippets-insert \
 ''$0''
-    }'
+}'
 }
 
 hook global WinSetOption filetype=(c|cpp) %{
