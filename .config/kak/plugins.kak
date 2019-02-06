@@ -107,24 +107,24 @@ plug "occivink/kakoune-snippets" config %{
         unmap window insert '<ret>' "z<a-;>: snippets-expand-or-jump 'ret'<ret>"
     }
 
-define-command snippets-expand-or-jump -params 1 %{
-    execute-keys <backspace>
-    try %{
-        snippets-expand-trigger %{
-            set-register / "%opt{snippets_triggers_regex}\z"
-            execute-keys 'hGhs<ret>'
+    define-command snippets-expand-or-jump -params 1 %{
+        execute-keys <backspace>
+        try %{
+            snippets-expand-trigger %{
+                set-register / "%opt{snippets_triggers_regex}\z"
+                execute-keys 'hGhs<ret>'
+            }
+        } catch %{
+            snippets-select-next-placeholders
+        } catch %sh{
+            case $1 in
+                ret|tab)
+                    printf "%s\n" "execute-keys -with-hooks <$1>" ;;
+                *)
+                    printf "%s\n" "execute-keys -with-hooks $1" ;;
+            esac
         }
-    } catch %{
-        snippets-select-next-placeholders
-    } catch %sh{
-        case $1 in
-            ret|tab)
-                printf "%s\n" "execute-keys -with-hooks <$1>" ;;
-            *)
-                printf "%s\n" "execute-keys -with-hooks $1" ;;
-        esac
     }
-}
 }
 
 plug "occivink/kakoune-find"
