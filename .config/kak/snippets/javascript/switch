@@ -1,8 +1,0 @@
-switch(${1:expression}) {
-	case '${3:/* case */}':
-		${4:/* case body */}
-		break;
-
-	default:
-		${2:/* default */}
-}

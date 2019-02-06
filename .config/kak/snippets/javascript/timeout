@@ -1,3 +1,0 @@
-setTimeout(function() {
-	${0:/* body */}
-}.bind(${3:this}), ${1:10});

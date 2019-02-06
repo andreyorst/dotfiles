@@ -1,3 +1,0 @@
-do {
-	${0:/* body */}
-} while (${1:/* condition */});

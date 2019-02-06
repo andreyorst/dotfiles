@@ -1,3 +1,0 @@
-(function(${1:window}) {
-	${0:/* body */}
-}($1));
