@@ -1,0 +1,5 @@
+try {
+
+} catch(${0:/* exception */}) {
+
+}

@@ -1,0 +1,1 @@
+let (${1:tx}, ${2:rx}): (Sender<${3:T1}>, Receiver<${0:T2}>) = channel();

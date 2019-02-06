@@ -1,0 +1,1 @@
+getElement${0:s}By${1:TagName}('${2:name}')

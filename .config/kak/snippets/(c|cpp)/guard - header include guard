@@ -1,0 +1,4 @@
+#ifndef ${1!substitute(substitute(expand('%:t'), '.*', '\U&', 'g'), '\v\..*', '_H', 'g')}
+#define $1
+${0:/* header body */}
+#endif /* $1 */

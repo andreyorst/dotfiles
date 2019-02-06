@@ -1,0 +1,3 @@
+case'${1:case}':
+	${0:/* case body */}
+	break;

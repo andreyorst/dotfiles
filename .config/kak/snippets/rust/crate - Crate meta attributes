@@ -1,0 +1,8 @@
+// Crate Name
+#![crate_name = "${1:name}"]
+// Additional metadate attributes
+#![desc = "${2:Descrption.}"]
+#![license = "${3:BSD}"]
+#![comment = "${4:Comment.}"]
+// Specify the output type
+#![crate_type = "${0:lib}"]

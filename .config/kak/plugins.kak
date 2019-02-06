@@ -93,8 +93,6 @@ plug "alexherbo2/move-line.kak" config %{
 }
 
 plug "occivink/kakoune-snippets" config %{
-    source "~/.config/kak/snippets.kak"
-
     set-option global snippets_auto_expand false
     map global insert '<tab>' "z<a-;>: snippets-expand-or-jump 'tab'<ret>"
 

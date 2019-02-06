@@ -1,0 +1,4 @@
+auto ${1:func_name}(${2:param}) -> ${3:void}
+{
+	${0:/* body */}
+};

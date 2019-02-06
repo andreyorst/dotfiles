@@ -1,0 +1,1 @@
+std::cout << ${0:"message"} << std::endl;

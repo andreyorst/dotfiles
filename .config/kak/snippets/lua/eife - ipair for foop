@@ -1,0 +1,7 @@
+if ${1:condition_a} then
+	${2:-- body_a}
+elseif ${3:condition_b} then
+	${4:-- body_b}
+else
+	${0:-- body_c}
+end

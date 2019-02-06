@@ -1,0 +1,3 @@
+;(function(${1:argument}) {
+	${0:/* body */}
+}(pre_args))

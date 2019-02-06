@@ -1,0 +1,3 @@
+impl ${1:Type/Trait} ${2:for type} {
+	${0:body}
+}

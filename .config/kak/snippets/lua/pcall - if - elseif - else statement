@@ -1,0 +1,6 @@
+local ${2:ok}, ${3:err} = pcall(${1:function})
+if not ok then
+	handler($2, $3)
+else
+	success($2, $3)
+end

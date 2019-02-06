@@ -1,0 +1,5 @@
+if ${1:condition} then
+	${2:-- body_a}
+else
+	${0:-- body_b}
+end

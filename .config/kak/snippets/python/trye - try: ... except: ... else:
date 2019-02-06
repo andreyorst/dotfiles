@@ -1,0 +1,6 @@
+try:
+    ${1:#try body}
+except ${2:Expression}:
+    ${3:#exp body}
+else:
+    ${0:#statements}

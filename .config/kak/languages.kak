@@ -46,7 +46,7 @@ hook global WinSetOption filetype=(c|cpp) %{
     add-highlighter "buffer/%val{hook_param_capture_1}_types2"     regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
     add-highlighter "buffer/%val{hook_param_capture_1}_types3"     regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
     add-highlighter "buffer/%val{hook_param_capture_1}_user_types" regex \b(\w+_t|lambda)\b 0:type
-    add-highlighter "window/%val{hook_param_capture_1}_return"     regex \breturn\b 0:child
+    # add-highlighter "window/%val{hook_param_capture_1}_return"     regex \breturn\b 0:child
     add-highlighter "buffer/%val{hook_param_capture_1}_namespace"  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace
     hook -always -once window WinSetOption filetype=.* "
         remove-highlighter buffer/%val{hook_param_capture_1}_types

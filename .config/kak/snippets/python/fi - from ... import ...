@@ -1,0 +1,1 @@
+from ${1:module} import ${0:something}

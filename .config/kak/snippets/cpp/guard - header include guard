@@ -1,0 +1,4 @@
+#ifndef ${1:INCLUDE_H}
+#define $1
+${0:/* header body */}
+#endif /* $1 */

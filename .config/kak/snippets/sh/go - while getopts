@@ -1,0 +1,7 @@
+while getopts '${1:o}' ${2:opts}
+do
+	case $$2 in
+	${3:o0})
+		${0:#staments};;
+	esac
+done

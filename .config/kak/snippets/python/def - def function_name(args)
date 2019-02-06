@@ -1,0 +1,2 @@
+def ${1:function_name}(${2:args}):
+	${0:#function_body}

@@ -1,0 +1,1 @@
+enum ${1:name} { ${2:constant}, ${0:constant} };

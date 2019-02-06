@@ -1,0 +1,1 @@
+typedef ${1:type} ${0:name}

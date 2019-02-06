@@ -1,0 +1,4 @@
+try:
+    ${1:#try body}
+except ${2:Exception}:
+    ${0:#exp boxy}

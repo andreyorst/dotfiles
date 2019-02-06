@@ -1,0 +1,3 @@
+pub fn new(${2:entry}) -> ${1:Name} {
+    $1 { ${0: /* body */} }
+}
