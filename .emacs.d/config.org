@@ -1,5 +1,4 @@
-* Emacs configuration with Org Mode
-
+#+TITLE: Emacs configuration with Org Mode
 [[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
 
 This is  my Emacs configuration  file written as Org  document.  The
@@ -28,10 +27,10 @@ have those sections.
 
 Now to the configuration itself.
 
-** Common settings
+* Common settings
 This section is all about basic configurations of builtin features.
 
-*** Startup
+** Startup
 I like to  keep my starting process straightforward, so  I tend to
 disable  startup screen  and  start with  lisp interaction  buffer
 instead.
@@ -63,7 +62,7 @@ Also I'd like to start in Org mode when file has no extension.
   (setq-default major-mode 'org-mode)
 #+END_SRC
 
-*** UI
+** UI
 These are  some defaults  for user interface.  I don't  like those
 bars, buttons, tooltips, scrollbars, etc.
 
@@ -88,7 +87,7 @@ minimized for some reason.
   (setq-default frame-title-format '("%b — Emacs"))
 #+END_SRC
 
-*** Font
+** Font
 I like  this Adobe  Source Code Pro  font. Even if  I use  Hack in
 every other  editor, for some reason  I find this font  just right
 for Emacs.
@@ -97,7 +96,7 @@ for Emacs.
   (set-face-attribute 'default nil :font "Source Code Pro-10")
 #+END_SRC
 
-*** Common behaviors
+** Common behaviors
 I don't  like how Emacs  handles scrolling,  and that it  uses tab
 characters by  default.  I  need tab characters  only when  I work
 with C  code and Makefile rules.   And Just because I  can, enable
@@ -113,7 +112,7 @@ be honest.
                 cursor-type 'bar)
 #+END_SRC
 
-*** Line numbers
+** Line numbers
 For some  reason Emacs has  long history  of being not  capable to
 display line  numbers properly,  but now  native line  numbers are
 shipped with  Emacs starting with  version 26.  However  even this
@@ -124,7 +123,7 @@ them, and therefore I'm enabling them in all programming modes.
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
-*** Matching parentheses
+** Matching parentheses
 One  feature that  I think  is really  important, especially  when
 working  with lisp  code, is  ability to  see matching  paren when
 cursor  stands near  the other  paren. So  I enable  it for  every
@@ -134,10 +133,10 @@ language.
   (add-hook 'prog-mode-hook 'show-paren-mode)
 #+END_SRC
 
-*** Fixing dumb Emacs stuff
+** Fixing dumb Emacs stuff
 This is just some fixes of things I found kind of strange.
 
-**** Bell
+*** Bell
 I'm not trying to insult on anyone, but usage of the bell is just
 insane. It's  not 1980's, computers  have their own  speakers and
 rich displays, why would anyone want to use builtin speaker?  Why
@@ -147,7 +146,7 @@ everyone should know when I'm mistaken? Disable bell.
   (setq ring-bell-function 'ignore)
 #+END_SRC
 
-**** Custom
+*** Custom
 I don't  like custom, and especially  would like to stop  it from
 interfering  to  my  configuration  files, so  lets  move  it  to
 separate file.
@@ -157,7 +156,7 @@ separate file.
   (load custom-file :noerror)
 #+END_SRC
 
-**** Backups
+*** Backups
 I don't know  who decided that having backups all  over the place
 is good idea, but I don't think alike.
 
@@ -168,7 +167,7 @@ is good idea, but I don't think alike.
         auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
 #+END_SRC
 
-**** Shorter confirmation dialogues
+*** Shorter confirmation dialogues
 For some reason in some situations Emacs asks for typing =yes= or
 =no= explicitly,  instead of  accepting =y= or  =n=. This  can be
 fixed with this.
@@ -177,7 +176,7 @@ fixed with this.
   (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-*** Trailing whitespaces
+** Trailing whitespaces
 I don't  want my  files to contain  trailing whitespaces,  so this
 hook will get rid of those automatically for me.
 
@@ -185,7 +184,7 @@ hook will get rid of those automatically for me.
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-*** MELPA
+** MELPA
 Melpa is a  package repository, that I use to  get packages. Since
 all packages  that I  need can  be obtained  from there,  I didn't
 bothered with different methods of installation.
@@ -198,7 +197,7 @@ bothered with different methods of installation.
 #+END_SRC
 
 Note for Windows users: change =https= to =http=
-**** Package initialization
+*** Package initialization
 This basic  piece of code  is used to  update package list  if there's
 none.
 
@@ -208,13 +207,13 @@ none.
     (package-refresh-contents))
 #+END_SRC
 
-** Functions
+* Functions
 This section should contain functions that I've wrote for personal
 use here and there. I'm not elisp expert, so code may be not the
 best quality. If you feel that this code should be improved you can
 open issue and blame on me all you want.
 
-*** =ensure-installed=
+** =ensure-installed=
 To ensure  that some essential  packages are installed  I've wrote
 this small lisp function that checks  if package exists and if not
 downloads it from Melpa.
@@ -226,7 +225,7 @@ downloads it from Melpa.
       (package-install package)))
 #+END_SRC
 
-*** =autokill-when-no-processes=
+** =autokill-when-no-processes=
 This function should be used as advice to any exit handle function
 
 #+BEGIN_SRC emacs-lisp
@@ -250,7 +249,7 @@ I'd also would like to do this for [[Geiser]]:
   (advice-add 'geiser-repl-exit :after #'autokill-when-no-processes)
 #+END_SRC
 
-*** =update-inline-images=
+** =update-inline-images=
 This function is supposed to automatically update inline images in
 org buffers, when for some reason image was changed.
 
@@ -261,12 +260,12 @@ org buffers, when for some reason image was changed.
       (org-redisplay-inline-images)))
 #+END_SRC
 
-** Packages
+* Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
 packages.
 
-*** use-package
+** use-package
 I use package, named =use-package=  to install, load and configure
 my  packages.  I  find  this  way  very  consistent  and  easy  to
 understand  and  maintain.    Since  =use-package=  can't  install
@@ -280,7 +279,7 @@ with something someday.
   (setq use-package-always-ensure t)
 #+END_SRC
 
-*** Spacemacs theme
+** Spacemacs theme
 I really  like this theme.   It's something like Atom's  One Dark,
 but little more purple. Anyway it's awesome, and colors are really
 nice.
@@ -299,7 +298,7 @@ if theme changes it.
   (set-face-attribute 'line-number nil :background nil)
 #+END_SRC
 
-*** Diminish
+** Diminish
 Emacs, please stop  cluttering my modeline with all  those modes I
 already know about.  Since =eldoc-mode= is builtin, I've put it to
 =diminish= configuration.
@@ -309,7 +308,7 @@ already know about.  Since =eldoc-mode= is builtin, I've put it to
     :diminish eldoc-mode)
 #+END_SRC
 
-*** Markdown
+** Markdown
 Who needs  markdown when  you have  Org?  Well,  I need.  Kinda. I
 still do most of writing with it. Shame on me.
 
@@ -323,7 +322,7 @@ still do most of writing with it. Shame on me.
 
 But I hope, that Org-mode will replace it eventually.
 
-*** Geiser
+** Geiser
 Since I mostly  use Emacs for studying LISP, and  I'm reading SICP
 which  uses  Scheme  as  main LISP  flavor  for  explanations  and
 exercises, I need a tool to  run Scheme, and Geiser seems like the
@@ -335,7 +334,7 @@ most viable option here, since it also provides completion for it.
     (defvar geiser-active-implementations '(mit guile)))
 #+END_SRC
 
-*** Parinfer
+** Parinfer
 Now that's a quality package. It  makes writing LISP so easy, that
 I've never thought it could be.
 
@@ -360,14 +359,14 @@ Parinfer Mode repository.
       (add-hook 'lisp-mode-hook #'parinfer-mode)))
 #+END_SRC
 
-*** Flx
+** Flx
 This package provides some kind of fuzzy matching for Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package flx)
 #+END_SRC
 
-*** Ivy
+** Ivy
 Ivy is  a narrowing framework  like Helm,  but much lighter  in my
 experience.
 
@@ -404,7 +403,7 @@ handles searching in the file, so let's install those too.
   (use-package swiper)
 #+END_SRC
 
-*** Flycheck
+** Flycheck
 A really nice  linting package that helps me track  errors in most
 of languages.
 
@@ -412,7 +411,7 @@ of languages.
   (use-package flycheck)
 #+END_SRC
 
-*** Company
+** Company
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
@@ -437,7 +436,7 @@ Complete anything framework. Nothing much to say. Does it's job.
     (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 #+END_SRC
 
-**** Company flx
+*** Company flx
 This   actually  makes   company  behave   as  fuzzy   completion
 framework. It's kind of slow though.
 
@@ -450,14 +449,14 @@ framework. It's kind of slow though.
     (company-flx-mode +1))
 #+END_SRC
 
-**** Company lsp
+*** Company lsp
 To make compay understand completions from language servers we need this backend.
 
 #+BEGIN_SRC emacs-lisp
   (use-package company-lsp)
 #+END_SRC
 
-*** Undo Tree
+** Undo Tree
 This is more  familiar undo mode. It adds C-/  mapping to undo and
 C-?  mapping to redo.
 
@@ -468,7 +467,7 @@ C-?  mapping to redo.
     (global-undo-tree-mode 1))
 #+END_SRC
 
-*** Yasnippet
+** Yasnippet
 Another  very  handy  package,  that  helps  insert  templates  of
 code. Now I really need to write some snippets to use...
 
@@ -487,7 +486,7 @@ load my own snippets lets use this hook.
   (add-hook 'prog-mode-hook 'yas-reload-all)
 #+END_SRC
 
-*** Projectile
+** Projectile
 Since emacs  is stupid,  it changes  working directory  to current
 file location. So  I need a whole plugin to  workaround this silly
 issue.
@@ -503,14 +502,14 @@ However this plugin is quite useful with Git repositories.
     (("C-c p" . projectile-command-map)))
 #+END_SRC
 
-**** Counsel projectile
+*** Counsel projectile
 It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
   (use-package counsel-projectile)
 #+END_SRC
 
-*** GNU Plot
+** GNU Plot
 This is a package needed  for making plots with gnuplot.  Required
 by Org mode.
 
@@ -518,7 +517,7 @@ by Org mode.
   (use-package gnuplot)
 #+END_SRC
 
-*** Rust
+** Rust
 I'd  like  to  have  Rust   syntax  highlighting  and  some  basic
 facilities, since I'm planning to write my exercises in org mode.
 
@@ -526,14 +525,14 @@ facilities, since I'm planning to write my exercises in org mode.
   (use-package rust-mode)
 #+END_SRC
 
-**** emacs-racer
-Racer stands for /R/ust /A/uto-/C/omplete-/er/.
+*** emacs-racer
+Racer stands for /Rust Auto-Complete-er/.
 
 #+BEGIN_SRC emacs-lisp
   (use-package racer)
 #+END_SRC
 
-*** TOML
+** TOML
 =toml-mode= helps  with highlighting of TOML files,  which Rust uses
 to configure project.
 
@@ -541,7 +540,7 @@ to configure project.
   (use-package toml-mode)
 #+END_SRC
 
-*** lsp-mode
+** lsp-mode
 To provide nice IDE-like features, I like to use language servers,
 that can be handled with language server protocol mode for Emacs.
 
@@ -566,7 +565,7 @@ for it.
   (use-package company-lsp :commands company-lsp)
 #+END_SRC
 
-**** cquery
+*** cquery
 =cquery= is a  language server for C/C++ code.  It interacts with
 [[lsp-mode]].
 
@@ -580,18 +579,18 @@ for it.
           cquery-extra-args '("--log-file=/tmp/cq.log")))
 #+END_SRC
 
-*** clang-format
+** clang-format
 I use clang-format tool to format my C/C++ code.
 
 #+BEGIN_SRC emacs-lisp
   (use-package clang-format)
 #+END_SRC
 
-** Modes
+* Modes
 This section will contain some  settings for various modes that are
 not handled within package configurations.
 
-*** Org Mode
+** Org Mode
 For Org Mode I need spell checking to be default, and yasnippet so
 I could expand some useful things like =SRC= blocks.
 
@@ -621,7 +620,7 @@ package   installed  system-wide   and  this   code  (taken   from
 #+BEGIN_SRC emacs-lisp
   (require 'ox-latex)
   (setq org-latex-listings 'minted)
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (add-to-list 'org-latex-packages-alist '("" "minted" nil))
 #+END_SRC
 
 This will  make =pdflatex=  use these  escape sequence  for proper
@@ -664,7 +663,7 @@ source code, lets set =org-confirm-babel-evaluate= to =nil=
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
-*** C/Cpp Mode
+** C/Cpp Mode
 I don't think that I'm gonna  use Emacs for C/C++ development, but
 sometimes  I'm just  in the  mood of  opening some  sources inside
 Emacs. For  such reasons I  just want  to have sane  defaults that
@@ -679,7 +678,7 @@ match my workflow.
                (lsp)))
 #+END_SRC
 
-*** Rust
+** Rust
 Since I make notes in Org-mode, and  I started to use it for Rust too,
 I need some settings for Rust mode.
 
