@@ -620,8 +620,8 @@ package   installed  system-wide   and  this   code  (taken   from
 
 #+BEGIN_SRC emacs-lisp
   (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "minted" nil))
   (setq org-latex-listings 'minted)
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
 #+END_SRC
 
 This will  make =pdflatex=  use these  escape sequence  for proper
@@ -629,7 +629,15 @@ colors.
 
 #+BEGIN_SRC emacs-lisp
   (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+I think I also need this, but I'm not sure:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
 #+END_SRC
 
 Since Org-mode allows inline images, we need a way to update them,
