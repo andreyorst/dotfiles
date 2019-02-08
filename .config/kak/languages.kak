@@ -22,7 +22,7 @@ hook global WinCreate .* %{
 
 # Highlight operators and delimiters
 hook -once global WinCreate .* %{
-    add-highlighter global/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/) 0:operator
+    add-highlighter global/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
     add-highlighter global/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
 }
 
