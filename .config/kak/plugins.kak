@@ -93,6 +93,7 @@ plug "alexherbo2/move-line.kak" config %{
 }
 
 plug "occivink/kakoune-snippets" config %{
+    set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
     map global insert '<tab>' "z<a-;>: snippets-expand-or-jump 'tab'<ret>"
 
@@ -126,5 +127,7 @@ plug "occivink/kakoune-snippets" config %{
         }
     }
 }
+
+plug "andreyorst/kakoune-snippets-collection"
 
 plug "occivink/kakoune-find"
