@@ -689,3 +689,17 @@ I need some settings for Rust mode.
                (eldoc-mode)
                (setq company-tooltip-align-annotations t)))
 #+END_SRC
+
+** Markdown
+For markdown  mode I would like  to have automatic spell  checking and
+filling. Basically the same setup as for Org Mode.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'markdown-mode-hook
+            '(lambda()
+               (flyspell-mode)
+               (setq fill-column 80
+                     default-justification 'full)
+               (auto-fill-mode)))
+
+#+END_SRC
