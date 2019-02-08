@@ -128,6 +128,6 @@ plug "occivink/kakoune-snippets" config %{
     }
 }
 
-plug "andreyorst/kakoune-snippets-collection"
+plug "andreyorst/kakoune-snippet-collection"
 
 plug "occivink/kakoune-find"
