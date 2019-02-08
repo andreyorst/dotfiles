@@ -1,4 +1,0 @@
-${3:int} ${1:function_name}(${2:int a})
-{
-	${0:return 0;}
-}

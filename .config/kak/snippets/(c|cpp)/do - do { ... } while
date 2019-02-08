@@ -1,3 +1,0 @@
-do {
-	${0:/* expression */}
-} while (${1:/* condition */})

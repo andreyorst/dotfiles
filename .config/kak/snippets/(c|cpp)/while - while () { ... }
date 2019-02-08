@@ -1,3 +1,0 @@
-while (${1:true}) {
-	${0:/* expression */}
-}
