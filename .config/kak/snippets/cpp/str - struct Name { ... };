@@ -1,3 +1,0 @@
-struct ${1:Name} {
-	${0:/* fields */}
-};

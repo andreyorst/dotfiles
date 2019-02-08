@@ -1,8 +1,0 @@
-try:
-    ${1:#try body}
-except ${2:Expression}:
-    ${3:#exp body}
-else:
-    ${4:#statements}
-finally:
-    ${0:#fin body}

@@ -1,3 +1,0 @@
-function ${1:new_function}(${2:args})
-	${0:-- body}
-end

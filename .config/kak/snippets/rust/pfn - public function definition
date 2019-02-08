@@ -1,4 +1,0 @@
-pub fn ${1:function_name}(${2:let a}) ${3:-> i32 }{
-	${0:/* body */}
-}
-

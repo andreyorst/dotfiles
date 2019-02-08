@@ -1,6 +1,0 @@
-#[bench]
-fn ${1:bench_function_name}(b: &mut test::Bencher) {
-    b.iter(|| {
-        ${0:/* bench body */}
-    })
-}

@@ -1,3 +1,0 @@
-for ${1:name},${2:val} in pairs(${3:table_name}) do
-	${0:-- body}
-end

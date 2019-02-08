@@ -1,3 +1,0 @@
-repeat
-	${1:-- body}
-until ${0:condition}

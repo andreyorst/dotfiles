@@ -1,3 +1,0 @@
-thread::scoped(${1:move} || {
-	${0:/* body */}
-});

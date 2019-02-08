@@ -1,3 +1,0 @@
-if ${2:[[ }${1:condition}${3: ]]}; then
-	${0:#statements}
-fi

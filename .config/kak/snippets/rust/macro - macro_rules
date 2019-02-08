@@ -1,5 +1,0 @@
-macro_rules! ${1:name} {
-    (${2:matcher}) => (
-        ${0:/* body */}
-    )
-}

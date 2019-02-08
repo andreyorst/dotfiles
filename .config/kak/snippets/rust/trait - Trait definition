@@ -1,3 +1,0 @@
-trait ${1:Name} {
-	${0:item}
-}

@@ -1,3 +1,0 @@
-#ifndef ${1:HEADER_H}
-${0:/* header body */}
-#endif /* end of include guard: $1 */

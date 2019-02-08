@@ -1,3 +1,0 @@
-for ${1:idx},${2:val} in ipairs(${3:table_name}) do
-	${0:-- body}
-end

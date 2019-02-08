@@ -1,3 +1,0 @@
-${3:TODO}:
-${0:I Solenmly Swear That I'm Up To No Good}
-${1!getent passwd "$USER" | cut -d : -f 5} ${2!date +%d-%m-%Y}

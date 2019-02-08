@@ -1,6 +1,0 @@
-#[cfg(test)]
-mod tests {
-	use super::${1:entry};
-	
-	${0:test_name}
-}

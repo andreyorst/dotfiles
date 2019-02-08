@@ -1,3 +1,0 @@
-while ${2:[[ }${1:condition}${3: ]]}; do
-	${0:#statements}
-done
