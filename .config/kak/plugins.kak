@@ -13,7 +13,6 @@ plug "andreyorst/plug.kak" noload
 
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
-
 plug "occivink/kakoune-gdb"
 
 plug "andreyorst/base16-gruvbox.kak" noload do %{

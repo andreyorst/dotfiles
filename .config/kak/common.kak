@@ -10,9 +10,11 @@
 
 # Common options
 set-option global scrolloff 3,3
+
 evaluate-commands %sh{
-    [ ! -z "$(command -v rg)" ] && echo "set-option global grepcmd 'rg -L --with-filename --column'"
+    [ ! -z "$(command -v rg)" ] && printf "%s\n" "set-option global grepcmd 'rg -L --with-filename --column'"
 }
+
 set-option global tabstop 4
 set-option global indentwidth 4
 
