@@ -53,10 +53,10 @@ plug "ul/kak-lsp" do %{
         map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
         lsp-enable-window
         lsp-auto-hover-enable
+        lsp-auto-hover-insert-mode-disable
     }
     hook global WinSetOption filetype=rust %{
         set-option window lsp_server_configuration rust.clippy_preference="on"
-        lsp-auto-hover-disable
     }
     hook global KakEnd .* lsp-exit
 }

@@ -331,7 +331,7 @@ most viable option here, since it also provides completion for it.
 #+BEGIN_SRC emacs-lisp
   (use-package geiser
     :init
-    (defvar geiser-active-implementations '(mit guile)))
+    (defvar geiser-active-implementations '(mit)))
 #+END_SRC
 
 ** Parinfer
