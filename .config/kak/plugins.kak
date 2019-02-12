@@ -10,7 +10,6 @@
 # ╰────────────────────────────────╯
 
 plug "andreyorst/plug.kak" noload
-
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-gdb"
@@ -129,5 +128,4 @@ plug "occivink/kakoune-snippets" config %{
 }
 
 plug "andreyorst/kakoune-snippet-collection"
-
 plug "occivink/kakoune-find"
