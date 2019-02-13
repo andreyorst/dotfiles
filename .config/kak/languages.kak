@@ -21,9 +21,9 @@ hook global WinCreate .* %{
 }
 
 # Highlight operators and delimiters
-hook -once global WinCreate .* %{
-    add-highlighter global/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
-    add-highlighter global/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+hook global WinCreate .* %{
+    add-highlighter window/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
+    add-highlighter window/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
 }
 
 # C/Cpp/Rust syntax fixes

@@ -129,4 +129,12 @@ plug "occivink/kakoune-snippets" config %{
 
 plug "andreyorst/kakoune-snippet-collection"
 plug "occivink/kakoune-find"
-plug "git@gitlab.com:andreyorst/tagbar.kak.git"
+
+plug "git@gitlab.com:andreyorst/tagbar.kak.git" config %{
+    hook global WinSetOption filetype=(grep|tagbar) %{
+        remove-highlighter window/wrap
+        remove-highlighter window/numbers
+        remove-highlighter window/whitespace
+        remove-highlighter window/wrap
+    }
+}

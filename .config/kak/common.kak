@@ -11,19 +11,24 @@
 # Common options
 set-option global scrolloff 3,3
 
+# Grep
 evaluate-commands %sh{
     [ ! -z "$(command -v rg)" ] && printf "%s\n" "set-option global grepcmd 'rg -L --with-filename --column'"
 }
 
+# Tabstop and indentwidth
 set-option global tabstop 4
 set-option global indentwidth 4
 
+# Use main client as jumpclient
+set-option global jumpclient client0
+
 # Highlighters
-hook global KakBegin .* %{
-    add-highlighter global/numbers    number-lines -relative -hlcursor -separator ' '
-    add-highlighter global/matching   show-matching
-    add-highlighter global/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
-    add-highlighter global/wrap       wrap -word -indent -marker ↪
+hook global WinCreate .* %{
+    add-highlighter window/numbers    number-lines -relative -hlcursor -separator ' '
+    add-highlighter window/matching   show-matching
+    add-highlighter window/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
+    add-highlighter window/wrap       wrap -word -indent -marker ↪
 }
 
 # Maps
@@ -54,7 +59,7 @@ map -docstring "replace word"    global spell 'r' ': spell-replace<ret>'
 map -docstring "exit spell mode" global spell 'c' ': spell-clear<ret>'
 map -docstring "spell mode"      global user  'S' ': enter-user-mode -lock spell; spell en-US<ret>'
 
-# Hooks
+# Completion
 hook global InsertCompletionShow .* %{
     try %{
         execute-keys -draft 'h<a-K>\h<ret>'
@@ -68,6 +73,7 @@ hook global InsertCompletionHide .* %{
     unmap window insert <s-tab> <c-p>
 }
 
+# Editorconfig
 hook global BufOpenFile .* editorconfig-load
 hook global BufNewFile  .* editorconfig-load
 
