@@ -96,7 +96,7 @@ If no symbol given, current selection is used as a symbol name" \
     ctags -f "$tags" "$kak_buffile"
     cut -f 1 "$tags" | grep -v '^!' | awk '!x[$0]++'
 } symbol -params ..1 %{ evaluate-commands %sh{
-    export tagname=${1:-$kak_selection}
+    export tagname="${1:-$kak_selection}"
     tags="${TMPDIR:-/tmp}/tags-tmp"
     if [ ! -s "$tags" ]; then
         ctags -f "$tags" "$kak_buffile"
@@ -106,7 +106,7 @@ If no symbol given, current selection is used as a symbol name" \
             opener = "{"; closer = "}"
             line = $0; sub(".*\t/\\^", "", line); sub("\\$?/$", "", line);
             menu_info = line; gsub("!", "!!", menu_info); gsub(/^[\t+ ]+/, "", menu_info); gsub(opener, "\\"opener, menu_info); gsub(/\t/, " ", menu_info);
-            keys = line; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys); gsub("!", "!!", keys); gsub("&", "&&", keys); gsub("?", "??", keys); gsub("\\|", "||", keys);
+            keys = line; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys); gsub("!", "!!", keys); gsub("&", "&&", keys); gsub("?", "??", keys); gsub("\\|", "||", keys); gsub("\\\\/", "/", keys);
             menu_item = $2; gsub("!", "!!", menu_item);
             edit_path = $2; gsub("&", "&&", edit_path); gsub("?", "??", edit_path); gsub("\\|", "||", edit_path);
             select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("!", "!!", select); gsub("&", "&&", select); gsub("?", "??", select); gsub("\\|", "||", select);
@@ -117,7 +117,7 @@ If no symbol given, current selection is used as a symbol name" \
             menu_item = $2; gsub("!", "!!", menu_item);
             select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("!", "!!", select); gsub("&", "&&", select); gsub("?", "??", select); gsub("\\|", "||", select);
             menu_info = $3; gsub("!", "!!", menu_info); gsub(opener, "\\"opener, menu_info);
-            edit_path = $2; gsub("!", "!!", edit_path); gsub("?", "??", edit_path); gsub("&", "&&", edit_path); gsub("\\|", "||", keys);
+            edit_path = $2; gsub("!", "!!", edit_path); gsub("?", "??", edit_path); gsub("&", "&&", edit_path); gsub("\\|", "||", edit_path);
             line_number = $3;
             out = out "%!" menu_item ": {MenuInfo}" menu_info "! %!evaluate-commands %? try %& edit -existing %|" edit_path "|; execute-keys %|" line_number "gx| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & ? !"
         }
