@@ -136,5 +136,8 @@ plug "git@gitlab.com:andreyorst/tagbar.kak.git" config %{
         remove-highlighter window/numbers
         remove-highlighter window/whitespace
         remove-highlighter window/wrap
+        set-option window tabstop 1
     }
+    set-option global tagbar_sort false
+    set-option global tagbar_display_anon false
 }
