@@ -131,13 +131,10 @@ plug "andreyorst/kakoune-snippet-collection"
 plug "occivink/kakoune-find"
 
 plug "andreyorst/tagbar.kak.git" config %{
-    hook global WinSetOption filetype=(grep|tagbar) %{
-        remove-highlighter window/wrap
-        remove-highlighter window/numbers
-        remove-highlighter window/whitespace
-        remove-highlighter window/wrap
-        set-option window tabstop 1
-    }
     set-option global tagbar_sort false
+    set-option global tagbar_size 40
     set-option global tagbar_display_anon false
+    hook -once global WinSetOption filetype=(c|cpp|rust) %{
+        tagbar-enable
+    }
 }
