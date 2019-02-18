@@ -28,7 +28,7 @@ hook global WinCreate .* %{
     add-highlighter window/numbers    number-lines -relative -hlcursor -separator ' '
     add-highlighter window/matching   show-matching
     add-highlighter window/whitespace show-whitespaces -tab "▏" -lf " " -nbsp "⋅" -spc " "
-    add-highlighter window/wrap       wrap -word -indent -marker ↪
+    add-highlighter window/wrap       wrap -word -indent -marker '↪'
 }
 
 # Maps
@@ -40,10 +40,12 @@ map -docstring "convert leading tabs to spaces"       global user   'T'     ': l
 ## Goto
 map -docstring "file non-recursive"             global goto   '<a-f>' '<esc>gf'
 map -docstring "file recursive"                 global goto   'f'     '<esc>: smart-select; search-file %val{selection}<ret>'
-map -docstring "next buffer"                    global goto   'b'     '<esc>:bn<ret>'
-map -docstring "previous buffer"                global goto   'B'     '<esc>:bp<ret>'
+map -docstring "next buffer"                    global goto   'b'     '<esc>: buffer-next<ret>'
+map -docstring "previous buffer"                global goto   'B'     '<esc>: buffer-previous<ret>'
 map -docstring "search tag in current file"     global goto   '['     '<esc>: smart-select word; symbol<ret>'
 map -docstring "search tag in global tags file" global goto   ']'     '<esc>: smart-select word; ctags-search<ret>'
+map -docstring "move one paragraph down"        global goto   'p'     '<esc>/[^\s]<ret><a-i>p'
+map -docstring "move one paragraph up"          global goto   'P'     '<esc><a-/>[^\s]<ret><a-i>p<a-;>'
 
 ## System clipboard
 map -docstring "copy to system clipboard"    global user 'y' '<a-|>xsel -b -i<ret>'
