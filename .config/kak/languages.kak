@@ -82,3 +82,9 @@ hook global WinSetOption filetype=kak %{
     }
 }
 
+# Assemply
+hook global WinSetOption filetype=gas %{
+    remove-highlighter window/whitespace
+    add-highlighter window/whitespace show-whitespaces -lf " " -nbsp " " -spc " " -tabpad " "
+    set-option window comment_line '#'
+}
