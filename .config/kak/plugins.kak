@@ -132,9 +132,9 @@ plug "occivink/kakoune-find"
 
 plug "andreyorst/tagbar.kak.git" config %{
     set-option global tagbar_sort false
-    set-option global tagbar_size 40
+    set-option global tagbar_size 32%
     set-option global tagbar_display_anon false
-    hook -once global WinSetOption filetype=(c|cpp|rust) %{
+    hook global WinSetOption filetype=(c|cpp|rust) %{
         tagbar-enable
     }
 }
