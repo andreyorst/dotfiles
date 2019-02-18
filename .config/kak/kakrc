@@ -23,3 +23,26 @@ evaluate-commands %sh{
     done
 }
 
+define-command -override snippets-create-snippet %{ evaluate-commands %{
+    prompt "enter trigger: " %{
+        declare-option str new_trigger %val{text}
+        prompt "snippet description: " %{
+            declare-option str new_description %val{text}
+            evaluate-commands %sh{
+                snippet_path="$kak_config/snippets/$kak_filetype"
+                if [ ! -d "'$snippet_path'" ]; then
+                    mkdir -p "'$snippet_path'"
+                fi
+                if [ -z "${kak_opt_new_trigger##*/*}" ]; then
+                    printf "echo -markup %%{{Error}Trigger can't contain '/' character}"
+                elif [ -z "${kak_opt_new_description##*/*}" ]; then
+                    printf "echo -markup %%{{Error}Description can't contain '/' character}"
+                else
+                    snippet_path="$snippet_path/$kak_opt_new_trigger - $kak_opt_new_description"
+                    printf "edit %s\n" "'$snippet_path'"
+                fi
+            }
+        }
+    }
+}}
+
