@@ -71,3 +71,14 @@ hook global WinSetOption filetype=markdown %{
 hook global BufCreate .*\.mk$ %{
     set-option buffer filetype makefile
 }
+
+# Kakscript
+hook global WinSetOption filetype=kak %{
+    hook global NormalIdle .* %{
+        try %{
+            execute-keys -draft -save-regs '' <a-i>w"ay
+            echo -markup "{rgb:%reg{a}}██"
+        }
+    }
+}
+
