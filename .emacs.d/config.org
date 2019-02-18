@@ -663,6 +663,12 @@ source code, lets set =org-confirm-babel-evaluate= to =nil=
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
+To export Org to Markdown, we need this:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-md nil t)
+#+END_SRC
+
 ** C/Cpp Mode
 I don't think that I'm gonna  use Emacs for C/C++ development, but
 sometimes  I'm just  in the  mood of  opening some  sources inside
