@@ -62,7 +62,7 @@ Also I'd like to start in Org mode when file has no extension.
   (setq-default major-mode 'org-mode)
 #+END_SRC
 
-** UI
+** User Interface
 These are  some defaults  for user interface.  I don't  like those
 bars, buttons, tooltips, scrollbars, etc.
 
@@ -96,7 +96,7 @@ for Emacs.
   (set-face-attribute 'default nil :font "Source Code Pro-10")
 #+END_SRC
 
-** Common behaviors
+** Common Behaviors
 I don't  like how Emacs  handles scrolling,  and that it  uses tab
 characters by  default.  I  need tab characters  only when  I work
 with C  code and Makefile rules.   And Just because I  can, enable
@@ -112,7 +112,7 @@ be honest.
                 cursor-type 'bar)
 #+END_SRC
 
-** Line numbers
+** Line Numbers
 For some  reason Emacs has  long history  of being not  capable to
 display line  numbers properly,  but now  native line  numbers are
 shipped with  Emacs starting with  version 26.  However  even this
@@ -123,7 +123,7 @@ them, and therefore I'm enabling them in all programming modes.
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
-** Matching parentheses
+** Matching Parentheses
 One  feature that  I think  is really  important, especially  when
 working  with lisp  code, is  ability to  see matching  paren when
 cursor  stands near  the other  paren. So  I enable  it for  every
@@ -133,7 +133,7 @@ language.
   (add-hook 'prog-mode-hook 'show-paren-mode)
 #+END_SRC
 
-** Fixing dumb Emacs stuff
+** Fixing Dumb Emacs Stuff
 This is just some fixes of things I found kind of strange.
 
 *** Bell
@@ -176,7 +176,7 @@ fixed with this.
   (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-** Trailing whitespaces
+** Trailing Whitespaces
 I don't  want my  files to contain  trailing whitespaces,  so this
 hook will get rid of those automatically for me.
 
@@ -265,7 +265,7 @@ Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
 packages.
 
-** use-package
+** Use Package
 I use package, named =use-package=  to install, load and configure
 my  packages.  I  find  this  way  very  consistent  and  easy  to
 understand  and  maintain.    Since  =use-package=  can't  install
@@ -540,7 +540,7 @@ to configure project.
   (use-package toml-mode)
 #+END_SRC
 
-** lsp-mode
+** LSP Mode
 To provide nice IDE-like features, I like to use language servers,
 that can be handled with language server protocol mode for Emacs.
 
@@ -579,11 +579,22 @@ for it.
           cquery-extra-args '("--log-file=/tmp/cq.log")))
 #+END_SRC
 
-** clang-format
+** Clang Format
 I use clang-format tool to format my C/C++ code.
 
 #+BEGIN_SRC emacs-lisp
   (use-package clang-format)
+#+END_SRC
+
+** Editorconfig
+Speaking of  formatting, =.editorconfig= file  provides a nice  way to
+synchronize my editor configurations between projects.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package editorconfig
+    :ensure t
+    :config
+    (editorconfig-mode 1))
 #+END_SRC
 
 * Modes
