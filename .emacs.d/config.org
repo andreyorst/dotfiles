@@ -586,15 +586,31 @@ I use clang-format tool to format my C/C++ code.
   (use-package clang-format)
 #+END_SRC
 
-** Editorconfig
+** EditorConfig
 Speaking of  formatting, =.editorconfig= file  provides a nice  way to
 synchronize my editor configurations between projects.
 
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
+    :diminish editroconfig-mode
     :ensure t
     :config
     (editorconfig-mode 1))
+#+END_SRC
+
+** Magit
+Magit is a  Emacs interface to Git.  I've heard that it  has many nice
+features, so I want to try it out.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit)
+#+END_SRC
+
+** Ediff
+Ediff is part of Emacs, so I just want to configure it to my liking.
+
+#+BEGIN_SRC emacs-lisp
+  (setq ediff-split-window-function 'split-window-horizontally)
 #+END_SRC
 
 * Modes

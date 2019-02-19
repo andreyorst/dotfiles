@@ -13,7 +13,7 @@
  '(mode-line-percent-position nil)
  '(package-selected-packages
    (quote
-    (editorconfig racer clang-format toml-mode company-flx cquery company-lsp lsp-ui lsp-mode rust-mode gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish use-package))))
+    (magit editorconfig racer clang-format toml-mode company-flx cquery company-lsp lsp-ui lsp-mode rust-mode gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
