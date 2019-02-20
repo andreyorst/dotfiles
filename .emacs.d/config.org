@@ -592,8 +592,7 @@ synchronize my editor configurations between projects.
 
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
-    :diminish editroconfig-mode
-    :ensure t
+    :diminish editorconfig-mode
     :config
     (editorconfig-mode 1))
 #+END_SRC
