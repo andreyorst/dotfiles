@@ -27,7 +27,6 @@ set-option global jumpclient client0
 hook global WinCreate .* %{
     add-highlighter window/numbers    number-lines -relative -hlcursor -separator ' '
     add-highlighter window/matching   show-matching
-    add-highlighter window/whitespace show-whitespaces -tab " " -lf " " -nbsp "⋅" -spc " "
     add-highlighter window/wrap       wrap -word -indent -marker '↪'
 }
 
