@@ -54,6 +54,8 @@ plug "ul/kak-lsp" do %{
         lsp-enable-window
         lsp-auto-hover-enable
         lsp-auto-hover-insert-mode-disable
+        set-face window DiagnosticError default+u
+        set-face window DiagnosticWarning default+u
     }
     hook global WinSetOption filetype=rust %{
         set-option window lsp_server_configuration rust.clippy_preference="on"
