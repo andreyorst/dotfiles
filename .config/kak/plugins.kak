@@ -10,12 +10,16 @@
 # ╰────────────────────────────────╯
 
 plug "andreyorst/plug.kak" noload
+plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-gdb"
+plug "occivink/kakoune-find"
+plug "occivink/kakoune-sudo-write"
 
 plug "andreyorst/base16-gruvbox.kak" noload do %{
-    find -type f -name "*.kak" -print0 | xargs -0 cp -t $HOME/.config/kak/colors
+    mkdir -p $HOME/.config/kak/colors
+    find $PWD -type f -name "*.kak" -exec ln -sf {} $HOME/.config/kak/colors/ \;
 } config %{
     colorscheme base16-gruvbox-dark-soft
 }
@@ -129,9 +133,6 @@ plug "occivink/kakoune-snippets" config %{
         }
     }
 }
-
-plug "andreyorst/kakoune-snippet-collection"
-plug "occivink/kakoune-find"
 
 plug "andreyorst/tagbar.kak.git" config %{
     set-option global tagbar_sort false
