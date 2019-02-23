@@ -43,8 +43,6 @@ map -docstring "next buffer"                    global goto 'b'     '<esc>: buff
 map -docstring "previous buffer"                global goto 'B'     '<esc>: buffer-previous<ret>'
 map -docstring "search tag in current file"     global goto '['     '<esc>: smart-select word; symbol<ret>'
 map -docstring "search tag in global tags file" global goto ']'     '<esc>: smart-select word; ctags-search<ret>'
-map -docstring "move one paragraph down"        global goto 'p'     '<esc>/[^\s]<ret><a-i>p'
-map -docstring "move one paragraph up"          global goto 'P'     '<esc><a-/>[^\s]<ret><a-i>p<a-;>'
 
 ## System clipboard
 map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>'
