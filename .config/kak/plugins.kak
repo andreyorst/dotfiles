@@ -28,6 +28,9 @@ plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
+        if [ -n "$(command -v sk)" ]; then
+            echo "set-option global fzf_implementation sk"
+        fi
         if [ -n "$(command -v fd)" ]; then
             echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
         else
@@ -35,8 +38,6 @@ plug "andreyorst/fzf.kak" %{
         fi
         if [ -n "$(command -v bat)" ]; then
             echo "set-option global fzf_highlighter bat"
-        elif [ -n "$(command -v highlight)" ]; then
-            echo "set-option global fzf_highlighter highlight"
         fi
     }
 }
