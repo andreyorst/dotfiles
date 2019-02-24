@@ -1,3 +1,0 @@
-[submodule ".config/bat/themes/gruvbox"]
-	path = .config/bat/themes/gruvbox
-	url = https://github.com/Briles/gruvbox
