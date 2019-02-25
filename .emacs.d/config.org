@@ -605,6 +605,18 @@ Ediff is part of Emacs, so I just want to configure it to my liking.
   (setq ediff-split-window-function 'split-window-horizontally)
 #+END_SRC
 
+** Which Key
+=which-key= is  a package that  can show all possible  completions for
+keyboard shortcuts in a popup menu. I'm still learning Emacs, so let's
+enable it by default.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :diminish which-key-mode
+    :config
+    (which-key-mode))
+#+END_SRC
+
 * Modes
 This section will contain some  settings for various modes that are
 not handled within package configurations.
