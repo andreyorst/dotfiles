@@ -1,12 +1,12 @@
 #+TITLE: Emacs configuration with Org Mode
 [[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
 
-This is  my Emacs configuration  file written as Org  document.  The
-purpose of  this file is  to learn basics of  Org Mode and  Emacs in
-general. I try to keep my configuration simple and fast and I mostly
-use Emacs  as environment  for studying  LISP, currently  Scheme, so
-this configuration is pretty much about it.  I'm not elisp guru yet,
-so I  don't think that this  document can be really  interesting for
+This  is my  Emacs configuration  file written  as Org  document.  The
+purpose of  this file  is to  learn basics  of Org  Mode and  Emacs in
+general. I try  to keep my configuration simple and  fast and I mostly
+use Emacs as environment for  studying LISP, currently Scheme, so this
+configuration is pretty  much about it.  I'm not Emacs  Lisp guru yet,
+so I  don't think  that this  document can  be really  interesting for
 anyone.
 
 I tend to split my configurations of Editors to sections.  The basic
@@ -114,8 +114,8 @@ be honest.
 
 ** Input Languages
 I use two keyboard layouts: =qwerty=  and =йцукен=, therefore I need a
-way to switch between those without loosing ability to use such crords
-as =C-x= which will become a =C-ч=  if I select cyrillic layout in the
+way to switch between those without loosing ability to use such chords
+as =C-x= which will become a =C-ч=  if I select Cyrillic layout in the
 OS. Luckily for  me, Emacs provides a method to  switch layouts within
 Emacs with =C-\=, so all common shortcuts will still work fine.
 
@@ -124,8 +124,8 @@ Emacs with =C-\=, so all common shortcuts will still work fine.
 #+END_SRC
 
 I'm  not  using  =russian-jcuken=   here  because  it  represents  the
-"typewriter" layout with  numberline inverted, so to  access numbers I
-needto use Shift key. =russian-computer= doesn't have this problem.
+"typewriter" layout with number-line inverted,  so to access numbers I
+need to use Shift key. =russian-computer= doesn't have this problem.
 
 ** Line Numbers
 For some  reason Emacs has  long history  of being not  capable to
@@ -139,10 +139,9 @@ them, and therefore I'm enabling them in all programming modes.
 #+END_SRC
 
 ** Matching Parentheses
-One  feature that  I think  is really  important, especially  when
-working  with lisp  code, is  ability to  see matching  paren when
-cursor  stands near  the other  paren. So  I enable  it for  every
-language.
+One feature that I think  is really important, especially when working
+with lisp code, is ability to  see matching bracket when cursor stands
+near the other bracket. So I enable it for every programming language.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook 'show-paren-mode)
@@ -465,7 +464,7 @@ framework. It's kind of slow though.
 #+END_SRC
 
 *** Company lsp
-To make compay understand completions from language servers we need this backend.
+To make company understand completions from language servers we need this backend.
 
 #+BEGIN_SRC emacs-lisp
   (use-package company-lsp)
@@ -502,7 +501,7 @@ load my own snippets lets use this hook.
 #+END_SRC
 
 ** Projectile
-Since emacs  is stupid,  it changes  working directory  to current
+Since Emacs  is stupid,  it changes  working directory  to current
 file location. So  I need a whole plugin to  workaround this silly
 issue.
 
@@ -573,7 +572,7 @@ for it.
   (use-package company-lsp :commands company-lsp)
 #+END_SRC
 
-*** cquery
+*** Cquery
 =cquery= is a  language server for C/C++ code.  It interacts with
 [[lsp-mode]].
 
@@ -637,13 +636,14 @@ This section will contain some  settings for various modes that are
 not handled within package configurations.
 
 ** Org Mode
-For Org Mode I need spell checking to be default, and yasnippet so
+For Org Mode I need spell checking to be default, and Yasnippet so
 I could expand some useful things like =SRC= blocks.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook (lambda()
                              (org-indent-mode)
                              (flyspell-mode)
+                             (flyspell-buffer)
                              (yas-minor-mode)
                              (yas-reload-all)
                              (setq default-justification 'full
@@ -750,8 +750,25 @@ filling. Basically the same setup as for Org Mode.
   (add-hook 'markdown-mode-hook
             '(lambda()
                (flyspell-mode)
+               (flyspell-buffer)
                (setq fill-column 80
                      default-justification 'full)
                (auto-fill-mode)))
 
 #+END_SRC
+
+** Flyspell mode
+It's annoying that if I save  word to my personal dictionary, all other
+misspelled  words  are no  longer  highlighted,  and  I need  to  call
+=flyspell-buffer= again and again. Let's get rid of this.
+
+#+BEGIN_SRC emacs-lisp
+  (defun flyspell-buffer-after-pdict-save (&rest _)
+    (flyspell-buffer))
+
+  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
+#+END_SRC
+
+I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
+since I don't  understand why I need to define  another function, that
+just calls =flyspell-buffer= but it works fine.
