@@ -9,6 +9,7 @@
 # ╰────────────────────────────────╯
 
 evaluate-commands %sh{
+    printf "%s\n" "echo -debug %{start: $(date +%-M:%S:%N)}"
     config_files="
         plugins/plug.kak/rc/plug.kak
         plugins.kak
@@ -23,3 +24,6 @@ evaluate-commands %sh{
     done
 }
 
+evaluate-commands %sh{
+    printf "%s\n" "echo -debug %{end:   $(date +%-M:%S:%N)}"
+}
