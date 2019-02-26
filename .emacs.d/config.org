@@ -112,6 +112,21 @@ be honest.
                 cursor-type 'bar)
 #+END_SRC
 
+** Input Languages
+I use two keyboard layouts: =qwerty=  and =йцукен=, therefore I need a
+way to switch between those without loosing ability to use such crords
+as =C-x= which will become a =C-ч=  if I select cyrillic layout in the
+OS. Luckily for  me, Emacs provides a method to  switch layouts within
+Emacs with =C-\=, so all common shortcuts will still work fine.
+
+#+BEGIN_SRC emacs-lisp
+  (setq default-input-method 'russian-computer)
+#+END_SRC
+
+I'm  not  using  =russian-jcuken=   here  because  it  represents  the
+"typewriter" layout with  numberline inverted, so to  access numbers I
+needto use Shift key. =russian-computer= doesn't have this problem.
+
 ** Line Numbers
 For some  reason Emacs has  long history  of being not  capable to
 display line  numbers properly,  but now  native line  numbers are
