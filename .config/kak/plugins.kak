@@ -135,11 +135,11 @@ plug "occivink/kakoune-snippets" config %{
     }
 }
 
-plug "andreyorst/tagbar.kak.git" config %{
+plug "andreyorst/tagbar.kak" config %{
     set-option global tagbar_sort false
     set-option global tagbar_size 40
     set-option global tagbar_display_anon false
-    hook global WinSetOption filetype=(c|cpp|rust|gas) %{
+    hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
         tagbar-enable
     }
 }
