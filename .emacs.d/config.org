@@ -643,7 +643,6 @@ I could expand some useful things like =SRC= blocks.
   (add-hook 'org-mode-hook (lambda()
                              (org-indent-mode)
                              (flyspell-mode)
-                             (flyspell-buffer)
                              (yas-minor-mode)
                              (yas-reload-all)
                              (setq default-justification 'full
