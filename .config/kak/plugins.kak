@@ -17,10 +17,7 @@ plug "occivink/kakoune-gdb"
 plug "occivink/kakoune-find"
 plug "occivink/kakoune-sudo-write"
 
-plug "andreyorst/base16-gruvbox.kak" noload do %{
-    mkdir -p $HOME/.config/kak/colors
-    find $PWD -type f -name "*.kak" -exec ln -sf {} $HOME/.config/kak/colors/ \;
-} config %{
+plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
