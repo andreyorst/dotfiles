@@ -623,14 +623,9 @@ so I gonna try it out.
                 ("C-c" . vdiff-mode-prefix-map))
     :init (setq vdiff-lock-scrolling t
                 vdiff-diff-algorithm 'diff
-                vdiff-diff3-command '("diff3")
-                vdiff-disable-folding nil
-                vdiff-fold-padding 6
+                vdiff-magit-stage-is-2way t
+                vdiff-disable-folding t
                 vdiff-min-fold-size 4
-                vdiff-may-close-fold-on-point t
-                vdiff-fold-string-function 'vdiff-fold-string-default
-                vdiff-default-refinement-syntax-code "w"
-                vdiff-auto-refine nil
                 vdiff-subtraction-style 'full
                 vdiff-subtraction-fill-char ?-))
 #+END_SRC
@@ -641,15 +636,9 @@ so I gonna try it out.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vdiff-magit
-    :after (magit vdiff)
     :bind (:map magit-mode-map
                 ("e" . vdiff-magit-dwim)
-                ("E" . vdiff-magit-popup))
-    :init
-    (setcdr (assoc ?e (plist-get magit-dispatch-popup :actions))
-            '("vdiff dwim" #'vdiff-magit-dwim))
-    (setcdr (assoc ?E (plist-get magit-dispatch-popup :actions))
-            '("vdiff popup" #'vdiff-magit-popup)))
+                ("E" . vdiff-magit-popup)))
 #+END_SRC
 
 ** Which Key
