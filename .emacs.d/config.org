@@ -612,11 +612,44 @@ features, so I want to try it out.
   (use-package magit)
 #+END_SRC
 
-** Ediff
-Ediff is part of Emacs, so I just want to configure it to my liking.
+** Vdiff
+=vdiff=  is a  package, that  works similar  to Vimdiff.   Ediff isn't
+really comfortable to use, and  vdiff also has integration with [[Magit]],
+so I gonna try it out.
 
 #+BEGIN_SRC emacs-lisp
-  (setq ediff-split-window-function 'split-window-horizontally)
+  (use-package vdiff
+    :bind (:map vdiff-mode-map
+                ("C-c" . vdiff-mode-prefix-map))
+    :init (setq vdiff-lock-scrolling t
+                vdiff-diff-algorithm 'diff
+                vdiff-diff3-command '("diff3")
+                vdiff-disable-folding nil
+                vdiff-fold-padding 6
+                vdiff-min-fold-size 4
+                vdiff-may-close-fold-on-point t
+                vdiff-fold-string-function 'vdiff-fold-string-default
+                vdiff-default-refinement-syntax-code "w"
+                vdiff-auto-refine nil
+                vdiff-subtraction-style 'full
+                vdiff-subtraction-fill-char ?-))
+#+END_SRC
+
+*** Vdiff Magit
+=vdiff-magit= is a supplement  package, that provides integration with
+[[Magit]] package.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vdiff-magit
+    :after (magit vdiff)
+    :bind (:map magit-mode-map
+                ("e" . vdiff-magit-dwim)
+                ("E" . vdiff-magit-popup))
+    :init
+    (setcdr (assoc ?e (plist-get magit-dispatch-popup :actions))
+            '("vdiff dwim" #'vdiff-magit-dwim))
+    (setcdr (assoc ?E (plist-get magit-dispatch-popup :actions))
+            '("vdiff popup" #'vdiff-magit-popup)))
 #+END_SRC
 
 ** Which Key
