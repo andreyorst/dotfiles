@@ -77,7 +77,7 @@ plug "andreyorst/powerline.kak" %{
 
 plug "andreyorst/smarttab.kak" %{
     set-option global softtabstop 4
-    hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme) expandtab
+    hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme|sh|perl) expandtab
     hook global WinSetOption filetype=(makefile|gas) noexpandtab
     hook global WinSetOption filetype=(c|cpp) smarttab
 }
