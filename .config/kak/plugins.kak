@@ -9,6 +9,10 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
+evaluate-commands %sh{
+    printf "%s\n" "declare-option str start %{$(date +%-S.%N)}"
+}
+
 plug "andreyorst/plug.kak" noload
 plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
@@ -25,9 +29,6 @@ plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
-        if [ -n "$(command -v sk)" ]; then
-            echo "set-option global fzf_implementation sk"
-        fi
         if [ -n "$(command -v fd)" ]; then
             echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
         else
@@ -139,4 +140,10 @@ plug "andreyorst/tagbar.kak" config %{
     hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
         tagbar-enable
     }
+}
+
+evaluate-commands %sh{
+    end=$(date +%-S.%N)
+    result=$(echo "print $end - $kak_opt_start" | perl)
+    printf "%s\n" "echo -debug %{$result}"
 }
