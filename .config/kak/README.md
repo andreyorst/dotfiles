@@ -137,3 +137,7 @@ these things:
 [16]:https://github.com/andreyorst/powerline.kak
 [17]:https://github.com/andreyorst/smarttab.kak
 [18]:https://github.com/andreyorst/tagbar.kak
+[19]:https://github.com/junegunn/fzf
+[20]:https://github.com/majutsushi/tagbar
+[21]:https://github.com/junegunn/vim-plug
+[22]:https://github.com/jwiegley/use-package
