@@ -1,63 +1,139 @@
-# Kakoune config
+# Kakoune configuration
 
-Fancy screenshot for you:
-![image](https://user-images.githubusercontent.com/19470159/49689293-45a14900-fb30-11e8-915b-9a660aa1a233.png)
+Fancy screenshot for you: ![Kakoune][0]
 
+Kakoune is amazing code editor, with multiple cursors as a central way of
+interaction with text. It was inspired by Vim, and I quite like it. Currently it
+is my favorite editor. I've configured it for my needs, but if you find this
+configuration useful feel free to use and modify it for your needs.
 
 ## Plugins
-- [kakoune-text-objects](https://github.com/delapouite/kakoune-text-objects) - additional text objects.
-- [kakoune-vertical-selection](https://github.com/occivink/kakoune-vertical-selection) - handling vertical selection.
-- [kakoune-gdb](https://github.com/occivink/kakoune-gdb) - gdb integration.
-- [kakoune-edit-or-dir](https://github.com/TeddyDD/kakoune-edit-or-dir) - open directories with edit command.
-- [kak-lsp](https://github.com/ul/kak-lsp) - language server protocol for Kakoune.
-- [auto-pairs.kak](https://github.com/alexherbo2/auto-pairs.kak) - insert pared symbol automatically and surround selections.
-- [parinfer-rust](https://github.com/eraserhd/parinfer-rust) - parinfer support for Kakoune.
+I use a lot of plugins that may or may not be listed here (because I'm lazy and
+I rarely update this document). For managing those plugins, e.g. installing new
+ones, updating existed, isolating configurations I use my own plugin manager
+called [plug.kak][15], that was inspired by [vim-plug][21] and
+[use-package][22]. It is capable of loading plugin configurations, evaluating
+post-update commands, checking for updates, and it is asynchronous. I try to
+make it as fast as possible.
 
-### My plugins
-- [plug.kak](https://github.com/andreyorst/plug.kak) - a plugin manager.
-- [base16-gruvbox.kak](https://github.com/andreyorst/base16-gruvbox.kak) - base16 Gruvbox Dark Soft colorscheme.
-- [fzf.kak](https://github.com/andreyorst/fzf.kak) - fzf integration plugin.
-- [powerline.kak](https://github.com/andreyorst/powerline.kak) - powerline like plugin.
-- [smarttab.kak](https://github.com/andreyorst/smarttab.kak) - smarttab plugin for different tab styles handling.
+This is the list of plugins that I use basically every time I do something in
+Kakoune:
+
+- [auto-pairs.kak][1] - Automatically insert pair symbols, like braces, quotes,
+  etc. Also allows surrounding text.
+- [move-line.kak][2] - Move selections up or down with keybindings.
+- [replace.kak][3] - Vim replace mode for Kakoune.
+- [kakoune-text-objects][4] - Additional text objects, works nice with
+  `kakoune-vertical-selection`.
+- [kakoune-find][5] - Find and replace text in all opened buffers in a grep
+  format.
+- [kakoune-gdb][6] - Awesome GDB integration for Kakoune.
+- [kakoune-snippets][7] - Finally good snippet plugin.
+- [kakoune-sudo-write][8] - A command that pretty much about writing `sudo`
+  protected files.
+- [kakoune-vertical-selection][9] - Add cursors up or down based on text under
+  the cursor.
+- [kakoune-edit-or-dir][10] - Sort of a file explorer for Kakoune.
+- [kak-lsp][11] - A client for Language Server Protocol implemented in Rust.
+
+These plugins are written by me for personal use, but I tend to share everything
+with the community so you're more than welcome to use them:
+
+- [base16-gruvbox.kak][12] - Base16 Gruvbox inspired color-scheme.
+- [fzf.kak][13] - Integration of [Fzf][19] tool to Kakoune.
+- [kakoune-snippet-collection][14] - Collection of snippets for
+  [kakoune-snippets][7] plugin
+- [plug.kak][15] - This is my plugin management solution for Kakoune.
+- [powerline.kak][16] - A modeline but with passion.
+- [smarttab.kak][17] - Vim has a nice features, called `expandtab`,
+  `noexpandtab`, and `smarttab`. This plugin implements those.
+- [tagbar.kak][18] - A Vim [tagbar][20] like plugin for Kakoune.
 
 ## Custom Mappings
-- <kbd>Ctrl+/</kbd>: <c-/> to comment/uncomment selection.
-- <kbd>Ctrl+d</kbd>: add currsor/jump on current word.
-- <kbd>t</kbd>: convert leading spaces to tabs.
-- <kbd>T</kbd>: convert leading tabs to spaces.
-- <kbd>Alt+f</kbd>: file non-recursive.
-- <kbd>f</kbd>: file recursive.
-- <kbd>b</kbd>: next buffer.
-- <kbd>B</kbd>: previous buffer.
-- <kbd>[</kbd>: search tag in current file.
-- <kbd>]</kbd>: search tag in global tags file.
-- <kbd>y</kbd>: copy to system clipboard.
-- <kbd>d</kbd>: cut to system clipboard.
-- <kbd>c</kbd>: cut to system clipboard.
-- <kbd>P</kbd>: paste from system clipboard.
-- <kbd>p</kbd>: paste from system clipboard.
-- <kbd>n</kbd>: next error.
-- <kbd>r</kbd>: replace word.
-- <kbd>c</kbd>: exit spell mode.
-- <kbd>S</kbd>: spell mode.
+Kakoune, like Vim, provides  a nice way to modify or  add mappings. I've defined
+some in my configuration files, and some are being defined by plugins.
+
+### General purpose mappings
+- <kbd>Ctrl</kbd>+<kbd>/</kbd> - to comment/uncomment selection
+- <kbd>Ctrl</kbd>+<kbd>d</kbd> - add cursor/jump on current word
+- <kbd>,</kbd> <kbd>t</kbd> - convert leading spaces to tabs
+- <kbd>,</kbd> <kbd>T</kbd> - convert leading tabs to spaces
+
+### Goto mode mappings
+- <kbd>g</kbd> <kbd>Alt</kbd>+<kbd>f</kbd> - file non-recursive
+- <kbd>g</kbd> <kbd>f</kbd> - file recursive
+- <kbd>g</kbd> <kbd>b</kbd> - next buffer
+- <kbd>g</kbd> <kbd>B</kbd> - previous buffer
+- <kbd>g</kbd> <kbd>[</kbd> - search tag in current file
+- <kbd>g</kbd> <kbd>]</kbd> - search tag in global tags file
+
+### System clipboard mappings
+Kakoune  doesn't provide  a system  clipboard  integration by  default, so  I've
+defined  these mappings  to be  able  to copy,  paste, and  replace from  system
+keyboard, in a way Kakoune's clipboard works. They are defined in `user` mode.
+
+- <kbd>,</kbd> <kbd>y</kbd> - copy to system clipboard
+- <kbd>,</kbd> <kbd>d</kbd> - cut to system clipboard
+- <kbd>,</kbd> <kbd>c</kbd> - cut to system clipboard, enter insert mode
+- <kbd>,</kbd> <kbd>P</kbd> - paste from system clipboard before cursor
+- <kbd>,</kbd> <kbd>p</kbd> - paste from system clipboard after cursor
+- <kbd>,</kbd> <kbd>R</kbd> - replace selection with system clipboard
 
 ## Custom commands
-- `smart-select` - select `WORD` or `word` if current selection is only one character.
-- `find` - search for file recusively under path option: `%opt{path}`.
-- `select-or-add-cursor` - select a `word` under cursor, or add cursor on next occurrence of current selection.
-- `leading-spaces-to-tabs` - Convert all leading spaces to tabs.
-- `leading-tabs-to-spaces` - Convert all leading tabs to spaces.
-- `symbol` - jump to symbol definition in current file. If no symbol given, current selection is used as a symbol name.
+I've defined these commands because Kakoune doesn't work quite how I want it
+to. Feel free to modify it for your needs.
 
-### Tmux commands
-- `vspl[it]` `vert[ical]` - split screen vertically
-- `spl[it]` - split screen horizontally
-- `tabn[ew]` - create new Kakoune window in new tmux window
-- `term[inal]` `tmux-new-terminal` - split screen horizontally opening shell at the bottom
-- `init-tmux` `restore-tmux` - modify tmux's statusline
-- `rename-tmux` - rename current tmux window to opened buffer filename.
+- `format-c` - You probably don't need this command. It executes a search over
+  the buffer, and wraps each line that has `tos()` or `ton()` function with
+  `clang-format off/on` comment, executes the `format` command and removes those
+  comments.
+- `leading-spaces-to-tabs` - Converts leading spaces to tabs based on
+  `indentwidth` option
+- `leading-tabs-to-spaces` - Converts leading tabs to spaces based on `tabstop`
+  option
+- `search-file` - A recursive file search.
+- `select-or-add-cursor` - A supplement command for the
+  <kbd>Ctrl</kbd>+<kbd>d</kbd> mapping.
+- `smart-select` - A supplement command for selecting `word` or `WORD`, and
+  passing it to the `search-file` or `select-or-add-cursor`.
+- `symbol` - Generates tags for current buffer, and allows searching and
+  jumping.
+
+### Tmux integration
+Commands to provide nice integration with tmux:
+
+- `vsplit` - splits window vertically by creating pane to the right.
+- `split` - splits window horizontally by creating pane below.
+- `tabnew` - creates new window.
+
+These commands can be used with other Kakoune commands, like `edit`, `buffer`, etc.
 
 ## Language specific settings
-- Highlighted operators and delimiters
-- Regexes to highlight user types in C/Cpp, and various language facilities,
+There's a file [languages.kak](./languages.kak) that defines some language
+specific settings that you sould check for yourself, but in general it does
+these things:
+
+- Highlights operators and delimiters
+- Extends highlighters of C/Cpp/Rust by regexps to highlight user types in C/Cpp, and various language facilities,
   like methods, or `struct` fields.
+- Adds Perl region highlighting to `sh` language with `perl[^']+'` regexp.
+
+[0]:https://user-images.githubusercontent.com/19470159/49689293-45a14900-fb30-11e8-915b-9a660aa1a233.png
+[1]:https://github.com/alexherbo2/auto-pairs.kak
+[2]:https://github.com/alexherbo2/move-line.kak
+[3]:https://github.com/alexherbo2/replace.kak
+[4]:https://github.com/delapouite/kakoune-text-objects
+[5]:https://github.com/occivink/kakoune-find
+[6]:https://github.com/occivink/kakoune-gdb
+[7]:https://github.com/occivink/kakoune-snippets
+[8]:https://github.com/occivink/kakoune-sudo-write
+[9]:https://github.com/occivink/kakoune-vertical-selection
+[10]:https://github.com/TeddyDD/kakoune-edit-or-dir
+[11]:https://github.com/ul/kak-lsp
+[12]:https://github.com/andreyorst/base16-gruvbox.kak
+[13]:https://github.com/andreyorst/fzf.kak
+[14]:https://github.com/andreyorst/kakoune-snippet-collection
+[15]:https://github.com/andreyorst/plug.kak
+[16]:https://github.com/andreyorst/powerline.kak
+[17]:https://github.com/andreyorst/smarttab.kak
+[18]:https://github.com/andreyorst/tagbar.kak
