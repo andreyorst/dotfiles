@@ -10,7 +10,6 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-# Custom faces
 set-face global delimiters rgb:aa3a03,default
 
 # Never.
@@ -20,8 +19,10 @@ hook global WinCreate .* %{
 
 # Highlight operators and delimiters
 hook global WinCreate .* %{
-    add-highlighter window/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
-    add-highlighter window/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+    hook -once window NormalIdle .* %{
+        add-highlighter window/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
+        add-highlighter window/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+    }
 }
 
 # C/Cpp
@@ -36,8 +37,8 @@ hook global WinSetOption filetype=rust %{
 
 # Markdown
 hook global WinSetOption filetype=markdown %{
-    remove-highlighter buffer/operators
-    remove-highlighter buffer/delimiters
+    remove-highlighter window/operators
+    remove-highlighter window/delimiters
 }
 
 # Makefile
@@ -66,16 +67,13 @@ hook global WinSetOption filetype=gas %{
 # sh
 add-highlighter shared/sh/perl region -recurse "'" "perl [^']+'" "'" ref perl/code
 
-set-face global child rgb:fb4934,default+b
-set-face global namespace rgb:be8019,default
-
 # C Cpp Rust Java
 evaluate-commands %sh{
     for filetype in c cpp rust java; do
-        printf "%s\n" "add-highlighter shared/$filetype/code/functions regex \w+(\h+)?(?=\() 0:function
-                       add-highlighter shared/$filetype/code/struct_field regex ((?<!\.\.)(?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>\"\(]) 0:child
-                       add-highlighter shared/$filetype/code/method regex ((?<!\.\.)(?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
-                       add-highlighter shared/$filetype/code/return regex \breturn\b 0:child"
+        printf "%s\n" "add-highlighter shared/$filetype/code/functions    regex \w+(\h+)?(?=\() 0:function
+                       add-highlighter shared/$filetype/code/struct_field regex ((?<!\.\.)(?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>\"\(]) 0:rgb:fb4934,default+b
+                       add-highlighter shared/$filetype/code/method       regex ((?<!\.\.)(?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
+                       add-highlighter shared/$filetype/code/return       regex \breturn\b 0:rgb:fb4934,default+b"
     done
     for filetype in c cpp; do
         printf "%s\n" "add-highlighter shared/$filetype/code/types_1 regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
@@ -84,6 +82,6 @@ evaluate-commands %sh{
                        add-highlighter shared/$filetype/code/types_4 regex \b\w+_t\b 0:type"
     done
     for filetype in cpp rust; do
-        printf "%s\n" "add-highlighter shared/$filetype/code/  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:namespace"
+        printf "%s\n" "add-highlighter shared/$filetype/code/  regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:rgb:be8019,default"
     done
 }
