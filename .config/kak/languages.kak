@@ -19,9 +19,9 @@ hook global WinCreate .* %{
 
 # Highlight operators and delimiters
 hook global WinCreate .* %{
-    hook -once window NormalIdle .* %{
-        add-highlighter window/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
-        add-highlighter window/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
+    hook -once buffer NormalIdle .* %{
+        add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
+        add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
     }
 }
 
@@ -37,8 +37,8 @@ hook global WinSetOption filetype=rust %{
 
 # Markdown
 hook global WinSetOption filetype=markdown %{
-    remove-highlighter window/operators
-    remove-highlighter window/delimiters
+    remove-highlighter buffer/operators
+    remove-highlighter buffer/delimiters
 }
 
 # Makefile
