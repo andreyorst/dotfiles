@@ -52,13 +52,6 @@ map -docstring "paste from system clipboard before cursor"  global user 'P' '!xs
 map -docstring "paste from system clipboard after cursor"   global user 'p' '<a-!>xsel --output --clipboard<ret>'
 map -docstring "replace selection with system clipboard"    global user 'R' '|xsel --output --clipboard<ret>'
 
-## Spell
-declare-user-mode spell
-map -docstring "next error"      global spell 'n' ': spell-next<ret>'
-map -docstring "replace word"    global spell 'r' ': spell-replace<ret>'
-map -docstring "exit spell mode" global spell 'c' ': spell-clear<ret>'
-map -docstring "spell mode"      global user  'S' ': enter-user-mode -lock spell; spell en-US<ret>'
-
 # Completion
 hook global InsertCompletionShow .* %{
     try %{
