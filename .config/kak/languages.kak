@@ -19,10 +19,8 @@ hook global WinCreate .* %{
 
 # Highlight operators and delimiters
 hook global WinCreate .* %{
-    hook -once buffer NormalIdle .* %{
-        add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
-        add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
-    }
+    add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
+    add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
 }
 
 # C/Cpp
