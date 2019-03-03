@@ -34,9 +34,8 @@ plug "andreyorst/fzf.kak" %{
         else
             echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
         fi
-        if [ -n "$(command -v bat)" ]; then
-            echo "set-option global fzf_highlighter bat"
-        fi
+        [ -n "$(command -v rg)" ] && [ -n "$(command -v sk)" ] && echo "set-option global fzf_sk_grep_command %{$kak_opt_grepcmd}"
+        [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlighter bat"
     }
 }
 

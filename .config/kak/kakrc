@@ -11,11 +11,11 @@
 evaluate-commands %sh{
     config_files="
         plugins/plug.kak/rc/plug.kak
-        plugins.kak
+        common.kak
         commands.kak
         tmux.kak
-        common.kak
         languages.kak
+        plugins.kak
     "
 
     for file in $config_files; do
