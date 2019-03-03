@@ -539,6 +539,12 @@ facilities, since I'm planning to write my exercises in org mode.
   (use-package rust-mode)
 #+END_SRC
 
+*** Racer
+Racer is a Rust Auto-Complete-er.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racer)
+#+END_SRC
 ** TOML
 =toml-mode= helps  with highlighting of TOML files,  which Rust uses
 to configure project.
@@ -758,7 +764,7 @@ I need some settings for Rust mode.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'rust-mode-hook
             '(lambda()
-               (lsp)
+               (racer-mode)
                (eldoc-mode)
                (setq company-tooltip-align-annotations t)))
 #+END_SRC
