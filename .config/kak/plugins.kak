@@ -34,7 +34,7 @@ plug "andreyorst/fzf.kak" %{
         else
             echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
         fi
-        [ -n "$(command -v rg)" ] && [ -n "$(command -v sk)" ] && echo "set-option global fzf_sk_grep_command %{$kak_opt_grepcmd}"
+        [ -n "$(command -v rg)" ] && echo "set-option global fzf_sk_grep_command %{$kak_opt_grepcmd}"
         [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlighter bat"
     }
 }
@@ -142,7 +142,6 @@ plug "andreyorst/tagbar.kak" config %{
 }
 
 evaluate-commands %sh{
-    end=$(date +%-S.%N)
-    result=$(echo "print $end - $kak_opt_start" | perl)
+    result=$(echo "print $(date +%-S.%N) - $kak_opt_start" | perl)
     printf "%s\n" "echo -debug %{$result}"
 }
