@@ -1,4 +1,4 @@
->#+TITLE: Emacs configuration with Org Mode
+#+TITLE: Emacs configuration with Org Mode
 [[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
