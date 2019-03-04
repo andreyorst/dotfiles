@@ -147,6 +147,15 @@ near the other bracket. So I enable it for every programming language.
   (add-hook 'prog-mode-hook 'show-paren-mode)
 #+END_SRC
 
+** Automatic pairs
+Emacs has builtin  functionality to provide me  automatic insertion of
+matching pair character, so I would  like to enable it for programming
+modes.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'electric-pair-mode)
+#+END_SRC
+
 ** Fixing Dumb Emacs Stuff
 This is just some fixes of things I found kind of strange.
 
