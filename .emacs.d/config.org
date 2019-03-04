@@ -1,4 +1,4 @@
-#+TITLE: Emacs configuration with Org Mode
+>#+TITLE: Emacs configuration with Org Mode
 [[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
@@ -554,6 +554,7 @@ Racer is a Rust Auto-Complete-er.
 #+BEGIN_SRC emacs-lisp
   (use-package racer)
 #+END_SRC
+
 ** TOML
 =toml-mode= helps  with highlighting of TOML files,  which Rust uses
 to configure project.
@@ -653,7 +654,12 @@ so I gonna try it out.
   (use-package vdiff-magit
     :bind (:map magit-mode-map
                 ("e" . vdiff-magit-dwim)
-                ("E" . vdiff-magit-popup)))
+                ("E" . vdiff-magit))
+    :config
+    (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
+    (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
+    (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
+    (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
 #+END_SRC
 
 ** Which Key
@@ -680,8 +686,6 @@ I could expand some useful things like =SRC= blocks.
   (add-hook 'org-mode-hook (lambda()
                              (org-indent-mode)
                              (flyspell-mode)
-                             (yas-minor-mode)
-                             (yas-reload-all)
                              (setq default-justification 'full
                                    org-startup-with-inline-images t
                                    org-startup-folded 'content)
@@ -786,9 +790,8 @@ filling. Basically the same setup as for Org Mode.
   (add-hook 'markdown-mode-hook
             '(lambda()
                (flyspell-mode)
-               (flyspell-buffer)
                (setq fill-column 80
-                     default-justification 'full)
+                     default-justification 'left)
                (auto-fill-mode)))
 
 #+END_SRC
