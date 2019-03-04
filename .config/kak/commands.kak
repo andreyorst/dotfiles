@@ -127,3 +127,8 @@ If no symbol given, current selection is used as a symbol name" \
 define-command -override format-c %{
     execute-keys -draft '%stos|ton|tob<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc><space>;:<space> format<ret>%stos|ton|tob<ret><a-h>kxdjxd<space>;'
 }
+
+define-command -override -docstring "evaluate-buffer" \
+evaluate-buffer %{
+    execute-keys -draft '%:<space><c-r>.<ret>'
+}
