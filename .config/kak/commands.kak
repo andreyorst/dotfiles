@@ -124,11 +124,12 @@ If no symbol given, current selection is used as a symbol name" \
         END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
 }}
 
-define-command -override format-c %{
-    execute-keys -draft '%stos|ton|tob<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc><space>;:<space> format<ret>%stos|ton|tob<ret><a-h>kxdjxd<space>;'
+define-command -override -docstring "wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove thosecomments." \
+format-c %{
+    execute-keys -draft '%s(tos|ton(f)?|tob)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc><space>;:<space> format<ret>%stos|ton|tob<ret><a-h>kxdjxd<space>;'
 }
 
-define-command -override -docstring "evaluate-buffer" \
+define-command -override -docstring "evaluate-buffer: evaluate current buffer contents as kakscrupt" \
 evaluate-buffer %{
     execute-keys -draft '%:<space><c-r>.<ret>'
 }
