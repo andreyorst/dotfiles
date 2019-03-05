@@ -18,10 +18,10 @@ hook global WinCreate .* %{
 }
 
 # Highlight operators and delimiters
-hook global WinCreate .* %{
+hook global WinCreate .* %{ try %{
     add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
     add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
-}
+}}
 
 # C/Cpp
 hook global WinSetOption filetype=(c|cpp) %{
