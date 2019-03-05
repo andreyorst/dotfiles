@@ -138,6 +138,15 @@ them, and therefore I'm enabling them in all programming modes.
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
+** Matching Parentheses
+One feature that I think  is really important, especially when working
+with lisp code, is ability to  see matching bracket when cursor stands
+near the other bracket. So I enable it for every programming language.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'show-paren-mode)
+#+END_SRC
+
 ** Fixing Dumb Emacs Stuff
 This is just some fixes of things I found kind of strange.
 
@@ -625,9 +634,11 @@ so I gonna try it out.
 #+BEGIN_SRC emacs-lisp
   (use-package vdiff-magit
     :bind (:map magit-mode-map
-                ("e" . vdiff-magit-dwim)
-                ("E" . vdiff-magit))
-    :config
+                ("e" . 'vdiff-magit-dwim)
+                ("E" . 'vdiff-magit))
+    :init
+    ;; (define-key magit-mode-map "e" 'vdiff-magit-dwim)
+    ;; (define-key magit-mode-map "E" 'vdiff-magit)
     (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
     (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
     (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
