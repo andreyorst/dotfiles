@@ -68,7 +68,7 @@ add-highlighter shared/sh/perl region -recurse "'" "perl [^']+'" "'" ref perl/co
 # C Cpp Rust Java
 evaluate-commands %sh{
     for filetype in c cpp rust java; do
-        printf "%s\n" "add-highlighter shared/$filetype/code/functions    regex \w+((?<!if)(?<!for)(?<!while))(\h+)?(?=\() 0:function
+        printf "%s\n" "add-highlighter shared/$filetype/code/functions    regex (\w*?)\b(for|if|while)?(\h+)?(?=\() 1:function
                        add-highlighter shared/$filetype/code/struct_field regex ((?<!\.\.)(?<=\.)|(?<=->))[a-zA-Z](\w+)?\b(?![>\"\(]) 0:rgb:fb4934,default+b
                        add-highlighter shared/$filetype/code/method       regex ((?<!\.\.)(?<=\.)|(?<=->))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
                        add-highlighter shared/$filetype/code/return       regex \breturn\b 0:rgb:fb4934,default+b"
