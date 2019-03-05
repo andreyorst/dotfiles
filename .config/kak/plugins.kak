@@ -9,29 +9,10 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-define-command -hidden -docstring "pre-install-plug [<branch>]: Automatically install plug.kak to '%val{config}/plugins' in case it isn't installed" \
-pre-install-plug -params 1 %{ evaluate-commands %sh{
-    plugins_dir="${kak_config}/plugins"
-    mkdir -p "${plugins_dir}"
-    if [ ! -d "${plugins_dir}/plug.kak" ]; then
-        [ -z "${GIT_TERMINAL_PROMPT}" ] && export GIT_TERMINAL_PROMPT=0
-        [ $# -ge 0 ] && branch="--branch $1"
-        plug_url="https://github.com/andreyorst/plug.kak"
-        install_path="${plugins_dir}/plug.kak"
-        git clone ${branch} ${plug_url} "${install_path}" >/dev/null 2>&1
-        status=$?
-        if [ ${status} -ne 0 ]; then
-            printf "%s\n" "fail %{pre-install-plug: Can't install plug.kak. Error code: ${status}}"
-        fi
-    fi
-}}
-
-pre-install-plug "spring-refactoring"
+# source the plugin manager itself
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
-plug "andreyorst/plug.kak" branch "spring-refactoring" noload config %{
-    set-option global plug_always_ensure true
-}
+plug "andreyorst/plug.kak" branch "spring-refactoring" noload
 plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
