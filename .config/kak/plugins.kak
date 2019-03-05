@@ -9,11 +9,29 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-evaluate-commands %sh{
-    printf "%s\n" "declare-option str start %{$(date +%-S.%N)}"
-}
+define-command -hidden -docstring "pre-install-plug [<branch>]: Automatically install plug.kak to '%val{config}/plugins' in case it isn't installed" \
+pre-install-plug -params 1 %{ evaluate-commands %sh{
+    plugins_dir="${kak_config}/plugins"
+    mkdir -p "${plugins_dir}"
+    if [ ! -d "${plugins_dir}/plug.kak" ]; then
+        [ -z "${GIT_TERMINAL_PROMPT}" ] && export GIT_TERMINAL_PROMPT=0
+        [ $# -ge 0 ] && branch="--branch $1"
+        plug_url="https://github.com/andreyorst/plug.kak"
+        install_path="${plugins_dir}/plug.kak"
+        git clone ${branch} ${plug_url} "${install_path}" >/dev/null 2>&1
+        status=$?
+        if [ ${status} -ne 0 ]; then
+            printf "%s\n" "fail %{pre-install-plug: Can't install plug.kak. Error code: ${status}}"
+        fi
+    fi
+}}
 
-plug "andreyorst/plug.kak" noload
+pre-install-plug "spring-refactoring"
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+
+plug "andreyorst/plug.kak" branch "spring-refactoring" noload config %{
+    set-option global plug_always_ensure true
+}
 plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
@@ -25,7 +43,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
-plug "andreyorst/fzf.kak" %{
+plug "andreyorst/fzf.kak" branch "skim-grep" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
@@ -69,9 +87,9 @@ plug "andreyorst/powerline.kak" %{
     set-option global powerline_separator ''
     set-option global powerline_separator_thin ''
     hook -once global WinCreate .* %{
-        powerline-theme base16-gruvbox
         powerline-toggle line_column off
     }
+    powerline-theme base16-gruvbox
 }
 
 plug "andreyorst/smarttab.kak" %{
@@ -83,7 +101,6 @@ plug "andreyorst/smarttab.kak" %{
 
 plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
-    # hook global WinCreate .* %{ auto-pairs-enable }
 }
 
 plug "alexherbo2/replace.kak" config %{
@@ -141,7 +158,3 @@ plug "andreyorst/tagbar.kak" config %{
     }
 }
 
-evaluate-commands %sh{
-    result=$(echo "print $(date +%-S.%N) - $kak_opt_start" | perl)
-    printf "%s\n" "echo -debug %{$result}"
-}
