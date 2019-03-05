@@ -18,7 +18,12 @@ evaluate-commands %sh{
     "
 
     for file in $config_files; do
-        echo "try %{ source '$HOME/.config/kak/$file' } catch %{ echo -debug 'Error sourcing $file' }"
+        printf "%s\n" "try %{
+            source '$HOME/.config/kak/$file'
+        } catch %{
+            echo -debug 'Error sourcing $file'
+            try %{ echo -debug %{%val{error}} }
+        }"
     done
 }
 
