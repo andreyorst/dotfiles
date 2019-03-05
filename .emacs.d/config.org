@@ -138,24 +138,6 @@ them, and therefore I'm enabling them in all programming modes.
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
-** Matching Parentheses
-One feature that I think  is really important, especially when working
-with lisp code, is ability to  see matching bracket when cursor stands
-near the other bracket. So I enable it for every programming language.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'show-paren-mode)
-#+END_SRC
-
-** Automatic pairs
-Emacs has builtin  functionality to provide me  automatic insertion of
-matching pair character, so I would  like to enable it for programming
-modes.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'electric-pair-mode)
-#+END_SRC
-
 ** Fixing Dumb Emacs Stuff
 This is just some fixes of things I found kind of strange.
 
@@ -496,17 +478,7 @@ code. Now I really need to write some snippets to use...
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :diminish yas-minor-mode
-    :config
-    (add-hook 'prog-mode-hook 'yas-minor-mode))
-#+END_SRC
-
-Since  we need  snippets in  all programming  modes, and  I didn't
-found a proper way to load them without extra snippets package, to
-load my own snippets lets use this hook.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'yas-reload-all)
+    :diminish yas-minor-mode)
 #+END_SRC
 
 ** Projectile
@@ -767,7 +739,9 @@ match my workflow.
                (setq indent-tabs-mode t
                      c-basic-offset 4
                      tab-width 4)
-               (lsp)))
+               (lsp)
+               (yas-minor-mode)
+               (electric-pair-mode)))
 #+END_SRC
 
 ** Rust
@@ -778,6 +752,8 @@ I need some settings for Rust mode.
   (add-hook 'rust-mode-hook
             '(lambda()
                (racer-mode)
+               (yas-minor-mode)
+               (electric-pair-mode)
                (eldoc-mode)
                (setq company-tooltip-align-annotations t)))
 #+END_SRC
