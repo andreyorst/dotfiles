@@ -63,7 +63,7 @@ hook global WinSetOption filetype=gas %{
 # Extra Highlightings
 
 # sh
-add-highlighter shared/sh/perl region -recurse "'" "perl [^']+'" "'" ref perl/code
+add-highlighter shared/sh/perl region "perl [^']*'" "'" ref perl/code
 
 # C Cpp Rust Java
 evaluate-commands %sh{
