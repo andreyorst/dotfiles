@@ -25,9 +25,10 @@ set-option global jumpclient client0
 
 # Highlighters
 hook global WinCreate .* %{
-    add-highlighter window/numbers    number-lines -relative -hlcursor -separator ' '
-    add-highlighter window/matching   show-matching
-    add-highlighter window/wrap       wrap -word -indent -marker '↪'
+    add-highlighter window/numbers          number-lines -relative -hlcursor -separator ' '
+    add-highlighter window/matching         show-matching
+    add-highlighter window/wrap             wrap -word -indent -marker '↪'
+    add-highlighter window/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
 }
 
 # Maps

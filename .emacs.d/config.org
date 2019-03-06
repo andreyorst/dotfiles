@@ -380,7 +380,7 @@ This package provides some kind of fuzzy matching for Emacs.
   (use-package flx)
 #+END_SRC
 
-** Ivy
+** Ivy and Counsel
 Ivy is  a narrowing framework  like Helm,  but much lighter  in my
 experience.
 
@@ -389,32 +389,31 @@ experience.
     :init
     (setq ivy-use-virtual-buffers t
           enable-recursive-minibuffers t)
-    :bind (("C-s" . swiper)
-           ("C-c C-r" . ivy-resume)
+    :bind (("C-c C-r" . ivy-resume)
            ("<f6>" . ivy-resume)
-           ("M-x" . counsel-M-x)
-           ("C-x C-f" . counsel-find-file)
            ("C-x C-b" . ivy-switch-buffer)
-           ("C-x b" . ivy-switch-buffer)
-           ("C-h f" . counsel-describe-function)
-           ("C-h v" . counsel-describe-variable)
-           ("C-h l" . counsel-find-library))
+           ("C-x b" . ivy-switch-buffer))
     :diminish ivy-mode
     :config
     (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
           ivy-count-format ""
           ivy-display-style nil
           ivy-minibuffer-faces nil)
-    (ivy-mode 1)
-    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+    (ivy-mode 1))
 #+END_SRC
 
-It integrates with Counsel that handles minibuffer and swiper that
-handles searching in the file, so let's install those too.
+It integrates with  Counsel that handles minibuffer,  so let's install
+it too.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel)
-  (use-package swiper)
+  (use-package counsel
+    :bind (("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-h l" . counsel-find-library)
+           :map minibuffer-local-map
+           ("C-r" . 'counsel-minibuffer-history)))
 #+END_SRC
 
 ** Flycheck

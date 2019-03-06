@@ -24,7 +24,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
-plug "andreyorst/fzf.kak" branch "skim-grep" %{
+plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
