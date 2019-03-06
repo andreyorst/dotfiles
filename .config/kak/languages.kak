@@ -17,12 +17,6 @@ hook global WinCreate .* %{
     set-option window aligntab false
 }
 
-# Highlight operators and delimiters
-hook global WinCreate .* %{ try %{
-    add-highlighter buffer/operators  regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|::|\^|/|~) 0:operator
-    add-highlighter buffer/delimiters regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiters
-}}
-
 # C/Cpp
 hook global WinSetOption filetype=(c|cpp) %{
     set-option window formatcmd 'clang-format'
@@ -33,12 +27,6 @@ hook global WinSetOption filetype=rust %{
     set window formatcmd 'rustfmt'
 }
 
-# Markdown
-hook global WinSetOption filetype=markdown %{
-    remove-highlighter buffer/operators
-    remove-highlighter buffer/delimiters
-}
-
 # Makefile
 hook global BufCreate .*\.mk$ %{
     set-option buffer filetype makefile
@@ -46,12 +34,10 @@ hook global BufCreate .*\.mk$ %{
 
 # Kakscript
 hook global WinSetOption filetype=kak %{
-    hook global NormalIdle .* %{
-        try %{
-            execute-keys -draft -save-regs '' <a-i>w"ay
-            echo -markup "{rgb:%reg{a}}██"
-        }
-    }
+    hook global NormalIdle .* %{ try %{
+        execute-keys -draft -save-regs '' <a-i>w"ay
+        echo -markup "{rgb:%reg{a}}██"
+    }}
 }
 
 # Assemply

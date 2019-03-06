@@ -22,7 +22,7 @@ evaluate-commands %sh{
             source '$HOME/.config/kak/$file'
         } catch %{
             echo -debug 'Error sourcing $file'
-            try %{ echo -debug %{%val{error}} }
+            try %{ echo -debug \"%val{error}\" }
         }"
     done
 }
