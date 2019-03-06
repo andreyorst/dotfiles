@@ -570,7 +570,7 @@ for it.
 
 *** Cquery
 =cquery= is a  language server for C/C++ code.  It interacts with
-[[lsp-mode]].
+[[*LSP Mode][lsp-mode]].
 
 #+BEGIN_SRC emacs-lisp
   (use-package cquery
@@ -658,7 +658,7 @@ enable it by default.
 This section will contain some  settings for various modes that are
 not handled within package configurations.
 
-** TODO Org Mode
+** Org Mode
 For Org  Mode I  need spell  checking to be  enabled by  default. Also
 Org-mode plays nicely with justification, so I'll set it to =full=, as
 I think that it is the most appropriate format for text. Org files are
@@ -716,7 +716,7 @@ I think I also need this, but I'm not sure:
 
 Since Org-mode allows inline images, we need a way to update them,
 if  image  changes  for  some  reason.   We  will  use  hook  to  call
-[[=update-inline-images=]] function after executing code with babel.
+[[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-babel-after-execute-hook 'update-inline-images)
