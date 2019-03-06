@@ -658,17 +658,25 @@ enable it by default.
 This section will contain some  settings for various modes that are
 not handled within package configurations.
 
-** Org Mode
-For Org Mode I need spell checking to be default, and Yasnippet so
-I could expand some useful things like =SRC= blocks.
+** TODO Org Mode
+For Org  Mode I  need spell  checking to be  enabled by  default. Also
+Org-mode plays nicely with justification, so I'll set it to =full=, as
+I think that it is the most appropriate format for text. Org files are
+capable of displaying images, so let's enable them by default. There's
+also a  nice mode  called =org-indent-mode= that  makes easier  to see
+different sub-trees.  Speaking  of sub-trees, =org-startup-folded= can
+be  set to  ='content=,  so every  document will  look  like table  of
+contents by default. Last but not least, let's enable =auto-fill-mode=
+for  org mode,  so all  text will  be folded  and re-filled  after its
+length reaches the =fill-column= value.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook (lambda()
-                             (org-indent-mode)
                              (flyspell-mode)
                              (setq default-justification 'full
                                    org-startup-with-inline-images t
                                    org-startup-folded 'content)
+                             (org-indent-mode)
                              (auto-fill-mode)))
 #+END_SRC
 
@@ -679,6 +687,7 @@ images stored in plain sight. At least use hidden folder.
   (setq org-latex-preview-ltxpng-directory ".ltximg/")
 #+END_SRC
 
+#+TODO: rework highlighting for exporting pdfs
 To highlight code blocks when  exporting to LaTeX we need =minted=
 package   installed  system-wide   and  this   code  (taken   from
 [[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
@@ -706,8 +715,8 @@ I think I also need this, but I'm not sure:
 #+END_SRC
 
 Since Org-mode allows inline images, we need a way to update them,
-if image changes  for some reason. We will use  hook after loading
-Org-mode.
+if  image  changes  for  some  reason.   We  will  use  hook  to  call
+[[=update-inline-images=]] function after executing code with babel.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-babel-after-execute-hook 'update-inline-images)
