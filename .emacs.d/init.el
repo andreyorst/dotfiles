@@ -3,6 +3,7 @@
 ;;; Emacs config by Andrey Orst
 ;;; Code:
 
+(require 'org)
 (org-babel-load-file "~/.emacs.d/config.org")
 
 (provide 'init)

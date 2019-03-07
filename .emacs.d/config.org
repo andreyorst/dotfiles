@@ -429,8 +429,7 @@ already know about.  Since =eldoc-mode= is builtin, I've put it to
 #+END_SRC
 
 ** Markdown
-Some  times I  need to  edit Markdown  documents, so  this package  is
-handy.
+Sometimes I need to edit Markdown documents, so this package is handy.
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
