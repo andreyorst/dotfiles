@@ -10,14 +10,16 @@
 
 define-command -override -hidden \
 -docstring "smart-select: select WORD if current selection is only one character" \
-smart-select -params ..1 %{ execute-keys -save-regs '' %sh{
+smart-select -params 1 %{ evaluate-commands %sh{
     if [ "$1" = "WORD" ]; then
         keys="<a-w>"
     elif [ "$1" = "word" ]; then
         keys="w"
+    else
+        printf "%s\n" "fail %{wrong word type '$1'}"
     fi
     if [ $(expr $(printf "%s\n" $kak_selection | wc -m) - 1) -eq 1 ]; then
-        printf "%s\n" "<a-i>${keys:-<a-w>}"
+        printf "%s\n" "execute-keys -save-regs '' <a-i>${keys}"
     fi
 }}
 
