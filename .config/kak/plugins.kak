@@ -113,12 +113,10 @@ plug "occivink/kakoune-snippets" config %{
 
     define-command snippets-expand-or-jump -params 1 %{
         execute-keys <backspace>
-        try %{
-            snippets-expand-trigger %{
-                set-register / "%opt{snippets_triggers_regex}\z"
-                execute-keys 'hGhs<ret>'
-            }
-        } catch %{
+        try %{ snippets-expand-trigger %{
+            set-register / "%opt{snippets_triggers_regex}\z"
+            execute-keys 'hGhs<ret>'
+        }} catch %{
             snippets-select-next-placeholders
         } catch %sh{
             printf "%s\n" "execute-keys -with-hooks <$1>"
