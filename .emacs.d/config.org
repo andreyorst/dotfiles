@@ -20,7 +20,7 @@ sections are:
 
 Since  Emacs  configuration and  Emacs  in  general is  more  complex,
 compared  to  configurations of  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]]  or  [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]]  there may  be  more
-sections, or  some may be missing  completely. I can't figure  out the
+sect~ions, or  some may be missing  completely. I can't figure  out the
 best way of splitting entire configuration  with Org mode so this list
 may update or  disappear if I'll realize that this  isn't necessary to
 have those sections.
@@ -577,13 +577,6 @@ framework. It's kind of slow though.
                                    (add-to-list 'company-backends 'company-capf)))
     :config
     (company-flx-mode +1))
-#+END_SRC
-
-*** Company lsp
-To make company understand completions from language servers we need this backend.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package company-lsp)
 #+END_SRC
 
 ** Undo Tree
