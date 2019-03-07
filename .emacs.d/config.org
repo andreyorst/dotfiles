@@ -14,9 +14,9 @@ sections are:
 
 1. Common settings - configuration of basic editor facilities.
 2. Custom commands - which stores my custom commands that I use.
-3. Plugins - the set of used plugins and it's configurations.
-4. Language  specific  settings  - everything  that  needed  to  feel
+3. Language  specific  settings  - everything  that  needed  to  feel
    comfortable while working with some language.
+4. Plugins - the set of used plugins and it's configurations.
 
 Since  Emacs  configuration and  Emacs  in  general is  more  complex,
 compared  to  configurations of  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]]  or  [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]]  there may  be  more
@@ -274,6 +274,112 @@ org buffers, when for some reason image was changed.
       (org-redisplay-inline-images)))
 #+END_SRC
 
+* Modes
+This section will contain some  settings for various modes that are
+not handled within package configurations.
+
+** Org Mode
+For Org  Mode I  need spell  checking to be  enabled by  default. Also
+Org-mode plays nicely with justification, so I'll set it to =full=, as
+I think that it is the most appropriate format for text. Org files are
+capable of displaying images, so let's enable them by default. There's
+also a  nice mode  called =org-indent-mode= that  makes easier  to see
+different sub-trees.  Speaking  of sub-trees, =org-startup-folded= can
+be  set to  ='content=,  so every  document will  look  like table  of
+contents by default. Last but not least, let's enable =auto-fill-mode=
+for  org mode,  so all  text will  be folded  and re-filled  after its
+length reaches the =fill-column= value.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook (lambda()
+                             (flyspell-mode)
+                             (setq default-justification 'full
+                                   org-startup-with-inline-images t
+                                   org-startup-folded 'content)
+                             (org-indent-mode)
+                             (auto-fill-mode)))
+#+END_SRC
+
+Latex  preview feature  is really  awesome,  but I  don't want  my
+images stored in plain sight. At least use hidden folder.
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-preview-ltxpng-directory ".ltximg/")
+#+END_SRC
+
+#+TODO: rework highlighting for exporting pdfs
+To highlight code blocks when  exporting to LaTeX we need =minted=
+package   installed  system-wide   and  this   code  (taken   from
+[[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
+
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-latex)
+  (setq org-latex-listings 'minted)
+  (add-to-list 'org-latex-packages-alist '("" "minted" nil))
+#+END_SRC
+
+This will  make =pdflatex=  use these  escape sequence  for proper
+colors.
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+I think I also need this, but I'm not sure:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+#+END_SRC
+
+Since Org-mode allows inline images, we need a way to update them,
+if  image  changes  for  some  reason.   We  will  use  hook  to  call
+[[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-babel-after-execute-hook 'update-inline-images)
+#+END_SRC
+
+This will  come in handy  when using Org  with GNU Plot.  Lets add
+support for it to Org-mode.
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((gnuplot . t)))
+#+END_SRC
+
+To  prevent Emacs  from constantly  asking  if I  want to  execute
+source code, lets set =org-confirm-babel-evaluate= to =nil=
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+#+END_SRC
+
+To export Org to Markdown, we need this:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-md nil t)
+#+END_SRC
+
+** Flyspell mode
+It's annoying that if I save  word to my personal dictionary, all other
+misspelled  words  are no  longer  highlighted,  and  I need  to  call
+=flyspell-buffer= again and again. Let's get rid of this.
+
+#+BEGIN_SRC emacs-lisp
+  (defun flyspell-buffer-after-pdict-save (&rest _)
+    (flyspell-buffer))
+
+  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
+#+END_SRC
+
+I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
+since I don't  understand why I need to define  another function, that
+just calls =flyspell-buffer= but it works fine.
+
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
@@ -323,8 +429,8 @@ already know about.  Since =eldoc-mode= is builtin, I've put it to
 #+END_SRC
 
 ** Markdown
-Who needs  markdown when  you have  Org?  Well,  I need.  Kinda. I
-still do most of writing with it. Shame on me.
+Some  times I  need to  edit Markdown  documents, so  this package  is
+handy.
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -334,7 +440,18 @@ still do most of writing with it. Shame on me.
     :init (defvar markdown-command "multimarkdown"))
 #+END_SRC
 
-But I hope, that Org-mode will replace it eventually.
+For markdown  mode I would like  to have automatic spell  checking and
+filling. Basically the same setup as for Org Mode.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'markdown-mode-hook
+            '(lambda()
+               (flyspell-mode)
+               (setq fill-column 80
+                     default-justification 'left)
+               (auto-fill-mode)))
+
+#+END_SRC
 
 ** Geiser
 Since I mostly  use Emacs for studying LISP, and  I'm reading SICP
@@ -529,6 +646,19 @@ facilities, since I'm planning to write my exercises in org mode.
   (use-package rust-mode)
 #+END_SRC
 
+Since I make notes in Org-mode, and  I started to use it for Rust too,
+I need some settings for Rust mode.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'rust-mode-hook
+            '(lambda()
+               (racer-mode)
+               (yas-minor-mode)
+               (electric-pair-mode)
+               (eldoc-mode)
+               (setq company-tooltip-align-annotations t)))
+#+END_SRC
+
 *** Racer
 Racer is a Rust Auto-Complete-er.
 
@@ -542,52 +672,6 @@ to configure project.
 
 #+BEGIN_SRC emacs-lisp
   (use-package toml-mode)
-#+END_SRC
-
-** LSP Mode
-To provide nice IDE-like features, I like to use language servers,
-that can be handled with language server protocol mode for Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :commands lsp
-    :config
-    (setq lsp-highlight-symbol-at-point nil))
-#+END_SRC
-
-LSP can provide lots of information  to observe, so it's useful to
-be able to view it. Luckily there's a package for it.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-ui :commands lsp-ui-mode)
-#+END_SRC
-
-This mode also can be used with company, so lets install a backend
-for it.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package company-lsp :commands company-lsp)
-#+END_SRC
-
-*** Cquery
-=cquery= is a  language server for C/C++ code.  It interacts with
-[[*LSP Mode][lsp-mode]].
-
-#+BEGIN_SRC emacs-lisp
-  (use-package cquery
-    :after lsp-mode
-    :config
-    (setq cquery-executable "/usr/bin/cquery"
-          cquery-cache-dir "~/.cache/cquery"
-          cquery-sem-highlight-method 'font-lock
-          cquery-extra-args '("--log-file=/tmp/cq.log")))
-#+END_SRC
-
-** Clang Format
-I use clang-format tool to format my C/C++ code.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package clang-format)
 #+END_SRC
 
 ** EditorConfig
@@ -654,154 +738,3 @@ enable it by default.
     :config
     (which-key-mode))
 #+END_SRC
-
-* Modes
-This section will contain some  settings for various modes that are
-not handled within package configurations.
-
-** Org Mode
-For Org  Mode I  need spell  checking to be  enabled by  default. Also
-Org-mode plays nicely with justification, so I'll set it to =full=, as
-I think that it is the most appropriate format for text. Org files are
-capable of displaying images, so let's enable them by default. There's
-also a  nice mode  called =org-indent-mode= that  makes easier  to see
-different sub-trees.  Speaking  of sub-trees, =org-startup-folded= can
-be  set to  ='content=,  so every  document will  look  like table  of
-contents by default. Last but not least, let's enable =auto-fill-mode=
-for  org mode,  so all  text will  be folded  and re-filled  after its
-length reaches the =fill-column= value.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-mode-hook (lambda()
-                             (flyspell-mode)
-                             (setq default-justification 'full
-                                   org-startup-with-inline-images t
-                                   org-startup-folded 'content)
-                             (org-indent-mode)
-                             (auto-fill-mode)))
-#+END_SRC
-
-Latex  preview feature  is really  awesome,  but I  don't want  my
-images stored in plain sight. At least use hidden folder.
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-preview-ltxpng-directory ".ltximg/")
-#+END_SRC
-
-#+TODO: rework highlighting for exporting pdfs
-To highlight code blocks when  exporting to LaTeX we need =minted=
-package   installed  system-wide   and  this   code  (taken   from
-[[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
-
-#+BEGIN_SRC emacs-lisp
-  (require 'ox-latex)
-  (setq org-latex-listings 'minted)
-  (add-to-list 'org-latex-packages-alist '("" "minted" nil))
-#+END_SRC
-
-This will  make =pdflatex=  use these  escape sequence  for proper
-colors.
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
-
-I think I also need this, but I'm not sure:
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t)
-#+END_SRC
-
-Since Org-mode allows inline images, we need a way to update them,
-if  image  changes  for  some  reason.   We  will  use  hook  to  call
-[[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'update-inline-images)
-#+END_SRC
-
-This will  come in handy  when using Org  with GNU Plot.  Lets add
-support for it to Org-mode.
-
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((gnuplot . t)))
-#+END_SRC
-
-To  prevent Emacs  from constantly  asking  if I  want to  execute
-source code, lets set =org-confirm-babel-evaluate= to =nil=
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-confirm-babel-evaluate nil)
-#+END_SRC
-
-To export Org to Markdown, we need this:
-
-#+BEGIN_SRC emacs-lisp
-  (require 'ox-md nil t)
-#+END_SRC
-
-** C/Cpp Mode
-I don't think that I'm gonna  use Emacs for C/C++ development, but
-sometimes  I'm just  in the  mood of  opening some  sources inside
-Emacs. For  such reasons I  just want  to have sane  defaults that
-match my workflow.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook
-            '(lambda()
-               (setq indent-tabs-mode t
-                     c-basic-offset 4
-                     tab-width 4)
-               (lsp)
-               (yas-minor-mode)
-               (electric-pair-mode)))
-#+END_SRC
-
-** Rust
-Since I make notes in Org-mode, and  I started to use it for Rust too,
-I need some settings for Rust mode.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'rust-mode-hook
-            '(lambda()
-               (racer-mode)
-               (yas-minor-mode)
-               (electric-pair-mode)
-               (eldoc-mode)
-               (setq company-tooltip-align-annotations t)))
-#+END_SRC
-
-** Markdown
-For markdown  mode I would like  to have automatic spell  checking and
-filling. Basically the same setup as for Org Mode.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'markdown-mode-hook
-            '(lambda()
-               (flyspell-mode)
-               (setq fill-column 80
-                     default-justification 'left)
-               (auto-fill-mode)))
-
-#+END_SRC
-
-** Flyspell mode
-It's annoying that if I save  word to my personal dictionary, all other
-misspelled  words  are no  longer  highlighted,  and  I need  to  call
-=flyspell-buffer= again and again. Let's get rid of this.
-
-#+BEGIN_SRC emacs-lisp
-  (defun flyspell-buffer-after-pdict-save (&rest _)
-    (flyspell-buffer))
-
-  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
-#+END_SRC
-
-I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
-since I don't  understand why I need to define  another function, that
-just calls =flyspell-buffer= but it works fine.
