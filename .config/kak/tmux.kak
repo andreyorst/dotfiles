@@ -10,7 +10,6 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-# tmux tricks
 define-command -override -docstring "rename tmux window to current buffer filename" \
 rename-tmux %{ nop %sh{ [ -n "$kak_client_env_TMUX" ] && tmux rename-window "kak: ${kak_bufname##*/}" } }
 
@@ -32,5 +31,4 @@ define-command -override -docstring "create new tmux window" \
 tabnew -params .. -command-completion %{
     tmux-terminal-window kak -c %val{session} -e "%arg{@}"
 }
-
 

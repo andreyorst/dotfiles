@@ -10,9 +10,8 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-set-face global delimiters rgb:aa3a03,default
-
-# Never.
+# Language specific options
+# Align with spaces
 hook global WinCreate .* %{
     set-option window aligntab false
 }
@@ -47,11 +46,10 @@ hook global WinSetOption filetype=gas %{
 }
 
 # Extra Highlightings
-
-# sh
+## sh
 add-highlighter shared/sh/perl region "perl [^']*'" "'" ref perl/code
 
-# C Cpp Rust Java
+## C Cpp Rust Java
 evaluate-commands %sh{
     for filetype in c cpp rust java; do
         printf "%s\n" "add-highlighter shared/$filetype/code/functions    regex (\w*?)\b(for|if|while)?(\h+)?(?=\() 1:function
