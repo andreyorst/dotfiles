@@ -289,6 +289,7 @@ be  set to  ='content=,  so every  document will  look  like table  of
 contents by default. Last but not least, let's enable =auto-fill-mode=
 for  org mode,  so all  text will  be folded  and re-filled  after its
 length reaches the =fill-column= value.
+document
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook (lambda()
@@ -298,6 +299,16 @@ length reaches the =fill-column= value.
                                    org-startup-folded 'content)
                              (org-indent-mode)
                              (auto-fill-mode)))
+#+END_SRC
+
+I  don't   like  that   my  =S-tab=   mapping  for   Company  triggers
+=org-shifftab= function, so I'll remap it to use =C-tab= instead.
+
+#+BEGIN_SRC emacs-lisp
+  (define-key org-mode-map [backtab] nil)
+  (define-key org-mode-map [S-iso-lefttab] nil)
+  (define-key org-mode-map [C-tab] nil)
+  (define-key org-mode-map [C-tab] 'org-shifttab)
 #+END_SRC
 
 Latex  preview feature  is really  awesome,  but I  don't want  my
