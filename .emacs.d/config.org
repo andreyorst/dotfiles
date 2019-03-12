@@ -473,7 +473,8 @@ most viable option here, since it also provides completion for it.
 #+BEGIN_SRC emacs-lisp
   (use-package geiser
     :init
-    (defvar geiser-active-implementations '(mit)))
+    (setq geiser-active-implementations '(mit)
+          geiser-default-implementation 'mit))
 #+END_SRC
 
 ** Parinfer
