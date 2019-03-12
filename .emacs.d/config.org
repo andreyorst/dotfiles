@@ -353,13 +353,14 @@ if  image  changes  for  some  reason.   We  will  use  hook  to  call
   (add-hook 'org-babel-after-execute-hook 'update-inline-images)
 #+END_SRC
 
-This will  come in handy  when using Org  with GNU Plot.  Lets add
-support for it to Org-mode.
+Let's define  what languages can  be executed with =C-c  C-c= shortcut
+from org mode:
 
 #+BEGIN_SRC emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((gnuplot . t)))
+   '((gnuplot . t)
+     (scheme . t)))
 #+END_SRC
 
 To  prevent Emacs  from constantly  asking  if I  want to  execute
@@ -563,7 +564,6 @@ Complete anything framework. Nothing much to say. Does it's job.
     :init
     (setq company-require-match 'never
           company-minimum-prefix-length 3
-          company-idle-delay .1
           company-tooltip-align-annotations t
           company-frontends
           '(company-pseudo-tooltip-unless-just-one-frontend
