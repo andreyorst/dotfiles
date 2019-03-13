@@ -301,6 +301,7 @@ document
                              (auto-fill-mode)))
 #+END_SRC
 
+*** Org Mappings
 I  don't   like  that   my  =S-tab=   mapping  for   Company  triggers
 =org-shifftab= function, so I'll remap it to use =C-tab= instead.
 
@@ -311,6 +312,7 @@ I  don't   like  that   my  =S-tab=   mapping  for   Company  triggers
   (define-key org-mode-map [C-tab] 'org-shifttab)
 #+END_SRC
 
+*** Syntax Highlighting in Exported PDFs
 Latex  preview feature  is really  awesome,  but I  don't want  my
 images stored in plain sight. At least use hidden folder.
 
@@ -318,7 +320,6 @@ images stored in plain sight. At least use hidden folder.
   (setq org-latex-preview-ltxpng-directory ".ltximg/")
 #+END_SRC
 
-#+TODO: rework highlighting for exporting pdfs
 To highlight code blocks when  exporting to LaTeX we need =minted=
 package   installed  system-wide   and  this   code  (taken   from
 [[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
@@ -345,6 +346,7 @@ I think I also need this, but I'm not sure:
   (setq org-src-fontify-natively t)
 #+END_SRC
 
+*** Inline Images
 Since Org-mode allows inline images, we need a way to update them,
 if  image  changes  for  some  reason.   We  will  use  hook  to  call
 [[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
@@ -353,6 +355,7 @@ if  image  changes  for  some  reason.   We  will  use  hook  to  call
   (add-hook 'org-babel-after-execute-hook 'update-inline-images)
 #+END_SRC
 
+*** Executable Languages
 Let's define  what languages can  be executed with =C-c  C-c= shortcut
 from org mode:
 
@@ -374,6 +377,28 @@ To export Org to Markdown, we need this:
 
 #+BEGIN_SRC emacs-lisp
   (require 'ox-md nil t)
+#+END_SRC
+
+*** Paragraphs
+
+I would like to use the same level headings after certain part, so all
+my   deeply   nested   notes   contained   right   section   separator
+headings. This is a hacky way but it works:
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-latex-classes
+               '("article"
+                 "\\documentclass{article}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 #+END_SRC
 
 ** Flyspell mode
@@ -472,9 +497,11 @@ most viable option here, since it also provides completion for it.
 
 #+BEGIN_SRC emacs-lisp
   (use-package geiser
+    :config
+    (add-hook 'scheme-mode-hook 'geiser-mode)
     :init
-    (setq geiser-active-implementations '(mit)
-          geiser-default-implementation 'mit))
+    (setq geiser-active-implementations '(guile)
+          geiser-default-implementation 'guile))
 #+END_SRC
 
 ** Parinfer
