@@ -1,8 +1,7 @@
-#+TITLE: Emacs configuration with Org Mode
-#+AUTHOR: Andrey Orst
-#+OPTIONS: toc:nil
-#+OPTIONS: num:2
-[[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
+#+title: Emacs configuration with Org Mode
+#+setupfile: ~/.dotfiles/.org-defaults.org
+
+[[file:.sceenshot.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
 purpose of  this file  is to  learn basics  of Org  Mode and  Emacs in
@@ -788,7 +787,7 @@ features, so I want to try it out.
 
 ** Vdiff
 =vdiff=  is a  package, that  works similar  to Vimdiff.   Ediff isn't
-really comfortable to use, and  vdiff also has integration with [[Magit]],
+really comfortable to use, and  vdiff also has integration with [[*Magit][Magit]],
 so I gonna try it out.
 
 #+BEGIN_SRC emacs-lisp
@@ -806,7 +805,7 @@ so I gonna try it out.
 
 *** Vdiff Magit
 =vdiff-magit= is a supplement  package, that provides integration with
-[[Magit]] package.
+[[*Magit][Magit]] package.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vdiff-magit
