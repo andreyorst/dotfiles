@@ -1,4 +1,7 @@
 #+TITLE: Emacs configuration with Org Mode
+#+AUTHOR: Andrey Orst
+#+OPTIONS: toc:nil
+#+OPTIONS: num:2
 [[https://user-images.githubusercontent.com/19470159/49866750-b2129580-fe19-11e8-9121-45c7c99850bb.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
@@ -12,28 +15,35 @@ anyone.
 I tend to split my configurations of Editors to sections.  The basic
 sections are:
 
-1. Common settings - configuration of basic editor facilities.
-2. Custom commands - which stores my custom commands that I use.
+1. [[*Common  settings][*Common settings*]] -  configuration of basic editor  facilities.
+2. Custom commands  - which stores my custom commands  that I use. But
+   since  in Emacs  everything is  a function,  the section  is called
+   [[*Functions][*Functions*]].
 3. Language  specific  settings  - everything  that  needed  to  feel
-   comfortable while working with some language.
-4. Plugins - the set of used plugins and it's configurations.
+   comfortable while  working with  some language.  In case  of Emacs,
+   this section would be called [[*Modes][*Modes*]].
+4. Plugins - or  [[*Packages][*Packages*]] to be precise, is the  set of used plugins
+   and it's configurations.
 
 Since  Emacs  configuration and  Emacs  in  general is  more  complex,
-compared  to  configurations of  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]]  or  [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]]  there may  be  more
-sect~ions, or  some may be missing  completely. I can't figure  out the
-best way of splitting entire configuration  with Org mode so this list
-may update or  disappear if I'll realize that this  isn't necessary to
-have those sections.
+compared to  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]], [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]],  and other editors,  there may  actually be
+more sections, or  some may be missing completely. I  can't figure out
+the best way  of splitting entire configuration with Org  mode so this
+list may update or disappear if I'll realize that this isn't necessary
+to have those sections.
 
-Now to the configuration itself.
+Now on to the configuration itself.
 
 * Common settings
-This section is all about basic configurations of builtin features.
+This   section  is   all   about  basic   configurations  of   builtin
+features. Emacs provides a lot of settings  on it's own, but I want to
+stay  as  close   as  possible  to  the  defaults,   except  for  some
+things. That's also answers why I don't  use Evil mode. If I wanted to
+use Vim, I'd just used Vim.
 
 ** Startup
-I like to  keep my starting process straightforward, so  I tend to
-disable  startup screen  and  start with  lisp interaction  buffer
-instead.
+I  like to  keep my  starting process  straightforward, so  I tend  to
+disable startup screen and start with the =*scratch*= buffer instead.
 
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-splash-screen t)
