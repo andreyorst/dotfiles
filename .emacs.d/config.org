@@ -279,6 +279,12 @@ This section will contain some  settings for various modes that are
 not handled within package configurations.
 
 ** Org Mode
+Org  Mode is  a great  mode for  taking notes,  managing to-do  lists,
+writing books, literate programming, and  many other things. I primary
+use it for taking notes on different programming languages, and manage
+my Emacs configuration with it.
+
+*** Startup Settings
 For Org  Mode I  need spell  checking to be  enabled by  default. Also
 Org-mode plays nicely with justification, so I'll set it to =full=, as
 I think that it is the most appropriate format for text. Org files are
@@ -301,6 +307,23 @@ document
                              (auto-fill-mode)))
 #+END_SRC
 
+*** Inline Images
+Since Org-mode allows inline images, we need a way to update them,
+if  image  changes  for  some  reason.   We  will  use  hook  to  call
+[[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-babel-after-execute-hook 'update-inline-images)
+#+END_SRC
+
+**** Inline LaTeX Preview
+Latex preview  feature is  really awesome, but  I don't  want produced
+images to be stored in plain sight. At least use hidden folder.
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-preview-ltxpng-directory ".ltximg/")
+#+END_SRC
+
 *** Org Mappings
 I  don't   like  that   my  =S-tab=   mapping  for   Company  triggers
 =org-shifftab= function, so I'll remap it to use =C-tab= instead.
@@ -313,13 +336,6 @@ I  don't   like  that   my  =S-tab=   mapping  for   Company  triggers
 #+END_SRC
 
 *** Syntax Highlighting in Exported PDFs
-Latex  preview feature  is really  awesome,  but I  don't want  my
-images stored in plain sight. At least use hidden folder.
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-preview-ltxpng-directory ".ltximg/")
-#+END_SRC
-
 To highlight code blocks when  exporting to LaTeX we need =minted=
 package   installed  system-wide   and  this   code  (taken   from
 [[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
@@ -330,8 +346,11 @@ package   installed  system-wide   and  this   code  (taken   from
   (add-to-list 'org-latex-packages-alist '("" "minted" nil))
 #+END_SRC
 
-This will  make =pdflatex=  use these  escape sequence  for proper
-colors.
+This  will  make  =pdflatex=  use these  escape  sequence  for  proper
+colors. This part is worth checking  for a more proper way of handling
+highlighting, because right  now code blocks written  in language that
+=minted= doesn't  support will not be  exported to PDF at  all.  But I
+don't know how to fix this.
 
 #+BEGIN_SRC emacs-lisp
   (setq org-latex-pdf-process
@@ -346,18 +365,11 @@ I think I also need this, but I'm not sure:
   (setq org-src-fontify-natively t)
 #+END_SRC
 
-*** Inline Images
-Since Org-mode allows inline images, we need a way to update them,
-if  image  changes  for  some  reason.   We  will  use  hook  to  call
-[[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'update-inline-images)
-#+END_SRC
-
 *** Executable Languages
-Let's define  what languages can  be executed with =C-c  C-c= shortcut
-from org mode:
+A nice feature of Org-mode over Markdown is that we can execute source
+code  blocks with  a keybinding  and see  results inside  the document
+itself.  Let's  define what languages  can be executed with  =C-c C-c=
+shortcut from org mode:
 
 #+BEGIN_SRC emacs-lisp
   (org-babel-do-load-languages
@@ -366,21 +378,22 @@ from org mode:
      (scheme . t)))
 #+END_SRC
 
-To  prevent Emacs  from constantly  asking  if I  want to  execute
+And  to prevent  Emacs from  constantly asking  if I  want to  execute
 source code, lets set =org-confirm-babel-evaluate= to =nil=
 
 #+BEGIN_SRC emacs-lisp
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
-To export Org to Markdown, we need this:
+*** Markdown Export
+I don't  think that I gonna  use this much,  but just in case  if I'll
+ever decide to export Org to Markdown, I'll need this:
 
 #+BEGIN_SRC emacs-lisp
   (require 'ox-md nil t)
 #+END_SRC
 
 *** Paragraphs
-
 I would like to use the same level headings after certain part, so all
 my   deeply   nested   notes   contained   right   section   separator
 headings. This is a hacky way but it works:
@@ -415,7 +428,7 @@ misspelled  words  are no  longer  highlighted,  and  I need  to  call
 
 I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
 since I don't  understand why I need to define  another function, that
-just calls =flyspell-buffer= but it works fine.
+just  calls =flyspell-buffer=  but  it works  fine.
 
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
