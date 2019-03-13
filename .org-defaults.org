@@ -1,7 +1,9 @@
 #+author: Andrey Orst
 #+options: toc:nil
+#+options: H:8
 #+options: num:2
 #+latex_header: \hypersetup{colorlinks}
 #+latex_header: \hypersetup{linkcolor={red!50!black}}
 #+latex_header: \hypersetup{citecolor={blue!50!black}}
 #+latex_header: \hypersetup{urlcolor={blue!80!black}}
+#+latex_header: \usemintedstyle{lovelace}
