@@ -14,14 +14,14 @@ anyone.
 I tend to split my configurations of Editors to sections.  The basic
 sections are:
 
-1. [[*Common  settings][*Common settings*]] -  configuration of basic editor  facilities.
+1. *[[*Common  settings][Common settings]]* -  configuration of basic editor  facilities.
 2. Custom commands  - which stores my custom commands  that I use. But
    since  in Emacs  everything is  a function,  the section  is called
-   [[*Functions][*Functions*]].
+   *[[*Functions][Functions]]*.
 3. Language  specific  settings  - everything  that  needed  to  feel
    comfortable while  working with  some language.  In case  of Emacs,
-   this section would be called [[*Modes][*Modes*]].
-4. Plugins - or  [[*Packages][*Packages*]] to be precise, is the  set of used plugins
+   this section would be called *[[*Modes][Modes]]*.
+4. Plugins - or  *[[*Packages][Packages]]* to be precise, is the  set of used plugins
    and it's configurations.
 
 Since  Emacs  configuration and  Emacs  in  general is  more  complex,
