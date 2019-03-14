@@ -1,0 +1,5 @@
+[user]
+	email = andreyorst@gmail.com
+	name = Andrey Orst
+[alias]
+	clean-all = clean -x -d -f
