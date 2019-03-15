@@ -12,7 +12,7 @@
 # source the plugin manager itself
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
-plug "andreyorst/plug.kak" branch "spring-refactoring" noload
+plug "andreyorst/plug.kak" noload
 plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
