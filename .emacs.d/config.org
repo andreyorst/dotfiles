@@ -830,11 +830,14 @@ so I gonna try it out.
                 ("C-c" . vdiff-mode-prefix-map))
     :init (setq vdiff-lock-scrolling t
                 vdiff-diff-algorithm 'diff
-                vdiff-magit-stage-is-2way t
-                vdiff-disable-folding t
+                vdiff-disable-folding nil
                 vdiff-min-fold-size 4
                 vdiff-subtraction-style 'full
-                vdiff-subtraction-fill-char ?-))
+                vdiff-subtraction-fill-char ?\ )
+    :config
+    (set-face-attribute 'vdiff-subtraction-face nil :background "#553333" :foreground "#cc99999")
+    (set-face-attribute 'vdiff-addition-face nil :background "#335533" :foreground "#cceecc")
+    (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7"))
 #+END_SRC
 
 *** Vdiff Magit
@@ -846,6 +849,8 @@ so I gonna try it out.
     :bind (:map magit-mode-map
                 ("e" . 'vdiff-magit-dwim)
                 ("E" . 'vdiff-magit))
+    :init
+    (setq vdiff-magit-stage-is-2way t)
     :config
     (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
     (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
