@@ -355,6 +355,12 @@ document
                              (auto-fill-mode)))
 #+END_SRC
 
+This will fontify code inside =SRC_BLOCK= sections:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+#+END_SRC
+
 *** Inline Images
 Since Org-mode allows inline images, we need a way to update them,
 if  image  changes  for  some  reason.   We  will  use  hook  to  call
@@ -391,10 +397,24 @@ package   installed  system-wide   and  this   code  (taken   from
 #+BEGIN_SRC emacs-lisp
   (require 'ox-latex)
   (setq org-latex-listings 'minted)
-  (add-to-list 'org-latex-packages-alist '("" "minted" nil))
 #+END_SRC
 
-This  will  make  =pdflatex=  use these  escape  sequence  for  proper
+Minted creates annoying  directories named =_minted-documentname=, and
+I don't  want them to be  in plain sight.  So this code here  will put
+those directories to temporary folder on my system.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar minted-cache-dir
+    (file-name-as-directory
+     (expand-file-name ".minted/\\jombname"
+                       temporary-file-directory)))
+
+  (add-to-list 'org-latex-packages-alist
+               `(,(concat "cachedir=" minted-cache-dir)
+                 "minted" nil))
+#+END_SRC
+
+Now we need to tell =pdflatex= to use these escape sequence for proper
 colors. This part is worth checking  for a more proper way of handling
 highlighting, because right  now code blocks written  in language that
 =minted= doesn't  support will not be  exported to PDF at  all.  But I
@@ -407,11 +427,17 @@ don't know how to fix this.
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
-I think I also need this, but I'm not sure:
+*** Cleanup After Export
+Since I'm exporting my notes to PDF as final file format, I don't need
+intermediary =.tex=  file to stay.  Let's assume that these  files are
+log files, so Org mode will remove those after exporting is finished.
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t)
+  (eval-after-load 'org
+    '(add-to-list 'org-latex-logfiles-extensions "tex"))
 #+END_SRC
+
+This will get rid of =.tex= files.
 
 *** Executable Languages
 A nice feature of Org-mode over Markdown is that we can execute source
@@ -431,14 +457,6 @@ source code, lets set =org-confirm-babel-evaluate= to =nil=
 
 #+BEGIN_SRC emacs-lisp
   (setq org-confirm-babel-evaluate nil)
-#+END_SRC
-
-*** Markdown Export
-I don't  think that I gonna  use this much,  but just in case  if I'll
-ever decide to export Org to Markdown, I'll need this:
-
-#+BEGIN_SRC emacs-lisp
-  (require 'ox-md nil t)
 #+END_SRC
 
 *** Paragraphs
@@ -462,7 +480,15 @@ headings. This is a hacky way but it works:
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 #+END_SRC
 
-** Flyspell mode
+*** Markdown Export
+I don't  think that I gonna  use this much,  but just in case  if I'll
+ever decide to export Org to Markdown, I'll need this:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-md nil t)
+#+END_SRC
+
+** Flyspell Mode
 It's annoying that if I save  word to my personal dictionary, all other
 misspelled  words  are no  longer  highlighted,  and  I need  to  call
 =flyspell-buffer= again and again. Let's get rid of this.
@@ -477,6 +503,14 @@ misspelled  words  are no  longer  highlighted,  and  I need  to  call
 I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
 since I don't  understand why I need to define  another function, that
 just  calls =flyspell-buffer=  but  it works  fine.
+
+** DocView Mode
+I use DocView to preview my Org documents as PDF files, so I want it to
+reload files automatically
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+#+END_SRC
 
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
