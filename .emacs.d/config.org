@@ -350,7 +350,8 @@ document
                              (flyspell-mode)
                              (setq default-justification 'full
                                    org-startup-with-inline-images t
-                                   org-startup-folded 'content)
+                                   org-startup-folded 'content
+                                   revert-without-query ".*.pdf")
                              (org-indent-mode)
                              (auto-fill-mode)))
 #+END_SRC
@@ -503,14 +504,6 @@ misspelled  words  are no  longer  highlighted,  and  I need  to  call
 I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
 since I don't  understand why I need to define  another function, that
 just  calls =flyspell-buffer=  but  it works  fine.
-
-** DocView Mode
-I use DocView to preview my Org documents as PDF files, so I want it to
-reload files automatically
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'doc-view-mode-hook 'auto-revert-mode)
-#+END_SRC
 
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
