@@ -3,3 +3,4 @@
 	name = Andrey Orst
 [alias]
 	clean-all = clean -x -d -f
+	st = status
