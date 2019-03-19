@@ -43,3 +43,13 @@ hook global BufNewFile  .* editorconfig-load
 # Aliases
 alias global h doc
 
+# Scratch buffer
+## delete the `*scratch*' buffer as soon as another is created, but only if it's empty
+hook global BufCreate '^\*scratch\*$' %{
+    hook -once -always global BufCreate '^(?!\*scratch\*).*$' %{ try %{
+        # throw if the buffer has more than one character
+        execute-keys -buffer *scratch* 'L<a-K>..<ret>'
+        delete-buffer *scratch*
+    }}
+}
+
