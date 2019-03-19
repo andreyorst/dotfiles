@@ -862,3 +862,40 @@ enable it by default.
     :config
     (which-key-mode))
 #+END_SRC
+
+** Multiple Cursors
+This  package provides  multiple  cursors functionality  to Emacs.  It
+isn't much like Kakoune's multiple selections, but anything will do. I
+guess I'll figure out best mappings over time.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+    :bind
+    (("C-S-c C-S-c" . mc/edit-lines)
+     ("C-S-c C-e" . mc/edit-ends-of-lines)
+     ("C-S-c C-a" . mc/edit-beginnings-of-lines)
+     ("C-S-<mouse-1>" . mc/add-cursor-on-click)
+
+     ;; Mark additional regions matching current region
+     ("C-s-e" . mc/mark-previous-like-this)
+     ("C-s-d" . mc/mark-next-like-this)
+     ("C-s-A" . mc/mark-more-like-this-extended)
+     ("C-s-a" . mc/mark-all-in-region)
+
+     ;; Symbol and word specific mark-more
+     ("C-s-D" . mc/mark-next-word-like-this)
+     ("C-s-E" . mc/mark-previous-word-like-this)
+     ("C-s-w" . mc/mark-all-words-like-this)
+     ("C-s-s" . mc/mark-next-symbol-like-this)
+     ("C-s-q" . mc/mark-previous-symbol-like-this)
+     ("M-s-S" . mc/mark-all-symbols-like-this)
+#+END_SRC
+
+** Phi Search
+This search mode is compatible with multiple cursors.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package phi-search
+    :bind (("C-s" . phi-search)
+           ("C-r" . phi-search-backward)))
+#+END_SRC
