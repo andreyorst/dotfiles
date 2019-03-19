@@ -505,6 +505,13 @@ I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellche
 since I don't  understand why I need to define  another function, that
 just  calls =flyspell-buffer=  but  it works  fine.
 
+** Doc View Mode
+Default resolution is too low:
+
+#+BEGIN_SRC emacs-lisp
+  (setq doc-view-resolution 192)
+#+END_SRC
+
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
@@ -898,4 +905,16 @@ This search mode is compatible with multiple cursors.
   (use-package phi-search
     :bind (("C-s" . phi-search)
            ("C-r" . phi-search-backward)))
+#+END_SRC
+
+** Eyebrowse
+This  package imitates  virtual workspaces,  or virtual  frames inside
+single Emacs  frame. This  is really  useful, when  you have  bunch of
+windows, and you  want to open new  set but don't want  to loose other
+window configurations. It works much like Vim tabs, or Tmux windows.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eyebrowse
+    :config
+    (eyebrowse-mode t))
 #+END_SRC
