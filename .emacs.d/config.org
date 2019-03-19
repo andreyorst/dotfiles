@@ -888,7 +888,7 @@ guess I'll figure out best mappings over time.
      ("C-s-w" . mc/mark-all-words-like-this)
      ("C-s-s" . mc/mark-next-symbol-like-this)
      ("C-s-q" . mc/mark-previous-symbol-like-this)
-     ("M-s-S" . mc/mark-all-symbols-like-this)
+     ("M-s-S" . mc/mark-all-symbols-like-this)))
 #+END_SRC
 
 ** Phi Search
