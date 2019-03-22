@@ -41,14 +41,12 @@ hook global WinSetOption filetype=kak %{
 
 # Assemply
 hook global WinSetOption filetype=gas %{
-    remove-highlighter window/whitespace
     set-option window comment_line '#'
 }
 
 # Extra Highlightings
 ## sh
 add-highlighter shared/sh/perl region "perl [^']*'" "'" ref perl/code
-
 ## C Cpp Rust Java
 evaluate-commands %sh{
     for filetype in c cpp rust java; do

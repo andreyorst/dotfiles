@@ -128,8 +128,15 @@ plug "andreyorst/tagbar.kak" config %{
     set-option global tagbar_sort false
     set-option global tagbar_size 40
     set-option global tagbar_display_anon false
+    map global user "<c-t>" ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
     hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
         tagbar-enable
+    }
+    hook global WinSetOption filetype=tagbar %{
+        remove-highlighter window/numbers
+        remove-highlighter window/matching
+        remove-highlighter window/wrap
+        remove-highlighter window/show-whitespaces
     }
 }
 

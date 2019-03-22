@@ -8,13 +8,13 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-# Normal modemappings
+# Normal mode mappings
 map -docstring "comment/uncomment selection (<c-/>)" global normal ''     ': comment-line<ret>'
 map -docstring "add currsor/jump on current word"    global normal '<c-d>' ': select-or-add-cursor<ret>'
 
 # User Mappings
 map -docstring "convert leading spaces to tabs"      global user   't'     ': leading-spaces-to-tabs<ret>'
-map -docstring "convert leading tabs to spaces"      global user   'T'     ': leading-tabs-to-spaces<ret>'
+map -docstring "convert leading tabs to spaces"      global user   '<a-t>' ': leading-tabs-to-spaces<ret>'
 
 ## System clipboard mappings
 map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>;:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'

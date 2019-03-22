@@ -4,3 +4,4 @@
 [alias]
 	clean-all = clean -x -d -f
 	st = status
+	co = checkout

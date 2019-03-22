@@ -11,11 +11,15 @@
 # ╰────────────────────────────────╯
 
 define-command -override -docstring "rename tmux window to current buffer filename" \
-rename-tmux %{ nop %sh{ [ -n "$kak_client_env_TMUX" ] && tmux rename-window "kak: ${kak_bufname##*/}" } }
+rename-tmux %{ nop %sh{
+    if [ -n "${kak_client_env_TMUX}" ]; then
+        tmux rename-window "kak: ${kak_bufname##*/}"
+    fi
+}}
 
-hook -group tmux global FocusIn .* %{rename-tmux}
-hook -group tmux global WinDisplay .* %{rename-tmux}
-hook -group tmux global KakEnd .* %{ %sh{ [ -n "$TMUX" ] && tmux rename-window 'zsh' } }
+hook -group tmux global FocusIn .* %{ rename-tmux  }
+hook -group tmux global WinDisplay .* %{ rename-tmux }
+hook -group tmux global KakEnd .* %{ nop %sh{ [ -n "${TMUX}" ] && tmux rename-window "zsh" }}
 
 define-command -override -docstring "split tmux vertically" \
 vsplit -params .. -command-completion %{
