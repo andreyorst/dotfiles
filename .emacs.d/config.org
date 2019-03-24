@@ -351,7 +351,7 @@ document
                              (setq default-justification 'full
                                    org-startup-with-inline-images t
                                    org-startup-folded 'content
-                                   revert-without-query ".*.pdf")
+                                   revert-without-query '(".*\.pdf"))
                              (org-indent-mode)
                              (auto-fill-mode)))
 #+END_SRC
