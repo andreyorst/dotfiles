@@ -24,7 +24,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
-plug "andreyorst/fzf.kak" %{
+plug "andreyorst/fzf.kak" branch "spring-refactoring" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
@@ -120,6 +120,8 @@ plug "occivink/kakoune-snippets" config %{
             snippets-select-next-placeholders
         } catch %sh{
             printf "%s\n" "execute-keys -with-hooks <$1>"
+        } catch %{
+            echo -debug "snippets-expand-or-jump:%val{error}"
         }
     }
 }
@@ -140,3 +142,7 @@ plug "andreyorst/tagbar.kak" config %{
     }
 }
 
+plug "alexherbo2/word-movement.kak" config %{
+    word-movement-map next w
+    word-movement-map previous b
+}
