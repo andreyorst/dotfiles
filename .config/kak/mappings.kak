@@ -12,6 +12,12 @@
 map -docstring "comment/uncomment selection (<c-/>)" global normal ''     ': comment-line<ret>'
 map -docstring "add currsor/jump on current word"    global normal '<c-d>' ': select-or-add-cursor<ret>'
 
+# Avoid escape key
+map -docstring "avoid escape key"                    global normal '<c-g>' '<esc>'
+map -docstring "avoid escape key"                    global prompt '<c-g>' '<esc>'
+map -docstring "avoid escape key"                    global insert '<c-g>' '<esc>'
+map -docstring "avoid escape key"                    global user   '<c-g>' '<esc>'
+
 # User Mappings
 map -docstring "convert leading spaces to tabs"      global user   't'     ': leading-spaces-to-tabs<ret>'
 map -docstring "convert leading tabs to spaces"      global user   '<a-t>' ': leading-tabs-to-spaces<ret>'
