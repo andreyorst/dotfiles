@@ -685,6 +685,7 @@ Complete anything framework. Nothing much to say. Does it's job.
                 ("<S-Tab>" . company-select-previous)
                 ("<backtab>" . company-select-previous))
     :init
+    (add-hook 'after-init-hook 'global-company-mode)
     (setq company-require-match 'never
           company-minimum-prefix-length 3
           company-tooltip-align-annotations t
@@ -696,21 +697,7 @@ Complete anything framework. Nothing much to say. Does it's job.
     (setq company-backends (remove 'company-clang company-backends)
           company-backends (remove 'company-xcode company-backends)
           company-backends (remove 'company-cmake company-backends)
-          company-backends (remove 'company-gtags company-backends))
-    (add-hook 'after-init-hook 'global-company-mode))
-#+END_SRC
-
-*** Company flx
-This   actually  makes   company  behave   as  fuzzy   completion
-framework. It's kind of slow though.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package company-flx
-    :init
-    (add-hook 'company-mode-hook (lambda ()
-                                   (add-to-list 'company-backends 'company-capf)))
-    :config
-    (company-flx-mode +1))
+          company-backends (remove 'company-gtags company-backends)))
 #+END_SRC
 
 ** Undo Tree
