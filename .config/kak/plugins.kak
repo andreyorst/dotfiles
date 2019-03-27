@@ -38,15 +38,11 @@ plug "andreyorst/fzf.kak" branch "spring-refactoring" %{
     }
 }
 
-plug "TeddyDD/kakoune-edit-or-dir" %{
-    unalias global e
-    alias global e edit-or-dir
-}
-
 plug "ul/kak-lsp" do %{
     cargo build --release --locked
     cargo install --force --path .
 } config %{
+    define-command lsp-restart %{ lsp-stop; lsp-start }
     set-option global lsp_completion_trigger "execute-keys 'h<a-h><a-k>\S[^\h\n,=;*(){}\[\]]\z<ret>'"
     set-option global lsp_diagnostic_line_error_sign "!"
     set-option global lsp_diagnostic_line_warning_sign "?"
