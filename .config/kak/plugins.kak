@@ -24,7 +24,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
-plug "andreyorst/fzf.kak" branch "spring-refactoring" %{
+plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
     evaluate-commands %sh{
@@ -142,3 +142,4 @@ plug "alexherbo2/word-movement.kak" config %{
     word-movement-map next w
     word-movement-map previous b
 }
+

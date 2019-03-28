@@ -147,6 +147,13 @@ them, and therefore I'm enabling them in all programming modes.
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
+** Save History Between Sessions
+This is what I've loved about Vim.
+
+#+BEGIN_SRC emacs-lisp
+  (savehist-mode 1)
+#+END_SRC
+
 ** Matching Parentheses
 One feature that I think  is really important, especially when working
 with lisp code, is ability to  see matching bracket when cursor stands
