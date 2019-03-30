@@ -1,0 +1,7 @@
+fzf:  /home/andreyorst/.config/kak/plugins/fzf.kak
+plug:  /home/andreyorst/.dotfiles/.config/kak/plugins/plug.kak
+dotfiles:  /home/andreyorst/.dotfiles
+tagbar:  /home/andreyorst/.dotfiles/.vim/bundle/tagbar
+gruvbox:  /home/andreyorst/.dotfiles/.config/kak/plugins/base16-gruvbox.kak
+powerline:  /home/andreyorst/.dotfiles/.config/kak/plugins/powerline.kak
+smarttab:  /home/andreyorst/.dotfiles/.config/kak/plugins/smarttab.kak
