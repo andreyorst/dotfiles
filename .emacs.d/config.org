@@ -831,7 +831,8 @@ so I gonna try it out.
     :config
     (set-face-attribute 'vdiff-subtraction-face nil :background "#553333" :foreground "#cc99999")
     (set-face-attribute 'vdiff-addition-face nil :background "#335533" :foreground "#cceecc")
-    (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7"))
+    (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7")
+    (add-hook 'vdiff-mode-hook #'show-all))
 #+END_SRC
 
 *** Vdiff Magit
