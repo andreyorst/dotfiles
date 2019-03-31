@@ -873,22 +873,22 @@ guess I'll figure out best mappings over time.
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
     :bind
-    (("C-S-c l" . mc/edit-lines)
-     ("C-S-c e" . mc/edit-ends-of-lines)
-     ("C-S-c a" . mc/edit-beginnings-of-lines)
-     ("C-S-<mouse-1>" . mc/add-cursor-on-click)
+    (("M-s l" . mc/edit-lines)
+     ("M-s e" . mc/edit-ends-of-lines)
+     ("M-s a" . mc/edit-beginnings-of-lines)
+     ("C-<mouse-1>" . mc/add-cursor-on-click)
 
      ;; Mark additional regions matching current region
-     ("C-S-c p" . mc/mark-previous-like-this)
-     ("C-S-c n" . mc/mark-next-like-this)
-     ("C-S-c N" . mc/mark-more-like-this-extended)
-     ("C-S-c A" . mc/mark-all-in-region)
-     ("C-S-c r" . mc/mark-all-in-region-regexp)
+     ("M-s p" . mc/mark-previous-like-this)
+     ("M-s n" . mc/mark-next-like-this)
+     ("M-s N" . mc/mark-more-like-this-extended)
+     ("M-s A" . mc/mark-all-in-region)
+     ("M-s r" . mc/mark-all-in-region-regexp)
 
      ;; Symbol and word specific mark-more
-     ("C-S-c d" . mc/mark-next-word-like-this)
-     ("C-S-c D" . mc/mark-previous-word-like-this)
-     ("C-S-c W" . mc/mark-all-words-like-this)))
+     ("M-s d" . mc/mark-next-word-like-this)
+     ("M-s D" . mc/mark-previous-word-like-this)
+     ("M-s W" . mc/mark-all-words-like-this)))
 #+END_SRC
 
 ** Phi Search
