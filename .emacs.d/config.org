@@ -875,7 +875,9 @@ guess I'll figure out best mappings over time.
      ("C-c m a" . mc/edit-beginnings-of-lines)
      ("C-S-<mouse-1>" . mc/add-cursor-on-click)
      ("C-c m A" . mc/mark-all-in-region)
-     ("C-c m r" . mc/mark-all-in-region-regexp)))
+     ("C-c m r" . mc/mark-all-in-region-regexp)
+     ("C-c m n" . mc/mark-next-like-this-word)
+     ("C-c m p" . mc/mark-previous-like-this-word)))
 #+END_SRC
 
 *** MC Extras
@@ -886,6 +888,7 @@ like.
 
 #+BEGIN_SRC emacs-lisp
   (use-package mc-extras
+    :bind (("C-c m d" . mc/remove-duplicated-cursors))
     :init
     (add-hook 'post-command-hook 'mc/remove-duplicated-cursors))
 #+END_SRC
