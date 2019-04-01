@@ -878,6 +878,18 @@ guess I'll figure out best mappings over time.
      ("C-c m r" . mc/mark-all-in-region-regexp)))
 #+END_SRC
 
+*** MC Extras
+this package provides  some extra functions for  multiple cursors. I'm
+interested in =mc/remove-duplicaded-cursors=. When using [[*Phi Search][Phi Search]] it
+often  places several  cursors at  the same  positions, which  I don't
+like.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package mc-extras
+    :init
+    (add-hook 'post-command-hook 'mc/remove-duplicated-cursors))
+#+END_SRC
+
 ** Expand Region
 This package allows to expand  or reduce region selection semantically
 in most languages that I work with inside Emacs.
