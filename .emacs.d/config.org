@@ -117,8 +117,8 @@ be honest.
                 scroll-step 1
                 scroll-conservatively 10000
                 auto-window-vscroll nil
-                scroll-margin 3
-                cursor-type 'bar)
+                scroll-margin 3)
+                ;; cursor-type 'bar)
 #+END_SRC
 
 ** Input Languages
@@ -873,22 +873,12 @@ guess I'll figure out best mappings over time.
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
     :bind
-    (("M-s l" . mc/edit-lines)
-     ("M-s e" . mc/edit-ends-of-lines)
-     ("M-s a" . mc/edit-beginnings-of-lines)
-     ("C-<mouse-1>" . mc/add-cursor-on-click)
-
-     ;; Mark additional regions matching current region
-     ("M-s p" . mc/mark-previous-like-this)
-     ("M-s n" . mc/mark-next-like-this)
-     ("M-s N" . mc/mark-more-like-this-extended)
-     ("M-s A" . mc/mark-all-in-region)
-     ("M-s r" . mc/mark-all-in-region-regexp)
-
-     ;; Symbol and word specific mark-more
-     ("M-s d" . mc/mark-next-word-like-this)
-     ("M-s D" . mc/mark-previous-word-like-this)
-     ("M-s W" . mc/mark-all-words-like-this)))
+    (("C-c m l" . mc/edit-lines)
+     ("C-c m e" . mc/edit-ends-of-lines)
+     ("C-c m a" . mc/edit-beginnings-of-lines)
+     ("C-S-<mouse-1>" . mc/add-cursor-on-click)
+     ("C-c m A" . mc/mark-all-in-region)
+     ("C-c m r" . mc/mark-all-in-region-regexp)))
 #+END_SRC
 
 ** Phi Search
