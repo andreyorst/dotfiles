@@ -108,9 +108,7 @@ for Emacs.
 ** Common Behaviors
 I don't  like how Emacs  handles scrolling,  and that it  uses tab
 characters by  default.  I  need tab characters  only when  I work
-with C  code and Makefile rules.   And Just because I  can, enable
-bar cursor. It's not Kakoune, there's no need for big rectangle to
-be honest.
+with C  code and Makefile rules.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil
@@ -118,7 +116,6 @@ be honest.
                 scroll-conservatively 10000
                 auto-window-vscroll nil
                 scroll-margin 3)
-                ;; cursor-type 'bar)
 #+END_SRC
 
 ** Input Languages
@@ -879,6 +876,21 @@ guess I'll figure out best mappings over time.
      ("C-S-<mouse-1>" . mc/add-cursor-on-click)
      ("C-c m A" . mc/mark-all-in-region)
      ("C-c m r" . mc/mark-all-in-region-regexp)))
+#+END_SRC
+
+** Expand Region
+This package allows to expand  or reduce region selection semantically
+in most languages that I work with inside Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :bind
+    (("C-c e e" . er/expand-region)
+     ("C-c e p" . er/mark-paragraph)
+     ("C-c e (" . er/mark-inside-pairs)
+     ("C-c e )" . er/mark-outside-pairs)
+     ("C-c e q" . er/mark-inside-quotes)
+     ("C-c e Q" . er/mark-outside-quotes)))
 #+END_SRC
 
 ** Phi Search
