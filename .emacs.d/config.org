@@ -235,10 +235,10 @@ none.
 #+END_SRC
 
 * Functions
-This section should contain functions that I've wrote for personal
-use here and there. I'm not elisp expert, so code may be not the
-best quality. If you feel that this code should be improved you can
-open issue and blame on me all you want.
+This section should contain functions that I've wrote for personal use
+here and  there. I'm not  e-lisp expert, so code  may be not  the best
+quality. If  you feel that this  code should be improved  you can open
+issue and blame on me all you want.
 
 ** =ensure-installed=
 To ensure  that some essential  packages are installed  I've wrote
@@ -356,7 +356,6 @@ document
                                    org-startup-with-inline-images t
                                    org-startup-folded 'content
                                    revert-without-query '(".*\.pdf"))
-                             (org-indent-mode)
                              (auto-fill-mode)))
 #+END_SRC
 
