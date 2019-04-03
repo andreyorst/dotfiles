@@ -66,7 +66,9 @@ plug "andreyorst/powerline.kak" %{
     set-option global powerline_separator_thin ''
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname smarttab mode_info filetype client session position'
-    powerline-theme base16-gruvbox
+    hook -once global WinDisplay .* %{
+        powerline-theme base16-gruvbox
+    }
 }
 
 plug "andreyorst/smarttab.kak" %{
