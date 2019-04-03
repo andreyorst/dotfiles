@@ -551,6 +551,7 @@ if theme changes it.
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'fringe nil :background nil)
   (set-face-attribute 'line-number nil :background nil)
+  (set-face-attribute 'header-line nil :background "#222226")
 #+END_SRC
 
 ** Diminish

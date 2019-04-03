@@ -9,20 +9,24 @@
 # ╰────────────────────────────────╯
 
 # Normal mode mappings
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "comment/uncomment selection (<c-/>)" global normal ''     ': comment-line<ret>'
 map -docstring "add currsor/jump on current word"    global normal '<c-d>' ': select-or-add-cursor<ret>'
 
 # Avoid escape key
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "avoid escape key"                    global normal '<c-g>' '<esc>'
 map -docstring "avoid escape key"                    global prompt '<c-g>' '<esc>'
 map -docstring "avoid escape key"                    global insert '<c-g>' '<esc>'
 map -docstring "avoid escape key"                    global user   '<c-g>' '<esc>'
 
 # User Mappings
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "convert leading spaces to tabs"      global user   't'     ': leading-spaces-to-tabs<ret>'
 map -docstring "convert leading tabs to spaces"      global user   '<a-t>' ': leading-tabs-to-spaces<ret>'
 
 ## System clipboard mappings
+## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>;:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
 map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
 map -docstring "cut to system clipboard, enter insert mode" global user 'c' '|xsel -b -i<ret>i'
@@ -31,7 +35,9 @@ map -docstring "paste from system clipboard after cursor"   global user 'p' '<a-
 map -docstring "replace selection with system clipboard"    global user 'R' '|xsel --output --clipboard<ret>'
 
 # Insert mode mappings
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ## Completion
+## ‾‾‾‾‾‾‾‾‾‾
 hook global InsertCompletionShow .* %{ try %{
     execute-keys -draft 'h<a-K>\h<ret>'
     map window insert <tab> <c-n>
@@ -44,6 +50,7 @@ hook global InsertCompletionHide .* %{
 }
 
 # Goto mode mappings
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "file non-recursive"             global goto '<a-f>' '<esc>gf'
 map -docstring "file recursive"                 global goto 'f'     '<esc>: smart-select WORD; search-file %val{selection}<ret>'
 map -docstring "next buffer"                    global goto 'b'     '<esc>: buffer-next<ret>'
