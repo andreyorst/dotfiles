@@ -77,7 +77,7 @@ evaluate-commands %sh{
     join() { sep=$2; eval set -- $1; IFS="$sep"; echo "$*"; }
 
     # Highlight functions ignoring Rust specific keywords
-    printf "%s\n" "add-highlighter shared/rust/code/functions regex (\w*?)\b($(join '${cpp_keywords}' '|'))?(\h+)?(?=\() 1:function"
+    printf "%s\n" "add-highlighter shared/rust/code/functions regex (\w*?)\b($(join '${rust_keywords}' '|'))?\h*(?=\() 1:function"
 }
 
 # Makefile
