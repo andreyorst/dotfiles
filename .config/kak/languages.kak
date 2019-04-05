@@ -67,6 +67,7 @@ evaluate-commands %sh{
     printf "%s\n" "add-highlighter shared/rust/code/field     regex ((?<!\.\.)(?<=\.))[a-zA-Z](\w+)?\b(?![>\"\(]) 0:meta
                    add-highlighter shared/rust/code/method    regex ((?<!\.\.)(?<=\.))[a-zA-Z](\w+)?(\h+)?(?=\() 0:function
                    add-highlighter shared/rust/code/return    regex \breturn\b 0:meta
+                   add-highlighter shared/rust/code/usertype  regex \b[A-Z]\w*\b 0:type
                    add-highlighter shared/rust/code/namespace regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:module"
 
     # Taken from rc/filetype/rust.kak
