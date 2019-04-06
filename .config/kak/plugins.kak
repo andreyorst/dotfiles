@@ -145,3 +145,18 @@ plug "alexherbo2/word-movement.kak" config %{
     word-movement-map previous b
 }
 
+plug "occivink/kakoune-expand" branch "shrink" config %{
+    declare-user-mode expand
+    map -docstring "expand selection" global expand "e"       ": expand<ret>"
+    map -docstring "shrink selection" global expand "<minus>" ": shrink<ret>"
+    map -docstring "expand selection" global object "e"       "<esc>: expand; enter-user-mode -lock expand<ret>"
+    set-option -add global expand_commands 'execute-keys <a-i>w' # select word if possible
+    set-option -add global expand_commands 'execute-keys <a-i>q' # select inside single quotes
+    set-option -add global expand_commands 'execute-keys <a-a>q' # select around single quotes
+    set-option -add global expand_commands 'execute-keys <a-i>Q' # select inside double quotes
+    set-option -add global expand_commands 'execute-keys <a-a>Q' # select around double quotes
+    set-option -add global expand_commands 'execute-keys <a-i>g' # select inside backticks
+    set-option -add global expand_commands 'execute-keys <a-a>g' # select around graves
+    set-option -add global expand_commands 'execute-keys <a-a>a' # select around angle block
+}
+
