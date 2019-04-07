@@ -534,6 +534,24 @@ with something someday.
   (setq use-package-always-ensure t)
 #+END_SRC
 
+** Hydra
+Hydra is  something like additional modes  for Emacs but it  isn't. It
+allows me  to press some shortcut  and be locked in  a mode-like state
+where keys  that are related to  this prefix shortcut are  behaving in
+terms of this shortcut.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :config
+    (defhydra hydra-zoom (global-map "<f2>")
+      "zoom"
+      ("g" text-scale-increase "in")
+      ("l" text-scale-decrease "out")))
+#+END_SRC
+
+This  package will  be used  in many  other package  configurations to
+provide sane keybindings.
+
 ** Spacemacs theme
 I really  like this theme.   It's something like Atom's  One Dark,
 but little more purple. Anyway it's awesome, and colors are really
@@ -869,15 +887,17 @@ guess I'll figure out best mappings over time.
 
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
-    :bind
-    (("C-c m l" . mc/edit-lines)
-     ("C-c m e" . mc/edit-ends-of-lines)
-     ("C-c m a" . mc/edit-beginnings-of-lines)
-     ("C-S-<mouse-1>" . mc/add-cursor-on-click)
-     ("C-c m A" . mc/mark-all-in-region)
-     ("C-c m r" . mc/mark-all-in-region-regexp)
-     ("C-c m n" . mc/mark-next-like-this-word)
-     ("C-c m p" . mc/mark-previous-like-this-word)))
+    :bind (("C-S-<mouse-1>" . mc/add-cursor-on-click))
+    :config (defhydra hydra-multiple-cursors (global-map "C-c m")
+              "multiple cursors"
+              ("l" mc/edit-lines "edit lines" :exit t)
+              ("e" mc/edit-ends-of-lines "edit ends of lines" :exit t)
+              ("a" mc/edit-beginnings-of-lines "edit beginnings of lines" :exit t)
+              ("A" mc/mark-all-in-region "mark all in region" :exit t)
+              ("r" mc/mark-all-in-region-regexp "mark regexp in region" :exit t)
+              ("n" mc/mark-next-like-this-word "mark next like this word")
+              ("p" mc/mark-previous-like-this-word "mark previous like this word")
+              ("d" mc/remove-duplicated-cursors "remove duplicated cursors" :exit t)))
 #+END_SRC
 
 *** MC Extras
@@ -888,9 +908,8 @@ like.
 
 #+BEGIN_SRC emacs-lisp
   (use-package mc-extras
-    :bind (("C-c m d" . mc/remove-duplicated-cursors))
-    :init
-    (add-hook 'post-command-hook 'mc/remove-duplicated-cursors))
+    :config
+    (advice-add 'phi-search-complete :after 'mc/remove-duplicated-cursors))
 #+END_SRC
 
 ** Expand Region
@@ -899,13 +918,14 @@ in most languages that I work with inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
-    :bind
-    (("C-c e e" . er/expand-region)
-     ("C-c e p" . er/mark-paragraph)
-     ("C-c e (" . er/mark-inside-pairs)
-     ("C-c e )" . er/mark-outside-pairs)
-     ("C-c e q" . er/mark-inside-quotes)
-     ("C-c e Q" . er/mark-outside-quotes)))
+    :config (defhydra hydra-expand-region (global-map "C-c e")
+              "expand region"
+              ("e" er/expand-region "expand region" :exit t)
+              ("p" er/mark-paragraph "mark paragraph")
+              ("(" er/mark-inside-pairs "mark inside pairs")
+              (")" er/mark-outside-pairs "mark outside pairs")
+              ("q" er/mark-inside-quotes "mark inside quotes")
+              ("Q" er/mark-outside-quotes "mark outside quotes")))
 #+END_SRC
 
 ** Phi Search
