@@ -65,12 +65,6 @@ it's better to change its  message to something more /appropriate/
   (setq initial-scratch-message "")
 #+END_SRC
 
-Also I'd like to start in Org mode when file has no extension.
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default major-mode 'org-mode)
-#+END_SRC
-
 ** User Interface
 These are  some defaults  for user interface.  I don't  like those
 bars, buttons, tooltips, scrollbars, etc.
@@ -909,7 +903,7 @@ like.
 #+BEGIN_SRC emacs-lisp
   (use-package mc-extras
     :config
-    (advice-add 'phi-search-complete :after 'mc/remove-duplicated-cursors))
+    (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
 #+END_SRC
 
 ** Expand Region
