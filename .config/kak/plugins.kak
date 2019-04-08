@@ -28,6 +28,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
 plug "andreyorst/fzf.kak" %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
     set-option global fzf_preview_width '65%'
+    set-option global fzf_project_use_tilda true
     evaluate-commands %sh{
         if [ -n "$(command -v fd)" ]; then
             echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
@@ -162,3 +163,4 @@ plug "occivink/kakoune-expand" branch "shrink" config %{
     set-option -add global expand_commands 'execute-keys <a-a>a' # select around angle block
 }
 
+plug "alexherbo2/yank-ring.kak"
