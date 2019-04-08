@@ -43,7 +43,7 @@ hook global WinCreate .* %{
     add-highlighter window/wrap             wrap -word -indent -marker '↪'
     add-highlighter window/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
     add-highlighter window/operators        regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~) 0:operator
-    add-highlighter window/delimiters       regex (\(|\)|\[|\]|\{|\}|\;|') 0:delimiter
+    add-highlighter window/delimiters       regex (\(|\)|\[|\]|\{|\}|\;|'|`) 0:delimiter
 }
 
 # Hooks
