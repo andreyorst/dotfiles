@@ -1,6 +1,6 @@
 #+title: Emacs configuration with Org Mode
 #+setupfile: ~/.dotfiles/.org-defaults.org
-
+#+startup: noinlineimages
 [[file:.sceenshot.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
