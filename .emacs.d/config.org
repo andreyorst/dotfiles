@@ -234,23 +234,23 @@ here and  there. I'm not  e-lisp expert, so code  may be not  the best
 quality. If  you feel that this  code should be improved  you can open
 issue and blame on me all you want.
 
-** =ensure-installed=
+** =my/ensure-installed=
 To ensure  that some essential  packages are installed  I've wrote
 this small lisp function that checks  if package exists and if not
 downloads it from Melpa.
 
 #+BEGIN_SRC emacs-lisp
-  (defun ensure-installed (package)
+  (defun my/ensure-installed (package)
     "Ensure that PACKAGE is installed."
     (when (not (package-installed-p package))
       (package-install package)))
 #+END_SRC
 
-** =autokill-when-no-processes=
+** =my/autokill-when-no-processes=
 This function should be used as advice to any exit handle function
 
 #+BEGIN_SRC emacs-lisp
-  (defun autokill-when-no-processes (&rest args)
+  (defun my/autokill-when-no-processes (&rest args)
     "Kill buffer and its window automatically when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
         (kill-buffer (current-buffer))
@@ -261,33 +261,33 @@ Let's define  some advices with  it. First, term buffer  should be
 killed when I exit terminal:
 
 #+BEGIN_SRC emacs-lisp
-  (advice-add 'term-handle-exit :after #'autokill-when-no-processes)
+  (advice-add 'term-handle-exit :after #'my/autokill-when-no-processes)
 #+END_SRC
 
 I'd also would like to do this for [[Geiser]]:
 
 #+BEGIN_SRC emacs-lisp
-  (advice-add 'geiser-repl-exit :after #'autokill-when-no-processes)
+  (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
 #+END_SRC
 
-** =update-inline-images=
+** =my/update-inline-images=
 This function is supposed to automatically update inline images in
 org buffers, when for some reason image was changed.
 
 #+BEGIN_SRC emacs-lisp
-  (defun update-inline-images ()
+  (defun my/update-inline-images ()
     "Update inline images in Org-mode."
     (when org-inline-image-overlays
       (org-redisplay-inline-images)))
 #+END_SRC
 
-** =move-line-up=
+** =my/move-line-up=
 This function moves current line  down. This is pretty common function
 for most of editors, and sometimes I want to move lines around so this
 will come in handy.
 
 #+BEGIN_SRC emacs-lisp
-  (defun move-line-up ()
+  (defun my/move-line-up ()
     "Move up the current line."
     (interactive)
     (transpose-lines 1)
@@ -298,14 +298,14 @@ will come in handy.
 Let's bind it to =C-s-up= or /Ctrl/ + /Super/ + /Up/.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key [C-s-up] 'move-line-up)
+  (global-set-key [C-s-up] 'my/move-line-up)
   #+END_SRC
 
-** =move-line-down=
+** =my/move-line-down=
 The same as above but moves line down.
 
 #+BEGIN_SRC emacs-lisp
-  (defun move-line-down ()
+  (defun my/move-line-down ()
     "Move down the current line."
     (interactive)
     (forward-line 1)
@@ -317,8 +317,24 @@ The same as above but moves line down.
 Let's bind it to =C-s-down= or /Ctrl/ + /Super/ + /Down/.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key [C-s-down] 'move-line-down)
+  (global-set-key [C-s-down] 'my/move-line-down)
   #+END_SRC
+
+** =my/org-tangle-on-config-save=
+I often  edit my configuration,  so it would  be cool to  update Emacs
+config automatically on save. This function will handle it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-tangle-on-config-save()
+    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+      (org-babel-tangle)))
+#+END_SRC
+
+To actually make it work we need to add this hook:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
+#+END_SRC
 
 * Modes
 This section will contain some  settings for various modes that are
@@ -360,12 +376,12 @@ This will fontify code inside =SRC_BLOCK= sections:
 #+END_SRC
 
 *** Inline Images
-Since Org-mode allows inline images, we need a way to update them,
-if  image  changes  for  some  reason.   We  will  use  hook  to  call
-[[*=update-inline-images=][=update-inline-images=]] function after executing code with babel.
+Since Org-mode allows inline images, we  need a way to update them, if
+image  changes   for  some   reason.   We  will   use  hook   to  call
+[[*=my/update-inline-images=][=my/update-inline-images=]] function after executing code with babel.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'update-inline-images)
+  (add-hook 'org-babel-after-execute-hook 'my/update-inline-images)
 #+END_SRC
 
 **** Inline LaTeX Preview
@@ -515,15 +531,15 @@ simple,  and  fast but  I  still  think  that  I need  some  essential
 packages.
 
 ** Use Package
-I use package, named =use-package=  to install, load and configure
-my  packages.  I  find  this  way  very  consistent  and  easy  to
-understand  and  maintain.    Since  =use-package=  can't  install
-itself,  let's use  =ensure-installed= function  for it.  The only
-thing I miss is updating those  packages, but I think I'll come up
-with something someday.
+I use package,  named =use-package= to install, load  and configure my
+packages.  I find this way very  consistent and easy to understand and
+maintain.   Since  =use-package=  can't   install  itself,  let's  use
+=my/ensure-installed=  function for  it.   The only  thing  I miss  is
+updating  those packages,  but I  think  I'll come  up with  something
+someday.
 
 #+BEGIN_SRC emacs-lisp
-  (ensure-installed 'use-package)
+  (my/ensure-installed 'use-package)
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+END_SRC
