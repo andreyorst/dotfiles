@@ -126,8 +126,6 @@ plug "occivink/kakoune-snippets" config %{
 }
 
 plug "andreyorst/tagbar.kak" config %{
-    alias global 'q' 'tagbar-quit'
-    alias global 'wq' 'tagbar-write-quit'
     set-option global tagbar_sort false
     set-option global tagbar_size 40
     set-option global tagbar_display_anon false
