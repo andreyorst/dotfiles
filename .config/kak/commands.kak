@@ -127,10 +127,13 @@ If no symbol given, current selection is used as a symbol name" \
 }}
 
 hook global WinSetOption filetype=c %{
-    define-command -override -docstring "wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove thosecomments." \
-    format %{
-        execute-keys -draft '%s(tos|ton(f)?|tob)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc><space>;:<space> format<ret>%stos|ton|tob<ret><a-h>kxdjxd<space>;'
-    }
+    alias window format format-c
+}
+
+define-command -hidden format-c -docstring \
+"wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove those comments." \
+%{
+    execute-keys -draft 'ggitos(<ret><esc>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc><space>;%|clang-format<ret>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>kxdjxd<space>;ggxd'
 }
 
 define-command -override -docstring "evaluate-buffer: evaluate current buffer contents as kakscrupt" \
