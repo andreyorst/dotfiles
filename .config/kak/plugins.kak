@@ -161,4 +161,6 @@ plug "occivink/kakoune-expand" branch "shrink" config %{
     set-option -add global expand_commands 'execute-keys <a-a>a' # select around angle block
 }
 
-plug "alexherbo2/yank-ring.kak"
+plug "alexherbo2/yank-ring.kak" config %{
+    map -docstring "yank-ring" global user 'Y' ': yank-ring<ret>'
+}
