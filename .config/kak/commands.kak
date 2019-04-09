@@ -132,9 +132,11 @@ hook global WinSetOption filetype=c %{
 
 define-command -hidden format-c -docstring \
 "wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove those comments." \
-%{
-    execute-keys -draft 'ggitos(<ret><esc>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc><space>;%|clang-format<ret>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>kxdjxd<space>;ggxd'
-}
+%{ try %{
+    execute-keys -draft '%s(to[nbs](f)?)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc>%|clang-format<ret>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>kxdjxd'
+} catch %{
+    execute-keys -draft '%|clang-format<ret>'
+}}
 
 define-command -override -docstring "evaluate-buffer: evaluate current buffer contents as kakscrupt" \
 evaluate-buffer %{
