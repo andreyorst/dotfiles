@@ -24,6 +24,7 @@ alias stopwatch='while true; do echo -ne "\r$(date +%-M:%S:%N)"; done'
 alias mc="command mc -x"
 alias less="less --tabs 4"
 alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
+alias gti="git"
 
 export EDITOR="kak"
 
