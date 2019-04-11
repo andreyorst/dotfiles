@@ -13,7 +13,5 @@ command = "rls"
 
 [language.c_cpp]
 filetypes = ["c", "cpp"]
-roots = [".cquery", "compile_commands.json"]
+roots = ["compile_flags.txt", "compile_commands.json"]
 command = "clangd"
-# args = ["--log-file=/tmp/ccls.log", "--init={\"cacheDirectory\": \"/home/andreyorst/.cache/ccls\"}"]
-
