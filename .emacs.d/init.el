@@ -8,6 +8,9 @@
 ;; Avoid garbage collection during startup. The GC eats up quite a bit of
 ;; time, easily doubling startup time. The trick is to turn up the memory
 ;; threshold to prevent it from running
+(defvar my--gc-cons-threshold gc-cons-threshold)
+(defvar my--gc-cons-percentage gc-cons-percentage)
+
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
 
@@ -25,8 +28,8 @@
 (org-babel-load-file "~/.emacs.d/config.org")
 
 ;; reset garbage collection
-(setq gc-cons-threshold 16777216
-      gc-cons-percentage 0.1)
+(setq gc-cons-threshold my--gc-cons-threshold
+      gc-cons-percentage my--gc-cons-percentage)
 
 ;; restore file-name-handler-alist
 (setq file-name-handler-alist my--file-name-handler-alist)
