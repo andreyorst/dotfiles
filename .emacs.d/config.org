@@ -336,6 +336,28 @@ To actually make it work we need to add this hook:
   (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
 #+END_SRC
 
+** =my/set-selected-frame-dark=
+Emacs uses white titlebar, but since I'm using dark colorscheme I want
+title bar to be dark as well. It is quite difficult to achieve this in
+GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/set-selected-frame-dark ()
+    "set titlebar colorscheme to dark variant"
+    (interactive)
+    (if window-system
+        (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+                                            (frame-parameter (selected-frame) 'name)
+                                            "\""))))
+#+END_SRC
+
+If  case I  use =window-system=  I want  this function  to run  during
+initialization process.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'emacs-startup-hook 'my/set-selected-frame-dark :after)
+#+END_SRC
+
 * Modes
 This section will contain some  settings for various modes that are
 not handled within package configurations.
