@@ -398,6 +398,15 @@ This will fontify code inside =SRC_BLOCK= sections:
   (setq org-src-fontify-natively t)
 #+END_SRC
 
+*** Source Code Blocks
+Since I'm using Emacs to configure Emacs, I want flycheck to run while
+I'm editing =emacs-lisp=  source blocks. But I find  it distracting to
+see warnings like =;;; Code=, so let's disable it:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-src-mode-hook 'my/disable-fylcheck-in-org-src-block)
+#+END_SRC
+
 *** Inline Images
 Since Org-mode allows inline images, we  need a way to update them, if
 image  changes   for  some   reason.   We  will   use  hook   to  call
@@ -540,6 +549,14 @@ misspelled  words  are no  longer  highlighted,  and  I need  to  call
 I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
 since I don't  understand why I need to define  another function, that
 just  calls =flyspell-buffer=  but  it works  fine.
+
+** Flycheck Mode
+Flycheck  is useful  tool, which  can provide  syntax checking  on the
+fly. Let's enable it for bunch of languages here.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
+#+END_SRC
 
 ** Doc View Mode
 Default resolution is too low:
