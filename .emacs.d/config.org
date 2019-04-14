@@ -326,6 +326,7 @@ config automatically on save. This function will handle it:
 
 #+BEGIN_SRC emacs-lisp
   (defun my/org-tangle-on-config-save()
+    "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
       (org-babel-tangle)))
 #+END_SRC
