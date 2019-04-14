@@ -299,7 +299,7 @@ will come in handy.
 Let's bind it to =C-s-up= or /Ctrl/ + /Super/ + /Up/.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key [C-s-up] 'my/move-line-up)
+  (global-set-key (kbd "M-p") 'my/move-line-up)
   #+END_SRC
 
 ** =my/move-line-down=
@@ -318,7 +318,7 @@ The same as above but moves line down.
 Let's bind it to =C-s-down= or /Ctrl/ + /Super/ + /Down/.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key [C-s-down] 'my/move-line-down)
+  (global-set-key (kbd "M-n") 'my/move-line-down)
   #+END_SRC
 
 ** =my/org-tangle-on-config-save=
