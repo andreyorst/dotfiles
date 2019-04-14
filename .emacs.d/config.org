@@ -1,6 +1,7 @@
 #+title: Emacs configuration with Org Mode
 #+setupfile: ~/.dotfiles/.org-defaults.org
 #+startup: noinlineimages
+#+property: header-args :tangle yes
 [[file:.sceenshot.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
