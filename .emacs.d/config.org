@@ -836,31 +836,28 @@ by Org mode.
 #+END_SRC
 
 ** Rust
-I'd  like  to  have  Rust   syntax  highlighting  and  some  basic
-facilities, since I'm planning to write my exercises in org mode.
+I'd like to  have Rust syntax highlighting and  some basic facilities,
+since I'm  planning to write my  exercises in org mode.   Since I make
+notes in Org-mode, and  I started to use it for Rust  too, I need some
+settings for Rust mode.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package rust-mode)
-#+END_SRC
-
-Since I make notes in Org-mode, and  I started to use it for Rust too,
-I need some settings for Rust mode.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'rust-mode-hook
-            '(lambda()
-               (racer-mode)
-               (yas-minor-mode)
-               (electric-pair-mode)
-               (eldoc-mode)
-               (setq company-tooltip-align-annotations t)))
+  (use-package rust-mode
+    :config (add-hook 'rust-mode-hook
+                      '(lambda()
+                         (racer-mode)
+                         (yas-minor-mode)
+                         (electric-pair-mode)
+                         (setq company-tooltip-align-annotations t))))
 #+END_SRC
 
 *** Racer
-Racer is a Rust Auto-Complete-er.
+A  Rust  Auto-Complete-er  package   support.  It's  kinda  slow,  but
+whatever.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package racer)
+  (use-package racer
+    :config (add-hook 'racer-mode-hook #'eldoc-mode))
 #+END_SRC
 
 ** TOML
