@@ -326,10 +326,11 @@ I often  edit my configuration,  so it would  be cool to  update Emacs
 config automatically on save. This function will handle it:
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/org-tangle-on-config-save()
+  (defun my/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-      (org-babel-tangle)))
+      (org-babel-tangle)
+      (load-file (file-truename "~/.emacs.d/config.el"))))
 #+END_SRC
 
 To actually make it work we need to add this hook:
