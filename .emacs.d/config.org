@@ -338,7 +338,7 @@ To actually make it work we need to add this hook:
   (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
 #+END_SRC
 
-** =my/set-selected-frame-dark=
+** =my/set-frame-dark=
 Emacs uses white titlebar, but since I'm using dark colorscheme I want
 title bar to be dark as well. It is quite difficult to achieve this in
 GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
