@@ -343,20 +343,30 @@ title bar to be dark as well. It is quite difficult to achieve this in
 GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/set-selected-frame-dark ()
-    "set titlebar colorscheme to dark variant"
-    (interactive)
-    (if window-system
-        (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
-                                            (frame-parameter (selected-frame) 'name)
-                                            "\""))))
+  (defun my/set-frame-dark (&optional frame)
+    "Set FRAME titlebar colorscheme to dark variant."
+    (with-selected-frame (or frame (selected-frame))
+    (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+                                        (frame-parameter frame 'name)
+                                        "\""))))
 #+END_SRC
 
-If  case I  use =window-system=  I want  this function  to run  during
-initialization process.
+If  I  use  =window-system=  I   want  this  function  to  run  during
+initialization process, and when new frame is created.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'emacs-startup-hook 'my/set-selected-frame-dark :after)
+  (when window-system
+    (add-hook 'emacs-startup-hook 'my/set-frame-dark :after)
+    (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
+#+END_SRC
+
+** =my/disable-fylcheck-in-org-src-bloc=
+This function disables flycheck =emacs-lisp-checkdoc= messages.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/disable-fylcheck-in-org-src-block ()
+    "Disable checkdoc in emacs-lisp buffers."
+    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 #+END_SRC
 
 * Modes
