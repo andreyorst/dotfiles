@@ -362,6 +362,35 @@ This function disables flycheck =emacs-lisp-checkdoc= messages.
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 #+END_SRC
 
+** =my/escape=
+Taken from [[https://www.reddit.com/r/emacs/comments/bb5c1w/weekly_tipstricketc_thread/ekgje7j/][u/clemera]] comment.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/escape ()
+    "Quit in current context.
+
+  When there is an active minibuffer and we are not inside it close
+  it. When we are inside the minibuffer use the regular
+  `minibuffer-keyboard-quit' which quits any active region before
+  exiting. When there is no minibuffer `keyboard-quit' unless we
+  are defining or executing a macro."
+    (interactive)
+    (cond ((active-minibuffer-window)
+           (if (minibufferp)
+               (minibuffer-keyboard-quit)
+             (abort-recursive-edit)))
+          (t
+           ;; ignore top level quits for macros
+           (unless (or defining-kbd-macro executing-kbd-macro)
+             (keyboard-quit)))))
+#+END_SRC
+
+Let's remap default =keyboard-quit= key with this function.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key [remap keyboard-quit] #'my/escape)
+#+END_SRC
+
 * Modes
 This section will contain some  settings for various modes that are
 not handled within package configurations.
