@@ -89,8 +89,8 @@ plug "alexherbo2/replace.kak" config %{
 }
 
 plug "alexherbo2/move-line.kak" config %{
-    map global normal "<a-p>" ': move-line-above %val{count}<ret>'
-    map global normal "<a-n>" ': move-line-below %val{count}<ret>'
+    map global normal '<a-up>'   ': move-line-above %val{count}<ret>'
+    map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
 plug "occivink/kakoune-snippets" config %{
@@ -170,8 +170,9 @@ plug "alexherbo2/split-object.kak" config %{
     map -docstring "split object" global normal '<a-I>' ': enter-user-mode split-object<ret>'
 }
 
-plug "https://gitlab.com/Screwtapello/kakoune-inc-dec.git" config %{
-    map -docstring "decrement" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
-    map -docstring "decrement" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
+
+plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
+    map -docstring "decrement selection" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
+    map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
 
