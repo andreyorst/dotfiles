@@ -358,7 +358,7 @@ initialization process, and when new frame is created.
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (add-hook 'emacs-startup-hook 'my/set-frame-dark :after)
+    (my/set-frame-dark)
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
