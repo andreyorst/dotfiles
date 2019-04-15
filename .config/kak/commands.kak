@@ -130,7 +130,7 @@ hook global WinSetOption filetype=c %{
     alias window format format-c
 }
 
-define-command -hidden format-c -docstring \
+define-command -hidden -override format-c -docstring \
 "wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove those comments." \
 %{ try %{
     execute-keys -draft '%s(to[nbs](f)?)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc>%|clang-format<ret>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>kxdjxd'
@@ -147,3 +147,4 @@ define-command -override -docstring "evaluate-selection: evaluate current sellec
 evaluate-selection %{
     execute-keys -draft ':<space><c-r>.<ret>'
 }
+
