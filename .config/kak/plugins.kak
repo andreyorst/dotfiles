@@ -174,4 +174,3 @@ plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
     map -docstring "decrement selection" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
-

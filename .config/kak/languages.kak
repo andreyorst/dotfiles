@@ -106,4 +106,3 @@ hook global WinSetOption filetype=kak %{
 hook global WinSetOption filetype=gas %{
     set-option window comment_line '#'
 }
-

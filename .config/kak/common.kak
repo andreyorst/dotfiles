@@ -71,4 +71,3 @@ hook global BufCreate '^\*scratch\*$' %{
         delete-buffer *scratch*
     }}
 }
-
