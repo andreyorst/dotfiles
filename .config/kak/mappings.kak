@@ -15,26 +15,25 @@ map -docstring "add currsor/jump on current word"    global normal '<c-d>' ': se
 
 # Avoid escape key
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-map -docstring "avoid escape key"                    global normal '<c-g>' '<esc>;<space>'
-map -docstring "avoid escape key"                    global prompt '<c-g>' '<esc>;<space>'
-map -docstring "avoid escape key"                    global insert '<c-g>' '<esc>;<space>'
-map -docstring "avoid escape key"                    global user   '<c-g>' '<esc>;<space>'
+map -docstring "avoid escape key" global normal '<c-g>' ';<space>'
+map -docstring "avoid escape key" global prompt '<c-g>' '<esc>'
+map -docstring "avoid escape key" global insert '<c-g>' '<esc>'
 
-# User Mappings
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾
-map -docstring "convert leading spaces to tabs"      global user   't'     ': leading-spaces-to-tabs<ret>'
-map -docstring "convert leading tabs to spaces"      global user   '<a-t>' ': leading-tabs-to-spaces<ret>'
+# User Mode Mappings
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+map -docstring "convert leading spaces to tabs" global user '<a-t>' ': leading-spaces-to-tabs<ret>'
+map -docstring "convert leading tabs to spaces" global user '<a-T>' ': leading-tabs-to-spaces<ret>'
 
 ## System clipboard mappings
 ## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>;:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
+map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
 map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
 map -docstring "cut to system clipboard, enter insert mode" global user 'c' '|xsel -b -i<ret>i'
 map -docstring "paste from system clipboard before cursor"  global user 'P' '!xsel --output --clipboard<ret>'
 map -docstring "paste from system clipboard after cursor"   global user 'p' '<a-!>xsel --output --clipboard<ret>'
 map -docstring "replace selection with system clipboard"    global user 'R' '|xsel --output --clipboard<ret>'
 
-# Insert mode mappings
+# Insert Mode Mappings
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ## Completion
 ## ‾‾‾‾‾‾‾‾‾‾
