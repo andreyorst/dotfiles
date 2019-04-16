@@ -13,7 +13,6 @@ evaluate-commands %sh{
         common.kak
         commands.kak
         mappings.kak
-        tmux.kak
         languages.kak
         plugins.kak
     "
