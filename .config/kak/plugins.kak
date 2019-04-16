@@ -146,11 +146,10 @@ plug "alexherbo2/word-movement.kak" config %{
     word-movement-map previous b
 }
 
-plug "andreyorst/kakoune-expand" branch "reduce-selection" config %{
+plug "occivink/kakoune-expand" branch "shrink" config %{
     declare-user-mode expand
     map -docstring "expand selection" global expand "e"       ": expand<ret>"
-    map -docstring "shrink selection" global expand "<minus>" ": reduce<ret>"
-    map -docstring "shrink selection" global expand "s"       ": shrink<ret>"
+    map -docstring "shrink selection" global expand "<minus>" ": shrink<ret>"
     map -docstring "expand selection" global object "e"       "<esc>: expand; enter-user-mode -lock expand<ret>"
     set-option -add global expand_commands 'execute-keys <a-i>w' # select word if possible
     set-option -add global expand_commands 'execute-keys <a-i>q' # select inside single quotes
