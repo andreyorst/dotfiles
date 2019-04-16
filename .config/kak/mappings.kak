@@ -15,10 +15,10 @@ map -docstring "add currsor/jump on current word"    global normal '<c-d>' ': se
 
 # Avoid escape key
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-map -docstring "avoid escape key"                    global normal '<c-g>' '<esc>'
-map -docstring "avoid escape key"                    global prompt '<c-g>' '<esc>'
-map -docstring "avoid escape key"                    global insert '<c-g>' '<esc>'
-map -docstring "avoid escape key"                    global user   '<c-g>' '<esc>'
+map -docstring "avoid escape key"                    global normal '<c-g>' '<esc>;<space>'
+map -docstring "avoid escape key"                    global prompt '<c-g>' '<esc>;<space>'
+map -docstring "avoid escape key"                    global insert '<c-g>' '<esc>;<space>'
+map -docstring "avoid escape key"                    global user   '<c-g>' '<esc>;<space>'
 
 # User Mappings
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾
