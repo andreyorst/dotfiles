@@ -41,19 +41,20 @@ hook global InsertCompletionShow .* %{ try %{
     execute-keys -draft 'h<a-K>\h<ret>'
     map window insert <tab> <c-n>
     map window insert <s-tab> <c-p>
+    map window insert <c-g> <c-o>
 }}
 
 hook global InsertCompletionHide .* %{
     unmap window insert <tab> <c-n>
     unmap window insert <s-tab> <c-p>
+    unmap window insert <c-g> <c-o>
 }
 
 # Goto mode mappings
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-map -docstring "file non-recursive"             global goto '<a-f>' '<esc>gf'
-map -docstring "file recursive"                 global goto 'f'     '<esc>: smart-select WORD; search-file %val{selection}<ret>'
+map -docstring "file (non-recursive)"           global goto '<a-f>' '<esc>gf'
+map -docstring "file (recursive)"               global goto 'f'     '<esc>: smart-select WORD; search-file %val{selection}<ret>'
 map -docstring "next buffer"                    global goto 'b'     '<esc>: buffer-next<ret>'
 map -docstring "previous buffer"                global goto 'B'     '<esc>: buffer-previous<ret>'
-map -docstring "search tag in current file"     global goto '['     '<esc>: smart-select word; symbol<ret>'
-map -docstring "search tag in global tags file" global goto ']'     '<esc>: smart-select word; ctags-search<ret>'
-
+map -docstring "search tag in current file"     global goto '['     '<esc><c-s>: smart-select word; symbol<ret>'
+map -docstring "search tag in global tags file" global goto ']'     '<esc><c-s>: smart-select word; ctags-search<ret>'
