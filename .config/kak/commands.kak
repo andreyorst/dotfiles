@@ -108,10 +108,18 @@ If no symbol given, current selection is used as a symbol name" \
 } symbol -params ..1 %{ evaluate-commands %sh{
     export tagname="${1:-${kak_selection}}"
     tags="${TMPDIR:-/tmp}/tags-tmp"
+
     if [ ! -s "${tags}" ]; then
         ctags -f "${tags}" "${kak_buffile}"
     fi
-    readtags -t "${tags}" "${tagname}" | awk -F '\t|\n' '
+
+    if [ -n "$(command -v readtags)" ]; then
+        tags_cmd='readtags -t "${tags}" "${tagname}"'
+    else
+        tags_cmd='grep "^\b${tagname}\b.*\$/" "${tags}" -o'
+    fi
+
+    eval "${tags_cmd}" | awk -F '\t|\n' '
         /[^\t]+\t[^\t]+\t\/\^.*\$?\// {
             opener = "{"; closer = "}"
             line = $0; sub(".*\t/\\^", "", line); sub("\\$?/$", "", line);
