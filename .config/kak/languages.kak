@@ -16,10 +16,10 @@ hook global WinSetOption filetype=(c|cpp) %{
     set-option window formatcmd 'clang-format'
 
     remove-highlighter window/operators
-    add-highlighter buffer/operators        regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\]) 0:operator
+    add-highlighter    buffer/operators regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\]) 0:operator
 
     remove-highlighter window/delimiters
-    add-highlighter buffer/delimiters       regex (\(|\)||\{|\}|\;|'|`) 0:delimiter
+    add-highlighter    buffer/delimiters regex (\(|\)||\{|\}|\;|'|`) 0:delimiter
 }
 
 evaluate-commands %sh{
