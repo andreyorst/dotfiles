@@ -976,7 +976,7 @@ guess I'll figure out best mappings over time.
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
     :bind (("C-S-<mouse-1>" . mc/add-cursor-on-click))
-    :config (defhydra hydra-multiple-cursors (global-map "C-c m")
+    :config (defhydra h-mc (global-map "C-c m")
               "multiple cursors"
               ("l" mc/edit-lines "edit lines" :exit t)
               ("e" mc/edit-ends-of-lines "edit ends of lines" :exit t)
@@ -1006,7 +1006,7 @@ in most languages that I work with inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
-    :config (defhydra hydra-expand-region (global-map "C-c e")
+    :config (defhydra h-er (global-map "C-c e")
               "expand region"
               ("e" er/expand-region "expand region" :exit t)
               ("p" er/mark-paragraph "mark paragraph")
