@@ -130,13 +130,11 @@ need to use Shift key. =russian-computer= doesn't have this problem.
 
 ** Line Numbers
 For some  reason Emacs has  long history  of being not  capable to
-display line  numbers properly,  but now  native line  numbers are
-shipped with  Emacs starting with  version 26.  However  even this
-implementation is slow on large files in my experience, but I need
-them, and therefore I'm enabling them in all programming modes.
+display   line   numbers   properly,    so   I've   decided   to   try
+=line-number-mode=, that displays current line in the modeline.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+  (line-number-mode)
 #+END_SRC
 
 ** Save History Between Sessions
