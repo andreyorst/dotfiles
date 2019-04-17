@@ -851,7 +851,8 @@ However this plugin is quite useful with Git repositories.
 It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel-projectile)
+  (use-package counsel-projectile
+    :config (counsel-projectile-mode))
 #+END_SRC
 
 ** GNU Plot
