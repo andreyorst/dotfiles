@@ -1037,9 +1037,10 @@ This is a  modeline for Emacs that looks like  default but prettier. I
 like it, and it doesn't add too much overhead.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package moody
-    :config
-    (setq x-underline-at-descent-line t)
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+  (when window-system
+    (use-package moody
+      :config
+      (setq x-underline-at-descent-line t)
+      (moody-replace-mode-line-buffer-identification)
+      (moody-replace-vc-mode)))
 #+END_SRC

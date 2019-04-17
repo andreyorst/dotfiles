@@ -13,7 +13,7 @@
  '(mode-line-percent-position nil)
  '(package-selected-packages
    (quote
-    (mc-extras expand-region eyebrowse phi-search multiple-cursors racer vdiff-magit vdiff which-key magit editorconfig clang-format toml-mode company-flx rust-mode gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish use-package))))
+    (moody mc-extras expand-region eyebrowse phi-search multiple-cursors racer vdiff-magit vdiff which-key magit editorconfig clang-format toml-mode company-flx rust-mode gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
