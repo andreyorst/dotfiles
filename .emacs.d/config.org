@@ -675,7 +675,7 @@ initialization process, and when new frame is created.
 #+END_SRC
 
 ** Diminish
-Emacs,  please stop  cluttering my  modeline  with all  those modes  I
+Emacs, please  stop cluttering  my mode  line with  all those  modes I
 already  know about.   Since =eldoc-mode=  is  builtin, I've  put it  to
 =diminish= configuration.
 
@@ -1042,7 +1042,7 @@ window configurations. It works much like Vim tabs, or Tmux windows.
 #+END_SRC
 
 ** Moody
-This is a  modeline for Emacs that looks like  default but prettier. I
+This is a mode line for Emacs  that looks like default but prettier. I
 like it, and it doesn't add too much overhead.
 
 #+BEGIN_SRC emacs-lisp
@@ -1053,3 +1053,23 @@ like it, and it doesn't add too much overhead.
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)))
 #+END_SRC
+
+** Minion
+This  package  implements   a  menu  that  lists   all  enabled  minor
+modes. Emacs mode  line can become pretty long, so  this can be handy,
+and perhaps I don't need to use =:diminish= everywhere anymore.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package minions
+    :config (minions-mode 1))
+#+END_SRC
+
+* Postscript
+This Emacs Configuration features various  cool E-Lisp hacks that I've
+found  in the  Internet,  and I  try to  keep  references to  original
+places, so reader  could refer to those, because I  alter these pieces
+of code for my  personal needs and thus it may  not be compatible with
+other people tastes, and because I want to credit original author.
+
+If you  find any issue with  my config feel  free to [[https://github.com/andreyorst/dotfiles/issues/new][file an  issue]] or
+contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].
