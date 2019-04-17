@@ -750,15 +750,12 @@ Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
 experience.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
+  (use-package ivy :diminish
     :init
     (setq ivy-use-virtual-buffers t
           enable-recursive-minibuffers t)
-    :bind (("C-c C-r" . ivy-resume)
-           ("<f6>" . ivy-resume)
-           ("C-x C-b" . ivy-switch-buffer)
+    :bind (("C-x C-b" . ivy-switch-buffer)
            ("C-x b" . ivy-switch-buffer))
-    :diminish ivy-mode
     :config
     (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
           ivy-count-format ""
