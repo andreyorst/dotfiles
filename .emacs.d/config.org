@@ -90,6 +90,14 @@ for some reason.
   (setq-default frame-title-format '("%b — Emacs"))
 #+END_SRC
 
+*** Mode Line
+Small  tweak to  mode line,  that disables  changing appearance  in non
+active window.
+
+#+BEGIN_SRC emacs-lisp
+  (setq mode-line-in-non-selected-windows nil)
+#+END_SRC
+
 ** Font
 I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
 other editor, for some reason I find this font just right for Emacs.
