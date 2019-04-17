@@ -416,6 +416,7 @@ so all text will be folded  and re-filled after its length reaches the
                                    org-startup-with-inline-images t
                                    org-startup-folded 'content
                                    org-hide-emphasis-markers t
+                                   org-highlight-latex-and-related '(latex)
                                    revert-without-query '(".*\.pdf"))
                              (auto-fill-mode)))
 #+END_SRC
