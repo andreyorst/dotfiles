@@ -791,8 +791,7 @@ languages.
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package company
-    :diminish company-mode
+  (use-package company :diminish
     :bind (:map company-active-map
                 ("TAB" . company-complete-common-or-cycle)
                 ("<tab>" . company-complete-common-or-cycle)
@@ -819,8 +818,7 @@ This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
 mapping to redo.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-    :diminish undo-tree-mode
+  (use-package undo-tree :diminish
     :config
     (global-undo-tree-mode 1))
 #+END_SRC
@@ -830,8 +828,7 @@ Another very handy package, that helps insert templates of code. Now I
 really need to write some snippets to use...
 
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :diminish yas-minor-mode)
+  (use-package yasnippet :diminish)
 #+END_SRC
 
 ** Projectile
@@ -904,8 +901,7 @@ Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
 synchronize my editor configurations between projects.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package editorconfig
-    :diminish editorconfig-mode
+  (use-package editorconfig :diminish
     :config
     (editorconfig-mode 1))
 #+END_SRC
@@ -964,8 +960,7 @@ keyboard shortcuts in a popup menu. I'm still learning Emacs, so let's
 enable it by default.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :diminish which-key-mode
+  (use-package which-key :diminish
     :config
     (which-key-mode))
 #+END_SRC
