@@ -1,4 +1,6 @@
 #+title: Emacs configuration with Org Mode
+#+author: Andrey Orst
+#+email: andreyorst@gmail.com
 #+setupfile: ~/.dotfiles/.org-defaults.org
 #+startup: noinlineimages
 #+property: header-args :tangle yes
