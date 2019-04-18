@@ -98,6 +98,17 @@ active window.
   (setq mode-line-in-non-selected-windows nil)
 #+END_SRC
 
+**** Line Numbers Column and Percent position
+I've decided to stop using line numbers at the side of the window, but
+I still want to see which  line number I'm currently on. Luckily Emacs
+can display all relevant information in  the mode line. I just need to
+enable =column-number-mode= feature.
+
+#+BEGIN_SRC emacs-lisp
+  (setq column-number-mode t
+        size-indication-mode nil)
+#+END_SRC
+
 ** Font
 I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
 other editor, for some reason I find this font just right for Emacs.
@@ -133,17 +144,6 @@ Emacs with =C-\=, so all common shortcuts will still work fine.
 I'm  not   using  =russian-jcuken=   here  because  it   represents  the
 "typewriter" layout with number-line inverted,  so to access numbers I
 need to use Shift key. =russian-computer= doesn't have this problem.
-
-** Line Numbers Column and Percent position
-I've decided to stop using line numbers at the side of the window, but
-I still want to see which  line number I'm currently on. Luckily Emacs
-can display all relevant information in  the mode line. I just need to
-enable =column-number-mode= feature.
-
-#+BEGIN_SRC emacs-lisp
-  (setq column-number-mode t
-        size-indication-mode nil)
-#+END_SRC
 
 ** Save History Between Sessions
 This is what I've loved about Vim.
