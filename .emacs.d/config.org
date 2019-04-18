@@ -396,6 +396,30 @@ Let's remap default =keyboard-quit= key with this function.
   (global-set-key [remap keyboard-quit] #'my/escape)
 #+END_SRC
 
+** =my/eshell-toggle=
+This command toggles eshell window on and off without killing eshell.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/eshell-toggle ()
+    "Toggle eshell window on and off with the same command."
+    (interactive)
+    (defvar name "*eshell-popup*")
+    (cond ((get-buffer-window name)
+           (ignore-errors (delete-window)))
+          (t (split-window-below)
+             (other-window 1)
+             (cond ((get-buffer name)
+                    (view-buffer name))
+                   (t (eshell)
+                      (rename-buffer name))))))
+#+END_SRC
+
+I find it conveinient to bind this function to /Ctrl+t/ shortcut.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-t" 'my/eshell-toggle)
+#+END_SRC
+
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.
