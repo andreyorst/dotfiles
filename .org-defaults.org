@@ -1,4 +1,3 @@
-#+author: Andrey Orst
 #+options: toc:nil
 #+options: H:8
 #+options: num:2
