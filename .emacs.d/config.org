@@ -403,19 +403,19 @@ Let's remap default =keyboard-quit= key with this function.
 This command toggles ansi-term window on and off without killing ansi-term.
 
 #+BEGIN_SRC emacs-lisp
-    (defun my/ansi-term-toggle ()
-      "Toggle ansi-term window on and off with the same command."
-      (interactive)
-      (defvar my--ansi-term-name "ansi-term-popup")
-      (defvar my--window-name (concat "*" my--ansi-term-name "*"))
-      (cond ((get-buffer-window my--window-name)
-             (ignore-errors (delete-window
-                             (get-buffer-window my--window-name))))
-            (t (split-window-below)
-               (other-window 1)
-               (cond ((get-buffer my--window-name)
-                      (switch-to-buffer my--window-name))
-                     (t (ansi-term "bash" my--ansi-term-name))))))
+  (defun my/ansi-term-toggle ()
+    "Toggle ansi-term window on and off with the same command."
+    (interactive)
+    (defvar my--ansi-term-name "ansi-term-popup")
+    (defvar my--window-name (concat "*" my--ansi-term-name "*"))
+    (cond ((get-buffer-window my--window-name)
+           (delete-window
+            (get-buffer-window my--window-name)))
+          (t (split-window-below)
+             (other-window 1)
+             (cond ((get-buffer my--window-name)
+                    (switch-to-buffer my--window-name))
+                   (t (ansi-term "bash" my--ansi-term-name))))))
   #+END_SRC
 
 I find it conveinient to bind this function to /Ctrl+t/ shortcut.
