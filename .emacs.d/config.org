@@ -101,8 +101,10 @@ active window.
 **** Line Numbers Column and Percent position
 I've decided to stop using line numbers at the side of the window, but
 I still want to see which  line number I'm currently on. Luckily Emacs
-can display all relevant information in  the mode line. I just need to
-enable =column-number-mode= feature.
+can display all  relevant information in the mode  line.  Line numbers
+are displayed by default, so  I just need to enable =column-number-mode=
+feature.  Also  disable the  size  indication,  as  I find  it  pretty
+useless.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook (lambda () (setq column-number-mode t
@@ -195,7 +197,7 @@ good idea, but I don't think alike.
         auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
 #+END_SRC
 
-*** Shorter confirmation dialogues
+*** Shorter Confirmation Dialogues
 For some  reason in some  situations Emacs asks  for typing =yes=  or =no=
 explicitly, instead of accepting =y= or =n=. This can be fixed with this.
 
@@ -225,7 +227,7 @@ with different methods of installation.
 
 Note for Windows users: change =https= to =http=
 
-*** Package initialization
+*** Package Initialization
 This basic  piece of code  is used to  update package list  if there's
 none.
 
@@ -239,7 +241,8 @@ none.
 This section should contain functions that I've wrote for personal use
 here and  there. I'm not  e-lisp expert, so code  may be not  the best
 quality. If  you feel that this  code should be improved  you can open
-issue and blame on me all you want.
+issue and  blame on me  all you want. I  prefix functions with  =my/= to
+avoid conflicts.
 
 ** =my/ensure-installed=
 To ensure that  some essential packages are installed  I've wrote this
@@ -271,18 +274,14 @@ when I exit terminal:
   (advice-add 'term-handle-exit :after #'my/autokill-when-no-processes)
 #+END_SRC
 
-I'd also would like to do this for [[Geiser]]:
+I'd also would like to do this for [[Geiser]] ([[https://gitlab.com/jaor/geiser/issues/267][it doesn't work for some reason]]):
 
-#+BEGIN_SRC emacs-lisp
-  (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
-#+END_SRC
-
-** =my/update-inline-images=
+** =my/org-update-inline-images=
 This function is supposed to automatically update inline images in org
 buffers, when for some reason image was changed.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/update-inline-images ()
+  (defun my/org-update-inline-images ()
     "Update inline images in Org-mode."
     (when org-inline-image-overlays
       (org-redisplay-inline-images)))
@@ -474,10 +473,10 @@ warnings like =;;; Code=, so let's disable it:
 *** Inline Images
 Since Org-mode allows inline images, we  need a way to update them, if
 image  changes   for  some   reason.   We  will   use  hook   to  call
-[[*=my/update-inline-images=][=my/update-inline-images=]] function after executing code with babel.
+[[*=my/org-update-inline-images=][=my/org-update-inline-images=]] function after executing code with babel.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'my/update-inline-images)
+  (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
 #+END_SRC
 
 **** Inline LaTeX Preview
@@ -604,15 +603,15 @@ misspelled  words  are no  longer  highlighted,  and  I need  to  call
 =flyspell-buffer= again and again. Let's get rid of this.
 
 #+BEGIN_SRC emacs-lisp
-  (defun flyspell-buffer-after-pdict-save (&rest _)
+  (defun my/flyspell-buffer-after-pdict-save (&rest _)
     (flyspell-buffer))
 
-  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
+  (advice-add 'ispell-pdict-save :after #'my/flyspell-buffer-after-pdict-save)
 #+END_SRC
 
 I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
 since I don't  understand why I need to define  another function, that
-just calls =flyspell-buffer= but it works fine.
+simply calls =flyspell-buffer= but it works fine.
 
 ** Flycheck Mode
 Flycheck  is useful  tool, which  can provide  syntax checking  on the
@@ -744,6 +743,7 @@ here, since it also provides completion for it.
   (use-package geiser
     :config
     (add-hook 'scheme-mode-hook 'geiser-mode)
+    (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
     :init
     (setq geiser-active-implementations '(guile)
           geiser-default-implementation 'guile))
