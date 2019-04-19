@@ -664,11 +664,13 @@ terms of this shortcut.
 
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
+    :bind (("<f5>" . hydra-zoom/body))
     :config
-    (defhydra hydra-zoom (global-map "<f2>")
-      "zoom"
-      ("g" text-scale-increase "in")
-      ("l" text-scale-decrease "out")))
+    (defhydra hydra-zoom (:hint nil)
+      "Scale text"
+      ("+" text-scale-increase "in")
+      ("-" text-scale-decrease "out")
+      ("0" (text-scale-set 0) "reset")))
 #+END_SRC
 
 This  package will  be used  in many  other package  configurations to
@@ -1014,17 +1016,29 @@ guess I'll figure out best mappings over time.
 
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
-    :bind (("C-S-<mouse-1>" . mc/add-cursor-on-click))
-    :config (defhydra h-mc (global-map "C-c m")
-              "multiple cursors"
-              ("l" mc/edit-lines "edit lines" :exit t)
-              ("e" mc/edit-ends-of-lines "edit ends of lines" :exit t)
-              ("a" mc/edit-beginnings-of-lines "edit beginnings of lines" :exit t)
-              ("A" mc/mark-all-in-region "mark all in region" :exit t)
-              ("r" mc/mark-all-in-region-regexp "mark regexp in region" :exit t)
-              ("n" mc/mark-next-like-this-word "mark next like this word")
-              ("p" mc/mark-previous-like-this-word "mark previous like this word")
-              ("d" mc/remove-duplicated-cursors "remove duplicated cursors" :exit t)))
+    :bind (("C-S-<mouse-1>" . mc/add-cursor-on-click)
+           ("C-c m" . hydra-mc/body))
+    :config (defhydra hydra-mc (:hint nil)
+              "
+  ^Select^               ^Discard^                   ^Move^
+  ^──────^───────────────^───────^───────────────────^────^────────────
+  _M-s_ split lines      _M-SPC_ discard current     _&_ align
+  _s_   select regexp    _b_     discard blank lines _(_ cycle backward
+  _n_   select next      _d_     remove duplicated   _)_ cycle forward
+  _p_   select previous  _q_     exit                ^ ^
+  _C_   select next line"
+              ("M-s" mc/edit-ends-of-lines)
+              ("s" mc/mark-all-in-region-regexp)
+              ("n" mc/mark-next-like-this-word)
+              ("p" mc/mark-previous-like-this-word)
+              ("&" mc/vertical-align-with-space)
+              ("(" mc/cycle-backward)
+              (")" mc/cycle-forward)
+              ("M-SPC" mc/remove-current-cursor)
+              ("b" mc/remove-cursors-on-blank-lines)
+              ("d" mc/remove-duplicated-cursors)
+              ("C" mc/mark-next-lines)
+              ("q" mc/remove-duplicated-cursors :exit t)))
 #+END_SRC
 
 *** MC Extras
@@ -1045,14 +1059,22 @@ in most languages that I work with inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
-    :config (defhydra h-er (global-map "C-c e")
-              "expand region"
-              ("e" er/expand-region "expand region" :exit t)
-              ("p" er/mark-paragraph "mark paragraph")
-              ("(" er/mark-inside-pairs "mark inside pairs")
-              (")" er/mark-outside-pairs "mark outside pairs")
-              ("q" er/mark-inside-quotes "mark inside quotes")
-              ("Q" er/mark-outside-quotes "mark outside quotes")))
+    :bind (("C-c e" . hydra-er/body))
+    :config (defhydra hydra-er (:hint nil)
+              "
+  ^Expand^          ^Mark^
+  ^──────^──────────^────^─────────────────
+  _e_ expand region _(_ inside pairs
+  _-_ reduce region _)_ around pairs
+  ^ ^               _q_ inside quotes
+  ^ ^               _Q_ around quotes"
+              ("e" er/expand-region :post hydra-er/body)
+              ("-" er/contract-region :post hydra-er/body)
+              ("p" er/mark-paragraph)
+              ("(" er/mark-inside-pairs)
+              (")" er/mark-outside-pairs)
+              ("q" er/mark-inside-quotes)
+              ("Q" er/mark-outside-quotes)))
 #+END_SRC
 
 ** Phi Search
