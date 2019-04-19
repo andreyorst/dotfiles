@@ -8,6 +8,8 @@
 ;; Avoid garbage collection during startup. The GC eats up quite a bit of
 ;; time, easily doubling startup time. The trick is to turn up the memory
 ;; threshold to prevent it from running
+;; -*- lexical-binding: t; -*-
+
 (defvar my--gc-cons-threshold gc-cons-threshold)
 (defvar my--gc-cons-percentage gc-cons-percentage)
 
