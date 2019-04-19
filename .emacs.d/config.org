@@ -1046,7 +1046,7 @@ guess I'll figure out best mappings over time.
   _n_   select next      _d_     remove duplicated   _)_ cycle forward
   _p_   select previous  _q_     exit                ^ ^
   _C_   select next line"
-              ("M-s" (mc/edit-ends-of-lines))
+              ("M-s" mc/edit-ends-of-lines)
               ("s" mc/mark-all-in-region-regexp)
               ("n" mc/mark-next-like-this-word)
               ("p" mc/mark-previous-like-this-word)
