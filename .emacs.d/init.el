@@ -266,6 +266,11 @@ are defining or executing a macro."
 (setq use-package-always-ensure t)
 
 (use-package hydra
+  :commands (hydra-default-pre
+             hydra-keyboard-quit
+             hydra--call-interactively-remap-maybe
+             hydra-show-hint
+             hydra-set-transient-map)
   :bind (("<f5>" . hydra-zoom/body))
   :config
   (defhydra hydra-zoom (:hint nil)
@@ -317,6 +322,7 @@ are defining or executing a macro."
         geiser-default-implementation 'guile))
 
 (use-package parinfer
+  :commands parinfer-mode
   :bind
   (("C-," . parinfer-toggle-mode))
   :init
@@ -335,6 +341,7 @@ are defining or executing a macro."
 (use-package flx)
 
 (use-package ivy :diminish
+  :commands ivy-mode
   :init
   (setq ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
@@ -378,12 +385,14 @@ are defining or executing a macro."
         company-backends (remove 'company-gtags company-backends)))
 
 (use-package undo-tree :diminish
+  :commands global-undo-tree-mode
   :config
   (global-undo-tree-mode 1))
 
 (use-package yasnippet :diminish)
 
 (use-package projectile :diminish
+  :commands projectile-mode
   :bind (("C-c p" . projectile-command-map))
   :init
   (projectile-mode +1)
@@ -392,6 +401,7 @@ are defining or executing a macro."
         projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
+  :commands counsel-projectile-mode
   :config (counsel-projectile-mode))
 
 (use-package gnuplot)
@@ -410,6 +420,7 @@ are defining or executing a macro."
 (use-package toml-mode)
 
 (use-package editorconfig :diminish
+  :commands editorconfig-mode
   :config
   (editorconfig-mode 1))
 
@@ -431,6 +442,7 @@ are defining or executing a macro."
   (add-hook 'vdiff-mode-hook #'outline-show-all))
 
 (use-package vdiff-magit
+  :commands (vdiff-magit-dwim vdiff-magit)
   :bind (:map magit-mode-map
               ("e" . 'vdiff-magit-dwim)
               ("E" . 'vdiff-magit))
@@ -443,6 +455,7 @@ are defining or executing a macro."
   (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
 
 (use-package which-key :diminish
+  :commands which-key-mode
   :config
   (which-key-mode))
 
@@ -476,6 +489,13 @@ _C_   select next line"
   (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
 
 (use-package expand-region
+  :commands (er/expand-region
+             er/mark-paragraph
+             er/mark-inside-pairs
+             er/mark-outside-pairs
+             er/mark-inside-quotes
+             er/mark-outside-quotes
+             er/contract-region)
   :bind (("C-c e" . hydra-er/body))
   :config (defhydra hydra-er (:hint nil)
             "
@@ -484,7 +504,8 @@ _C_   select next line"
 _e_ expand region _(_ inside pairs
 _-_ reduce region _)_ around pairs
 ^ ^               _q_ inside quotes
-^ ^               _Q_ around quotes"
+^ ^               _Q_ around quotes
+^ ^               _p_ paragraph"
             ("e" er/expand-region :post hydra-er/body)
             ("-" er/contract-region :post hydra-er/body)
             ("p" er/mark-paragraph)
@@ -498,17 +519,21 @@ _-_ reduce region _)_ around pairs
          ("C-r" . phi-search-backward)))
 
 (use-package eyebrowse
+  :commands eyebrowse-mode
   :config
   (eyebrowse-mode t))
 
 (when window-system
   (use-package moody
+    :commands (moody-replace-mode-line-buffer-identification
+               moody-replace-vc-mode)
     :config
     (setq-default x-underline-at-descent-line t)
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode)))
 
 (use-package minions
+  :commands minions-mode
   :config (minions-mode 1))
 
 (provide 'init)

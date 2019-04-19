@@ -751,6 +751,11 @@ terms of this shortcut.
 
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
+    :commands (hydra-default-pre
+               hydra-keyboard-quit
+               hydra--call-interactively-remap-maybe
+               hydra-show-hint
+               hydra-set-transient-map)
     :bind (("<f5>" . hydra-zoom/body))
     :config
     (defhydra hydra-zoom (:hint nil)
@@ -856,6 +861,7 @@ Parinfer Mode repository.
 
 #+BEGIN_SRC emacs-lisp
   (use-package parinfer
+    :commands parinfer-mode
     :bind
     (("C-," . parinfer-toggle-mode))
     :init
@@ -885,6 +891,7 @@ experience.
 
 #+BEGIN_SRC emacs-lisp
   (use-package ivy :diminish
+    :commands ivy-mode
     :init
     (setq ivy-use-virtual-buffers t
           enable-recursive-minibuffers t)
@@ -950,6 +957,7 @@ mapping to redo.
 
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree :diminish
+    :commands global-undo-tree-mode
     :config
     (global-undo-tree-mode 1))
 #+END_SRC
@@ -970,6 +978,7 @@ However this plugin is quite useful with Git repositories.
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile :diminish
+    :commands projectile-mode
     :bind (("C-c p" . projectile-command-map))
     :init
     (projectile-mode +1)
@@ -983,6 +992,7 @@ It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
   (use-package counsel-projectile
+    :commands counsel-projectile-mode
     :config (counsel-projectile-mode))
 #+END_SRC
 
@@ -1033,6 +1043,7 @@ synchronize my editor configurations between projects.
 
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig :diminish
+    :commands editorconfig-mode
     :config
     (editorconfig-mode 1))
 #+END_SRC
@@ -1073,6 +1084,7 @@ gonna try it out.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vdiff-magit
+    :commands (vdiff-magit-dwim vdiff-magit)
     :bind (:map magit-mode-map
                 ("e" . 'vdiff-magit-dwim)
                 ("E" . 'vdiff-magit))
@@ -1092,6 +1104,7 @@ enable it by default.
 
 #+BEGIN_SRC emacs-lisp
   (use-package which-key :diminish
+    :commands which-key-mode
     :config
     (which-key-mode))
 #+END_SRC
@@ -1146,6 +1159,13 @@ in most languages that I work with inside Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
+    :commands (er/expand-region
+               er/mark-paragraph
+               er/mark-inside-pairs
+               er/mark-outside-pairs
+               er/mark-inside-quotes
+               er/mark-outside-quotes
+               er/contract-region)
     :bind (("C-c e" . hydra-er/body))
     :config (defhydra hydra-er (:hint nil)
               "
@@ -1154,7 +1174,8 @@ in most languages that I work with inside Emacs.
   _e_ expand region _(_ inside pairs
   _-_ reduce region _)_ around pairs
   ^ ^               _q_ inside quotes
-  ^ ^               _Q_ around quotes"
+  ^ ^               _Q_ around quotes
+  ^ ^               _p_ paragraph"
               ("e" er/expand-region :post hydra-er/body)
               ("-" er/contract-region :post hydra-er/body)
               ("p" er/mark-paragraph)
@@ -1181,6 +1202,7 @@ window configurations. It works much like Vim tabs, or Tmux windows.
 
 #+BEGIN_SRC emacs-lisp
   (use-package eyebrowse
+    :commands eyebrowse-mode
     :config
     (eyebrowse-mode t))
 #+END_SRC
@@ -1192,6 +1214,8 @@ like it, and it doesn't add too much overhead.
 #+BEGIN_SRC emacs-lisp
   (when window-system
     (use-package moody
+      :commands (moody-replace-mode-line-buffer-identification
+                 moody-replace-vc-mode)
       :config
       (setq-default x-underline-at-descent-line t)
       (moody-replace-mode-line-buffer-identification)
@@ -1205,6 +1229,7 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
 
 #+BEGIN_SRC emacs-lisp
   (use-package minions
+    :commands minions-mode
     :config (minions-mode 1))
 #+END_SRC
 
@@ -1224,3 +1249,5 @@ And as a final step of a proper init file:
   (provide 'init)
   ;;; init.el ends here
 #+END_SRC
+
+Thanks for reading!
