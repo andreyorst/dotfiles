@@ -205,6 +205,15 @@ explicitly, instead of accepting =y= or =n=. This can be fixed with this.
   (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
+*** Key Display Timeout
+Emacs displays pressed  key after some time but it's  too fast for me,
+because I use Emacs on the phone  too, and the keyboard is a bit small
+for lightning fast typing.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 3)))
+#+END_SRC
+
 ** Trailing Whitespaces
 I don't  want my files to  contain trailing whitespaces, so  this hook
 will get rid of those automatically for me.
