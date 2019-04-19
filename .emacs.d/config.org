@@ -3,7 +3,8 @@
 #+email: andreyorst@gmail.com
 #+setupfile: ~/.dotfiles/.org-defaults.org
 #+startup: noinlineimages
-#+property: header-args :tangle yes
+#+property: header-args :tangle "~/.emacs.d/init.el"
+
 [[file:.sceenshot.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
@@ -35,6 +36,72 @@ list may update or disappear if I'll realize that this isn't necessary
 to have those sections.
 
 Now on to the configuration itself.
+
+* Init
+I've  decided to  drop =org-babel-load-file=  usage, and  tangle current
+file directly to main init file. This section represents the beginning
+of =init.el=.
+
+** Commentary
+First of all, good init file starts with commentary:
+
+#+BEGIN_SRC emacs-lisp
+  ;;; init.el --- Emacs main configuration file
+  ;;; Commentary:
+  ;;; Emacs config by Andrey Orst
+  ;;; Main config is located in .emacs.d/config.org
+  ;;; This file contains some speed hacks taken from Doom Emacs
+  ;;; Code:
+#+END_SRC
+
+Next I enable lexical binding to speedup load time:
+
+#+BEGIN_SRC emacs-lisp
+  ;; -*- lexical-binding: t; -*-
+#+END_SRC
+
+** Garbage Collection and File Name Handler
+I'm  declaring these  variables to  store default  values, to  restore
+those after initialization is finished.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar my--gc-cons-threshold gc-cons-threshold)
+  (defvar my--gc-cons-percentage gc-cons-percentage)
+  (defvar my--file-name-handler-alist file-name-handler-alist)
+#+END_SRC
+
+These settings help to avoid garbage collection during startup. The GC
+eats up quite  a bit of time, easily doubling  startup time. The trick
+is to turn up the memory threshold to prevent it from running:
+
+#+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold 402653184
+        gc-cons-percentage 0.6
+        message-log-max 16384
+        auto-window-vscroll nil
+        package-enable-at-startup nil
+        file-name-handler-alist nil)
+#+END_SRC
+
+Let's define a hook to restore these values after startup is finished:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook (lambda ()
+                               (setq gc-cons-threshold my--gc-cons-threshold
+                                     gc-cons-percentage my--gc-cons-percentage
+                                     file-name-handler-alist my--file-name-handler-alist)))
+#+END_SRC
+
+** =Package.el=
+I don't fully understand what the  following code does, but that's what
+Doom  Emacs  uses  to  speedup  initialization,  so  I'll  include  it
+anyways.  In  the  Doom  Emacs  Wiki  it  is  stated  that  Package.el
+initialization is expensive.
+
+#+BEGIN_SRC emacs-lisp
+  (setq package-enable-at-startup nil
+        package--init-file-ensured t)
+#+END_SRC
 
 * Common settings
 This   section  is   all   about  basic   configurations  of   builtin
@@ -344,7 +411,7 @@ config automatically on save. This function will handle it:
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
       (org-babel-tangle)
-      (load-file (file-truename "~/.emacs.d/config.el"))))
+      (byte-compile-file "~/.emacs.d/init.el")))
 #+END_SRC
 
 To actually make it work we need to add this hook:
@@ -472,6 +539,7 @@ so all text will be folded  and re-filled after its length reaches the
 =fill-column= value.  document
 
 #+BEGIN_SRC emacs-lisp
+  (require 'org)
   (add-hook 'org-mode-hook (lambda()
                              (flyspell-mode)
                              (setq default-justification 'full
@@ -512,7 +580,7 @@ Latex preview  feature is  really awesome, but  I don't  want produced
 images to be stored in plain sight. At least use hidden folder.
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-latex-preview-ltxpng-directory ".ltximg/")
+  (setq org-preview-latex-image-directory ".ltximg/")
 #+END_SRC
 
 *** Org Mappings
@@ -996,7 +1064,7 @@ gonna try it out.
     (set-face-attribute 'vdiff-subtraction-face nil :background "#553333" :foreground "#cc99999")
     (set-face-attribute 'vdiff-addition-face nil :background "#335533" :foreground "#cceecc")
     (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7")
-    (add-hook 'vdiff-mode-hook #'show-all))
+    (add-hook 'vdiff-mode-hook #'outline-show-all))
 #+END_SRC
 
 *** Vdiff Magit
@@ -1125,7 +1193,7 @@ like it, and it doesn't add too much overhead.
   (when window-system
     (use-package moody
       :config
-      (setq x-underline-at-descent-line t)
+      (setq-default x-underline-at-descent-line t)
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)))
 #+END_SRC
@@ -1149,3 +1217,10 @@ other people tastes, and because I want to credit original author.
 
 If you  find any issue with  my config feel  free to [[https://github.com/andreyorst/dotfiles/issues/new][file an  issue]] or
 contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].
+
+And as a final step of a proper init file:
+
+#+BEGIN_SRC emacs-lisp
+  (provide 'init)
+  ;;; init.el ends here
+#+END_SRC
