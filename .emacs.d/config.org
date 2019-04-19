@@ -5,7 +5,7 @@
 #+startup: noinlineimages
 #+property: header-args :tangle "~/.emacs.d/init.el"
 
-[[file:.sceenshot.png]]
+[[file:.screenshot.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
 purpose of  this file  is to  learn basics  of Org  Mode and  Emacs in
