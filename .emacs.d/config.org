@@ -430,6 +430,25 @@ I find it conveinient to bind this function to /Ctrl+t/ shortcut.
   (global-set-key "\C-t" 'my/ansi-term-toggle)
 #+END_SRC
 
+** =my/select-line=
+This  command provides  a  nice  way to  create  region that  includes
+current line.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/select-line ()
+    "Select the current line"
+    (interactive)
+    (end-of-line)
+    (set-mark (line-beginning-position)))
+#+END_SRC
+
+It is mapped to /Ctrl C/ + /x/ because in Kakoune selecting line is mapped
+to /x/.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c x") 'my/select-line)
+  #+END_SRC
+
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.
@@ -1027,7 +1046,7 @@ guess I'll figure out best mappings over time.
   _n_   select next      _d_     remove duplicated   _)_ cycle forward
   _p_   select previous  _q_     exit                ^ ^
   _C_   select next line"
-              ("M-s" mc/edit-ends-of-lines)
+              ("M-s" (mc/edit-ends-of-lines))
               ("s" mc/mark-all-in-region-regexp)
               ("n" mc/mark-next-like-this-word)
               ("p" mc/mark-previous-like-this-word)
