@@ -14,7 +14,10 @@
 (defvar my--gc-cons-percentage gc-cons-percentage)
 
 (setq gc-cons-threshold 402653184
-      gc-cons-percentage 0.6)
+      gc-cons-percentage 0.6
+      message-log-max 16384
+      auto-window-vscroll nil
+      package-enable-at-startup nil)
 
 ;; Unset file-name-handler-alist
 (defvar my--file-name-handler-alist file-name-handler-alist)
