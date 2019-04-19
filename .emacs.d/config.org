@@ -802,16 +802,6 @@ initialization process, and when new frame is created.
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
-** Diminish
-Emacs, please  stop cluttering  my mode  line with  all those  modes I
-already  know about.   Since =eldoc-mode=  is  builtin, I've  put it  to
-=diminish= configuration.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :diminish eldoc-mode)
-#+END_SRC
-
 ** Markdown
 Sometimes I need to edit Markdown documents, so this package is handy.
 
@@ -890,7 +880,7 @@ Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
 experience.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy :diminish
+  (use-package ivy
     :commands ivy-mode
     :init
     (setq ivy-use-virtual-buffers t
@@ -929,7 +919,7 @@ languages.
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package company :diminish
+  (use-package company
     :bind (:map company-active-map
                 ("TAB" . company-complete-common-or-cycle)
                 ("<tab>" . company-complete-common-or-cycle)
@@ -956,7 +946,7 @@ This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
 mapping to redo.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package undo-tree :diminish
+  (use-package undo-tree
     :commands global-undo-tree-mode
     :config
     (global-undo-tree-mode 1))
@@ -967,7 +957,7 @@ Another very handy package, that helps insert templates of code. Now I
 really need to write some snippets to use...
 
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet :diminish)
+  (use-package yasnippet)
 #+END_SRC
 
 ** Projectile
@@ -977,7 +967,7 @@ location. So I need a whole plugin to workaround this silly issue.
 However this plugin is quite useful with Git repositories.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package projectile :diminish
+  (use-package projectile
     :commands projectile-mode
     :bind (("C-c p" . projectile-command-map))
     :init
@@ -1042,7 +1032,7 @@ Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
 synchronize my editor configurations between projects.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package editorconfig :diminish
+  (use-package editorconfig
     :commands editorconfig-mode
     :config
     (editorconfig-mode 1))
@@ -1103,7 +1093,7 @@ keyboard shortcuts in a popup menu. I'm still learning Emacs, so let's
 enable it by default.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key :diminish
+  (use-package which-key
     :commands which-key-mode
     :config
     (which-key-mode))

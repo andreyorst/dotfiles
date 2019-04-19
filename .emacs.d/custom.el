@@ -10,7 +10,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (minions moody mc-extras expand-region eyebrowse phi-search multiple-cursors racer vdiff-magit vdiff which-key magit editorconfig clang-format toml-mode company-flx rust-mode gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer diminish use-package)))
+    (minions moody mc-extras expand-region eyebrowse phi-search multiple-cursors racer vdiff-magit vdiff which-key magit editorconfig clang-format toml-mode company-flx rust-mode gnuplot move-text undo-tree yasnippet counsel-projectile projectile markdown-mode geiser company-quickhelp company flycheck counsel ivy flx parinfer use-package)))
  '(size-indication-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

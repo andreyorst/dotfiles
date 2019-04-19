@@ -297,9 +297,6 @@ are defining or executing a macro."
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 
-(use-package diminish
-  :diminish eldoc-mode)
-
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -340,7 +337,7 @@ are defining or executing a macro."
 
 (use-package flx)
 
-(use-package ivy :diminish
+(use-package ivy
   :commands ivy-mode
   :init
   (setq ivy-use-virtual-buffers t
@@ -363,7 +360,7 @@ are defining or executing a macro."
 
 (use-package flycheck)
 
-(use-package company :diminish
+(use-package company
   :bind (:map company-active-map
               ("TAB" . company-complete-common-or-cycle)
               ("<tab>" . company-complete-common-or-cycle)
@@ -384,14 +381,14 @@ are defining or executing a macro."
         company-backends (remove 'company-cmake company-backends)
         company-backends (remove 'company-gtags company-backends)))
 
-(use-package undo-tree :diminish
+(use-package undo-tree
   :commands global-undo-tree-mode
   :config
   (global-undo-tree-mode 1))
 
-(use-package yasnippet :diminish)
+(use-package yasnippet)
 
-(use-package projectile :diminish
+(use-package projectile
   :commands projectile-mode
   :bind (("C-c p" . projectile-command-map))
   :init
@@ -419,7 +416,7 @@ are defining or executing a macro."
 
 (use-package toml-mode)
 
-(use-package editorconfig :diminish
+(use-package editorconfig
   :commands editorconfig-mode
   :config
   (editorconfig-mode 1))
@@ -454,7 +451,7 @@ are defining or executing a macro."
   (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
   (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
 
-(use-package which-key :diminish
+(use-package which-key
   :commands which-key-mode
   :config
   (which-key-mode))
