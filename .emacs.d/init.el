@@ -524,14 +524,14 @@ _-_ reduce region _)_ around pairs
   (use-package moody
     :commands (moody-replace-mode-line-buffer-identification
                moody-replace-vc-mode)
-    :config
+    :init
     (setq-default x-underline-at-descent-line t)
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode)))
 
 (use-package minions
   :commands minions-mode
-  :config (minions-mode 1))
+  :init (minions-mode 1))
 
 (provide 'init)
 ;;; init.el ends here

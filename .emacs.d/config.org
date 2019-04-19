@@ -1206,7 +1206,7 @@ like it, and it doesn't add too much overhead.
     (use-package moody
       :commands (moody-replace-mode-line-buffer-identification
                  moody-replace-vc-mode)
-      :config
+      :init
       (setq-default x-underline-at-descent-line t)
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)))
@@ -1220,7 +1220,7 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
 #+BEGIN_SRC emacs-lisp
   (use-package minions
     :commands minions-mode
-    :config (minions-mode 1))
+    :init (minions-mode 1))
 #+END_SRC
 
 * Postscript
