@@ -3,13 +3,17 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        forward-sexp
         indent-for-tab-command
         org-self-insert-command
+        org-yank
         parinfer-backward-delete-char
+        parinfer-region-delete-region
         ))
 
 (setq mc/cmds-to-run-once
       '(
+        hydra-mc/body
         hydra-mc/lambda-M-s
         hydra-mc/mc/cycle-backward
         hydra-mc/mc/cycle-forward
