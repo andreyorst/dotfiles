@@ -52,11 +52,9 @@ disable startup screen and start with the =*scratch*= buffer instead.
 #+END_SRC
 
 I also  would like  to start  Emacs in  Org mode  by default,  so lets
-=require=  the =org-mode=  and change  the  default major  mode for  Emacs
-startup.
+change the default major mode for Emacs startup.
 
 #+BEGIN_SRC emacs-lisp
-  (require 'org)
   (setq initial-major-mode 'org-mode)
 #+END_SRC
 
