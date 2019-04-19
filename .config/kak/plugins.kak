@@ -17,8 +17,6 @@ plug "andreyorst/plug.kak" noload
 plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
-plug "occivink/kakoune-gdb"
-plug "occivink/kakoune-find"
 plug "occivink/kakoune-sudo-write"
 
 plug "andreyorst/base16-gruvbox.kak" theme %{
@@ -168,7 +166,6 @@ plug "alexherbo2/yank-ring.kak" config %{
 plug "alexherbo2/split-object.kak" config %{
     map -docstring "split object" global normal '<a-I>' ': enter-user-mode split-object<ret>'
 }
-
 
 plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
     map -docstring "decrement selection" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
