@@ -107,8 +107,8 @@ can display all relevant information in  the mode line. I just need to
 enable =column-number-mode= feature.
 
 #+BEGIN_SRC emacs-lisp
-  (setq column-number-mode t
-        size-indication-mode nil)
+  (add-hook 'after-init-hook (lambda () (setq column-number-mode t
+                                              size-indication-mode nil)))
 #+END_SRC
 
 ** Font
