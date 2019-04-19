@@ -14,3 +14,4 @@ saved_workspaces
 !.emacs.d/custom.el
 !.emacs.d/snippets/
 !.emacs.d/.sceenshot.png
+!.emacs.d/.mc-lists.el
