@@ -454,13 +454,14 @@ are defining or executing a macro."
 
 (use-package which-key
   :commands which-key-mode
-  :config
+  :init
   (which-key-mode))
 
 (use-package multiple-cursors
   :bind (("C-S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydra-mc/body))
-  :config (defhydra hydra-mc (:hint nil)
+  :config (defhydra hydra-mc (:color pink
+                              :hint nil)
             "
 ^Select^               ^Discard^                   ^Move^
 ^──────^───────────────^───────^───────────────────^────^────────────
