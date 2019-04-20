@@ -43,8 +43,8 @@
 
 (setq mode-line-in-non-selected-windows nil)
 
-(add-hook 'after-init-hook (lambda () (setq column-number-mode t
-                                            size-indication-mode nil)))
+(setq column-number-mode t
+      size-indication-mode 0)
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 

@@ -174,8 +174,8 @@ feature.  Also  disable the  size  indication,  as  I find  it  pretty
 useless.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook (lambda () (setq column-number-mode t
-                                              size-indication-mode nil)))
+  (setq column-number-mode t
+        size-indication-mode 0)
 #+END_SRC
 
 ** Font
