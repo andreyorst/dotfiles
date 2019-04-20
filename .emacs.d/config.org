@@ -958,7 +958,9 @@ Another very handy package, that helps insert templates of code. Now I
 really need to write some snippets to use...
 
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet)
+  (use-package yasnippet
+    :commands yas-reload-all
+    :init (yas-reload-all))
 #+END_SRC
 
 ** Projectile

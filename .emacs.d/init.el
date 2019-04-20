@@ -387,7 +387,9 @@ are defining or executing a macro."
   :config
   (global-undo-tree-mode 1))
 
-(use-package yasnippet)
+(use-package yasnippet
+  :commands yas-reload-all
+  :init (yas-reload-all))
 
 (use-package projectile
   :commands projectile-mode
