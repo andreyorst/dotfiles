@@ -175,7 +175,7 @@ useless.
 
 #+BEGIN_SRC emacs-lisp
   (setq column-number-mode t
-        size-indication-mode 0)
+        size-indication-mode nil)
 #+END_SRC
 
 ** Font

@@ -44,7 +44,7 @@
 (setq mode-line-in-non-selected-windows nil)
 
 (setq column-number-mode t
-      size-indication-mode 0)
+      size-indication-mode nil)
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
