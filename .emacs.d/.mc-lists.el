@@ -28,5 +28,6 @@
         hydra-mc/mc/remove-duplicated-cursors
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
+        minions-minor-modes-menu
         parinfer-mouse-drag-region
         ))
