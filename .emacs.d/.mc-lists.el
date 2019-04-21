@@ -5,6 +5,8 @@
       '(
         forward-sexp
         indent-for-tab-command
+        my/select-line
+        org-beginning-of-line
         org-self-insert-command
         org-yank
         parinfer-backward-delete-char
@@ -26,4 +28,5 @@
         hydra-mc/mc/remove-duplicated-cursors
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
+        parinfer-mouse-drag-region
         ))
