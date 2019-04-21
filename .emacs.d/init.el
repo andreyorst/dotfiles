@@ -534,6 +534,9 @@ _-_ reduce region _)_ around pairs
 
 (use-package minions
   :commands minions-mode
+  :config (setq minions-direct '(multiple-cursors-mode
+                                 flycheck-mode
+                                 flyspell-mode))
   :init (minions-mode 1))
 
 (provide 'init)

@@ -1215,7 +1215,7 @@ like it, and it doesn't add too much overhead.
       (moody-replace-vc-mode)))
 #+END_SRC
 
-** Minion
+** Minions
 This  package  implements   a  menu  that  lists   all  enabled  minor
 modes. Emacs mode  line can become pretty long, so  this can be handy,
 and perhaps I don't need to use =:diminish= everywhere anymore.
@@ -1223,6 +1223,9 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
 #+BEGIN_SRC emacs-lisp
   (use-package minions
     :commands minions-mode
+    :config (setq minions-direct '(multiple-cursors-mode
+                                   flycheck-mode
+                                   flyspell-mode))
     :init (minions-mode 1))
 #+END_SRC
 
