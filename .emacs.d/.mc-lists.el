@@ -7,6 +7,7 @@
         indent-for-tab-command
         my/select-line
         org-beginning-of-line
+        org-delete-char
         org-self-insert-command
         org-yank
         parinfer-backward-delete-char
