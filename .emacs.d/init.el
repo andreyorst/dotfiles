@@ -271,20 +271,22 @@ are defining or executing a macro."
 
 This mode makes buffer contents centered."
   :lighter " center-view"
-  (center-view))
-;;;###autoload
+  (if center-view-mode
+      (progn
+        (add-hook 'window-size-change-functions
+                  'center-view)
+        (center-view))
+    (progn
+      (remove-hook 'window-size-change-functions
+                   'center-view)
+      (set-window-margins nil 0 0))))
 
 (make-variable-buffer-local
  (defvar margin-size 0 "the size of margins in the buffer"))
 
-(defun center-view ()
-  (if center-view-mode
-      (let ((margin-size (/ (- (frame-width) (+ fill-column 5)) 2)))
-        (set-window-margins nil margin-size margin-size))
-    (set-window-margins nil 0 0)))
-
-(add-hook 'window-configuration-change-hook 'center-view)
-(add-hook 'center-view-mode-hook 'center-view)
+(defun center-view (&optional _)
+  (let ((margin-size (/ (- (frame-width) (+ fill-column 10)) 2)))
+    (set-window-margins nil margin-size margin-size)))
 
 (provide 'center-view-mode)
 
