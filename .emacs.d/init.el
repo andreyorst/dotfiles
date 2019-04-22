@@ -284,9 +284,9 @@ This mode makes buffer contents centered."
 (make-variable-buffer-local
  (defvar margin-size 0 "the size of margins in the buffer"))
 
-(defun center-view (&optional _)
+(defun center-view (&optional window)
   (let ((margin-size (/ (- (frame-width) (+ fill-column 10)) 2)))
-    (set-window-margins nil margin-size margin-size)))
+    (set-window-margins (frame-root-window window) margin-size margin-size)))
 
 (provide 'center-view-mode)
 

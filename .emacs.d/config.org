@@ -766,9 +766,9 @@ Let's make =margin-size= a buffer local variable:
 This is the main function that centers buffer contents:
 
 #+BEGIN_SRC emacs-lisp
-  (defun center-view (&optional _)
+  (defun center-view (&optional window)
     (let ((margin-size (/ (- (frame-width) (+ fill-column 10)) 2)))
-      (set-window-margins nil margin-size margin-size)))
+      (set-window-margins (frame-root-window window) margin-size margin-size)))
 #+END_SRC
 
 Now we can provide the mode:
