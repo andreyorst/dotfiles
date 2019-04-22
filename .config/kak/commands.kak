@@ -50,16 +50,18 @@ search-file -params 1 %{ evaluate-commands %sh{
     eval "set -- ${kak_opt_path}"
     while [ $# -gt 0 ]; do
         case $1 in
-            ./) path=${PWD} ;;
-            %/) path=${kak_buffile%/*} ;;
-            *)  path=$1 ;;
+            %/) path=${PWD}            ;;
+            ./) path=${kak_buffile%/*} ;;
+            *)  path=$1                ;;
         esac
         if [ -z "${file##*/*}" ]; then # test if filename contains path
             if [ -e "${path}/${file}" ]; then
                 printf "%s\n" "edit -existing %{${path}/${file}}"
                 exit
             fi
-        else # build list of candidates or automatically select if only one found
+        else
+            # build list of candidates or automatically select if only one found
+            # this doesn't support files with newlines in them unfortunately
             IFS='
 '
             for candidate in $(eval "${find}"); do
