@@ -336,7 +336,7 @@ it from Melpa.
 This function should be used as advice to any exit handle function
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/autokill-when-no-processes (&rest args)
+  (defun my/autokill-when-no-processes (&rest _)
     "Kill buffer and its window automatically when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
         (kill-buffer (current-buffer))
@@ -478,7 +478,7 @@ This command toggles ansi-term window on and off without killing ansi-term.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/ansi-term-toggle ()
-    "Toggle ansi-term window on and off with the same command."
+    "Toggle `ansi-term' window on and off with the same command."
     (interactive)
     (defvar my--ansi-term-name "ansi-term-popup")
     (defvar my--window-name (concat "*" my--ansi-term-name "*"))
@@ -504,7 +504,7 @@ current line.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/select-line ()
-    "Select the current line"
+    "Select the current line."
     (interactive)
     (end-of-line)
     (set-mark (line-beginning-position)))
@@ -726,68 +726,13 @@ Default resolution is too low:
 #+END_SRC
 
 ** Center View Mode
-This is my  own mode, that I  like to use when writing  text in single
-frame. It centers buffer contents, making it nice an clean.
-
-First, we need a mode hook:
-
-#+BEGIN_SRC emacs-lisp
-  (defvar center-view-mode-hook nil)
-  (defvar center-view-mode nil)
-  (defvar center-view-extra-space 10)
-#+END_SRC
-
-Let's make =center-view--margin-size= a buffer local variable:
+This is my own minor mode. It  makes text centered in the buffer where
+the   mode   was   enabled.    I'm   aware   of   [[https://github.com/joostkremers/writeroom-mode][writeroom-mode]]   and
+[[https://github.com/anler/centered-window-mode][centered-window-mode]],  but I  wanted to  try to  create my  own thing,
+because there's no better way to learn a language, but to write in it.
 
 #+BEGIN_SRC emacs-lisp
-  (make-variable-buffer-local
-   (progn
-     (defvar center-view--margin-size 0 "the size of margins in the buffer")
-     (defvar center-view--buffer-window nil)))
-#+END_SRC
-
-Next, let's create the minor mode:
-
-#+BEGIN_SRC emacs-lisp
-  ;;;###autoload
-  (define-minor-mode center-view-mode
-    "Toggle Center View Mode.
-
-  This mode makes buffer contents centered."
-    :lighter " center-view"
-    (if center-view-mode
-        (progn
-          (setq center-view--buffer-window (get-buffer-window))
-          (add-hook 'window-size-change-functions
-                    'center-view)
-          (center-view))
-      (progn
-        (remove-hook 'window-size-change-functions
-                     'center-view)
-        (set-window-margins nil 0 0))))
-#+END_SRC
-
-This is the main function that centers buffer contents:
-
-#+BEGIN_SRC emacs-lisp
-  (defun center-view (&optional frame)
-    (if (>= (window-total-width)
-            (+ fill-column center-view-extra-space))
-        (if center-view--buffer-window
-            (let ((center-view--margin-size
-                   (/ (- (window-total-width center-view--buffer-window)
-                         (+ fill-column
-                            center-view-extra-space))
-                      2)))
-              (set-window-margins center-view--buffer-window
-                                  center-view--margin-size
-                                  center-view--margin-size)))))
-#+END_SRC
-
-Now we can provide the mode:
-
-#+BEGIN_SRC emacs-lisp
-  (provide 'center-view-mode)
+  (load-file "~/.emacs.d/elisp/center-view.el")
 #+END_SRC
 
 * Packages

@@ -90,7 +90,7 @@
   (when (not (package-installed-p package))
     (package-install package)))
 
-(defun my/autokill-when-no-processes (&rest args)
+(defun my/autokill-when-no-processes (&rest _)
   "Kill buffer and its window automatically when there's no processes left."
   (when (null (get-buffer-process (current-buffer)))
       (kill-buffer (current-buffer))
@@ -163,7 +163,7 @@ are defining or executing a macro."
 (global-set-key [remap keyboard-quit] #'my/escape)
 
 (defun my/ansi-term-toggle ()
-  "Toggle ansi-term window on and off with the same command."
+  "Toggle `ansi-term' window on and off with the same command."
   (interactive)
   (defvar my--ansi-term-name "ansi-term-popup")
   (defvar my--window-name (concat "*" my--ansi-term-name "*"))
@@ -179,7 +179,7 @@ are defining or executing a macro."
 (global-set-key "\C-t" 'my/ansi-term-toggle)
 
 (defun my/select-line ()
-  "Select the current line"
+  "Select the current line."
   (interactive)
   (end-of-line)
   (set-mark (line-beginning-position)))
@@ -262,46 +262,7 @@ are defining or executing a macro."
 
 (setq doc-view-resolution 192)
 
-(defvar center-view-mode-hook nil)
-(defvar center-view-mode nil)
-(defvar center-view-extra-space 10)
-
-(make-variable-buffer-local
- (progn
-   (defvar center-view--margin-size 0 "the size of margins in the buffer")
-   (defvar center-view--buffer-window nil)))
-
-;;;###autoload
-(define-minor-mode center-view-mode
-  "Toggle Center View Mode.
-
-This mode makes buffer contents centered."
-  :lighter " center-view"
-  (if center-view-mode
-      (progn
-        (setq center-view--buffer-window (get-buffer-window))
-        (add-hook 'window-size-change-functions
-                  'center-view)
-        (center-view))
-    (progn
-      (remove-hook 'window-size-change-functions
-                   'center-view)
-      (set-window-margins nil 0 0))))
-
-(defun center-view (&optional frame)
-  (if (>= (window-total-width)
-          (+ fill-column center-view-extra-space))
-      (if center-view--buffer-window
-          (let ((center-view--margin-size
-                 (/ (- (window-total-width center-view--buffer-window)
-                       (+ fill-column
-                          center-view-extra-space))
-                    2)))
-            (set-window-margins center-view--buffer-window
-                                center-view--margin-size
-                                center-view--margin-size)))))
-
-(provide 'center-view-mode)
+(load-file "~/.emacs.d/elisp/center-view.el")
 
 (my/ensure-installed 'use-package)
 (require 'use-package)
