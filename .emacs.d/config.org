@@ -725,6 +725,60 @@ Default resolution is too low:
   (setq doc-view-resolution 192)
 #+END_SRC
 
+** Center View Mode
+This is my  own mode, that I  like to use when writing  text in single
+frame. It centers buffer contents, making it nice an clean.
+
+First, we need a mode hook:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar center-view-mode-hook nil)
+  (defvar center-view-mode nil)
+#+END_SRC
+
+Next, let's create the minor mode:
+
+#+BEGIN_SRC emacs-lisp
+  ;;;###autoload
+  (define-minor-mode center-view-mode
+    "Toggle Center View Mode.
+
+  This mode makes buffer contents centered."
+    :lighter " center-view"
+    (my/center-view))
+  ;;;###autoload
+#+END_SRC
+
+Let's make =margin-size= a buffer local variable:
+
+#+BEGIN_SRC emacs-lisp
+  (make-variable-buffer-local
+   (defvar margin-size 0 "the size of margins in the buffer"))
+#+END_SRC
+
+This is the main function that centers buffer contents:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/center-view ()
+    (if center-view-mode
+        (let ((margin-size (/ (- (frame-width) (+ fill-column 10)) 2)))
+          (set-window-margins nil margin-size margin-size))
+      (set-window-margins nil 0 0)))
+#+END_SRC
+
+Some important hooks to run:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'frame-size-changed-p 'my/center-view)
+  (add-hook 'center-view-mode-hook 'my/center-view)
+#+END_SRC
+
+Now we can provide the mode:
+
+#+BEGIN_SRC emacs-lisp
+  (provide 'center-view-mode)
+#+END_SRC
+
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
@@ -1196,7 +1250,7 @@ window configurations. It works much like Vim tabs, or Tmux windows.
 #+BEGIN_SRC emacs-lisp
   (use-package eyebrowse
     :commands eyebrowse-mode
-    :config
+    :init
     (eyebrowse-mode t))
 #+END_SRC
 
@@ -1225,7 +1279,8 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
     :commands minions-mode
     :config (setq minions-direct '(multiple-cursors-mode
                                    flycheck-mode
-                                   flyspell-mode))
+                                   flyspell-mode
+                                   parinfer-mode))
     :init (minions-mode 1))
 #+END_SRC
 

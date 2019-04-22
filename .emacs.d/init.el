@@ -262,6 +262,32 @@ are defining or executing a macro."
 
 (setq doc-view-resolution 192)
 
+(defvar center-view-mode-hook nil)
+(defvar center-view-mode nil)
+
+;;;###autoload
+(define-minor-mode center-view-mode
+  "Toggle Center View Mode.
+
+This mode makes buffer contents centered."
+  :lighter " center-view"
+  (my/center-view))
+;;;###autoload
+
+(make-variable-buffer-local
+ (defvar margin-size 0 "the size of margins in the buffer"))
+
+(defun my/center-view ()
+  (if center-view-mode
+      (let ((margin-size (/ (- (frame-width) (+ fill-column 10)) 2)))
+        (set-window-margins nil margin-size margin-size))
+    (set-window-margins nil 0 0)))
+
+(add-hook 'frame-size-changed-p 'my/center-view)
+(add-hook 'center-view-mode-hook 'my/center-view)
+
+(provide 'center-view-mode)
+
 (my/ensure-installed 'use-package)
 (require 'use-package)
 (setq use-package-always-ensure t)
@@ -520,7 +546,7 @@ _-_ reduce region _)_ around pairs
 
 (use-package eyebrowse
   :commands eyebrowse-mode
-  :config
+  :init
   (eyebrowse-mode t))
 
 (when window-system
@@ -536,7 +562,8 @@ _-_ reduce region _)_ around pairs
   :commands minions-mode
   :config (setq minions-direct '(multiple-cursors-mode
                                  flycheck-mode
-                                 flyspell-mode))
+                                 flyspell-mode
+                                 parinfer-mode))
   :init (minions-mode 1))
 
 (provide 'init)
