@@ -48,17 +48,16 @@ search-file -params 1 %{ evaluate-commands %sh{
 
     # if everthing  above fails - search for file under `path'
     eval "set -- ${kak_opt_path}"
-    while [ $# -gt 0 ]; do
-        case $1 in
-            %/) path=${PWD}            ;;
-            ./) path=${kak_buffile%/*} ;;
-            *)  path=$1                ;;
-        esac
-        if [ -z "${file##*/*}" ]; then # test if filename contains path
-            if [ -e "${path}/${file}" ]; then
-                printf "%s\n" "edit -existing %{${path}/${file}}"
-                exit
-            fi
+    while [ $# -gt 0 ]; do                # Since we want to check fewer places,
+        case $1 in                        # I've swapped ./ and %/ because
+            ./) path=${kak_buffile%/*} ;; # %/ usually has smaller scope. So
+            %/) path=${PWD}            ;; # this trick is a speedi-up hack.
+            *)  path=$1                ;; # This means that `path' option should
+        esac                              # first contain `./' and then `%/'
+
+        if [ -z "${file##*/*}" ] && [ -e "${path}/${file}" ]; then
+            printf "%s\n" "edit -existing %{${path}/${file}}"
+            exit
         else
             # build list of candidates or automatically select if only one found
             # this doesn't support files with newlines in them unfortunately
@@ -67,6 +66,7 @@ search-file -params 1 %{ evaluate-commands %sh{
             for candidate in $(eval "${find}"); do
                 [ -n "${candidate}" ] && candidates="${candidates} %{${candidate}} %{evaluate-commands %{edit -existing %{${candidate}}}}"
             done
+
             # we want to get out as early as possible
             # so if any candidate found in current cycle
             # we prompt it in menu and exit
@@ -75,6 +75,7 @@ search-file -params 1 %{ evaluate-commands %sh{
                 exit
             fi
         fi
+
         shift
     done
 
@@ -171,7 +172,7 @@ vsplit -params .. -command-completion %{
     tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
 
-define-command  -docstring "split tmux horizontally" \
+define-command -docstring "split tmux horizontally" \
 split -params .. -command-completion %{
     tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
 }
@@ -185,3 +186,19 @@ define-command -docstring "print current working directory" \
 pwd %{ evaluate-commands %sh{
     printf "%s\n" "echo -markup %{{Information}${PWD}}"
 }}
+
+define-command -docstring "Ask before repeating last command (with `.' (dot)) for next search match" \
+query-repeat %{ try %{
+    execute-keys n
+    prompt "confirm? [yn]: " -on-change %{ execute-keys %sh{
+        case ${kak_text} in
+            y) printf "%s\n" "<esc>.: query-repeat<ret>";;
+            n) printf "%s\n" "<esc>: query-repeat<ret>" ;;
+            *) ;;
+        esac
+    }} nop
+} catch %{
+    fail "no search pattern"
+}}
+
+map global normal <c-n> ': query-repeat<ret>'
