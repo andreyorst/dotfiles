@@ -12,6 +12,7 @@
 (make-variable-buffer-local
  (progn
    (defvar center-view--margin-size 0)
+   (defvar center-view--window-width 0)
    (defvar center-view--buffer-window nil)))
 
 ;;;###autoload
@@ -39,11 +40,12 @@ If current window is wider than `fill-column' + `center-view-extra-space'
 active buffer will be displayed centered.  This function accepts optional
 frame argument, however it is done only to please `window-size-change-functions'
 format."
-  (if (and (>= (window-total-width)
+  (setq center-view--window-width (window-total-width))
+  (if (and (>= center-view--window-width
                (+ fill-column center-view-extra-space))
            center-view--buffer-window)
       (let ((center-view--margin-size
-             (/ (- (window-total-width center-view--buffer-window)
+             (/ (- center-view--window-width
                    (+ fill-column center-view-extra-space))
                 2)))
         (set-window-margins center-view--buffer-window
