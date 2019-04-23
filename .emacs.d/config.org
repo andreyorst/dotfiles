@@ -104,9 +104,14 @@ initialization is expensive.
 #+END_SRC
 
 ** Load Path
+Since  I've  started  splitting  configuration  into  separate  parts,
+because  those  parts  don't  quite  match  the  literate  programming
+paradigm, I want to be able to load those files:
+
 #+BEGIN_SRC emacs-lisp
   (push (expand-file-name "lisp" user-emacs-directory) load-path)
 #+END_SRC
+
 * Common settings
 This   section  is   all   about  basic   configurations  of   builtin
 features. Emacs provides a lot of settings  on it's own, but I want to
