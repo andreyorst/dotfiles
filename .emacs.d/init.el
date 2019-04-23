@@ -26,6 +26,8 @@
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
 
+(push (expand-file-name "lisp" user-emacs-directory) load-path)
+
 (setq inhibit-splash-screen t)
 
 (setq initial-major-mode 'org-mode)
@@ -262,7 +264,7 @@ are defining or executing a macro."
 
 (setq doc-view-resolution 192)
 
-(load-file "~/.emacs.d/elisp/center-view.el")
+(require 'center-view)
 
 (my/ensure-installed 'use-package)
 (require 'use-package)

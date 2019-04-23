@@ -50,5 +50,5 @@ format."
                             center-view--margin-size
                             center-view--margin-size))))
 
-(provide 'center-view-mode)
+(provide 'center-view)
 ;;; center-view.el ends here

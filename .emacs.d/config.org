@@ -103,6 +103,10 @@ initialization is expensive.
         package--init-file-ensured t)
 #+END_SRC
 
+** Load Path
+#+BEGIN_SRC emacs-lisp
+  (push (expand-file-name "lisp" user-emacs-directory) load-path)
+#+END_SRC
 * Common settings
 This   section  is   all   about  basic   configurations  of   builtin
 features. Emacs provides a lot of settings  on it's own, but I want to
@@ -732,7 +736,7 @@ the   mode   was   enabled.    I'm   aware   of   [[https://github.com/joostkrem
 because there's no better way to learn a language, but to write in it.
 
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/elisp/center-view.el")
+  (require 'center-view)
 #+END_SRC
 
 * Packages
