@@ -788,29 +788,26 @@ terms of this shortcut.
 This  package will  be used  in many  other package  configurations to
 provide sane keybindings.
 
-** Spacemacs theme
-I really  like this theme.  It's  something like Atom's One  Dark, but
-little more purple. Anyway it's awesome, and colors are really nice.
+** Doom Themes
+I've  decided to  try out  Doom Themes.  It contains  nice variant  of
+Atom-like One theme which I like, but it is also an amazingly well put
+package, which defines colors for pretty much everything in Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package spacemacs-common
-      :ensure spacemacs-theme
-      :config (load-theme 'spacemacs-dark t)
-        (let ((line (face-attribute 'mode-line :underline)))
-          (set-face-attribute 'mode-line          nil :overline   line)
-          (set-face-attribute 'mode-line-inactive nil :overline   line)
-          (set-face-attribute 'mode-line-inactive nil :underline  line)
-          (set-face-attribute 'mode-line          nil :box        nil)
-          (set-face-attribute 'mode-line-inactive nil :box        nil)))
-#+END_SRC
-
-Also let's disable fringe background  color and line numbers color, if
-theme changes it.
-
-#+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'fringe nil :background nil)
-  (set-face-attribute 'line-number nil :background nil)
-  (set-face-attribute 'header-line nil :background "#222226")
+  (use-package doom-themes
+    :commands (doom-themes-org-config doom-themes-neotree-config)
+    :init
+    (load-theme 'doom-one t)
+    (doom-themes-org-config)
+    (doom-themes-neotree-config)
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (let ((line (face-attribute 'mode-line :underline)))
+      (set-face-attribute 'mode-line          nil :overline   line)
+      (set-face-attribute 'mode-line-inactive nil :overline   line)
+      (set-face-attribute 'mode-line-inactive nil :underline  line)
+      (set-face-attribute 'mode-line          nil :box        nil)
+      (set-face-attribute 'mode-line-inactive nil :box        nil)))
 #+END_SRC
 
 If  I  use =window-system=  I  want  [[*=my/set-frame-dark=][=my/set-frame-dark=]] to  run  during

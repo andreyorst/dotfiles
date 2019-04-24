@@ -284,23 +284,38 @@ are defining or executing a macro."
     ("-" text-scale-decrease "out")
     ("0" (text-scale-set 0) "reset")))
 
-(use-package spacemacs-common
-    :ensure spacemacs-theme
-    :config (load-theme 'spacemacs-dark t)
-      (let ((line (face-attribute 'mode-line :underline)))
-        (set-face-attribute 'mode-line          nil :overline   line)
-        (set-face-attribute 'mode-line-inactive nil :overline   line)
-        (set-face-attribute 'mode-line-inactive nil :underline  line)
-        (set-face-attribute 'mode-line          nil :box        nil)
-        (set-face-attribute 'mode-line-inactive nil :box        nil)))
-
-(set-face-attribute 'fringe nil :background nil)
-(set-face-attribute 'line-number nil :background nil)
-(set-face-attribute 'header-line nil :background "#222226")
+(use-package doom-themes
+  :commands (doom-themes-org-config doom-themes-neotree-config)
+  :init
+  (load-theme 'doom-one t)
+  (doom-themes-org-config)
+  (doom-themes-neotree-config)
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  (let ((line (face-attribute 'mode-line :underline)))
+    (set-face-attribute 'mode-line          nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :underline  line)
+    (set-face-attribute 'mode-line          nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :box        nil)))
 
 (when window-system
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
+
+(use-package solaire-mode
+  :commands (solaire-global-mode solaire-mode-swap-bg)
+  :hook
+  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+  (minibuffer-setup . solaire-mode-in-minibuffer)
+  :init
+  (solaire-mode-swap-bg)
+  (solaire-global-mode +1))
+
+(use-package neotree
+  :bind (("<f8>" . neotree-toggle)))
+
+(use-package all-the-icons)
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
