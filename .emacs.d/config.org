@@ -175,16 +175,16 @@ active window.
 #+END_SRC
 
 **** Line Numbers Column and Percent position
-I've decided to stop using line numbers at the side of the window, but
-I still want to see which  line number I'm currently on. Luckily Emacs
-can display all  relevant information in the mode  line.  Line numbers
-are displayed by default, so  I just need to enable =column-number-mode=
-feature.  Also  disable the  size  indication,  as  I find  it  pretty
-useless.
+I  don't  find displaying  position  in  modeline really  great  idea,
+because I need to move my eyes too much on big screen just to see what
+line number I'm currently on.
 
 #+BEGIN_SRC emacs-lisp
-  (setq column-number-mode t
-        size-indication-mode nil)
+  (setq column-number-mode nil
+        line-number-mode nil
+        size-indication-mode nil
+        mode-line-position nil)
+
 #+END_SRC
 
 ** Font
