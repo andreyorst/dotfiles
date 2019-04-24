@@ -744,6 +744,16 @@ because there's no better way to learn a language, but to write in it.
   (require 'center-view)
 #+END_SRC
 
+** Prog Mode
+This isn't really a configuration of Prog Mode itself, but some hooks that change how
+programming related modes behave.
+
+Here, I want all programming modes to include line numbers by default:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+END_SRC
+
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
@@ -828,7 +838,6 @@ buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
     :commands (solaire-global-mode solaire-mode-swap-bg)
     :hook
     ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
-    (minibuffer-setup . solaire-mode-in-minibuffer)
     :init
     (solaire-mode-swap-bg)
     (solaire-global-mode +1))

@@ -268,6 +268,8 @@ are defining or executing a macro."
 
 (require 'center-view)
 
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
 (my/ensure-installed 'use-package)
 (require 'use-package)
 (setq use-package-always-ensure t)
@@ -309,13 +311,18 @@ are defining or executing a macro."
   :commands (solaire-global-mode solaire-mode-swap-bg)
   :hook
   ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
-  (minibuffer-setup . solaire-mode-in-minibuffer)
   :init
   (solaire-mode-swap-bg)
   (solaire-global-mode +1))
 
 (use-package neotree
-  :bind (("<f8>" . neotree-toggle)))
+  :commands (neotree-show
+             neotree-find
+             neotree-projectile-action)
+  :bind (("<f8>" . neotree-toggle))
+  :init
+  (setq neo-show-hidden-files t)
+  (neotree-show))
 
 (use-package all-the-icons)
 
