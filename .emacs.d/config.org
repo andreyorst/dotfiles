@@ -1049,12 +1049,15 @@ However this plugin is quite useful with Git repositories.
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :commands projectile-mode
+    :commands (projectile-mode projectile-find-file)
     :bind (("C-c p" . projectile-command-map))
     :init
     (projectile-mode +1)
     (setq projectile-svn-command "fd -L --type f --print0"
           projectile-generic-command "fd -L --type f --print0"
+          projectile-switch-project-action (lambda()
+                                             (neotree-projectile-action)
+                                             (projectile-find-file))
           projectile-completion-system 'ivy))
 #+END_SRC
 
@@ -1099,7 +1102,6 @@ whatever.
   (use-package racer
     :config (add-hook 'racer-mode-hook #'eldoc-mode))
 #+END_SRC
-
 ** TOML
 =toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
 configure project.

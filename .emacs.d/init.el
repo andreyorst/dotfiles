@@ -428,12 +428,15 @@ are defining or executing a macro."
   :init (yas-reload-all))
 
 (use-package projectile
-  :commands projectile-mode
+  :commands (projectile-mode projectile-find-file)
   :bind (("C-c p" . projectile-command-map))
   :init
   (projectile-mode +1)
   (setq projectile-svn-command "fd -L --type f --print0"
         projectile-generic-command "fd -L --type f --print0"
+        projectile-switch-project-action (lambda()
+                                           (neotree-projectile-action)
+                                           (projectile-find-file))
         projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
