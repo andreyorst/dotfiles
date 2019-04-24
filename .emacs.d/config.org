@@ -819,6 +819,40 @@ initialization process, and when new frame is created.
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
+** Solaire Mode
+This  package helps  distinguish  buffers that  have  file opened  and
+buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package solaire-mode
+    :commands (solaire-global-mode solaire-mode-swap-bg)
+    :hook
+    ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+    (minibuffer-setup . solaire-mode-in-minibuffer)
+    :init
+    (solaire-mode-swap-bg)
+    (solaire-global-mode +1))
+#+END_SRC
+
+If only certain buffers could be so grossly incandescent.
+
+** Neotree
+I don't think that  I'm going to use it, but it  looks amazing so I've
+installed it just for aesthetic purposes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :bind (("<f8>" . neotree-toggle)))
+#+END_SRC
+
+** All The Icons
+This  package provides  nice icons  for emacs  via custom  fonts. Just
+don't forget to use =M-x all-the-icons-install-fonts RET= after install.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons)
+#+END_SRC
+
 ** Markdown
 Sometimes I need to edit Markdown documents, so this package is handy.
 
@@ -965,7 +999,7 @@ mapping to redo.
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :commands global-undo-tree-mode
-    :config
+    :init
     (global-undo-tree-mode 1))
 #+END_SRC
 

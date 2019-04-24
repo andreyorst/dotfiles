@@ -403,7 +403,7 @@ are defining or executing a macro."
 
 (use-package undo-tree
   :commands global-undo-tree-mode
-  :config
+  :init
   (global-undo-tree-mode 1))
 
 (use-package yasnippet
