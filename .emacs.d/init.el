@@ -138,7 +138,7 @@
 (defun my/set-frame-dark (&optional frame)
   "Set FRAME titlebar colorscheme to dark variant."
   (with-selected-frame (or frame (selected-frame))
-  (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+    (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
                                       (frame-parameter frame 'name)
                                       "\""))))
 
