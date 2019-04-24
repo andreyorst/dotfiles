@@ -386,7 +386,7 @@ will come in handy.
     (indent-according-to-mode))
 #+END_SRC
 
-Let's bind it to =C-s-up= or /Ctrl/ + /Super/ + /Up/.
+Let's bind it to =M-p= or /Alt + p/.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "M-p") 'my/move-line-up)
@@ -405,7 +405,7 @@ The same as above but moves line down.
     (indent-according-to-mode))
 #+END_SRC
 
-Let's bind it to =C-s-down= or /Ctrl/ + /Super/ + /Down/.
+Let's bind it to =M-n= or /Alt + n/.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "M-n") 'my/move-line-down)
@@ -579,7 +579,7 @@ warnings like =;;; Code=, so let's disable it:
 *** Inline Images
 Since Org-mode allows inline images, we  need a way to update them, if
 image  changes   for  some   reason.   We  will   use  hook   to  call
-[[*=my/org-update-inline-images=][=my/org-update-inline-images=]] function after executing code with babel.
+[[*=my/org-update-inline-images=][my/org-update-inline-images]] function after executing code with babel.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
