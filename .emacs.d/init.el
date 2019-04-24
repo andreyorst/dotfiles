@@ -297,10 +297,12 @@ are defining or executing a macro."
   (doom-themes-neotree-config)
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (set-face-attribute 'org-level-1        nil :height 1.4 :background nil)
-  (set-face-attribute 'org-level-2        nil :height 1.2 :background nil)
-  (set-face-attribute 'org-level-3        nil :height 1.0 :background nil)
-  (set-face-attribute 'org-document-title nil :height 1.7 :background nil)
+  (add-hook 'org-load-hook
+            (progn
+              (set-face-attribute 'org-document-title nil :height 1.7)
+              (set-face-attribute 'org-level-1        nil :height 1.4)
+              (set-face-attribute 'org-level-2        nil :height 1.2)
+              (set-face-attribute 'org-level-3        nil :height 1.0)))
   (let ((line (face-attribute 'mode-line :underline)))
     (set-face-attribute 'mode-line          nil :overline   line)
     (set-face-attribute 'mode-line-inactive nil :overline   line)
@@ -328,7 +330,8 @@ are defining or executing a macro."
   :init
   (setq neo-show-hidden-files t)
   (when window-system
-    (neotree-show)))
+    (neotree-show)
+    (other-window 1)))
 
 (use-package all-the-icons)
 
