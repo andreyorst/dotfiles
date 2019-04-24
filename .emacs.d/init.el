@@ -383,11 +383,19 @@ are defining or executing a macro."
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
+         ("C-x C-r" . counsel-recentf)
+         ("C-c g" . counsel-git-grep)
+         ("C-c r" . counsel-rg)
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
          ("C-h l" . counsel-find-library)))
 
 (use-package flycheck)
+
+(use-package flycheck-rust
+  :commands (flycheck-rust-setup)
+  :init (with-eval-after-load 'rust-mode
+          (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
 (use-package company
   :bind (:map company-active-map

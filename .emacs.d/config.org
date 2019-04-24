@@ -851,7 +851,13 @@ installed it just for aesthetic purposes.
 
 #+BEGIN_SRC emacs-lisp
   (use-package neotree
-    :bind (("<f8>" . neotree-toggle)))
+    :commands (neotree-show
+               neotree-find
+               neotree-projectile-action)
+    :bind (("<f8>" . neotree-toggle))
+    :init
+    (setq neo-show-hidden-files t)
+    (neotree-show))
 #+END_SRC
 
 ** All The Icons
@@ -962,6 +968,9 @@ it too.
   (use-package counsel
     :bind (("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
+           ("C-x C-r" . counsel-recentf)
+           ("C-c g" . counsel-git-grep)
+           ("C-c r" . counsel-rg)
            ("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
            ("C-h l" . counsel-find-library)))
@@ -974,6 +983,16 @@ languages.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck)
 #+END_SRC
+
+*** Flycheck Rust
+This package makes flycheck work with Rust projects.
+
+ #+BEGIN_SRC emacs-lisp
+   (use-package flycheck-rust
+     :commands (flycheck-rust-setup)
+     :init (with-eval-after-load 'rust-mode
+             (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+ #+END_SRC
 
 ** Company
 Complete anything framework. Nothing much to say. Does it's job.
