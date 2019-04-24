@@ -289,13 +289,18 @@ are defining or executing a macro."
     ("0" (text-scale-set 0) "reset")))
 
 (use-package doom-themes
-  :commands (doom-themes-org-config doom-themes-neotree-config)
+  :commands (doom-themes-org-config
+             doom-themes-neotree-config)
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
   (doom-themes-neotree-config)
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
+  (set-face-attribute 'org-level-1        nil :height 1.4 :background nil)
+  (set-face-attribute 'org-level-2        nil :height 1.2 :background nil)
+  (set-face-attribute 'org-level-3        nil :height 1.0 :background nil)
+  (set-face-attribute 'org-document-title nil :height 1.7 :background nil)
   (let ((line (face-attribute 'mode-line :underline)))
     (set-face-attribute 'mode-line          nil :overline   line)
     (set-face-attribute 'mode-line-inactive nil :overline   line)
