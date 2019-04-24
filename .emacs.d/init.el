@@ -327,7 +327,8 @@ are defining or executing a macro."
   :bind (("<f8>" . neotree-toggle))
   :init
   (setq neo-show-hidden-files t)
-  (neotree-show))
+  (when window-system
+    (neotree-show)))
 
 (use-package all-the-icons)
 

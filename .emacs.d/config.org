@@ -862,7 +862,8 @@ installed it just for aesthetic purposes.
     :bind (("<f8>" . neotree-toggle))
     :init
     (setq neo-show-hidden-files t)
-    (neotree-show))
+    (when window-system
+      (neotree-show)))
 #+END_SRC
 
 ** All The Icons
