@@ -150,9 +150,9 @@
   "Quit in current context.
 
 When there is an active minibuffer and we are not inside it close
-it. When we are inside the minibuffer use the regular
+it.  When we are inside the minibuffer use the regular
 `minibuffer-keyboard-quit' which quits any active region before
-exiting. When there is no minibuffer `keyboard-quit' unless we
+exiting.  When there is no minibuffer `keyboard-quit' unless we
 are defining or executing a macro."
   (interactive)
   (cond ((active-minibuffer-window)
