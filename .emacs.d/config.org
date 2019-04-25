@@ -176,11 +176,11 @@ Also,  why initial  frame size  is so  small? When  I launch  Emacs in
 terminal it  occupies whole window.  When I launch it  under graphical
 environment it defaults to really  small window, which is smaller than
 my   terminal.  My   window   manager  doesn't   adjust  window   size
-automatically so let's just set little bit bigger initial size::
+automatically so let's just set little bit bigger initial size:
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (set-frame-size (selected-frame) 144 72))
+    (set-frame-size (selected-frame) 180 60))
 #+END_SRC
 
 *** Mode Line
