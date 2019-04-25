@@ -20,10 +20,11 @@
       package-enable-at-startup nil
       file-name-handler-alist nil)
 
-(add-hook 'after-init-hook (lambda ()
-                             (setq gc-cons-threshold my--gc-cons-threshold
-                                   gc-cons-percentage my--gc-cons-percentage
-                                   file-name-handler-alist my--file-name-handler-alist)))
+(add-hook 'after-init-hook
+          (lambda ()
+            (setq gc-cons-threshold my--gc-cons-threshold
+                  gc-cons-percentage my--gc-cons-percentage
+                  file-name-handler-alist my--file-name-handler-alist)))
 
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
@@ -266,7 +267,7 @@ are defining or executing a macro."
 
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
 
-(setq doc-view-resolution 192)
+(setq-default doc-view-resolution 192)
 
 (require 'center-view)
 

@@ -88,10 +88,11 @@ is to turn up the memory threshold to prevent it from running:
 Let's define a hook to restore these values after startup is finished:
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook (lambda ()
-                               (setq gc-cons-threshold my--gc-cons-threshold
-                                     gc-cons-percentage my--gc-cons-percentage
-                                     file-name-handler-alist my--file-name-handler-alist)))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (setq gc-cons-threshold my--gc-cons-threshold
+                    gc-cons-percentage my--gc-cons-percentage
+                    file-name-handler-alist my--file-name-handler-alist)))
 #+END_SRC
 
 ** =Package.el=
@@ -733,7 +734,7 @@ fly. Let's enable it for bunch of languages here.
 Default resolution is too low:
 
 #+BEGIN_SRC emacs-lisp
-  (setq doc-view-resolution 192)
+  (setq-default doc-view-resolution 192)
 #+END_SRC
 
 ** Center View Mode
