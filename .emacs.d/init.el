@@ -48,7 +48,7 @@
 (setq-default frame-title-format '("%b — Emacs"))
 
 (when window-system
-  (set-frame-size (selected-frame) 180 60))
+  (set-frame-size (selected-frame) 190 52))
 
 (setq mode-line-in-non-selected-windows nil)
 

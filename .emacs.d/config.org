@@ -180,8 +180,11 @@ automatically so let's just set little bit bigger initial size:
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (set-frame-size (selected-frame) 180 60))
+    (set-frame-size (selected-frame) 190 52))
 #+END_SRC
+
+With this size I'm  able to fire up Emacs and get  enough space to fit
+two vertically aligned windows and a file explorer together.
 
 *** Mode Line
 Small  tweak to  mode line,  that disables  changing appearance  in non
