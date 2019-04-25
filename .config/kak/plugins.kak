@@ -18,6 +18,7 @@ plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-sudo-write"
+plug "occivink/kakoune-find"
 
 plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
