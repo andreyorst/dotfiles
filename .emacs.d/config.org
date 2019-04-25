@@ -766,7 +766,8 @@ This mode provides line numbers on  the left side of the window, which
 doesn't lag. I don't like that it changes width, so let's change it:
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default display-line-numbers-width-start t)
+  (setq-default display-line-numbers-grow-only t
+                display-line-numbers-width-start t)
 #+END_SRC
 
 ** Prog Mode
