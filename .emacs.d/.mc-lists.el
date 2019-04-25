@@ -22,6 +22,7 @@
         hydra-mc/mc/cycle-backward
         hydra-mc/mc/cycle-forward
         hydra-mc/mc/edit-ends-of-lines
+        hydra-mc/mc/mark-all-in-region-regexp
         hydra-mc/mc/mark-next-like-this-word
         hydra-mc/mc/mark-next-lines
         hydra-mc/mc/mark-previous-like-this-word
@@ -31,5 +32,6 @@
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
         minions-minor-modes-menu
+        org-shifttab
         parinfer-mouse-drag-region
         ))
