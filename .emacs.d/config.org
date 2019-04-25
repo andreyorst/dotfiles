@@ -150,7 +150,6 @@ buttons, tooltips, scrollbars, etc.
 
 #+BEGIN_SRC emacs-lisp
   (menu-bar-mode -1)
-  (tool-bar-mode -1)
   (tooltip-mode -1)
   (fset 'menu-bar-open nil)
 #+END_SRC
@@ -160,7 +159,8 @@ Emacs has, and it's annoying. Let's disable it:
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (scroll-bar-mode -1))
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1))
 #+END_SRC
 
 *** Frame
