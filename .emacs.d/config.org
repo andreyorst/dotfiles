@@ -761,6 +761,14 @@ because there's no better way to learn a language, but to write in it.
   (require 'center-view)
 #+END_SRC
 
+** Display Line Numbers Mode
+This mode provides line numbers on  the left side of the window, which
+doesn't lag. I don't like that it changes width, so let's change it:
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default display-line-numbers-width-start t)
+#+END_SRC
+
 ** Prog Mode
 This isn't really a configuration of Prog Mode itself, but some hooks that change how
 programming related modes behave.

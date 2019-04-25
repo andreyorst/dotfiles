@@ -275,6 +275,8 @@ are defining or executing a macro."
 
 (require 'center-view)
 
+(setq-default display-line-numbers-width-start t)
+
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (my/ensure-installed 'use-package)
