@@ -444,11 +444,11 @@ GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-w
                                         "\""))))
 #+END_SRC
 
-** =my/disable-fylcheck-in-org-src-bloc=
+** =my/disable-flycheck-in-org-src-bloc=
 This function disables flycheck =emacs-lisp-checkdoc= messages.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/disable-fylcheck-in-org-src-block ()
+  (defun my/disable-flycheck-in-org-src-block ()
     "Disable checkdoc in emacs-lisp buffers."
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 #+END_SRC
@@ -573,7 +573,7 @@ I'm editing =emacs-lisp= source blocks. But I find it distracting to see
 warnings like =;;; Code=, so let's disable it:
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'org-src-mode-hook 'my/disable-fylcheck-in-org-src-block)
+  (add-hook 'org-src-mode-hook 'my/disable-flycheck-in-org-src-block)
 #+END_SRC
 
 *** Inline Images

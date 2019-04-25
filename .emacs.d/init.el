@@ -142,7 +142,7 @@
                                       (frame-parameter frame 'name)
                                       "\""))))
 
-(defun my/disable-fylcheck-in-org-src-block ()
+(defun my/disable-flycheck-in-org-src-block ()
   "Disable checkdoc in emacs-lisp buffers."
   (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
@@ -203,7 +203,7 @@ are defining or executing a macro."
 
 (setq org-src-fontify-natively t)
 
-(add-hook 'org-src-mode-hook 'my/disable-fylcheck-in-org-src-block)
+(add-hook 'org-src-mode-hook 'my/disable-flycheck-in-org-src-block)
 
 (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
 
