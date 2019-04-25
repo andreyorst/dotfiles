@@ -37,14 +37,18 @@
 
 (setq initial-scratch-message "")
 
-(ignore-errors
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (tooltip-mode -1)
-  (fset 'menu-bar-open nil))
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(fset 'menu-bar-open nil)
+
+(when window-system
+  (scroll-bar-mode -1))
 
 (setq-default frame-title-format '("%b — Emacs"))
+
+(when window-system
+  (set-frame-size (selected-frame) 144 72))
 
 (setq mode-line-in-non-selected-windows nil)
 

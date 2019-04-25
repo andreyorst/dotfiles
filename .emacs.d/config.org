@@ -149,24 +149,38 @@ These are some defaults for user  interface.  I don't like those bars,
 buttons, tooltips, scrollbars, etc.
 
 #+BEGIN_SRC emacs-lisp
-  (ignore-errors
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (tooltip-mode -1)
-    (fset 'menu-bar-open nil))
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (fset 'menu-bar-open nil)
 #+END_SRC
 
-I'm using =ignore-errors=  here because I use both GUI  and TUI versions
-of Emacs,  and since TUI version  doesn't have some of  those features
-the startup process will fail.
+Terminal version  of Emacs  doesn't have scroll  bar feature,  but GUI
+Emacs has, and it's annoying. Let's disable it:
 
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (scroll-bar-mode -1))
+#+END_SRC
+
+*** Frame
 Emacs uses weird method of naming a window, I'd like to see a file I'm
 currently working  on in the task  bar in case my  Emacs was minimized
 for some reason.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default frame-title-format '("%b — Emacs"))
+#+END_SRC
+
+Also,  why initial  frame size  is so  small? When  I launch  Emacs in
+terminal it  occupies whole window.  When I launch it  under graphical
+environment it defaults to really  small window, which is smaller than
+my   terminal.  My   window   manager  doesn't   adjust  window   size
+automatically so let's just set little bit bigger initial size::
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (set-frame-size (selected-frame) 144 72))
 #+END_SRC
 
 *** Mode Line
