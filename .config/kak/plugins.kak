@@ -92,7 +92,7 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
-plug "occivink/kakoune-snippets" config %{
+plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
     map global insert '<tab>' "z<a-;>: snippets-expand-or-jump 'tab'<ret>"
