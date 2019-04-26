@@ -12,7 +12,9 @@
         org-self-insert-command
         org-yank
         parinfer-backward-delete-char
+        parinfer-double-quote
         parinfer-region-delete-region
+        parinfer-smart-yank:yank
         ))
 
 (setq mc/cmds-to-run-once

@@ -12,8 +12,6 @@
 
 # C/Cpp
 # ‾‾‾‾‾
-try %{ require-module c-family }
-
 hook global WinSetOption filetype=(c|cpp) %{
     set-option window formatcmd 'clang-format'
 
@@ -62,8 +60,6 @@ hook global WinSetOption filetype=(c|cpp) %{
 
 # Rust
 # ‾‾‾‾
-try %{ require-module rust }
-
 hook global WinSetOption filetype=rust %{
     set window formatcmd 'rustfmt'
 
