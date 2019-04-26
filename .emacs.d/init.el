@@ -176,11 +176,10 @@ are defining or executing a macro."
 
 (global-set-key [remap keyboard-quit] #'my/escape)
 
-(defun my/ansi-term-toggle ()
-  "Toggle `ansi-term' window on and off with the same command."
+(defun my/eshell-toggle ()
+  "Toggle `eshell' window on and off with the same command."
   (interactive)
-  (defvar my--ansi-term-name "ansi-term-popup")
-  (defvar my--window-name (concat "*" my--ansi-term-name "*"))
+  (defvar my--window-name "*eshell-popup*")
   (cond ((get-buffer-window my--window-name)
          (delete-window
           (get-buffer-window my--window-name)))
@@ -188,9 +187,11 @@ are defining or executing a macro."
            (other-window 1)
            (cond ((get-buffer my--window-name)
                   (switch-to-buffer my--window-name))
-                 (t (ansi-term "bash" my--ansi-term-name))))))
+                 (t
+                  (eshell)
+                  (rename-buffer my--window-name))))))
 
-(global-set-key "\C-t" 'my/ansi-term-toggle)
+(global-set-key "\C-t" 'my/eshell-toggle)
 
 (defun my/select-line ()
   "Select the current line."

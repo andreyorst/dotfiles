@@ -509,15 +509,14 @@ Let's remap default =keyboard-quit= key with this function.
   (global-set-key [remap keyboard-quit] #'my/escape)
 #+END_SRC
 
-** =my/ansi-term-toggle=
-This command toggles ansi-term window on and off without killing ansi-term.
+** =my/eshell-toggle=
+This command toggles eshell window on and off without killing eshell.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/ansi-term-toggle ()
-    "Toggle `ansi-term' window on and off with the same command."
+  (defun my/eshell-toggle ()
+    "Toggle `eshell' window on and off with the same command."
     (interactive)
-    (defvar my--ansi-term-name "ansi-term-popup")
-    (defvar my--window-name (concat "*" my--ansi-term-name "*"))
+    (defvar my--window-name "*eshell-popup*")
     (cond ((get-buffer-window my--window-name)
            (delete-window
             (get-buffer-window my--window-name)))
@@ -525,13 +524,15 @@ This command toggles ansi-term window on and off without killing ansi-term.
              (other-window 1)
              (cond ((get-buffer my--window-name)
                     (switch-to-buffer my--window-name))
-                   (t (ansi-term "bash" my--ansi-term-name))))))
+                   (t
+                    (eshell)
+                    (rename-buffer my--window-name))))))
   #+END_SRC
 
 I find it conveinient to bind this function to /Ctrl+t/ shortcut.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key "\C-t" 'my/ansi-term-toggle)
+  (global-set-key "\C-t" 'my/eshell-toggle)
 #+END_SRC
 
 ** =my/select-line=
