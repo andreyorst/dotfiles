@@ -163,6 +163,13 @@ Emacs has, and it's annoying. Let's disable it:
     (tool-bar-mode -1))
 #+END_SRC
 
+Also let's use bar cursor when in window system:
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (setq cursor-type 'bar))
+#+END_SRC
+
 *** Frame
 Emacs uses weird method of naming a window, I'd like to see a file I'm
 currently working  on in the task  bar in case my  Emacs was minimized

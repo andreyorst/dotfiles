@@ -45,6 +45,9 @@
   (scroll-bar-mode -1)
   (tool-bar-mode -1))
 
+(when window-system
+  (setq cursor-type 'bar))
+
 (setq-default frame-title-format '("%b — Emacs"))
 
 (when window-system
