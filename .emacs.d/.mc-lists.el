@@ -14,6 +14,7 @@
         parinfer-backward-delete-char
         parinfer-double-quote
         parinfer-region-delete-region
+        parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
         ))
 
