@@ -60,6 +60,8 @@
       size-indication-mode nil
       mode-line-position nil)
 
+(fringe-mode '(nil . 1))
+
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
 (setq-default indent-tabs-mode nil
@@ -360,6 +362,8 @@ are defining or executing a macro."
              neotree-find
              neotree-projectile-action)
   :bind (("<f8>" . neotree-toggle))
+  :config
+  (set-window-fringes neo-global--window 0 1)
   :init
   (setq neo-show-hidden-files t)
   (when window-system

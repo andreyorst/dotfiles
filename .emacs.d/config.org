@@ -214,6 +214,13 @@ line number I'm currently on.
 
 #+END_SRC
 
+*** Fringe
+Right fringe isn't really useful for me, so I'm going to disable it.
+
+#+BEGIN_SRC emacs-lisp
+  (fringe-mode '(nil . 1))
+#+END_SRC
+
 ** Font
 I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
 other editor, for some reason I find this font just right for Emacs.
@@ -929,6 +936,8 @@ installed it just for aesthetic purposes.
                neotree-find
                neotree-projectile-action)
     :bind (("<f8>" . neotree-toggle))
+    :config
+    (set-window-fringes neo-global--window 0 1)
     :init
     (setq neo-show-hidden-files t)
     (when window-system
