@@ -554,6 +554,24 @@ to /x/.
   (global-set-key (kbd "C-c x") 'my/select-line)
   #+END_SRC
 
+** =my/disable-fringes-in-minibuffer=
+Fringes in minibuffer are useless and  can go out of sync with Solaire
+mode turned on.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/disable-fringes-in-minibuffer (&rest _)
+    (set-window-fringes (minibuffer-window) 0 0 nil))
+#+END_SRC
+
+** =my/no-fringes-in-which-key-buffer=
+Same as for minibuffer, no use for fringes in Which Key buffers.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/no-fringes-in-which-key-buffer (&rest _)
+    (my/disable-fringes-in-minibuffer)
+    (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
+#+END_SRC
+
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.
@@ -1225,6 +1243,9 @@ enable it by default.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :commands which-key-mode
+    :config
+    (advice-add 'which-key--show-buffer-side-window
+                :after #'my/no-fringes-in-which-key-buffer)
     :init
     (which-key-mode))
 #+END_SRC

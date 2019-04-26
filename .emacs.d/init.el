@@ -201,6 +201,13 @@ are defining or executing a macro."
 
 (global-set-key (kbd "C-c x") 'my/select-line)
 
+(defun my/disable-fringes-in-minibuffer (&rest _)
+  (set-window-fringes (minibuffer-window) 0 0 nil))
+
+(defun my/no-fringes-in-which-key-buffer (&rest _)
+  (my/disable-fringes-in-minibuffer)
+  (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
+
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
                            (flyspell-mode)
@@ -518,6 +525,9 @@ are defining or executing a macro."
 
 (use-package which-key
   :commands which-key-mode
+  :config
+  (advice-add 'which-key--show-buffer-side-window
+              :after #'my/no-fringes-in-which-key-buffer)
   :init
   (which-key-mode))
 
