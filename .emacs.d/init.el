@@ -336,12 +336,24 @@ are defining or executing a macro."
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 
 (use-package solaire-mode
-  :commands (solaire-global-mode solaire-mode-swap-bg)
+  :commands (solaire-global-mode
+             solaire-mode-swap-bg
+             turn-on-solaire-mode
+             solaire-mode-in-minibuffer
+             solaire-mode-reset)
   :hook
-  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+  ((change-major-mode
+    after-revert
+    ediff-prepare-buffer) . turn-on-solaire-mode)
+  :config
+  (add-hook 'minibuffer-setup #'solaire-mode-in-minibuffer)
+  (add-hook 'focus-in-hook #'solaire-mode-reset)
+  (add-hook 'solaire-mode-hook #'my/disable-fringes-in-minibuffer)
+  (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
+  (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init
-  (solaire-mode-swap-bg)
-  (solaire-global-mode +1))
+  (solaire-global-mode +1)
+  (solaire-mode-swap-bg))
 
 (use-package neotree
   :commands (neotree-show
