@@ -816,6 +816,18 @@ Here, I want all programming modes to include line numbers by default:
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
+** Windmove
+This mode  allows to move  between windows, but  I don't like  that it
+uses arrow keys, and I would like  to use it with /hjkl/, because that's
+what I use in Tmux.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h") 'windmove-left)
+  (global-set-key (kbd "C-c j") 'windmove-down)
+  (global-set-key (kbd "C-c k") 'windmove-up)
+  (global-set-key (kbd "C-c l") 'windmove-right)
+#+END_SRC
+
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential

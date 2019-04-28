@@ -293,6 +293,11 @@ are defining or executing a macro."
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
+(global-set-key (kbd "C-c h") 'windmove-left)
+(global-set-key (kbd "C-c j") 'windmove-down)
+(global-set-key (kbd "C-c k") 'windmove-up)
+(global-set-key (kbd "C-c l") 'windmove-right)
+
 (my/ensure-installed 'use-package)
 (require 'use-package)
 (setq use-package-always-ensure t)
