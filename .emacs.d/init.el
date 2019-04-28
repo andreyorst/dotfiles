@@ -524,10 +524,10 @@ are defining or executing a macro."
               vdiff-disable-folding nil
               vdiff-min-fold-size 4
               vdiff-subtraction-style 'full
-              vdiff-subtraction-fill-char ?\ )
+              vdiff-subtraction-fill-char ?)
   :config
-  (set-face-attribute 'vdiff-subtraction-face nil :background "#4F343A" :foreground "#cc99999")
-  (set-face-attribute 'vdiff-addition-face nil :background "#3E493D" :foreground "#cceecc")
+  (set-face-attribute 'vdiff-subtraction-face nil :background "#4F343A" :foreground "#F36868")
+  (set-face-attribute 'vdiff-addition-face nil :background "#3E493D" :foreground "#98BE65")
   (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7")
   (add-hook 'vdiff-mode-hook #'outline-show-all))
 
