@@ -95,22 +95,20 @@ plug "alexherbo2/move-line.kak" config %{
 plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
-    map global insert '<tab>' "z<a-;>: snippets-expand-or-jump 'tab'<ret>"
-    map global normal '<tab>' ": snippets-expand-or-jump 'tab'<ret>"
+    map global insert '<tab>' "<a-;>: expand-or-jump tab<ret>"
+    map global normal '<tab>' ":      expand-or-jump tab<ret>"
 
-    hook global InsertCompletionShow .* %{
-        try %{
-            execute-keys -draft 'h<a-K>\h<ret>'
-            map window insert '<ret>' "z<a-;>: snippets-expand-or-jump 'ret'<ret>"
-        }
-    }
+    hook global InsertCompletionShow .* %{ try %{
+        execute-keys -draft 'h<a-K>\h<ret>'
+        map window insert '<ret>' "<a-;>: expand-or-jump ret<ret>"
+    }}
 
     hook global InsertCompletionHide .* %{
-        unmap window insert '<ret>' "z<a-;>: snippets-expand-or-jump 'ret'<ret>"
+        unmap window insert '<ret>' "<a-;>: expand-or-jump ret<ret>"
     }
 
-    define-command snippets-expand-or-jump -params 1 %{
-        execute-keys <backspace>
+    define-command -docstring "expand-or-jump <key>: expand snippet or jump to the placeholder and execute <key>" \
+    expand-or-jump -params 1 %{
         try %{ snippets-expand-trigger %{
             set-register / "%opt{snippets_triggers_regex}\z"
             execute-keys 'hGhs<ret>'
@@ -119,7 +117,7 @@ plug "occivink/kakoune-snippets" branch "auto-discard" config %{
         } catch %sh{
             printf "%s\n" "execute-keys -with-hooks <$1>"
         } catch %{
-            echo -debug "snippets-expand-or-jump:%val{error}"
+            echo -debug "expand-or-jump: %val{error}"
         }
     }
 }

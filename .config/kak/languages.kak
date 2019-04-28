@@ -90,18 +90,16 @@ hook global BufCreate .*\.mk$ %{
 
 # Kakscript
 # ‾‾‾‾‾‾‾‾‾
-hook global WinSetOption filetype=kak %{
-    hook global NormalIdle .* %{
-        evaluate-commands -save-regs 'a' %{ try %{
-            execute-keys -draft <a-i>w"ay
-            evaluate-commands %sh{
-                color=$(echo "$kak_reg_a" | perl -pe "s/'//g")
-                inverted_color=$(echo "${color}" | perl -pe 'tr/0123456789abcdefABCDEF/fedcba9876543210543210/')
-                printf "%s\n" "echo -markup %{{rgb:${inverted_color},rgb:${color}+b}  #${color}  }"
-            }
-        }}
-    }
-}
+hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
+    evaluate-commands -save-regs 'a' %{ try %{
+        execute-keys -draft <a-i>w"ay
+        evaluate-commands %sh{
+            color=$(echo "$kak_reg_a" | perl -pe "s/'//g")
+            inverted_color=$(echo "${color}" | perl -pe 'tr/0123456789abcdefABCDEF/fedcba9876543210543210/')
+            printf "%s\n" "echo -markup %{{rgb:${inverted_color},rgb:${color}+b}  #${color}  }"
+        }
+    }}
+}}
 
 # Assemply
 # ‾‾‾‾‾‾‾‾
