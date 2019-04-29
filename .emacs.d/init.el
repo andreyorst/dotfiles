@@ -210,6 +210,10 @@ are defining or executing a macro."
   (my/disable-fringes-in-minibuffer)
   (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
 
+(defun my/neotree-1px-fringe ()
+  "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
+  (set-window-fringes neo-global--window 0 1))
+
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
                            (flyspell-mode)
@@ -368,7 +372,7 @@ are defining or executing a macro."
              neotree-projectile-action)
   :bind (("<f8>" . neotree-toggle))
   :config
-  (set-window-fringes neo-global--window 0 1)
+  (advice-add 'doom--neotree-no-fringes :after #'my/neotree-1px-fringe)
   :init
   (setq neo-show-hidden-files t)
   (when window-system
