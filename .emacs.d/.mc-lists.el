@@ -9,6 +9,7 @@
         my/select-line
         org-beginning-of-line
         org-delete-char
+        org-end-of-line
         org-self-insert-command
         org-yank
         parinfer-backward-delete-char
