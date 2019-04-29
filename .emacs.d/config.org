@@ -1430,6 +1430,7 @@ This mode makes org headings use fancy bullet symbols.
     :commands org-bullets-mode
     :config
     (setq-default org-bullets-bullet-list '("◉" "○"))
+    :init
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 

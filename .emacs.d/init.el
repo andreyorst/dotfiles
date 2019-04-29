@@ -641,6 +641,7 @@ _-_ reduce region _)_ around pairs
   :commands org-bullets-mode
   :config
   (setq-default org-bullets-bullet-list '("◉" "○"))
+  :init
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (provide 'init)
