@@ -372,9 +372,11 @@ are defining or executing a macro."
              neotree-projectile-action)
   :bind (("<f8>" . neotree-toggle))
   :config
+  (my/neotree-1px-fringe)
   (advice-add 'doom--neotree-no-fringes :after #'my/neotree-1px-fringe)
   :init
-  (setq neo-show-hidden-files t)
+  (setq neo-show-hidden-files t
+        neo-hide-cursor t)
   (when window-system
     (neotree-show)
     (other-window 1)))
@@ -634,6 +636,12 @@ _-_ reduce region _)_ around pairs
                                  flyspell-mode
                                  parinfer-mode))
   :init (minions-mode 1))
+
+(use-package org-bullets
+  :commands org-bullets-mode
+  :config
+  (setq-default org-bullets-bullet-list '("◉" "○"))
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (provide 'init)
 ;;; init.el ends here
