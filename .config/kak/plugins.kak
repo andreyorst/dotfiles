@@ -95,20 +95,11 @@ plug "alexherbo2/move-line.kak" config %{
 plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
-    map global insert '<tab>' "<a-;>: expand-or-jump tab<ret>"
-    map global normal '<tab>' ":      expand-or-jump tab<ret>"
+    map global insert '<ret>' "<a-;>: expand-jump-key ret<ret>"
+    map global normal '<ret>' ":      expand-jump-key ret<ret>"
 
-    hook global InsertCompletionShow .* %{ try %{
-        execute-keys -draft 'h<a-K>\h<ret>'
-        map window insert '<ret>' "<a-;>: expand-or-jump ret<ret>"
-    }}
-
-    hook global InsertCompletionHide .* %{
-        unmap window insert '<ret>' "<a-;>: expand-or-jump ret<ret>"
-    }
-
-    define-command -docstring "expand-or-jump <key>: expand snippet or jump to the placeholder and execute <key>" \
-    expand-or-jump -params 1 %{
+    define-command -docstring "expand-jump-key <key>: expand snippet or jump to the placeholder or execute <key>" \
+    expand-jump-key -params 1 %{
         try %{ snippets-expand-trigger %{
             set-register / "%opt{snippets_triggers_regex}\z"
             execute-keys 'hGhs<ret>'
@@ -116,8 +107,6 @@ plug "occivink/kakoune-snippets" branch "auto-discard" config %{
             snippets-select-next-placeholders
         } catch %sh{
             printf "%s\n" "execute-keys -with-hooks <$1>"
-        } catch %{
-            echo -debug "expand-or-jump: %val{error}"
         }
     }
 }
