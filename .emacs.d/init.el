@@ -60,7 +60,8 @@
       size-indication-mode nil
       mode-line-position nil)
 
-(fringe-mode '(nil . 1))
+(when window-system
+  (fringe-mode '(nil . 1)))
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
@@ -642,7 +643,8 @@ _-_ reduce region _)_ around pairs
   :config
   (setq-default org-bullets-bullet-list '("◉" "○"))
   :init
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (when window-system
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
 (provide 'init)
 ;;; init.el ends here

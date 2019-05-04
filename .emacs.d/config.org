@@ -218,7 +218,8 @@ line number I'm currently on.
 Right fringe isn't really useful for me, so I'm going to disable it.
 
 #+BEGIN_SRC emacs-lisp
-  (fringe-mode '(nil . 1))
+  (when window-system
+    (fringe-mode '(nil . 1)))
 #+END_SRC
 
 ** Font
@@ -1431,7 +1432,8 @@ This mode makes org headings use fancy bullet symbols.
     :config
     (setq-default org-bullets-bullet-list '("◉" "○"))
     :init
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    (when window-system
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 #+END_SRC
 
 * Postscript
