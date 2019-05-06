@@ -145,10 +145,6 @@ If no symbol given, current selection is used as a symbol name" \
         END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
 }}
 
-hook global WinSetOption filetype=c %{
-    alias window format format-c
-}
-
 define-command -hidden format-c -docstring \
 "wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove those comments." \
 %{ try %{
