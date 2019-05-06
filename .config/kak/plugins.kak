@@ -95,11 +95,11 @@ plug "alexherbo2/move-line.kak" config %{
 plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
-    map global insert '<ret>' "<a-;>: expand-jump-key ret<ret>"
-    map global normal '<ret>' ":      expand-jump-key ret<ret>"
+    map global insert '<ret>' "<a-;>: expand-or-jump-or-key ret<ret>"
+    map global normal '<ret>' ":      expand-or-jump-or-key ret<ret>"
 
-    define-command -docstring "expand-jump-key <key>: expand snippet or jump to the placeholder or execute <key>" \
-    expand-jump-key -params 1 %{
+    define-command -docstring "expand-or-jump-or-key <key>: expand snippet or jump to the placeholder or execute <key>" \
+    expand-or-jump-or-key -params 1 %{
         try %{ snippets-expand-trigger %{
             set-register / "%opt{snippets_triggers_regex}\z"
             execute-keys 'hGhs<ret>'
@@ -132,10 +132,9 @@ plug "alexherbo2/word-movement.kak" config %{
     word-movement-map previous b
 }
 
-plug "occivink/kakoune-expand" branch "shrink" config %{
+plug "occivink/kakoune-expand" config %{
     declare-user-mode expand
     map -docstring "expand selection" global expand "e"       ": expand<ret>"
-    map -docstring "shrink selection" global expand "<minus>" ": shrink<ret>"
     map -docstring "expand selection" global object "e"       "<esc>: expand; enter-user-mode -lock expand<ret>"
     set-option -add global expand_commands 'execute-keys <a-i>w' # select word if possible
     set-option -add global expand_commands 'execute-keys <a-i>q' # select inside single quotes
