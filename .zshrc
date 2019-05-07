@@ -14,9 +14,17 @@ if [ -n "$(command -v exa)" ]; then
     alias ls=exa
 fi
 
+if [ -n "$(command -v kak)" ]; then
+    export EDITOR="kak"
+elif [ -n "$(command -v emacs)" ]; then
+    export EDITOR="emacs"
+else
+    export EDITOR="vi"
+fi
+
 alias vimdiff="nvim -u ~/.dotfiles/.vimdiffrc -d"
-alias zshconf="kak ~/.zshrc"
-alias tmuxconf="kak ~/.tmux.conf"
+alias zshconf="$EDITOR ~/.zshrc"
+alias tmuxconf="$EDITOR ~/.tmux.conf"
 alias vimconf="nvim ~/.config/nvim/init.vim"
 alias kakconf="kak ~/.config/kak/kakrc"
 alias emacsconf="emacs ~/.emacs.d/config.org"
@@ -25,8 +33,6 @@ alias mc="command mc -x"
 alias less="less --tabs 4"
 alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
 alias gti="git"
-
-export EDITOR="kak"
 
 if [ -n "$(command -v dash)" ]; then
     export KAKOUNE_POSIX_SHELL=$(command -v dash)
