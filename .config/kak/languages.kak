@@ -13,14 +13,15 @@
 # C/Cpp
 # ‾‾‾‾‾
 hook global WinSetOption filetype=(c|cpp) %{
-    set-option window formatcmd 'clang-format'
+    set-option buffer formatcmd 'clang-format'
+    set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
 
     try %{
-        remove-highlighter window/operators
+        remove-highlighter buffer/operators
         add-highlighter    buffer/operators regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\]) 0:operator
     }
     try %{
-        remove-highlighter window/delimiters
+        remove-highlighter buffer/delimiters
         add-highlighter    buffer/delimiters regex (\(|\)||\{|\}|\;|'|`) 0:delimiter
     }
     try %{ evaluate-commands %sh{
@@ -61,7 +62,8 @@ hook global WinSetOption filetype=(c|cpp) %{
 # Rust
 # ‾‾‾‾
 hook global WinSetOption filetype=rust %{
-    set window formatcmd 'rustfmt'
+    set-option buffer formatcmd 'rustfmt'
+    set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
 
     evaluate-commands %sh{
         # Common highlightings for Rust

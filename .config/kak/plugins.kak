@@ -10,10 +10,19 @@
 # ╰────────────────────────────────╯
 
 # source the plugin manager itself
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
-plug "andreyorst/plug.kak" noload
+# Plugin configurations
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+plug "andreyorst/plug.kak" noload config %{
+    hook global WinSetOption filetype=plug %{
+        remove-highlighter buffer/numbers
+        remove-highlighter buffer/matching
+        remove-highlighter buffer/wrap
+        remove-highlighter buffer/show-whitespaces
+    }
+}
+
 plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
@@ -120,10 +129,10 @@ plug "andreyorst/tagbar.kak" config %{
         tagbar-enable
     }
     hook global WinSetOption filetype=tagbar %{
-        remove-highlighter window/numbers
-        remove-highlighter window/matching
-        remove-highlighter window/wrap
-        remove-highlighter window/show-whitespaces
+        remove-highlighter buffer/numbers
+        remove-highlighter buffer/matching
+        remove-highlighter buffer/wrap
+        remove-highlighter buffer/show-whitespaces
     }
 }
 
