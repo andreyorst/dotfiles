@@ -4,6 +4,8 @@
 (setq mc/cmds-to-run-for-all
       '(
         forward-sexp
+        hydra-er/er/contract-region
+        hydra-er/er/expand-region
         indent-for-tab-command
         kill-region
         my/select-line
@@ -21,6 +23,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        hydra-er/body
         hydra-mc/body
         hydra-mc/lambda-M-s
         hydra-mc/mc/cycle-backward
