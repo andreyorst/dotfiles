@@ -14,7 +14,6 @@ define-command -docstring "toggle-layout: toggle between keyboard layouts in ins
 toggle-layout %{ evaluate-commands %sh{
     perl -Mutf8 -CS -e 'use strict;
         use utf8;
-        use Env;
         my $us_qwerty = q{`~@#$^&|qQwWeErRtTyYuUiIoOpP[{]}aAsSdDfFgGhHjJkKlL;:''"zZxXcCvVbBnNmM,<.>/?};
         my $ru_jcuken = q{ёЁ"№;:?/йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪфФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮ.,};
         my $map;
@@ -31,9 +30,11 @@ toggle-layout %{ evaluate-commands %sh{
             $_ = $key;
             eval sprintf "tr/%s/%s/", map quotemeta, $us_qwerty, $ru_jcuken;
             print "$map global insert -- %🦀$key🦀 %🦀$_🦀\n";
+            print "$map global prompt -- %🦀$key🦀 %🦀$_🦀\n";
         }'
 }}
 
 map global normal '' ': toggle-layout<ret>'
 map global insert '' '<a-;>: toggle-layout<ret>'
+map global prompt '' '<a-;>: toggle-layout<ret>'
 
