@@ -14,6 +14,7 @@ evaluate-commands %sh{
         commands.kak
         mappings.kak
         languages.kak
+        layouts.kak
         plugins.kak
     "
 
@@ -27,3 +28,4 @@ evaluate-commands %sh{
         }"
     done
 }
+
