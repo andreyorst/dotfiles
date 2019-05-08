@@ -14,7 +14,7 @@ source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "andreyorst/plug.kak" noload config %{
+plug "andreyorst/plug.kak" branch "dev" noload config %{
     hook global WinSetOption filetype=plug %{
         remove-highlighter buffer/numbers
         remove-highlighter buffer/matching
@@ -72,8 +72,6 @@ plug "ul/kak-lsp" do %{
 }
 
 plug "andreyorst/powerline.kak" %{
-    set-option global powerline_separator ''
-    set-option global powerline_separator_thin ''
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname smarttab mode_info filetype client session position'
     hook -once global WinDisplay .* %{
