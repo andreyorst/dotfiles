@@ -31,7 +31,7 @@ toggle-layout -params 1 %{ evaluate-commands %sh{
         for my $key (split //, $us_qwerty) {
             $_ = $key;
             eval sprintf "tr/%s/%s/", map quotemeta, $us_qwerty, $ru_jcuken;
-            print "$map global $mode -- %🦀$key🦀 %🦀$_🦀\n";
+            print "$map buffer $mode -- %🦀$key🦀 %🦀$_🦀\n";
         }'
 }}
 
