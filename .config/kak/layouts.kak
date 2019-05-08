@@ -12,7 +12,6 @@ declare-option -hidden str langmap "us"
 
 define-command -docstring "toggle-layout: toggle between keyboard layouts in insert mode only" \
 toggle-layout %{ evaluate-commands %sh{
-    echo "echo -debug -- %{$kak_opt_langmap_ru_jcuken}"
     perl -Mutf8 -CS -e 'use strict;
         use utf8;
         use Env;
