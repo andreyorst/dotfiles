@@ -211,7 +211,6 @@ line number I'm currently on.
         line-number-mode nil
         size-indication-mode nil
         mode-line-position nil)
-
 #+END_SRC
 
 *** Fringe
@@ -591,6 +590,23 @@ it.
     (set-window-fringes neo-global--window 0 1))
 #+END_SRC
 
+** =my/company-enable-yas=
+Found  this  function on  [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][emacs.stackexchange.com]].  It  is adding  =yas=
+backend  to all  company backends,  so  I could  expand snippets  from
+completion menu.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar my--company-enable-yas t
+    "Enable yasnippet for all backends.")
+
+  (defun my/company-enable-yas (backend)
+    (if (or (not my--company-enable-yas)
+            (and (listp backend) (member 'company-yasnippet backend)))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+#+END_SRC
+
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.
@@ -621,6 +637,8 @@ so all text will be folded  and re-filled after its length reaches the
                                    org-startup-with-inline-images t
                                    org-startup-folded 'content
                                    org-hide-emphasis-markers t
+                                   org-adapt-indentation nil
+                                   org-hide-leading-stars t
                                    org-highlight-latex-and-related '(latex)
                                    revert-without-query '(".*\.pdf"))
                              (auto-fill-mode)))
@@ -910,7 +928,8 @@ package, which defines colors for pretty much everything in Emacs.
       (set-face-attribute 'mode-line-inactive nil :overline   line)
       (set-face-attribute 'mode-line-inactive nil :underline  line)
       (set-face-attribute 'mode-line          nil :box        nil)
-      (set-face-attribute 'mode-line-inactive nil :box        nil)))
+      (set-face-attribute 'mode-line-inactive nil :box        nil)
+      (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#918BC0")))
 #+END_SRC
 
 If  I  use  =window-system=  I  want  [[*=my/set-frame-dark=][my/set-frame-dark]]  to  run  during
@@ -1128,7 +1147,8 @@ Complete anything framework. Nothing much to say. Does it's job.
     (setq company-backends (remove 'company-clang company-backends)
           company-backends (remove 'company-xcode company-backends)
           company-backends (remove 'company-cmake company-backends)
-          company-backends (remove 'company-gtags company-backends)))
+          company-backends (remove 'company-gtags company-backends)
+          company-backends (mapcar #'my/company-enable-yas company-backends)))
 #+END_SRC
 
 ** Undo Tree
@@ -1150,6 +1170,13 @@ really need to write some snippets to use...
   (use-package yasnippet
     :commands yas-reload-all
     :init (yas-reload-all))
+#+END_SRC
+
+*** Yasnippet Snippets
+A enormous snippet collection for yasnippet.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet-snippets)
 #+END_SRC
 
 ** Projectile
@@ -1430,7 +1457,7 @@ This mode makes org headings use fancy bullet symbols.
   (use-package org-bullets
     :commands org-bullets-mode
     :config
-    (setq-default org-bullets-bullet-list '("◉" "○"))
+    (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦"))
     :init
     (when window-system
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))

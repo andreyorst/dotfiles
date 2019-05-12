@@ -215,6 +215,16 @@ are defining or executing a macro."
   "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
   (set-window-fringes neo-global--window 0 1))
 
+(defvar my--company-enable-yas t
+  "Enable yasnippet for all backends.")
+
+(defun my/company-enable-yas (backend)
+  (if (or (not my--company-enable-yas)
+          (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
+
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
                            (flyspell-mode)
@@ -222,6 +232,8 @@ are defining or executing a macro."
                                  org-startup-with-inline-images t
                                  org-startup-folded 'content
                                  org-hide-emphasis-markers t
+                                 org-adapt-indentation nil
+                                 org-hide-leading-stars t
                                  org-highlight-latex-and-related '(latex)
                                  revert-without-query '(".*\.pdf"))
                            (auto-fill-mode)))
@@ -341,7 +353,8 @@ are defining or executing a macro."
     (set-face-attribute 'mode-line-inactive nil :overline   line)
     (set-face-attribute 'mode-line-inactive nil :underline  line)
     (set-face-attribute 'mode-line          nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :box        nil)))
+    (set-face-attribute 'mode-line-inactive nil :box        nil)
+    (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#918BC0")))
 
 (when window-system
   (my/set-frame-dark)
@@ -474,7 +487,8 @@ are defining or executing a macro."
   (setq company-backends (remove 'company-clang company-backends)
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends)
-        company-backends (remove 'company-gtags company-backends)))
+        company-backends (remove 'company-gtags company-backends)
+        company-backends (mapcar #'my/company-enable-yas company-backends)))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -484,6 +498,8 @@ are defining or executing a macro."
 (use-package yasnippet
   :commands yas-reload-all
   :init (yas-reload-all))
+
+(use-package yasnippet-snippets)
 
 (use-package projectile
   :commands (projectile-mode projectile-find-file)
@@ -641,7 +657,7 @@ _-_ reduce region _)_ around pairs
 (use-package org-bullets
   :commands org-bullets-mode
   :config
-  (setq-default org-bullets-bullet-list '("◉" "○"))
+  (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦"))
   :init
   (when window-system
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
