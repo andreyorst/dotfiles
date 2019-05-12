@@ -73,7 +73,7 @@ plug "ul/kak-lsp" do %{
 
 plug "andreyorst/powerline.kak" %{
     set-option global powerline_ignore_warnings true
-    set-option global powerline_format 'git bufname smarttab mode_info filetype client session position'
+    set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
     hook -once global WinDisplay .* %{
         powerline-theme base16-gruvbox
     }
@@ -139,20 +139,6 @@ plug "alexherbo2/word-movement.kak" config %{
     word-movement-map previous b
 }
 
-plug "occivink/kakoune-expand" config %{
-    declare-user-mode expand
-    map -docstring "expand selection" global expand "e"       ": expand<ret>"
-    map -docstring "expand selection" global object "e"       "<esc>: expand; enter-user-mode -lock expand<ret>"
-    set-option -add global expand_commands 'execute-keys <a-i>w' # select word if possible
-    set-option -add global expand_commands 'execute-keys <a-i>q' # select inside single quotes
-    set-option -add global expand_commands 'execute-keys <a-a>q' # select around single quotes
-    set-option -add global expand_commands 'execute-keys <a-i>Q' # select inside double quotes
-    set-option -add global expand_commands 'execute-keys <a-a>Q' # select around double quotes
-    set-option -add global expand_commands 'execute-keys <a-i>g' # select inside backticks
-    set-option -add global expand_commands 'execute-keys <a-a>g' # select around graves
-    set-option -add global expand_commands 'execute-keys <a-a>a' # select around angle block
-}
-
 plug "alexherbo2/yank-ring.kak" config %{
     map -docstring "yank-ring" global user 'Y' ': yank-ring<ret>'
 }
@@ -164,4 +150,11 @@ plug "alexherbo2/split-object.kak" config %{
 plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
     map -docstring "decrement selection" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
+}
+
+plug "andreyorst/langmap.kak" config %{
+    set-option global langmap %opt{langmap_ru_jcuken}
+    map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
+    map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
+    map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
 }

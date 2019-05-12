@@ -38,12 +38,14 @@ set-option global jumpclient client0
 set-face global delimiter rgb:aa3a03,default
 
 hook global WinCreate .* %{
-    add-highlighter buffer/numbers          number-lines -relative -hlcursor -separator ' '
-    add-highlighter buffer/matching         show-matching
-    add-highlighter buffer/wrap             wrap -word -indent -marker '↪'
-    add-highlighter buffer/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
-    add-highlighter buffer/operators        regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~) 0:operator
-    add-highlighter buffer/delimiters       regex (\(|\)|\[|\]|\{|\}|\;|'|`) 0:delimiter
+    try %{
+        add-highlighter buffer/numbers          number-lines -relative -hlcursor -separator ' '
+        add-highlighter buffer/matching         show-matching
+        add-highlighter buffer/wrap             wrap -word -indent -marker '↪'
+        add-highlighter buffer/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
+        add-highlighter buffer/operators        regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~) 0:operator
+        add-highlighter buffer/delimiters       regex (\(|\)|\[|\]|\{|\}|\;|'|`) 0:delimiter
+    }
 }
 
 # Hooks
