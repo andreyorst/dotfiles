@@ -310,10 +310,11 @@ are defining or executing a macro."
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-(setq-default c-basic-offset 4
-              c-default-style "linux"
-              indent-tabs-mode t
-              tab-width 4)
+(add-hook 'c-mode-hook (lambda()
+                         (setq-default c-basic-offset 4
+                                       c-default-style "linux"
+                                       indent-tabs-mode t
+                                       tab-width 4)))
 
 (global-set-key (kbd "C-c h") 'windmove-left)
 (global-set-key (kbd "C-c j") 'windmove-down)
@@ -359,7 +360,7 @@ are defining or executing a macro."
     (set-face-attribute 'mode-line-inactive nil :underline  line)
     (set-face-attribute 'mode-line          nil :box        nil)
     (set-face-attribute 'mode-line-inactive nil :box        nil)
-    (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#918BC0")))
+    (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#51AFEF")))
 
 (when window-system
   (my/set-frame-dark)
@@ -666,6 +667,17 @@ _-_ reduce region _)_ around pairs
   :init
   (when window-system
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+
+(use-package irony
+  :config
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+
+(use-package company-irony
+  :config (eval-after-load 'company
+            '(add-to-list 'company-backends 'company-irony)))
 
 (provide 'init)
 ;;; init.el ends here

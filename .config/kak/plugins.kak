@@ -27,7 +27,10 @@ plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-sudo-write"
-plug "occivink/kakoune-find"
+plug "occivink/kakoune-find" config %{
+    define-command -docstring "grep-apply-changes: apply changes specified in current *grep* buffer to their respective files" \
+    grep-apply-changes %{ find-apply-changes -force }
+}
 
 plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft

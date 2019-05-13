@@ -850,10 +850,11 @@ Here, I want all programming modes to include line numbers by default:
 These settings are for editing C source files.
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default c-basic-offset 4
-                c-default-style "linux"
-                indent-tabs-mode t
-                tab-width 4)
+  (add-hook 'c-mode-hook (lambda()
+                           (setq-default c-basic-offset 4
+                                         c-default-style "linux"
+                                         indent-tabs-mode t
+                                         tab-width 4)))
 #+END_SRC
 
 ** Windmove
@@ -939,7 +940,7 @@ package, which defines colors for pretty much everything in Emacs.
       (set-face-attribute 'mode-line-inactive nil :underline  line)
       (set-face-attribute 'mode-line          nil :box        nil)
       (set-face-attribute 'mode-line-inactive nil :box        nil)
-      (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#918BC0")))
+      (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#51AFEF")))
 #+END_SRC
 
 If  I  use  =window-system=  I  want  [[*=my/set-frame-dark=][my/set-frame-dark]]  to  run  during
@@ -1471,6 +1472,27 @@ This mode makes org headings use fancy bullet symbols.
     :init
     (when window-system
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+#+END_SRC
+
+** Irony Mode
+Irony is a package that provides completions for C and C++
+
+#+BEGIN_SRC emacs-lisp
+  (use-package irony
+	:config
+	(add-hook 'c++-mode-hook 'irony-mode)
+	(add-hook 'c-mode-hook 'irony-mode)
+	(add-hook 'objc-mode-hook 'irony-mode)
+	(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+#+END_SRC
+
+*** Company Irony
+A backend for company.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company-irony
+    :config (eval-after-load 'company
+              '(add-to-list 'company-backends 'company-irony)))
 #+END_SRC
 
 * Postscript
