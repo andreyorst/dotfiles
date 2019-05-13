@@ -846,6 +846,16 @@ Here, I want all programming modes to include line numbers by default:
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
+** C Mode
+These settings are for editing C source files.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default c-basic-offset 4
+                c-default-style "linux"
+                indent-tabs-mode t
+                tab-width 4)
+#+END_SRC
+
 ** Windmove
 This mode  allows to move  between windows, but  I don't like  that it
 uses arrow keys, and I would like  to use it with /hjkl/, because that's

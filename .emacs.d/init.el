@@ -310,6 +310,11 @@ are defining or executing a macro."
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
+(setq-default c-basic-offset 4
+              c-default-style "linux"
+              indent-tabs-mode t
+              tab-width 4)
+
 (global-set-key (kbd "C-c h") 'windmove-left)
 (global-set-key (kbd "C-c j") 'windmove-down)
 (global-set-key (kbd "C-c k") 'windmove-up)
