@@ -670,17 +670,6 @@ _-_ reduce region _)_ around pairs
   (when window-system
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
-(use-package irony
-  :config
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'objc-mode-hook 'irony-mode)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-
-(use-package company-irony
-  :config (eval-after-load 'company
-            '(add-to-list 'company-backends 'company-irony)))
-
 (use-package clang-format)
 
 (provide 'init)

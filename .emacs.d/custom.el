@@ -10,7 +10,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (clang-format company-irony irony yasnippet-snippets org-bullets flycheck-rust neotree solaire-mode doom-themes minions moody eyebrowse phi-search expand-region mc-extras multiple-cursors which-key vdiff-magit vdiff magit editorconfig toml-mode racer rust-mode gnuplot counsel-projectile projectile yasnippet undo-tree company flycheck counsel ivy flx parinfer geiser markdown-mode hydra use-package))))
+    (clang-format yasnippet-snippets org-bullets flycheck-rust neotree solaire-mode doom-themes minions moody eyebrowse phi-search expand-region mc-extras multiple-cursors which-key vdiff-magit vdiff magit editorconfig toml-mode racer rust-mode gnuplot counsel-projectile projectile yasnippet undo-tree company flycheck counsel ivy flx parinfer geiser markdown-mode hydra use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

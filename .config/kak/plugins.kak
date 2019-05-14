@@ -14,7 +14,7 @@ source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "andreyorst/plug.kak" branch "dev" noload config %{
+plug "andreyorst/plug.kak" noload config %{
     hook global WinSetOption filetype=plug %{
         remove-highlighter buffer/numbers
         remove-highlighter buffer/matching

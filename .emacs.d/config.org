@@ -1476,28 +1476,7 @@ This mode makes org headings use fancy bullet symbols.
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 #+END_SRC
 
-** Irony Mode
-Irony is a package that provides completions for C and C++
-
-#+BEGIN_SRC emacs-lisp
-  (use-package irony
-    :config
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'objc-mode-hook 'irony-mode)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-#+END_SRC
-
-*** Company Irony
-A backend for company.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package company-irony
-    :config (eval-after-load 'company
-              '(add-to-list 'company-backends 'company-irony)))
-#+END_SRC
-
-*** Clang Format
+** Clang Format
 A package to format C code with Clang Format.
 
 #+BEGIN_SRC emacs-lisp
