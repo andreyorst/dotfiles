@@ -310,7 +310,9 @@ are defining or executing a macro."
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-(add-hook 'c-mode-hook (lambda()
+(add-hook 'c-mode-hook (lambda ()
+                         (yas-minor-mode)
+                         (electric-pair-mode)
                          (setq-default c-basic-offset 4
                                        c-default-style "linux"
                                        indent-tabs-mode t
@@ -678,6 +680,8 @@ _-_ reduce region _)_ around pairs
 (use-package company-irony
   :config (eval-after-load 'company
             '(add-to-list 'company-backends 'company-irony)))
+
+(use-package clang-format)
 
 (provide 'init)
 ;;; init.el ends here
