@@ -56,7 +56,7 @@ plug "ul/kak-lsp" do %{
     cargo install --force --path .
 } config %{
     define-command lsp-restart %{ lsp-stop; lsp-start }
-    set-option global lsp_completion_trigger "execute-keys 'h<a-h><a-k>\S[^\h\n,=;*(){}\[\]]\z<ret>'"
+    set-option global lsp_completion_trigger "execute-keys 'h<a-h><a-k>\S[^\s,=;*(){}\[\]]\z<ret>'"
     set-option global lsp_diagnostic_line_error_sign "!"
     set-option global lsp_diagnostic_line_warning_sign "?"
     hook global WinSetOption filetype=(c|cpp|rust) %{

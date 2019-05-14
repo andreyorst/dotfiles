@@ -1459,7 +1459,6 @@ This mode makes org headings use fancy bullet symbols.
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 #+END_SRC
 
-
 ** Eglot
 Emacs polyglot. LSP client.
 
