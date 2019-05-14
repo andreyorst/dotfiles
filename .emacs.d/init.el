@@ -313,10 +313,10 @@ are defining or executing a macro."
 (add-hook 'c-mode-hook (lambda ()
                          (yas-minor-mode)
                          (electric-pair-mode)
-                         (setq-default c-basic-offset 4
-                                       c-default-style "linux"
-                                       indent-tabs-mode t
-                                       tab-width 4)))
+                         (setq c-basic-offset 4
+                               c-default-style "linux"
+                               indent-tabs-mode t
+                               tab-width 4)))
 
 (global-set-key (kbd "C-c h") 'windmove-left)
 (global-set-key (kbd "C-c j") 'windmove-down)
@@ -669,6 +669,14 @@ _-_ reduce region _)_ around pairs
   :init
   (when window-system
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+
+(use-package eglot
+  :commands (eglot eglot-ensure)
+  :config
+  (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
+  :init
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure))
 
 (use-package clang-format)
 

@@ -853,10 +853,10 @@ These settings are for editing C source files.
   (add-hook 'c-mode-hook (lambda ()
                            (yas-minor-mode)
                            (electric-pair-mode)
-                           (setq-default c-basic-offset 4
-                                         c-default-style "linux"
-                                         indent-tabs-mode t
-                                         tab-width 4)))
+                           (setq c-basic-offset 4
+                                 c-default-style "linux"
+                                 indent-tabs-mode t
+                                 tab-width 4)))
 #+END_SRC
 
 ** Windmove
@@ -1474,6 +1474,20 @@ This mode makes org headings use fancy bullet symbols.
     :init
     (when window-system
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+#+END_SRC
+
+
+** Eglot
+Emacs polyglot. LSP client.
+
+ #+BEGIN_SRC emacs-lisp
+   (use-package eglot
+     :commands (eglot eglot-ensure)
+     :config
+     (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
+     :init
+     (add-hook 'c-mode-hook 'eglot-ensure)
+     (add-hook 'c++-mode-hook 'eglot-ensure))
 #+END_SRC
 
 ** Clang Format
