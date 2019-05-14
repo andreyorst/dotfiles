@@ -215,16 +215,6 @@ are defining or executing a macro."
   "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
   (set-window-fringes neo-global--window 0 1))
 
-(defvar my--company-enable-yas t
-  "Enable yasnippet for all backends.")
-
-(defun my/company-enable-yas (backend)
-  (if (or (not my--company-enable-yas)
-          (and (listp backend) (member 'company-yasnippet backend)))
-      backend
-    (append (if (consp backend) backend (list backend))
-            '(:with company-yasnippet))))
-
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
                            (flyspell-mode)
@@ -495,8 +485,7 @@ are defining or executing a macro."
   (setq company-backends (remove 'company-clang company-backends)
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends)
-        company-backends (remove 'company-gtags company-backends)
-        company-backends (mapcar #'my/company-enable-yas company-backends)))
+        company-backends (remove 'company-gtags company-backends)))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -516,6 +505,7 @@ are defining or executing a macro."
   (projectile-mode +1)
   (setq projectile-svn-command "fd -L --type f --print0"
         projectile-generic-command "fd -L --type f --print0"
+        projectile-require-project-root nil
         projectile-switch-project-action (lambda()
                                            (neotree-projectile-action)
                                            (projectile-find-file))

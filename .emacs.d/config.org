@@ -590,23 +590,6 @@ it.
     (set-window-fringes neo-global--window 0 1))
 #+END_SRC
 
-** =my/company-enable-yas=
-Found  this  function on  [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][emacs.stackexchange.com]].  It  is adding  =yas=
-backend  to all  company backends,  so  I could  expand snippets  from
-completion menu.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar my--company-enable-yas t
-    "Enable yasnippet for all backends.")
-
-  (defun my/company-enable-yas (backend)
-    (if (or (not my--company-enable-yas)
-            (and (listp backend) (member 'company-yasnippet backend)))
-        backend
-      (append (if (consp backend) backend (list backend))
-              '(:with company-yasnippet))))
-#+END_SRC
-
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.
@@ -1160,8 +1143,7 @@ Complete anything framework. Nothing much to say. Does it's job.
     (setq company-backends (remove 'company-clang company-backends)
           company-backends (remove 'company-xcode company-backends)
           company-backends (remove 'company-cmake company-backends)
-          company-backends (remove 'company-gtags company-backends)
-          company-backends (mapcar #'my/company-enable-yas company-backends)))
+          company-backends (remove 'company-gtags company-backends)))
 #+END_SRC
 
 ** Undo Tree
@@ -1206,6 +1188,7 @@ However this plugin is quite useful with Git repositories.
     (projectile-mode +1)
     (setq projectile-svn-command "fd -L --type f --print0"
           projectile-generic-command "fd -L --type f --print0"
+          projectile-require-project-root nil
           projectile-switch-project-action (lambda()
                                              (neotree-projectile-action)
                                              (projectile-find-file))
