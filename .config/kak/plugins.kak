@@ -36,7 +36,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
-if '-n ${PATH##*termux*}' %{
+if '-n "${PATH##*termux*}"' %{
     plug "andreyorst/fzf.kak" %{
         map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
         set-option global fzf_preview_width '65%'
@@ -53,7 +53,7 @@ if '-n ${PATH##*termux*}' %{
     }
 }
 
-if '-n ${PATH##*termux*}' %{
+if '-n "${PATH##*termux*}"' %{
     plug "ul/kak-lsp" do %{
         cargo build --release --locked
         cargo install --force --path .
@@ -78,7 +78,7 @@ if '-n ${PATH##*termux*}' %{
     }
 }
 
-if '-n ${PATH##*termux*}' %{
+if '-n "${PATH##*termux*}"' %{
     plug "andreyorst/powerline.kak" %{
         set-option global powerline_ignore_warnings true
         set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
@@ -127,7 +127,7 @@ plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     }
 }
 
-if '-n ${PATH##*termux*}' %{
+if '-n "${PATH##*termux*}"' %{
     plug "andreyorst/tagbar.kak" config %{
         set-option global tagbar_sort false
         set-option global tagbar_size 40
@@ -162,7 +162,7 @@ plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
 
-if '-n ${PATH##*termux*}' %{
+if '-n "${PATH##*termux*}"' %{
     plug "andreyorst/langmap.kak" config %{
         set-option global langmap %opt{langmap_ru_jcuken}
         map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
