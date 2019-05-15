@@ -201,7 +201,11 @@ map global normal <c-n> ': query-repeat<ret>'
 
 define-command fd -params 1 -shell-script-candidates %{fd --hidden --type f} %{edit -existing %arg{1}}
 
-define-command if -params 2..4 %{ evaluate-commands %sh{
+try %{ require-module kak }
+add-highlighter shared/kakrc/code/if_else regex \b(if|else)\b 0:keyword
+
+define-command -docstring "if <condition> <expression> [else <expression>]: if statement that accepts shell-valid condition string" \
+if -params 2..4 %{ evaluate-commands %sh{
     condition="[ $1 ]"
     else_op="$3"
     if [ -n "$else_op" ] && [ "$else_op" != "else" ]; then
