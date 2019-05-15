@@ -590,6 +590,22 @@ it.
     (set-window-fringes neo-global--window 0 1))
 #+END_SRC
 
+** =my/setup-fringe-bitmaps=
+This  function  sets fringe  diff  highlighting  bitmaps to  get  nice
+looking thin vertical bars.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/setup-fringe-bitmaps ()
+    "Set fringe bitmaps."
+    (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+
+#+END_SRC
+
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.
@@ -1479,6 +1495,16 @@ A package to format C code with Clang Format.
   (use-package clang-format)
 #+END_SRC
 
+** Diff HL Mode
+This package  provides nice way  of diffing buffers. It  displays thin
+bar inside fringe marking unstaged changes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :commands (global-diff-hl-mode)
+    :config (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+    :init (global-diff-hl-mode 1))
+#+END_SRC
 * Postscript
 This Emacs Configuration features various  cool E-Lisp hacks that I've
 found  in the  Internet,  and I  try to  keep  references to  original

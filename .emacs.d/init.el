@@ -215,6 +215,15 @@ are defining or executing a macro."
   "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
   (set-window-fringes neo-global--window 0 1))
 
+(defun my/setup-fringe-bitmaps ()
+  "Set fringe bitmaps."
+  (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
                            (flyspell-mode)
@@ -669,6 +678,13 @@ _-_ reduce region _)_ around pairs
   (add-hook 'c++-mode-hook 'eglot-ensure))
 
 (use-package clang-format)
+
+(use-package diff-hl
+  :commands (global-diff-hl-mode)
+  :config
+  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+  :init
+  (global-diff-hl-mode))
 
 (provide 'init)
 ;;; init.el ends here
