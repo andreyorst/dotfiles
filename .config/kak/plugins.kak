@@ -76,6 +76,16 @@ if '-n "${PATH##*termux*}"' %{
         }
         hook global KakEnd .* lsp-exit
     }
+} else %{
+    hook global WinSetOption filetype=(c|cpp) %{
+        clang-enable-autocomplete
+        clang-enable-diagnostics
+        map -docstring "next diagnostics error" window goto n '<esc>: clang-diagnostics-next<ret>'
+    }
+    hook global WinSetOption filetype=rust) %{
+        racer-enable-autocomplete
+        map -docstring "go to definition" window goto d '<esc>: racer-go-definition<ret>'
+    }
 }
 
 if '-n "${PATH##*termux*}"' %{
