@@ -36,49 +36,55 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     colorscheme base16-gruvbox-dark-soft
 }
 
-plug "andreyorst/fzf.kak" %{
-    map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
-    set-option global fzf_preview_width '65%'
-    set-option global fzf_project_use_tilda true
-    evaluate-commands %sh{
-        if [ -n "$(command -v fd)" ]; then
-            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
-        else
-            echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
-        fi
-        [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_cmd bat"
-        [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"
+if '-z ${PATH##*termux*}' %{
+    plug "andreyorst/fzf.kak" %{
+        map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
+        set-option global fzf_preview_width '65%'
+        set-option global fzf_project_use_tilda true
+        evaluate-commands %sh{
+            if [ -n "$(command -v fd)" ]; then
+                echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
+            else
+                echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
+            fi
+            [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_cmd bat"
+            [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"
+        }
     }
 }
 
-plug "ul/kak-lsp" do %{
-    cargo build --release --locked
-    cargo install --force --path .
-} config %{
-    define-command lsp-restart %{ lsp-stop; lsp-start }
-    set-option global lsp_completion_trigger "execute-keys 'h<a-h><a-k>\S[^\s,=;*(){}\[\]]\z<ret>'"
-    set-option global lsp_diagnostic_line_error_sign "!"
-    set-option global lsp_diagnostic_line_warning_sign "?"
-    hook global WinSetOption filetype=(c|cpp|rust) %{
-        map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
-        lsp-enable-window
-        lsp-auto-hover-enable
-        lsp-auto-hover-insert-mode-disable
-        set-option window lsp_hover_anchor true
-        set-face window DiagnosticError default+u
-        set-face window DiagnosticWarning default+u
+if '-z ${PATH##*termux*}' %{
+    plug "ul/kak-lsp" do %{
+        cargo build --release --locked
+        cargo install --force --path .
+    } config %{
+        define-command lsp-restart %{ lsp-stop; lsp-start }
+        set-option global lsp_completion_trigger "execute-keys 'h<a-h><a-k>\S[^\s,=;*(){}\[\]]\z<ret>'"
+        set-option global lsp_diagnostic_line_error_sign "!"
+        set-option global lsp_diagnostic_line_warning_sign "?"
+        hook global WinSetOption filetype=(c|cpp|rust) %{
+            map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
+            lsp-enable-window
+            lsp-auto-hover-enable
+            lsp-auto-hover-insert-mode-disable
+            set-option window lsp_hover_anchor true
+            set-face window DiagnosticError default+u
+            set-face window DiagnosticWarning default+u
+        }
+        hook global WinSetOption filetype=rust %{
+            set-option window lsp_server_configuration rust.clippy_preference="on"
+        }
+        hook global KakEnd .* lsp-exit
     }
-    hook global WinSetOption filetype=rust %{
-        set-option window lsp_server_configuration rust.clippy_preference="on"
-    }
-    hook global KakEnd .* lsp-exit
 }
 
-plug "andreyorst/powerline.kak" %{
-    set-option global powerline_ignore_warnings true
-    set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
-    hook -once global WinDisplay .* %{
-        powerline-theme base16-gruvbox
+if '-z ${PATH##*termux*}' %{
+    plug "andreyorst/powerline.kak" %{
+        set-option global powerline_ignore_warnings true
+        set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
+        hook -once global WinDisplay .* %{
+            powerline-theme base16-gruvbox
+        }
     }
 }
 
@@ -121,22 +127,23 @@ plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     }
 }
 
-plug "andreyorst/tagbar.kak" config %{
-    set-option global tagbar_sort false
-    set-option global tagbar_size 40
-    set-option global tagbar_display_anon false
-    map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
-    hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
-        tagbar-enable
-    }
-    hook global WinSetOption filetype=tagbar %{
-        remove-highlighter buffer/numbers
-        remove-highlighter buffer/matching
-        remove-highlighter buffer/wrap
-        remove-highlighter buffer/show-whitespaces
+if '-z ${PATH##*termux*}' %{
+    plug "andreyorst/tagbar.kak" config %{
+        set-option global tagbar_sort false
+        set-option global tagbar_size 40
+        set-option global tagbar_display_anon false
+        map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
+        hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
+            tagbar-enable
+        }
+        hook global WinSetOption filetype=tagbar %{
+            remove-highlighter buffer/numbers
+            remove-highlighter buffer/matching
+            remove-highlighter buffer/wrap
+            remove-highlighter buffer/show-whitespaces
+        }
     }
 }
-
 plug "alexherbo2/word-movement.kak" config %{
     word-movement-map next w
     word-movement-map previous b
@@ -155,9 +162,11 @@ plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
 
-plug "andreyorst/langmap.kak" config %{
-    set-option global langmap %opt{langmap_ru_jcuken}
-    map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
-    map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
-    map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
+if '-z ${PATH##*termux*}' %{
+    plug "andreyorst/langmap.kak" config %{
+        set-option global langmap %opt{langmap_ru_jcuken}
+        map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
+        map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
+        map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
+    }
 }

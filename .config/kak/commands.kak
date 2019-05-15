@@ -198,3 +198,23 @@ query-repeat %{ try %{
 }}
 
 map global normal <c-n> ': query-repeat<ret>'
+
+define-command fd -params 1 -shell-script-candidates %{fd --hidden --type f} %{edit -existing %arg{1}}
+
+define-command if -params 2..4 %{ evaluate-commands %sh{
+    condition="$1"
+    else_op="$3"
+    if [ -n "$else_op" ] && [ "$else_op" != "else" ]; then
+        printf "%s\n" "fail %{if: unknow operator '$else_op'}"
+        exit
+    fi
+    if [ $# -eq 3 ]; then
+        printf "%s\n" "fail %{if: wrong argument count}"
+        exit
+    fi
+    if [ $expression ]; then
+        printf "%s\n" "evaluate-commands %arg{2}"
+    elif [ $# -eq 4 ]; then
+        printf "%s\n" "evaluate-commands %arg{4}"
+    fi
+}}
