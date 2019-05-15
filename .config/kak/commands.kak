@@ -212,7 +212,7 @@ define-command if -params 2..4 %{ evaluate-commands %sh{
         printf "%s\n" "fail %{if: wrong argument count}"
         exit
     fi
-    if [ $expression ]; then
+    if [ $condition ]; then
         printf "%s\n" "evaluate-commands %arg{2}"
     elif [ $# -eq 4 ]; then
         printf "%s\n" "evaluate-commands %arg{4}"
