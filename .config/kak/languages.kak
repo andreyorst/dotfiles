@@ -65,6 +65,48 @@ hook global WinSetOption filetype=rust %{
     set-option buffer formatcmd 'rustfmt'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
 
+    define-command -override racer-complete -docstring "Complete the current selection with racer" %{
+        evaluate-commands %sh{
+            dir=$(mktemp -d "${TMPDIR:-/tmp}"/kak-racer.XXXXXXXX)
+            printf %s\\n "set-option buffer racer_tmp_dir ${dir}"
+            printf %s\\n "evaluate-commands -no-hooks %{ write ${dir}/buf }"
+        }
+        evaluate-commands %sh{
+            dir=${kak_opt_racer_tmp_dir}
+            (
+                cursor="${kak_cursor_line} $((${kak_cursor_column} - 1))"
+                racer_data=$(racer --interface tab-text complete-with-snippet ${cursor} ${kak_buffile} ${dir}/buf)
+                compl=$(printf %s\\n "${racer_data}" | awk '
+                    BEGIN { FS = "\t"; ORS = " " }
+                    /^PREFIX/ {
+                        column = ENVIRON["kak_cursor_column"] + $2 - $3
+                        print ENVIRON["kak_cursor_line"] "." column "@@" ENVIRON["kak_timestamp"]
+                    }
+                    /^MATCH/ {
+                        word = $2
+                        type = $7
+                        desc = substr($9, 2, length($9) - 2)
+                        gsub(/\|/, "\\|", desc)
+                        gsub(/\\n/, "\n", desc)
+                        gsub(/!/, "!!", desc)
+                        menu = $8
+                        sub(/^pub /, "", menu)
+                        gsub(/\|/, "\\|", menu)
+
+                        candidate = word "|info -style menu %!" desc "!|" word " {MenuInfo}" menu
+
+                        gsub(/:/, "\\:", candidate)
+                        gsub(/@/, "@@", candidate)
+                        gsub(/~/, "~~", candidate)
+                        print "%~" candidate "~"
+                    }'
+                )
+                printf %s\\n "evaluate-commands -client '${kak_client}' %@ set-option 'buffer=${kak_bufname}' racer_completions ${compl%?} @" | kak -p ${kak_session}
+                rm -r ${dir}
+            ) > /dev/null 2>&1 < /dev/null &
+        }
+    }
+
     evaluate-commands %sh{
         # Taken from rc/filetype/rust.kak
         rust_keywords="let as fn return match if else loop for in while
