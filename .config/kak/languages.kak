@@ -84,18 +84,15 @@ hook global WinSetOption filetype=rust %{
                     }
                     /^MATCH/ {
                         word = $2
-                        type = $7
                         desc = substr($9, 2, length($9) - 2)
                         gsub(/\|/, "\\|", desc)
                         gsub(/\\n/, "\n", desc)
                         gsub(/!/, "!!", desc)
-                        menu = $8
-                        sub(/^pub /, "", menu)
-                        gsub(/\|/, "\\|", menu)
+                        info = $8
+                        gsub(/\|/, "\\|", info)
 
-                        candidate = word "|info -style menu %!" desc "!|" word " {MenuInfo}" menu
+                        candidate = word "|info -style menu %!" desc "!|" word " {default+df}" info
 
-                        gsub(/:/, "\\:", candidate)
                         gsub(/@/, "@@", candidate)
                         gsub(/~/, "~~", candidate)
                         print "%~" candidate "~"

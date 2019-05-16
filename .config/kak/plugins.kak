@@ -80,6 +80,17 @@ if '-n "${PATH##*termux*}"' %{
     hook global WinSetOption filetype=(c|cpp) %{
         clang-enable-autocomplete
         clang-enable-diagnostics
+        hook window BufWritePre .* %{ clang-parse }
+        alias window lint clang-parse
+        set-option -add window clang_options %sh{ (
+            while [ "$PWD" != "$HOME" ]; do
+                if [ -e "$PWD/compile_flags.txt" ]; then
+                    printf "%s\n" "$(cat "$PWD/compile_flags.txt" | tr '\n' ' ')"
+                    exit
+                fi
+                cd ..
+            done
+        ) }
         map -docstring "next diagnostics error" window goto n '<esc>: clang-diagnostics-next<ret>'
     }
     hook global WinSetOption filetype=rust) %{
