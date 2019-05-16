@@ -207,16 +207,11 @@ add-highlighter shared/kakrc/code/if_else regex \b(if|else)\b 0:keyword
 define-command -docstring "if <condition> <expression> [else <expression>]: if statement that accepts shell-valid condition string" \
 if -params 2..4 %{ evaluate-commands %sh{
     condition="[ $1 ]"
-    else_op="$3"
-    if [ -n "$else_op" ] && [ "$else_op" != "else" ]; then
-        printf "%s\n" "fail %{if: unknow operator '$else_op'}"
-        exit
-    fi
-    if [ $# -eq 3 ]; then
+    if [ -n "$3" ] && [ "$3" != "else" ]; then
+        printf "%s\n" "fail %{if: unknow operator '$3'}"
+    elif [ $# -eq 3 ]; then
         printf "%s\n" "fail %{if: wrong argument count}"
-        exit
-    fi
-    if eval $condition; then
+    elif eval $condition; then
         printf "%s\n" "evaluate-commands %arg{2}"
     elif [ $# -eq 4 ]; then
         printf "%s\n" "evaluate-commands %arg{4}"
