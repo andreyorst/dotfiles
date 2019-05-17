@@ -232,7 +232,7 @@ are defining or executing a macro."
   "Generate tags file for DIR."
   (interactive "DDirectory: ")
   (shell-command
-   (format "%s -f tags -e -R %s") my--ctags-executable (directory-file-name dir)))
+   (format "%s -f tags -e -R %s" my--ctags-executable (directory-file-name dir))))
 
 (require 'org)
 (add-hook 'org-mode-hook (lambda()

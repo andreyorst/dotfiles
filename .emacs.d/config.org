@@ -625,7 +625,7 @@ The  function =my/generate-tags=  will accept  directory from  where the
     "Generate tags file for DIR."
     (interactive "DDirectory: ")
     (shell-command
-     (format "%s -f tags -e -R %s") my--ctags-executable (directory-file-name dir)))
+     (format "%s -f tags -e -R %s" my--ctags-executable (directory-file-name dir))))
 #+END_SRC
 
 * Modes
