@@ -1523,10 +1523,12 @@ bar inside fringe marking unstaged changes.
 
 #+BEGIN_SRC emacs-lisp
   (use-package diff-hl
+    :commands global-diff-hl-mode
     :init
     (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
     (global-diff-hl-mode 1))
 #+END_SRC
+
 * Postscript
 This Emacs Configuration features various  cool E-Lisp hacks that I've
 found  in the  Internet,  and I  try to  keep  references to  original

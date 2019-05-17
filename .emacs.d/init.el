@@ -690,6 +690,7 @@ _-_ reduce region _)_ around pairs
 (use-package clang-format)
 
 (use-package diff-hl
+  :commands global-diff-hl-mode
   :init
   (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
   (global-diff-hl-mode 1))
