@@ -5,3 +5,7 @@
 	clean-all = clean -x -d -f
 	st = status
 	co = checkout
+	ci = commit
+	cim = commit -m
+	br = branch
+	bra = branch -a
