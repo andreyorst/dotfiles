@@ -205,9 +205,11 @@ are defining or executing a macro."
 (global-set-key (kbd "C-c x") 'my/select-line)
 
 (defun my/disable-fringes-in-minibuffer (&rest _)
+  "Disable fringes in mimibuffer."
   (set-window-fringes (minibuffer-window) 0 0 nil))
 
 (defun my/no-fringes-in-which-key-buffer (&rest _)
+  "Disable fringes in which key buffers."
   (my/disable-fringes-in-minibuffer)
   (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
 
@@ -680,11 +682,9 @@ _-_ reduce region _)_ around pairs
 (use-package clang-format)
 
 (use-package diff-hl
-  :commands (global-diff-hl-mode)
-  :config
-  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
   :init
-  (global-diff-hl-mode))
+  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+  (global-diff-hl-mode 1))
 
 (provide 'init)
 ;;; init.el ends here

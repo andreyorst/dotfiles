@@ -567,6 +567,7 @@ mode turned on.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/disable-fringes-in-minibuffer (&rest _)
+    "Disable fringes in mimibuffer."
     (set-window-fringes (minibuffer-window) 0 0 nil))
 #+END_SRC
 
@@ -575,6 +576,7 @@ Same as for minibuffer, no use for fringes in Which Key buffers.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/no-fringes-in-which-key-buffer (&rest _)
+    "Disable fringes in which key buffers."
     (my/disable-fringes-in-minibuffer)
     (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
 #+END_SRC
@@ -1501,9 +1503,9 @@ bar inside fringe marking unstaged changes.
 
 #+BEGIN_SRC emacs-lisp
   (use-package diff-hl
-    :commands (global-diff-hl-mode)
-    :config (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-    :init (global-diff-hl-mode 1))
+    :init
+    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+    (global-diff-hl-mode 1))
 #+END_SRC
 * Postscript
 This Emacs Configuration features various  cool E-Lisp hacks that I've
