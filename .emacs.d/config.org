@@ -867,17 +867,25 @@ Here, I want all programming modes to include line numbers by default:
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
-** C Mode
-These settings are for editing C source files.
+** CC Mode
+These settings are for editing C source files. First, to suppress byte
+compilation warning lets declare variables:
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-hook (lambda ()
-                           (yas-minor-mode)
-                           (electric-pair-mode)
-                           (setq c-basic-offset 4
-                                 c-default-style "linux"
-                                 indent-tabs-mode t
-                                 tab-width 4)))
+  (defvar c-basic-offset)
+  (defvar c-default-style)
+#+END_SRC
+
+Now we can create a hook that will run for all C related modes:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook (lambda ()
+                                  (yas-minor-mode)
+                                  (electric-pair-mode)
+                                  (setq c-basic-offset 4
+                                        c-default-style "linux"
+                                        indent-tabs-mode t
+                                        tab-width 4)))
 #+END_SRC
 
 ** Windmove
