@@ -683,6 +683,7 @@ _-_ reduce region _)_ around pairs
   :commands (eglot eglot-ensure)
   :config
   (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
+  (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
   :init
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure))
