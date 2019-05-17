@@ -608,6 +608,26 @@ looking thin vertical bars.
 
 #+END_SRC
 
+** =my/generate-tags=
+To  generate tags  I'm  going  to use  universal  ctags.  Since it  is
+installed on my system and available  in path, I simply will declare a
+variable for quick configuration:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar my--ctags-executable "ctags")
+#+END_SRC
+
+The  function =my/generate-tags=  will accept  directory from  where the
+=ctags= will browse project recursively and generate =tags= file.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/generate-tags (dir)
+    "Generate tags file for DIR."
+    (interactive "DDirectory: ")
+    (shell-command
+     (format "%s -f tags -e -R %s") my--ctags-executable (directory-file-name dir)))
+#+END_SRC
+
 * Modes
 This section will contain some settings for various modes that are not
 handled within package configurations.

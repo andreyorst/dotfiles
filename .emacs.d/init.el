@@ -226,6 +226,14 @@ are defining or executing a macro."
   (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
   (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
 
+(defvar my--ctags-executable "ctags")
+
+(defun my/generate-tags (dir)
+  "Generate tags file for DIR."
+  (interactive "DDirectory: ")
+  (shell-command
+   (format "%s -f tags -e -R %s") my--ctags-executable (directory-file-name dir)))
+
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
                            (flyspell-mode)
