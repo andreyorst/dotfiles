@@ -12,6 +12,7 @@ if [ -n "$(command -v exa)" ]; then
     unset LS_COLORS
     unset LSCOLORS
     alias ls="exa"
+    alias la="exa -la"
     alias l="exa -l"
 fi
 
@@ -23,6 +24,8 @@ else
     export EDITOR="vi"
 fi
 
+mkcd() { mkdir "$1" && cd "$1" }
+
 alias zshconf="$EDITOR ~/.zshrc"
 alias tmuxconf="$EDITOR ~/.tmux.conf"
 alias kakconf="kak ~/.config/kak/kakrc"
@@ -30,6 +33,7 @@ alias emacsconf="emacs ~/.emacs.d/config.org"
 alias less="less --tabs 4"
 alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
 alias gti="git"
+alias sudo="sudo "
 
 alias g="git"
 alias e="$EDITOR"
