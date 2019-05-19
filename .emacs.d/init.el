@@ -204,14 +204,21 @@ are defining or executing a macro."
 
 (global-set-key (kbd "C-c x") 'my/select-line)
 
-(defun my/disable-fringes-in-minibuffer (&rest _)
+(defun my/minibuffer-no-fringes (&rest _)
   "Disable fringes in mimibuffer."
   (set-window-fringes (minibuffer-window) 0 0 nil))
 
-(defun my/no-fringes-in-which-key-buffer (&rest _)
+(add-hook 'after-init-hook #'my/minibuffer-no-fringes)
+
+(defun my/which-key-no-fringes (&rest _)
   "Disable fringes in which key buffers."
-  (my/disable-fringes-in-minibuffer)
+  (my/minibuffer-no-fringes)
   (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
+
+(defun my/geiser-no-fringes (&rest _)
+  "Disable fringes in geiser REPL BUFFER."
+  (when (get-buffer "* Guile REPL *")
+    (set-window-fringes (get-buffer-window "* Guile REPL *") 0 0 nil)))
 
 (defun my/neotree-1px-fringe ()
   "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
@@ -391,9 +398,9 @@ are defining or executing a macro."
     after-revert
     ediff-prepare-buffer) . turn-on-solaire-mode)
   :config
-  (add-hook 'minibuffer-setup #'solaire-mode-in-minibuffer)
+  (add-hook 'minibuffer-setup-hook #'my/minibuffer-no-fringes)
   (add-hook 'focus-in-hook #'solaire-mode-reset)
-  (add-hook 'solaire-mode-hook #'my/disable-fringes-in-minibuffer)
+  (add-hook 'solaire-mode-hook #'my/geiser-no-fringes)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
   (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init
@@ -434,6 +441,7 @@ are defining or executing a macro."
   :config
   (add-hook 'scheme-mode-hook 'geiser-mode)
   (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
+  (advice-add 'geiser-repl--startup :after #'my/geiser-no-fringes)
   :init
   (setq geiser-active-implementations '(guile)
         geiser-default-implementation 'guile))
@@ -589,7 +597,7 @@ are defining or executing a macro."
   :commands which-key-mode
   :config
   (advice-add 'which-key--show-buffer-side-window
-              :after #'my/no-fringes-in-which-key-buffer)
+              :after #'my/which-key-no-fringes)
   :init
   (which-key-mode))
 

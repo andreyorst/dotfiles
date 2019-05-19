@@ -561,24 +561,40 @@ to /x/.
   (global-set-key (kbd "C-c x") 'my/select-line)
   #+END_SRC
 
-** =my/disable-fringes-in-minibuffer=
+** =my/minibuffer-no-fringes=
 Fringes in minibuffer are useless and  can go out of sync with Solaire
 mode turned on.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/disable-fringes-in-minibuffer (&rest _)
+  (defun my/minibuffer-no-fringes (&rest _)
     "Disable fringes in mimibuffer."
     (set-window-fringes (minibuffer-window) 0 0 nil))
 #+END_SRC
 
-** =my/no-fringes-in-which-key-buffer=
+Let's disable minibuffer fringes on startup:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook #'my/minibuffer-no-fringes)
+#+END_SRC
+
+** =my/which-key-no-fringes=
 Same as for minibuffer, no use for fringes in Which Key buffers.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/no-fringes-in-which-key-buffer (&rest _)
+  (defun my/which-key-no-fringes (&rest _)
     "Disable fringes in which key buffers."
-    (my/disable-fringes-in-minibuffer)
+    (my/minibuffer-no-fringes)
     (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
+#+END_SRC
+
+** =my/geiser-no-fringes=
+Disables fringes in Geiser main buffer.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/geiser-no-fringes (&rest _)
+    "Disable fringes in geiser REPL BUFFER."
+    (when (get-buffer "* Guile REPL *")
+      (set-window-fringes (get-buffer-window "* Guile REPL *") 0 0 nil)))
 #+END_SRC
 
 ** =my/neotree-1px-fringe=
@@ -999,9 +1015,9 @@ buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
       after-revert
       ediff-prepare-buffer) . turn-on-solaire-mode)
     :config
-    (add-hook 'minibuffer-setup #'solaire-mode-in-minibuffer)
+    (add-hook 'minibuffer-setup-hook #'my/minibuffer-no-fringes)
     (add-hook 'focus-in-hook #'solaire-mode-reset)
-    (add-hook 'solaire-mode-hook #'my/disable-fringes-in-minibuffer)
+    (add-hook 'solaire-mode-hook #'my/geiser-no-fringes)
     (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
     (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
     :init
@@ -1075,6 +1091,7 @@ here, since it also provides completion for it.
     :config
     (add-hook 'scheme-mode-hook 'geiser-mode)
     (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
+    (advice-add 'geiser-repl--startup :after #'my/geiser-no-fringes)
     :init
     (setq geiser-active-implementations '(guile)
           geiser-default-implementation 'guile))
@@ -1359,7 +1376,7 @@ enable it by default.
     :commands which-key-mode
     :config
     (advice-add 'which-key--show-buffer-side-window
-                :after #'my/no-fringes-in-which-key-buffer)
+                :after #'my/which-key-no-fringes)
     :init
     (which-key-mode))
 #+END_SRC
