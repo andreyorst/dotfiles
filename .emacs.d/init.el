@@ -204,6 +204,10 @@ are defining or executing a macro."
 
 (global-set-key (kbd "C-c x") 'my/select-line)
 
+(defun my/window-no-fringes ()
+   "Wrapper around `set-window-fringes' function."
+   (set-window-fringes nil 0 0 nil))
+
 (defun my/minibuffer-no-fringes (&rest _)
   "Disable fringes in mimibuffer."
   (set-window-fringes (minibuffer-window) 0 0 nil))
@@ -216,9 +220,16 @@ are defining or executing a macro."
   (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
 
 (defun my/geiser-no-fringes (&rest _)
-  "Disable fringes in geiser REPL BUFFER."
-  (when (get-buffer "* Guile REPL *")
-    (set-window-fringes (get-buffer-window "* Guile REPL *") 0 0 nil)))
+  "Disable fringes in geiser REPL buffers."
+  (my/window-no-fringes)
+  (add-hook 'window-configuration-change-hook
+            'my/window-no-fringes nil :local))
+
+(defun my/magit-no-fringes ()
+  "Disable fringes in Magit window"
+  (my/window-no-fringes)
+  (add-hook 'window-configuration-change-hook
+            'my/window-no-fringes nil :local))
 
 (defun my/neotree-1px-fringe ()
   "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
@@ -400,7 +411,6 @@ are defining or executing a macro."
   :config
   (add-hook 'minibuffer-setup-hook #'my/minibuffer-no-fringes)
   (add-hook 'focus-in-hook #'solaire-mode-reset)
-  (add-hook 'solaire-mode-hook #'my/geiser-no-fringes)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
   (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init
@@ -441,7 +451,7 @@ are defining or executing a macro."
   :config
   (add-hook 'scheme-mode-hook 'geiser-mode)
   (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
-  (advice-add 'geiser-repl--startup :after #'my/geiser-no-fringes)
+  (add-hook 'geiser-repl-mode-hook #'my/geiser-no-fringes)
   :init
   (setq geiser-active-implementations '(guile)
         geiser-default-implementation 'guile))
@@ -569,7 +579,9 @@ are defining or executing a macro."
   :config
   (editorconfig-mode 1))
 
-(use-package magit)
+(use-package magit
+  :config
+  (add-hook 'magit-mode-hook 'my/magit-no-fringes))
 
 (use-package vdiff
   :init (setq vdiff-lock-scrolling t

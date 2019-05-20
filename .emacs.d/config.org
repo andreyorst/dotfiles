@@ -561,7 +561,18 @@ to /x/.
   (global-set-key (kbd "C-c x") 'my/select-line)
   #+END_SRC
 
-** =my/minibuffer-no-fringes=
+** Fringe functions
+*** =my/window-no-fringes=
+This function will be called  in various window configuration hooks to
+keep consistent view.
+
+#+BEGIN_SRC emacs-lisp
+   (defun my/window-no-fringes ()
+      "Wrapper around `set-window-fringes' function."
+      (set-window-fringes nil 0 0 nil))
+#+END_SRC
+
+*** =my/minibuffer-no-fringes=
 Fringes in minibuffer are useless and  can go out of sync with Solaire
 mode turned on.
 
@@ -577,7 +588,7 @@ Let's disable minibuffer fringes on startup:
   (add-hook 'after-init-hook #'my/minibuffer-no-fringes)
 #+END_SRC
 
-** =my/which-key-no-fringes=
+*** =my/which-key-no-fringes=
 Same as for minibuffer, no use for fringes in Which Key buffers.
 
 #+BEGIN_SRC emacs-lisp
@@ -587,17 +598,28 @@ Same as for minibuffer, no use for fringes in Which Key buffers.
     (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
 #+END_SRC
 
-** =my/geiser-no-fringes=
+*** =my/geiser-no-fringes=
 Disables fringes in Geiser main buffer.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/geiser-no-fringes (&rest _)
-    "Disable fringes in geiser REPL BUFFER."
-    (when (get-buffer "* Guile REPL *")
-      (set-window-fringes (get-buffer-window "* Guile REPL *") 0 0 nil)))
+    "Disable fringes in geiser REPL buffers."
+    (my/window-no-fringes)
+    (add-hook 'window-configuration-change-hook
+              'my/window-no-fringes nil :local))
 #+END_SRC
 
-** =my/neotree-1px-fringe=
+*** =my/magit-no-fringes=
+
+#+BEGIN_SRC emacs-lisp
+    (defun my/magit-no-fringes ()
+      "Disable fringes in Magit window"
+      (my/window-no-fringes)
+      (add-hook 'window-configuration-change-hook
+                'my/window-no-fringes nil :local))
+#+END_SRC
+
+*** =my/neotree-1px-fringe=
 Doom themes explicitly set Neotree fringes to =0 0=, which I don't like,
 because it adds =$= sign on  truncated lines. This function will prevent
 it.
@@ -608,7 +630,7 @@ it.
     (set-window-fringes neo-global--window 0 1))
 #+END_SRC
 
-** =my/setup-fringe-bitmaps=
+*** =my/setup-fringe-bitmaps=
 This  function  sets fringe  diff  highlighting  bitmaps to  get  nice
 looking thin vertical bars.
 
@@ -1017,7 +1039,6 @@ buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
     :config
     (add-hook 'minibuffer-setup-hook #'my/minibuffer-no-fringes)
     (add-hook 'focus-in-hook #'solaire-mode-reset)
-    (add-hook 'solaire-mode-hook #'my/geiser-no-fringes)
     (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
     (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
     :init
@@ -1091,7 +1112,7 @@ here, since it also provides completion for it.
     :config
     (add-hook 'scheme-mode-hook 'geiser-mode)
     (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
-    (advice-add 'geiser-repl--startup :after #'my/geiser-no-fringes)
+    (add-hook 'geiser-repl-mode-hook #'my/geiser-no-fringes)
     :init
     (setq geiser-active-implementations '(guile)
           geiser-default-implementation 'guile))
@@ -1333,7 +1354,9 @@ Magit is a Emacs  interface to Git.  I've heard that  it has many nice
 features, so I want to try it out.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit)
+  (use-package magit
+    :config
+    (add-hook 'magit-mode-hook 'my/magit-no-fringes))
 #+END_SRC
 
 ** Vdiff
