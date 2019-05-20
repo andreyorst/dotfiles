@@ -1300,6 +1300,15 @@ whatever.
     :config (add-hook 'racer-mode-hook #'eldoc-mode))
 #+END_SRC
 
+*** Cargo
+Supplement package for Cargo integration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cargo
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))
+#+END_SRC
+
 ** TOML
 =toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
 configure project.

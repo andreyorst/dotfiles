@@ -558,6 +558,10 @@ are defining or executing a macro."
 (use-package racer
   :config (add-hook 'racer-mode-hook #'eldoc-mode))
 
+(use-package cargo
+  :config
+  (add-hook 'rust-mode-hook 'cargo-minor-mode))
+
 (use-package toml-mode)
 
 (use-package editorconfig
