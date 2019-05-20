@@ -1356,7 +1356,7 @@ features, so I want to try it out.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :config
-    (add-hook 'magit-mode-hook 'my/magit-no-fringes))
+    (add-hook 'magit-mode-setup-hook 'my/magit-no-fringes))
 #+END_SRC
 
 ** Vdiff

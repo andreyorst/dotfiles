@@ -581,7 +581,7 @@ are defining or executing a macro."
 
 (use-package magit
   :config
-  (add-hook 'magit-mode-hook 'my/magit-no-fringes))
+  (add-hook 'magit-mode-setup-hook 'my/magit-no-fringes))
 
 (use-package vdiff
   :init (setq vdiff-lock-scrolling t
