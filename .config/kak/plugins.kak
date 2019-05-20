@@ -37,8 +37,9 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/fzf.kak" %{
+    plug "andreyorst/fzf.kak" config %{
         map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
+    } defer "fzf" %{
         set-option global fzf_preview_width '65%'
         set-option global fzf_project_use_tilda true
         evaluate-commands %sh{
@@ -100,12 +101,10 @@ if '-n "${PATH##*termux*}"' %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/powerline.kak" %{
+    plug "andreyorst/powerline.kak" defer "powerline" %{
         set-option global powerline_ignore_warnings true
         set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
-        hook -once global WinDisplay .* %{
-            powerline-theme base16-gruvbox
-        }
+        powerline-theme base16-gruvbox
     }
 }
 
@@ -149,10 +148,11 @@ plug "occivink/kakoune-snippets" branch "auto-discard" config %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/tagbar.kak" config %{
+    plug "andreyorst/tagbar.kak" defer "tagbar" %{
         set-option global tagbar_sort false
         set-option global tagbar_size 40
         set-option global tagbar_display_anon false
+    } config %{
         map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
         hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
             tagbar-enable
@@ -184,7 +184,7 @@ plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/langmap.kak" config %{
+    plug "andreyorst/langmap.kak" defer "langmap" %{
         set-option global langmap %opt{langmap_ru_jcuken}
         map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
         map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
