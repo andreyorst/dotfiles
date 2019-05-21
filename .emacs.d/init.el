@@ -449,9 +449,9 @@ are defining or executing a macro."
   (my/neotree-1px-fringe)
   (advice-add 'doom--neotree-no-fringes :after #'my/neotree-1px-fringe)
   :init
-  (setq neo-show-hidden-files t
-        neo-hide-cursor t)
   (when window-system
+    (setq neo-show-hidden-files t
+          neo-hide-cursor t)
     (neotree-show)
     (other-window 1)))
 
@@ -630,7 +630,8 @@ are defining or executing a macro."
   (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
   (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
   (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
-  (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
+  (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
+  (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 
 (use-package which-key
   :commands which-key-mode
@@ -702,16 +703,8 @@ _-_ reduce region _)_ around pairs
 (use-package eyebrowse
   :commands eyebrowse-mode
   :init
-  (eyebrowse-mode t))
-
-(when window-system
-  (use-package moody
-    :commands (moody-replace-mode-line-buffer-identification
-               moody-replace-vc-mode)
-    :init
-    (setq-default x-underline-at-descent-line t)
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode)))
+  (eyebrowse-mode t)
+  (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
 
 (use-package minions
   :commands minions-mode
@@ -724,7 +717,7 @@ _-_ reduce region _)_ around pairs
 (use-package org-bullets
   :commands org-bullets-mode
   :config
-  (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦"))
+  (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
   :init
   (when window-system
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
@@ -744,6 +737,7 @@ _-_ reduce region _)_ around pairs
   :commands global-diff-hl-mode
   :init
   (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
   (global-diff-hl-mode 1))
 
 (provide 'init)

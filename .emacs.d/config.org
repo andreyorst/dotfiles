@@ -1098,9 +1098,9 @@ installed it just for aesthetic purposes.
     (my/neotree-1px-fringe)
     (advice-add 'doom--neotree-no-fringes :after #'my/neotree-1px-fringe)
     :init
-    (setq neo-show-hidden-files t
-          neo-hide-cursor t)
     (when window-system
+      (setq neo-show-hidden-files t
+            neo-hide-cursor t)
       (neotree-show)
       (other-window 1)))
 #+END_SRC
@@ -1431,7 +1431,8 @@ gonna try it out.
     (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
     (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
     (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
-    (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
+    (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
+    (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 #+END_SRC
 
 ** Which Key
@@ -1544,22 +1545,8 @@ window configurations. It works much like Vim tabs, or Tmux windows.
   (use-package eyebrowse
     :commands eyebrowse-mode
     :init
-    (eyebrowse-mode t))
-#+END_SRC
-
-** Moody
-This is a mode line for Emacs  that looks like default but prettier. I
-like it, and it doesn't add too much overhead.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (use-package moody
-      :commands (moody-replace-mode-line-buffer-identification
-                 moody-replace-vc-mode)
-      :init
-      (setq-default x-underline-at-descent-line t)
-      (moody-replace-mode-line-buffer-identification)
-      (moody-replace-vc-mode)))
+    (eyebrowse-mode t)
+    (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
 #+END_SRC
 
 ** Minions
@@ -1584,7 +1571,7 @@ This mode makes org headings use fancy bullet symbols.
   (use-package org-bullets
     :commands org-bullets-mode
     :config
-    (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦"))
+    (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
     :init
     (when window-system
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
@@ -1620,6 +1607,7 @@ bar inside fringe marking unstaged changes.
     :commands global-diff-hl-mode
     :init
     (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     (global-diff-hl-mode 1))
 #+END_SRC
 
