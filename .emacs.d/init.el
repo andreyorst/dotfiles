@@ -115,6 +115,8 @@
 
 (advice-add 'term-handle-exit :after #'my/autokill-when-no-processes)
 
+(defvar org-inline-image-overlays)
+
 (defun my/org-update-inline-images ()
   "Update inline images in Org-mode."
   (when org-inline-image-overlays
@@ -154,6 +156,8 @@
     (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
                                       (frame-parameter frame 'name)
                                       "\""))))
+
+(defvar flycheck-disabled-checkers)
 
 (defun my/disable-flycheck-in-org-src-block ()
   "Disable checkdoc in emacs-lisp buffers."
@@ -214,6 +218,8 @@ are defining or executing a macro."
 
 (add-hook 'after-init-hook #'my/minibuffer-no-fringes)
 
+(defvar which-key--buffer)
+
 (defun my/which-key-no-fringes (&rest _)
   "Disable fringes in which key buffers."
   (my/minibuffer-no-fringes)
@@ -226,10 +232,12 @@ are defining or executing a macro."
             'my/window-no-fringes nil :local))
 
 (defun my/magit-no-fringes ()
-  "Disable fringes in Magit window"
+  "Disable fringes in Magit window."
   (my/window-no-fringes)
   (add-hook 'window-configuration-change-hook
             'my/window-no-fringes nil :local))
+
+(defvar neo-global--window)
 
 (defun my/neotree-1px-fringe ()
   "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
@@ -322,6 +330,7 @@ are defining or executing a macro."
 (require 'ox-md nil t)
 
 (defun my/flyspell-buffer-after-pdict-save (&rest _)
+  "Run flyspell after saving word to dictonary."
   (flyspell-buffer))
 
 (advice-add 'ispell-pdict-save :after #'my/flyspell-buffer-after-pdict-save)

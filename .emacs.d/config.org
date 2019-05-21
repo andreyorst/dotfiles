@@ -400,6 +400,8 @@ This function is supposed to automatically update inline images in org
 buffers, when for some reason image was changed.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar org-inline-image-overlays)
+
   (defun my/org-update-inline-images ()
     "Update inline images in Org-mode."
     (when org-inline-image-overlays
@@ -482,6 +484,8 @@ GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-w
 This function disables flycheck =emacs-lisp-checkdoc= messages.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar flycheck-disabled-checkers)
+
   (defun my/disable-flycheck-in-org-src-block ()
     "Disable checkdoc in emacs-lisp buffers."
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
@@ -592,6 +596,8 @@ Let's disable minibuffer fringes on startup:
 Same as for minibuffer, no use for fringes in Which Key buffers.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar which-key--buffer)
+
   (defun my/which-key-no-fringes (&rest _)
     "Disable fringes in which key buffers."
     (my/minibuffer-no-fringes)
@@ -610,10 +616,11 @@ Disables fringes in Geiser main buffer.
 #+END_SRC
 
 *** =my/magit-no-fringes=
+This function disables fringes for Magit windows.
 
 #+BEGIN_SRC emacs-lisp
     (defun my/magit-no-fringes ()
-      "Disable fringes in Magit window"
+      "Disable fringes in Magit window."
       (my/window-no-fringes)
       (add-hook 'window-configuration-change-hook
                 'my/window-no-fringes nil :local))
@@ -625,6 +632,8 @@ because it adds =$= sign on  truncated lines. This function will prevent
 it.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar neo-global--window)
+
   (defun my/neotree-1px-fringe ()
     "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
     (set-window-fringes neo-global--window 0 1))
@@ -852,6 +861,7 @@ misspelled  words  are no  longer  highlighted,  and  I need  to  call
 
 #+BEGIN_SRC emacs-lisp
   (defun my/flyspell-buffer-after-pdict-save (&rest _)
+    "Run flyspell after saving word to dictonary."
     (flyspell-buffer))
 
   (advice-add 'ispell-pdict-save :after #'my/flyspell-buffer-after-pdict-save)
