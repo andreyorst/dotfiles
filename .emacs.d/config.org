@@ -948,6 +948,17 @@ what I use in Tmux.
   (global-set-key (kbd "C-c l") 'windmove-right)
 #+END_SRC
 
+** Window Divider
+This mode changes  how window dividers are.  I want to set  them to be
+only 1px wide because if this mode is turned on, fringes don't loose 1
+pixel of width.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (setq window-divider-default-right-width 1)
+    (window-divider-mode 1))
+#+END_SRC
+
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential

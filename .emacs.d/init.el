@@ -362,6 +362,10 @@ are defining or executing a macro."
 (global-set-key (kbd "C-c k") 'windmove-up)
 (global-set-key (kbd "C-c l") 'windmove-right)
 
+(when window-system
+  (setq window-divider-default-right-width 1)
+  (window-divider-mode 1))
+
 (my/ensure-installed 'use-package)
 (require 'use-package)
 (setq use-package-always-ensure t)
