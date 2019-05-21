@@ -26,6 +26,10 @@
                   gc-cons-percentage my--gc-cons-percentage
                   file-name-handler-alist my--file-name-handler-alist)))
 
+(add-to-list 'default-frame-alist '(tool-bar-lines . 0))
+(add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+(add-to-list 'default-frame-alist '(vertical-scroll-bars))
+
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
 
@@ -370,19 +374,7 @@ are defining or executing a macro."
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(use-package hydra
-  :commands (hydra-default-pre
-             hydra-keyboard-quit
-             hydra--call-interactively-remap-maybe
-             hydra-show-hint
-             hydra-set-transient-map)
-  :bind (("<f5>" . hydra-zoom/body))
-  :config
-  (defhydra hydra-zoom (:hint nil)
-    "Scale text"
-    ("+" text-scale-increase "in")
-    ("-" text-scale-decrease "out")
-    ("0" (text-scale-set 0) "reset")))
+(use-package all-the-icons)
 
 (use-package doom-themes
   :commands (doom-themes-org-config
@@ -411,16 +403,6 @@ are defining or executing a macro."
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 
-(use-package doom-modeline
-  :commands (doom-modeline-mode)
-  :init (doom-modeline-mode 1)
-  :config
-  (setq doom-modeline-bar-width 3
-        doom-modeline-buffer-file-name-style 'file-name
-        doom-modeline-major-mode-color-icon nil
-        doom-modeline-minor-modes t
-        find-file-visit-truename t))
-
 (use-package solaire-mode
   :commands (solaire-global-mode
              solaire-mode-swap-bg
@@ -440,6 +422,16 @@ are defining or executing a macro."
   (solaire-global-mode +1)
   (solaire-mode-swap-bg))
 
+(use-package doom-modeline
+  :commands (doom-modeline-mode)
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-bar-width 3
+        doom-modeline-buffer-file-name-style 'file-name
+        doom-modeline-major-mode-color-icon nil
+        doom-modeline-minor-modes t
+        find-file-visit-truename t))
+
 (use-package neotree
   :commands (neotree-show
              neotree-find
@@ -455,7 +447,34 @@ are defining or executing a macro."
     (neotree-show)
     (other-window 1)))
 
-(use-package all-the-icons)
+(use-package org-bullets
+  :commands org-bullets-mode
+  :config
+  (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
+  :init
+  (when window-system
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+
+(use-package eyebrowse
+  :commands eyebrowse-mode
+  :init
+  (eyebrowse-mode t)
+  (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
+
+(use-package diff-hl
+  :commands global-diff-hl-mode
+  :init
+  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (global-diff-hl-mode 1))
+
+(use-package minions
+  :commands minions-mode
+  :config (setq minions-direct '(multiple-cursors-mode
+                                 flycheck-mode
+                                 flyspell-mode
+                                 parinfer-mode))
+  :init (minions-mode 1))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
@@ -469,6 +488,42 @@ are defining or executing a macro."
              (setq fill-column 80
                    default-justification 'left)
              (auto-fill-mode)))
+
+(use-package rust-mode
+  :config (add-hook 'rust-mode-hook
+                    '(lambda()
+                       (racer-mode)
+                       (yas-minor-mode)
+                       (electric-pair-mode)
+                       (setq company-tooltip-align-annotations t))))
+
+(use-package racer
+  :config (add-hook 'racer-mode-hook #'eldoc-mode))
+
+(use-package cargo
+  :config
+  (add-hook 'rust-mode-hook 'cargo-minor-mode))
+
+(use-package toml-mode)
+
+(use-package editorconfig
+  :commands editorconfig-mode
+  :config
+  (editorconfig-mode 1))
+
+(use-package hydra
+  :commands (hydra-default-pre
+             hydra-keyboard-quit
+             hydra--call-interactively-remap-maybe
+             hydra-show-hint
+             hydra-set-transient-map)
+  :bind (("<f5>" . hydra-zoom/body))
+  :config
+  (defhydra hydra-zoom (:hint nil)
+    "Scale text"
+    ("+" text-scale-increase "in")
+    ("-" text-scale-decrease "out")
+    ("0" (text-scale-set 0) "reset")))
 
 (use-package geiser
   :config
@@ -578,30 +633,6 @@ are defining or executing a macro."
   :commands counsel-projectile-mode
   :config (counsel-projectile-mode))
 
-(use-package gnuplot)
-
-(use-package rust-mode
-  :config (add-hook 'rust-mode-hook
-                    '(lambda()
-                       (racer-mode)
-                       (yas-minor-mode)
-                       (electric-pair-mode)
-                       (setq company-tooltip-align-annotations t))))
-
-(use-package racer
-  :config (add-hook 'racer-mode-hook #'eldoc-mode))
-
-(use-package cargo
-  :config
-  (add-hook 'rust-mode-hook 'cargo-minor-mode))
-
-(use-package toml-mode)
-
-(use-package editorconfig
-  :commands editorconfig-mode
-  :config
-  (editorconfig-mode 1))
-
 (use-package magit
   :config
   (add-hook 'magit-mode-setup-hook 'my/magit-no-fringes))
@@ -699,28 +730,6 @@ _-_ reduce region _)_ around pairs
 (use-package phi-search
   :bind (("C-s" . phi-search)
          ("C-r" . phi-search-backward)))
-
-(use-package eyebrowse
-  :commands eyebrowse-mode
-  :init
-  (eyebrowse-mode t)
-  (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
-
-(use-package minions
-  :commands minions-mode
-  :config (setq minions-direct '(multiple-cursors-mode
-                                 flycheck-mode
-                                 flyspell-mode
-                                 parinfer-mode))
-  :init (minions-mode 1))
-
-(use-package org-bullets
-  :commands org-bullets-mode
-  :config
-  (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-  :init
-  (when window-system
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
 (use-package eglot
   :commands (eglot eglot-ensure)
