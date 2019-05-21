@@ -1591,24 +1591,29 @@ Emacs polyglot. LSP client.
      (add-hook 'c++-mode-hook 'eglot-ensure))
 #+END_SRC
 
-** Clang Format
+*** Clang Format
 A package to format C code with Clang Format.
 
 #+BEGIN_SRC emacs-lisp
   (use-package clang-format)
 #+END_SRC
 
-** Diff HL Mode
-This package  provides nice way  of diffing buffers. It  displays thin
-bar inside fringe marking unstaged changes.
+*** GCMH
+The Garbage Collector Magic Hack.  Enforce a sneaky Garbage Collection
+strategy to minimize GC interference with the activity.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package diff-hl
-    :commands global-diff-hl-mode
-    :init
-    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (global-diff-hl-mode 1))
+  (use-package gcmh
+    :commands gcmh-mode
+    :init (gcmh-mode 1))
+#+END_SRC
+
+*** GNU Plot
+This is a  package needed for making plots with  gnuplot.  Required by
+Org mode.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package gnuplot)
 #+END_SRC
 
 * Postscript
