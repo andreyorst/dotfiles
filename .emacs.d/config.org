@@ -1031,6 +1031,21 @@ initialization process, and when new frame is created.
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
+** Doom modeline
+Fancy and fast modeline.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :commands (doom-modeline-mode)
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-bar-width 3
+          doom-modeline-buffer-file-name-style 'file-name
+          doom-modeline-major-mode-color-icon nil
+          doom-modeline-minor-modes t
+          find-file-visit-truename t))
+#+END_SRC
+
 ** Solaire Mode
 This  package helps  distinguish  buffers that  have  file opened  and
 buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=

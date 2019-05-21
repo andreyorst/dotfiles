@@ -407,6 +407,16 @@ are defining or executing a macro."
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 
+(use-package doom-modeline
+  :commands (doom-modeline-mode)
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-bar-width 3
+        doom-modeline-buffer-file-name-style 'file-name
+        doom-modeline-major-mode-color-icon nil
+        doom-modeline-minor-modes t
+        find-file-visit-truename t))
+
 (use-package solaire-mode
   :commands (solaire-global-mode
              solaire-mode-swap-bg
