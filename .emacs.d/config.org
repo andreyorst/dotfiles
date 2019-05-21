@@ -95,6 +95,14 @@ Let's define a hook to restore these values after startup is finished:
                     file-name-handler-alist my--file-name-handler-alist)))
 #+END_SRC
 
+Also this should disable some ui elements early:
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
+  (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+  (add-to-list 'default-frame-alist '(vertical-scroll-bars))
+#+END_SRC
+
 ** =Package.el=
 I don't fully understand what the  following code does, but that's what
 Doom  Emacs  uses  to  speedup  initialization,  so  I'll  include  it
@@ -978,32 +986,16 @@ someday.
   (setq use-package-always-ensure t)
 #+END_SRC
 
-** Hydra
-Hydra is  something like additional modes  for Emacs but it  isn't. It
-allows me  to press some shortcut  and be locked in  a mode-like state
-where keys  that are related to  this prefix shortcut are  behaving in
-terms of this shortcut.
+** UI
+*** All The Icons
+This  package provides  nice icons  for emacs  via custom  fonts. Just
+don't forget to use =M-x all-the-icons-install-fonts RET= after install.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :commands (hydra-default-pre
-               hydra-keyboard-quit
-               hydra--call-interactively-remap-maybe
-               hydra-show-hint
-               hydra-set-transient-map)
-    :bind (("<f5>" . hydra-zoom/body))
-    :config
-    (defhydra hydra-zoom (:hint nil)
-      "Scale text"
-      ("+" text-scale-increase "in")
-      ("-" text-scale-decrease "out")
-      ("0" (text-scale-set 0) "reset")))
+  (use-package all-the-icons)
 #+END_SRC
 
-This  package will  be used  in many  other package  configurations to
-provide sane keybindings.
-
-** Doom Themes
+*** Doom Themes
 I've  decided to  try out  Doom Themes.  It contains  nice variant  of
 Atom-like One theme which I like, but it is also an amazingly well put
 package, which defines colors for pretty much everything in Emacs.
@@ -1042,22 +1034,7 @@ initialization process, and when new frame is created.
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
-** Doom modeline
-Fancy and fast modeline.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package doom-modeline
-    :commands (doom-modeline-mode)
-    :init (doom-modeline-mode 1)
-    :config
-    (setq doom-modeline-bar-width 3
-          doom-modeline-buffer-file-name-style 'file-name
-          doom-modeline-major-mode-color-icon nil
-          doom-modeline-minor-modes t
-          find-file-visit-truename t))
-#+END_SRC
-
-** Solaire Mode
+*** Solaire Mode
 This  package helps  distinguish  buffers that  have  file opened  and
 buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
 
@@ -1084,7 +1061,22 @@ buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
 
 If only certain buffers could be so grossly incandescent.
 
-** Neotree
+*** Doom Modeline
+Fancy and fast modeline.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :commands (doom-modeline-mode)
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-bar-width 3
+          doom-modeline-buffer-file-name-style 'file-name
+          doom-modeline-major-mode-color-icon nil
+          doom-modeline-minor-modes t
+          find-file-visit-truename t))
+#+END_SRC
+
+*** Neotree
 I don't think that  I'm going to use it, but it  looks amazing so I've
 installed it just for aesthetic purposes.
 
@@ -1105,15 +1097,63 @@ installed it just for aesthetic purposes.
       (other-window 1)))
 #+END_SRC
 
-** All The Icons
-This  package provides  nice icons  for emacs  via custom  fonts. Just
-don't forget to use =M-x all-the-icons-install-fonts RET= after install.
+*** Org Bullets
+This mode makes org headings use fancy bullet symbols.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons)
+  (use-package org-bullets
+    :commands org-bullets-mode
+    :config
+    (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
+    :init
+    (when window-system
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 #+END_SRC
 
-** Markdown
+*** Eyebrowse
+This  package imitates  virtual workspaces,  or virtual  frames inside
+single Emacs  frame. This  is really  useful, when  you have  bunch of
+windows, and you  want to open new  set but don't want  to loose other
+window configurations. It works much like Vim tabs, or Tmux windows.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eyebrowse
+    :commands eyebrowse-mode
+    :init
+    (eyebrowse-mode t)
+    (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
+#+END_SRC
+
+*** Diff HL Mode
+This package  provides nice way  of diffing buffers. It  displays thin
+bar inside fringe marking unstaged changes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :commands global-diff-hl-mode
+    :init
+    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    (global-diff-hl-mode 1))
+#+END_SRC
+
+*** Minions
+This  package  implements   a  menu  that  lists   all  enabled  minor
+modes. Emacs mode  line can become pretty long, so  this can be handy,
+and perhaps I don't need to use =:diminish= everywhere anymore.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package minions
+    :commands minions-mode
+    :config (setq minions-direct '(multiple-cursors-mode
+                                   flycheck-mode
+                                   flyspell-mode
+                                   parinfer-mode))
+    :init (minions-mode 1))
+#+END_SRC
+
+** Modes
+*** Markdown
 Sometimes I need to edit Markdown documents, so this package is handy.
 
 #+BEGIN_SRC emacs-lisp
@@ -1137,7 +1177,86 @@ filling. Basically the same setup as for Org Mode.
 
 #+END_SRC
 
-** Geiser
+*** Rust
+I'd like to  have Rust syntax highlighting and  some basic facilities,
+since I'm  planning to write my  exercises in org mode.   Since I make
+notes in Org-mode, and  I started to use it for Rust  too, I need some
+settings for Rust mode.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :config (add-hook 'rust-mode-hook
+                      '(lambda()
+                         (racer-mode)
+                         (yas-minor-mode)
+                         (electric-pair-mode)
+                         (setq company-tooltip-align-annotations t))))
+#+END_SRC
+
+**** Racer
+A  Rust  Auto-Complete-er  package  support.   It's  kinda  slow,  but
+whatever.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racer
+    :config (add-hook 'racer-mode-hook #'eldoc-mode))
+#+END_SRC
+
+**** Cargo
+Supplement package for Cargo integration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cargo
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))
+#+END_SRC
+
+*** TOML
+=toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
+configure project.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package toml-mode)
+#+END_SRC
+
+*** EditorConfig
+Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
+synchronize my editor configurations between projects.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package editorconfig
+    :commands editorconfig-mode
+    :config
+    (editorconfig-mode 1))
+#+END_SRC
+
+** Tools
+*** Hydra
+Hydra is  something like additional modes  for Emacs but it  isn't. It
+allows me  to press some shortcut  and be locked in  a mode-like state
+where keys  that are related to  this prefix shortcut are  behaving in
+terms of this shortcut.
+
+This  package will  be used  in many  other package  configurations to
+provide sane keybindings.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :commands (hydra-default-pre
+               hydra-keyboard-quit
+               hydra--call-interactively-remap-maybe
+               hydra-show-hint
+               hydra-set-transient-map)
+    :bind (("<f5>" . hydra-zoom/body))
+    :config
+    (defhydra hydra-zoom (:hint nil)
+      "Scale text"
+      ("+" text-scale-increase "in")
+      ("-" text-scale-decrease "out")
+      ("0" (text-scale-set 0) "reset")))
+#+END_SRC
+
+*** Geiser
 Since I mostly use Emacs for studying LISP, and I'm reading SICP which
 uses Scheme as main LISP flavor for explanations and exercises, I need
 a tool  to run Scheme,  and Geiser seems  like the most  viable option
@@ -1154,7 +1273,7 @@ here, since it also provides completion for it.
           geiser-default-implementation 'guile))
 #+END_SRC
 
-** Parinfer
+*** Parinfer
 Now that's a quality package. It makes writing LISP so easy, that I've
 never thought it could be.
 
@@ -1180,14 +1299,14 @@ Parinfer Mode repository.
       (add-hook 'lisp-mode-hook #'parinfer-mode)))
 #+END_SRC
 
-** Flx
+*** Flx
 This package provides some kind of fuzzy matching for Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package flx)
 #+END_SRC
 
-** Ivy and Counsel
+*** Ivy and Counsel
 Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
 experience.
 
@@ -1222,7 +1341,7 @@ it too.
            ("C-h l" . counsel-find-library)))
 #+END_SRC
 
-** Flycheck
+*** Flycheck
 A really  nice linting package that  helps me track errors  in most of
 languages.
 
@@ -1230,7 +1349,7 @@ languages.
   (use-package flycheck)
 #+END_SRC
 
-*** Flycheck Rust
+**** Flycheck Rust
 This package makes flycheck work with Rust projects.
 
  #+BEGIN_SRC emacs-lisp
@@ -1240,7 +1359,7 @@ This package makes flycheck work with Rust projects.
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
  #+END_SRC
 
-** Company
+*** Company
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
@@ -1266,7 +1385,7 @@ Complete anything framework. Nothing much to say. Does it's job.
           company-backends (remove 'company-gtags company-backends)))
 #+END_SRC
 
-** Undo Tree
+*** Undo Tree
 This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
 mapping to redo.
 
@@ -1277,7 +1396,7 @@ mapping to redo.
     (global-undo-tree-mode 1))
 #+END_SRC
 
-** Yasnippet
+*** Yasnippet
 Another very handy package, that helps insert templates of code. Now I
 really need to write some snippets to use...
 
@@ -1287,14 +1406,14 @@ really need to write some snippets to use...
     :init (yas-reload-all))
 #+END_SRC
 
-*** Yasnippet Snippets
+**** Yasnippet Snippets
 A enormous snippet collection for yasnippet.
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet-snippets)
 #+END_SRC
 
-** Projectile
+*** Projectile
 Since Emacs  is stupid, it  changes working directory to  current file
 location. So I need a whole plugin to workaround this silly issue.
 
@@ -1315,7 +1434,7 @@ However this plugin is quite useful with Git repositories.
           projectile-completion-system 'ivy))
 #+END_SRC
 
-*** Counsel projectile
+**** Counsel projectile
 It makes using projectile easier by allowing fuzzy matching.
 
 #+BEGIN_SRC emacs-lisp
@@ -1324,68 +1443,7 @@ It makes using projectile easier by allowing fuzzy matching.
     :config (counsel-projectile-mode))
 #+END_SRC
 
-** GNU Plot
-This is a  package needed for making plots with  gnuplot.  Required by
-Org mode.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package gnuplot)
-#+END_SRC
-
-** Rust
-I'd like to  have Rust syntax highlighting and  some basic facilities,
-since I'm  planning to write my  exercises in org mode.   Since I make
-notes in Org-mode, and  I started to use it for Rust  too, I need some
-settings for Rust mode.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rust-mode
-    :config (add-hook 'rust-mode-hook
-                      '(lambda()
-                         (racer-mode)
-                         (yas-minor-mode)
-                         (electric-pair-mode)
-                         (setq company-tooltip-align-annotations t))))
-#+END_SRC
-
-*** Racer
-A  Rust  Auto-Complete-er  package  support.   It's  kinda  slow,  but
-whatever.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package racer
-    :config (add-hook 'racer-mode-hook #'eldoc-mode))
-#+END_SRC
-
-*** Cargo
-Supplement package for Cargo integration.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package cargo
-    :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode))
-#+END_SRC
-
-** TOML
-=toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
-configure project.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package toml-mode)
-#+END_SRC
-
-** EditorConfig
-Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
-synchronize my editor configurations between projects.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package editorconfig
-    :commands editorconfig-mode
-    :config
-    (editorconfig-mode 1))
-#+END_SRC
-
-** Magit
+*** Magit
 Magit is a Emacs  interface to Git.  I've heard that  it has many nice
 features, so I want to try it out.
 
@@ -1395,7 +1453,7 @@ features, so I want to try it out.
     (add-hook 'magit-mode-setup-hook 'my/magit-no-fringes))
 #+END_SRC
 
-** Vdiff
+*** Vdiff
 =vdiff= is a package, that works similar to Vimdiff.  Ediff isn't really
 comfortable to  use, and vdiff also  has integration with [[*Magit][Magit]],  so I
 gonna try it out.
@@ -1416,7 +1474,7 @@ gonna try it out.
     (add-hook 'vdiff-mode-hook #'outline-show-all))
 #+END_SRC
 
-*** Vdiff Magit
+**** Vdiff Magit
 =vdiff-magit= is  a supplement  package, that provides  integration with
 [[*Magit][Magit]] package.
 
@@ -1435,7 +1493,7 @@ gonna try it out.
     (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 #+END_SRC
 
-** Which Key
+*** Which Key
 =which-key=  is a  package that  can show  all possible  completions for
 keyboard shortcuts in a popup menu. I'm still learning Emacs, so let's
 enable it by default.
@@ -1450,7 +1508,7 @@ enable it by default.
     (which-key-mode))
 #+END_SRC
 
-** Multiple Cursors
+*** Multiple Cursors
 This  package provides  multiple cursors  functionality to  Emacs.  It
 isn't much like Kakoune's multiple selections, but anything will do. I
 guess I'll figure out best mappings over time.
@@ -1482,7 +1540,7 @@ guess I'll figure out best mappings over time.
               ("q" mc/remove-duplicated-cursors :exit t)))
 #+END_SRC
 
-*** MC Extras
+**** MC Extras
 this package provides  some extra functions for  multiple cursors. I'm
 interested in  =mc/remove-duplicaded-cursors=. When using [[*Phi  Search][Phi Search]] it
 often  places several  cursors at  the same  positions, which  I don't
@@ -1494,7 +1552,7 @@ like.
     (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
 #+END_SRC
 
-** Expand Region
+*** Expand Region
 This package allows to expand  or reduce region selection semantically
 in most languages that I work with inside Emacs.
 
@@ -1526,7 +1584,7 @@ in most languages that I work with inside Emacs.
               ("Q" er/mark-outside-quotes)))
 #+END_SRC
 
-** Phi Search
+*** Phi Search
 This search mode is compatible with multiple cursors.
 
 #+BEGIN_SRC emacs-lisp
@@ -1535,49 +1593,7 @@ This search mode is compatible with multiple cursors.
            ("C-r" . phi-search-backward)))
 #+END_SRC
 
-** Eyebrowse
-This  package imitates  virtual workspaces,  or virtual  frames inside
-single Emacs  frame. This  is really  useful, when  you have  bunch of
-windows, and you  want to open new  set but don't want  to loose other
-window configurations. It works much like Vim tabs, or Tmux windows.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package eyebrowse
-    :commands eyebrowse-mode
-    :init
-    (eyebrowse-mode t)
-    (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
-#+END_SRC
-
-** Minions
-This  package  implements   a  menu  that  lists   all  enabled  minor
-modes. Emacs mode  line can become pretty long, so  this can be handy,
-and perhaps I don't need to use =:diminish= everywhere anymore.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package minions
-    :commands minions-mode
-    :config (setq minions-direct '(multiple-cursors-mode
-                                   flycheck-mode
-                                   flyspell-mode
-                                   parinfer-mode))
-    :init (minions-mode 1))
-#+END_SRC
-
-** Org Bullets
-This mode makes org headings use fancy bullet symbols.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :commands org-bullets-mode
-    :config
-    (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-    :init
-    (when window-system
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-#+END_SRC
-
-** Eglot
+*** Eglot
 Emacs polyglot. LSP client.
 
  #+BEGIN_SRC emacs-lisp
