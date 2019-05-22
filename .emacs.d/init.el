@@ -211,16 +211,6 @@ are defining or executing a macro."
 
 (global-set-key (kbd "C-c x") 'my/select-line)
 
-(defun my/enable-fringes-real-buffer (&rest _)
-   "Wrapper around `set-window-fringes' function."
-   (when (and (not (minibufferp))
-              (buffer-file-name))
-     (set-window-fringes nil 8 1 nil)))
-
-(defun my/disable-fringes (&rest _)
-   "Disable fringes in current window."
-   (set-window-fringes nil 0 0 nil))
-
 (defun my/setup-fringe-bitmaps ()
   "Set fringe bitmaps."
   (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))

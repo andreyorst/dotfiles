@@ -574,7 +574,7 @@ to /x/.
   (global-set-key (kbd "C-c x") 'my/select-line)
   #+END_SRC
 
-** =my/enable-fringes-real-buffer=
+** COMMENT =my/enable-fringes-real-buffer=
 This function will be called  in various window configuration hooks to
 keep consistent view.
 
@@ -586,7 +586,7 @@ keep consistent view.
        (set-window-fringes nil 8 1 nil)))
 #+END_SRC
 
-** =my/disable-fringes=
+** COMMENT =my/disable-fringes=
 This function simply removes fringes in current window.
 
 #+BEGIN_SRC emacs-lisp
