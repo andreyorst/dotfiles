@@ -377,26 +377,19 @@ are defining or executing a macro."
 
 (use-package doom-themes
   :commands (doom-themes-org-config
-             doom-themes-neotree-config)
+             doom-themes-treemacs-config)
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
-  (doom-themes-neotree-config)
+  (doom-themes-treemacs-config)
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
   (add-hook 'org-load-hook
             (progn
-              (set-face-attribute 'org-document-title nil :height 1.7)
+              (set-face-attribute 'org-document-title nil :height 1.6)
               (set-face-attribute 'org-level-1        nil :height 1.4)
               (set-face-attribute 'org-level-2        nil :height 1.2)
-              (set-face-attribute 'org-level-3        nil :height 1.0)))
-  (let ((line (face-attribute 'mode-line :underline)))
-    (set-face-attribute 'mode-line          nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :underline  line)
-    (set-face-attribute 'mode-line          nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :box        nil)
-    (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#51AFEF")))
+              (set-face-attribute 'org-level-3        nil :height 1.0))))
 
 (when window-system
   (my/set-frame-dark)
@@ -431,21 +424,6 @@ are defining or executing a macro."
         doom-modeline-minor-modes t
         find-file-visit-truename t))
 
-(use-package neotree
-  :commands (neotree-show
-             neotree-find
-             neotree-projectile-action)
-  :bind (("<f8>" . neotree-toggle))
-  :config
-  (my/neotree-1px-fringe)
-  (advice-add 'doom--neotree-no-fringes :after #'my/neotree-1px-fringe)
-  :init
-  (when window-system
-    (setq neo-show-hidden-files t
-          neo-hide-cursor t)
-    (neotree-show)
-    (other-window 1)))
-
 (use-package org-bullets
   :commands org-bullets-mode
   :config
@@ -457,8 +435,7 @@ are defining or executing a macro."
 (use-package eyebrowse
   :commands eyebrowse-mode
   :init
-  (eyebrowse-mode t)
-  (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
+  (eyebrowse-mode t))
 
 (use-package diff-hl
   :commands global-diff-hl-mode
@@ -623,9 +600,6 @@ are defining or executing a macro."
   (setq projectile-svn-command "fd -L --type f --print0"
         projectile-generic-command "fd -L --type f --print0"
         projectile-require-project-root nil
-        projectile-switch-project-action (lambda()
-                                           (neotree-projectile-action)
-                                           (projectile-find-file))
         projectile-completion-system 'ivy))
 
 (use-package counsel-projectile

@@ -1002,26 +1002,19 @@ package, which defines colors for pretty much everything in Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
     :commands (doom-themes-org-config
-               doom-themes-neotree-config)
+               doom-themes-treemacs-config)
     :init
     (load-theme 'doom-one t)
     (doom-themes-org-config)
-    (doom-themes-neotree-config)
+    (doom-themes-treemacs-config)
     (setq doom-themes-enable-bold t
           doom-themes-enable-italic t)
     (add-hook 'org-load-hook
               (progn
-                (set-face-attribute 'org-document-title nil :height 1.7)
+                (set-face-attribute 'org-document-title nil :height 1.6)
                 (set-face-attribute 'org-level-1        nil :height 1.4)
                 (set-face-attribute 'org-level-2        nil :height 1.2)
-                (set-face-attribute 'org-level-3        nil :height 1.0)))
-    (let ((line (face-attribute 'mode-line :underline)))
-      (set-face-attribute 'mode-line          nil :overline   line)
-      (set-face-attribute 'mode-line-inactive nil :overline   line)
-      (set-face-attribute 'mode-line-inactive nil :underline  line)
-      (set-face-attribute 'mode-line          nil :box        nil)
-      (set-face-attribute 'mode-line-inactive nil :box        nil)
-      (set-face-attribute 'line-number-current-line nil :background "#282C34" :foreground "#51AFEF")))
+                (set-face-attribute 'org-level-3        nil :height 1.0))))
 #+END_SRC
 
 If  I  use  =window-system=  I  want  [[*=my/set-frame-dark=][my/set-frame-dark]]  to  run  during
@@ -1075,25 +1068,42 @@ Fancy and fast modeline.
           find-file-visit-truename t))
 #+END_SRC
 
-*** Neotree
-I don't think that  I'm going to use it, but it  looks amazing so I've
+*** COMMENT Treemacs
+I don't  think that I'm going  to use it,  but it looks great  so I've
 installed it just for aesthetic purposes.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package neotree
-    :commands (neotree-show
-               neotree-find
-               neotree-projectile-action)
-    :bind (("<f8>" . neotree-toggle))
-    :config
-    (my/neotree-1px-fringe)
-    (advice-add 'doom--neotree-no-fringes :after #'my/neotree-1px-fringe)
+  (use-package treemacs
+    :after doom-themes
+    :commands (treemacs
+               treemacs-follow-mode
+               treemacs-filewatch-mode
+               treemacs-fringe-indicator-mode)
+    :bind (("<f8>" . treemacs))
     :init
+    (setq treemacs-width 28)
     (when window-system
-      (setq neo-show-hidden-files t
-            neo-hide-cursor t)
-      (neotree-show)
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode nil)
+      (treemacs)
       (other-window 1)))
+#+END_SRC
+
+**** COMMENT Treemacs Projectile
+Supplement package for Projectile integration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs-projectile
+    :after (treemacs projectile))
+#+END_SRC
+
+**** COMMENT Treemacs Magit
+Supplement package for Magit integration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs-magit
+    :after (treemacs magit))
 #+END_SRC
 
 *** Org Bullets
@@ -1119,8 +1129,7 @@ window configurations. It works much like Vim tabs, or Tmux windows.
   (use-package eyebrowse
     :commands eyebrowse-mode
     :init
-    (eyebrowse-mode t)
-    (add-hook 'eyebrowse-post-window-switch-hook 'neo-global--attach))
+    (eyebrowse-mode t))
 #+END_SRC
 
 *** Diff HL Mode
@@ -1427,9 +1436,6 @@ However this plugin is quite useful with Git repositories.
     (setq projectile-svn-command "fd -L --type f --print0"
           projectile-generic-command "fd -L --type f --print0"
           projectile-require-project-root nil
-          projectile-switch-project-action (lambda()
-                                             (neotree-projectile-action)
-                                             (projectile-find-file))
           projectile-completion-system 'ivy))
 #+END_SRC
 
