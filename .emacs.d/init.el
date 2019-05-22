@@ -65,7 +65,7 @@
       mode-line-position nil)
 
 (when window-system
-  (fringe-mode '(nil . 1)))
+  (fringe-mode 0))
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
@@ -211,40 +211,15 @@ are defining or executing a macro."
 
 (global-set-key (kbd "C-c x") 'my/select-line)
 
-(defun my/window-no-fringes ()
+(defun my/enable-fringes-real-buffer (&rest _)
    "Wrapper around `set-window-fringes' function."
+   (when (and (not (minibufferp))
+              (buffer-file-name))
+     (set-window-fringes nil 8 1 nil)))
+
+(defun my/disable-fringes (&rest _)
+   "Disable fringes in current window."
    (set-window-fringes nil 0 0 nil))
-
-(defun my/minibuffer-no-fringes (&rest _)
-  "Disable fringes in mimibuffer."
-  (set-window-fringes (minibuffer-window) 0 0 nil))
-
-(add-hook 'after-init-hook #'my/minibuffer-no-fringes)
-
-(defvar which-key--buffer)
-
-(defun my/which-key-no-fringes (&rest _)
-  "Disable fringes in which key buffers."
-  (my/minibuffer-no-fringes)
-  (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
-
-(defun my/geiser-no-fringes (&rest _)
-  "Disable fringes in geiser REPL buffers."
-  (my/window-no-fringes)
-  (add-hook 'window-configuration-change-hook
-            'my/window-no-fringes nil :local))
-
-(defun my/magit-no-fringes ()
-  "Disable fringes in Magit window."
-  (my/window-no-fringes)
-  (add-hook 'window-configuration-change-hook
-            'my/window-no-fringes nil :local))
-
-(defvar neo-global--window)
-
-(defun my/neotree-1px-fringe ()
-  "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
-  (set-window-fringes neo-global--window 0 1))
 
 (defun my/setup-fringe-bitmaps ()
   "Set fringe bitmaps."
@@ -401,13 +376,10 @@ are defining or executing a macro."
              turn-on-solaire-mode
              solaire-mode-in-minibuffer
              solaire-mode-reset)
-  :hook
-  ((change-major-mode
-    after-revert
-    ediff-prepare-buffer) . turn-on-solaire-mode)
   :config
-  (add-hook 'minibuffer-setup-hook #'my/minibuffer-no-fringes)
   (add-hook 'focus-in-hook #'solaire-mode-reset)
+  (add-hook 'after-revert-hook #'turn-on-solaire-mode)
+  (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
   (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init
@@ -420,9 +392,28 @@ are defining or executing a macro."
   :config
   (setq doom-modeline-bar-width 3
         doom-modeline-buffer-file-name-style 'file-name
-        doom-modeline-major-mode-color-icon nil
+        doom-modeline-major-mode-color-icon t
         doom-modeline-minor-modes t
         find-file-visit-truename t))
+
+(use-package treemacs
+  :commands (treemacs
+             treemacs-follow-mode
+             treemacs-filewatch-mode
+             treemacs-fringe-indicator-mode)
+  :bind (("<f8>" . treemacs))
+  :init
+  (when window-system
+    (setq treemacs-width 27)
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode nil)
+    (treemacs)
+    (other-window 1)))
+
+(use-package treemacs-projectile)
+
+(use-package treemacs-magit)
 
 (use-package org-bullets
   :commands org-bullets-mode
@@ -505,7 +496,6 @@ are defining or executing a macro."
   :config
   (add-hook 'scheme-mode-hook 'geiser-mode)
   (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
-  (add-hook 'geiser-repl-mode-hook #'my/geiser-no-fringes)
   :init
   (setq geiser-active-implementations '(guile)
         geiser-default-implementation 'guile))
@@ -606,9 +596,7 @@ are defining or executing a macro."
   :commands counsel-projectile-mode
   :config (counsel-projectile-mode))
 
-(use-package magit
-  :config
-  (add-hook 'magit-mode-setup-hook 'my/magit-no-fringes))
+(use-package magit)
 
 (use-package vdiff
   :init (setq vdiff-lock-scrolling t
@@ -639,9 +627,6 @@ are defining or executing a macro."
 
 (use-package which-key
   :commands which-key-mode
-  :config
-  (advice-add 'which-key--show-buffer-side-window
-              :after #'my/which-key-no-fringes)
   :init
   (which-key-mode))
 

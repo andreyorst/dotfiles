@@ -222,11 +222,13 @@ line number I'm currently on.
 #+END_SRC
 
 *** Fringe
-Right fringe isn't really useful for me, so I'm going to disable it.
+I want fringes  to appear only in certain buffers  where I really need
+them, so let's  disable it entirely on startup and  set them with some
+hooks later.
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (fringe-mode '(nil . 1)))
+    (fringe-mode 0))
 #+END_SRC
 
 ** Font
@@ -572,81 +574,28 @@ to /x/.
   (global-set-key (kbd "C-c x") 'my/select-line)
   #+END_SRC
 
-** Fringe functions
-*** =my/window-no-fringes=
+** =my/enable-fringes-real-buffer=
 This function will be called  in various window configuration hooks to
 keep consistent view.
 
 #+BEGIN_SRC emacs-lisp
-   (defun my/window-no-fringes ()
-      "Wrapper around `set-window-fringes' function."
-      (set-window-fringes nil 0 0 nil))
+  (defun my/enable-fringes-real-buffer (&rest _)
+     "Wrapper around `set-window-fringes' function."
+     (when (and (not (minibufferp))
+                (buffer-file-name))
+       (set-window-fringes nil 8 1 nil)))
 #+END_SRC
 
-*** =my/minibuffer-no-fringes=
-Fringes in minibuffer are useless and  can go out of sync with Solaire
-mode turned on.
+** =my/disable-fringes=
+This function simply removes fringes in current window.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/minibuffer-no-fringes (&rest _)
-    "Disable fringes in mimibuffer."
-    (set-window-fringes (minibuffer-window) 0 0 nil))
+  (defun my/disable-fringes (&rest _)
+     "Disable fringes in current window."
+     (set-window-fringes nil 0 0 nil))
 #+END_SRC
 
-Let's disable minibuffer fringes on startup:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook #'my/minibuffer-no-fringes)
-#+END_SRC
-
-*** =my/which-key-no-fringes=
-Same as for minibuffer, no use for fringes in Which Key buffers.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar which-key--buffer)
-
-  (defun my/which-key-no-fringes (&rest _)
-    "Disable fringes in which key buffers."
-    (my/minibuffer-no-fringes)
-    (set-window-fringes (get-buffer-window which-key--buffer) 0 0 nil))
-#+END_SRC
-
-*** =my/geiser-no-fringes=
-Disables fringes in Geiser main buffer.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/geiser-no-fringes (&rest _)
-    "Disable fringes in geiser REPL buffers."
-    (my/window-no-fringes)
-    (add-hook 'window-configuration-change-hook
-              'my/window-no-fringes nil :local))
-#+END_SRC
-
-*** =my/magit-no-fringes=
-This function disables fringes for Magit windows.
-
-#+BEGIN_SRC emacs-lisp
-    (defun my/magit-no-fringes ()
-      "Disable fringes in Magit window."
-      (my/window-no-fringes)
-      (add-hook 'window-configuration-change-hook
-                'my/window-no-fringes nil :local))
-#+END_SRC
-
-*** =my/neotree-1px-fringe=
-Doom themes explicitly set Neotree fringes to =0 0=, which I don't like,
-because it adds =$= sign on  truncated lines. This function will prevent
-it.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar neo-global--window)
-
-  (defun my/neotree-1px-fringe ()
-    "Add back 1px fringe on the right side, to hide ugly $ signs on truncated lines."
-    (set-window-fringes neo-global--window 0 1))
-#+END_SRC
-
-*** =my/setup-fringe-bitmaps=
+** =my/setup-fringe-bitmaps=
 This  function  sets fringe  diff  highlighting  bitmaps to  get  nice
 looking thin vertical bars.
 
@@ -1037,13 +986,10 @@ buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
                turn-on-solaire-mode
                solaire-mode-in-minibuffer
                solaire-mode-reset)
-    :hook
-    ((change-major-mode
-      after-revert
-      ediff-prepare-buffer) . turn-on-solaire-mode)
     :config
-    (add-hook 'minibuffer-setup-hook #'my/minibuffer-no-fringes)
     (add-hook 'focus-in-hook #'solaire-mode-reset)
+    (add-hook 'after-revert-hook #'turn-on-solaire-mode)
+    (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
     (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
     (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
     :init
@@ -1063,26 +1009,25 @@ Fancy and fast modeline.
     :config
     (setq doom-modeline-bar-width 3
           doom-modeline-buffer-file-name-style 'file-name
-          doom-modeline-major-mode-color-icon nil
+          doom-modeline-major-mode-color-icon t
           doom-modeline-minor-modes t
           find-file-visit-truename t))
 #+END_SRC
 
-*** COMMENT Treemacs
+*** Treemacs
 I don't  think that I'm going  to use it,  but it looks great  so I've
 installed it just for aesthetic purposes.
 
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs
-    :after doom-themes
     :commands (treemacs
                treemacs-follow-mode
                treemacs-filewatch-mode
                treemacs-fringe-indicator-mode)
     :bind (("<f8>" . treemacs))
     :init
-    (setq treemacs-width 28)
     (when window-system
+      (setq treemacs-width 27)
       (treemacs-follow-mode t)
       (treemacs-filewatch-mode t)
       (treemacs-fringe-indicator-mode nil)
@@ -1090,20 +1035,18 @@ installed it just for aesthetic purposes.
       (other-window 1)))
 #+END_SRC
 
-**** COMMENT Treemacs Projectile
+**** Treemacs Projectile
 Supplement package for Projectile integration.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package treemacs-projectile
-    :after (treemacs projectile))
+  (use-package treemacs-projectile)
 #+END_SRC
 
-**** COMMENT Treemacs Magit
+**** Treemacs Magit
 Supplement package for Magit integration.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package treemacs-magit
-    :after (treemacs magit))
+  (use-package treemacs-magit)
 #+END_SRC
 
 *** Org Bullets
@@ -1275,7 +1218,6 @@ here, since it also provides completion for it.
     :config
     (add-hook 'scheme-mode-hook 'geiser-mode)
     (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
-    (add-hook 'geiser-repl-mode-hook #'my/geiser-no-fringes)
     :init
     (setq geiser-active-implementations '(guile)
           geiser-default-implementation 'guile))
@@ -1453,9 +1395,7 @@ Magit is a Emacs  interface to Git.  I've heard that  it has many nice
 features, so I want to try it out.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :config
-    (add-hook 'magit-mode-setup-hook 'my/magit-no-fringes))
+  (use-package magit)
 #+END_SRC
 
 *** Vdiff
@@ -1506,9 +1446,6 @@ enable it by default.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :commands which-key-mode
-    :config
-    (advice-add 'which-key--show-buffer-side-window
-                :after #'my/which-key-no-fringes)
     :init
     (which-key-mode))
 #+END_SRC
