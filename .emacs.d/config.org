@@ -883,13 +883,14 @@ compilation warning lets declare variables:
 Now we can create a hook that will run for all C related modes:
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook (lambda ()
-                                  (yas-minor-mode)
-                                  (electric-pair-mode)
-                                  (setq c-basic-offset 4
-                                        c-default-style "linux"
-                                        indent-tabs-mode t
-                                        tab-width 4)))
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (yas-minor-mode)
+              (electric-pair-mode)
+              (setq c-basic-offset 4
+                    c-default-style "linux"
+                    indent-tabs-mode t
+                    tab-width 4)))
 #+END_SRC
 
 ** Windmove
@@ -1335,6 +1336,15 @@ Complete anything framework. Nothing much to say. Does it's job.
           company-backends (remove 'company-gtags company-backends)))
 #+END_SRC
 
+**** Company FLX
+Fuzzy matching for company.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company-flx
+   :commands company-flx-mode
+   :init (with-eval-after-load 'company
+           (company-flx-mode +1)))
+#+END_SRC
 *** Undo Tree
 This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
 mapping to redo.

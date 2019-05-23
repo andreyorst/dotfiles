@@ -317,13 +317,14 @@ are defining or executing a macro."
 (defvar c-basic-offset)
 (defvar c-default-style)
 
-(add-hook 'c-mode-common-hook (lambda ()
-                                (yas-minor-mode)
-                                (electric-pair-mode)
-                                (setq c-basic-offset 4
-                                      c-default-style "linux"
-                                      indent-tabs-mode t
-                                      tab-width 4)))
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (yas-minor-mode)
+            (electric-pair-mode)
+            (setq c-basic-offset 4
+                  c-default-style "linux"
+                  indent-tabs-mode t
+                  tab-width 4)))
 
 (global-set-key (kbd "C-c h") 'windmove-left)
 (global-set-key (kbd "C-c j") 'windmove-down)
@@ -560,6 +561,11 @@ are defining or executing a macro."
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends)
         company-backends (remove 'company-gtags company-backends)))
+
+(use-package company-flx
+ :commands company-flx-mode
+ :init (with-eval-after-load 'company
+         (company-flx-mode +1)))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
