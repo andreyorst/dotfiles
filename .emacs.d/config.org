@@ -574,25 +574,18 @@ to /x/.
   (global-set-key (kbd "C-c x") 'my/select-line)
   #+END_SRC
 
-** COMMENT =my/enable-fringes-real-buffer=
+** =my/fringes-in-real-buffer=
 This function will be called  in various window configuration hooks to
 keep consistent view.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/enable-fringes-real-buffer (&rest _)
+  (defun my/fringes-in-real-buffer (&rest _)
      "Wrapper around `set-window-fringes' function."
      (when (and (not (minibufferp))
                 (buffer-file-name))
        (set-window-fringes nil 8 1 nil)))
-#+END_SRC
 
-** COMMENT =my/disable-fringes=
-This function simply removes fringes in current window.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/disable-fringes (&rest _)
-     "Disable fringes in current window."
-     (set-window-fringes nil 0 0 nil))
+  (add-hook 'post-command-hook 'my/fringes-in-real-buffer)
 #+END_SRC
 
 ** =my/setup-fringe-bitmaps=
