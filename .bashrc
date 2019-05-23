@@ -15,5 +15,5 @@ export PATH
 if [ -n "$SSH_CONNECTION" ]; then
     export PS1="\[$(tput setaf 1)\]┌─╼[\[$(tput setaf 7)\]\w\[$(tput setaf 1)\]] [\[$(tput setaf 7)\]ssh\[$(tput setaf 1)\]]\n\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
 else
-    export PS1="\[$(tput setaf 1)\]┌─╼\[$(tput setaf 7)\][\w]\n\[$(tput setaf 1)\]\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
+    export PS1="\[$(tput setaf 1)\]┌─╼[\[$(tput setaf 7)\]\w\[$(tput setaf 1)\]]\n\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
 fi
