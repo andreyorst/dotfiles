@@ -95,6 +95,10 @@
 
 (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 3)))
 
+(global-unset-key (kbd "S-<down-mouse-1>"))
+(global-unset-key (kbd "<mouse-3>"))
+(global-unset-key (kbd "S-<mouse-3>"))
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (require 'package)
@@ -233,6 +237,21 @@ are defining or executing a macro."
   (interactive "DDirectory: ")
   (shell-command
    (format "%s -f tags -e -R %s" my--ctags-executable (directory-file-name dir))))
+
+(defun my/rectangle-mouse-mark (event)
+  "Mark rectangle region with the mouse."
+  (interactive "e")
+  (deactivate-mark)
+  (mouse-set-point event)
+  (rectangle-mark-mode +1)
+  (let ((drag-event))
+    (track-mouse
+      (while (progn
+               (setq drag-event (read-event))
+               (mouse-movement-p drag-event))
+        (mouse-set-point drag-event)))))
+
+(global-set-key (kbd "C-S-<down-mouse-1>") #'my/rectangle-mouse-mark)
 
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
@@ -635,7 +654,7 @@ are defining or executing a macro."
   (which-key-mode))
 
 (use-package multiple-cursors
-  :bind (("C-S-<mouse-1>" . mc/add-cursor-on-click)
+  :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydra-mc/body))
   :config (defhydra hydra-mc (:hint nil)
             "
