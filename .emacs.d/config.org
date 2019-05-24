@@ -584,8 +584,6 @@ keep consistent view.
      (when (and (not (minibufferp))
                 (buffer-file-name))
        (set-window-fringes nil 8 1 nil)))
-
-  (add-hook 'post-command-hook 'my/fringes-in-real-buffer)
 #+END_SRC
 
 ** =my/setup-fringe-bitmaps=
