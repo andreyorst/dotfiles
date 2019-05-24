@@ -398,10 +398,12 @@ are defining or executing a macro."
              treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-fringe-indicator-mode)
-  :bind (("<f8>" . treemacs))
+  :bind (("<f8>" . treemacs)
+         ("<f9>" . treemacs-select-window))
   :init
   (when window-system
-    (setq treemacs-width 27)
+    (setq treemacs-width 27
+          treemacs-is-never-other-window t)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)
