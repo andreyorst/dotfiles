@@ -589,10 +589,18 @@ keep consistent view.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/fringes-in-real-buffer (&rest _)
-     "Wrapper around `set-window-fringes' function."
-     (when (and (not (minibufferp))
-                (buffer-file-name))
-       (set-window-fringes nil 8 1 nil)))
+    "Wrapper around `set-window-fringes' function."
+    (when (and (not (minibufferp))
+               (buffer-file-name))
+      (set-window-fringes nil 8 8 nil)))
+#+END_SRC
+
+Let's assign it to these hooks for now:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
+  (add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
+  (add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
 #+END_SRC
 
 ** =my/setup-fringe-bitmaps=

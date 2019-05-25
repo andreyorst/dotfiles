@@ -216,10 +216,14 @@ are defining or executing a macro."
 (global-set-key (kbd "C-c x") 'my/select-line)
 
 (defun my/fringes-in-real-buffer (&rest _)
-   "Wrapper around `set-window-fringes' function."
-   (when (and (not (minibufferp))
-              (buffer-file-name))
-     (set-window-fringes nil 8 1 nil)))
+  "Wrapper around `set-window-fringes' function."
+  (when (and (not (minibufferp))
+             (buffer-file-name))
+    (set-window-fringes nil 8 8 nil)))
+
+(add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
+(add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
+(add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
 
 (defun my/setup-fringe-bitmaps ()
   "Set fringe bitmaps."
