@@ -500,6 +500,14 @@ are defining or executing a macro."
   :config
   (editorconfig-mode 1))
 
+(use-package nov
+  :commands nov-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (setq nov-text-width 80)
+  (add-hook 'nov-mode-hook #'visual-line-mode)
+  (add-hook 'nov-mode-hook #'solaire-mode))
+
 (use-package hydra
   :commands (hydra-default-pre
              hydra-keyboard-quit
