@@ -95,7 +95,8 @@ Let's define a hook to restore these values after startup is finished:
                     file-name-handler-alist my--file-name-handler-alist)))
 #+END_SRC
 
-Also this should disable some ui elements early:
+** Early UI
+This should disable some ui elements early:
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
@@ -157,7 +158,6 @@ These are some defaults for user  interface.  I don't like those bars,
 buttons, tooltips, scrollbars, etc.
 
 #+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
   (tooltip-mode -1)
   (fset 'menu-bar-open nil)
 #+END_SRC
@@ -394,121 +394,6 @@ it from Melpa.
       (package-install package)))
 #+END_SRC
 
-** =my/autokill-when-no-processes=
-This function should be used as advice to any exit handle function
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/autokill-when-no-processes (&rest _)
-    "Kill buffer and its window automatically when there's no processes left."
-    (when (null (get-buffer-process (current-buffer)))
-        (kill-buffer (current-buffer))
-        (delete-window)))
-#+END_SRC
-
-Let's define some advices with it. First, term buffer should be killed
-when I exit terminal:
-
-#+BEGIN_SRC emacs-lisp
-  (advice-add 'term-handle-exit :after #'my/autokill-when-no-processes)
-#+END_SRC
-
-I'd also would like to do this for [[Geiser]] ([[https://gitlab.com/jaor/geiser/issues/267][it doesn't work for some reason]]):
-
-** =my/org-update-inline-images=
-This function is supposed to automatically update inline images in org
-buffers, when for some reason image was changed.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar org-inline-image-overlays)
-
-  (defun my/org-update-inline-images ()
-    "Update inline images in Org-mode."
-    (when org-inline-image-overlays
-      (org-redisplay-inline-images)))
-#+END_SRC
-
-** =my/move-line-up=
-This function moves current line  down. This is pretty common function
-for most of editors, and sometimes I want to move lines around so this
-will come in handy.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/move-line-up ()
-    "Move up the current line."
-    (interactive)
-    (transpose-lines 1)
-    (forward-line -2)
-    (indent-according-to-mode))
-#+END_SRC
-
-Let's bind it to =M-p= or /Alt + p/.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-p") 'my/move-line-up)
-  #+END_SRC
-
-** =my/move-line-down=
-The same as above but moves line down.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/move-line-down ()
-    "Move down the current line."
-    (interactive)
-    (forward-line 1)
-    (transpose-lines 1)
-    (forward-line -1)
-    (indent-according-to-mode))
-#+END_SRC
-
-Let's bind it to =M-n= or /Alt + n/.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-n") 'my/move-line-down)
-  #+END_SRC
-
-** =my/org-tangle-on-config-save=
-I often  edit my configuration,  so it would  be cool to  update Emacs
-config automatically on save. This function will handle it:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/org-tangle-on-config-save ()
-    "Tangle source code blocks when configuration file is saved."
-    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-      (org-babel-tangle)
-      (byte-compile-file "~/.emacs.d/init.el")))
-#+END_SRC
-
-To actually make it work we need to add this hook:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
-#+END_SRC
-
-** =my/set-frame-dark=
-Emacs uses white titlebar, but since I'm using dark colorscheme I want
-title bar to be dark as well. It is quite difficult to achieve this in
-GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/set-frame-dark (&optional frame)
-    "Set FRAME titlebar colorscheme to dark variant."
-    (with-selected-frame (or frame (selected-frame))
-      (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
-                                        (frame-parameter frame 'name)
-                                        "\""))))
-#+END_SRC
-
-** =my/disable-flycheck-in-org-src-bloc=
-This function disables flycheck =emacs-lisp-checkdoc= messages.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar flycheck-disabled-checkers)
-
-  (defun my/disable-flycheck-in-org-src-block ()
-    "Disable checkdoc in emacs-lisp buffers."
-    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-#+END_SRC
-
 ** =my/escape=
 Taken from [[https://www.reddit.com/r/emacs/comments/bb5c1w/weekly_tipstricketc_thread/ekgje7j/][u/clemera]] comment.
 
@@ -562,81 +447,6 @@ I find it conveinient to bind this function to /Ctrl+t/ shortcut.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\C-t" 'my/eshell-toggle)
-#+END_SRC
-
-** =my/select-line=
-This  command provides  a  nice  way to  create  region that  includes
-current line.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/select-line ()
-    "Select the current line."
-    (interactive)
-    (end-of-line)
-    (set-mark (line-beginning-position)))
-#+END_SRC
-
-It is mapped to /Ctrl C/ + /x/ because in Kakoune selecting line is mapped
-to /x/.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c x") 'my/select-line)
-  #+END_SRC
-
-** =my/fringes-in-real-buffer=
-This function will be called  in various window configuration hooks to
-keep consistent view.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/fringes-in-real-buffer (&rest _)
-    "Wrapper around `set-window-fringes' function."
-    (when (and (not (minibufferp))
-               (buffer-file-name))
-      (set-window-fringes nil 8 8 nil)))
-#+END_SRC
-
-Let's assign it to these hooks for now:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
-  (add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
-  (add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
-#+END_SRC
-
-** =my/setup-fringe-bitmaps=
-This  function  sets fringe  diff  highlighting  bitmaps to  get  nice
-looking thin vertical bars.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/setup-fringe-bitmaps ()
-    "Set fringe bitmaps."
-    (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
-
-#+END_SRC
-
-** =my/generate-tags=
-To  generate tags  I'm  going  to use  universal  ctags.  Since it  is
-installed on my system and available  in path, I simply will declare a
-variable for quick configuration:
-
-#+BEGIN_SRC emacs-lisp
-  (defvar my--ctags-executable "ctags")
-#+END_SRC
-
-The  function =my/generate-tags=  will accept  directory from  where the
-=ctags= will browse project recursively and generate =tags= file.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/generate-tags (dir)
-    "Generate tags file for DIR."
-    (interactive "DDirectory: ")
-    (shell-command
-     (format "%s -f tags -e -R %s" my--ctags-executable (directory-file-name dir))))
 #+END_SRC
 
 ** =my/rectangle-mouse-mark=
@@ -713,15 +523,50 @@ I'm editing =emacs-lisp= source blocks. But I find it distracting to see
 warnings like =;;; Code=, so let's disable it:
 
 #+BEGIN_SRC emacs-lisp
+  (defvar flycheck-disabled-checkers)
+
+  (defun my/disable-flycheck-in-org-src-block ()
+    "Disable checkdoc in emacs-lisp buffers."
+    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+#+END_SRC
+
+Now we need to call this function when editing source blocks:
+
+#+BEGIN_SRC emacs-lisp
   (add-hook 'org-src-mode-hook 'my/disable-flycheck-in-org-src-block)
+#+END_SRC
+
+I often  edit my configuration,  so it would  be cool to  update Emacs
+config automatically on save. This function will handle it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-tangle-on-config-save ()
+    "Tangle source code blocks when configuration file is saved."
+    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+      (org-babel-tangle)
+      (byte-compile-file "~/.emacs.d/init.el")))
+#+END_SRC
+
+To actually make it work we need to add this hook:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
 #+END_SRC
 
 *** Inline Images
 Since Org-mode allows inline images, we  need a way to update them, if
-image  changes   for  some   reason.   We  will   use  hook   to  call
-[[*=my/org-update-inline-images=][my/org-update-inline-images]] function after executing code with babel.
+image changes for some reason.  We will use hook to call this function
+is supposed to automatically update inline images in org buffers, when
+for some reason image was changed.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar org-inline-image-overlays)
+
+  (defun my/org-update-inline-images ()
+    "Update inline images in Org-mode."
+    (when org-inline-image-overlays
+      (org-redisplay-inline-images)))
+
   (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
 #+END_SRC
 
@@ -952,15 +797,14 @@ pixel of width.
 * Packages
 Now that's  where fun  starts. I  try to  keep my  Emacs configuration
 simple,  and  fast but  I  still  think  that  I need  some  essential
-packages.
+packages. One of such packages is [[https://github.com/jwiegley/use-package][use-package]].
 
 ** Use Package
-I use  package, named  =use-package= to install,  load and  configure my
-packages.  I find this way very  consistent and easy to understand and
-maintain.   Since   =use-package=  can't   install  itself,   let's  use
-=my/ensure-installed=  function  for  it.   The only  thing  I  miss  is
-updating  those packages,  but I  think  I'll come  up with  something
-someday.
+I use =use-package= to install, load  and configure my packages.  I find
+this way very  consistent and easy to understand  and maintain.  Since
+=use-package=  can't  install   itself,  let's  use  =my/ensure-installed=
+function for  it.  The only thing  I miss is updating  those packages,
+but I think I'll come up with something someday.
 
 #+BEGIN_SRC emacs-lisp
   (my/ensure-installed 'use-package)
@@ -968,7 +812,14 @@ someday.
   (setq use-package-always-ensure t)
 #+END_SRC
 
+All  other packages  were  split to  individual  categories much  like
+Emacs  settings above.  This  helps  me to  keep  track  of things  in
+different packages and do not rely on search that much.
+
 ** UI
+Packages that change  how Emacs looks. Themes,  modelines, UI elements
+like filetree, icons all go here.
+
 *** All The Icons
 This  package provides  nice icons  for emacs  via custom  fonts. Just
 don't forget to use =M-x all-the-icons-install-fonts RET= after install.
@@ -977,10 +828,14 @@ don't forget to use =M-x all-the-icons-install-fonts RET= after install.
   (use-package all-the-icons)
 #+END_SRC
 
-*** Doom Themes
-I've  decided to  try out  Doom Themes.  It contains  nice variant  of
-Atom-like One theme which I like, but it is also an amazingly well put
-package, which defines colors for pretty much everything in Emacs.
+I don't use  this package directly yet, but some  other packages, like
+[[https://github.com/hlissner/emacs-doom-themes][DOOM Themes]] do.
+
+*** DOOM Themes
+This theme collection  was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and  I find these
+themes actually great  on its own. This package  contains nice variant
+of Atom-like One theme which I like,  but it is also an amazingly well
+put package, which defines colors for pretty much everything in Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
@@ -1000,7 +855,21 @@ package, which defines colors for pretty much everything in Emacs.
                 (set-face-attribute 'org-level-3        nil :height 1.0))))
 #+END_SRC
 
-If  I  use  =window-system=  I  want  [[*=my/set-frame-dark=][my/set-frame-dark]]  to  run  during
+Emacs uses white titlebar, but since I'm using dark colorscheme I want
+title bar to be dark as well. It is quite difficult to achieve this in
+GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/set-frame-dark (&optional frame)
+    "Set FRAME titlebar colorscheme to dark variant."
+    (with-selected-frame (or frame (selected-frame))
+      (call-process-shell-command
+       (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+               (frame-parameter frame 'name)
+               "\""))))
+#+END_SRC
+
+So  if  I  use  =window-system=  I want  this  function  to  run  during
 initialization process, and when new frame is created.
 
 #+BEGIN_SRC emacs-lisp
@@ -1009,9 +878,13 @@ initialization process, and when new frame is created.
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
+There's also another  great package that adds nice  colors for buffers
+that are actually used for editing files: [[https://github.com/hlissner/emacs-solaire-mode][Solaire Mode]].
+
 *** Solaire Mode
 This  package helps  distinguish  buffers that  have  file opened  and
-buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
+buffers that  are for utilities  like file  browser. Also it  has cool
+name! =\[T]/=
 
 #+BEGIN_SRC emacs-lisp
   (use-package solaire-mode
@@ -1031,10 +904,49 @@ buffers that are for utilities like Neotree. Also it has cool name! =\[T]/=
     (solaire-mode-swap-bg))
 #+END_SRC
 
-If only certain buffers could be so grossly incandescent.
+If only  certain buffers  could +be so  grossly incandescent+  *have damn
+fringes!* With  this package  Emacs becomes way  more like  true editor
+with  actual   graphical  interface,   but  these  fringes   drive  me
+crazy. That's why I wrote this  function, that enables fringes only in
+buffers that are affected by Solaire Mode:
 
-*** Doom Modeline
-Fancy and fast modeline.
+#+BEGIN_SRC emacs-lisp
+  (defun my/fringes-in-real-buffer (&rest _)
+    "Wrapper around `set-window-fringes' function."
+    (when (and (not (minibufferp))
+               (buffer-file-name))
+      (set-window-fringes nil 8 8 nil)))
+#+END_SRC
+
+Let's assign it to these hooks:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
+  (add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
+  (add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
+#+END_SRC
+
+Now my  buffers looks  really nice, but  my modeline  doesn't. Luckily
+there's another great package from DOOM Emacs - [[https://github.com/hlissner/doom-modeline][DOOM Modeline]].
+
+*** DOOM Modeline
+I've tried bunch of different modelines:
+
+- [[https://github.com/TheBB/spaceline][Spaceline]]
+  Great modeline, but I was  experiencing slowdowns in Emacs startup,
+  and I like my Emacs to start fast.
+- [[https://github.com/dbordak/telephone-line][Telephone Line]]
+  Another good modeline, but I was lazy to configure it.
+- [[https://github.com/milkypostman/powerline][Powerline]]
+  This was first what I tried because I was using something similar in
+  Vim. I don't remember why I dropped it.
+- [[https://github.com/tarsius/moody][Moody]]
+  Really lightweight  configuration for  default modeline,  which I've
+  used for quite a some time.
+
+They're all  great, but  I esperienced some  troubles with  DOOM Theme
+that I use,  so I've decided to  try out DOOM Modeline.  And turns out
+it's great!
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
@@ -1048,9 +960,19 @@ Fancy and fast modeline.
           find-file-visit-truename t))
 #+END_SRC
 
+I guess that this is all for DOOM  packages for now, but I have to say
+that I really  appreciate *[[https://github.com/hlissner][@hlissner]]* work. These  packages already make
+Emacs look  outstanding. But to make  it look more like  a traditional
+modern text editor we need a  file explorer. Emacs has builtin package
+for this, named  =speedbar=, but It uses external frame  and has so many
+features  that I  don't  know  if I  really  need. Thankfully  there's
+another package that provides filetree: [[https://github.com/Alexander-Miller/treemacs][Treemacs]].
+
 *** Treemacs
-I don't  think that I'm going  to use it,  but it looks great  so I've
-installed it just for aesthetic purposes.
+With this package, and its supplement packages I can have a consistent
+filetree inside my Emacs frame. Which  is good. But there's more: DOOM
+Themes support  this package as  well, which means that  Treemacs will
+look just as great as DOOM themed Emacs!
 
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs
@@ -1071,32 +993,24 @@ installed it just for aesthetic purposes.
       (other-window 1)))
 #+END_SRC
 
-**** Treemacs Projectile
-Supplement package for Projectile integration.
+This supplement  package makes  some nice integration  with Projectile
+package that I'm using. It doesn't really need any configuration.
 
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs-projectile)
 #+END_SRC
 
-**** Treemacs Magit
-Supplement package for Magit integration.
+Same story with Magit integration.
 
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs-magit)
 #+END_SRC
 
-*** Org Bullets
-This mode makes org headings use fancy bullet symbols.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :commands org-bullets-mode
-    :config
-    (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-    :init
-    (when window-system
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-#+END_SRC
+Before using Treemacs I was a  happy user of another filetree package:
+[[https://github.com/jaypei/emacs-neotree][Neotree]]. Unfortunately, last  commit to this package dates  to Nov 21,
+2018, and since then there were no maintenance, and I was experiencing
+a bug which  affects my usage of another amazing  package [[https://github.com/wasamasa/eyebrowse][Eyebrowse]] so
+I've decided to move to Treemacs, since it works fine with it.
 
 *** Eyebrowse
 This  package imitates  virtual workspaces,  or virtual  frames inside
@@ -1124,6 +1038,42 @@ bar inside fringe marking unstaged changes.
     (global-diff-hl-mode 1))
 #+END_SRC
 
+But I don't quite  like how it looks. So there's  another thing that I
+borrowed from DOOM Emacs configuration. This function sets fringe diff
+highlighting bitmaps to get nice looking thin vertical bars which play
+nicely with DOOM Themes and DOOM Modeline:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/setup-fringe-bitmaps ()
+    "Set fringe bitmaps."
+    (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+
+#+END_SRC
+
+Speaking of defining fancier things.  This configuration is written in
+Org Mode, so maybe we could  have nice symbols for headings? Of course
+we can, there's a package for it: [[https://github.com/sabof/org-bullets][Org Bullets]].
+
+*** Org Bullets
+This package makes org headings use  fancy bullet symbols. But I don't
+quite like those, so I set them to these four symbols: =◉=, =○=, =•=, =◦=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :commands org-bullets-mode
+    :config
+    (setq-default org-bullets-bullet-list
+                  '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
+    :init
+    (when window-system
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+#+END_SRC
+
 *** Minions
 This  package  implements   a  menu  that  lists   all  enabled  minor
 modes. Emacs mode  line can become pretty long, so  this can be handy,
@@ -1140,6 +1090,9 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
 #+END_SRC
 
 ** Modes
+In  this section  I'm going  to  list additional  mode packages,  that
+aren't included with Emacs by default, or lacking features.
+
 *** Markdown
 Sometimes I need to edit Markdown documents, so this package is handy.
 
@@ -1180,17 +1133,17 @@ settings for Rust mode.
                          (setq company-tooltip-align-annotations t))))
 #+END_SRC
 
-**** Racer
-A  Rust  Auto-Complete-er  package  support.   It's  kinda  slow,  but
-whatever.
+This also means  that I could use something  to automatically complete
+Rust  language facilities.  Rust  ecosystem provides  two options  for
+that:  Racer, and  RLS.  I'm  planning to  use  Racer  when RLS  isn't
+possible to use, like in Org Mode.
 
 #+BEGIN_SRC emacs-lisp
   (use-package racer
     :config (add-hook 'racer-mode-hook #'eldoc-mode))
 #+END_SRC
 
-**** Cargo
-Supplement package for Cargo integration.
+There's also a package for Cargo integration:
 
 #+BEGIN_SRC emacs-lisp
   (use-package cargo
@@ -1208,7 +1161,8 @@ configure project.
 
 *** EditorConfig
 Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
-synchronize my editor configurations between projects.
+synchronize my  editor configurations  between projects  and different
+editors.
 
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
@@ -1224,6 +1178,7 @@ Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package nov
     :commands nov-mode
+    :functions solaire-mode
     :init
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
     (setq nov-text-width 80)
@@ -1232,11 +1187,15 @@ Emacs.
 #+END_SRC
 
 ** Tools
+Additional  packages  that  change  how Emacs  works,  providing  more
+comfortable user experience.
+
 *** Hydra
-Hydra is  something like additional modes  for Emacs but it  isn't. It
-allows me  to press some shortcut  and be locked in  a mode-like state
-where keys  that are related to  this prefix shortcut are  behaving in
-terms of this shortcut.
+Hydra is  something like ability to  create mappings that sit  in it's
+own mode, like different user modes  in Kakoune. It allows me to press
+some shortcut and  be locked in a mode-like state  where keys that are
+related  to  this  prefix  shortcut  are behaving  in  terms  of  this
+shortcut.
 
 This  package will  be used  in many  other package  configurations to
 provide sane keybindings.

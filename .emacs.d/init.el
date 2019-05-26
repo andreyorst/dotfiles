@@ -41,7 +41,6 @@
 
 (setq initial-scratch-message "")
 
-(menu-bar-mode -1)
 (tooltip-mode -1)
 (fset 'menu-bar-open nil)
 
@@ -115,61 +114,6 @@
   (when (not (package-installed-p package))
     (package-install package)))
 
-(defun my/autokill-when-no-processes (&rest _)
-  "Kill buffer and its window automatically when there's no processes left."
-  (when (null (get-buffer-process (current-buffer)))
-      (kill-buffer (current-buffer))
-      (delete-window)))
-
-(advice-add 'term-handle-exit :after #'my/autokill-when-no-processes)
-
-(defvar org-inline-image-overlays)
-
-(defun my/org-update-inline-images ()
-  "Update inline images in Org-mode."
-  (when org-inline-image-overlays
-    (org-redisplay-inline-images)))
-
-(defun my/move-line-up ()
-  "Move up the current line."
-  (interactive)
-  (transpose-lines 1)
-  (forward-line -2)
-  (indent-according-to-mode))
-
-(global-set-key (kbd "M-p") 'my/move-line-up)
-
-(defun my/move-line-down ()
-  "Move down the current line."
-  (interactive)
-  (forward-line 1)
-  (transpose-lines 1)
-  (forward-line -1)
-  (indent-according-to-mode))
-
-(global-set-key (kbd "M-n") 'my/move-line-down)
-
-(defun my/org-tangle-on-config-save ()
-  "Tangle source code blocks when configuration file is saved."
-  (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-    (org-babel-tangle)
-    (byte-compile-file "~/.emacs.d/init.el")))
-
-(add-hook 'after-save-hook 'my/org-tangle-on-config-save)
-
-(defun my/set-frame-dark (&optional frame)
-  "Set FRAME titlebar colorscheme to dark variant."
-  (with-selected-frame (or frame (selected-frame))
-    (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
-                                      (frame-parameter frame 'name)
-                                      "\""))))
-
-(defvar flycheck-disabled-checkers)
-
-(defun my/disable-flycheck-in-org-src-block ()
-  "Disable checkdoc in emacs-lisp buffers."
-  (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
 (defun my/escape ()
   "Quit in current context.
 
@@ -207,41 +151,6 @@ are defining or executing a macro."
 
 (global-set-key "\C-t" 'my/eshell-toggle)
 
-(defun my/select-line ()
-  "Select the current line."
-  (interactive)
-  (end-of-line)
-  (set-mark (line-beginning-position)))
-
-(global-set-key (kbd "C-c x") 'my/select-line)
-
-(defun my/fringes-in-real-buffer (&rest _)
-  "Wrapper around `set-window-fringes' function."
-  (when (and (not (minibufferp))
-             (buffer-file-name))
-    (set-window-fringes nil 8 8 nil)))
-
-(add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
-(add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
-(add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
-
-(defun my/setup-fringe-bitmaps ()
-  "Set fringe bitmaps."
-  (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
-
-(defvar my--ctags-executable "ctags")
-
-(defun my/generate-tags (dir)
-  "Generate tags file for DIR."
-  (interactive "DDirectory: ")
-  (shell-command
-   (format "%s -f tags -e -R %s" my--ctags-executable (directory-file-name dir))))
-
 (defun my/rectangle-mouse-mark (event)
   "Mark rectangle region with the mouse."
   (interactive "e")
@@ -272,7 +181,28 @@ are defining or executing a macro."
 
 (setq org-src-fontify-natively t)
 
+(defvar flycheck-disabled-checkers)
+
+(defun my/disable-flycheck-in-org-src-block ()
+  "Disable checkdoc in emacs-lisp buffers."
+  (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+
 (add-hook 'org-src-mode-hook 'my/disable-flycheck-in-org-src-block)
+
+(defun my/org-tangle-on-config-save ()
+  "Tangle source code blocks when configuration file is saved."
+  (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+    (org-babel-tangle)
+    (byte-compile-file "~/.emacs.d/init.el")))
+
+(add-hook 'after-save-hook 'my/org-tangle-on-config-save)
+
+(defvar org-inline-image-overlays)
+
+(defun my/org-update-inline-images ()
+  "Update inline images in Org-mode."
+  (when org-inline-image-overlays
+    (org-redisplay-inline-images)))
 
 (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
 
@@ -386,6 +316,14 @@ are defining or executing a macro."
               (set-face-attribute 'org-level-2        nil :height 1.2)
               (set-face-attribute 'org-level-3        nil :height 1.0))))
 
+(defun my/set-frame-dark (&optional frame)
+  "Set FRAME titlebar colorscheme to dark variant."
+  (with-selected-frame (or frame (selected-frame))
+    (call-process-shell-command
+     (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+             (frame-parameter frame 'name)
+             "\""))))
+
 (when window-system
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
@@ -405,6 +343,16 @@ are defining or executing a macro."
   :init
   (solaire-global-mode +1)
   (solaire-mode-swap-bg))
+
+(defun my/fringes-in-real-buffer (&rest _)
+  "Wrapper around `set-window-fringes' function."
+  (when (and (not (minibufferp))
+             (buffer-file-name))
+    (set-window-fringes nil 8 8 nil)))
+
+(add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
+(add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
+(add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
 
 (use-package doom-modeline
   :commands (doom-modeline-mode)
@@ -437,14 +385,6 @@ are defining or executing a macro."
 
 (use-package treemacs-magit)
 
-(use-package org-bullets
-  :commands org-bullets-mode
-  :config
-  (setq-default org-bullets-bullet-list '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-  :init
-  (when window-system
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-
 (use-package eyebrowse
   :commands eyebrowse-mode
   :init
@@ -456,6 +396,24 @@ are defining or executing a macro."
   (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
   (global-diff-hl-mode 1))
+
+(defun my/setup-fringe-bitmaps ()
+  "Set fringe bitmaps."
+  (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+
+(use-package org-bullets
+  :commands org-bullets-mode
+  :config
+  (setq-default org-bullets-bullet-list
+                '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
+  :init
+  (when window-system
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
 (use-package minions
   :commands minions-mode
@@ -502,6 +460,7 @@ are defining or executing a macro."
 
 (use-package nov
   :commands nov-mode
+  :functions solaire-mode
   :init
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (setq nov-text-width 80)
