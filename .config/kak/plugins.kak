@@ -33,7 +33,11 @@ plug "occivink/kakoune-find" config %{
 }
 
 plug "andreyorst/base16-gruvbox.kak" theme %{
-    colorscheme base16-gruvbox-dark-soft
+    if '-n "${PATH##*termux*}"' %{
+        colorscheme base16-gruvbox-dark-soft
+    } else %{
+        colorscheme base16-gruvbox-dark-hard
+    }
 }
 
 if '-n "${PATH##*termux*}"' %{
