@@ -1593,6 +1593,16 @@ Org mode.
   (use-package gnuplot)
 #+END_SRC
 
+*** VLF
+This package  makes it easier to  view large files in  Emacs. It opens
+files in chunks, but still allows to search through file with
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vlf-setup
+    :ensure vlf
+    :config (setq vlf-application 'dont-ask))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features various  cool E-Lisp hacks that I've
 found  in the  Internet,  and I  try to  keep  references to  original

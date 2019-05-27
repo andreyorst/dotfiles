@@ -700,5 +700,9 @@ _-_ reduce region _)_ around pairs
 
 (use-package gnuplot)
 
+(use-package vlf-setup
+  :ensure vlf
+  :config (setq vlf-application 'dont-ask))
+
 (provide 'init)
 ;;; init.el ends here
