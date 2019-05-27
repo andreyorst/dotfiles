@@ -195,3 +195,10 @@ if '-n "${PATH##*termux*}"' %{
         map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
     }
 }
+
+
+plug 'delapouite/kakoune-select-view' %{
+    # Suggested mappings
+    map global normal <a-%> ': select-view<ret>' -docstring 'select view'
+    map global view s '<esc>: select-view<ret>' -docstring 'select view'
+}
