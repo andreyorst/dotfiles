@@ -484,7 +484,6 @@ are defining or executing a macro."
 (use-package geiser
   :config
   (add-hook 'scheme-mode-hook 'geiser-mode)
-  (advice-add 'geiser-repl-exit :after #'my/autokill-when-no-processes)
   :init
   (setq geiser-active-implementations '(guile)
         geiser-default-implementation 'guile))
