@@ -149,3 +149,26 @@ hook global WinSetOption filetype=gas %{
     # a c-like line comment highlighter for compatibility reasons
     add-highlighter shared/gas/c_line_comment region // (?<!\\\\)(?=\n) fill comment
 }
+
+hook global WinSetOption filetype=markdown %{
+    define-command load-languages %{ evaluate-commands -save-regs 'a' %{
+        try %{
+            execute-keys -draft '%s```\h*\K[^\s]+<ret>"ay'
+            nop %sh{ (
+                eval "set -- $kak_reg_a"
+                while [ $# -gt 0 ]; do
+                    case $1 in
+                        c|cpp|c++|objc) module="c-family" ;;
+                        lisp|emacs-lisp) module="lisp" ;;
+                    esac
+                    [ -n "$module" ] && printf "%s\n" "evaluate-commands -client $kak_client %{ require-module $module }"
+                    module=
+                    shift
+                done | kak -p $kak_session
+            ) > /dev/null 2>&1 < /dev/null & }}
+        }
+    }
+
+    hook buffer NormalIdle .* load-languages
+    hook buffer InsertIdle .* load-languages
+}
