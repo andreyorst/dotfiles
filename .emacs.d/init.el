@@ -374,7 +374,9 @@ are defining or executing a macro."
   :init
   (when window-system
     (setq treemacs-width 27
-          treemacs-is-never-other-window t)
+          treemacs-is-never-other-window t
+          treemacs-indentation 0
+          treemacs-space-between-root-nodes nil)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)
@@ -583,6 +585,7 @@ are defining or executing a macro."
   (setq projectile-svn-command "fd -L --type f --print0"
         projectile-generic-command "fd -L --type f --print0"
         projectile-require-project-root nil
+        projectile-enable-caching t
         projectile-completion-system 'ivy))
 
 (use-package counsel-projectile
@@ -628,13 +631,13 @@ are defining or executing a macro."
          ("C-c m" . hydra-mc/body))
   :config (defhydra hydra-mc (:hint nil)
             "
-^Select^               ^Discard^                   ^Move^
-^──────^───────────────^───────^───────────────────^────^────────────
-_M-s_ split lines      _M-SPC_ discard current     _&_ align
-_s_   select regexp    _b_     discard blank lines _(_ cycle backward
-_n_   select next      _d_     remove duplicated   _)_ cycle forward
-_p_   select previous  _q_     exit                ^ ^
-_C_   select next line"
+^Select^                ^Discard^                    ^Move^
+^──────^────────────────^───────^────────────────────^────^────────────
+_M-s_: split lines      _M-SPC_: discard current     _&_: align
+_s_:   select regexp    _b_:     discard blank lines _(_: cycle backward
+_n_:   select next      _d_:     remove duplicated   _)_: cycle forward
+_p_:   select previous  _q_:     exit                ^ ^
+_C_:   select next line"
             ("M-s" mc/edit-ends-of-lines)
             ("s" mc/mark-all-in-region-regexp)
             ("n" mc/mark-next-like-this-word)
@@ -663,13 +666,13 @@ _C_   select next line"
   :bind (("C-c e" . hydra-er/body))
   :config (defhydra hydra-er (:hint nil)
             "
-^Expand^          ^Mark^
-^──────^──────────^────^─────────────────
-_e_ expand region _(_ inside pairs
-_-_ reduce region _)_ around pairs
-^ ^               _q_ inside quotes
-^ ^               _Q_ around quotes
-^ ^               _p_ paragraph"
+^Expand^           ^Mark^
+^──────^───────────^────^─────────────────
+_e_: expand region _(_: inside pairs
+_-_: reduce region _)_: around pairs
+^ ^                _q_: inside quotes
+^ ^                _Q_: around quotes
+^ ^                _p_: paragraph"
             ("e" er/expand-region :post hydra-er/body)
             ("-" er/contract-region :post hydra-er/body)
             ("p" er/mark-paragraph)
