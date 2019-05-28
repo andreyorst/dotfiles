@@ -382,18 +382,6 @@ quality. If  you feel that this  code should be improved  you can open
 issue and  blame on me  all you want. I  prefix functions with  =my/= to
 avoid conflicts.
 
-** =my/ensure-installed=
-To ensure that  some essential packages are installed  I've wrote this
-small lisp function that checks if package exists and if not downloads
-it from Melpa.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/ensure-installed (package)
-    "Ensure that PACKAGE is installed."
-    (when (not (package-installed-p package))
-      (package-install package)))
-#+END_SRC
-
 ** =my/escape=
 Taken from [[https://www.reddit.com/r/emacs/comments/bb5c1w/weekly_tipstricketc_thread/ekgje7j/][u/clemera]] comment.
 
@@ -790,7 +778,7 @@ pixel of width.
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (setq window-divider-default-right-width 1)
+    (setq window-divider-default-right-width 2)
     (window-divider-mode 1))
 #+END_SRC
 
@@ -801,10 +789,20 @@ packages. One of such packages is [[https://github.com/jwiegley/use-package][use
 
 ** Use Package
 I use =use-package= to install, load  and configure my packages.  I find
-this way very  consistent and easy to understand  and maintain.  Since
-=use-package=  can't  install   itself,  let's  use  =my/ensure-installed=
-function for  it.  The only thing  I miss is updating  those packages,
-but I think I'll come up with something someday.
+this way very consistent and easy  to understand and maintain.  What I
+like about Use  Package is that it automatically  installs packages on
+Emacs startup. But  unfortunately it can't be installed  by itself, so
+we need  a way to install  Use Package in  case I load this  config on
+fresh system.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/ensure-installed (package)
+    "Ensure that PACKAGE is installed."
+    (when (not (package-installed-p package))
+      (package-install package)))
+#+END_SRC
+
+Now we can install and configure Use Package itself:
 
 #+BEGIN_SRC emacs-lisp
   (my/ensure-installed 'use-package)

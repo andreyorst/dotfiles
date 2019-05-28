@@ -109,11 +109,6 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-(defun my/ensure-installed (package)
-  "Ensure that PACKAGE is installed."
-  (when (not (package-installed-p package))
-    (package-install package)))
-
 (defun my/escape ()
   "Quit in current context.
 
@@ -291,8 +286,13 @@ are defining or executing a macro."
 (global-set-key (kbd "C-c l") 'windmove-right)
 
 (when window-system
-  (setq window-divider-default-right-width 1)
+  (setq window-divider-default-right-width 2)
   (window-divider-mode 1))
+
+(defun my/ensure-installed (package)
+  "Ensure that PACKAGE is installed."
+  (when (not (package-installed-p package))
+    (package-install package)))
 
 (my/ensure-installed 'use-package)
 (require 'use-package)
