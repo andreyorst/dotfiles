@@ -475,8 +475,8 @@ are defining or executing a macro."
 (use-package nov
   :commands nov-mode
   :functions solaire-mode
+  :mode "\\.epub$"
   :init
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (setq nov-text-width 80)
   (add-hook 'nov-mode-hook #'visual-line-mode)
   (add-hook 'nov-mode-hook #'solaire-mode))
@@ -717,6 +717,18 @@ _-_: reduce region _)_: around pairs
 (use-package vlf-setup
   :ensure vlf
   :config (setq vlf-application 'dont-ask))
+
+(use-package imenu-list
+  :defines imenu-list-idle-update-delay-time
+  :bind (("<f7>" . imenu-list-smart-toggle))
+  :config
+  (advice-add 'imenu-list-smart-toggle :after-while
+              (lambda()
+                (setq window-size-fixed t
+                      mode-line-format nil)))
+  :init (setq imenu-list-idle-update-delay-time 0.1
+              imenu-list-size 27
+              imenu-list-focus-after-activation t))
 
 (provide 'init)
 ;;; init.el ends here

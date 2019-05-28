@@ -1197,8 +1197,8 @@ Emacs.
   (use-package nov
     :commands nov-mode
     :functions solaire-mode
+    :mode "\\.epub$"
     :init
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
     (setq nov-text-width 80)
     (add-hook 'nov-mode-hook #'visual-line-mode)
     (add-hook 'nov-mode-hook #'solaire-mode))
@@ -1619,6 +1619,25 @@ files in chunks, but still allows to search through file with
   (use-package vlf-setup
     :ensure vlf
     :config (setq vlf-application 'dont-ask))
+#+END_SRC
+
+*** Imenu List
+Package  somewhat  similar  to  [[https://github.com/vim-scripts/taglist.vim][Taglist]] plugin  in  Vim  or  Kakoune's
+[[https://github.com/andreyorst/tagbar.kak][tagbar.kak]].  Uses =imenu=  to get  information, and  since many  plugins
+provide =imenu= data it's quite useful.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package imenu-list
+    :defines imenu-list-idle-update-delay-time
+    :bind (("<f7>" . imenu-list-smart-toggle))
+    :config
+    (advice-add 'imenu-list-smart-toggle :after-while
+                (lambda()
+                  (setq window-size-fixed t
+                        mode-line-format nil)))
+    :init (setq imenu-list-idle-update-delay-time 0.1
+                imenu-list-size 27
+                imenu-list-focus-after-activation t))
 #+END_SRC
 
 * Postscript
