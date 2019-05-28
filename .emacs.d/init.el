@@ -382,6 +382,7 @@ are defining or executing a macro."
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)
     (treemacs)
+    (treemacs-TAB-action)
     (other-window 1)))
 
 (use-package treemacs-projectile)

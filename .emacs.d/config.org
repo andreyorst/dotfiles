@@ -992,6 +992,7 @@ look just as great as DOOM themed Emacs!
       (treemacs-filewatch-mode t)
       (treemacs-fringe-indicator-mode nil)
       (treemacs)
+      (treemacs-TAB-action)
       (other-window 1)))
 #+END_SRC
 
