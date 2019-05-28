@@ -171,11 +171,13 @@ Emacs has, and it's annoying. Let's disable it:
     (tool-bar-mode -1))
 #+END_SRC
 
-Also let's use bar cursor when in window system:
+Also let's  use bar  cursor when  in window  system, which  is visible
+only in active window:
 
 #+BEGIN_SRC emacs-lisp
-  (when window-system
-    (setq-default cursor-type 'bar))
+    (when window-system
+      (setq-default cursor-type 'bar
+                    cursor-in-non-selected-windows nil))
 #+END_SRC
 
 *** Frame

@@ -49,7 +49,8 @@
   (tool-bar-mode -1))
 
 (when window-system
-  (setq-default cursor-type 'bar))
+  (setq-default cursor-type 'bar
+                cursor-in-non-selected-windows nil))
 
 (setq-default frame-title-format '("%b — Emacs"))
 
