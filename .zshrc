@@ -26,6 +26,13 @@ fi
 
 mkcd() { mkdir "$1" && cd "$1" }
 
+webmp4() {
+    while [ $# -ne 0 ]; do
+        ffmpeg -i "$1" "${1%.*}.mp4"
+        shift
+    done
+}
+
 alias zshconf="$EDITOR ~/.zshrc"
 alias tmuxconf="$EDITOR ~/.tmux.conf"
 alias kakconf="kak ~/.config/kak/kakrc"
