@@ -1092,6 +1092,21 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
     :init (minions-mode 1))
 #+END_SRC
 
+*** Eldoc Box
+A package that creates child frame for eldoc documentation messages.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eldoc-box
+    :commands eldoc-box-hover-mode
+    :config
+    (set-face-attribute 'eldoc-box-border nil :background "#191B20")
+    :init
+    (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
+    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
+    (setq eldoc-box-max-pixel-width 1920
+          eldoc-box-max-pixel-height 1080))
+#+END_SRC
+
 ** Modes
 In  this section  I'm going  to  list additional  mode packages,  that
 aren't included with Emacs by default, or lacking features.

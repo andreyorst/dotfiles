@@ -427,6 +427,16 @@ are defining or executing a macro."
                                  parinfer-mode))
   :init (minions-mode 1))
 
+(use-package eldoc-box
+  :commands eldoc-box-hover-mode
+  :config
+  (set-face-attribute 'eldoc-box-border nil :background "#191B20")
+  :init
+  (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
+  (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
+  (setq eldoc-box-max-pixel-width 1920
+        eldoc-box-max-pixel-height 1080))
+
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
