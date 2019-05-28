@@ -3,6 +3,11 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        c-electric-brace
+        c-electric-paren
+        c-electric-semi&comma
+        c-indent-line-or-region
+        electric-newline-and-maybe-indent
         forward-sexp
         hydra-er/er/contract-region
         hydra-er/er/expand-region
