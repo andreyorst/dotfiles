@@ -252,12 +252,6 @@ are defining or executing a macro."
 
 (require 'ox-md nil t)
 
-(defun my/flyspell-buffer-after-pdict-save (&rest _)
-  "Run flyspell after saving word to dictonary."
-  (flyspell-buffer))
-
-(advice-add 'ispell-pdict-save :after #'my/flyspell-buffer-after-pdict-save)
-
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
 
 (setq-default doc-view-resolution 192)

@@ -678,7 +678,7 @@ ever decide to export Org to Markdown, I'll need this:
   (require 'ox-md nil t)
 #+END_SRC
 
-** Flyspell Mode
+** COMMENT Flyspell Mode
 It's annoying that if I save word to my personal dictionary, all other
 misspelled  words  are no  longer  highlighted,  and  I need  to  call
 =flyspell-buffer= again and again. Let's get rid of this.
@@ -1623,8 +1623,13 @@ files in chunks, but still allows to search through file with
 
 *** Imenu List
 Package  somewhat  similar  to  [[https://github.com/vim-scripts/taglist.vim][Taglist]] plugin  in  Vim  or  Kakoune's
-[[https://github.com/andreyorst/tagbar.kak][tagbar.kak]].  Uses =imenu=  to get  information, and  since many  plugins
-provide =imenu= data it's quite useful.
+[[https://github.com/andreyorst/tagbar.kak][tagbar.kak]].  Uses  =imenu= to  get information,  and since  many plugins
+provide =imenu=  data it's  quite useful. I'm  using =advice-add=  here to
+disable  modeline  in  =*imenu-list*=   buffer,  also  locking  it  size
+preventing it from  changing when I close or resize  other windows. If
+we call  this lambda  function with =:after=  advice, the  modeline will
+disappear in  another window. With =:after-while=  lambda evaluated only
+when =imenu-list= was toggled to be shown.
 
 #+BEGIN_SRC emacs-lisp
   (use-package imenu-list
