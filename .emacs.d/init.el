@@ -718,8 +718,9 @@ _-_: reduce region _)_: around pairs
   :config
   (advice-add 'imenu-list-smart-toggle :after-while
               (lambda()
-                (setq window-size-fixed t
-                      mode-line-format nil)))
+                (setq window-size-fixed 'width
+                      mode-line-format nil)
+                (other-window 1)))
   :init (setq imenu-list-idle-update-delay-time 0.1
               imenu-list-size 27
               imenu-list-focus-after-activation t))
