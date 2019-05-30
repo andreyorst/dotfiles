@@ -1,17 +1,18 @@
-define-command -override smart-indent %[ evaluate-commands -draft -save-regs 'a' %[ try %[
+define-command smart-indent %[ evaluate-commands -draft -save-regs 'a' %[ try %[
     try %[
         # this will take care of cursor position relative to opened curly brace.
         # we need to be behind it in order for algorithm to work right, because
         # the cursor can't be "between" chars like in other editors.
-        execute-keys '<a-h><a-l>s\{\z<ret>h'
+        # If there's a opening curly brace in the line we need to stand before it
+        # and start search for all curly braces to the beginning of the file.
+        execute-keys -draft '<a-h><a-l>s\{\z<ret>hGkGhs\{|\}<ret>"ay'
     ] catch %[
-        # if no curly brace found in the line we try to find closing one
-        try %[ execute-keys '<a-h><a-l>s\}\z<ret>' ]
+        # if there's no opening curly brace, we check for closing one and search.
+        try %[ execute-keys -draft '<a-h><a-l>s\}\z<ret>GkGhs\{|\}<ret>"ay' ] catch %[ fail ]
+    ] catch %[
+        # everything before failed, so we search for curly braces as is.
+        execute-keys -draft '<a-h>hGkGhs\{|\}<ret>"ay'
     ]
-    # now we can store all remaining braces upt to the beginning of the buffer
-    # not sure how good is this solution, since we can't really identify where
-    # minimum scope ends.
-    execute-keys -draft 'GkGhs\{|\}<ret>"ay'
     evaluate-commands %sh{
         indentation=0
         eval "set -- $kak_reg_a"
