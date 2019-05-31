@@ -182,7 +182,7 @@ plug "alexherbo2/split-object.kak" config %{
     map -docstring "split object" global normal '<a-I>' ': enter-user-mode split-object<ret>'
 }
 
-plug "screwtapello/kakoune-inc-dec" domain "GitLab.com" config %{
+plug "screwtapello/kakoune-inc-dec" domain GitLab.com config %{
     map -docstring "decrement selection" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
@@ -196,9 +196,15 @@ if '-n "${PATH##*termux*}"' %{
     }
 }
 
-
-plug 'delapouite/kakoune-select-view' %{
+plug "delapouite/kakoune-select-view" %{
     # Suggested mappings
     map global normal <a-%> ': select-view<ret>' -docstring 'select view'
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
+
+plug "andreyorst/smart-indent.kak" domain GitLab.com %{
+    # Suggested mappings
+    map global normal <a-%> ': select-view<ret>' -docstring 'select view'
+    map global view s '<esc>: select-view<ret>' -docstring 'select view'
+}
+
