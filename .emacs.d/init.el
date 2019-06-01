@@ -67,6 +67,11 @@
 (when window-system
   (fringe-mode 0))
 
+(when window-system
+  (or standard-display-table
+      (setq standard-display-table (make-display-table)))
+  (set-display-table-slot standard-display-table 0 ?\ ))
+
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
 (setq-default indent-tabs-mode nil

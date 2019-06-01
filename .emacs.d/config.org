@@ -233,6 +233,18 @@ hooks later.
     (fringe-mode 0))
 #+END_SRC
 
+But this adds another problem. Emacs displays =$= sign at the end of the
+window if line is being truncated. Damn,  why it is so hard to make it
+work how I want.. And you can't simply set =standard-display-table= slot
+to empty space, because it isn't ready on Emacs init.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (or standard-display-table
+        (setq standard-display-table (make-display-table)))
+    (set-display-table-slot standard-display-table 0 ?\ ))
+#+END_SRC
+
 ** Font
 I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
 other editor, for some reason I find this font just right for Emacs.
