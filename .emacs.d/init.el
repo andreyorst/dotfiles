@@ -298,10 +298,26 @@ are defining or executing a macro."
 (use-package doom-themes
   :commands (doom-themes-org-config
              doom-themes-treemacs-config)
+  :defines (treemacs-icon-root-png
+            doom-treemacs-use-generic-icons)
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
+  (eval-after-load 'treemacs
+    (lambda ()
+      "Adjust DOOME Treemacs root icon."
+      (unless (require 'all-the-icons nil t)
+        (error "all-the-icons isn't installed"))
+      (when doom-treemacs-use-generic-icons
+        (let ((all-the-icons-default-adjust 0))
+          (setq treemacs-icon-root-png
+                (concat
+                 " "
+                 (all-the-icons-octicon "file-directory" :v-adjust 0)
+                 " "))))))
+  (add-hook 'treemacs-mode-hook (lambda ()
+                                  (setq line-spacing 3)))
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
   (add-hook 'org-load-hook
@@ -363,15 +379,19 @@ are defining or executing a macro."
   :commands (treemacs
              treemacs-follow-mode
              treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode)
+             treemacs-fringe-indicator-mode
+             doom-color)
   :bind (("<f8>" . treemacs)
          ("<f9>" . treemacs-select-window))
+  :config
+  (set-face-attribute 'treemacs-root-face nil
+                      :foreground (doom-color 'fg)
+                      :height 1.0
+                      :weight 'normal)
   :init
   (when window-system
     (setq treemacs-width 27
-          treemacs-is-never-other-window t
-          treemacs-indentation 0
-          treemacs-space-between-root-nodes nil)
+          treemacs-is-never-other-window t)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)
