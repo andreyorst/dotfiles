@@ -380,7 +380,8 @@ are defining or executing a macro."
              treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-fringe-indicator-mode
-             doom-color)
+             doom-color
+             doom-modeline-focus)
   :bind (("<f8>" . treemacs)
          ("<f9>" . treemacs-select-window))
   :config
@@ -397,7 +398,8 @@ are defining or executing a macro."
     (treemacs-fringe-indicator-mode nil)
     (treemacs)
     (treemacs-TAB-action)
-    (other-window 1)))
+    (other-window 1)
+    (doom-modeline-focus)))
 
 (use-package treemacs-projectile)
 
