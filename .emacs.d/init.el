@@ -281,7 +281,7 @@ are defining or executing a macro."
 (global-set-key (kbd "C-c l") 'windmove-right)
 
 (when window-system
-  (setq window-divider-default-right-width 2)
+  (setq window-divider-default-right-width 1)
   (window-divider-mode 1))
 
 (defun my/ensure-installed (package)
