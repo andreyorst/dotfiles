@@ -374,6 +374,7 @@ are defining or executing a macro."
   :commands (doom-modeline-mode)
   :init (doom-modeline-mode 1)
   :config
+  (advice-add #'select-window :after #'doom-modeline-set-selected-window)
   (setq doom-modeline-bar-width 3
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-major-mode-color-icon t
