@@ -304,23 +304,49 @@ are defining or executing a macro."
   :commands (doom-themes-org-config
              doom-themes-treemacs-config)
   :defines (treemacs-icon-root-png
-            doom-treemacs-use-generic-icons)
+            doom-treemacs-use-generic-icons
+            treemacs-icon-open-png
+            treemacs-icon-closed-png)
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
   (eval-after-load 'treemacs
     (lambda ()
-      "Adjust DOOME Treemacs root icon."
+      "Adjust DOOM Treemacs root icon."
       (unless (require 'all-the-icons nil t)
         (error "all-the-icons isn't installed"))
       (when doom-treemacs-use-generic-icons
         (let ((all-the-icons-default-adjust 0))
           (setq treemacs-icon-root-png
-                (concat
-                 " "
-                 (all-the-icons-octicon "file-directory" :v-adjust 0)
-                 " "))))))
+                (concat " " (all-the-icons-octicon
+                             "file-directory"
+                             :v-adjust 0
+                             :face '(:inherit font-lock-doc-face :slant normal))
+                        " ")
+                treemacs-icon-open-png
+                (concat (all-the-icons-octicon
+                         "chevron-down"
+                         :height 0.75
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        "\t"
+                        (all-the-icons-octicon
+                         "file-directory"
+                         :v-adjust 0
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        " ")
+                treemacs-icon-closed-png
+                (concat (all-the-icons-octicon
+                         "chevron-right"
+                         :height 0.9
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        "\t"
+                        (all-the-icons-octicon
+                         "file-directory"
+                         :v-adjust 0
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        " "))))))
+
   (add-hook 'treemacs-mode-hook (lambda ()
                                   (setq line-spacing 3)))
   (setq doom-themes-enable-bold t
@@ -398,7 +424,8 @@ are defining or executing a macro."
   :init
   (when window-system
     (setq treemacs-width 27
-          treemacs-is-never-other-window t)
+          treemacs-is-never-other-window t
+          treemacs-space-between-root-nodes nil)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)
