@@ -615,6 +615,8 @@ two spaces to match new directory icon indentation."
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
+         ("C-x p" . counsel-file-jump)
+         ("C-x f" . counsel-fzf)
          ("C-x C-r" . counsel-recentf)
          ("C-c g" . counsel-git-grep)
          ("C-c r" . counsel-rg)
