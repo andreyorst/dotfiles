@@ -25,6 +25,7 @@
         parinfer-region-delete-region
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        parinfer-semicolon
         ))
 
 (setq mc/cmds-to-run-once
