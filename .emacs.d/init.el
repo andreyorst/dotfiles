@@ -356,24 +356,19 @@ two spaces to match new directory icon indentation."
                            :v-adjust 0
                            :face '(:inherit font-lock-doc-face :slant normal))
                           " "))
-
             (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
                   treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
                   treemacs-icon-text treemacs-icon-fallback)))
-
         (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
                                      "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                                      "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
                                      "wav" "mp3" "ogg" "midi")
-
         (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
                                      "md" "markdown" "rst" "log" "org" "txt"
                                      "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-
         (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
                                      "yaml" "yml" "json" "xml" "toml" "cson" "ini"
                                      "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
-
     (add-hook 'treemacs-mode-hook (lambda ()
                                     (setq line-spacing 4)))
     (setq doom-themes-enable-bold t
@@ -678,7 +673,7 @@ two spaces to match new directory icon indentation."
   (projectile-mode +1)
   (setq projectile-svn-command "fd -L --type f --print0"
         projectile-generic-command "fd -L --type f --print0"
-        projectile-require-project-root nil
+        projectile-require-project-root t
         projectile-enable-caching t
         projectile-completion-system 'ivy))
 
@@ -787,6 +782,16 @@ _-_: reduce region _)_: around pairs
   :init
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure))
+
+(defun my/projectile-project-find-function (dir)
+  (let ((root (projectile-project-root dir)))
+    (and root (cons 'transient root))))
+
+(defvar project-find-functions)
+
+(with-eval-after-load 'project
+  (add-to-list 'project-find-functions
+               'my/projectile-project-find-function))
 
 (use-package clang-format)
 
