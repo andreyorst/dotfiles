@@ -266,7 +266,9 @@ are defining or executing a macro."
 (setq-default display-line-numbers-grow-only t
               display-line-numbers-width-start t)
 
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(add-hook 'prog-mode-hook (lambda ()
+                            (display-line-numbers-mode t)
+                            (hl-line-mode t)))
 
 (defvar c-basic-offset)
 (defvar c-default-style)
@@ -301,62 +303,66 @@ are defining or executing a macro."
 (use-package all-the-icons)
 
 (use-package doom-themes
-  :commands (doom-themes-org-config
-             doom-themes-treemacs-config)
-  :defines (treemacs-icon-root-png
-            doom-treemacs-use-generic-icons
-            treemacs-icon-open-png
-            treemacs-icon-closed-png)
-  :init
-  (load-theme 'doom-one t)
-  (doom-themes-org-config)
-  (doom-themes-treemacs-config)
-  (eval-after-load 'treemacs
-    (lambda ()
-      "Adjust DOOM Treemacs root icon."
-      (unless (require 'all-the-icons nil t)
-        (error "all-the-icons isn't installed"))
-      (when doom-treemacs-use-generic-icons
-        (let ((all-the-icons-default-adjust 0))
-          (setq treemacs-icon-root-png
-                (concat " " (all-the-icons-octicon
-                             "file-directory"
-                             :v-adjust 0
-                             :face '(:inherit font-lock-doc-face :slant normal))
-                        " ")
-                treemacs-icon-open-png
-                (concat (all-the-icons-octicon
-                         "chevron-down"
-                         :height 0.75
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        "\t"
-                        (all-the-icons-octicon
-                         "file-directory"
-                         :v-adjust 0
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        " ")
-                treemacs-icon-closed-png
-                (concat (all-the-icons-octicon
-                         "chevron-right"
-                         :height 0.9
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        "\t"
-                        (all-the-icons-octicon
-                         "file-directory"
-                         :v-adjust 0
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        " "))))))
+    :commands (doom-themes-org-config
+               doom-themes-treemacs-config)
+    :defines (treemacs-icon-root-png
+              doom-treemacs-use-generic-icons
+              treemacs-icon-open-png
+              treemacs-icon-closed-png)
+    :init
+    (load-theme 'doom-one t)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config)
+    (eval-after-load 'treemacs
+      (lambda ()
+        "Adjust DOOM Themes settings for Treemacs.
 
-  (add-hook 'treemacs-mode-hook (lambda ()
-                                  (setq line-spacing 3)))
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (add-hook 'org-load-hook
-            (progn
-              (set-face-attribute 'org-document-title nil :height 1.6)
-              (set-face-attribute 'org-level-1        nil :height 1.4)
-              (set-face-attribute 'org-level-2        nil :height 1.2)
-              (set-face-attribute 'org-level-3        nil :height 1.0))))
+This lambda function sets root icon to be regular folder icon,
+and adds `chevron' icons to directories in order to display
+opened and closed states."
+        (unless (require 'all-the-icons nil t)
+          (error "`all-the-icons' isn't installed"))
+        (when doom-treemacs-use-generic-icons
+          (let ((all-the-icons-default-adjust 0))
+            (setq treemacs-icon-root-png
+                  (concat " " (all-the-icons-octicon
+                               "file-directory"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal))
+                          " ")
+                  treemacs-icon-open-png
+                  (concat (all-the-icons-octicon
+                           "chevron-down"
+                           :height 0.75
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          "\t"
+                          (all-the-icons-octicon
+                           "file-directory"
+                           :v-adjust 0
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          " ")
+                  treemacs-icon-closed-png
+                  (concat (all-the-icons-octicon
+                           "chevron-right"
+                           :height 0.9
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          "\t"
+                          (all-the-icons-octicon
+                           "file-directory"
+                           :v-adjust 0
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          " "))))))
+
+    (add-hook 'treemacs-mode-hook (lambda ()
+                                    (setq line-spacing 4)))
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (add-hook 'org-load-hook
+              (progn
+                (set-face-attribute 'org-document-title nil :height 1.6)
+                (set-face-attribute 'org-level-1        nil :height 1.4)
+                (set-face-attribute 'org-level-2        nil :height 1.2)
+                (set-face-attribute 'org-level-3        nil :height 1.0))))
 
 (defun my/set-frame-dark (&optional frame)
   "Set FRAME titlebar colorscheme to dark variant."
