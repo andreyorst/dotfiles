@@ -267,8 +267,7 @@ are defining or executing a macro."
               display-line-numbers-width-start t)
 
 (add-hook 'prog-mode-hook (lambda ()
-                            (display-line-numbers-mode t)
-                            (hl-line-mode t)))
+                            (display-line-numbers-mode t)))
 
 (defvar c-basic-offset)
 (defvar c-default-style)
@@ -305,10 +304,14 @@ are defining or executing a macro."
 (use-package doom-themes
     :commands (doom-themes-org-config
                doom-themes-treemacs-config)
+    :functions (all-the-icons-octicon)
     :defines (treemacs-icon-root-png
               doom-treemacs-use-generic-icons
               treemacs-icon-open-png
-              treemacs-icon-closed-png)
+              treemacs-icon-closed-png
+              treemacs-icon-fallback
+              treemacs-icons-hash
+              treemacs-icon-text)
     :init
     (load-theme 'doom-one t)
     (doom-themes-org-config)
@@ -319,7 +322,8 @@ are defining or executing a macro."
 
 This lambda function sets root icon to be regular folder icon,
 and adds `chevron' icons to directories in order to display
-opened and closed states."
+opened and closed states.  Also it indents all file icons with
+two spaces to match new directory icon indentation."
         (unless (require 'all-the-icons nil t)
           (error "`all-the-icons' isn't installed"))
         (when doom-treemacs-use-generic-icons
@@ -335,7 +339,7 @@ opened and closed states."
                            "chevron-down"
                            :height 0.75
                            :face '(:inherit font-lock-doc-face :slant normal))
-                          "\t"
+                          " "
                           (all-the-icons-octicon
                            "file-directory"
                            :v-adjust 0
@@ -346,12 +350,29 @@ opened and closed states."
                            "chevron-right"
                            :height 0.9
                            :face '(:inherit font-lock-doc-face :slant normal))
-                          "\t"
+                          " "
                           (all-the-icons-octicon
                            "file-directory"
                            :v-adjust 0
                            :face '(:inherit font-lock-doc-face :slant normal))
-                          " "))))))
+                          " "))
+
+            (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
+                  treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+                  treemacs-icon-text treemacs-icon-fallback)))
+
+        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
+                                     "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                                     "wav" "mp3" "ogg" "midi")
+
+        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
+                                     "md" "markdown" "rst" "log" "org" "txt"
+                                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
+
+        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+                                     "yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                                     "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
 
     (add-hook 'treemacs-mode-hook (lambda ()
                                     (setq line-spacing 4)))
@@ -368,13 +389,19 @@ opened and closed states."
   "Set FRAME titlebar colorscheme to dark variant."
   (with-selected-frame (or frame (selected-frame))
     (call-process-shell-command
-     (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+     (concat "xprop -f _GTK_THEME_VARIANT 8u -set"
+             " _GTK_THEME_VARIANT \"dark\" -name \""
              (frame-parameter frame 'name)
              "\""))))
 
 (when window-system
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
+
+(defun my/real-buffer-p ()
+  (or (and (not (minibufferp))
+           (buffer-file-name))
+      (string-equal (buffer-name) "*scratch*")))
 
 (use-package solaire-mode
   :commands (solaire-global-mode
@@ -389,13 +416,13 @@ opened and closed states."
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
   (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init
+  (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
   (solaire-global-mode +1)
   (solaire-mode-swap-bg))
 
 (defun my/fringes-in-real-buffer (&rest _)
   "Wrapper around `set-window-fringes' function."
-  (when (and (not (minibufferp))
-             (buffer-file-name))
+  (when (my/real-buffer-p)
     (set-window-fringes nil 8 8 nil)))
 
 (add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)

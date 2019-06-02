@@ -742,15 +742,14 @@ doesn't lag. I don't like that it changes width, so let's change it:
 #+END_SRC
 
 ** Prog Mode
-This isn't really a configuration of Prog Mode itself, but some hooks that change how
-programming related modes behave.
+This isn't really a configuration of  Prog Mode itself, but some hooks
+that change how programming related modes behave.
 
 Here, I want all programming modes to include line numbers by default:
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook (lambda ()
-                              (display-line-numbers-mode t)
-                              (hl-line-mode t)))
+                              (display-line-numbers-mode t)))
 #+END_SRC
 
 ** CC Mode
@@ -857,10 +856,14 @@ change a little bit of it.
     (use-package doom-themes
       :commands (doom-themes-org-config
                  doom-themes-treemacs-config)
+      :functions (all-the-icons-octicon)
       :defines (treemacs-icon-root-png
                 doom-treemacs-use-generic-icons
                 treemacs-icon-open-png
-                treemacs-icon-closed-png)
+                treemacs-icon-closed-png
+                treemacs-icon-fallback
+                treemacs-icons-hash
+                treemacs-icon-text)
       :init
       (load-theme 'doom-one t)
       (doom-themes-org-config)
@@ -871,7 +874,8 @@ change a little bit of it.
 
   This lambda function sets root icon to be regular folder icon,
   and adds `chevron' icons to directories in order to display
-  opened and closed states."
+  opened and closed states.  Also it indents all file icons with
+  two spaces to match new directory icon indentation."
           (unless (require 'all-the-icons nil t)
             (error "`all-the-icons' isn't installed"))
           (when doom-treemacs-use-generic-icons
@@ -887,7 +891,7 @@ change a little bit of it.
                              "chevron-down"
                              :height 0.75
                              :face '(:inherit font-lock-doc-face :slant normal))
-                            "\t"
+                            " "
                             (all-the-icons-octicon
                              "file-directory"
                              :v-adjust 0
@@ -898,12 +902,29 @@ change a little bit of it.
                              "chevron-right"
                              :height 0.9
                              :face '(:inherit font-lock-doc-face :slant normal))
-                            "\t"
+                            " "
                             (all-the-icons-octicon
                              "file-directory"
                              :v-adjust 0
                              :face '(:inherit font-lock-doc-face :slant normal))
-                            " "))))))
+                            " "))
+
+              (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
+                    treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+                    treemacs-icon-text treemacs-icon-fallback)))
+
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
+                                       "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                                       "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                                       "wav" "mp3" "ogg" "midi")
+
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
+                                       "md" "markdown" "rst" "log" "org" "txt"
+                                       "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
+
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+                                       "yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                                       "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
 
       (add-hook 'treemacs-mode-hook (lambda ()
                                       (setq line-spacing 4)))
@@ -917,16 +938,17 @@ change a little bit of it.
                   (set-face-attribute 'org-level-3        nil :height 1.0))))
 #+END_SRC
 
-Emacs uses white titlebar, but since I'm using dark colorscheme I want
-title bar to be dark as well. It is quite difficult to achieve this in
-GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
+Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
+want title bar  to be dark as  well. It is quite  difficult to achieve
+this in GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
 
 #+BEGIN_SRC emacs-lisp
   (defun my/set-frame-dark (&optional frame)
     "Set FRAME titlebar colorscheme to dark variant."
     (with-selected-frame (or frame (selected-frame))
       (call-process-shell-command
-       (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+       (concat "xprop -f _GTK_THEME_VARIANT 8u -set"
+               " _GTK_THEME_VARIANT \"dark\" -name \""
                (frame-parameter frame 'name)
                "\""))))
 #+END_SRC
@@ -948,6 +970,20 @@ This  package helps  distinguish  buffers that  have  file opened  and
 buffers that  are for utilities  like file  browser. Also it  has cool
 name! =\[T]/=
 
+I really want  Solaire to treat =*scratch*= buffer as  real.  For that I
+need to define my  own function that will decide if  buffer is real or
+not:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/real-buffer-p ()
+    (or (and (not (minibufferp))
+             (buffer-file-name))
+        (string-equal (buffer-name) "*scratch*")))
+#+END_SRC
+
+Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
+=solaire-mode-real-buffer-fn=.
+
 #+BEGIN_SRC emacs-lisp
   (use-package solaire-mode
     :commands (solaire-global-mode
@@ -962,6 +998,7 @@ name! =\[T]/=
     (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
     (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
     :init
+    (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
     (solaire-global-mode +1)
     (solaire-mode-swap-bg))
 #+END_SRC
@@ -975,8 +1012,7 @@ buffers that are affected by Solaire Mode:
 #+BEGIN_SRC emacs-lisp
   (defun my/fringes-in-real-buffer (&rest _)
     "Wrapper around `set-window-fringes' function."
-    (when (and (not (minibufferp))
-               (buffer-file-name))
+    (when (my/real-buffer-p)
       (set-window-fringes nil 8 8 nil)))
 #+END_SRC
 
