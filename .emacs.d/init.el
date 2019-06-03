@@ -453,17 +453,15 @@ two spaces to match new directory icon indentation."
                       :height 1.0
                       :weight 'normal)
   :init
+  (setq treemacs-width 27
+        treemacs-is-never-other-window t
+        treemacs-space-between-root-nodes nil)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode nil)
   (when window-system
-    (setq treemacs-width 27
-          treemacs-is-never-other-window t
-          treemacs-space-between-root-nodes nil)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode nil)
     (treemacs)
-    (treemacs-TAB-action)
-    (other-window 1)
-    (doom-modeline-focus)))
+    (treemacs-TAB-action)))
 
 (use-package treemacs-projectile)
 
