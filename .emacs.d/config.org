@@ -8,45 +8,93 @@
 [[file:.screenshot.png]]
 
 This  is my  Emacs configuration  file written  as Org  document.  The
-purpose of  this file  is to  learn basics  of Org  Mode and  Emacs in
-general. I try  to keep my configuration simple and  fast and I mostly
-use Emacs as environment for  studying LISP, currently Scheme, so this
-configuration is pretty  much about it.  I'm not Emacs  Lisp guru yet,
-so I  don't think  that this  document can  be really  interesting for
-anyone.
+purpose of  this file  is to  provide convenient  way to  browse Emacs
+configuration  with  expressive  comments,  and  references  to  other
+people's work.
 
-I tend to  split my configurations of Editors to  sections.  The basic
-sections are:
+* Why Emacs?
+Emacs by nature  is really powerful editor, that can  do anything from
+playing [[https://github.com/emacs-mirror/emacs/blob/d0e2a341dd9a9a365fd311748df024ecb25b70ec/lisp/play/tetris.el][Tetris]]  to [[https://github.com/CestDiego/sweetgreen.el][Ordering  Salads]], but  as any  kind of  power, this
+comes at a cost.  In case of Emacs the cost is  time.  Making Emacs as
+feature full as most modern  editors, like Sublime Text, Visual Studio
+Code, and  Atom, can  take huge  amount of time,  because you  need to
+search over the internet for the packages, that provide this and that.
 
-1. *[[*Common settings][Common settings]]* - configuration of basic editor facilities.
-2. Custom commands  - which stores my custom commands  that I use. But
-   since  in Emacs  everything is  a function,  the section  is called
-   *[[*Functions][Functions]]*.
-3. Language  specific  settings  - everything  that  needed  to  feel
-   comfortable while  working with  some language.  In case  of Emacs,
-   this section would be called *[[*Modes][Modes]]*.
-4. Plugins - or *[[*Packages][Packages]]* to be precise, is the set of used plugins and
-   it's configurations.
+If Atom or VS Code already have all of this plus more why not just use
+those editors instead of Emacs? Well,  first of all, they are built on
+top  of [[https://electronjs.org/][Electron]]  framework, which  has some  /problems/. It  constantly
+improves, but still  it is enormously fat for text  editor. If I would
+use  windows,  I  would  choose  to use  VS  Code,  since  there's  no
+alternative  actually.  Well,  I  could  use Emacs  there,  but it  is
+unpleasant experience. What's  actually good about VS Code  or Atom is
+that they have all functionality within themselves.  For example,
+recursive search for a  file, I can do it with  atom without any extra
+tool like  =find=, but not  in Emacs. This isn't  a problem in  Linux or
+Mac OS  though, due it's  Unix nature. It's  even better, since  I can
+replace these  tools with  more performant tools  like [[https://github.com/sharkdp/fd][fd]]  or [[https://github.com/BurntSushi/ripgrep][ripgrep]],
+which would be hard to achieve in Windows.
 
-Since  Emacs  configuration and  Emacs  in  general is  more  complex,
-compared to  [[https://github.com/andreyorst/dotfiles/tree/master/.config/nvim][Vim]], [[https://github.com/andreyorst/dotfiles/tree/master/.config/kak][Kakoune]],  and other editors,  there may  actually be
-more sections, or  some may be missing completely. I  can't figure out
-the best way  of splitting entire configuration with Org  mode so this
-list may update or disappear if I'll realize that this isn't necessary
-to have those sections.
+I've  avoided  Sublime  Text  in previous  paragraph,  because  it  is
+actually performant, and features everything that other editors offer,
+but unfortunately it's not free. I don't  mind to pay for a good tool,
+but I don't  think that software has  to be closed source  in order to
+get funding.  I  understand that closed source  software gets payments
+more often, because you can't use  it without paying, and Sublime Text
+is  actually a  great  editor, but  still, I  prefer  free tools  when
+possible.
 
-Now on to the configuration itself.
+OK,  what about  terminal editors  like Vim?  It is  highly extensible
+editor, it's fast, and is available  on all systems.  That's true, but
+there's a problem I  can't live with. Neovim. At first I  was a fan of
+Vim  and  Neovim competition,  thinking  that  Neovim can  bring  long
+awaited features, and fix major problems  with Vim, but after using it
+for  several years  I've  realized  that it  brought  mostly bugs  and
+incompatibilities. Yeah, the  features were neat, but  for some reason
+Vim started  implementing these  new features in  its own  way, making
+them incompatible with Neovim's. Which resulted in plugins having half
+backed support  of both editors. At  this point I was  struggling with
+snippets, intelligent completion, certain UI plugins.  Maybe currently
+situation is better, I don't know. And I don't want to know, actually.
 
-* Init
-I've  decided to  drop =org-babel-load-file=  usage, and  tangle current
-file directly to main init file. This section represents the beginning
-of =init.el=.
+Given that I don't want to turn Emacs  to Vim copy. I want Emacs to be
+Emacs.  If  I wanted  to use  Vim I'd use  Vim. Although  there's also
+Kakoune,  which is  great alternative  to  Vim. If  you need  terminal
+editor that  is fast  and minimalist, yet  provides many  features via
+POSIX tools, check it out.
 
-** Commentary
-First of all, good init file starts with commentary:
+Emacs  is hard,  it has  lame keybindings,  you need  to do  a lot  of
+tinkering  in  order to  get  it  work how  you  like,  it has  bigger
+footprint compared  to Vim, but still  it is a great  editor with huge
+community.
+
+* About this document
+This file is  my actual configuration file for Emacs.   I do all edits
+here, then /compile/  it to =.el= file. It is  convenient because Emacs is
+complex tool, so I  can leave comments by myself, but  I don't need to
+keep track over two files, like in Kakoune or Vim, since this document
+is my configuration file and a bunch of notes simultaneously.
+
+I try to  maintain my Emacs configuration simple and  small keeping as
+much of  vanilla Emacs behaviors  as I can, but  I'm a sane  person so
+some aspects which are actually insane in my opinion are changed. Like
+for example, why  on Earth Emacs scrolls buffer by  chunks? It already
+has =C-v= and  =A-v= for this. Anyway, I'll make  explicit annotation if I
+change something so it won't be hard to notice.
+
+Now to the configuration itself.
+
+* Configuration
+As  I've  mentioned  earlier,  I'm  using  Org  Mode  function  called
+=org-babel-tangle= to  build my =init.el=  file. This means that  you only
+need  this  file  in order  to  get  my  config  and compile  it  with
+=org-babel-tangle= function for  the first time. After  that, every time
+this file is edited and  saved it gets re-tangled automatically.
+
+Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
+starts with commentary:
 
 #+BEGIN_SRC emacs-lisp
-  ;;; init.el --- Emacs main configuration file
+  ;;; init.el --- Emacs main configuration file -*- lexical-binding: t; -*-
   ;;;
   ;;; Commentary:
   ;;; Emacs config by Andrey Orst.
@@ -56,15 +104,24 @@ First of all, good init file starts with commentary:
   ;;; Code:
 #+END_SRC
 
-Next I enable lexical binding to speedup load time:
+After this  point configurations will  be split in  different sections
+grouped by something in common to them all.
 
-#+BEGIN_SRC emacs-lisp
-  ;; -*- lexical-binding: t; -*-
-#+END_SRC
+** Startup
+Emacs starts slow, and  I like to close it when I'm  not using it. I'm
+not closing and  opening it for every file, of  like every 15 minutes,
+but still, the faster it starts - the better for me.
 
-** Garbage Collection and File Name Handler
-I'm  declaring these  variables to  store default  values, to  restore
-those after initialization is finished.
+Once I switch  to Emacs 27 most  of these settings will  be tangled to
+=early-init.el=.
+
+*** Garbage collection and file handler
+The  main  problem  with  Emacs startup  file  is  garbage  collection
+system. It invoked  so many times on startup that  it causes quite big
+impact on  startup time.  We're talking /seconds/.  One can  raise limit
+when to trigger garbage collection, but this will end up in unpleasant
+editing experience. So I'm declaring  these variables to store default
+values for the GC, to restore them after initialization is finished:
 
 #+BEGIN_SRC emacs-lisp
   (defvar my--gc-cons-threshold gc-cons-threshold)
@@ -72,9 +129,7 @@ those after initialization is finished.
   (defvar my--file-name-handler-alist file-name-handler-alist)
 #+END_SRC
 
-These settings help to avoid garbage collection during startup. The GC
-eats up quite  a bit of time, easily doubling  startup time. The trick
-is to turn up the memory threshold to prevent it from running:
+Now we can tweak GC. We need to raise threshold to prevent it running:
 
 #+BEGIN_SRC emacs-lisp
   (setq gc-cons-threshold 402653184
@@ -85,7 +140,7 @@ is to turn up the memory threshold to prevent it from running:
         file-name-handler-alist nil)
 #+END_SRC
 
-Let's define a hook to restore these values after startup is finished:
+We need a hook that restores initial values once initialization done:
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook
@@ -95,19 +150,9 @@ Let's define a hook to restore these values after startup is finished:
                     file-name-handler-alist my--file-name-handler-alist)))
 #+END_SRC
 
-** Early UI
-This should disable some ui elements early:
-
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
-  (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
-  (add-to-list 'default-frame-alist '(vertical-scroll-bars))
-#+END_SRC
-
-** =Package.el=
-I don't fully understand what the  following code does, but that's what
-Doom  Emacs  uses  to  speedup  initialization,  so  I'll  include  it
-anyways.  In  the  Doom  Emacs  Wiki  it  is  stated  that  Package.el
+*** =package.el= initialization
+Doom Emacs  uses this  to speedup initialization,  so I'll  include it
+too.   In   the  Doom  Emacs   Wiki  it  is  stated   that  Package.el
 initialization is expensive.
 
 #+BEGIN_SRC emacs-lisp
@@ -115,145 +160,75 @@ initialization is expensive.
         package--init-file-ensured t)
 #+END_SRC
 
-** Load Path
-Since  I've  started  splitting  configuration  into  separate  parts,
-because  those  parts  don't  quite  match  the  literate  programming
-paradigm, I want to be able to load those files:
+Melpa is a  package repository, that I use to  get packages. Since all
+packages that  I need can  be obtained  from there, I  didn't bothered
+with different methods of installation.
 
 #+BEGIN_SRC emacs-lisp
-  (push (expand-file-name "lisp" user-emacs-directory) load-path)
+  (require 'package)
+  (setq package-enable-at-startup nil)
+  (add-to-list 'package-archives
+               '("melpa" . "https://melpa.org/packages/") t)
 #+END_SRC
 
-* Common settings
-This   section  is   all   about  basic   configurations  of   builtin
-features. Emacs provides a lot of settings  on it's own, but I want to
-stay  as  close   as  possible  to  the  defaults,   except  for  some
-things. That's also answers why I don't  use Evil mode. If I wanted to
-use Vim, I'd just used Vim.
+Note for Windows users: change =https= to =http=
 
-** Startup
-I  like to  keep my  starting process  straightforward, so  I tend  to
-disable startup screen and start with the =*scratch*= buffer instead.
+This basic  piece of code  is used to  update package list  if there's
+none.
 
 #+BEGIN_SRC emacs-lisp
-  (setq inhibit-splash-screen t)
+  (package-initialize)
+  (when (not package-archive-contents)
+    (package-refresh-contents))
 #+END_SRC
 
-I also  would like  to start  Emacs in  Org mode  by default,  so lets
-change the default major mode for Emacs startup.
+** Default Behavior Fixes
+Emacs is  old. I  understand that  back then  it could  be appropriate
+decisions,  but as  of today  they are  completely obliterated  by the
+passage of time.
+
+I'm not  trying to  insult on anyone,  but usage of  the bell  is just
+insane. It's  not 1980's, computers  have their own speakers  and rich
+displays, why would anyone want  to use builtin speaker?  Why everyone
+should know when I'm mistaken? Disable bell.
 
 #+BEGIN_SRC emacs-lisp
-  (setq initial-major-mode 'org-mode)
+  (setq ring-bell-function 'ignore)
 #+END_SRC
 
-And since scratch  buffer is no longer in  =lisp-interaction= mode, it's
-better to change its message to something more /appropriate/ (nothing).
+I don't  know who decided  that having backups  all over the  place is
+good idea, but I don't think alike.
 
 #+BEGIN_SRC emacs-lisp
-  (setq initial-scratch-message "")
+  (setq backup-by-copying t
+        create-lockfiles nil
+        backup-directory-alist '(("." . "~/.cache/emacs-backups"))
+        auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
 #+END_SRC
 
-** User Interface
-These are some defaults for user  interface.  I don't like those bars,
-buttons, tooltips, scrollbars, etc.
+For some  reason in some  situations Emacs asks  for typing =yes=  or =no=
+explicitly, instead of accepting =y= or =n=. This can be fixed with this.
 
 #+BEGIN_SRC emacs-lisp
-  (tooltip-mode -1)
-  (fset 'menu-bar-open nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-Terminal version  of Emacs  doesn't have scroll  bar feature,  but GUI
-Emacs has, and it's annoying. Let's disable it:
+Emacs displays pressed  key after some time but it's  too fast for me,
+because I use Emacs on the phone  too, and the keyboard is a bit small
+for lightning fast typing.
 
 #+BEGIN_SRC emacs-lisp
-  (when window-system
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1))
+  (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 5)))
 #+END_SRC
 
-Also let's  use bar  cursor when  in window  system, which  is visible
-only in active window:
+I don't want menus on shift clicks:
 
 #+BEGIN_SRC emacs-lisp
-    (when window-system
-      (setq-default cursor-type 'bar
-                    cursor-in-non-selected-windows nil))
+  (global-unset-key (kbd "S-<down-mouse-1>"))
+  (global-unset-key (kbd "<mouse-3>"))
+  (global-unset-key (kbd "S-<mouse-3>"))
 #+END_SRC
 
-*** Frame
-Emacs uses weird method of naming a window, I'd like to see a file I'm
-currently working  on in the task  bar in case my  Emacs was minimized
-for some reason.
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default frame-title-format '("%b — Emacs"))
-#+END_SRC
-
-Also,  why initial  frame size  is so  small? When  I launch  Emacs in
-terminal it  occupies whole window.  When I launch it  under graphical
-environment it defaults to really  small window, which is smaller than
-my   terminal.  My   window   manager  doesn't   adjust  window   size
-automatically so let's just set little bit bigger initial size:
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (set-frame-size (selected-frame) 190 52))
-#+END_SRC
-
-With this size I'm  able to fire up Emacs and get  enough space to fit
-two vertically aligned windows and a file explorer together.
-
-*** Mode Line
-Small  tweak to  mode line,  that disables  changing appearance  in non
-active window.
-
-#+BEGIN_SRC emacs-lisp
-  (setq mode-line-in-non-selected-windows nil)
-#+END_SRC
-
-**** Line Numbers Column and Percent position
-I  don't  find displaying  position  in  modeline really  great  idea,
-because I need to move my eyes too much on big screen just to see what
-line number I'm currently on.
-
-#+BEGIN_SRC emacs-lisp
-  (setq column-number-mode nil
-        line-number-mode nil
-        size-indication-mode nil
-        mode-line-position nil)
-#+END_SRC
-
-*** Fringe
-I want fringes  to appear only in certain buffers  where I really need
-them, so let's  disable it entirely on startup and  set them with some
-hooks later.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (fringe-mode 0))
-#+END_SRC
-
-But this adds another problem. Emacs displays =$= sign at the end of the
-window if line is being truncated. Damn,  why it is so hard to make it
-work how I want.. And you can't simply set =standard-display-table= slot
-to empty space, because it isn't ready on Emacs init.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (or standard-display-table
-        (setq standard-display-table (make-display-table)))
-    (set-display-table-slot standard-display-table 0 ?\ ))
-#+END_SRC
-
-** Font
-I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
-other editor, for some reason I find this font just right for Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Source Code Pro-10")
-#+END_SRC
-
-** Common Behaviors
 I  don't like  how  Emacs  handles scrolling,  and  that  it uses  tab
 characters by default.  I need tab  characters only when I work with C
 code and Makefile rules.
@@ -266,7 +241,21 @@ code and Makefile rules.
                 scroll-margin 3)
 #+END_SRC
 
-** Input Languages
+I  don't like  custom,  and  especially would  like  to  stop it  from
+interfering to  my configuration  files, so lets  move it  to separate
+file.
+
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (load custom-file :noerror)
+#+END_SRC
+
+I'm not sure why it isn't default.
+
+#+BEGIN_SRC emacs-lisp
+  (savehist-mode 1)
+#+END_SRC
+
 I use two keyboard layouts: =qwerty=  and =йцукен=, therefore I need a way
 to switch between those without loosing  ability to use such chords as
 =C-x=  which will  become  a =C-ч=  if  I select  Cyrillic  layout in  the
@@ -281,83 +270,17 @@ I'm  not   using  =russian-jcuken=   here  because  it   represents  the
 "typewriter" layout with number-line inverted,  so to access numbers I
 need to use Shift key. =russian-computer= doesn't have this problem.
 
-** Save History Between Sessions
-This is what I've loved about Vim.
+I  don't  find displaying  position  in  modeline really  great  idea,
+because I need to move my eyes too much on big screen just to see what
+line number I'm currently on.
 
 #+BEGIN_SRC emacs-lisp
-  (savehist-mode 1)
+  (setq column-number-mode nil
+        line-number-mode nil
+        size-indication-mode nil
+        mode-line-position nil)
 #+END_SRC
 
-** Matching Parentheses
-One feature that I think  is really important, especially when working
-with lisp code, is ability to  see matching bracket when cursor stands
-near the other bracket. So I enable it for every programming language.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'show-paren-mode)
-#+END_SRC
-
-** Fixing Dumb Emacs Stuff
-This is just some fixes of things I found kind of strange.
-
-*** Bell
-I'm not  trying to  insult on anyone,  but usage of  the bell  is just
-insane. It's  not 1980's, computers  have their own speakers  and rich
-displays, why would anyone want  to use builtin speaker?  Why everyone
-should know when I'm mistaken? Disable bell.
-
-#+BEGIN_SRC emacs-lisp
-  (setq ring-bell-function 'ignore)
-#+END_SRC
-
-*** Custom
-I  don't like  custom,  and  especially would  like  to  stop it  from
-interfering to  my configuration  files, so lets  move it  to separate
-file.
-
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file :noerror)
-#+END_SRC
-
-*** Backups
-I don't  know who decided  that having backups  all over the  place is
-good idea, but I don't think alike.
-
-#+BEGIN_SRC emacs-lisp
-  (setq backup-by-copying t
-        create-lockfiles nil
-        backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-        auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
-#+END_SRC
-
-*** Shorter Confirmation Dialogues
-For some  reason in some  situations Emacs asks  for typing =yes=  or =no=
-explicitly, instead of accepting =y= or =n=. This can be fixed with this.
-
-#+BEGIN_SRC emacs-lisp
-  (fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-
-*** Key Display Timeout
-Emacs displays pressed  key after some time but it's  too fast for me,
-because I use Emacs on the phone  too, and the keyboard is a bit small
-for lightning fast typing.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 3)))
-#+END_SRC
-
-*** Mouse maps
-I don't want menus on shift clicks:
-
-#+BEGIN_SRC emacs-lisp
-  (global-unset-key (kbd "S-<down-mouse-1>"))
-  (global-unset-key (kbd "<mouse-3>"))
-  (global-unset-key (kbd "S-<mouse-3>"))
-#+END_SRC
-
-** Trailing Whitespaces
 I don't  want my files to  contain trailing whitespaces, so  this hook
 will get rid of those automatically for me.
 
@@ -365,51 +288,10 @@ will get rid of those automatically for me.
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-** MELPA
-Melpa is a  package repository, that I use to  get packages. Since all
-packages that  I need can  be obtained  from there, I  didn't bothered
-with different methods of installation.
-
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/") t)
-#+END_SRC
-
-Note for Windows users: change =https= to =http=
-
-*** Package Initialization
-This basic  piece of code  is used to  update package list  if there's
-none.
-
-#+BEGIN_SRC emacs-lisp
-  (package-initialize)
-  (when (not package-archive-contents)
-    (package-refresh-contents))
-#+END_SRC
-
-** =fd= instead of =find=
-I'm using  [[https://github.com/sharkdp/fd][fd]] as a  great replacement for GNU  Find. It's fast  and it
-takes =.gitignore=  into account.  Let's  assign it to  =find-program=.  /I
-guess there will  be no problems/ /if  a well known tool  is replaced by
-something that is  completely different, am I right?/ Well  I hope that
-it is used by =grep.el= only.
-
-#+BEGIN_SRC emacs-lisp
-  (when (executable-find "fd")
-    (setq find-program "fd"))
-#+END_SRC
-
-* Functions
-This section should contain functions that I've wrote for personal use
-here and  there. I'm not  e-lisp expert, so code  may be not  the best
-quality. If  you feel that this  code should be improved  you can open
-issue and  blame on me  all you want. I  prefix functions with  =my/= to
-avoid conflicts.
-
-** =my/escape=
-Taken from [[https://www.reddit.com/r/emacs/comments/bb5c1w/weekly_tipstricketc_thread/ekgje7j/][u/clemera]] comment.
+One thing  that bothered  me is  that =C-g= is  universal way  to cancel
+things  in  Emacs, gut  you  have  to be  in  exact  window to  cancel
+action.  This function  intelligently  tries to  cancel regardless  of
+active window:
 
 #+BEGIN_SRC emacs-lisp
   (defun my/escape ()
@@ -437,68 +319,45 @@ Let's remap default =keyboard-quit= key with this function.
   (global-set-key [remap keyboard-quit] #'my/escape)
 #+END_SRC
 
-** =my/eshell-toggle=
-This command toggles eshell window on and off without killing eshell.
+** Use Package
+I use =use-package= to install, load  and configure my packages.  I find
+this way very consistent and easy  to understand and maintain.  What I
+like about Use  Package is that it automatically  installs packages on
+Emacs startup. But  unfortunately it can't be installed  by itself, so
+we need  a way to install  Use Package in  case I load this  config on
+fresh system.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/eshell-toggle ()
-    "Toggle `eshell' window on and off with the same command."
-    (interactive)
-    (defvar my--window-name "*eshell-popup*")
-    (cond ((get-buffer-window my--window-name)
-           (delete-window
-            (get-buffer-window my--window-name)))
-          (t (split-window-below)
-             (other-window 1)
-             (cond ((get-buffer my--window-name)
-                    (switch-to-buffer my--window-name))
-                   (t
-                    (eshell)
-                    (rename-buffer my--window-name))))))
-  #+END_SRC
-
-I find it conveinient to bind this function to /Ctrl+t/ shortcut.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key "\C-t" 'my/eshell-toggle)
+  (defun my/ensure-installed (package)
+    "Ensure that PACKAGE is installed."
+    (when (not (package-installed-p package))
+      (package-install package)))
 #+END_SRC
 
-** =my/rectangle-mouse-mark=
-Just in  case I want  to select  something with rectangular  region by
-using mouse.
+Now we can install and configure Use Package itself:
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/rectangle-mouse-mark (event)
-    "Mark rectangle region with the mouse."
-    (interactive "e")
-    (deactivate-mark)
-    (mouse-set-point event)
-    (rectangle-mark-mode +1)
-    (let ((drag-event))
-      (track-mouse
-        (while (progn
-                 (setq drag-event (read-event))
-                 (mouse-movement-p drag-event))
-          (mouse-set-point drag-event)))))
+  (my/ensure-installed 'use-package)
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 #+END_SRC
 
-Let's bind it to something I don't accidentally press.
+All  other packages  were  split to  individual  categories much  like
+Emacs  settings above.  This  helps  me to  keep  track  of things  in
+different packages and do not rely on search that much.
 
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-S-<down-mouse-1>") #'my/rectangle-mouse-mark)
-#+END_SRC
+** Modes
+In Emacs  world Modes  are the  main thing. I'm  using Org  Mode quite
+heavily right now, as well as  a lot of other modes. Configurations of
+these modes are stored here.
 
-* Modes
-This section will contain some settings for various modes that are not
-handled within package configurations.
-
-** Org Mode
+*** Org Mode
 Org  Mode is  a great  mode for  taking notes,  managing to-do  lists,
 writing books, literate programming, and  many other things. I primary
 use it for taking notes on different programming languages, and manage
 my Emacs configuration with it.
 
-*** Startup Settings
+**** Startup Settings
 For Org  Mode I  need spell  checking to be  enabled by  default. Also
 Org-mode plays nicely with justification, so I'll set it to =full=, as I
 think that it  is the most appropriate format for  text. Org files are
@@ -531,7 +390,7 @@ This will fontify code inside =SRC_BLOCK= sections:
   (setq org-src-fontify-natively t)
 #+END_SRC
 
-*** Source Code Blocks
+**** Source Code Blocks
 Since I'm using Emacs to configure Emacs, I want flycheck to run while
 I'm editing =emacs-lisp= source blocks. But I find it distracting to see
 warnings like =;;; Code=, so let's disable it:
@@ -567,7 +426,7 @@ To actually make it work we need to add this hook:
   (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
 #+END_SRC
 
-*** Inline Images
+**** Inline Images
 Since Org-mode allows inline images, we  need a way to update them, if
 image changes for some reason.  We will use hook to call this function
 is supposed to automatically update inline images in org buffers, when
@@ -584,7 +443,7 @@ for some reason image was changed.
   (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
 #+END_SRC
 
-**** Inline LaTeX Preview
+***** Inline LaTeX Preview
 Latex preview  feature is  really awesome, but  I don't  want produced
 images to be stored in plain sight. At least use hidden folder.
 
@@ -592,7 +451,7 @@ images to be stored in plain sight. At least use hidden folder.
   (setq org-preview-latex-image-directory ".ltximg/")
 #+END_SRC
 
-*** Org Mappings
+**** Org Mappings
 I don't like  that my =S-tab= mapping for  Company triggers =org-shifftab=
 function, so I'll remap it to use =C-tab= instead.
 
@@ -603,7 +462,7 @@ function, so I'll remap it to use =C-tab= instead.
   (define-key org-mode-map [C-tab] 'org-shifttab)
 #+END_SRC
 
-*** Syntax Highlighting in Exported PDFs
+**** Syntax Highlighting in Exported PDFs
 To  highlight code  blocks  when  exporting to  LaTeX  we need  =minted=
 package   installed   system-wide   and    this   code   (taken   from
 [[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
@@ -641,7 +500,7 @@ don't know how to fix this.
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
-*** Cleanup After Export
+**** Cleanup After Export
 Since I'm exporting my notes to PDF as final file format, I don't need
 intermediary =.tex= file to stay.  Let's assume that these files are log
 files, so Org mode will remove those after exporting is finished.
@@ -653,7 +512,7 @@ files, so Org mode will remove those after exporting is finished.
 
 This will get rid of =.tex= files.
 
-*** Executable Languages
+**** Executable Languages
 A nice feature of Org-mode over Markdown is that we can execute source
 code  blocks with  a keybinding  and see  results inside  the document
 itself.   Let's define  what languages  can be  executed with  =C-c C-c=
@@ -673,7 +532,7 @@ source code, lets set =org-confirm-babel-evaluate= to =nil=
   (setq org-confirm-babel-evaluate nil)
 #+END_SRC
 
-*** Paragraphs
+**** Paragraphs
 I would like to use the same level headings after certain part, so all
 my   deeply   nested   notes   contained   right   section   separator
 headings. This is a hacky way but it works:
@@ -694,7 +553,7 @@ headings. This is a hacky way but it works:
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 #+END_SRC
 
-*** Markdown Export
+**** Markdown Export
 I don't  think that I gonna  use this much,  but just in case  if I'll
 ever decide to export Org to Markdown, I'll need this:
 
@@ -702,24 +561,7 @@ ever decide to export Org to Markdown, I'll need this:
   (require 'ox-md nil t)
 #+END_SRC
 
-** COMMENT Flyspell Mode
-It's annoying that if I save word to my personal dictionary, all other
-misspelled  words  are no  longer  highlighted,  and  I need  to  call
-=flyspell-buffer= again and again. Let's get rid of this.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/flyspell-buffer-after-pdict-save (&rest _)
-    "Run flyspell after saving word to dictonary."
-    (flyspell-buffer))
-
-  (advice-add 'ispell-pdict-save :after #'my/flyspell-buffer-after-pdict-save)
-#+END_SRC
-
-I've found  this trick [[https://www.reddit.com/r/emacs/comments/4oc7pg/spellcheck_flyspellmode_underlines_disappear_when/d5ptwql/][here]],  but I  don't really like  this solution,
-since I don't  understand why I need to define  another function, that
-simply calls =flyspell-buffer= but it works fine.
-
-** Flycheck Mode
+*** Flycheck Mode
 Flycheck  is useful  tool, which  can provide  syntax checking  on the
 fly. Let's enable it for bunch of languages here.
 
@@ -727,24 +569,14 @@ fly. Let's enable it for bunch of languages here.
   (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
 #+END_SRC
 
-** Doc View Mode
+*** Doc View Mode
 Default resolution is too low:
 
 #+BEGIN_SRC emacs-lisp
   (setq-default doc-view-resolution 192)
 #+END_SRC
 
-** Center View Mode
-This is my own minor mode. It  makes text centered in the buffer where
-the   mode   was   enabled.    I'm   aware   of   [[https://github.com/joostkremers/writeroom-mode][writeroom-mode]]   and
-[[https://github.com/anler/centered-window-mode][centered-window-mode]],  but I  wanted to  try to  create my  own thing,
-because there's no better way to learn a language, but to write in it.
-
-#+BEGIN_SRC emacs-lisp
-  (require 'center-view)
-#+END_SRC
-
-** Display Line Numbers Mode
+*** Display Line Numbers Mode
 This mode provides line numbers on  the left side of the window, which
 doesn't lag. I don't like that it changes width, so let's change it:
 
@@ -753,18 +585,25 @@ doesn't lag. I don't like that it changes width, so let's change it:
                 display-line-numbers-width-start t)
 #+END_SRC
 
-** Prog Mode
+*** Prog Mode
 This isn't really a configuration of  Prog Mode itself, but some hooks
 that change how programming related modes behave.
 
 Here, I want all programming modes to include line numbers by default:
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook (lambda ()
-                              (display-line-numbers-mode t)))
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
-** CC Mode
+One feature that I think  is really important, especially when working
+with lisp code, is ability to  see matching bracket when cursor stands
+near the other bracket. So I enable it for every programming language.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'show-paren-mode)
+#+END_SRC
+
+*** CC Mode
 These settings are for editing C source files. First, to suppress byte
 compilation warning lets declare variables:
 
@@ -786,64 +625,197 @@ Now we can create a hook that will run for all C related modes:
                     tab-width 4)))
 #+END_SRC
 
-** Windmove
-This mode  allows to move  between windows, but  I don't like  that it
-uses arrow keys, and I would like  to use it with /hjkl/, because that's
-what I use in Tmux.
+*** Markdown
+Sometimes I need to edit Markdown documents, so this package is handy.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c h") 'windmove-left)
-  (global-set-key (kbd "C-c j") 'windmove-down)
-  (global-set-key (kbd "C-c k") 'windmove-up)
-  (global-set-key (kbd "C-c l") 'windmove-right)
+  (use-package markdown-mode
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (defvar markdown-command "multimarkdown"))
 #+END_SRC
 
-** Window Divider
-This mode changes  how window dividers are.  I want to set  them to be
-only 1px wide because if this mode is turned on, fringes don't loose 1
-pixel of width.
+For markdown  mode I would like  to have automatic spell  checking and
+filling. Basically the same setup as for Org Mode.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'markdown-mode-hook
+            '(lambda()
+               (flyspell-mode)
+               (setq fill-column 80
+                     default-justification 'left)
+               (auto-fill-mode)))
+
+#+END_SRC
+
+*** Rust
+I'd like to  have Rust syntax highlighting and  some basic facilities,
+since I'm  planning to write my  exercises in org mode.   Since I make
+notes in Org-mode, and  I started to use it for Rust  too, I need some
+settings for Rust mode.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :config (add-hook 'rust-mode-hook
+                      '(lambda()
+                         (racer-mode)
+                         (yas-minor-mode)
+                         (electric-pair-mode)
+                         (setq company-tooltip-align-annotations t))))
+#+END_SRC
+
+This also means  that I could use something  to automatically complete
+Rust  language facilities.  Rust  ecosystem provides  two options  for
+that:  Racer, and  RLS.  I'm  planning to  use  Racer  when RLS  isn't
+possible to use, like in Org Mode.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racer
+    :config (add-hook 'racer-mode-hook #'eldoc-mode))
+#+END_SRC
+
+There's also a package for Cargo integration:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cargo
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))
+#+END_SRC
+
+*** TOML
+=toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
+configure project.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package toml-mode)
+#+END_SRC
+
+*** EditorConfig
+Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
+synchronize my  editor configurations  between projects  and different
+editors.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package editorconfig
+    :commands editorconfig-mode
+    :config
+    (editorconfig-mode 1))
+#+END_SRC
+
+*** Nov.el
+Package that  makes it  possible to read  [[https://en.wikipedia.org/wiki/EPUB][ePUB]] formatted  books inside
+Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package nov
+    :commands nov-mode
+    :functions solaire-mode
+    :mode "\\.epub$"
+    :init
+    (setq nov-text-width 80)
+    (add-hook 'nov-mode-hook #'visual-line-mode)
+    (add-hook 'nov-mode-hook #'solaire-mode))
+#+END_SRC
+
+** User Interface
+All user interface related settings are presented in this section. I'm
+big fan of  DOOM themes, and modeline,  so I'll refer to  them quite a
+lot here.
+
+*** Default tweaks
+Emacs displays splash screen once started  with no files. I don't need
+it, and  I would like to  start with =*scratch*= buffer  instead. Also I
+would  like =*scratch*=  buffer  to be  an Org  buffer  with no  initial
+message:
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-splash-screen t
+        initial-major-mode 'org-mode
+        initial-scratch-message "")
+#+END_SRC
+
+I don't need  all these tooltips, menus and  scrollbars. Emacs enables
+all of those by default, so let's disable them as early as possible:
+
+#+BEGIN_SRC emacs-lisp
+  (tooltip-mode -1)
+  (menu-bar-mode -1)
+  (fset 'menu-bar-open nil)
+
+  (when window-system
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1))
+#+END_SRC
+
+Also let's  use bar  cursor when  in window  system, which  is visible
+only in active window:
+
+#+BEGIN_SRC emacs-lisp
+    (when window-system
+      (setq-default cursor-type 'bar
+                    cursor-in-non-selected-windows nil))
+#+END_SRC
+
+Emacs uses weird method of naming a window, I'd like to see a file I'm
+currently working  on in the task  bar in case my  Emacs was minimized
+for some reason.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default frame-title-format '("%b — Emacs"))
+#+END_SRC
+
+Also,  why initial  frame size  is so  small? When  I launch  Emacs in
+terminal it  occupies whole window.  When I launch it  under graphical
+environment it defaults to really  small window, which is smaller than
+my   terminal.  My   window   manager  doesn't   adjust  window   size
+automatically so let's just set little bit bigger initial size:
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (setq window-divider-default-right-width 1)
-    (window-divider-mode 1))
+    (set-frame-size (selected-frame) 190 52))
 #+END_SRC
 
-* Packages
-Now that's  where fun  starts. I  try to  keep my  Emacs configuration
-simple,  and  fast but  I  still  think  that  I need  some  essential
-packages. One of such packages is [[https://github.com/jwiegley/use-package][use-package]].
+With this size I'm  able to fire up Emacs and get  enough space to fit
+two vertically aligned windows and a file explorer together.
 
-** Use Package
-I use =use-package= to install, load  and configure my packages.  I find
-this way very consistent and easy  to understand and maintain.  What I
-like about Use  Package is that it automatically  installs packages on
-Emacs startup. But  unfortunately it can't be installed  by itself, so
-we need  a way to install  Use Package in  case I load this  config on
-fresh system.
+I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
+other editor, for some reason I find this font just right for Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/ensure-installed (package)
-    "Ensure that PACKAGE is installed."
-    (when (not (package-installed-p package))
-      (package-install package)))
+  (set-face-attribute 'default nil :font "Source Code Pro-10")
 #+END_SRC
 
-Now we can install and configure Use Package itself:
+I want fringes  to appear only in certain buffers  where I really need
+them, so let's  disable it entirely on startup and  set them with some
+hooks later.
 
 #+BEGIN_SRC emacs-lisp
-  (my/ensure-installed 'use-package)
-  (require 'use-package)
-  (setq use-package-always-ensure t)
+  (when window-system
+    (fringe-mode 0))
 #+END_SRC
 
-All  other packages  were  split to  individual  categories much  like
-Emacs  settings above.  This  helps  me to  keep  track  of things  in
-different packages and do not rely on search that much.
+But this adds another problem. Emacs displays =$= sign at the end of the
+window if line is being truncated. Damn,  why it is so hard to make it
+work how I want.. And you can't simply set =standard-display-table= slot
+to empty space, because it isn't ready on Emacs init.
 
-** UI
-Packages that change  how Emacs looks. Themes,  modelines, UI elements
-like filetree, icons all go here.
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (or standard-display-table
+        (setq standard-display-table (make-display-table)))
+    (set-display-table-slot standard-display-table 0 ?\ ))
+#+END_SRC
+
+Small  tweak to  mode line,  that disables  changing appearance  in non
+active window.
+
+#+BEGIN_SRC emacs-lisp
+  (setq mode-line-in-non-selected-windows nil)
+#+END_SRC
+
+Now  I can  list  some amazing  packages that  provide  some real  GUI
+goodies to Emacs.
 
 *** All The Icons
 This  package provides  nice icons  for emacs  via custom  fonts. Just
@@ -1218,101 +1190,15 @@ A package that creates child frame for eldoc documentation messages.
           eldoc-box-max-pixel-height 1080))
 #+END_SRC
 
-** Modes
-In  this section  I'm going  to  list additional  mode packages,  that
-aren't included with Emacs by default, or lacking features.
-
-*** Markdown
-Sometimes I need to edit Markdown documents, so this package is handy.
+*** Window Divider
+This package changes  window dividers appearance.  I want  to set them
+to be  only 1 pixel  wide because if this  mode is turned  on, fringes
+don't loose 1 pixel of width.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode))
-    :init (defvar markdown-command "multimarkdown"))
-#+END_SRC
-
-For markdown  mode I would like  to have automatic spell  checking and
-filling. Basically the same setup as for Org Mode.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'markdown-mode-hook
-            '(lambda()
-               (flyspell-mode)
-               (setq fill-column 80
-                     default-justification 'left)
-               (auto-fill-mode)))
-
-#+END_SRC
-
-*** Rust
-I'd like to  have Rust syntax highlighting and  some basic facilities,
-since I'm  planning to write my  exercises in org mode.   Since I make
-notes in Org-mode, and  I started to use it for Rust  too, I need some
-settings for Rust mode.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rust-mode
-    :config (add-hook 'rust-mode-hook
-                      '(lambda()
-                         (racer-mode)
-                         (yas-minor-mode)
-                         (electric-pair-mode)
-                         (setq company-tooltip-align-annotations t))))
-#+END_SRC
-
-This also means  that I could use something  to automatically complete
-Rust  language facilities.  Rust  ecosystem provides  two options  for
-that:  Racer, and  RLS.  I'm  planning to  use  Racer  when RLS  isn't
-possible to use, like in Org Mode.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package racer
-    :config (add-hook 'racer-mode-hook #'eldoc-mode))
-#+END_SRC
-
-There's also a package for Cargo integration:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package cargo
-    :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode))
-#+END_SRC
-
-*** TOML
-=toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
-configure project.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package toml-mode)
-#+END_SRC
-
-*** EditorConfig
-Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
-synchronize my  editor configurations  between projects  and different
-editors.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package editorconfig
-    :commands editorconfig-mode
-    :config
-    (editorconfig-mode 1))
-#+END_SRC
-
-*** Nov.el
-Package that  makes it  possible to read  [[https://en.wikipedia.org/wiki/EPUB][ePUB]] formatted  books inside
-Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package nov
-    :commands nov-mode
-    :functions solaire-mode
-    :mode "\\.epub$"
-    :init
-    (setq nov-text-width 80)
-    (add-hook 'nov-mode-hook #'visual-line-mode)
-    (add-hook 'nov-mode-hook #'solaire-mode))
+  (when window-system
+    (setq window-divider-default-right-width 1)
+    (window-divider-mode 1))
 #+END_SRC
 
 ** Tools
@@ -1414,7 +1300,19 @@ experience.
 #+END_SRC
 
 It integrates with  Counsel that handles minibuffer,  so let's install
-it too.
+it too. I'm  using [[https://github.com/sharkdp/fd][fd]] as a  great replacement for GNU  Find. It's fast
+and  it   takes  =.gitignore=   into  account.    Let's  assign   it  to
+=find-program=.  /I guess there will be  no problems/ /if a well known tool
+is replaced  by something  that is completely  different, am  I right?/
+Well I hope that it is used by =grep.el= only.
+
+#+BEGIN_SRC emacs-lisp
+  (when (executable-find "fd")
+    (setq find-program "fd"))
+#+END_SRC
+
+Counsel  has nice  =counsel-file-fump=  command  that uses  =find-program=
+variable, so it will be more performant with =fd=.
 
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
@@ -1784,11 +1682,12 @@ when =imenu-list= was toggled to be shown.
 #+END_SRC
 
 * Postscript
-This Emacs Configuration features various  cool E-Lisp hacks that I've
-found  in the  Internet,  and I  try to  keep  references to  original
-places, so reader  could refer to those, because I  alter these pieces
-of code for my  personal needs and thus it may  not be compatible with
-other people tastes, and because I want to credit original author.
+This Emacs Configuration features  various cool E-Lisp hacks somewhere
+that I've  found over the  Internet, and I  try to keep  references to
+original places, so reader could refer to those, because I alter these
+pieces of code for my personal needs and thus it may not be compatible
+with  other people  tastes,  and  because I  want  to credit  original
+author.
 
 If you  find any issue with  my config feel  free to [[https://github.com/andreyorst/dotfiles/issues/new][file an  issue]] or
 contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].

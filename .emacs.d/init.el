@@ -1,4 +1,4 @@
-;;; init.el --- Emacs main configuration file
+;;; init.el --- Emacs main configuration file -*- lexical-binding: t; -*-
 ;;;
 ;;; Commentary:
 ;;; Emacs config by Andrey Orst.
@@ -6,8 +6,6 @@
 ;;; Do not change this file.  Main config is located in .emacs.d/config.org
 ;;;
 ;;; Code:
-
-;; -*- lexical-binding: t; -*-
 
 (defvar my--gc-cons-threshold gc-cons-threshold)
 (defvar my--gc-cons-percentage gc-cons-percentage)
@@ -26,85 +24,8 @@
                   gc-cons-percentage my--gc-cons-percentage
                   file-name-handler-alist my--file-name-handler-alist)))
 
-(add-to-list 'default-frame-alist '(tool-bar-lines . 0))
-(add-to-list 'default-frame-alist '(menu-bar-lines . 0))
-(add-to-list 'default-frame-alist '(vertical-scroll-bars))
-
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
-
-(push (expand-file-name "lisp" user-emacs-directory) load-path)
-
-(setq inhibit-splash-screen t)
-
-(setq initial-major-mode 'org-mode)
-
-(setq initial-scratch-message "")
-
-(tooltip-mode -1)
-(fset 'menu-bar-open nil)
-
-(when window-system
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1))
-
-(when window-system
-  (setq-default cursor-type 'bar
-                cursor-in-non-selected-windows nil))
-
-(setq-default frame-title-format '("%b — Emacs"))
-
-(when window-system
-  (set-frame-size (selected-frame) 190 52))
-
-(setq mode-line-in-non-selected-windows nil)
-
-(setq column-number-mode nil
-      line-number-mode nil
-      size-indication-mode nil
-      mode-line-position nil)
-
-(when window-system
-  (fringe-mode 0))
-
-(when window-system
-  (or standard-display-table
-      (setq standard-display-table (make-display-table)))
-  (set-display-table-slot standard-display-table 0 ?\ ))
-
-(set-face-attribute 'default nil :font "Source Code Pro-10")
-
-(setq-default indent-tabs-mode nil
-              scroll-step 1
-              scroll-conservatively 10000
-              auto-window-vscroll nil
-              scroll-margin 3)
-
-(setq default-input-method 'russian-computer)
-
-(savehist-mode 1)
-
-(add-hook 'prog-mode-hook 'show-paren-mode)
-
-(setq ring-bell-function 'ignore)
-
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file :noerror)
-
-(setq backup-by-copying t
-      create-lockfiles nil
-      backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
-
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(add-hook 'after-init-hook (lambda () (setq echo-keystrokes 3)))
-
-(global-unset-key (kbd "S-<down-mouse-1>"))
-(global-unset-key (kbd "<mouse-3>"))
-(global-unset-key (kbd "S-<mouse-3>"))
-
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -115,8 +36,40 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-(when (executable-find "fd")
-  (setq find-program "fd"))
+(setq ring-bell-function 'ignore)
+
+(setq backup-by-copying t
+      create-lockfiles nil
+      backup-directory-alist '(("." . "~/.cache/emacs-backups"))
+      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(add-hook 'after-init-hook (lambda () (setq echo-keystrokes 5)))
+
+(global-unset-key (kbd "S-<down-mouse-1>"))
+(global-unset-key (kbd "<mouse-3>"))
+(global-unset-key (kbd "S-<mouse-3>"))
+
+(setq-default indent-tabs-mode nil
+              scroll-step 1
+              scroll-conservatively 10000
+              auto-window-vscroll nil
+              scroll-margin 3)
+
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file :noerror)
+
+(savehist-mode 1)
+
+(setq default-input-method 'russian-computer)
+
+(setq column-number-mode nil
+      line-number-mode nil
+      size-indication-mode nil
+      mode-line-position nil)
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (defun my/escape ()
   "Quit in current context.
@@ -138,37 +91,14 @@ are defining or executing a macro."
 
 (global-set-key [remap keyboard-quit] #'my/escape)
 
-(defun my/eshell-toggle ()
-  "Toggle `eshell' window on and off with the same command."
-  (interactive)
-  (defvar my--window-name "*eshell-popup*")
-  (cond ((get-buffer-window my--window-name)
-         (delete-window
-          (get-buffer-window my--window-name)))
-        (t (split-window-below)
-           (other-window 1)
-           (cond ((get-buffer my--window-name)
-                  (switch-to-buffer my--window-name))
-                 (t
-                  (eshell)
-                  (rename-buffer my--window-name))))))
+(defun my/ensure-installed (package)
+  "Ensure that PACKAGE is installed."
+  (when (not (package-installed-p package))
+    (package-install package)))
 
-(global-set-key "\C-t" 'my/eshell-toggle)
-
-(defun my/rectangle-mouse-mark (event)
-  "Mark rectangle region with the mouse."
-  (interactive "e")
-  (deactivate-mark)
-  (mouse-set-point event)
-  (rectangle-mark-mode +1)
-  (let ((drag-event))
-    (track-mouse
-      (while (progn
-               (setq drag-event (read-event))
-               (mouse-movement-p drag-event))
-        (mouse-set-point drag-event)))))
-
-(global-set-key (kbd "C-S-<down-mouse-1>") #'my/rectangle-mouse-mark)
+(my/ensure-installed 'use-package)
+(require 'use-package)
+(setq use-package-always-ensure t)
 
 (require 'org)
 (add-hook 'org-mode-hook (lambda()
@@ -264,13 +194,12 @@ are defining or executing a macro."
 
 (setq-default doc-view-resolution 192)
 
-(require 'center-view)
-
 (setq-default display-line-numbers-grow-only t
               display-line-numbers-width-start t)
 
-(add-hook 'prog-mode-hook (lambda ()
-                            (display-line-numbers-mode t)))
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+(add-hook 'prog-mode-hook 'show-paren-mode)
 
 (defvar c-basic-offset)
 (defvar c-default-style)
@@ -284,23 +213,82 @@ are defining or executing a macro."
                   indent-tabs-mode t
                   tab-width 4)))
 
-(global-set-key (kbd "C-c h") 'windmove-left)
-(global-set-key (kbd "C-c j") 'windmove-down)
-(global-set-key (kbd "C-c k") 'windmove-up)
-(global-set-key (kbd "C-c l") 'windmove-right)
+(use-package markdown-mode
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (defvar markdown-command "multimarkdown"))
+
+(add-hook 'markdown-mode-hook
+          '(lambda()
+             (flyspell-mode)
+             (setq fill-column 80
+                   default-justification 'left)
+             (auto-fill-mode)))
+
+(use-package rust-mode
+  :config (add-hook 'rust-mode-hook
+                    '(lambda()
+                       (racer-mode)
+                       (yas-minor-mode)
+                       (electric-pair-mode)
+                       (setq company-tooltip-align-annotations t))))
+
+(use-package racer
+  :config (add-hook 'racer-mode-hook #'eldoc-mode))
+
+(use-package cargo
+  :config
+  (add-hook 'rust-mode-hook 'cargo-minor-mode))
+
+(use-package toml-mode)
+
+(use-package editorconfig
+  :commands editorconfig-mode
+  :config
+  (editorconfig-mode 1))
+
+(use-package nov
+  :commands nov-mode
+  :functions solaire-mode
+  :mode "\\.epub$"
+  :init
+  (setq nov-text-width 80)
+  (add-hook 'nov-mode-hook #'visual-line-mode)
+  (add-hook 'nov-mode-hook #'solaire-mode))
+
+(setq inhibit-splash-screen t
+      initial-major-mode 'org-mode
+      initial-scratch-message "")
+
+(tooltip-mode -1)
+(menu-bar-mode -1)
+(fset 'menu-bar-open nil)
 
 (when window-system
-  (setq window-divider-default-right-width 1)
-  (window-divider-mode 1))
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1))
 
-(defun my/ensure-installed (package)
-  "Ensure that PACKAGE is installed."
-  (when (not (package-installed-p package))
-    (package-install package)))
+(when window-system
+  (setq-default cursor-type 'bar
+                cursor-in-non-selected-windows nil))
 
-(my/ensure-installed 'use-package)
-(require 'use-package)
-(setq use-package-always-ensure t)
+(setq-default frame-title-format '("%b — Emacs"))
+
+(when window-system
+  (set-frame-size (selected-frame) 190 52))
+
+(set-face-attribute 'default nil :font "Source Code Pro-10")
+
+(when window-system
+  (fringe-mode 0))
+
+(when window-system
+  (or standard-display-table
+      (setq standard-display-table (make-display-table)))
+  (set-display-table-slot standard-display-table 0 ?\ ))
+
+(setq mode-line-in-non-selected-windows nil)
 
 (use-package all-the-icons)
 
@@ -515,49 +503,9 @@ two spaces to match new directory icon indentation."
   (setq eldoc-box-max-pixel-width 1920
         eldoc-box-max-pixel-height 1080))
 
-(use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (defvar markdown-command "multimarkdown"))
-
-(add-hook 'markdown-mode-hook
-          '(lambda()
-             (flyspell-mode)
-             (setq fill-column 80
-                   default-justification 'left)
-             (auto-fill-mode)))
-
-(use-package rust-mode
-  :config (add-hook 'rust-mode-hook
-                    '(lambda()
-                       (racer-mode)
-                       (yas-minor-mode)
-                       (electric-pair-mode)
-                       (setq company-tooltip-align-annotations t))))
-
-(use-package racer
-  :config (add-hook 'racer-mode-hook #'eldoc-mode))
-
-(use-package cargo
-  :config
-  (add-hook 'rust-mode-hook 'cargo-minor-mode))
-
-(use-package toml-mode)
-
-(use-package editorconfig
-  :commands editorconfig-mode
-  :config
-  (editorconfig-mode 1))
-
-(use-package nov
-  :commands nov-mode
-  :functions solaire-mode
-  :mode "\\.epub$"
-  :init
-  (setq nov-text-width 80)
-  (add-hook 'nov-mode-hook #'visual-line-mode)
-  (add-hook 'nov-mode-hook #'solaire-mode))
+(when window-system
+  (setq window-divider-default-right-width 1)
+  (window-divider-mode 1))
 
 (use-package hydra
   :commands (hydra-default-pre
@@ -612,6 +560,9 @@ two spaces to match new directory icon indentation."
         ivy-display-style nil
         ivy-minibuffer-faces nil)
   (ivy-mode 1))
+
+(when (executable-find "fd")
+  (setq find-program "fd"))
 
 (use-package counsel
   :init (when (executable-find "fd")
