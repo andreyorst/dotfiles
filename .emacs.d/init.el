@@ -100,18 +100,269 @@ are defining or executing a macro."
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(setq inhibit-splash-screen t
+      initial-major-mode 'org-mode
+      initial-scratch-message "")
+
+(tooltip-mode -1)
+(menu-bar-mode -1)
+(fset 'menu-bar-open nil)
+
+(when window-system
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1))
+
+(when window-system
+  (setq-default cursor-type 'bar
+                cursor-in-non-selected-windows nil))
+
+(setq-default frame-title-format '("%b — Emacs"))
+
+(when window-system
+  (set-frame-size (selected-frame) 190 52))
+
+(set-face-attribute 'default nil :font "Source Code Pro-10")
+
+(when window-system
+  (fringe-mode 0))
+
+(when window-system
+  (or standard-display-table
+      (setq standard-display-table (make-display-table)))
+  (set-display-table-slot standard-display-table 0 ?\ ))
+
+(setq mode-line-in-non-selected-windows nil)
+
+(use-package all-the-icons)
+
+(use-package doom-themes
+    :commands (doom-themes-org-config
+               doom-themes-treemacs-config)
+    :functions (all-the-icons-octicon)
+    :defines (treemacs-icon-root-png
+              doom-treemacs-use-generic-icons
+              treemacs-icon-open-png
+              treemacs-icon-closed-png
+              treemacs-icon-fallback
+              treemacs-icons-hash
+              treemacs-icon-text)
+    :init
+    (load-theme 'doom-one t)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config)
+    (eval-after-load 'treemacs
+      (lambda ()
+        "Adjust DOOM Themes settings for Treemacs.
+
+This lambda function sets root icon to be regular folder icon,
+and adds `chevron' icons to directories in order to display
+opened and closed states.  Also it indents all file icons with
+two spaces to match new directory icon indentation."
+        (unless (require 'all-the-icons nil t)
+          (error "`all-the-icons' isn't installed"))
+        (when doom-treemacs-use-generic-icons
+          (let ((all-the-icons-default-adjust 0))
+            (setq treemacs-icon-root-png
+                  (concat " " (all-the-icons-octicon
+                               "file-directory"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal))
+                          " ")
+                  treemacs-icon-open-png
+                  (concat (all-the-icons-octicon
+                           "chevron-down"
+                           :height 0.75
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          " "
+                          (all-the-icons-octicon
+                           "file-directory"
+                           :v-adjust 0
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          " ")
+                  treemacs-icon-closed-png
+                  (concat (all-the-icons-octicon
+                           "chevron-right"
+                           :height 0.9
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          " "
+                          (all-the-icons-octicon
+                           "file-directory"
+                           :v-adjust 0
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                          " "))
+            (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
+                  treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+                  treemacs-icon-text treemacs-icon-fallback)))
+        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
+                                     "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                                     "wav" "mp3" "ogg" "midi")
+        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
+                                     "md" "markdown" "rst" "log" "org" "txt"
+                                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
+        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+                                     "yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                                     "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
+    (add-hook 'treemacs-mode-hook (lambda ()
+                                    (setq line-spacing 4)))
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t))
+
+(defun my/set-frame-dark (&optional frame)
+  "Set FRAME titlebar colorscheme to dark variant."
+  (with-selected-frame (or frame (selected-frame))
+    (call-process-shell-command
+     (concat "xprop -f _GTK_THEME_VARIANT 8u -set"
+             " _GTK_THEME_VARIANT \"dark\" -name \""
+             (frame-parameter frame 'name)
+             "\""))))
+
+(when window-system
+  (my/set-frame-dark)
+  (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
+
+(defun my/real-buffer-p ()
+  "Determines whether buffer is real."
+  (or (and (not (minibufferp))
+           (buffer-file-name))
+      (string-equal (buffer-name) "*scratch*")))
+
+(use-package solaire-mode
+  :commands (solaire-global-mode
+             solaire-mode-swap-bg
+             turn-on-solaire-mode
+             solaire-mode-in-minibuffer
+             solaire-mode-reset)
+  :config
+  (add-hook 'focus-in-hook #'solaire-mode-reset)
+  (add-hook 'after-revert-hook #'turn-on-solaire-mode)
+  (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
+  (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
+  (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
+  :init
+  (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
+  (solaire-global-mode +1)
+  (solaire-mode-swap-bg))
+
+(defun my/fringes-in-real-buffer (&rest _)
+  "Wrapper around `set-window-fringes' function."
+  (when (my/real-buffer-p)
+    (set-window-fringes nil 8 8 nil)))
+
+(add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
+(add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
+(add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
+
+(use-package doom-modeline
+  :commands (doom-modeline-mode
+             doom-modeline-set-selected-window)
+  :init (doom-modeline-mode 1)
+  :config
+  (advice-add #'select-window :after #'doom-modeline-set-selected-window)
+  (setq doom-modeline-bar-width 3
+        doom-modeline-buffer-file-name-style 'file-name
+        doom-modeline-minor-modes t
+        find-file-visit-truename t))
+
+(use-package treemacs
+  :commands (treemacs
+             treemacs-follow-mode
+             treemacs-filewatch-mode
+             treemacs-fringe-indicator-mode
+             doom-color
+             doom-modeline-focus
+             treemacs-TAB-action)
+  :bind (("<f8>" . treemacs)
+         ("<f9>" . treemacs-select-window))
+  :config
+  (set-face-attribute 'treemacs-root-face nil
+                      :foreground (doom-color 'fg)
+                      :height 1.0
+                      :weight 'normal)
+  :init
+  (setq treemacs-width 27
+        treemacs-is-never-other-window t
+        treemacs-space-between-root-nodes nil)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode nil)
+  (when window-system
+    (treemacs)
+    (treemacs-TAB-action)))
+
+(use-package treemacs-projectile)
+
+(use-package treemacs-magit)
+
+(use-package eyebrowse
+  :commands eyebrowse-mode
+  :init
+  (eyebrowse-mode t))
+
+(use-package diff-hl
+  :commands global-diff-hl-mode
+  :init
+  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (global-diff-hl-mode 1))
+
+(defun my/setup-fringe-bitmaps ()
+  "Set fringe bitmaps."
+  (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+
+(use-package org-bullets
+  :commands org-bullets-mode
+  :config
+  (setq-default org-bullets-bullet-list
+                '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
+  :init
+  (when window-system
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+
+(use-package minions
+  :commands minions-mode
+  :config (setq minions-direct '(multiple-cursors-mode
+                                 flycheck-mode
+                                 flyspell-mode
+                                 parinfer-mode))
+  :init (minions-mode 1))
+
+(use-package eldoc-box
+  :commands eldoc-box-hover-mode
+  :config
+  (set-face-attribute 'eldoc-box-border nil :background "#191B20")
+  :init
+  (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
+  (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
+  (setq eldoc-box-max-pixel-width 1920
+        eldoc-box-max-pixel-height 1080))
+
+(when window-system
+  (setq window-divider-default-right-width 1)
+  (window-divider-mode 1))
+
 (require 'org)
-(add-hook 'org-mode-hook (lambda()
-                           (flyspell-mode)
-                           (setq default-justification 'full
-                                 org-startup-with-inline-images t
-                                 org-startup-folded 'content
-                                 org-hide-emphasis-markers t
-                                 org-adapt-indentation nil
-                                 org-hide-leading-stars t
-                                 org-highlight-latex-and-related '(latex)
-                                 revert-without-query '(".*\.pdf"))
-                           (auto-fill-mode)))
+(add-hook 'org-mode-hook
+          (lambda()
+            (flyspell-mode)
+            (setq default-justification 'full
+                  org-startup-with-inline-images t
+                  org-startup-folded 'content
+                  org-hide-emphasis-markers t
+                  org-adapt-indentation nil
+                  org-hide-leading-stars t
+                  org-highlight-latex-and-related '(latex)
+                  revert-without-query '(".*\.pdf"))
+            (auto-fill-mode)
+            (set-face-attribute 'org-document-title nil :height 1.6)
+            (set-face-attribute 'org-level-1        nil :height 1.4)
+            (set-face-attribute 'org-level-2        nil :height 1.2)
+            (set-face-attribute 'org-level-3        nil :height 1.0)))
 
 (setq org-src-fontify-natively t)
 
@@ -257,256 +508,6 @@ are defining or executing a macro."
   (add-hook 'nov-mode-hook #'visual-line-mode)
   (add-hook 'nov-mode-hook #'solaire-mode))
 
-(setq inhibit-splash-screen t
-      initial-major-mode 'org-mode
-      initial-scratch-message "")
-
-(tooltip-mode -1)
-(menu-bar-mode -1)
-(fset 'menu-bar-open nil)
-
-(when window-system
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1))
-
-(when window-system
-  (setq-default cursor-type 'bar
-                cursor-in-non-selected-windows nil))
-
-(setq-default frame-title-format '("%b — Emacs"))
-
-(when window-system
-  (set-frame-size (selected-frame) 190 52))
-
-(set-face-attribute 'default nil :font "Source Code Pro-10")
-
-(when window-system
-  (fringe-mode 0))
-
-(when window-system
-  (or standard-display-table
-      (setq standard-display-table (make-display-table)))
-  (set-display-table-slot standard-display-table 0 ?\ ))
-
-(setq mode-line-in-non-selected-windows nil)
-
-(use-package all-the-icons)
-
-(use-package doom-themes
-    :commands (doom-themes-org-config
-               doom-themes-treemacs-config)
-    :functions (all-the-icons-octicon)
-    :defines (treemacs-icon-root-png
-              doom-treemacs-use-generic-icons
-              treemacs-icon-open-png
-              treemacs-icon-closed-png
-              treemacs-icon-fallback
-              treemacs-icons-hash
-              treemacs-icon-text)
-    :init
-    (load-theme 'doom-one t)
-    (doom-themes-org-config)
-    (doom-themes-treemacs-config)
-    (eval-after-load 'treemacs
-      (lambda ()
-        "Adjust DOOM Themes settings for Treemacs.
-
-This lambda function sets root icon to be regular folder icon,
-and adds `chevron' icons to directories in order to display
-opened and closed states.  Also it indents all file icons with
-two spaces to match new directory icon indentation."
-        (unless (require 'all-the-icons nil t)
-          (error "`all-the-icons' isn't installed"))
-        (when doom-treemacs-use-generic-icons
-          (let ((all-the-icons-default-adjust 0))
-            (setq treemacs-icon-root-png
-                  (concat " " (all-the-icons-octicon
-                               "file-directory"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal))
-                          " ")
-                  treemacs-icon-open-png
-                  (concat (all-the-icons-octicon
-                           "chevron-down"
-                           :height 0.75
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "
-                          (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " ")
-                  treemacs-icon-closed-png
-                  (concat (all-the-icons-octicon
-                           "chevron-right"
-                           :height 0.9
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "
-                          (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "))
-            (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
-                  treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-                  treemacs-icon-text treemacs-icon-fallback)))
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
-                                     "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                                     "wav" "mp3" "ogg" "midi")
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
-                                     "md" "markdown" "rst" "log" "org" "txt"
-                                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-                                     "yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                                     "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
-    (add-hook 'treemacs-mode-hook (lambda ()
-                                    (setq line-spacing 4)))
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
-    (add-hook 'org-load-hook
-              (progn
-                (set-face-attribute 'org-document-title nil :height 1.6)
-                (set-face-attribute 'org-level-1        nil :height 1.4)
-                (set-face-attribute 'org-level-2        nil :height 1.2)
-                (set-face-attribute 'org-level-3        nil :height 1.0))))
-
-(defun my/set-frame-dark (&optional frame)
-  "Set FRAME titlebar colorscheme to dark variant."
-  (with-selected-frame (or frame (selected-frame))
-    (call-process-shell-command
-     (concat "xprop -f _GTK_THEME_VARIANT 8u -set"
-             " _GTK_THEME_VARIANT \"dark\" -name \""
-             (frame-parameter frame 'name)
-             "\""))))
-
-(when window-system
-  (my/set-frame-dark)
-  (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
-
-(defun my/real-buffer-p ()
-  (or (and (not (minibufferp))
-           (buffer-file-name))
-      (string-equal (buffer-name) "*scratch*")))
-
-(use-package solaire-mode
-  :commands (solaire-global-mode
-             solaire-mode-swap-bg
-             turn-on-solaire-mode
-             solaire-mode-in-minibuffer
-             solaire-mode-reset)
-  :config
-  (add-hook 'focus-in-hook #'solaire-mode-reset)
-  (add-hook 'after-revert-hook #'turn-on-solaire-mode)
-  (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
-  (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
-  (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
-  :init
-  (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
-  (solaire-global-mode +1)
-  (solaire-mode-swap-bg))
-
-(defun my/fringes-in-real-buffer (&rest _)
-  "Wrapper around `set-window-fringes' function."
-  (when (my/real-buffer-p)
-    (set-window-fringes nil 8 8 nil)))
-
-(add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
-(add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
-(add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
-
-(use-package doom-modeline
-  :commands (doom-modeline-mode)
-  :init (doom-modeline-mode 1)
-  :config
-  (advice-add #'select-window :after #'doom-modeline-set-selected-window)
-  (setq doom-modeline-bar-width 3
-        doom-modeline-buffer-file-name-style 'file-name
-        doom-modeline-major-mode-color-icon t
-        doom-modeline-minor-modes t
-        find-file-visit-truename t))
-
-(use-package treemacs
-  :commands (treemacs
-             treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode
-             doom-color
-             doom-modeline-focus)
-  :bind (("<f8>" . treemacs)
-         ("<f9>" . treemacs-select-window))
-  :config
-  (set-face-attribute 'treemacs-root-face nil
-                      :foreground (doom-color 'fg)
-                      :height 1.0
-                      :weight 'normal)
-  :init
-  (setq treemacs-width 27
-        treemacs-is-never-other-window t
-        treemacs-space-between-root-nodes nil)
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode nil)
-  (when window-system
-    (treemacs)
-    (treemacs-TAB-action)))
-
-(use-package treemacs-projectile)
-
-(use-package treemacs-magit)
-
-(use-package eyebrowse
-  :commands eyebrowse-mode
-  :init
-  (eyebrowse-mode t))
-
-(use-package diff-hl
-  :commands global-diff-hl-mode
-  :init
-  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-  (global-diff-hl-mode 1))
-
-(defun my/setup-fringe-bitmaps ()
-  "Set fringe bitmaps."
-  (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
-
-(use-package org-bullets
-  :commands org-bullets-mode
-  :config
-  (setq-default org-bullets-bullet-list
-                '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-  :init
-  (when window-system
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-
-(use-package minions
-  :commands minions-mode
-  :config (setq minions-direct '(multiple-cursors-mode
-                                 flycheck-mode
-                                 flyspell-mode
-                                 parinfer-mode))
-  :init (minions-mode 1))
-
-(use-package eldoc-box
-  :commands eldoc-box-hover-mode
-  :config
-  (set-face-attribute 'eldoc-box-border nil :background "#191B20")
-  :init
-  (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
-  (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
-  (setq eldoc-box-max-pixel-width 1920
-        eldoc-box-max-pixel-height 1080))
-
-(when window-system
-  (setq window-divider-default-right-width 1)
-  (window-divider-mode 1))
-
 (use-package hydra
   :commands (hydra-default-pre
              hydra-keyboard-quit
@@ -525,8 +526,8 @@ two spaces to match new directory icon indentation."
   :config
   (add-hook 'scheme-mode-hook 'geiser-mode)
   :init
-  (setq geiser-active-implementations '(guile)
-        geiser-default-implementation 'guile))
+  (setq-default geiser-active-implementations '(guile)
+                geiser-default-implementation 'guile))
 
 (use-package parinfer
   :commands parinfer-mode
@@ -668,6 +669,7 @@ two spaces to match new directory icon indentation."
 
 (use-package vdiff-magit
   :commands (vdiff-magit-dwim vdiff-magit)
+  :functions (transient-suffix-put)
   :bind (:map magit-mode-map
               ("e" . 'vdiff-magit-dwim)
               ("E" . 'vdiff-magit))
@@ -685,6 +687,8 @@ two spaces to match new directory icon indentation."
   (which-key-mode))
 
 (use-package multiple-cursors
+  :commands (mc/cycle-backward
+             mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydra-mc/body))
   :config (defhydra hydra-mc (:hint nil)
@@ -771,8 +775,7 @@ _-_: reduce region _)_: around pairs
   (advice-add 'imenu-list-smart-toggle :after-while
               (lambda()
                 (setq window-size-fixed 'width
-                      mode-line-format nil)
-                (other-window 1)))
+                      mode-line-format nil)))
   :init (setq imenu-list-idle-update-delay-time 0.1
               imenu-list-size 27
               imenu-list-focus-after-activation t))

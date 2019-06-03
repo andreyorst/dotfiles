@@ -346,6 +346,485 @@ All  other packages  were  split to  individual  categories much  like
 Emacs  settings above.  This  helps  me to  keep  track  of things  in
 different packages and do not rely on search that much.
 
+** User Interface
+All user interface related settings are presented in this section. I'm
+big fan of  DOOM themes, and modeline,  so I'll refer to  them quite a
+lot here.
+
+*** Default tweaks
+Emacs displays splash screen once started  with no files. I don't need
+it, and  I would like to  start with =*scratch*= buffer  instead. Also I
+would  like =*scratch*=  buffer  to be  an Org  buffer  with no  initial
+message:
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-splash-screen t
+        initial-major-mode 'org-mode
+        initial-scratch-message "")
+#+END_SRC
+
+I don't need  all these tooltips, menus and  scrollbars. Emacs enables
+all of those by default, so let's disable them as early as possible:
+
+#+BEGIN_SRC emacs-lisp
+  (tooltip-mode -1)
+  (menu-bar-mode -1)
+  (fset 'menu-bar-open nil)
+
+  (when window-system
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1))
+#+END_SRC
+
+Also let's  use bar  cursor when  in window  system, which  is visible
+only in active window:
+
+#+BEGIN_SRC emacs-lisp
+    (when window-system
+      (setq-default cursor-type 'bar
+                    cursor-in-non-selected-windows nil))
+#+END_SRC
+
+Emacs uses weird method of naming a window, I'd like to see a file I'm
+currently working  on in the task  bar in case my  Emacs was minimized
+for some reason.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default frame-title-format '("%b — Emacs"))
+#+END_SRC
+
+Also,  why initial  frame size  is so  small? When  I launch  Emacs in
+terminal it  occupies whole window.  When I launch it  under graphical
+environment it defaults to really  small window, which is smaller than
+my   terminal.  My   window   manager  doesn't   adjust  window   size
+automatically so let's just set little bit bigger initial size:
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (set-frame-size (selected-frame) 190 52))
+#+END_SRC
+
+With this size I'm  able to fire up Emacs and get  enough space to fit
+two vertically aligned windows and a file explorer together.
+
+I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
+other editor, for some reason I find this font just right for Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :font "Source Code Pro-10")
+#+END_SRC
+
+I want fringes  to appear only in certain buffers  where I really need
+them, so let's  disable it entirely on startup and  set them with some
+hooks later.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (fringe-mode 0))
+#+END_SRC
+
+But this adds another problem. Emacs displays =$= sign at the end of the
+window if line is being truncated. Damn,  why it is so hard to make it
+work how I want.. And you can't simply set =standard-display-table= slot
+to empty space, because it isn't ready on Emacs init.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (or standard-display-table
+        (setq standard-display-table (make-display-table)))
+    (set-display-table-slot standard-display-table 0 ?\ ))
+#+END_SRC
+
+Small  tweak to  mode line,  that disables  changing appearance  in non
+active window.
+
+#+BEGIN_SRC emacs-lisp
+  (setq mode-line-in-non-selected-windows nil)
+#+END_SRC
+
+Now  I can  list  some amazing  packages that  provide  some real  GUI
+goodies to Emacs.
+
+*** All The Icons
+This  package provides  nice icons  for emacs  via custom  fonts. Just
+don't forget to use =M-x all-the-icons-install-fonts RET= after install.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons)
+#+END_SRC
+
+I don't use  this package directly yet, but some  other packages, like
+[[https://github.com/hlissner/emacs-doom-themes][DOOM Themes]] do.
+
+*** DOOM Themes
+This theme collection  was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and  I find these
+themes actually great  on its own. This package  contains nice variant
+of Atom-like One theme which I like,  but it is also an amazingly well
+put package, which defines colors for pretty much everything in Emacs.
+It also features Treemacs configuration, which  is nice, but I want to
+change a little bit of it.
+
+#+BEGIN_SRC emacs-lisp
+    (use-package doom-themes
+      :commands (doom-themes-org-config
+                 doom-themes-treemacs-config)
+      :functions (all-the-icons-octicon)
+      :defines (treemacs-icon-root-png
+                doom-treemacs-use-generic-icons
+                treemacs-icon-open-png
+                treemacs-icon-closed-png
+                treemacs-icon-fallback
+                treemacs-icons-hash
+                treemacs-icon-text)
+      :init
+      (load-theme 'doom-one t)
+      (doom-themes-org-config)
+      (doom-themes-treemacs-config)
+      (eval-after-load 'treemacs
+        (lambda ()
+          "Adjust DOOM Themes settings for Treemacs.
+
+  This lambda function sets root icon to be regular folder icon,
+  and adds `chevron' icons to directories in order to display
+  opened and closed states.  Also it indents all file icons with
+  two spaces to match new directory icon indentation."
+          (unless (require 'all-the-icons nil t)
+            (error "`all-the-icons' isn't installed"))
+          (when doom-treemacs-use-generic-icons
+            (let ((all-the-icons-default-adjust 0))
+              (setq treemacs-icon-root-png
+                    (concat " " (all-the-icons-octicon
+                                 "file-directory"
+                                 :v-adjust 0
+                                 :face '(:inherit font-lock-doc-face :slant normal))
+                            " ")
+                    treemacs-icon-open-png
+                    (concat (all-the-icons-octicon
+                             "chevron-down"
+                             :height 0.75
+                             :face '(:inherit font-lock-doc-face :slant normal))
+                            " "
+                            (all-the-icons-octicon
+                             "file-directory"
+                             :v-adjust 0
+                             :face '(:inherit font-lock-doc-face :slant normal))
+                            " ")
+                    treemacs-icon-closed-png
+                    (concat (all-the-icons-octicon
+                             "chevron-right"
+                             :height 0.9
+                             :face '(:inherit font-lock-doc-face :slant normal))
+                            " "
+                            (all-the-icons-octicon
+                             "file-directory"
+                             :v-adjust 0
+                             :face '(:inherit font-lock-doc-face :slant normal))
+                            " "))
+              (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
+                    treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+                    treemacs-icon-text treemacs-icon-fallback)))
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
+                                       "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                                       "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                                       "wav" "mp3" "ogg" "midi")
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
+                                       "md" "markdown" "rst" "log" "org" "txt"
+                                       "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+                                       "yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                                       "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
+      (add-hook 'treemacs-mode-hook (lambda ()
+                                      (setq line-spacing 4)))
+      (setq doom-themes-enable-bold t
+            doom-themes-enable-italic t))
+#+END_SRC
+
+Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
+want title bar  to be dark as  well. It is quite  difficult to achieve
+this in GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/set-frame-dark (&optional frame)
+    "Set FRAME titlebar colorscheme to dark variant."
+    (with-selected-frame (or frame (selected-frame))
+      (call-process-shell-command
+       (concat "xprop -f _GTK_THEME_VARIANT 8u -set"
+               " _GTK_THEME_VARIANT \"dark\" -name \""
+               (frame-parameter frame 'name)
+               "\""))))
+#+END_SRC
+
+So  if  I  use  =window-system=  I want  this  function  to  run  during
+initialization process, and when new frame is created.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (my/set-frame-dark)
+    (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
+#+END_SRC
+
+There's also another  great package that adds nice  colors for buffers
+that are actually used for editing files: [[https://github.com/hlissner/emacs-solaire-mode][Solaire Mode]].
+
+*** Solaire Mode
+This  package helps  distinguish  buffers that  have  file opened  and
+buffers that  are for utilities  like file  browser. Also it  has cool
+name! =\[T]/=
+
+I really want  Solaire to treat =*scratch*= buffer as  real.  For that I
+need to define my  own function that will decide if  buffer is real or
+not:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/real-buffer-p ()
+    "Determines whether buffer is real."
+    (or (and (not (minibufferp))
+             (buffer-file-name))
+        (string-equal (buffer-name) "*scratch*")))
+#+END_SRC
+
+Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
+=solaire-mode-real-buffer-fn=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package solaire-mode
+    :commands (solaire-global-mode
+               solaire-mode-swap-bg
+               turn-on-solaire-mode
+               solaire-mode-in-minibuffer
+               solaire-mode-reset)
+    :config
+    (add-hook 'focus-in-hook #'solaire-mode-reset)
+    (add-hook 'after-revert-hook #'turn-on-solaire-mode)
+    (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
+    (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
+    (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
+    :init
+    (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
+    (solaire-global-mode +1)
+    (solaire-mode-swap-bg))
+#+END_SRC
+
+If only  certain buffers  could +be so  grossly incandescent+  *have damn
+fringes!* With  this package  Emacs becomes way  more like  true editor
+with  actual   graphical  interface,   but  these  fringes   drive  me
+crazy. That's why I wrote this  function, that enables fringes only in
+buffers that are affected by Solaire Mode:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/fringes-in-real-buffer (&rest _)
+    "Wrapper around `set-window-fringes' function."
+    (when (my/real-buffer-p)
+      (set-window-fringes nil 8 8 nil)))
+#+END_SRC
+
+Let's assign it to these hooks:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
+  (add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
+  (add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
+#+END_SRC
+
+Now my  buffers looks  really nice, but  my modeline  doesn't. Luckily
+there's another great package from DOOM Emacs - [[https://github.com/hlissner/doom-modeline][DOOM Modeline]].
+
+*** DOOM Modeline
+I've tried bunch of different modelines:
+
+- [[https://github.com/TheBB/spaceline][Spaceline]]
+  Great modeline, but I was  experiencing slowdowns in Emacs startup,
+  and I like my Emacs to start fast.
+- [[https://github.com/dbordak/telephone-line][Telephone Line]]
+  Another good modeline, but I was lazy to configure it.
+- [[https://github.com/milkypostman/powerline][Powerline]]
+  This was first what I tried because I was using something similar in
+  Vim. I don't remember why I dropped it.
+- [[https://github.com/tarsius/moody][Moody]]
+  Really lightweight  configuration for  default modeline,  which I've
+  used for quite a some time.
+
+They're all  great, but  I esperienced some  troubles with  DOOM Theme
+that I use,  so I've decided to  try out DOOM Modeline.  And turns out
+it's great!
+
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :commands (doom-modeline-mode
+               doom-modeline-set-selected-window)
+    :init (doom-modeline-mode 1)
+    :config
+    (advice-add #'select-window :after #'doom-modeline-set-selected-window)
+    (setq doom-modeline-bar-width 3
+          doom-modeline-buffer-file-name-style 'file-name
+          doom-modeline-minor-modes t
+          find-file-visit-truename t))
+#+END_SRC
+
+I guess that this is all for DOOM  packages for now, but I have to say
+that I really  appreciate *[[https://github.com/hlissner][@hlissner]]* work. These  packages already make
+Emacs look  outstanding. But to make  it look more like  a traditional
+modern text editor we need a  file explorer. Emacs has builtin package
+for this, named  =speedbar=, but It uses external frame  and has so many
+features  that I  don't  know  if I  really  need. Thankfully  there's
+another package that provides filetree: [[https://github.com/Alexander-Miller/treemacs][Treemacs]].
+
+*** Treemacs
+With this package, and its supplement packages I can have a consistent
+filetree inside my Emacs frame. Which  is good. But there's more: DOOM
+Themes support  this package as  well, which means that  Treemacs will
+look just as great as DOOM themed Emacs!
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs
+    :commands (treemacs
+               treemacs-follow-mode
+               treemacs-filewatch-mode
+               treemacs-fringe-indicator-mode
+               doom-color
+               doom-modeline-focus
+               treemacs-TAB-action)
+    :bind (("<f8>" . treemacs)
+           ("<f9>" . treemacs-select-window))
+    :config
+    (set-face-attribute 'treemacs-root-face nil
+                        :foreground (doom-color 'fg)
+                        :height 1.0
+                        :weight 'normal)
+    :init
+    (setq treemacs-width 27
+          treemacs-is-never-other-window t
+          treemacs-space-between-root-nodes nil)
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode nil)
+    (when window-system
+      (treemacs)
+      (treemacs-TAB-action)))
+#+END_SRC
+
+This supplement  package makes  some nice integration  with Projectile
+package that I'm using. It doesn't really need any configuration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs-projectile)
+#+END_SRC
+
+Same story with Magit integration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs-magit)
+#+END_SRC
+
+Before using Treemacs I was a  happy user of another filetree package:
+[[https://github.com/jaypei/emacs-neotree][Neotree]]. Unfortunately, last  commit to this package dates  to Nov 21,
+2018, and since then there were no maintenance, and I was experiencing
+a bug which  affects my usage of another amazing  package [[https://github.com/wasamasa/eyebrowse][Eyebrowse]] so
+I've decided to move to Treemacs, since it works fine with it.
+
+*** Eyebrowse
+This  package imitates  virtual workspaces,  or virtual  frames inside
+single Emacs  frame. This  is really  useful, when  you have  bunch of
+windows, and you  want to open new  set but don't want  to loose other
+window configurations. It works much like Vim tabs, or Tmux windows.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eyebrowse
+    :commands eyebrowse-mode
+    :init
+    (eyebrowse-mode t))
+#+END_SRC
+
+*** Diff HL Mode
+This package  provides nice way  of diffing buffers. It  displays thin
+bar inside fringe marking unstaged changes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :commands global-diff-hl-mode
+    :init
+    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    (global-diff-hl-mode 1))
+#+END_SRC
+
+But I don't quite  like how it looks. So there's  another thing that I
+borrowed from DOOM Emacs configuration. This function sets fringe diff
+highlighting bitmaps to get nice looking thin vertical bars which play
+nicely with DOOM Themes and DOOM Modeline:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/setup-fringe-bitmaps ()
+    "Set fringe bitmaps."
+    (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+
+#+END_SRC
+
+Speaking of defining fancier things.  This configuration is written in
+Org Mode, so maybe we could  have nice symbols for headings? Of course
+we can, there's a package for it: [[https://github.com/sabof/org-bullets][Org Bullets]].
+
+*** Org Bullets
+This package makes org headings use  fancy bullet symbols. But I don't
+quite like those, so I set them to these four symbols: =◉=, =○=, =•=, =◦=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :commands org-bullets-mode
+    :config
+    (setq-default org-bullets-bullet-list
+                  '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
+    :init
+    (when window-system
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+#+END_SRC
+
+*** Minions
+This  package  implements   a  menu  that  lists   all  enabled  minor
+modes. Emacs mode  line can become pretty long, so  this can be handy,
+and perhaps I don't need to use =:diminish= everywhere anymore.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package minions
+    :commands minions-mode
+    :config (setq minions-direct '(multiple-cursors-mode
+                                   flycheck-mode
+                                   flyspell-mode
+                                   parinfer-mode))
+    :init (minions-mode 1))
+#+END_SRC
+
+*** Eldoc Box
+A package that creates child frame for eldoc documentation messages.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eldoc-box
+    :commands eldoc-box-hover-mode
+    :config
+    (set-face-attribute 'eldoc-box-border nil :background "#191B20")
+    :init
+    (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
+    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
+    (setq eldoc-box-max-pixel-width 1920
+          eldoc-box-max-pixel-height 1080))
+#+END_SRC
+
+*** Window Divider
+This package changes  window dividers appearance.  I want  to set them
+to be  only 1 pixel  wide because if this  mode is turned  on, fringes
+don't loose 1 pixel of width.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (setq window-divider-default-right-width 1)
+    (window-divider-mode 1))
+#+END_SRC
+
 ** Modes
 In Emacs  world Modes  are the  main thing. I'm  using Org  Mode quite
 heavily right now, as well as  a lot of other modes. Configurations of
@@ -371,17 +850,22 @@ so all text will be folded  and re-filled after its length reaches the
 
 #+BEGIN_SRC emacs-lisp
   (require 'org)
-  (add-hook 'org-mode-hook (lambda()
-                             (flyspell-mode)
-                             (setq default-justification 'full
-                                   org-startup-with-inline-images t
-                                   org-startup-folded 'content
-                                   org-hide-emphasis-markers t
-                                   org-adapt-indentation nil
-                                   org-hide-leading-stars t
-                                   org-highlight-latex-and-related '(latex)
-                                   revert-without-query '(".*\.pdf"))
-                             (auto-fill-mode)))
+  (add-hook 'org-mode-hook
+            (lambda()
+              (flyspell-mode)
+              (setq default-justification 'full
+                    org-startup-with-inline-images t
+                    org-startup-folded 'content
+                    org-hide-emphasis-markers t
+                    org-adapt-indentation nil
+                    org-hide-leading-stars t
+                    org-highlight-latex-and-related '(latex)
+                    revert-without-query '(".*\.pdf"))
+              (auto-fill-mode)
+              (set-face-attribute 'org-document-title nil :height 1.6)
+              (set-face-attribute 'org-level-1        nil :height 1.4)
+              (set-face-attribute 'org-level-2        nil :height 1.2)
+              (set-face-attribute 'org-level-3        nil :height 1.0)))
 #+END_SRC
 
 This will fontify code inside =SRC_BLOCK= sections:
@@ -718,489 +1202,6 @@ Emacs.
     (add-hook 'nov-mode-hook #'solaire-mode))
 #+END_SRC
 
-** User Interface
-All user interface related settings are presented in this section. I'm
-big fan of  DOOM themes, and modeline,  so I'll refer to  them quite a
-lot here.
-
-*** Default tweaks
-Emacs displays splash screen once started  with no files. I don't need
-it, and  I would like to  start with =*scratch*= buffer  instead. Also I
-would  like =*scratch*=  buffer  to be  an Org  buffer  with no  initial
-message:
-
-#+BEGIN_SRC emacs-lisp
-  (setq inhibit-splash-screen t
-        initial-major-mode 'org-mode
-        initial-scratch-message "")
-#+END_SRC
-
-I don't need  all these tooltips, menus and  scrollbars. Emacs enables
-all of those by default, so let's disable them as early as possible:
-
-#+BEGIN_SRC emacs-lisp
-  (tooltip-mode -1)
-  (menu-bar-mode -1)
-  (fset 'menu-bar-open nil)
-
-  (when window-system
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1))
-#+END_SRC
-
-Also let's  use bar  cursor when  in window  system, which  is visible
-only in active window:
-
-#+BEGIN_SRC emacs-lisp
-    (when window-system
-      (setq-default cursor-type 'bar
-                    cursor-in-non-selected-windows nil))
-#+END_SRC
-
-Emacs uses weird method of naming a window, I'd like to see a file I'm
-currently working  on in the task  bar in case my  Emacs was minimized
-for some reason.
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default frame-title-format '("%b — Emacs"))
-#+END_SRC
-
-Also,  why initial  frame size  is so  small? When  I launch  Emacs in
-terminal it  occupies whole window.  When I launch it  under graphical
-environment it defaults to really  small window, which is smaller than
-my   terminal.  My   window   manager  doesn't   adjust  window   size
-automatically so let's just set little bit bigger initial size:
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (set-frame-size (selected-frame) 190 52))
-#+END_SRC
-
-With this size I'm  able to fire up Emacs and get  enough space to fit
-two vertically aligned windows and a file explorer together.
-
-I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
-other editor, for some reason I find this font just right for Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Source Code Pro-10")
-#+END_SRC
-
-I want fringes  to appear only in certain buffers  where I really need
-them, so let's  disable it entirely on startup and  set them with some
-hooks later.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (fringe-mode 0))
-#+END_SRC
-
-But this adds another problem. Emacs displays =$= sign at the end of the
-window if line is being truncated. Damn,  why it is so hard to make it
-work how I want.. And you can't simply set =standard-display-table= slot
-to empty space, because it isn't ready on Emacs init.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (or standard-display-table
-        (setq standard-display-table (make-display-table)))
-    (set-display-table-slot standard-display-table 0 ?\ ))
-#+END_SRC
-
-Small  tweak to  mode line,  that disables  changing appearance  in non
-active window.
-
-#+BEGIN_SRC emacs-lisp
-  (setq mode-line-in-non-selected-windows nil)
-#+END_SRC
-
-Now  I can  list  some amazing  packages that  provide  some real  GUI
-goodies to Emacs.
-
-*** All The Icons
-This  package provides  nice icons  for emacs  via custom  fonts. Just
-don't forget to use =M-x all-the-icons-install-fonts RET= after install.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons)
-#+END_SRC
-
-I don't use  this package directly yet, but some  other packages, like
-[[https://github.com/hlissner/emacs-doom-themes][DOOM Themes]] do.
-
-*** DOOM Themes
-This theme collection  was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and  I find these
-themes actually great  on its own. This package  contains nice variant
-of Atom-like One theme which I like,  but it is also an amazingly well
-put package, which defines colors for pretty much everything in Emacs.
-It also features Treemacs configuration, which  is nice, but I want to
-change a little bit of it.
-
-#+BEGIN_SRC emacs-lisp
-    (use-package doom-themes
-      :commands (doom-themes-org-config
-                 doom-themes-treemacs-config)
-      :functions (all-the-icons-octicon)
-      :defines (treemacs-icon-root-png
-                doom-treemacs-use-generic-icons
-                treemacs-icon-open-png
-                treemacs-icon-closed-png
-                treemacs-icon-fallback
-                treemacs-icons-hash
-                treemacs-icon-text)
-      :init
-      (load-theme 'doom-one t)
-      (doom-themes-org-config)
-      (doom-themes-treemacs-config)
-      (eval-after-load 'treemacs
-        (lambda ()
-          "Adjust DOOM Themes settings for Treemacs.
-
-  This lambda function sets root icon to be regular folder icon,
-  and adds `chevron' icons to directories in order to display
-  opened and closed states.  Also it indents all file icons with
-  two spaces to match new directory icon indentation."
-          (unless (require 'all-the-icons nil t)
-            (error "`all-the-icons' isn't installed"))
-          (when doom-treemacs-use-generic-icons
-            (let ((all-the-icons-default-adjust 0))
-              (setq treemacs-icon-root-png
-                    (concat " " (all-the-icons-octicon
-                                 "file-directory"
-                                 :v-adjust 0
-                                 :face '(:inherit font-lock-doc-face :slant normal))
-                            " ")
-                    treemacs-icon-open-png
-                    (concat (all-the-icons-octicon
-                             "chevron-down"
-                             :height 0.75
-                             :face '(:inherit font-lock-doc-face :slant normal))
-                            " "
-                            (all-the-icons-octicon
-                             "file-directory"
-                             :v-adjust 0
-                             :face '(:inherit font-lock-doc-face :slant normal))
-                            " ")
-                    treemacs-icon-closed-png
-                    (concat (all-the-icons-octicon
-                             "chevron-right"
-                             :height 0.9
-                             :face '(:inherit font-lock-doc-face :slant normal))
-                            " "
-                            (all-the-icons-octicon
-                             "file-directory"
-                             :v-adjust 0
-                             :face '(:inherit font-lock-doc-face :slant normal))
-                            " "))
-              (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
-                    treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-                    treemacs-icon-text treemacs-icon-fallback)))
-          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
-                                       "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                                       "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                                       "wav" "mp3" "ogg" "midi")
-          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
-                                       "md" "markdown" "rst" "log" "org" "txt"
-                                       "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-                                       "yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                                       "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
-      (add-hook 'treemacs-mode-hook (lambda ()
-                                      (setq line-spacing 4)))
-      (setq doom-themes-enable-bold t
-            doom-themes-enable-italic t)
-      (add-hook 'org-load-hook
-                (progn
-                  (set-face-attribute 'org-document-title nil :height 1.6)
-                  (set-face-attribute 'org-level-1        nil :height 1.4)
-                  (set-face-attribute 'org-level-2        nil :height 1.2)
-                  (set-face-attribute 'org-level-3        nil :height 1.0))))
-#+END_SRC
-
-Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
-want title bar  to be dark as  well. It is quite  difficult to achieve
-this in GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/set-frame-dark (&optional frame)
-    "Set FRAME titlebar colorscheme to dark variant."
-    (with-selected-frame (or frame (selected-frame))
-      (call-process-shell-command
-       (concat "xprop -f _GTK_THEME_VARIANT 8u -set"
-               " _GTK_THEME_VARIANT \"dark\" -name \""
-               (frame-parameter frame 'name)
-               "\""))))
-#+END_SRC
-
-So  if  I  use  =window-system=  I want  this  function  to  run  during
-initialization process, and when new frame is created.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (my/set-frame-dark)
-    (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
-#+END_SRC
-
-There's also another  great package that adds nice  colors for buffers
-that are actually used for editing files: [[https://github.com/hlissner/emacs-solaire-mode][Solaire Mode]].
-
-*** Solaire Mode
-This  package helps  distinguish  buffers that  have  file opened  and
-buffers that  are for utilities  like file  browser. Also it  has cool
-name! =\[T]/=
-
-I really want  Solaire to treat =*scratch*= buffer as  real.  For that I
-need to define my  own function that will decide if  buffer is real or
-not:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/real-buffer-p ()
-    (or (and (not (minibufferp))
-             (buffer-file-name))
-        (string-equal (buffer-name) "*scratch*")))
-#+END_SRC
-
-Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
-=solaire-mode-real-buffer-fn=.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package solaire-mode
-    :commands (solaire-global-mode
-               solaire-mode-swap-bg
-               turn-on-solaire-mode
-               solaire-mode-in-minibuffer
-               solaire-mode-reset)
-    :config
-    (add-hook 'focus-in-hook #'solaire-mode-reset)
-    (add-hook 'after-revert-hook #'turn-on-solaire-mode)
-    (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
-    (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
-    (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
-    :init
-    (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
-    (solaire-global-mode +1)
-    (solaire-mode-swap-bg))
-#+END_SRC
-
-If only  certain buffers  could +be so  grossly incandescent+  *have damn
-fringes!* With  this package  Emacs becomes way  more like  true editor
-with  actual   graphical  interface,   but  these  fringes   drive  me
-crazy. That's why I wrote this  function, that enables fringes only in
-buffers that are affected by Solaire Mode:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/fringes-in-real-buffer (&rest _)
-    "Wrapper around `set-window-fringes' function."
-    (when (my/real-buffer-p)
-      (set-window-fringes nil 8 8 nil)))
-#+END_SRC
-
-Let's assign it to these hooks:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
-  (add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
-  (add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
-#+END_SRC
-
-Now my  buffers looks  really nice, but  my modeline  doesn't. Luckily
-there's another great package from DOOM Emacs - [[https://github.com/hlissner/doom-modeline][DOOM Modeline]].
-
-*** DOOM Modeline
-I've tried bunch of different modelines:
-
-- [[https://github.com/TheBB/spaceline][Spaceline]]
-  Great modeline, but I was  experiencing slowdowns in Emacs startup,
-  and I like my Emacs to start fast.
-- [[https://github.com/dbordak/telephone-line][Telephone Line]]
-  Another good modeline, but I was lazy to configure it.
-- [[https://github.com/milkypostman/powerline][Powerline]]
-  This was first what I tried because I was using something similar in
-  Vim. I don't remember why I dropped it.
-- [[https://github.com/tarsius/moody][Moody]]
-  Really lightweight  configuration for  default modeline,  which I've
-  used for quite a some time.
-
-They're all  great, but  I esperienced some  troubles with  DOOM Theme
-that I use,  so I've decided to  try out DOOM Modeline.  And turns out
-it's great!
-
-#+BEGIN_SRC emacs-lisp
-  (use-package doom-modeline
-    :commands (doom-modeline-mode)
-    :init (doom-modeline-mode 1)
-    :config
-    (advice-add #'select-window :after #'doom-modeline-set-selected-window)
-    (setq doom-modeline-bar-width 3
-          doom-modeline-buffer-file-name-style 'file-name
-          doom-modeline-major-mode-color-icon t
-          doom-modeline-minor-modes t
-          find-file-visit-truename t))
-#+END_SRC
-
-I guess that this is all for DOOM  packages for now, but I have to say
-that I really  appreciate *[[https://github.com/hlissner][@hlissner]]* work. These  packages already make
-Emacs look  outstanding. But to make  it look more like  a traditional
-modern text editor we need a  file explorer. Emacs has builtin package
-for this, named  =speedbar=, but It uses external frame  and has so many
-features  that I  don't  know  if I  really  need. Thankfully  there's
-another package that provides filetree: [[https://github.com/Alexander-Miller/treemacs][Treemacs]].
-
-*** Treemacs
-With this package, and its supplement packages I can have a consistent
-filetree inside my Emacs frame. Which  is good. But there's more: DOOM
-Themes support  this package as  well, which means that  Treemacs will
-look just as great as DOOM themed Emacs!
-
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs
-    :commands (treemacs
-               treemacs-follow-mode
-               treemacs-filewatch-mode
-               treemacs-fringe-indicator-mode
-               doom-color
-               doom-modeline-focus)
-    :bind (("<f8>" . treemacs)
-           ("<f9>" . treemacs-select-window))
-    :config
-    (set-face-attribute 'treemacs-root-face nil
-                        :foreground (doom-color 'fg)
-                        :height 1.0
-                        :weight 'normal)
-    :init
-    (setq treemacs-width 27
-          treemacs-is-never-other-window t
-          treemacs-space-between-root-nodes nil)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode nil)
-    (when window-system
-      (treemacs)
-      (treemacs-TAB-action)))
-#+END_SRC
-
-This supplement  package makes  some nice integration  with Projectile
-package that I'm using. It doesn't really need any configuration.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs-projectile)
-#+END_SRC
-
-Same story with Magit integration.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs-magit)
-#+END_SRC
-
-Before using Treemacs I was a  happy user of another filetree package:
-[[https://github.com/jaypei/emacs-neotree][Neotree]]. Unfortunately, last  commit to this package dates  to Nov 21,
-2018, and since then there were no maintenance, and I was experiencing
-a bug which  affects my usage of another amazing  package [[https://github.com/wasamasa/eyebrowse][Eyebrowse]] so
-I've decided to move to Treemacs, since it works fine with it.
-
-*** Eyebrowse
-This  package imitates  virtual workspaces,  or virtual  frames inside
-single Emacs  frame. This  is really  useful, when  you have  bunch of
-windows, and you  want to open new  set but don't want  to loose other
-window configurations. It works much like Vim tabs, or Tmux windows.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package eyebrowse
-    :commands eyebrowse-mode
-    :init
-    (eyebrowse-mode t))
-#+END_SRC
-
-*** Diff HL Mode
-This package  provides nice way  of diffing buffers. It  displays thin
-bar inside fringe marking unstaged changes.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package diff-hl
-    :commands global-diff-hl-mode
-    :init
-    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (global-diff-hl-mode 1))
-#+END_SRC
-
-But I don't quite  like how it looks. So there's  another thing that I
-borrowed from DOOM Emacs configuration. This function sets fringe diff
-highlighting bitmaps to get nice looking thin vertical bars which play
-nicely with DOOM Themes and DOOM Modeline:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/setup-fringe-bitmaps ()
-    "Set fringe bitmaps."
-    (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
-
-#+END_SRC
-
-Speaking of defining fancier things.  This configuration is written in
-Org Mode, so maybe we could  have nice symbols for headings? Of course
-we can, there's a package for it: [[https://github.com/sabof/org-bullets][Org Bullets]].
-
-*** Org Bullets
-This package makes org headings use  fancy bullet symbols. But I don't
-quite like those, so I set them to these four symbols: =◉=, =○=, =•=, =◦=.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :commands org-bullets-mode
-    :config
-    (setq-default org-bullets-bullet-list
-                  '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-    :init
-    (when window-system
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-#+END_SRC
-
-*** Minions
-This  package  implements   a  menu  that  lists   all  enabled  minor
-modes. Emacs mode  line can become pretty long, so  this can be handy,
-and perhaps I don't need to use =:diminish= everywhere anymore.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package minions
-    :commands minions-mode
-    :config (setq minions-direct '(multiple-cursors-mode
-                                   flycheck-mode
-                                   flyspell-mode
-                                   parinfer-mode))
-    :init (minions-mode 1))
-#+END_SRC
-
-*** Eldoc Box
-A package that creates child frame for eldoc documentation messages.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package eldoc-box
-    :commands eldoc-box-hover-mode
-    :config
-    (set-face-attribute 'eldoc-box-border nil :background "#191B20")
-    :init
-    (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
-    (setq eldoc-box-max-pixel-width 1920
-          eldoc-box-max-pixel-height 1080))
-#+END_SRC
-
-*** Window Divider
-This package changes  window dividers appearance.  I want  to set them
-to be  only 1 pixel  wide because if this  mode is turned  on, fringes
-don't loose 1 pixel of width.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (setq window-divider-default-right-width 1)
-    (window-divider-mode 1))
-#+END_SRC
-
 ** Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
@@ -1242,8 +1243,8 @@ here, since it also provides completion for it.
     :config
     (add-hook 'scheme-mode-hook 'geiser-mode)
     :init
-    (setq geiser-active-implementations '(guile)
-          geiser-default-implementation 'guile))
+    (setq-default geiser-active-implementations '(guile)
+                  geiser-default-implementation 'guile))
 #+END_SRC
 
 *** Parinfer
@@ -1498,6 +1499,7 @@ gonna try it out.
 #+BEGIN_SRC emacs-lisp
   (use-package vdiff-magit
     :commands (vdiff-magit-dwim vdiff-magit)
+    :functions (transient-suffix-put)
     :bind (:map magit-mode-map
                 ("e" . 'vdiff-magit-dwim)
                 ("E" . 'vdiff-magit))
@@ -1529,6 +1531,8 @@ guess I'll figure out best mappings over time.
 
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
+    :commands (mc/cycle-backward
+               mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
            ("C-c m" . hydra-mc/body))
     :config (defhydra hydra-mc (:hint nil)
@@ -1674,8 +1678,7 @@ when =imenu-list= was toggled to be shown.
     (advice-add 'imenu-list-smart-toggle :after-while
                 (lambda()
                   (setq window-size-fixed 'width
-                        mode-line-format nil)
-                  (other-window 1)))
+                        mode-line-format nil)))
     :init (setq imenu-list-idle-update-delay-time 0.1
                 imenu-list-size 27
                 imenu-list-focus-after-activation t))

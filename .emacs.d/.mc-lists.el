@@ -23,9 +23,9 @@
         parinfer-backward-delete-char
         parinfer-double-quote
         parinfer-region-delete-region
+        parinfer-semicolon
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
-        parinfer-semicolon
         ))
 
 (setq mc/cmds-to-run-once
@@ -48,4 +48,5 @@
         minions-minor-modes-menu
         org-shifttab
         parinfer-mouse-drag-region
+        yank-rectangle
         ))
