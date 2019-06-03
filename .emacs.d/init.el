@@ -115,6 +115,9 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
+(when (executable-find "fd")
+  (setq find-program "fd"))
+
 (defun my/escape ()
   "Quit in current context.
 
@@ -613,10 +616,11 @@ two spaces to match new directory icon indentation."
   (ivy-mode 1))
 
 (use-package counsel
+  :init (when (executable-find "fd")
+          (setq counsel-file-jump-args "-L --type f --hidden"))
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x p" . counsel-file-jump)
-         ("C-x f" . counsel-fzf)
          ("C-x C-r" . counsel-recentf)
          ("C-c g" . counsel-git-grep)
          ("C-c r" . counsel-rg)
