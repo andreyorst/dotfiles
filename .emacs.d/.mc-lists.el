@@ -30,6 +30,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        counsel-describe-function
         hydra-er/body
         hydra-mc/body
         hydra-mc/lambda-M-s
@@ -46,6 +47,7 @@
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
         minions-minor-modes-menu
+        org-edit-src-save
         org-shifttab
         parinfer-mouse-drag-region
         yank-rectangle
