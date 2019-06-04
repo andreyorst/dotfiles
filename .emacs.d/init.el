@@ -54,8 +54,7 @@
 (setq-default indent-tabs-mode nil
               scroll-step 1
               scroll-conservatively 10000
-              auto-window-vscroll nil
-              scroll-margin 3)
+              auto-window-vscroll nil)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
@@ -136,77 +135,75 @@ are defining or executing a macro."
 (use-package all-the-icons)
 
 (use-package doom-themes
-    :commands (doom-themes-org-config
-               doom-themes-treemacs-config)
-    :functions (all-the-icons-octicon)
-    :defines (treemacs-icon-root-png
-              doom-treemacs-use-generic-icons
-              treemacs-icon-open-png
-              treemacs-icon-closed-png
-              treemacs-icon-fallback
-              treemacs-icons-hash
-              treemacs-icon-text)
-    :init
-    (load-theme 'doom-one t)
-    (doom-themes-org-config)
-    (doom-themes-treemacs-config)
-    (eval-after-load 'treemacs
-      (lambda ()
-        "Adjust DOOM Themes settings for Treemacs.
+  :commands (doom-themes-org-config
+             doom-themes-treemacs-config)
+  :functions (all-the-icons-octicon)
+  :defines (treemacs-icon-root-png
+            doom-treemacs-use-generic-icons
+            treemacs-icon-open-png
+            treemacs-icon-closed-png
+            treemacs-icon-fallback
+            treemacs-icons-hash
+            treemacs-icon-text)
+  :init
+  (load-theme 'doom-one t)
+  (doom-themes-org-config)
+  (doom-themes-treemacs-config)
+  (eval-after-load 'treemacs
+    (lambda ()
+      "Adjust DOOM Themes settings for Treemacs.
 
 This lambda function sets root icon to be regular folder icon,
 and adds `chevron' icons to directories in order to display
 opened and closed states.  Also it indents all file icons with
 two spaces to match new directory icon indentation."
-        (unless (require 'all-the-icons nil t)
-          (error "`all-the-icons' isn't installed"))
-        (when doom-treemacs-use-generic-icons
-          (let ((all-the-icons-default-adjust 0))
-            (setq treemacs-icon-root-png
-                  (concat " " (all-the-icons-octicon
-                               "file-directory"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal))
-                          " ")
-                  treemacs-icon-open-png
-                  (concat (all-the-icons-octicon
-                           "chevron-down"
-                           :height 0.75
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "
-                          (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " ")
-                  treemacs-icon-closed-png
-                  (concat (all-the-icons-octicon
-                           "chevron-right"
-                           :height 0.9
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "
-                          (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "))
-            (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
-                  treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-                  treemacs-icon-text treemacs-icon-fallback)))
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
-                                     "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                                     "wav" "mp3" "ogg" "midi")
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
-                                     "md" "markdown" "rst" "log" "org" "txt"
-                                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-                                     "yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                                     "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
-    (add-hook 'treemacs-mode-hook (lambda ()
-                                    (setq line-spacing 4)))
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t))
+      (unless (require 'all-the-icons nil t)
+        (error "`all-the-icons' isn't installed"))
+      (when doom-treemacs-use-generic-icons
+        (let ((all-the-icons-default-adjust 0))
+          (setq treemacs-icon-root-png
+                (concat " " (all-the-icons-octicon
+                             "file-directory"
+                             :v-adjust 0
+                             :face '(:inherit font-lock-doc-face :slant normal))
+                        " ")
+                treemacs-icon-open-png
+                (concat (all-the-icons-octicon
+                         "chevron-down"
+                         :height 0.75
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        " "
+                        (all-the-icons-octicon
+                         "file-directory"
+                         :v-adjust 0
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        " ")
+                treemacs-icon-closed-png
+                (concat (all-the-icons-octicon
+                         "chevron-right"
+                         :height 0.9
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        " "
+                        (all-the-icons-octicon
+                         "file-directory"
+                         :v-adjust 0
+                         :face '(:inherit font-lock-doc-face :slant normal))
+                        " "))
+          (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
+                treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+                treemacs-icon-text treemacs-icon-fallback)))
+      (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
+                                   "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                                   "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                                   "wav" "mp3" "ogg" "midi")
+      (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
+                                   "md" "markdown" "rst" "log" "org" "txt"
+                                   "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
+      (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+                                   "yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                                   "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t))
 
 (defun my/set-frame-dark (&optional frame)
   "Set FRAME titlebar colorscheme to dark variant."
@@ -244,22 +241,40 @@ two spaces to match new directory icon indentation."
   (solaire-global-mode +1)
   (solaire-mode-swap-bg))
 
-(defun my/fringes-in-real-buffer (&rest _)
+(defun my/real-buffer-setup (&rest _)
   "Wrapper around `set-window-fringes' function."
   (when (my/real-buffer-p)
-    (set-window-fringes nil 8 8 nil)))
+    (set-window-fringes nil 8 8 nil)
+    (setq scroll-margin 3)))
 
-(add-hook 'window-configuration-change-hook 'my/fringes-in-real-buffer)
-(add-hook 'org-capture-mode-hook 'my/fringes-in-real-buffer)
-(add-hook 'org-src-mode-hook 'my/fringes-in-real-buffer)
+(add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
+(add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
+(add-hook 'org-src-mode-hook 'my/real-buffer-setup)
 
 (use-package doom-modeline
   :commands (doom-modeline-mode
              doom-modeline-set-selected-window)
   :init (doom-modeline-mode 1)
+  (set-face-attribute 'doom-modeline-buffer-path nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (doom-color 'fg) :weight 'semi-bold)
+  (set-face-attribute 'doom-modeline-buffer-modified nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-buffer-major-mode nil :foreground (doom-color 'fg) :weight 'semi-bold)
+  (set-face-attribute 'doom-modeline-buffer-minor-mode nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-project-parent-dir nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-project-dir nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-project-root-dir nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-highlight nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-panel nil :foreground (doom-color 'fg) :background (doom-color 'bg-alt))
+  (set-face-attribute 'doom-modeline-debug nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-info nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-warning nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-urgent nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-unread-number nil :foreground (doom-color 'fg) :weight 'normal)
+  (set-face-attribute 'doom-modeline-bar nil :foreground (doom-color 'fg) :background (doom-color 'bg-alt) :weight 'normal)
   :config
   (advice-add #'select-window :after #'doom-modeline-set-selected-window)
   (setq doom-modeline-bar-width 3
+        doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
         find-file-visit-truename t))
@@ -280,6 +295,9 @@ two spaces to match new directory icon indentation."
                       :height 1.0
                       :weight 'normal)
   :init
+  (add-hook 'treemacs-mode-hook
+            (lambda ()
+              (setq line-spacing 4)))
   (setq treemacs-width 27
         treemacs-is-never-other-window t
         treemacs-space-between-root-nodes nil)
@@ -568,6 +586,7 @@ two spaces to match new directory icon indentation."
 (use-package counsel
   :init (when (executable-find "fd")
           (setq counsel-file-jump-args "-L --type f --hidden"))
+  (setq counsel-rg-base-command "rg -S --no-heading --hidden --line-number --color never %s .")
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x p" . counsel-file-jump)
