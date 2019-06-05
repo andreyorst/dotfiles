@@ -48,6 +48,7 @@
         hydra-mc/mc/vertical-align-with-space
         iedit-switch-to-mc-mode
         minions-minor-modes-menu
+        mouse-set-region
         org-edit-src-save
         org-shifttab
         parinfer-mouse-drag-region

@@ -249,7 +249,19 @@ file.
   (load custom-file :noerror)
 #+END_SRC
 
-I'm not sure why it isn't default.
+I also don't like that Emacs  has disabled commands, and enabling them
+modifies  my =init.el=  that  I  don't modify  myself.  Let's put  those
+commands to =custom.el= instead:
+
+#+BEGIN_SRC emacs-lisp
+  (defadvice en/disable-command (around put-in-custom-file activate)
+    "Put declarations in `custom-file'."
+    (let ((user-init-file custom-file))
+      ad-do-it))
+#+END_SRC
+
+Another feature I  want is history between sessions. I'm  not sure why
+it isn't default.
 
 #+BEGIN_SRC emacs-lisp
   (savehist-mode 1)
@@ -309,8 +321,6 @@ active window:
            (if (minibufferp)
                (minibuffer-keyboard-quit)
              (abort-recursive-edit)))
-          ((bound-and-true-p iedit-mode)
-           (iedit-mode))
           (t
            ;; ignore top level quits for macros
            (unless (or defining-kbd-macro executing-kbd-macro)
@@ -1345,6 +1355,7 @@ variable, so it will be more performant with =fd=.
     (setq counsel-rg-base-command "rg -S --no-heading --hidden --line-number --color never %s .")
     :bind (("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
+           ("C-x f" . counsel-find-file)
            ("C-x p" . counsel-file-jump)
            ("C-x C-r" . counsel-recentf)
            ("C-c g" . counsel-git-grep)
@@ -1592,50 +1603,6 @@ like.
   (use-package mc-extras
     :config
     (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
-#+END_SRC
-
-*** Iedit
-This  is nice  package  that provides  something  similar to  multiple
-cursors, but  it's not actually multiple  cursors. I'd like to  use it
-when I  know that  multiple cursors  will cause  lot of  overhead. But
-unfortunately  =iedit-mode=  automatically  selects all  occurrences  in
-current buffer, which can be a  *lot* of occurrences. To prevent this, I
-wrote =my/iedit-select-current-or-add= function,  that enters =iedit-mode=
-and immediately restricts  it to current line, after  that removes all
-occurrences before and  after current. I know, that /Ctrl  + d/ is bound
-to =delete-char=, but  I rarely use it,  and I already built  a habit to
-use this shortcut  to add multiple cursors. With the  function above I
-can use Iedit for that.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package iedit
-    :commands (iedit-expand-down-to-occurrence
-               iedit-restrict-current-line
-               iedit-prev-occurrence
-               iedit-toggle-selection
-               iedit-next-occurrence
-               iedit-counter
-               iedit-goto-last-occurrence
-               iedit-mode)
-    :init
-    (defun my/iedit-select-current-or-add ()
-      "Select only current occurrence with `iedit-mode'.  Expand to
-  next occurrence if iedit mode is already active."
-      (interactive)
-      (if (bound-and-true-p iedit-mode)
-          (iedit-expand-down-to-occurrence)
-        (progn
-          (iedit-mode)
-          (iedit-restrict-current-line)
-          (while (> iedit-occurrence-index 1)
-            (iedit-prev-occurrence)
-            (iedit-toggle-selection)
-            (iedit-next-occurrence))
-          (while (> (iedit-counter) 1)
-            (iedit-goto-last-occurrence)
-            (iedit-toggle-selection))
-          (iedit-goto-last-occurrence))))
-    :bind (("C-d" . my/iedit-select-current-or-add)))
 #+END_SRC
 
 *** Expand Region

@@ -59,6 +59,11 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
 
+(defadvice en/disable-command (around put-in-custom-file activate)
+  "Put declarations in `custom-file'."
+  (let ((user-init-file custom-file))
+    ad-do-it))
+
 (savehist-mode 1)
 
 (setq default-input-method 'russian-computer)
@@ -86,8 +91,6 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
-        ((bound-and-true-p iedit-mode)
-         (iedit-mode))
         (t
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
@@ -594,6 +597,7 @@ two spaces to match new directory icon indentation."
   (setq counsel-rg-base-command "rg -S --no-heading --hidden --line-number --color never %s .")
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
+         ("C-x f" . counsel-find-file)
          ("C-x p" . counsel-file-jump)
          ("C-x C-r" . counsel-recentf)
          ("C-c g" . counsel-git-grep)
@@ -740,35 +744,6 @@ _C_:   select next line"
 (use-package mc-extras
   :config
   (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
-
-(use-package iedit
-  :commands (iedit-expand-down-to-occurrence
-             iedit-restrict-current-line
-             iedit-prev-occurrence
-             iedit-toggle-selection
-             iedit-next-occurrence
-             iedit-counter
-             iedit-goto-last-occurrence
-             iedit-mode)
-  :init
-  (defun my/iedit-select-current-or-add ()
-    "Select only current occurrence with `iedit-mode'.  Expand to
-next occurrence if iedit mode is already active."
-    (interactive)
-    (if (bound-and-true-p iedit-mode)
-        (iedit-expand-down-to-occurrence)
-      (progn
-        (iedit-mode)
-        (iedit-restrict-current-line)
-        (while (> iedit-occurrence-index 1)
-          (iedit-prev-occurrence)
-          (iedit-toggle-selection)
-          (iedit-next-occurrence))
-        (while (> (iedit-counter) 1)
-          (iedit-goto-last-occurrence)
-          (iedit-toggle-selection))
-        (iedit-goto-last-occurrence))))
-  :bind (("C-d" . my/iedit-select-current-or-add)))
 
 (use-package expand-region
   :commands (er/expand-region
