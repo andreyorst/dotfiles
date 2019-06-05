@@ -86,6 +86,8 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
+        ((bound-and-true-p iedit-mode)
+         (iedit-mode))
         (t
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
