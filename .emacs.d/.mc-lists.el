@@ -7,6 +7,8 @@
         c-electric-paren
         c-electric-semi&comma
         c-indent-line-or-region
+        counsel-M-x
+        downcase-region
         electric-newline-and-maybe-indent
         forward-sexp
         hydra-er/er/contract-region
