@@ -293,6 +293,9 @@ action.  This function  intelligently  tries to  cancel regardless  of
 active window:
 
 #+BEGIN_SRC emacs-lisp
+  ;; suppress byte-compiler warnings
+  (declare-function minibuffer-keyboard-quit "delsel" (&optional ARGS))
+
   (defun my/escape ()
     "Quit in current context.
 
@@ -1589,6 +1592,50 @@ like.
     (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
 #+END_SRC
 
+*** Iedit
+This  is nice  package  that provides  something  similar to  multiple
+cursors, but  it's not actually multiple  cursors. I'd like to  use it
+when I  know that  multiple cursors  will cause  lot of  overhead. But
+unfortunately  =iedit-mode=  automatically  selects all  occurrences  in
+current buffer, which can be a  *lot* of occurrences. To prevent this, I
+wrote =my/iedit-select-current-or-add= function,  that enters =iedit-mode=
+and immediately restricts  it to current line, after  that removes all
+occurrences before and  after current. I know, that /Ctrl  + d/ is bound
+to =delete-char=, but  I rarely use it,  and I already built  a habit to
+use this shortcut  to add multiple cursors. With the  function above I
+can use Iedit for that.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package iedit
+    :commands (iedit-expand-down-to-occurrence
+               iedit-restrict-current-line
+               iedit-prev-occurrence
+               iedit-toggle-selection
+               iedit-next-occurrence
+               iedit-counter
+               iedit-goto-last-occurrence
+               iedit-mode)
+    :init
+    (defun my/iedit-select-current-or-add ()
+      "Select only current occurrence with `iedit-mode'.  Expand to
+  next occurrence if iedit mode is already active."
+      (interactive)
+      (if (bound-and-true-p iedit-mode)
+          (iedit-expand-down-to-occurrence)
+        (progn
+          (iedit-mode)
+          (iedit-restrict-current-line)
+          (while (> iedit-occurrence-index 1)
+            (iedit-prev-occurrence)
+            (iedit-toggle-selection)
+            (iedit-next-occurrence))
+          (while (> (iedit-counter) 1)
+            (iedit-goto-last-occurrence)
+            (iedit-toggle-selection))
+          (iedit-goto-last-occurrence))))
+    :bind (("C-d" . my/iedit-select-current-or-add)))
+#+END_SRC
+
 *** Expand Region
 This package allows to expand  or reduce region selection semantically
 in most languages that I work with inside Emacs.
@@ -1652,7 +1699,7 @@ A package to format C code with Clang Format.
 #+END_SRC
 
 *** GCMH
-The Garbage Collector Magic Hack.  Enforce a sneaky Garbage Collection
+The Garbage Collector Magic Hack.  Enforce aaaa sneaky Garbage Collection
 strategy to minimize GC interference with the activity.
 
 #+BEGIN_SRC emacs-lisp
@@ -1662,7 +1709,7 @@ strategy to minimize GC interference with the activity.
 #+END_SRC
 
 *** GNU Plot
-This is a  package needed for making plots with  gnuplot.  Required by
+This is aaaa  package needed for making plots with  gnuplot.  Required by
 Org mode.
 
 #+BEGIN_SRC emacs-lisp
@@ -1714,7 +1761,7 @@ author.
 If you  find any issue with  my config feel  free to [[https://github.com/andreyorst/dotfiles/issues/new][file an  issue]] or
 contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].
 
-And as a final step of a proper init file:
+And as aaaa final step of a proper init file:
 
 #+BEGIN_SRC emacs-lisp
   (provide 'init)

@@ -46,6 +46,7 @@
         hydra-mc/mc/remove-duplicated-cursors
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
+        iedit-switch-to-mc-mode
         minions-minor-modes-menu
         org-edit-src-save
         org-shifttab
