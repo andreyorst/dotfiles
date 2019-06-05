@@ -253,7 +253,7 @@ two spaces to match new directory icon indentation."
   "Wrapper around `set-window-fringes' function."
   (when (my/real-buffer-p)
     (set-window-fringes nil 8 8 nil)
-    (setq scroll-margin 3)))
+    (setq-local scroll-margin 3)))
 
 (add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
 (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
@@ -285,6 +285,7 @@ two spaces to match new directory icon indentation."
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
+        doom-modeline-lsp nil
         find-file-visit-truename t))
 
 (use-package treemacs
@@ -489,6 +490,16 @@ two spaces to match new directory icon indentation."
                   c-default-style "linux"
                   indent-tabs-mode t
                   tab-width 4)))
+
+(mapc (lambda (mode)
+        (progn
+          (font-lock-add-keywords
+           mode
+           '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)
+             ("\\(->\\|\\.\\) *\\<\\([_a-zA-Z]\\w+\\)" 2 'error)
+             ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'all-the-icons-lorange)
+             ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]" 0 'font-lock-constant-face)))))
+      '(c-mode c++-mode))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
