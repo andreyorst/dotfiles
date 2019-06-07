@@ -545,6 +545,28 @@ two spaces to match new directory icon indentation."
   (add-hook 'nov-mode-hook #'visual-line-mode)
   (add-hook 'nov-mode-hook #'solaire-mode))
 
+(defun my/ansi-term-toggle ()
+  "Toggle ansi-term window on and off with the same command."
+  (interactive)
+  (cond ((get-buffer-window "*ansi-term*")
+         (ignore-errors (delete-window
+                         (get-buffer-window "*ansi-term*"))))
+        (t (split-window-below)
+           (other-window 1)
+           (cond ((get-buffer "*ansi-term*")
+                  (switch-to-buffer "*ansi-term*"))
+                 (t (ansi-term "bash"))))))
+
+(global-set-key (kbd "C-`") 'my/ansi-term-toggle)
+
+(defun my/autokill-when-no-processes (&rest _)
+  "Kill buffer and its window when there's no processes left."
+  (when (null (get-buffer-process (current-buffer)))
+      (kill-buffer (current-buffer))
+      (delete-window)))
+
+(advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
+
 (use-package hydra
   :commands (hydra-default-pre
              hydra-keyboard-quit

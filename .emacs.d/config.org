@@ -1254,6 +1254,43 @@ Emacs.
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
 
+*** Ansi Term
+I'm using  it more  and more,  so I've  decided that  I should  have a
+proper  shortcut  for it.  This  function  toggles bottom  split  with
+=ansi-term= inside it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/ansi-term-toggle ()
+    "Toggle ansi-term window on and off with the same command."
+    (interactive)
+    (cond ((get-buffer-window "*ansi-term*")
+           (ignore-errors (delete-window
+                           (get-buffer-window "*ansi-term*"))))
+          (t (split-window-below)
+             (other-window 1)
+             (cond ((get-buffer "*ansi-term*")
+                    (switch-to-buffer "*ansi-term*"))
+                   (t (ansi-term "bash"))))))
+#+END_SRC
+
+/Ctrl+`/ seems great shortcut for this.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-`") 'my/ansi-term-toggle)
+#+END_SRC
+
+Also, when I exit terminal, I'd like to kill its window automatically:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/autokill-when-no-processes (&rest _)
+    "Kill buffer and its window when there's no processes left."
+    (when (null (get-buffer-process (current-buffer)))
+        (kill-buffer (current-buffer))
+        (delete-window)))
+
+  (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
+#+END_SRC
+
 *** Hydra
 Hydra is  something like ability to  create mappings that sit  in it's
 own mode, like different user modes  in Kakoune. It allows me to press
