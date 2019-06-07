@@ -529,6 +529,14 @@ two spaces to match new directory icon indentation."
   :config
   (add-hook 'rust-mode-hook 'cargo-minor-mode))
 
+(modify-syntax-entry ?_ "w" rust-mode-syntax-table)
+(font-lock-add-keywords
+ 'rust-mode
+ '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)
+   ("\\. *\\<\\([_a-zA-Z]\\w+\\)" 1 'error)
+   ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'all-the-icons-lorange)
+   ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]" 0 'font-lock-constant-face)))
+
 (use-package toml-mode)
 
 (use-package editorconfig
@@ -631,7 +639,7 @@ two spaces to match new directory icon indentation."
   (setq counsel-rg-base-command
         "rg -S --no-heading --hidden --line-number --color never %s .")
   (setenv "FZF_DEFAULT_COMMAND"
-          "rg --files --hidden --no-ignore --no-messages --smart-case --glob '!.git/*' --glob '!.svn/*'")
+          "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'")
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x f" . counsel-fzf)
