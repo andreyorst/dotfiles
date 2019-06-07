@@ -625,12 +625,16 @@ two spaces to match new directory icon indentation."
   (setq find-program "fd"))
 
 (use-package counsel
-  :init (when (executable-find "fd")
-          (setq counsel-file-jump-args "-L --type f --hidden"))
-  (setq counsel-rg-base-command "rg -S --no-heading --hidden --line-number --color never %s .")
+  :init
+  (when (executable-find "fd")
+    (setq counsel-file-jump-args "-L --type f --hidden"))
+  (setq counsel-rg-base-command
+        "rg -S --no-heading --hidden --line-number --color never %s .")
+  (setenv "FZF_DEFAULT_COMMAND"
+          "rg --files --hidden --no-ignore --no-messages --smart-case --glob '!.git/*' --glob '!.svn/*'")
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
-         ("C-x f" . counsel-find-file)
+         ("C-x f" . counsel-fzf)
          ("C-x p" . counsel-file-jump)
          ("C-x C-r" . counsel-recentf)
          ("C-c g" . counsel-git-grep)
