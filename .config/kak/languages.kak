@@ -75,7 +75,7 @@ hook global ModuleLoad rust %{ try %{ evaluate-commands %sh{
     join() { sep=$2; eval set -- $1; IFS="$sep"; echo "$*"; }
 
     # Highlight functions ignoring Rust specific keywords
-    printf "%s\n" "add-highlighter shared/rust/code/functions regex ([_a-z]?\w*)\b($(join '${rust_keywords}' '|'))?\h*(?=\() 1:function"
+    printf "%s\n" "add-highlighter shared/rust/code/functions regex ([a-z_]*?\w*?)\b($(join '${rust_keywords}' '|'))?\h*(?=\() 1:function"
 
     # Common highlightings for Rust
     printf "%s\n" "add-highlighter shared/rust/code/field     regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?\b(?![>\"\(]) 0:meta

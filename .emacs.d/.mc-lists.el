@@ -49,6 +49,7 @@
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
         iedit-switch-to-mc-mode
+        magit-refresh-all
         minions-minor-modes-menu
         mouse-set-region
         org-edit-src-save
