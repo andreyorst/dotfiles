@@ -535,7 +535,7 @@ two spaces to match new directory icon indentation."
  '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)
    ("\\. *\\<\\([_a-zA-Z]\\w+\\)" 1 'error)
    ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'all-the-icons-lorange)
-   ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]" 0 'font-lock-constant-face)))
+   ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]\\|\\^" 0 'font-lock-constant-face)))
 
 (use-package toml-mode)
 
