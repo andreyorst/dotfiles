@@ -530,16 +530,14 @@ two spaces to match new directory icon indentation."
   :config
   (add-hook 'rust-mode-hook 'cargo-minor-mode))
 
-(add-hook 'rust-mode-hook
-          (lambda ()
-            (modify-syntax-entry ?_ "w" rust-mode-syntax-table)
-            (font-lock-add-keywords
-             'rust-mode
-             '(("\\<\\(\\sw+\\) *(" 1 'font-lock-function-name-face)
-               ("\\. *\\<\\([_a-zA-Z]\\w+\\)" 1 'error)
-               ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'all-the-icons-lorange)
-               ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]\\|\\^" 0 'font-lock-constant-face))
-             t)))
+(modify-syntax-entry ?_ "w" rust-mode-syntax-table)
+(font-lock-add-keywords
+ 'rust-mode
+ '(("\\<\\(\\sw+\\) *(" 1 'font-lock-function-name-face)
+   ("\\. *\\<\\([_a-zA-Z]\\w+\\)" 1 'error)
+   ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'all-the-icons-lorange)
+   ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]\\|\\^" 0 'font-lock-constant-face))
+ t)
 
 (use-package toml-mode)
 
