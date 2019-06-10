@@ -132,10 +132,12 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
-plug "occivink/kakoune-snippets" branch "auto-discard" config %{
+plug "andreyorst/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
+    map global insert '<tab>' "<a-;>: expand-or-jump-or-key tab<ret>"
     map global insert '<ret>' "<a-;>: expand-or-jump-or-key ret<ret>"
+    map global normal '<tab>' ":      expand-or-jump-or-key tab<ret>"
     map global normal '<ret>' ":      expand-or-jump-or-key ret<ret>"
 
     define-command -docstring "expand-or-jump-or-key <key>: expand snippet or jump to the placeholder or execute <key>" \
@@ -201,10 +203,3 @@ plug "delapouite/kakoune-select-view" %{
     map global normal <a-%> ': select-view<ret>' -docstring 'select view'
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
-
-plug "andreyorst/smart-indent.kak" domain GitLab.com %{
-    # Suggested mappings
-    map global normal <a-%> ': select-view<ret>' -docstring 'select view'
-    map global view s '<esc>: select-view<ret>' -docstring 'select view'
-}
-
