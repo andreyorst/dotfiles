@@ -15,7 +15,7 @@ set-option global scrolloff 4,4
 ## Grep
 ## ‾‾‾‾
 evaluate-commands %sh{
-    [ ! -z "$(command -v rg)" ] && printf "%s\n" "set-option global grepcmd 'rg -L --with-filename --column'"
+    [ ! -z "$(command -v rg)" ] && printf "%s\n" "set-option global grepcmd 'rg -L --hidden --with-filename --column'"
 }
 
 ## Tabstop and indentwidth
