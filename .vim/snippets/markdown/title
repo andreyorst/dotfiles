@@ -1,1 +1,0 @@
-# ${0!substitute(substitute(substitute(substitute(@%, '_', ' ', 'g'), '.md', '', 'g'), '\v.*\/', '', 'g'), '\<.', '\u&', 'g')}

@@ -1,3 +1,0 @@
-cb:    Code Block
-h:     Heading
-title: Filename based title

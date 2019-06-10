@@ -1,6 +1,0 @@
-${2|int,char,long|} ${1:func_name}()
-{
-	$2
-	${0:VISUAL}
-	return error;
-}
