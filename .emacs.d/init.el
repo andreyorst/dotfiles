@@ -304,6 +304,16 @@ two spaces to match new directory icon indentation."
                       :height 1.0
                       :weight 'normal)
   :init
+  (defun treemacs-expand-all-projects (&optional _)
+    "Expand all projects."
+    (save-excursion
+      (treemacs--forget-last-highlight)
+      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+        (-when-let (pos (treemacs-project->position project))
+          (when (eq 'root-node-closed (treemacs-button-get pos :state))
+            (goto-char pos)
+            (treemacs--expand-root-node pos)))))
+    (treemacs--maybe-recenter 'on-distance))
   (add-hook 'treemacs-mode-hook
             (lambda ()
               (setq line-spacing 4)))
@@ -315,7 +325,7 @@ two spaces to match new directory icon indentation."
   (treemacs-fringe-indicator-mode nil)
   (when window-system
     (treemacs)
-    (treemacs-TAB-action)))
+    (treemacs-expand-all-projects)))
 
 (use-package treemacs-projectile)
 

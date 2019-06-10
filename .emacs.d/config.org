@@ -723,6 +723,16 @@ look just as great as DOOM themed Emacs!
                         :height 1.0
                         :weight 'normal)
     :init
+    (defun treemacs-expand-all-projects (&optional _)
+      "Expand all projects."
+      (save-excursion
+        (treemacs--forget-last-highlight)
+        (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+          (-when-let (pos (treemacs-project->position project))
+            (when (eq 'root-node-closed (treemacs-button-get pos :state))
+              (goto-char pos)
+              (treemacs--expand-root-node pos)))))
+      (treemacs--maybe-recenter 'on-distance))
     (add-hook 'treemacs-mode-hook
               (lambda ()
                 (setq line-spacing 4)))
@@ -734,7 +744,7 @@ look just as great as DOOM themed Emacs!
     (treemacs-fringe-indicator-mode nil)
     (when window-system
       (treemacs)
-      (treemacs-TAB-action)))
+      (treemacs-expand-all-projects)))
 #+END_SRC
 
 This supplement  package makes  some nice integration  with Projectile
