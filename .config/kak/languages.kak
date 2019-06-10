@@ -55,7 +55,8 @@ hook global ModuleLoad c-family %{ try %{ evaluate-commands %sh{
                        add-highlighter shared/$filetype/code/my_types_1 regex \b(v|u|vu)\w+(8|16|32|64)(_t)?\b 0:type
                        add-highlighter shared/$filetype/code/my_types_2 regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
                        add-highlighter shared/$filetype/code/my_types_3 regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
-                       add-highlighter shared/$filetype/code/my_types_4 regex \b\w+_t\b 0:type"
+                       add-highlighter shared/$filetype/code/my_types_4 regex \b\w+_t\b 0:type
+                       add-highlighter shared/$filetype/code/my_types_5 regex \((\w+)\h*\*\)\h*\w+ 1:type"
     done
 }}}
 
