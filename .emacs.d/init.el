@@ -91,6 +91,8 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
+        ((when (bound-and-true-p iedit-mode)
+           (iedit-mode)))
         (t
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
@@ -801,6 +803,20 @@ _C_:   select next line"
 (use-package mc-extras
   :config
   (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
+
+(use-package iedit
+  :commands (iedit-mode
+             iedit-expand-down-to-occurrence)
+  :init
+  (setq iedit-toggle-key-default nil)
+  (defun my/iedit-select-current-or-add ()
+    "Select only current occurrence with `iedit-mode'.  Expand to
+next occurrence if `iedit-mode' is already active."
+    (interactive)
+    (if (bound-and-true-p iedit-mode)
+        (iedit-expand-down-to-occurrence)
+      (iedit-mode 1)))
+  (global-set-key (kbd "C-d") #'my/iedit-select-current-or-add))
 
 (use-package expand-region
   :commands (er/expand-region
