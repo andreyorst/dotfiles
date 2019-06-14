@@ -816,7 +816,7 @@ next occurrence if `iedit-mode' is already active."
     (if (bound-and-true-p iedit-mode)
         (iedit-expand-down-to-occurrence)
       (iedit-mode 1)))
-  (global-set-key (kbd "C-d") #'my/iedit-select-current-or-add))
+  (global-set-key (kbd "C-d") 'my/iedit-select-current-or-add))
 
 (use-package expand-region
   :commands (er/expand-region

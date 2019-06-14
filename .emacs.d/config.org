@@ -1703,7 +1703,7 @@ Another package that allows editing several regions simultaneously.
       (if (bound-and-true-p iedit-mode)
           (iedit-expand-down-to-occurrence)
         (iedit-mode 1)))
-    (global-set-key (kbd "C-d") #'my/iedit-select-current-or-add))
+    (global-set-key (kbd "C-d") 'my/iedit-select-current-or-add))
 #+END_SRC
 
 *** Expand Region
