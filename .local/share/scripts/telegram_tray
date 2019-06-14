@@ -1,3 +1,0 @@
-#!/bin/zsh
-sleep 15
-~/.Telegram/Telegram -startintray
