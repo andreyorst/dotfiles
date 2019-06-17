@@ -203,3 +203,18 @@ plug "delapouite/kakoune-select-view" %{
     map global normal <a-%> ': select-view<ret>' -docstring 'select view'
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
+
+if '-n "${PATH##*termux*}"' %{
+    plug "andreyorst/kaktree" defer kaktree %{
+        set-option global kaktree_ls_command "exa -1F"
+    } config %{
+        map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+        hook global WinSetOption filetype=kaktree %{
+            remove-highlighter buffer/numbers
+            remove-highlighter buffer/matching
+            remove-highlighter buffer/wrap
+            remove-highlighter buffer/show-whitespaces
+        }
+        hook -once global NormalIdle .* kaktree-enable
+    }
+}
