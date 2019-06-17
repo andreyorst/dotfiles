@@ -205,9 +205,7 @@ plug "delapouite/kakoune-select-view" %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/kaktree" defer kaktree %{
-        set-option global kaktree_ls_command "exa -1F"
-    } config %{
+    plug "andreyorst/kaktree" config %{
         map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
         hook global WinSetOption filetype=kaktree %{
             remove-highlighter buffer/numbers
