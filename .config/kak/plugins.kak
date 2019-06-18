@@ -205,13 +205,26 @@ plug "delapouite/kakoune-select-view" %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/kaktree" config %{
+    plug "andreyorst/kaktree" defer kaktree %{
+        set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂 📁
+        set-option global kaktree_dir_icon_close '▸ 🗀 '
+        set-option global kaktree_file_icon      '⠀⠀🖹 ' # 🖺 🖻
+                                                # ^^ these are not spaces. It is invisible characters.
+                                                # This needed to make folding work correctly if you do
+                                                # space alignment of icons.
+    } config %{
         map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+        define-command -hidden hlline-update -docstring "Highlight current line" %{
+            try %{ remove-highlighter buffer/hlline }
+            try %{ add-highlighter buffer/hlline line %val{cursor_line} default,default+@SecondarySelection }
+        }
         hook global WinSetOption filetype=kaktree %{
             remove-highlighter buffer/numbers
             remove-highlighter buffer/matching
             remove-highlighter buffer/wrap
             remove-highlighter buffer/show-whitespaces
+            hook buffer -group crosshairs RawKey '[jk]' hlline-update
+            hook buffer -group crosshairs NormalIdle .* hlline-update
         }
         hook -once global NormalIdle .* kaktree-enable
     }
