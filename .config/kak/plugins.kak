@@ -209,7 +209,7 @@ if '-n "${PATH##*termux*}"' %{
         set-option global kaktree_indentation 3
         set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂
         set-option global kaktree_dir_icon_close '▸ 🗀 ' # 📁
-        set-option global kaktree_file_icon      '⠀⠀🖺 ' # 🖹 🖻
+        set-option global kaktree_file_icon      '⠀⠀🖺'  # 🖹 🖻
                                                 # ^^ these are not spaces. It is invisible characters.
                                                 # This needed to make folding work correctly if you do
                                                 # space alignment of icons.
