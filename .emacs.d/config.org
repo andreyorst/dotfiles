@@ -481,32 +481,31 @@ It also features Treemacs configuration, which  is nice, but I want to
 change a little bit of it.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-themes
-    :commands (doom-themes-org-config
-               doom-themes-treemacs-config)
-    :functions (all-the-icons-octicon)
-    :defines (treemacs-icon-root-png
-              doom-treemacs-use-generic-icons
-              treemacs-icon-open-png
-              treemacs-icon-closed-png
-              treemacs-icon-fallback
-              treemacs-icons-hash
-              treemacs-icon-text)
-    :init
-    (load-theme 'doom-one t)
-    (doom-themes-org-config)
-    (doom-themes-treemacs-config)
-    (eval-after-load 'treemacs
-      (lambda ()
-        "Adjust DOOM Themes settings for Treemacs.
+    (use-package doom-themes
+      :commands (doom-themes-org-config
+                 doom-themes-treemacs-config)
+      :functions (all-the-icons-octicon)
+      :defines (treemacs-icon-root-png
+                doom-treemacs-use-generic-icons
+                treemacs-icon-open-png
+                treemacs-icon-closed-png
+                treemacs-icon-fallback
+                treemacs-icons-hash
+                treemacs-icon-text)
+      :init
+      (load-theme 'doom-one t)
+      (doom-themes-org-config)
+      (doom-themes-treemacs-config)
+      (eval-after-load 'treemacs
+        (lambda ()
+          "Adjust DOOM Themes settings for Treemacs.
 
-  This lambda function sets root icon to be regular folder icon,
-  and adds `chevron' icons to directories in order to display
-  opened and closed states.  Also it indents all file icons with
-  two spaces to match new directory icon indentation."
-        (unless (require 'all-the-icons nil t)
-          (error "`all-the-icons' isn't installed"))
-        (when doom-treemacs-use-generic-icons
+    This lambda function sets root icon to be regular folder icon,
+    and adds `chevron' icons to directories in order to display
+    opened and closed states.  Also it indents all file icons with
+    two spaces to match new directory icon indentation."
+          (unless (require 'all-the-icons nil t)
+            (error "`all-the-icons' isn't installed"))
           (let ((all-the-icons-default-adjust 0))
             (setq treemacs-icon-root-png
                   (concat " " (all-the-icons-octicon
@@ -514,7 +513,7 @@ change a little bit of it.
                                :v-adjust 0
                                :face '(:inherit font-lock-doc-face :slant normal))
                           " ")
-                  treemacs-icon-open-png
+                  treemacs-icon-dir-open
                   (concat (all-the-icons-octicon
                            "chevron-down"
                            :height 0.75
@@ -525,7 +524,7 @@ change a little bit of it.
                            :v-adjust 0
                            :face '(:inherit font-lock-doc-face :slant normal))
                           " ")
-                  treemacs-icon-closed-png
+                  treemacs-icon-dir-closed
                   (concat (all-the-icons-octicon
                            "chevron-right"
                            :height 0.9
@@ -538,19 +537,19 @@ change a little bit of it.
                           " "))
             (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
                   treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-                  treemacs-icon-text treemacs-icon-fallback)))
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
-                                     "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                                     "wav" "mp3" "ogg" "midi")
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
-                                     "md" "markdown" "rst" "log" "org" "txt"
-                                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-        (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-                                     "yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                                     "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t))
+                  treemacs-icon-text treemacs-icon-fallback))
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
+                                       "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                                       "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                                       "wav" "mp3" "ogg" "midi")
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
+                                       "md" "markdown" "rst" "log" "org" "txt"
+                                       "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
+          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+                                       "yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                                       "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
+      (setq doom-themes-enable-bold t
+            doom-themes-enable-italic t))
 #+END_SRC
 
 Emacs uses  white titlebar, but  since I'm  using dark color  scheme I

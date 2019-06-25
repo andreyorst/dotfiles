@@ -169,39 +169,38 @@ opened and closed states.  Also it indents all file icons with
 two spaces to match new directory icon indentation."
       (unless (require 'all-the-icons nil t)
         (error "`all-the-icons' isn't installed"))
-      (when doom-treemacs-use-generic-icons
-        (let ((all-the-icons-default-adjust 0))
-          (setq treemacs-icon-root-png
-                (concat " " (all-the-icons-octicon
-                             "file-directory"
-                             :v-adjust 0
-                             :face '(:inherit font-lock-doc-face :slant normal))
-                        " ")
-                treemacs-icon-open-png
-                (concat (all-the-icons-octicon
-                         "chevron-down"
-                         :height 0.75
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        " "
-                        (all-the-icons-octicon
-                         "file-directory"
-                         :v-adjust 0
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        " ")
-                treemacs-icon-closed-png
-                (concat (all-the-icons-octicon
-                         "chevron-right"
-                         :height 0.9
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        " "
-                        (all-the-icons-octicon
-                         "file-directory"
-                         :v-adjust 0
-                         :face '(:inherit font-lock-doc-face :slant normal))
-                        " "))
-          (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
-                treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-                treemacs-icon-text treemacs-icon-fallback)))
+      (let ((all-the-icons-default-adjust 0))
+        (setq treemacs-icon-root-png
+              (concat " " (all-the-icons-octicon
+                           "file-directory"
+                           :v-adjust 0
+                           :face '(:inherit font-lock-doc-face :slant normal))
+                      " ")
+              treemacs-icon-dir-open
+              (concat (all-the-icons-octicon
+                       "chevron-down"
+                       :height 0.75
+                       :face '(:inherit font-lock-doc-face :slant normal))
+                      " "
+                      (all-the-icons-octicon
+                       "file-directory"
+                       :v-adjust 0
+                       :face '(:inherit font-lock-doc-face :slant normal))
+                      " ")
+              treemacs-icon-dir-closed
+              (concat (all-the-icons-octicon
+                       "chevron-right"
+                       :height 0.9
+                       :face '(:inherit font-lock-doc-face :slant normal))
+                      " "
+                      (all-the-icons-octicon
+                       "file-directory"
+                       :v-adjust 0
+                       :face '(:inherit font-lock-doc-face :slant normal))
+                      " "))
+        (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
+              treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+              treemacs-icon-text treemacs-icon-fallback))
       (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
                                    "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                                    "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
