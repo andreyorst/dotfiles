@@ -666,6 +666,7 @@ it's great!
   (use-package doom-modeline
     :commands (doom-modeline-mode
                doom-modeline-set-selected-window)
+    :functions (doom-color)
     :init (doom-modeline-mode 1)
     (set-face-attribute 'doom-modeline-buffer-path nil :foreground (doom-color 'fg) :weight 'normal)
     (set-face-attribute 'doom-modeline-buffer-file nil :foreground (doom-color 'fg) :weight 'semi-bold)
@@ -701,7 +702,7 @@ for this, named  =speedbar=, but It uses external frame  and has so many
 features  that I  don't  know  if I  really  need. Thankfully  there's
 another package that provides filetree: [[https://github.com/Alexander-Miller/treemacs][Treemacs]].
 
-*** Treemacs
+*** COMMENT Treemacs
 With this package, and its supplement packages I can have a consistent
 filetree inside my Emacs frame. Which  is good. But there's more: DOOM
 Themes support  this package as  well, which means that  Treemacs will

@@ -263,6 +263,7 @@ two spaces to match new directory icon indentation."
 (use-package doom-modeline
   :commands (doom-modeline-mode
              doom-modeline-set-selected-window)
+  :functions (doom-color)
   :init (doom-modeline-mode 1)
   (set-face-attribute 'doom-modeline-buffer-path nil :foreground (doom-color 'fg) :weight 'normal)
   (set-face-attribute 'doom-modeline-buffer-file nil :foreground (doom-color 'fg) :weight 'semi-bold)
@@ -288,49 +289,6 @@ two spaces to match new directory icon indentation."
         doom-modeline-minor-modes t
         doom-modeline-lsp nil
         find-file-visit-truename t))
-
-(use-package treemacs
-  :commands (treemacs
-             treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode
-             doom-color
-             doom-modeline-focus
-             treemacs-TAB-action)
-  :bind (("<f8>" . treemacs)
-         ("<f9>" . treemacs-select-window))
-  :config
-  (set-face-attribute 'treemacs-root-face nil
-                      :foreground (doom-color 'fg)
-                      :height 1.0
-                      :weight 'normal)
-  :init
-  (defun treemacs-expand-all-projects (&optional _)
-    "Expand all projects."
-    (save-excursion
-      (treemacs--forget-last-highlight)
-      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
-        (-when-let (pos (treemacs-project->position project))
-          (when (eq 'root-node-closed (treemacs-button-get pos :state))
-            (goto-char pos)
-            (treemacs--expand-root-node pos)))))
-    (treemacs--maybe-recenter 'on-distance))
-  (add-hook 'treemacs-mode-hook
-            (lambda ()
-              (setq line-spacing 4)))
-  (setq treemacs-width 27
-        treemacs-is-never-other-window t
-        treemacs-space-between-root-nodes nil)
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode nil)
-  (when window-system
-    (treemacs)
-    (treemacs-expand-all-projects)))
-
-(use-package treemacs-projectile)
-
-(use-package treemacs-magit)
 
 (use-package eyebrowse
   :commands eyebrowse-mode
