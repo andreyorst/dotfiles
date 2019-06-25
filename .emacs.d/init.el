@@ -164,7 +164,7 @@ are defining or executing a macro."
       "Adjust DOOM Themes settings for Treemacs.
 
 This lambda function sets root icon to be regular folder icon,
-and adds `chevron' icons to directories in order to display
+and adds 'chevron' icons to directories in order to display
 opened and closed states.  Also it indents all file icons with
 two spaces to match new directory icon indentation."
       (unless (require 'all-the-icons nil t)
@@ -176,7 +176,7 @@ two spaces to match new directory icon indentation."
                            :v-adjust 0
                            :face '(:inherit font-lock-doc-face :slant normal))
                       " ")
-              treemacs-icon-dir-open
+              treemacs-icon-open-png
               (concat (all-the-icons-octicon
                        "chevron-down"
                        :height 0.75
@@ -187,7 +187,7 @@ two spaces to match new directory icon indentation."
                        :v-adjust 0
                        :face '(:inherit font-lock-doc-face :slant normal))
                       " ")
-              treemacs-icon-dir-closed
+              treemacs-icon-closed-png
               (concat (all-the-icons-octicon
                        "chevron-right"
                        :height 0.9
