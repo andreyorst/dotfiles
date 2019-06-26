@@ -20,6 +20,7 @@
         org-delete-char
         org-end-of-line
         org-fill-paragraph
+        org-kill-line
         org-self-insert-command
         org-yank
         parinfer-backward-delete-char
