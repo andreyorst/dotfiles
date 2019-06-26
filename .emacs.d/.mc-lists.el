@@ -10,6 +10,7 @@
         counsel-M-x
         downcase-region
         electric-newline-and-maybe-indent
+        end-of-buffer
         forward-sexp
         hydra-er/er/contract-region
         hydra-er/er/expand-region
