@@ -159,48 +159,6 @@ are defining or executing a macro."
   (load-theme 'doom-one t)
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (eval-after-load 'treemacs
-    (lambda ()
-      (treemacs-create-theme "DOOM One"
-        :config
-        (progn
-          (treemacs-create-icon
-           :icon (concat " " (all-the-icons-octicon
-                              "file-directory"
-                              :v-adjust 0
-                              :face '(:inherit font-lock-doc-face :slant normal))
-                         " ")
-           :extensions (root))
-          (treemacs-create-icon
-           :icon (concat (all-the-icons-octicon
-                          "chevron-down"
-                          :height 0.75
-                          :face '(:inherit font-lock-doc-face :slant normal))
-                         " "
-                         (all-the-icons-octicon
-                          "file-directory"
-                          :v-adjust 0
-                          :face '(:inherit font-lock-doc-face :slant normal))
-                         " ")
-           :extensions (dir-closed))
-          (treemacs-create-icon
-           :icon (concat (all-the-icons-octicon
-                          "chevron-right"
-                          :height 0.9
-                          :face '(:inherit font-lock-doc-face :slant normal))
-                         " "
-                         (all-the-icons-octicon
-                          "file-directory"
-                          :v-adjust 0
-                          :face '(:inherit font-lock-doc-face :slant normal))
-                         " ")
-           :extensions (dir-open))
-          (treemacs-create-icon
-           :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-           :extensions ("yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                        "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade"))))
-
-      (treemacs-load-theme "DOOM One")))
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
 
@@ -287,14 +245,82 @@ are defining or executing a macro."
              treemacs-fringe-indicator-mode
              doom-color
              doom-modeline-focus
-             treemacs-TAB-action)
+             treemacs--expand-root-node
+             treemacs--maybe-recenter
+             treemacs-TAB-action
+             treemacs-load-theme)
+  :functions (treemacs-expand-all-projects
+              all-the-icons-octicon)
   :bind (("<f8>" . treemacs)
          ("<f9>" . treemacs-select-window))
-  :config
-  (set-face-attribute 'treemacs-root-face nil
-                      :foreground (doom-color 'fg)
-                      :height 1.0
-                      :weight 'normal)
+  :config (set-face-attribute 'treemacs-root-face nil
+                              :foreground (doom-color 'fg)
+                              :height 1.0
+                              :weight 'normal)
+  (treemacs-create-theme "Atom"
+    :config
+    (progn
+      (treemacs-create-icon
+       :icon (concat " " (all-the-icons-octicon
+                          "file-directory"
+                          :v-adjust 0
+                          :face '(:inherit font-lock-doc-face :slant normal))
+                     " ")
+       :extensions (root))
+      (treemacs-create-icon
+       :file nil
+       :icon (concat (all-the-icons-octicon
+                      "chevron-down"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t"
+                     (all-the-icons-octicon
+                      "file-directory"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     " ")
+       :extensions (dir-closed))
+      (treemacs-create-icon
+       :file nil
+       :icon (concat (all-the-icons-octicon
+                      "chevron-right"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t"
+                     (all-the-icons-octicon
+                      "file-directory"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     " ")
+       :extensions (dir-open))
+      (treemacs-create-icon
+       :file nil
+       :icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0) " ")
+       :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                    "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                    "wav" "mp3" "ogg" "midi"))
+      (treemacs-create-icon
+       :file nil
+       :icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0) " ")
+       :extensions ("md" "markdown" "rst" "log" "org" "txt"
+                    "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
+      (treemacs-create-icon
+       :file nil
+       :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+       :extensions ("yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                    "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade"))
+      (treemacs-create-icon
+       :file nil
+       :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
+       :extensions (fallback))))
+
+  (when window-system
+    (add-hook 'after-init-hook (lambda ()
+                                 (treemacs-load-theme "Atom")
+                                 (treemacs)
+                                 (treemacs-expand-all-projects))))
   :init
   (defun treemacs-expand-all-projects (&optional _)
     "Expand all projects."
@@ -308,16 +334,14 @@ are defining or executing a macro."
     (treemacs--maybe-recenter 'on-distance))
   (add-hook 'treemacs-mode-hook
             (lambda ()
-              (setq line-spacing 4)))
+              (setq line-spacing 5)))
   (setq treemacs-width 27
         treemacs-is-never-other-window t
         treemacs-space-between-root-nodes nil)
+
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode nil)
-  (when window-system
-    (treemacs)
-    (treemacs-expand-all-projects)))
+  (treemacs-fringe-indicator-mode nil))
 
 (use-package treemacs-projectile)
 
@@ -567,7 +591,10 @@ are defining or executing a macro."
            (other-window 1)
            (cond ((get-buffer "*ansi-term*")
                   (switch-to-buffer "*ansi-term*"))
-                 (t (ansi-term "bash"))))))
+                 (t (ansi-term "bash")
+                    (face-remap-add-relative
+                     'default
+                     '(:family "Hack" :spacing 0.1 :height 0.8)))))))
 
 (global-set-key (kbd "C-`") 'my/ansi-term-toggle)
 
