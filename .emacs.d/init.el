@@ -188,7 +188,11 @@ are defining or executing a macro."
              solaire-mode-in-minibuffer
              solaire-mode-reset)
   :config
-  (add-hook 'after-focus-change-function #'solaire-mode-reset)
+  (with-no-warnings
+    (cond ((not (boundp 'after-focus-change-function))
+           (add-hook 'focus-in-hook  #'solaire-mode-reset))
+          (t
+           (add-function :after after-focus-change-function #'solaire-mode-reset))))
   (add-hook 'after-revert-hook #'turn-on-solaire-mode)
   (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
