@@ -188,7 +188,7 @@ are defining or executing a macro."
              solaire-mode-in-minibuffer
              solaire-mode-reset)
   :config
-  (add-hook 'focus-in-hook #'solaire-mode-reset)
+  (add-hook 'after-focus-change-function #'solaire-mode-reset)
   (add-hook 'after-revert-hook #'turn-on-solaire-mode)
   (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
@@ -268,11 +268,10 @@ are defining or executing a macro."
                      " ")
        :extensions (root))
       (treemacs-create-icon
-       :file nil
        :icon (concat (all-the-icons-octicon
                       "chevron-down"
                       :height 0.75
-                      :v-adjust 0.1
+                      :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      "\t"
                      (all-the-icons-octicon
@@ -280,9 +279,8 @@ are defining or executing a macro."
                       :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      " ")
-       :extensions (dir-closed))
+       :extensions (dir-open))
       (treemacs-create-icon
-       :file nil
        :icon (concat (all-the-icons-octicon
                       "chevron-right"
                       :height 0.75
@@ -294,25 +292,21 @@ are defining or executing a macro."
                       :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      " ")
-       :extensions (dir-open))
+       :extensions (dir-closed))
       (treemacs-create-icon
-       :file nil
        :icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0) " ")
        :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
                     "wav" "mp3" "ogg" "midi"))
       (treemacs-create-icon
-       :file nil
        :icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0) " ")
        :extensions ("md" "markdown" "rst" "log" "org" "txt"
                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
       (treemacs-create-icon
-       :file nil
        :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
        :extensions ("yaml" "yml" "json" "xml" "toml" "cson" "ini"
                     "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade"))
       (treemacs-create-icon
-       :file nil
        :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
        :extensions (fallback))))
 
@@ -384,16 +378,6 @@ are defining or executing a macro."
                                  flyspell-mode
                                  parinfer-mode))
   :init (minions-mode 1))
-
-(use-package eldoc-box
-  :commands eldoc-box-hover-mode
-  :config
-  (set-face-attribute 'eldoc-box-border nil :background "#191B20")
-  :init
-  (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
-  (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
-  (setq eldoc-box-max-pixel-width 1920
-        eldoc-box-max-pixel-height 1080))
 
 (when window-system
   (setq window-divider-default-right-width 1)
