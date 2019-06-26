@@ -275,7 +275,7 @@ are defining or executing a macro."
        :icon (concat (all-the-icons-octicon
                       "chevron-down"
                       :height 0.75
-                      :v-adjust 0
+                      :v-adjust 0.1
                       :face '(:inherit font-lock-doc-face :slant normal))
                      "\t"
                      (all-the-icons-octicon
@@ -301,12 +301,7 @@ are defining or executing a macro."
        :icon (concat (all-the-icons-octicon
                       "chevron-down"
                       :height 0.75
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal))
-                     "\t"
-                     (all-the-icons-octicon
-                      "tag"
-                      :v-adjust 0
+                      :v-adjust 0.1
                       :face '(:inherit font-lock-doc-face :slant normal))
                      " ")
        :extensions (tag-open))
@@ -316,13 +311,37 @@ are defining or executing a macro."
                       :height 0.75
                       :v-adjust 0.1
                       :face '(:inherit font-lock-doc-face :slant normal))
-                     "\t"
-                     (all-the-icons-octicon
+                     " ")
+       :extensions (tag-closed))
+      (treemacs-create-icon
+       :icon (concat (all-the-icons-octicon
                       "tag"
                       :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      " ")
-       :extensions (tag-closed))
+       :extensions (tag-leaf))
+      (treemacs-create-icon
+       :icon (concat (all-the-icons-octicon
+                      "flame"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     " ")
+       :extensions (error))
+      (treemacs-create-icon
+       :icon (concat (all-the-icons-octicon
+                      "stop"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     " ")
+       :extensions (warning))
+      (treemacs-create-icon
+       :icon (concat (all-the-icons-octicon
+                      "info"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     " ")
+       :extensions (info))
       (treemacs-create-icon
        :icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0) " ")
        :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
