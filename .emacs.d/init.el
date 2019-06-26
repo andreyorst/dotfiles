@@ -147,70 +147,60 @@ are defining or executing a macro."
 (use-package doom-themes
   :commands (doom-themes-org-config
              doom-themes-treemacs-config)
-  :functions (all-the-icons-octicon)
-  :defines (treemacs-icon-root-png
-            doom-treemacs-use-generic-icons
-            treemacs-icon-open-png
-            treemacs-icon-closed-png
-            treemacs-icon-fallback
-            treemacs-icons-hash
-            treemacs-icon-text)
+  :functions (all-the-icons-octicon
+              treemacs-create-theme
+              treemacs-create-icon
+              root
+              dir-closed
+              dir-open
+              treemacs-load-theme)
+  :defines (doom-treemacs-use-generic-icons)
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
   (eval-after-load 'treemacs
     (lambda ()
-      "Adjust DOOM Themes settings for Treemacs.
+      (treemacs-create-theme "DOOM One"
+        :config
+        (progn
+          (treemacs-create-icon
+           :icon (concat " " (all-the-icons-octicon
+                              "file-directory"
+                              :v-adjust 0
+                              :face '(:inherit font-lock-doc-face :slant normal))
+                         " ")
+           :extensions (root))
+          (treemacs-create-icon
+           :icon (concat (all-the-icons-octicon
+                          "chevron-down"
+                          :height 0.75
+                          :face '(:inherit font-lock-doc-face :slant normal))
+                         " "
+                         (all-the-icons-octicon
+                          "file-directory"
+                          :v-adjust 0
+                          :face '(:inherit font-lock-doc-face :slant normal))
+                         " ")
+           :extensions (dir-closed))
+          (treemacs-create-icon
+           :icon (concat (all-the-icons-octicon
+                          "chevron-right"
+                          :height 0.9
+                          :face '(:inherit font-lock-doc-face :slant normal))
+                         " "
+                         (all-the-icons-octicon
+                          "file-directory"
+                          :v-adjust 0
+                          :face '(:inherit font-lock-doc-face :slant normal))
+                         " ")
+           :extensions (dir-open))
+          (treemacs-create-icon
+           :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+           :extensions ("yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                        "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade"))))
 
-This lambda function sets root icon to be regular folder icon,
-and adds 'chevron' icons to directories in order to display
-opened and closed states.  Also it indents all file icons with
-two spaces to match new directory icon indentation."
-      (unless (require 'all-the-icons nil t)
-        (error "`all-the-icons' isn't installed"))
-      (let ((all-the-icons-default-adjust 0))
-        (setq treemacs-icon-root-png
-              (concat " " (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                      " ")
-              treemacs-icon-open-png
-              (concat (all-the-icons-octicon
-                       "chevron-down"
-                       :height 0.75
-                       :face '(:inherit font-lock-doc-face :slant normal))
-                      " "
-                      (all-the-icons-octicon
-                       "file-directory"
-                       :v-adjust 0
-                       :face '(:inherit font-lock-doc-face :slant normal))
-                      " ")
-              treemacs-icon-closed-png
-              (concat (all-the-icons-octicon
-                       "chevron-right"
-                       :height 0.9
-                       :face '(:inherit font-lock-doc-face :slant normal))
-                      " "
-                      (all-the-icons-octicon
-                       "file-directory"
-                       :v-adjust 0
-                       :face '(:inherit font-lock-doc-face :slant normal))
-                      " "))
-        (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
-              treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-              treemacs-icon-text treemacs-icon-fallback))
-      (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
-                                   "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                                   "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                                   "wav" "mp3" "ogg" "midi")
-      (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
-                                   "md" "markdown" "rst" "log" "org" "txt"
-                                   "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-      (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-                                   "yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                                   "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
+      (treemacs-load-theme "DOOM One")))
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
 
@@ -289,6 +279,49 @@ two spaces to match new directory icon indentation."
         doom-modeline-minor-modes t
         doom-modeline-lsp nil
         find-file-visit-truename t))
+
+(use-package treemacs
+  :commands (treemacs
+             treemacs-follow-mode
+             treemacs-filewatch-mode
+             treemacs-fringe-indicator-mode
+             doom-color
+             doom-modeline-focus
+             treemacs-TAB-action)
+  :bind (("<f8>" . treemacs)
+         ("<f9>" . treemacs-select-window))
+  :config
+  (set-face-attribute 'treemacs-root-face nil
+                      :foreground (doom-color 'fg)
+                      :height 1.0
+                      :weight 'normal)
+  :init
+  (defun treemacs-expand-all-projects (&optional _)
+    "Expand all projects."
+    (save-excursion
+      (treemacs--forget-last-highlight)
+      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+        (-when-let (pos (treemacs-project->position project))
+          (when (eq 'root-node-closed (treemacs-button-get pos :state))
+            (goto-char pos)
+            (treemacs--expand-root-node pos)))))
+    (treemacs--maybe-recenter 'on-distance))
+  (add-hook 'treemacs-mode-hook
+            (lambda ()
+              (setq line-spacing 4)))
+  (setq treemacs-width 27
+        treemacs-is-never-other-window t
+        treemacs-space-between-root-nodes nil)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode nil)
+  (when window-system
+    (treemacs)
+    (treemacs-expand-all-projects)))
+
+(use-package treemacs-projectile)
+
+(use-package treemacs-magit)
 
 (use-package eyebrowse
   :commands eyebrowse-mode

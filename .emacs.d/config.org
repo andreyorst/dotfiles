@@ -481,75 +481,65 @@ It also features Treemacs configuration, which  is nice, but I want to
 change a little bit of it.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package doom-themes
-      :commands (doom-themes-org-config
-                 doom-themes-treemacs-config)
-      :functions (all-the-icons-octicon)
-      :defines (treemacs-icon-root-png
-                doom-treemacs-use-generic-icons
-                treemacs-icon-open-png
-                treemacs-icon-closed-png
-                treemacs-icon-fallback
-                treemacs-icons-hash
-                treemacs-icon-text)
-      :init
-      (load-theme 'doom-one t)
-      (doom-themes-org-config)
-      (doom-themes-treemacs-config)
-      (eval-after-load 'treemacs
-        (lambda ()
-          "Adjust DOOM Themes settings for Treemacs.
+  (use-package doom-themes
+    :commands (doom-themes-org-config
+               doom-themes-treemacs-config)
+    :functions (all-the-icons-octicon
+                treemacs-create-theme
+                treemacs-create-icon
+                root
+                dir-closed
+                dir-open
+                treemacs-load-theme)
+    :defines (doom-treemacs-use-generic-icons)
+    :init
+    (load-theme 'doom-one t)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config)
+    (eval-after-load 'treemacs
+      (lambda ()
+        (treemacs-create-theme "DOOM One"
+          :config
+          (progn
+            (treemacs-create-icon
+             :icon (concat " " (all-the-icons-octicon
+                                "file-directory"
+                                :v-adjust 0
+                                :face '(:inherit font-lock-doc-face :slant normal))
+                           " ")
+             :extensions (root))
+            (treemacs-create-icon
+             :icon (concat (all-the-icons-octicon
+                            "chevron-down"
+                            :height 0.75
+                            :face '(:inherit font-lock-doc-face :slant normal))
+                           " "
+                           (all-the-icons-octicon
+                            "file-directory"
+                            :v-adjust 0
+                            :face '(:inherit font-lock-doc-face :slant normal))
+                           " ")
+             :extensions (dir-closed))
+            (treemacs-create-icon
+             :icon (concat (all-the-icons-octicon
+                            "chevron-right"
+                            :height 0.9
+                            :face '(:inherit font-lock-doc-face :slant normal))
+                           " "
+                           (all-the-icons-octicon
+                            "file-directory"
+                            :v-adjust 0
+                            :face '(:inherit font-lock-doc-face :slant normal))
+                           " ")
+             :extensions (dir-open))
+            (treemacs-create-icon
+             :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
+             :extensions ("yaml" "yml" "json" "xml" "toml" "cson" "ini"
+                          "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade"))))
 
-    This lambda function sets root icon to be regular folder icon,
-    and adds 'chevron' icons to directories in order to display
-    opened and closed states.  Also it indents all file icons with
-    two spaces to match new directory icon indentation."
-          (unless (require 'all-the-icons nil t)
-            (error "`all-the-icons' isn't installed"))
-          (let ((all-the-icons-default-adjust 0))
-            (setq treemacs-icon-root-png
-                  (concat " " (all-the-icons-octicon
-                               "file-directory"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal))
-                          " ")
-                  treemacs-icon-open-png
-                  (concat (all-the-icons-octicon
-                           "chevron-down"
-                           :height 0.75
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "
-                          (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " ")
-                  treemacs-icon-closed-png
-                  (concat (all-the-icons-octicon
-                           "chevron-right"
-                           :height 0.9
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "
-                          (all-the-icons-octicon
-                           "file-directory"
-                           :v-adjust 0
-                           :face '(:inherit font-lock-doc-face :slant normal))
-                          " "))
-            (setq treemacs-icons-hash (make-hash-table :size 200 :test #'equal)
-                  treemacs-icon-fallback (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) " ")
-                  treemacs-icon-text treemacs-icon-fallback))
-          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0))
-                                       "png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                                       "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                                       "wav" "mp3" "ogg" "midi")
-          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0))
-                                       "md" "markdown" "rst" "log" "org" "txt"
-                                       "CONTRIBUTE" "LICENSE" "README" "CHANGELOG")
-          (treemacs-define-custom-icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0))
-                                       "yaml" "yml" "json" "xml" "toml" "cson" "ini"
-                                       "tpl" "erb" "mustache" "twig" "ejs" "mk" "haml" "pug" "jade")))
-      (setq doom-themes-enable-bold t
-            doom-themes-enable-italic t))
+        (treemacs-load-theme "DOOM One")))
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t))
 #+END_SRC
 
 Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
@@ -702,7 +692,7 @@ for this, named  =speedbar=, but It uses external frame  and has so many
 features  that I  don't  know  if I  really  need. Thankfully  there's
 another package that provides filetree: [[https://github.com/Alexander-Miller/treemacs][Treemacs]].
 
-*** COMMENT Treemacs
+*** Treemacs
 With this package, and its supplement packages I can have a consistent
 filetree inside my Emacs frame. Which  is good. But there's more: DOOM
 Themes support  this package as  well, which means that  Treemacs will
