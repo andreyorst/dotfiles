@@ -255,8 +255,8 @@ are defining or executing a macro."
              treemacs-load-theme)
   :functions (treemacs-expand-all-projects
               all-the-icons-octicon)
-  :bind (("<f8>" . treemacs)
-         ("<f9>" . treemacs-select-window))
+  :bind (("<f7>" . treemacs)
+         ("<f8>" . treemacs-select-window))
   :config (set-face-attribute 'treemacs-root-face nil
                               :foreground (doom-color 'fg)
                               :height 1.0
@@ -876,7 +876,8 @@ _-_: reduce region _)_: around pairs
 
 (use-package imenu-list
   :defines imenu-list-idle-update-delay-time
-  :bind (("<f7>" . imenu-list-smart-toggle))
+  :bind (("<f9>" . imenu-list-smart-toggle)
+         ("<f10>". imenu-list-show))
   :config
   (advice-add 'imenu-list-smart-toggle :after-while
               (lambda()
