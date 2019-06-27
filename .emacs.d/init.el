@@ -316,6 +316,11 @@ are defining or executing a macro."
                       :height 0.75
                       :v-adjust 0.1
                       :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t"
+                     (all-the-icons-octicon
+                      "package"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
        :extensions (tag-open))
       (treemacs-create-icon
@@ -323,6 +328,11 @@ are defining or executing a macro."
                       "chevron-right"
                       :height 0.75
                       :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t"
+                     (all-the-icons-octicon
+                      "package"
+                      :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
        :extensions (tag-closed))

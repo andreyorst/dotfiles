@@ -745,6 +745,11 @@ look just as great as DOOM themed Emacs!
                         :height 0.75
                         :v-adjust 0.1
                         :face '(:inherit font-lock-doc-face :slant normal))
+                       "\t"
+                       (all-the-icons-octicon
+                        "package"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal))
                        "\t")
          :extensions (tag-open))
         (treemacs-create-icon
@@ -752,6 +757,11 @@ look just as great as DOOM themed Emacs!
                         "chevron-right"
                         :height 0.75
                         :v-adjust 0.1
+                        :face '(:inherit font-lock-doc-face :slant normal))
+                       "\t"
+                       (all-the-icons-octicon
+                        "package"
+                        :v-adjust 0
                         :face '(:inherit font-lock-doc-face :slant normal))
                        "\t")
          :extensions (tag-closed))
