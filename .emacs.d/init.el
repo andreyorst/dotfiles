@@ -281,7 +281,7 @@ are defining or executing a macro."
        :icon (concat " "
                      (all-the-icons-octicon
                       "repo"
-                      :v-adjust 0
+                      :v-adjust -0.1
                       :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
        :extensions (root))
