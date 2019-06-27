@@ -495,7 +495,6 @@ change a little bit of it.
     :init
     (load-theme 'doom-one t)
     (doom-themes-org-config)
-    (doom-themes-treemacs-config)
     (setq doom-themes-enable-bold t
           doom-themes-enable-italic t))
 #+END_SRC
@@ -590,6 +589,29 @@ Let's assign it to these hooks:
   (add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
   (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
   (add-hook 'org-src-mode-hook 'my/real-buffer-setup)
+#+END_SRC
+
+There's also  another problem with Solaire  (he tend not to  skip game
+cutscenes). When previewing LaTeX in  Org buffers, the background used
+isn't remapped by Solaire. This function should fix this problem:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/update-org-latex-preview-bg (&rest _)
+    (setq-default
+     org-format-latex-options
+     (plist-put org-format-latex-options
+                :background
+                (face-attribute
+                 (or
+                  (cadr (assq 'default face-remapping-alist))
+                  'default)
+                 :background nil t))))
+#+END_SRC
+
+We need to add advice to use this function:
+
+#+BEGIN_SRC emacs-lisp
+  ;(add-hook 'org-mode-hook 'my/update-org-latex-preview-bg)
 #+END_SRC
 
 Now my  buffers looks  really nice, but  my modeline  doesn't. Luckily
@@ -803,6 +825,16 @@ look just as great as DOOM themed Emacs!
         (treemacs-create-icon
          :icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0) "\t")
          :extensions (fallback))))
+
+    (add-hook 'treemacs-mode-hook
+              (lambda()
+                (setq tab-width 1
+                      mode-line-format nil)
+                (set-window-fringes nil 0 0 nil)))
+
+    (advice-add #'treemacs-select-window :after
+                (lambda()
+                  (set-window-fringes nil 0 0 nil)))
 
     (when window-system
       (add-hook 'after-init-hook (lambda ()

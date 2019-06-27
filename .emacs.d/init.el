@@ -158,7 +158,6 @@ are defining or executing a macro."
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
-  (doom-themes-treemacs-config)
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
 
@@ -211,6 +210,19 @@ are defining or executing a macro."
 (add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
 (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
 (add-hook 'org-src-mode-hook 'my/real-buffer-setup)
+
+(defun my/update-org-latex-preview-bg (&rest _)
+  (setq-default
+   org-format-latex-options
+   (plist-put org-format-latex-options
+              :background
+              (face-attribute
+               (or
+                (cadr (assq 'default face-remapping-alist))
+                'default)
+               :background nil t))))
+
+;(add-hook 'org-mode-hook 'my/update-org-latex-preview-bg)
 
 (use-package doom-modeline
   :commands (doom-modeline-mode
@@ -384,6 +396,16 @@ are defining or executing a macro."
       (treemacs-create-icon
        :icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0) "\t")
        :extensions (fallback))))
+
+  (add-hook 'treemacs-mode-hook
+            (lambda()
+              (setq tab-width 1
+                    mode-line-format nil)
+              (set-window-fringes nil 0 0 nil)))
+
+  (advice-add #'treemacs-select-window :after
+              (lambda()
+                (set-window-fringes nil 0 0 nil)))
 
   (when window-system
     (add-hook 'after-init-hook (lambda ()
