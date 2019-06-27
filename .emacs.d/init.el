@@ -205,6 +205,10 @@ are defining or executing a macro."
   "Wrapper around `set-window-fringes' function."
   (when (my/real-buffer-p)
     (set-window-fringes nil 8 8 nil)
+    (when (fboundp 'doom-color)
+      (set-face-attribute 'line-number-current-line nil
+                          :foreground (doom-color 'fg-alt)
+                          :background (doom-color 'bg)))
     (setq-local scroll-margin 3)))
 
 (add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
