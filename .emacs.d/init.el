@@ -279,7 +279,7 @@ are defining or executing a macro."
     (progn
       (treemacs-create-icon
        :icon (concat " " (all-the-icons-octicon
-                          "file-directory"
+                          "repo"
                           :v-adjust 0
                           :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
@@ -523,7 +523,8 @@ are defining or executing a macro."
                   org-adapt-indentation nil
                   org-hide-leading-stars t
                   org-highlight-latex-and-related '(latex)
-                  revert-without-query '(".*\.pdf"))
+                  revert-without-query '(".*\.pdf")
+                  org-preview-latex-default-process 'dvisvgm)
             (auto-fill-mode)
             (set-face-attribute 'org-document-title nil :height 1.6)
             (set-face-attribute 'org-level-1        nil :height 1.4)
