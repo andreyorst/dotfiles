@@ -450,18 +450,13 @@ are defining or executing a macro."
                       :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
-       :extensions (fallback))))
-
-  (defun my/set-bigger-spacing ()
-    (setq-local default-text-properties
-                '(line-spacing 0.25 line-height 1.25)))
+       :extensions (fallback)))))
 
   (add-hook 'treemacs-mode-hook
             (lambda()
               (setq tab-width 1
                     mode-line-format nil
                     line-spacing 5)
-              (my/set-bigger-spacing)
               (set-window-fringes nil 0 0 nil)
               (my/treemacs-variable-pitch-labels)))
 
