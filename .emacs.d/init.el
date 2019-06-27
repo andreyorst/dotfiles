@@ -450,7 +450,7 @@ are defining or executing a macro."
                       :v-adjust 0
                       :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
-       :extensions (fallback)))))
+       :extensions (fallback))))
 
   (add-hook 'treemacs-mode-hook
             (lambda()

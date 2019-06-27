@@ -879,7 +879,7 @@ look just as great as DOOM themed Emacs!
                         :v-adjust 0
                         :face '(:inherit font-lock-doc-face :slant normal))
                        "\t")
-         :extensions (fallback)))))
+         :extensions (fallback))))
 
     (add-hook 'treemacs-mode-hook
               (lambda()
