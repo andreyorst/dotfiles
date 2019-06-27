@@ -259,29 +259,30 @@ are defining or executing a macro."
              treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-fringe-indicator-mode
-             doom-color
-             doom-modeline-focus
              treemacs--expand-root-node
              treemacs--maybe-recenter
              treemacs-TAB-action
              treemacs-load-theme)
   :functions (my/treemacs-expand-all-projects
               my/treemacs-variable-pitch-labels
+              doom-color
               all-the-icons-octicon)
   :bind (("<f7>" . treemacs)
          ("<f8>" . treemacs-select-window))
-  :config (set-face-attribute 'treemacs-root-face nil
-                              :foreground (doom-color 'fg)
-                              :height 1.0
-                              :weight 'normal)
+  :config
+  (set-face-attribute 'treemacs-root-face nil
+                      :foreground (doom-color 'fg)
+                      :height 1.0
+                      :weight 'normal)
   (treemacs-create-theme "Atom"
     :config
     (progn
       (treemacs-create-icon
-       :icon (concat " " (all-the-icons-octicon
-                          "repo"
-                          :v-adjust 0
-                          :face '(:inherit font-lock-doc-face :slant normal))
+       :icon (concat " "
+                     (all-the-icons-octicon
+                      "repo"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
                      "\t")
        :extensions (root))
       (treemacs-create-icon
@@ -367,12 +368,21 @@ are defining or executing a macro."
                      "\t")
        :extensions (info))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-media" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-media"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
                     "wav" "mp3" "ogg" "midi"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-code" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-code"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)) "\t")
        :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
                     "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
                     "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
@@ -385,27 +395,57 @@ are defining or executing a macro."
                     "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
                     "gitconfig"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "book" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "book"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
                     "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
                     "azw3" "kf8" "kfx" "lit" "prc" "mobi" "exe" "or" "html"
                     "pkg" "opf" "txt" "pdb" "ps" "rtf" "pdg" "xml" "tr2"
                     "tr3" "oxps" "xps"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-text"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions ("md" "markdown" "rst" "log" "org" "txt"
                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-binary" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-binary"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions ("exe" "dll" "obj" "so" "o" "out"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-pdf" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-pdf"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions ("pdf"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-zip" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-zip"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
       (treemacs-create-icon
-       :icon (concat "  " (all-the-icons-octicon "file-text" :v-adjust 0) "\t")
+       :icon (concat "  "
+                     (all-the-icons-octicon
+                      "file-text"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     "\t")
        :extensions (fallback))))
 
   (add-hook 'treemacs-mode-hook
