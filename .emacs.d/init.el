@@ -222,7 +222,7 @@ are defining or executing a macro."
                 'default)
                :background nil t))))
 
-;(add-hook 'org-mode-hook 'my/update-org-latex-preview-bg)
+(add-hook 'solaire-mode-hook 'my/update-org-latex-preview-bg)
 
 (use-package doom-modeline
   :commands (doom-modeline-mode

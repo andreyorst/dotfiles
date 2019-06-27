@@ -611,7 +611,7 @@ isn't remapped by Solaire. This function should fix this problem:
 We need to add advice to use this function:
 
 #+BEGIN_SRC emacs-lisp
-  ;(add-hook 'org-mode-hook 'my/update-org-latex-preview-bg)
+  (add-hook 'solaire-mode-hook 'my/update-org-latex-preview-bg)
 #+END_SRC
 
 Now my  buffers looks  really nice, but  my modeline  doesn't. Luckily
