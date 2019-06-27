@@ -265,7 +265,8 @@ are defining or executing a macro."
              treemacs--maybe-recenter
              treemacs-TAB-action
              treemacs-load-theme)
-  :functions (treemacs-expand-all-projects
+  :functions (my/treemacs-expand-all-projects
+              my/treemacs-variable-pitch-labels
               all-the-icons-octicon)
   :bind (("<f7>" . treemacs)
          ("<f8>" . treemacs-select-window))
@@ -400,20 +401,25 @@ are defining or executing a macro."
   (add-hook 'treemacs-mode-hook
             (lambda()
               (setq tab-width 1
-                    mode-line-format nil)
-              (set-window-fringes nil 0 0 nil)))
+                    mode-line-format nil
+                    line-spacing 5)
+              (set-window-fringes nil 0 0 nil)
+              (my/treemacs-variable-pitch-labels)))
 
   (advice-add #'treemacs-select-window :after
               (lambda()
-                (set-window-fringes nil 0 0 nil)))
+                (set-window-fringes nil 0 0 nil)
+                (my/treemacs-variable-pitch-labels)))
 
   (when window-system
-    (add-hook 'after-init-hook (lambda ()
-                                 (treemacs-load-theme "Atom")
-                                 (treemacs)
-                                 (treemacs-expand-all-projects))))
+    (add-hook 'after-init-hook
+              (lambda ()
+                (treemacs-load-theme "Atom")
+                (treemacs)
+                (my/treemacs-expand-all-projects))))
+
   :init
-  (defun treemacs-expand-all-projects (&optional _)
+  (defun my/treemacs-expand-all-projects (&optional _)
     "Expand all projects."
     (save-excursion
       (treemacs--forget-last-highlight)
@@ -423,9 +429,25 @@ are defining or executing a macro."
             (goto-char pos)
             (treemacs--expand-root-node pos)))))
     (treemacs--maybe-recenter 'on-distance))
-  (add-hook 'treemacs-mode-hook
-            (lambda ()
-              (setq line-spacing 5)))
+
+  (defun my/treemacs-variable-pitch-labels (&rest _)
+    (dolist (face '(treemacs-root-face
+                    treemacs-git-unmodified-face
+                    treemacs-git-modified-face
+                    treemacs-git-renamed-face
+                    treemacs-git-ignored-face
+                    treemacs-git-untracked-face
+                    treemacs-git-added-face
+                    treemacs-git-conflict-face
+                    treemacs-directory-face
+                    treemacs-directory-collapsed-face
+                    treemacs-file-face
+                    treemacs-tags-face))
+      (let ((faces (face-attribute face :inherit nil)))
+        (set-face-attribute
+         face nil :inherit
+         `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
+
   (setq treemacs-width 27
         treemacs-is-never-other-window t
         treemacs-space-between-root-nodes nil)
