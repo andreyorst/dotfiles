@@ -1,4 +1,4 @@
-verbosity = 2
+verbosity = 0
 
 [server]
 # exit session if no requests were received during given period in seconds
@@ -10,8 +10,14 @@ timeout = 1800 # seconds = 30 minutes
 filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "rls"
+offset_encoding = "utf-8"
+[language.rust.initialization_options]
+offsetEncoding = ["utf-8"]
 
 [language.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_flags.txt", "compile_commands.json"]
 command = "clangd"
+offset_encoding = "utf-8"
+[language.c_cpp.initialization_options]
+offsetEncoding = ["utf-8"]
