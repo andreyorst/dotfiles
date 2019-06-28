@@ -601,7 +601,9 @@ cutscenes). When previewing LaTeX in  Org buffers, the background used
 isn't remapped by Solaire. This function should fix this problem:
 
 #+BEGIN_SRC emacs-lisp
+  (defvar org-format-latex-options)
   (defun my/update-org-latex-preview-bg (&rest _)
+    "Update background color for LaTeX images."
     (setq-default
      org-format-latex-options
      (plist-put org-format-latex-options
@@ -1480,7 +1482,7 @@ proper  shortcut  for it.  This  function  toggles bottom  split  with
 
 #+BEGIN_SRC emacs-lisp
   (defun my/ansi-term-toggle ()
-    "Toggle ansi-term window on and off with the same command."
+    "Toggle `ansi-term' window on and off with the same command."
     (interactive)
     (cond ((get-buffer-window "*ansi-term*")
            (ignore-errors (delete-window

@@ -216,7 +216,9 @@ are defining or executing a macro."
 (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
 (add-hook 'org-src-mode-hook 'my/real-buffer-setup)
 
+(defvar org-format-latex-options)
 (defun my/update-org-latex-preview-bg (&rest _)
+  "Update background color for LaTeX images."
   (setq-default
    org-format-latex-options
    (plist-put org-format-latex-options
@@ -741,7 +743,7 @@ are defining or executing a macro."
   (add-hook 'nov-mode-hook #'solaire-mode))
 
 (defun my/ansi-term-toggle ()
-  "Toggle ansi-term window on and off with the same command."
+  "Toggle `ansi-term' window on and off with the same command."
   (interactive)
   (cond ((get-buffer-window "*ansi-term*")
          (ignore-errors (delete-window
