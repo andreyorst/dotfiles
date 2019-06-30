@@ -736,7 +736,7 @@ are defining or executing a macro."
                  (t (ansi-term "bash")
                     (face-remap-add-relative
                      'default
-                     '(:family "Hack" :spacing 0.1 :height 0.8)))))))
+                     '(:family "Hack 9" :spacing 0.1 :height 0.8)))))))
 
 (global-set-key (kbd "C-`") 'my/ansi-term-toggle)
 
@@ -795,7 +795,7 @@ are defining or executing a macro."
         enable-recursive-minibuffers t)
   :bind (("C-x C-b" . ivy-switch-buffer)
          ("C-x b" . ivy-switch-buffer))
-  :config
+  :init
   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format ""
         ivy-display-style nil
@@ -806,6 +806,16 @@ are defining or executing a macro."
   (setq find-program "fd"))
 
 (use-package counsel
+  :commands (counsel-M-x
+             counsel-find-file
+             counsel-fzf
+             counsel-file-jump
+             counsel-recentf
+             counsel-git-grep
+             counsel-rg
+             counsel-describe-function
+             counsel-describe-variable
+             counsel-find-library)
   :init
   (when (executable-find "fd")
     (setq counsel-file-jump-args "-L --type f --hidden"))

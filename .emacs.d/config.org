@@ -1475,7 +1475,7 @@ proper  shortcut  for it.  This  function  toggles bottom  split  with
                    (t (ansi-term "bash")
                       (face-remap-add-relative
                        'default
-                       '(:family "Hack" :spacing 0.1 :height 0.8)))))))
+                       '(:family "Hack 9" :spacing 0.1 :height 0.8)))))))
 #+END_SRC
 
 /Ctrl+`/ seems great shortcut for this.
@@ -1582,7 +1582,7 @@ experience.
           enable-recursive-minibuffers t)
     :bind (("C-x C-b" . ivy-switch-buffer)
            ("C-x b" . ivy-switch-buffer))
-    :config
+    :init
     (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
           ivy-count-format ""
           ivy-display-style nil
@@ -1607,6 +1607,16 @@ variable, so it will be more performant with =fd=.
 
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
+    :commands (counsel-M-x
+               counsel-find-file
+               counsel-fzf
+               counsel-file-jump
+               counsel-recentf
+               counsel-git-grep
+               counsel-rg
+               counsel-describe-function
+               counsel-describe-variable
+               counsel-find-library)
     :init
     (when (executable-find "fd")
       (setq counsel-file-jump-args "-L --type f --hidden"))
