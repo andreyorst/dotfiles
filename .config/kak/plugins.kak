@@ -158,10 +158,11 @@ if '-n "${PATH##*termux*}"' %{
         set-option global tagbar_sort false
         set-option global tagbar_size 40
         set-option global tagbar_display_anon false
+        set-option global tagbar_powerline_format ""
     } config %{
         map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
         hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
-            tagbar-enable
+            hook window -once NormalIdle .* tagbar-enable
         }
         hook global WinSetOption filetype=tagbar %{
             remove-highlighter buffer/numbers
@@ -213,6 +214,10 @@ if '-n "${PATH##*termux*}"' %{
                                                 # ^^ these are not spaces. It is invisible characters.
                                                 # This needed to make folding work correctly if you do
                                                 # space alignment of icons.
+        set-option global kaktree_indentation 1
+        set-option global kaktree_dir_icon_open  '▾' # 📂
+        set-option global kaktree_dir_icon_close '▸' # 📁
+        set-option global kaktree_file_icon      ' ' # 🖹 🖻
     } config %{
         map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
         hook global WinSetOption filetype=kaktree %{

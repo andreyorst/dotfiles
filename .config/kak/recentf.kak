@@ -26,7 +26,7 @@ define-command recentf -params 1 -shell-script-completion %{ cat ${kak_opt_recen
 
 # fzf.kak support
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-hook global ModuleLoad fzf %§
+hook global ModuleLoaded fzf %§
 
 map global fzf -docstring "recent files" 'r' '<esc>: fzf-recentf<ret>'
 

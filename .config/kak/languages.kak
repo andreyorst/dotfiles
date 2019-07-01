@@ -26,7 +26,7 @@ hook global WinSetOption filetype=(c|cpp) %{
     }
 }
 
-hook global ModuleLoad c-family %{ try %{ evaluate-commands %sh{
+hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
     join() { sep=$2; eval set -- $1; IFS="$sep"; echo "$*"; }
 
     # taken from rc/filetype/c-family.kak
@@ -68,7 +68,7 @@ hook global WinSetOption filetype=rust %{
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
 }
 
-hook global ModuleLoad rust %{ try %{ evaluate-commands %sh{
+hook global ModuleLoaded rust %{ try %{ evaluate-commands %sh{
     # Taken from rc/filetype/rust.kak
     rust_keywords="let as fn return match if else loop for in while
                    break continue move box where impl dyn pub unsafe"
@@ -112,7 +112,7 @@ hook global WinSetOption filetype=gas %{
     # a c-like line comment highlighter for compatibility reasons
 }
 
-hook global ModuleLoad gas %{ try %{
+hook global ModuleLoaded gas %{ try %{
     add-highlighter shared/gas/c_line_comment region // (?<!\\\\)(?=\n) fill comment
 }}
 
