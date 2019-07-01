@@ -734,9 +734,7 @@ are defining or executing a macro."
            (cond ((get-buffer "*ansi-term*")
                   (switch-to-buffer "*ansi-term*"))
                  (t (ansi-term "bash")
-                    (face-remap-add-relative
-                     'default
-                     '(:family "Hack 9" :spacing 0.1 :height 0.8)))))))
+                    (set-frame-font "Hack" t))))))
 
 (global-set-key (kbd "C-`") 'my/ansi-term-toggle)
 

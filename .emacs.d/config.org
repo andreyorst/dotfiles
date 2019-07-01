@@ -1473,9 +1473,7 @@ proper  shortcut  for it.  This  function  toggles bottom  split  with
              (cond ((get-buffer "*ansi-term*")
                     (switch-to-buffer "*ansi-term*"))
                    (t (ansi-term "bash")
-                      (face-remap-add-relative
-                       'default
-                       '(:family "Hack 9" :spacing 0.1 :height 0.8)))))))
+                      (set-frame-font "Hack" t))))))
 #+END_SRC
 
 /Ctrl+`/ seems great shortcut for this.
