@@ -90,17 +90,31 @@ pm_yum() {
     esac
 }
 
-pm_apt() {
-    cmd=$1
-    shift
-    case $cmd in
-        install) sudo apt install $@ ;;
-        update)  sudo apt update $@  ;;
-        remove)  sudo apt remove $@  ;;
-        search)  apt search $@       ;;
-        *)       sudo apt $cmd $@    ;;
-    esac
-}
+if [ -n "${PATH##*termux*}" ]; then
+    pm_apt() {
+        cmd=$1
+        shift
+        case $cmd in
+            install) sudo apt install $@ ;;
+            update)  sudo apt update $@  ;;
+            remove)  sudo apt remove $@  ;;
+            search)  apt search $@       ;;
+            *)       sudo apt $cmd $@    ;;
+        esac
+    }
+else
+    pm_apt() {
+        cmd=$1
+        shift
+        case $cmd in
+            install) apt install $@ ;;
+            update)  apt update && apt upgrade $@  ;;
+            remove)  apt remove $@  ;;
+            search)  apt search $@  ;;
+            *)       apt $cmd $@    ;;
+        esac
+    }
+fi
 
 if [ -n "$(command -v dash)" ]; then
     export KAKOUNE_POSIX_SHELL=$(command -v dash)
