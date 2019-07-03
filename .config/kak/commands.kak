@@ -193,7 +193,16 @@ query-repeat %{ try %{
 
 map global normal <c-n> ': query-repeat<ret>'
 
-define-command fd -params 1 -shell-script-candidates %{fd --hidden --type f} %{edit -existing %arg{1}}
+define-command -override -docstring "file <path> [<line>]: Fuzzy search and open file. If <line> argument is specified jump to the <line> after opening" \
+file -shell-script-candidates %{
+    [ -n "$(command -v fd)" ] && fd . -L --hidden --no-ignore --type f || find . -follow -type f
+} -params 1..2 %{ evaluate-commands %sh{
+    file=$(printf "%s\n" "$1" | sed "s/&/&&/g")
+    printf "%s\n" "edit -existing -- %&${file}&"
+    [ $# -gt 1 ] && printf "%s\n" "execute-keys '${2}g'"
+}}
+
+alias global $ file
 
 try %{ require-module kak }
 add-highlighter shared/kakrc/code/if_else regex \b(if|else)\b 0:keyword
