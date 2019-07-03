@@ -157,25 +157,23 @@ evaluate-selection %{
     execute-keys -itersel -draft ':<space><c-r>.<ret>'
 }
 
-define-command -docstring "split tmux vertically" \
+define-command -docstring "vsplit [<commands>]: split tmux vertically" \
 vsplit -params .. -command-completion %{
     tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
 
-define-command -docstring "split tmux horizontally" \
+define-command -docstring "split [<commands>]: split tmux horizontally" \
 split -params .. -command-completion %{
     tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
 }
 
-define-command -docstring "create new tmux window" \
+define-command -docstring "tabnew [<commands>]: create new tmux window" \
 tabnew -params .. -command-completion %{
     tmux-terminal-window kak -c %val{session} -e "%arg{@}"
 }
 
 define-command -docstring "print current working directory" \
-pwd %{ evaluate-commands %sh{
-    printf "%s\n" "echo -markup %{{Information}${PWD}}"
-}}
+pwd %{ echo %sh{ printf "%s\n" "${PWD}" }}
 
 define-command -docstring "Ask before repeating last command (with `.' (dot)) for next search match" \
 query-repeat %{ try %{

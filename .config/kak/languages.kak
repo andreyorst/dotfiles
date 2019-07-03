@@ -18,11 +18,11 @@ hook global WinSetOption filetype=(c|cpp) %{
 
     try %{
         remove-highlighter buffer/operators
-        add-highlighter    buffer/operators regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\]) 0:operator
+        add-highlighter    buffer/operators regex \+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\] 0:operator
     }
     try %{
         remove-highlighter buffer/delimiters
-        add-highlighter    buffer/delimiters regex (\(|\)||\{|\}|\;|'|`) 0:delimiter
+        add-highlighter    buffer/delimiters regex \(|\)|\{|\}|\;|'|` 0:delimiter
     }
 }
 

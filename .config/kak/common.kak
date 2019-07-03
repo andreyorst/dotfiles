@@ -68,8 +68,8 @@ alias global h doc
 hook global BufCreate '^\*scratch\*$' %{
     execute-keys -buffer *scratch* '%d'
     hook -once -always global BufCreate '^(?!\*scratch\*).*$' %{ try %{
-        # throw if the buffer has more than one character
-        execute-keys -buffer *scratch* 'L<a-K>..<ret>'
+        # throw if the buffer has something other than newlines in the beginning of lines
+        execute-keys -buffer *scratch* '%<a-s><a-K>^[^\n]<ret>'
         delete-buffer *scratch*
     }}
 }
