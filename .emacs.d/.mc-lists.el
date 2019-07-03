@@ -30,6 +30,7 @@
         parinfer-semicolon
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        upcase-region
         ))
 
 (setq mc/cmds-to-run-once
