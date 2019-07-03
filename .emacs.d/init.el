@@ -876,35 +876,6 @@ are defining or executing a macro."
 
 (use-package yasnippet-snippets)
 
-(use-package projectile
-  :commands (projectile-mode
-             projectile-find-file
-             projectile-project-root)
-  :defines (my/projectile-project-find-function)
-  :bind (("C-c p" . projectile-command-map))
-  :init
-  (with-eval-after-load 'project
-    (defvar project-find-functions)
-    (add-to-list 'project-find-functions
-                 #'my/projectile-project-find-function))
-  (projectile-mode +1)
-  (setq projectile-svn-command "fd -L --type f --print0"
-        projectile-generic-command "fd -L --type f --print0"
-        projectile-require-project-root t
-        projectile-enable-caching t
-        projectile-completion-system 'ivy))
-
-(defun my/projectile-project-find-function (dir)
-  "Handle root search in DIR with Projectile."
-  (unless (require 'projectile nil t)
-    (error "`projectile' isn't installed"))
-  (let ((root (projectile-project-root dir)))
-    (and root (cons 'transient root))))
-
-(use-package counsel-projectile
-  :commands counsel-projectile-mode
-  :config (counsel-projectile-mode))
-
 (use-package magit)
 
 (use-package vdiff
