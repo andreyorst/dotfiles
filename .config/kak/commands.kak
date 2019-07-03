@@ -145,13 +145,7 @@ If no symbol given, current selection is used as a symbol name" \
         END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
 }}
 
-define-command -hidden format-c -docstring \
-"wrap all occurrences of `tos()', `ton()', `tonf()', and `tob()' functions with `// clang-format off/on' comments, execute formatting of a buffer with clang format and remove those comments." \
-%{ try %{
-    execute-keys -draft '%s(to[nbs](f)?)(\h+)?\(<ret><a-h>O//<space>clang-format<space>off<esc>jo//<space>clang-format<space>on<esc>%|clang-format<ret>%s(to[nbs](f)?)(\h+)?\(<ret><a-h>kxdjxd'
-} catch %{
-    execute-keys -draft '%|clang-format<ret>'
-}}
+alias global @ symbol
 
 define-command -docstring "evaluate-buffer: evaluate current buffer contents as kakscrupt" \
 evaluate-buffer %{
