@@ -1,13 +1,11 @@
 try %{ require-module perl }
 try %{ require-module kak }
 
-try %&
 add-highlighter shared/kakrc/code/perl_commands regex '(^|\h)define-perl-command\h' 0:keyword
 add-highlighter shared/kakrc/perl_command1 region -recurse '\{' 'define-perl-command\h.*?\K%\{' '\}' ref perl
 add-highlighter shared/kakrc/perl_command2 region -recurse '\(' 'define-perl-command\h.*?\K%\(' '\)' ref perl
 add-highlighter shared/kakrc/perl_command3 region -recurse '\[' 'define-perl-command\h.*?\K%\[' '\]' ref perl
 add-highlighter shared/kakrc/perl_command4 region -recurse '<'  'define-perl-command\h.*?\K%<'  '>'  ref perl
-&
 
 define-command define-perl-command \
 -docstring "define-perl-command [<switches>] <name> <cmds>: define a command <name> executing <cmds>       
@@ -78,3 +76,5 @@ define-command define-perl-command \
         hook global -always KakEnd .* %{ nop %sh{ rm $tmp }}
     "
 }}
+
+alias global def-perl define-perl-command

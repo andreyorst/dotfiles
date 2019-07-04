@@ -40,21 +40,19 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     }
 }
 
-if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/fzf.kak" config %{
-        map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
-    } defer fzf %{
-        set-option global fzf_preview_width '65%'
-        set-option global fzf_project_use_tilda true
-        evaluate-commands %sh{
-            if [ -n "$(command -v fd)" ]; then
-                echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
-            else
-                echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
-            fi
-            [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_cmd bat"
-            [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"
-        }
+plug "andreyorst/fzf.kak" config %{
+    map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
+} defer fzf %{
+    set-option global fzf_preview_width '65%'
+    set-option global fzf_project_use_tilda true
+    evaluate-commands %sh{
+        if [ -n "$(command -v fd)" ]; then
+            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
+        else
+            echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
+        fi
+        [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_cmd bat"
+        [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"
     }
 }
 
@@ -104,13 +102,12 @@ if '-n "${PATH##*termux*}"' %{
     }
 }
 
-if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/powerline.kak" defer powerline %{
-        set-option global powerline_ignore_warnings true
-        set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
-        powerline-theme base16-gruvbox
-    }
+plug "andreyorst/powerline.kak" defer powerline %{
+    set-option global powerline_ignore_warnings true
+    set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
+    powerline-theme base16-gruvbox
 }
+
 
 plug "andreyorst/smarttab.kak" %{
     set-option global softtabstop 4
@@ -191,13 +188,11 @@ plug "screwtapello/kakoune-inc-dec" domain GitLab.com config %{
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
 
-if '-n "${PATH##*termux*}"' %{
-    plug "andreyorst/langmap.kak" defer langmap %{
-        set-option global langmap %opt{langmap_ru_jcuken}
-        map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
-        map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
-        map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
-    }
+plug "andreyorst/langmap.kak" defer langmap %{
+    set-option global langmap %opt{langmap_ru_jcuken}
+    map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
+    map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
+    map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
 }
 
 plug "delapouite/kakoune-select-view" %{
