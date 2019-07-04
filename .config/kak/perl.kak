@@ -7,7 +7,22 @@ add-highlighter shared/kakrc/perl_command2 region -recurse '\(' 'define-perl-com
 add-highlighter shared/kakrc/perl_command3 region -recurse '\[' 'define-perl-command\h.*?\K%\[' '\]' ref perl
 add-highlighter shared/kakrc/perl_command4 region -recurse '<'  'define-perl-command\h.*?\K%<'  '>'  ref perl
 
-define-command define-perl-command -params 1.. %§ evaluate-commands %sh{
+define-command define-perl-command \
+-docstring "define-perl-command [<switches>] <name> <cmds>: define a command <name> executing <cmds>       
+ Switches:                                                                                 
+     -params <arg>                  take parameters, accessible to each shell escape as $0..$N
+     parameter should take the form <count> or <min>..<max> (both omittable)
+     -override                      allow overriding an existing command
+     -hidden                        do not display the command in completion candidates
+     -docstring <arg>               define the documentation string for command
+     -file-completion               complete parameters using filename completion
+     -client-completion             complete parameters using client name completion
+     -buffer-completion             complete parameters using buffer name completion
+     -command-completion            complete parameters using kakoune command completion
+     -shell-completion              complete parameters using shell command completion
+     -shell-script-completion <arg> complete parameters using the given shell-script
+     -shell-script-candidates <arg> get the parameter candidates using the given shell-script" \
+-params 1.. %{ evaluate-commands %sh{
     # filtering arguments
     while [ $# -gt 0 ]; do
         case $1 in
@@ -49,23 +64,24 @@ define-command define-perl-command -params 1.. %§ evaluate-commands %sh{
     printf "%s\n" "$1" >> "$tmp"
 
     # extracting kakoune variables from command body
-    vars=$(grep -o 'kak_\w*' $tmp | uniq)
-
+    vars=$(grep -o 'kak_\w*' $tmp | uniq | sed "s/^/# /")
     # creating body of the command
     printf "%s\n" "
         define-command $switches $docstring $command_name $completion $candidates $params %{
             evaluate-commands %sh{
-                # $vars
+                $vars
                 perl $tmp \$@
             }
         }
         hook global -always KakEnd .* %{ nop %sh{ rm $tmp }}
     "
-}§
+}}
 
-define-perl-command -docstring "docstring supported" -override test2 -params .. %{
-    my $variable = 'test';
+define-perl-command -docstring "docstring" -override perl-test1 -params 1.. %{
+    use strict;
+    use warnings;
+    my $variable = "test";
     my $env_variable = $ENV{"kak_bufname"};
-    my $parameter = $ARGV[1];
+    my $parameter = $ARGV[0];
     print("echo %{$variable, $env_variable, $parameter}\n");
 }
