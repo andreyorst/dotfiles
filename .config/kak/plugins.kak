@@ -132,7 +132,7 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
-plug "andreyorst/kakoune-snippets" branch "auto-discard" config %{
+plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
     map global insert '<tab>' "<a-;>: expand-or-jump-or-key tab<ret>"
@@ -162,7 +162,7 @@ if '-n "${PATH##*termux*}"' %{
     } config %{
         map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
         hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
-            hook window -once NormalIdle .* tagbar-enable
+            tagbar-enable
         }
         hook global WinSetOption filetype=tagbar %{
             remove-highlighter buffer/numbers
@@ -172,6 +172,7 @@ if '-n "${PATH##*termux*}"' %{
         }
     }
 }
+
 plug "alexherbo2/word-movement.kak" config %{
     word-movement-map next w
     word-movement-map previous b

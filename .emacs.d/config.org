@@ -1716,7 +1716,7 @@ A enormous snippet collection for yasnippet.
   (use-package yasnippet-snippets)
 #+END_SRC
 
-*** Projectile
+*** COMMENT Projectile
 Since Emacs  is stupid, it  changes working directory to  current file
 location. So I need a whole plugin to workaround this silly issue.
 
