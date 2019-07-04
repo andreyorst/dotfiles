@@ -12,6 +12,7 @@ evaluate-commands %sh{
     config_files="
         common.kak
         commands.kak
+        perl.kak
         mappings.kak
         languages.kak
         recentf.kak
