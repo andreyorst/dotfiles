@@ -1,11 +1,13 @@
 try %{ require-module perl }
 try %{ require-module kak }
 
+try %&
 add-highlighter shared/kakrc/code/perl_commands regex '(^|\h)define-perl-command\h' 0:keyword
 add-highlighter shared/kakrc/perl_command1 region -recurse '\{' 'define-perl-command\h.*?\K%\{' '\}' ref perl
 add-highlighter shared/kakrc/perl_command2 region -recurse '\(' 'define-perl-command\h.*?\K%\(' '\)' ref perl
 add-highlighter shared/kakrc/perl_command3 region -recurse '\[' 'define-perl-command\h.*?\K%\[' '\]' ref perl
 add-highlighter shared/kakrc/perl_command4 region -recurse '<'  'define-perl-command\h.*?\K%<'  '>'  ref perl
+&
 
 define-command define-perl-command \
 -docstring "define-perl-command [<switches>] <name> <cmds>: define a command <name> executing <cmds>       
@@ -36,11 +38,11 @@ define-command define-perl-command \
             -shell-script-completion)
                 shift
                 completion=$(printf "%s\n" "$1" | sed "s/&/&&/g")
-                completion="-shell-script-completion $&$completion&" ;;
+                completion="-shell-script-completion %&$completion&" ;;
             -shell-script-candidates)
                 shift
                 candidates=$(printf "%s\n" "$1" | sed "s/&/&&/g")
-                candidates="-shell-script-candidates $&$candidates&" ;;
+                candidates="-shell-script-candidates %&$candidates&" ;;
             -override|-hidden|-menu|-file-completion|-client-completion|-buffer-completion|-command-completion|-shell-completion)
                 switches="$switches $1" ;;
             *)
@@ -76,12 +78,3 @@ define-command define-perl-command \
         hook global -always KakEnd .* %{ nop %sh{ rm $tmp }}
     "
 }}
-
-define-perl-command -docstring "docstring" -override perl-test1 -params 1.. %{
-    use strict;
-    use warnings;
-    my $variable = "test";
-    my $env_variable = $ENV{"kak_bufname"};
-    my $parameter = $ARGV[0];
-    print("echo %{$variable, $env_variable, $parameter}\n");
-}
