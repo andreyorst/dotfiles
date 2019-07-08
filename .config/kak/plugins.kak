@@ -105,6 +105,10 @@ if '-n "${PATH##*termux*}"' %{
 plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
+    if '! -n "${PATH##*termux*}"' %{
+        set-option global powerline_separator ''
+        set-option global powerline_separator_thin ''
+    }
     powerline-theme base16-gruvbox
 }
 
