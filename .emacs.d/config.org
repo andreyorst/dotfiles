@@ -1357,7 +1357,6 @@ settings for Rust mode.
   (use-package rust-mode
     :config (add-hook 'rust-mode-hook
                       '(lambda()
-                         (racer-mode)
                          (yas-minor-mode)
                          (electric-pair-mode)
                          (setq company-tooltip-align-annotations t))))
@@ -1370,7 +1369,11 @@ possible to use, like in Org Mode.
 
 #+BEGIN_SRC emacs-lisp
   (use-package racer
-    :config (add-hook 'racer-mode-hook #'eldoc-mode))
+    :config (add-hook 'racer-mode-hook #'eldoc-mode)
+    :init
+    (defun org-babel-edit-prep:rust (&optional babel-info)
+      "Run racer mode for Org Babel."
+      (racer-mode 1)))
 #+END_SRC
 
 There's also a package for Cargo integration:
@@ -1851,7 +1854,8 @@ Emacs polyglot. LSP client.
      (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
      :init
      (add-hook 'c-mode-hook 'eglot-ensure)
-     (add-hook 'c++-mode-hook 'eglot-ensure))
+     (add-hook 'c++-mode-hook 'eglot-ensure)
+     (add-hook 'rust-mode-hook 'eglot-ensure))
 #+END_SRC
 
 There's still one  problem though. [[Eglot]] use =project.el=  to detect the

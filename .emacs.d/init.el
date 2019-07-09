@@ -683,13 +683,16 @@ are defining or executing a macro."
 (use-package rust-mode
   :config (add-hook 'rust-mode-hook
                     '(lambda()
-                       (racer-mode)
                        (yas-minor-mode)
                        (electric-pair-mode)
                        (setq company-tooltip-align-annotations t))))
 
 (use-package racer
-  :config (add-hook 'racer-mode-hook #'eldoc-mode))
+  :config (add-hook 'racer-mode-hook #'eldoc-mode)
+  :init
+  (defun org-babel-edit-prep:rust (&optional babel-info)
+    "Run racer mode for Org Babel."
+    (racer-mode 1)))
 
 (use-package cargo
   :config
@@ -981,7 +984,8 @@ _-_: reduce region _)_: around pairs
   (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
   :init
   (add-hook 'c-mode-hook 'eglot-ensure)
-  (add-hook 'c++-mode-hook 'eglot-ensure))
+  (add-hook 'c++-mode-hook 'eglot-ensure)
+  (add-hook 'rust-mode-hook 'eglot-ensure))
 
 (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
   "Files or directories that indicate the root of a project.")
