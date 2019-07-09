@@ -991,11 +991,10 @@ _-_: reduce region _)_: around pairs
 
 (defun my/project-root-p (path)
   "Check if current PATH has any of project root markers."
-  (let (result)
-    (dolist (marker project-root-markers)
-      (when (file-exists-p (concat path marker))
-        (setq result t)))
-    result))
+  (let ((results (mapcar (lambda (marker)
+                           (file-exists-p (concat path marker)))
+                         project-root-markers)))
+    (eval `(or ,@ results))))
 
 (with-eval-after-load 'project
   (add-to-list 'project-find-functions #'my/project-find-root))
