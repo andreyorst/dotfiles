@@ -930,10 +930,6 @@ _C_:   select next line"
             ("C" mc/mark-next-lines)
             ("q" mc/remove-duplicated-cursors :exit t)))
 
-(use-package mc-extras
-  :config
-  (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
-
 (use-package iedit
   :commands (iedit-mode
              iedit-expand-down-to-occurrence)

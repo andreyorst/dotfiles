@@ -1778,15 +1778,7 @@ guess I'll figure out best mappings over time.
 
 **** MC Extras
 this package provides  some extra functions for  multiple cursors. I'm
-interested in  =mc/remove-duplicaded-cursors=. When using [[*Phi  Search][Phi Search]] it
-often  places several  cursors at  the same  positions, which  I don't
-like.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package mc-extras
-    :config
-    (advice-add 'phi-search :after 'mc/remove-duplicated-cursors))
-#+END_SRC
+interested in  =mc/remove-duplicaded-cursors=.
 
 *** Iedit
 Another package that allows editing several regions simultaneously.
