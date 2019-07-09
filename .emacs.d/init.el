@@ -494,8 +494,6 @@ are defining or executing a macro."
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode nil))
 
-(use-package treemacs-projectile)
-
 (use-package treemacs-magit)
 
 (use-package eyebrowse

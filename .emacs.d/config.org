@@ -924,14 +924,7 @@ look just as great as DOOM themed Emacs!
     (treemacs-fringe-indicator-mode nil))
 #+END_SRC
 
-This supplement  package makes  some nice integration  with Projectile
-package that I'm using. It doesn't really need any configuration.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs-projectile)
-#+END_SRC
-
-Same story with Magit integration.
+This supplement  package makes  some nice integration  with Magit.
 
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs-magit)
@@ -1018,21 +1011,6 @@ and perhaps I don't need to use =:diminish= everywhere anymore.
                                    flyspell-mode
                                    parinfer-mode))
     :init (minions-mode 1))
-#+END_SRC
-
-*** COMMENT Eldoc Box
-A package that creates child frame for eldoc documentation messages.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package eldoc-box
-    :commands eldoc-box-hover-mode
-    :config
-    (set-face-attribute 'eldoc-box-border nil :background "#191B20")
-    :init
-    (advice-add 'eldoc-box-hover-mode :after 'eldoc-box-hover-at-point-mode)
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
-    (setq eldoc-box-max-pixel-width 1920
-          eldoc-box-max-pixel-height 1080))
 #+END_SRC
 
 *** Window Divider
@@ -1714,57 +1692,6 @@ A enormous snippet collection for yasnippet.
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet-snippets)
-#+END_SRC
-
-*** COMMENT Projectile
-Since Emacs  is stupid, it  changes working directory to  current file
-location. So I need a whole plugin to workaround this silly issue.
-
-However this plugin is quite useful with Git repositories.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package projectile
-    :commands (projectile-mode
-               projectile-find-file
-               projectile-project-root)
-    :defines (my/projectile-project-find-function)
-    :bind (("C-c p" . projectile-command-map))
-    :init
-    (with-eval-after-load 'project
-      (defvar project-find-functions)
-      (add-to-list 'project-find-functions
-                   #'my/projectile-project-find-function))
-    (projectile-mode +1)
-    (setq projectile-svn-command "fd -L --type f --print0"
-          projectile-generic-command "fd -L --type f --print0"
-          projectile-require-project-root t
-          projectile-enable-caching t
-          projectile-completion-system 'ivy))
-#+END_SRC
-
-There's still one problem though. I'm using Projectile, but some other
-packages, like [[Eglot]]  use =project.el=.  Which means that  all nice root
-detection handled by  projectile is bypassed and all  attempts to find
-roots of the  project are not exactly where the  project root actually
-is. This  function attempts to fix  this problem.  I found  it in this
-issue [[https://github.com/joaotavora/eglot/issues/129][joaotavora/eglot#129]]:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/projectile-project-find-function (dir)
-    "Handle root search in DIR with Projectile."
-    (unless (require 'projectile nil t)
-      (error "`projectile' isn't installed"))
-    (let ((root (projectile-project-root dir)))
-      (and root (cons 'transient root))))
-#+END_SRC
-
-**** Counsel projectile
-It makes using projectile easier by allowing fuzzy matching.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel-projectile
-    :commands counsel-projectile-mode
-    :config (counsel-projectile-mode))
 #+END_SRC
 
 *** Magit
