@@ -12,9 +12,9 @@ define-command -hidden \
 -docstring "smart-select: select WORD if current selection is only one character" \
 smart-select -params 1 %{ evaluate-commands %sh{
     case $1 in
-        WORD) keys="<a-w>" ;;
-        word) keys="w" ;;
-        *)    printf "%s\n" "fail %{wrong word type '$1'}"; exit ;;
+        (WORD) keys="<a-w>" ;;
+        (word) keys="w" ;;
+        (*)    printf "%s\n" "fail %{wrong word type '$1'}"; exit ;;
     esac
     if [ $(printf "%s\n" ${kak_selection} | wc -m) -eq 2 ]; then
         printf "%s\n" "execute-keys -save-regs '' <a-i>${keys}"
@@ -50,9 +50,9 @@ search-file -params 1 %{ evaluate-commands %sh{
     eval "set -- ${kak_opt_path}"
     while [ $# -gt 0 ]; do                # Since we want to check fewer places,
         case $1 in                        # I've swapped ./ and %/ because
-            ./) path=${kak_buffile%/*} ;; # %/ usually has smaller scope. So
-            %/) path=${PWD}            ;; # this trick is a speedi-up hack.
-            *)  path=$1                ;; # This means that `path' option should
+            (./) path=${kak_buffile%/*} ;; # %/ usually has smaller scope. So
+            (%/) path=${PWD}            ;; # this trick is a speedi-up hack.
+            (*)  path=$1                ;; # This means that `path' option should
         esac                              # first contain `./' and then `%/'
 
         if [ -z "${file##*/*}" ] && [ -e "${path}/${file}" ]; then
@@ -180,9 +180,9 @@ query-repeat %{ try %{
     execute-keys n
     prompt "confirm? [yn]: " -on-change %{ execute-keys %sh{
         case ${kak_text} in
-            y) printf "%s\n" "<esc>.: query-repeat<ret>";;
-            n) printf "%s\n" "<esc>: query-repeat<ret>" ;;
-            *) ;;
+            (y) printf "%s\n" "<esc>.: query-repeat<ret>";;
+            (n) printf "%s\n" "<esc>: query-repeat<ret>" ;;
+            (*) ;;
         esac
     }} nop
 } catch %{
