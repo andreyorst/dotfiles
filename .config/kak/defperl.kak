@@ -1,5 +1,5 @@
-try %{ require-module perl }
-try %{ require-module kak }
+require-module perl
+require-module kak
 
 add-highlighter shared/kakrc/code/perl_commands regex '(^|\h)define-perl-command\h' 0:keyword
 add-highlighter shared/kakrc/perl_command1 region -recurse '\{' 'define-perl-command\h.*?\K%\{' '\}' ref perl
@@ -8,8 +8,8 @@ add-highlighter shared/kakrc/perl_command3 region -recurse '\[' 'define-perl-com
 add-highlighter shared/kakrc/perl_command4 region -recurse '<'  'define-perl-command\h.*?\K%<'  '>'  ref perl
 
 define-command define-perl-command \
--docstring "define-perl-command [<switches>] <name> <cmds>: define a command <name> executing <cmds>       
- Switches:                                                                                 
+-docstring "define-perl-command [<switches>] <name> <cmds>: define a command <name> executing <cmds>
+ Switches:
      -params <arg>                  take parameters, accessible to each shell escape as $0..$N
      parameter should take the form <count> or <min>..<max> (both omittable)
      -override                      allow overriding an existing command
