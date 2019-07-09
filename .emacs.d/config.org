@@ -336,13 +336,13 @@ Let's remap default =keyboard-quit= key with this function.
   (global-set-key [remap keyboard-quit] #'my/escape)
 #+END_SRC
 
-** Use Package
+** [[https://github.com/jwiegley/use-package][Use Package]]
 I use =use-package= to install, load  and configure my packages.  I find
 this way very consistent and easy  to understand and maintain.  What I
-like about Use  Package is that it automatically  installs packages on
-Emacs startup. But  unfortunately it can't be installed  by itself, so
-we need  a way to install  Use Package in  case I load this  config on
-fresh system.
+like  about it  is that  it automatically  installs packages  on Emacs
+startup. But unfortunately it can't be installed by itself, so we need
+a way  to install  Use Package  in case  I load  this config  on fresh
+system.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/ensure-installed (package)
@@ -462,7 +462,7 @@ active window.
 Now  I can  list  some amazing  packages that  provide  some real  GUI
 goodies to Emacs.
 
-*** All The Icons
+*** [[https://github.com/domtronn/all-the-icons.el][All The Icons]]
 This  package provides  nice icons  for emacs  via custom  fonts. Just
 don't forget to use =M-x all-the-icons-install-fonts RET= after install.
 
@@ -471,9 +471,9 @@ don't forget to use =M-x all-the-icons-install-fonts RET= after install.
 #+END_SRC
 
 I don't use  this package directly yet, but some  other packages, like
-[[https://github.com/hlissner/emacs-doom-themes][DOOM Themes]] do.
+DOOM Modeline or Treemacs.
 
-*** DOOM Themes
+*** [[https://github.com/hlissner/emacs-doom-themes][DOOM Themes]]
 This theme collection  was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and  I find these
 themes actually great  on its own. This package  contains nice variant
 of Atom-like One theme which I like,  but it is also an amazingly well
@@ -483,16 +483,7 @@ change a little bit of it.
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-    :commands (doom-themes-org-config
-               doom-themes-treemacs-config)
-    :functions (all-the-icons-octicon
-                treemacs-create-theme
-                treemacs-create-icon
-                root
-                dir-closed
-                dir-open
-                treemacs-load-theme)
-    :defines (doom-treemacs-use-generic-icons)
+    :commands (doom-themes-org-config)
     :init
     (load-theme 'doom-one t)
     (doom-themes-org-config)
@@ -522,10 +513,7 @@ initialization process, and when new frame is created.
     (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 #+END_SRC
 
-There's also another  great package that adds nice  colors for buffers
-that are actually used for editing files: [[https://github.com/hlissner/emacs-solaire-mode][Solaire Mode]].
-
-*** Solaire Mode
+*** [[https://github.com/hlissner/emacs-solaire-mode][Solaire Mode]]
 This  package helps  distinguish  buffers that  have  file opened  and
 buffers that  are for utilities  like file  browser. Also it  has cool
 name! =\[T]/=
@@ -619,10 +607,7 @@ We need to add advice to use this function:
   (add-hook 'solaire-mode-hook 'my/update-org-latex-preview-bg)
 #+END_SRC
 
-Now my  buffers looks  really nice, but  my modeline  doesn't. Luckily
-there's another great package from DOOM Emacs - [[https://github.com/hlissner/doom-modeline][DOOM Modeline]].
-
-*** DOOM Modeline
+*** [[https://github.com/hlissner/doom-modeline][DOOM Modeline]]
 I've tried bunch of different modelines:
 
 - [[https://github.com/TheBB/spaceline][Spaceline]]
@@ -675,17 +660,16 @@ it's great!
 
 I guess that this is all for DOOM  packages for now, but I have to say
 that I really  appreciate *[[https://github.com/hlissner][@hlissner]]* work. These  packages already make
-Emacs look  outstanding. But to make  it look more like  a traditional
-modern text editor we need a  file explorer. Emacs has builtin package
-for this, named  =speedbar=, but It uses external frame  and has so many
-features  that I  don't  know  if I  really  need. Thankfully  there's
-another package that provides filetree: [[https://github.com/Alexander-Miller/treemacs][Treemacs]].
+Emacs look  outstanding.
 
-*** Treemacs
-With this package, and its supplement packages I can have a consistent
-filetree inside my Emacs frame. Which  is good. But there's more: DOOM
-Themes support  this package as  well, which means that  Treemacs will
-look just as great as DOOM themed Emacs!
+*** [[https://github.com/Alexander-Miller/treemacs][Treemacs]]
+To make Emacs look more like  a traditional modern text editor we need
+a file explorer.  Emacs has  builtin package for this, named =speedbar=,
+but It uses external frame and has  so many features that I don't know
+if I really need. With this package, and its supplement packages I can
+have a consistent  filetree inside my Emacs frame. Which  is good. But
+there's more:  DOOM Themes support  this package as well,  which means
+that Treemacs will look just as great as DOOM themed Emacs!
 
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs
@@ -696,7 +680,8 @@ look just as great as DOOM themed Emacs!
                treemacs--expand-root-node
                treemacs--maybe-recenter
                treemacs-TAB-action
-               treemacs-load-theme)
+               treemacs-load-theme
+               treemacs-toggle-fixed-width)
     :functions (my/treemacs-expand-all-projects
                 my/treemacs-variable-pitch-labels
                 doom-color
@@ -883,6 +868,7 @@ look just as great as DOOM themed Emacs!
                 (lambda ()
                   (treemacs-load-theme "Atom")
                   (treemacs)
+                  (treemacs-toggle-fixed-width)
                   (my/treemacs-expand-all-projects))))
 
     :init
@@ -933,10 +919,9 @@ This supplement  package makes  some nice integration  with Magit.
 Before using Treemacs I was a  happy user of another filetree package:
 [[https://github.com/jaypei/emacs-neotree][Neotree]]. Unfortunately, last  commit to this package dates  to Nov 21,
 2018, and since then there were no maintenance, and I was experiencing
-a bug which  affects my usage of another amazing  package [[https://github.com/wasamasa/eyebrowse][Eyebrowse]] so
-I've decided to move to Treemacs, since it works fine with it.
+a bug which made me move to Treemacs.
 
-*** Eyebrowse
+*** [[https://github.com/wasamasa/eyebrowse][Eyebrowse]]
 This  package imitates  virtual workspaces,  or virtual  frames inside
 single Emacs  frame. This  is really  useful, when  you have  bunch of
 windows, and you  want to open new  set but don't want  to loose other
@@ -949,7 +934,7 @@ window configurations. It works much like Vim tabs, or Tmux windows.
     (eyebrowse-mode t))
 #+END_SRC
 
-*** Diff HL Mode
+*** [[https://github.com/dgutov/diff-hl][Diff HL Mode]]
 This package  provides nice way  of diffing buffers. It  displays thin
 bar inside fringe marking unstaged changes.
 
@@ -979,11 +964,7 @@ nicely with DOOM Themes and DOOM Modeline:
 
 #+END_SRC
 
-Speaking of defining fancier things.  This configuration is written in
-Org Mode, so maybe we could  have nice symbols for headings? Of course
-we can, there's a package for it: [[https://github.com/sabof/org-bullets][Org Bullets]].
-
-*** Org Bullets
+*** [[https://github.com/sabof/org-bullets][Org Bullets]]
 This package makes org headings use  fancy bullet symbols. But I don't
 quite like those, so I set them to these four symbols: =◉=, =○=, =•=, =◦=.
 
@@ -998,7 +979,7 @@ quite like those, so I set them to these four symbols: =◉=, =○=, =•=, =◦
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 #+END_SRC
 
-*** Minions
+*** [[https://github.com/tarsius/minions][Minions]]
 This  package  implements   a  menu  that  lists   all  enabled  minor
 modes. Emacs mode  line can become pretty long, so  this can be handy,
 and perhaps I don't need to use =:diminish= everywhere anymore.
@@ -1244,7 +1225,7 @@ ever decide to export Org to Markdown, I'll need this:
   (require 'ox-md nil t)
 #+END_SRC
 
-*** Flycheck Mode
+*** [[https://www.flycheck.org/en/latest/][Flycheck Mode]]
 Flycheck  is useful  tool, which  can provide  syntax checking  on the
 fly. Let's enable it for bunch of languages here.
 
@@ -1323,7 +1304,7 @@ Also, let's fix highlighting a bit:
         '(c-mode c++-mode))
 #+END_SRC
 
-*** Markdown
+*** [[https://github.com/jrblevin/markdown-mode][Markdown Mode]]
 Sometimes I need to edit Markdown documents, so this package is handy.
 
 #+BEGIN_SRC emacs-lisp
@@ -1347,7 +1328,7 @@ filling. Basically the same setup as for Org Mode.
 
 #+END_SRC
 
-*** Rust
+*** [[https://github.com/rust-lang/rust-mode][Rust Mode]]
 I'd like to  have Rust syntax highlighting and  some basic facilities,
 since I'm  planning to write my  exercises in org mode.   Since I make
 notes in Org-mode, and  I started to use it for Rust  too, I need some
@@ -1364,7 +1345,7 @@ settings for Rust mode.
 
 This also means  that I could use something  to automatically complete
 Rust  language facilities.  Rust  ecosystem provides  two options  for
-that:  Racer, and  RLS.  I'm  planning to  use  Racer  when RLS  isn't
+that:  [[https://github.com/racer-rust/emacs-racer][Racer]], and  [[https://github.com/rust-lang/rls][RLS]].  I'm  planning to  use  Racer  when RLS  isn't
 possible to use, like in Org Mode.
 
 #+BEGIN_SRC emacs-lisp
@@ -1376,7 +1357,7 @@ possible to use, like in Org Mode.
       (racer-mode 1)))
 #+END_SRC
 
-There's also a package for Cargo integration:
+There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] integration:
 
 #+BEGIN_SRC emacs-lisp
   (use-package cargo
@@ -1397,7 +1378,7 @@ Once again, additional highlighting, but for Rust:
    t)
 #+END_SRC
 
-*** TOML
+*** [[https://github.com/dryman/toml-mode.el][TOML Mode]]
 =toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
 configure project.
 
@@ -1405,10 +1386,9 @@ configure project.
   (use-package toml-mode)
 #+END_SRC
 
-*** EditorConfig
-Speaking  of formatting,  =.editorconfig= file  provides a  nice way  to
-synchronize my  editor configurations  between projects  and different
-editors.
+*** [[https://github.com/editorconfig/editorconfig-emacs][EditorConfig]]
+=.editorconfig=  file  provides a  nice  way  to synchronize  my  editor
+configurations between projects and different editors.
 
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
@@ -1417,7 +1397,7 @@ editors.
     (editorconfig-mode 1))
 #+END_SRC
 
-*** Nov.el
+*** [[https://github.com/wasamasa/nov.el][Nov.el]]
 Package that  makes it  possible to read  [[https://en.wikipedia.org/wiki/EPUB][ePUB]] formatted  books inside
 Emacs.
 
@@ -1474,7 +1454,7 @@ Also, when I exit terminal, I'd like to kill its window automatically:
   (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
 #+END_SRC
 
-*** Hydra
+*** [[https://github.com/abo-abo/hydra][Hydra]]
 Hydra is  something like ability to  create mappings that sit  in it's
 own mode, like different user modes  in Kakoune. It allows me to press
 some shortcut and  be locked in a mode-like state  where keys that are
@@ -1500,7 +1480,7 @@ provide sane keybindings.
       ("0" (text-scale-set 0) "reset")))
 #+END_SRC
 
-*** Geiser
+*** [[https://gitlab.com/jaor/geiser][Geiser]]
 Since I mostly use Emacs for studying LISP, and I'm reading SICP which
 uses Scheme as main LISP flavor for explanations and exercises, I need
 a tool  to run Scheme,  and Geiser seems  like the most  viable option
@@ -1515,7 +1495,7 @@ here, since it also provides completion for it.
                   geiser-default-implementation 'guile))
 #+END_SRC
 
-*** Parinfer
+*** [[https://github.com/DogLooksGood/parinfer-mode][Parinfer]]
 Now that's a quality package. It makes writing LISP so easy, that I've
 never thought it could be.
 
@@ -1541,14 +1521,16 @@ Parinfer Mode repository.
       (add-hook 'lisp-mode-hook #'parinfer-mode)))
 #+END_SRC
 
-*** Flx
+Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
+
+*** [[https://github.com/lewang/flx][Flx]]
 This package provides some kind of fuzzy matching for Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package flx)
 #+END_SRC
 
-*** Ivy and Counsel
+*** [[https://github.com/abo-abo/swiper][Ivy and Counsel]]
 Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
 experience.
 
@@ -1614,7 +1596,7 @@ variable, so it will be more performant with =fd=.
            ("C-h l" . counsel-find-library)))
 #+END_SRC
 
-*** Flycheck
+*** [[https://www.flycheck.org/en/latest/][Flycheck]]
 A really  nice linting package that  helps me track errors  in most of
 languages.
 
@@ -1622,7 +1604,7 @@ languages.
   (use-package flycheck)
 #+END_SRC
 
-**** Flycheck Rust
+**** [[https://github.com/flycheck/flycheck-rust][Flycheck Rust]]
 This package makes flycheck work with Rust projects.
 
  #+BEGIN_SRC emacs-lisp
@@ -1632,7 +1614,7 @@ This package makes flycheck work with Rust projects.
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
  #+END_SRC
 
-*** Company
+*** [[https://github.com/company-mode/company-mode][Company]]
 Complete anything framework. Nothing much to say. Does it's job.
 
 #+BEGIN_SRC emacs-lisp
@@ -1658,7 +1640,7 @@ Complete anything framework. Nothing much to say. Does it's job.
           company-backends (remove 'company-gtags company-backends)))
 #+END_SRC
 
-**** Company FLX
+**** [[https://github.com/PythonNut/company-flx][Company FLX]]
 Fuzzy matching for company.
 
 #+BEGIN_SRC emacs-lisp
@@ -1668,7 +1650,7 @@ Fuzzy matching for company.
            (company-flx-mode +1)))
 #+END_SRC
 
-*** Undo Tree
+*** [[https://elpa.gnu.org/packages/undo-tree.html][Undo Tree]]
 This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
 mapping to redo.
 
@@ -1679,7 +1661,7 @@ mapping to redo.
     (global-undo-tree-mode 1))
 #+END_SRC
 
-*** Yasnippet
+*** [[https://github.com/joaotavora/yasnippet][Yasnippet]]
 Another very handy package, that helps insert templates of code. Now I
 really need to write some snippets to use...
 
@@ -1689,14 +1671,14 @@ really need to write some snippets to use...
     :init (yas-reload-all))
 #+END_SRC
 
-**** Yasnippet Snippets
+**** [[https://github.com/AndreaCrotti/yasnippet-snippets][Yasnippet Snippets]]
 A enormous snippet collection for yasnippet.
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet-snippets)
 #+END_SRC
 
-*** Magit
+*** [[https://github.com/magit/magit][Magit]]
 Magit is a Emacs  interface to Git.  I've heard that  it has many nice
 features, so I want to try it out.
 
@@ -1704,9 +1686,9 @@ features, so I want to try it out.
   (use-package magit)
 #+END_SRC
 
-*** Vdiff
+*** [[https://github.com/justbur/emacs-vdiff][Vdiff]]
 =vdiff= is a package, that works similar to Vimdiff.  Ediff isn't really
-comfortable to  use, and vdiff also  has integration with [[*Magit][Magit]],  so I
+comfortable to  use, and vdiff also  has integration with Magit,  so I
 gonna try it out.
 
 #+BEGIN_SRC emacs-lisp
@@ -1725,9 +1707,9 @@ gonna try it out.
     (add-hook 'vdiff-mode-hook #'outline-show-all))
 #+END_SRC
 
-**** Vdiff Magit
+**** [[https://github.com/justbur/emacs-vdiff-magit][Vdiff Magit]]
 =vdiff-magit= is  a supplement  package, that provides  integration with
-[[*Magit][Magit]] package.
+Magit package.
 
 #+BEGIN_SRC emacs-lisp
   (use-package vdiff-magit
@@ -1745,7 +1727,7 @@ gonna try it out.
     (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 #+END_SRC
 
-*** Multiple Cursors
+*** [[https://github.com/magnars/multiple-cursors.el][Multiple Cursors]]
 This  package provides  multiple cursors  functionality to  Emacs.  It
 isn't much like Kakoune's multiple selections, but anything will do. I
 guess I'll figure out best mappings over time.
@@ -1779,11 +1761,11 @@ guess I'll figure out best mappings over time.
               ("q" mc/remove-duplicated-cursors :exit t)))
 #+END_SRC
 
-**** MC Extras
+**** [[https://github.com/knu/mc-extras.el][MC Extras]]
 this package provides  some extra functions for  multiple cursors. I'm
 interested in  =mc/remove-duplicaded-cursors=.
 
-*** Iedit
+*** [[https://github.com/victorhge/iedit][Iedit]]
 Another package that allows editing several regions simultaneously.
 
 #+BEGIN_SRC emacs-lisp
@@ -1802,7 +1784,7 @@ Another package that allows editing several regions simultaneously.
     (global-set-key (kbd "C-d") 'my/iedit-select-current-or-add))
 #+END_SRC
 
-*** Expand Region
+*** [[https://github.com/magnars/expand-region.el][Expand Region]]
 This package allows to expand  or reduce region selection semantically
 in most languages that I work with inside Emacs.
 
@@ -1834,7 +1816,7 @@ in most languages that I work with inside Emacs.
               ("Q" er/mark-outside-quotes)))
 #+END_SRC
 
-*** Phi Search
+*** [[https://github.com/zk-phi/phi-search][Phi Search]]
 This search mode is compatible with multiple cursors.
 
 #+BEGIN_SRC emacs-lisp
@@ -1843,7 +1825,7 @@ This search mode is compatible with multiple cursors.
            ("C-r" . phi-search-backward)))
 #+END_SRC
 
-*** Eglot
+*** [[https://github.com/joaotavora/eglot][Eglot]]
 Emacs polyglot. LSP client.
 
  #+BEGIN_SRC emacs-lisp
@@ -1913,15 +1895,15 @@ Now  we  can   add  =my/project-find-root=  function  to   the  list  of
     (add-to-list 'project-find-functions #'my/project-find-root))
 #+END_SRC
 
-*** Clang Format
+*** [[https://github.com/sonatard/clang-format][Clang Format]]
 A package to format C code with Clang Format.
 
 #+BEGIN_SRC emacs-lisp
   (use-package clang-format)
 #+END_SRC
 
-*** GCMH
-The Garbage Collector Magic Hack.  Enforce aaaa sneaky Garbage Collection
+*** [[https://github.com/emacsmirror/gcmh][GCMH]]
+The Garbage Collector Magic Hack.  Enforce a sneaky Garbage Collection
 strategy to minimize GC interference with the activity.
 
 #+BEGIN_SRC emacs-lisp
@@ -1930,15 +1912,15 @@ strategy to minimize GC interference with the activity.
     :init (gcmh-mode 1))
 #+END_SRC
 
-*** GNU Plot
-This is aaaa  package needed for making plots with  gnuplot.  Required by
+*** [[https://github.com/bruceravel/gnuplot-mode][GNU Plot]]
+This is a  package needed for making plots with  gnuplot.  Required by
 Org mode.
 
 #+BEGIN_SRC emacs-lisp
   (use-package gnuplot)
 #+END_SRC
 
-*** VLF
+*** [[https://github.com/m00natic/vlfi][VLF]]
 This package  makes it easier to  view large files in  Emacs. It opens
 files in chunks, but still allows to search through file with
 
@@ -1948,7 +1930,7 @@ files in chunks, but still allows to search through file with
     :config (setq vlf-application 'dont-ask))
 #+END_SRC
 
-*** Imenu List
+*** [[https://github.com/bmag/imenu-list][Imenu List]]
 Package  somewhat  similar  to  [[https://github.com/vim-scripts/taglist.vim][Taglist]] plugin  in  Vim  or  Kakoune's
 [[https://github.com/andreyorst/tagbar.kak][tagbar.kak]].  Uses  =imenu= to  get information,  and since  many plugins
 provide =imenu=  data it's  quite useful. I'm  using =advice-add=  here to
@@ -1984,7 +1966,7 @@ author.
 If you  find any issue with  my config feel  free to [[https://github.com/andreyorst/dotfiles/issues/new][file an  issue]] or
 contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].
 
-And as aaaa final step of a proper init file:
+And as a final step of a proper init file:
 
 #+BEGIN_SRC emacs-lisp
   (provide 'init)

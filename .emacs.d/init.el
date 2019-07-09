@@ -146,16 +146,7 @@ are defining or executing a macro."
 (use-package all-the-icons)
 
 (use-package doom-themes
-  :commands (doom-themes-org-config
-             doom-themes-treemacs-config)
-  :functions (all-the-icons-octicon
-              treemacs-create-theme
-              treemacs-create-icon
-              root
-              dir-closed
-              dir-open
-              treemacs-load-theme)
-  :defines (doom-treemacs-use-generic-icons)
+  :commands (doom-themes-org-config)
   :init
   (load-theme 'doom-one t)
   (doom-themes-org-config)
@@ -267,7 +258,8 @@ are defining or executing a macro."
              treemacs--expand-root-node
              treemacs--maybe-recenter
              treemacs-TAB-action
-             treemacs-load-theme)
+             treemacs-load-theme
+             treemacs-toggle-fixed-width)
   :functions (my/treemacs-expand-all-projects
               my/treemacs-variable-pitch-labels
               doom-color
@@ -454,6 +446,7 @@ are defining or executing a macro."
               (lambda ()
                 (treemacs-load-theme "Atom")
                 (treemacs)
+                (treemacs-toggle-fixed-width)
                 (my/treemacs-expand-all-projects))))
 
   :init
