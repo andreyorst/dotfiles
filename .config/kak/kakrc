@@ -11,8 +11,8 @@
 evaluate-commands %sh{
     config_files="
         common.kak
-        commands.kak
         defperl.kak
+        commands.kak
         mappings.kak
         languages.kak
         recentf.kak
@@ -20,12 +20,11 @@ evaluate-commands %sh{
     "
 
     for file in $config_files; do
-        printf "%s\n" "try %{
-            source '$HOME/.config/kak/$file'
+        printf "%s\n" "
+        try %{
+            source \"%val{config}/$file\"
         } catch %{
             echo -debug %val{error}
-        } catch %{
-            echo -debug 'Error sourcing $file'
         }"
     done
 }
