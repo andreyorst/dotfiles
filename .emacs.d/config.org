@@ -1742,18 +1742,6 @@ gonna try it out.
     (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 #+END_SRC
 
-*** Which Key
-=which-key=  is a  package that  can show  all possible  completions for
-keyboard shortcuts in a popup menu. I'm still learning Emacs, so let's
-enable it by default.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :commands which-key-mode
-    :init
-    (which-key-mode))
-#+END_SRC
-
 *** Multiple Cursors
 This  package provides  multiple cursors  functionality to  Emacs.  It
 isn't much like Kakoune's multiple selections, but anything will do. I

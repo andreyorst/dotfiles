@@ -903,11 +903,6 @@ are defining or executing a macro."
   (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
   (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 
-(use-package which-key
-  :commands which-key-mode
-  :init
-  (which-key-mode))
-
 (use-package multiple-cursors
   :commands (mc/cycle-backward
              mc/cycle-forward)
