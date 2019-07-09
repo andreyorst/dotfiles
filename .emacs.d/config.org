@@ -1854,6 +1854,61 @@ Emacs polyglot. LSP client.
      (add-hook 'c++-mode-hook 'eglot-ensure))
 #+END_SRC
 
+There's still one  problem though. [[Eglot]] use =project.el=  to detect the
+root of current  project to run server in. Which  results in the roots
+of the  project is found not  exactly where the project  root actually
+is, e.g. when multiple projects are stored in single repository.
+
+*** =project.el=
+In  order to  migrate  the problem  with  [[Eglot]] I've  used  to have  a
+function wrapper over projectile, described in this [[https://github.com/joaotavora/eglot/issues/129#issuecomment-444130367][issue comment]]. But
+I do not want to use projectile for that, since Emacs already features
+=project.el= and Eglot uses it.  So first we need a list of project root
+markers, that will hold file names which we will look up recursively:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
+    "Files or directories that indicate the root of a project.")
+#+END_SRC
+
+Now we  need a function that  will test current directory  for several
+conditions,  like does  it have  any of  project markers,  is it  root
+directory, and  if everything fails, it  will go up one  directory and
+repeat:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/project-find-root (path)
+    "Tail-recursive search in PATH for root markers."
+    (let* ((this-dir (file-name-as-directory (file-truename path)))
+           (parent-dir (expand-file-name (concat this-dir "../")))
+           (system-root-dir (expand-file-name "/")))
+      (cond
+       ((my/project-root-p this-dir) (cons 'transient this-dir))
+       ((equal system-root-dir this-dir) nil)
+       (t (my/project-find-root parent-dir)))))
+#+END_SRC
+
+This  is helper  function that  checks  if current  path contains  any
+marker from the list:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/project-root-p (path)
+    "Check if current PATH has any of project root markers."
+    (let (result)
+      (dolist (marker project-root-markers)
+        (when (file-exists-p (concat path marker))
+          (setq result t)))
+      result))
+#+END_SRC
+
+Now  we  can   add  =my/project-find-root=  function  to   the  list  of
+=project-find-functions= that project.el uses:
+
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'project
+    (add-to-list 'project-find-functions #'my/project-find-root))
+#+END_SRC
+
 *** Clang Format
 A package to format C code with Clang Format.
 

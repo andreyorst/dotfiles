@@ -983,6 +983,30 @@ _-_: reduce region _)_: around pairs
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure))
 
+(defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
+  "Files or directories that indicate the root of a project.")
+
+(defun my/project-find-root (path)
+  "Tail-recursive search in PATH for root markers."
+  (let* ((this-dir (file-name-as-directory (file-truename path)))
+         (parent-dir (expand-file-name (concat this-dir "../")))
+         (system-root-dir (expand-file-name "/")))
+    (cond
+     ((my/project-root-p this-dir) (cons 'transient this-dir))
+     ((equal system-root-dir this-dir) nil)
+     (t (my/project-find-root parent-dir)))))
+
+(defun my/project-root-p (path)
+  "Check if current PATH has any of project root markers."
+  (let (result)
+    (dolist (marker project-root-markers)
+      (when (file-exists-p (concat path marker))
+        (setq result t)))
+    result))
+
+(with-eval-after-load 'project
+  (add-to-list 'project-find-functions #'my/project-find-root))
+
 (use-package clang-format)
 
 (use-package gcmh
