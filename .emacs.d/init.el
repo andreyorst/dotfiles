@@ -570,8 +570,7 @@ are defining or executing a macro."
 (defun my/org-tangle-on-config-save ()
   "Tangle source code blocks when configuration file is saved."
   (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-    (org-babel-tangle)
-    (byte-compile-file "~/.emacs.d/init.el")))
+    (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
 
