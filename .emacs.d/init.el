@@ -107,8 +107,9 @@ are defining or executing a macro."
     (package-install package)))
 
 (my/ensure-installed 'use-package)
-(require 'use-package)
-(setq use-package-always-ensure t)
+(eval-when-compile
+  (require 'use-package)
+  (setq use-package-always-ensure t))
 
 (setq inhibit-splash-screen t
       initial-major-mode 'org-mode
@@ -622,8 +623,6 @@ are defining or executing a macro."
 
 (require 'ox-md nil t)
 
-(add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
-
 (setq-default doc-view-resolution 192)
 
 (setq-default display-line-numbers-grow-only t
@@ -711,6 +710,12 @@ are defining or executing a macro."
   (setq nov-text-width 80)
   (add-hook 'nov-mode-hook #'visual-line-mode)
   (add-hook 'nov-mode-hook #'solaire-mode))
+
+(use-package flymake
+  :ensure nil
+  :init
+  (setq flymake-fringe-indicator-position 'right-fringe)
+  (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
 
 (defun my/ansi-term-toggle ()
   "Toggle `ansi-term' window on and off with the same command."
@@ -820,13 +825,6 @@ are defining or executing a macro."
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
          ("C-h l" . counsel-find-library)))
-
-(use-package flycheck)
-
-(use-package flycheck-rust
-  :commands (flycheck-rust-setup)
-  :init (with-eval-after-load 'rust-mode
-          (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
 (use-package company
   :bind (:map company-active-map

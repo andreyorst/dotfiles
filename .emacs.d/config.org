@@ -355,8 +355,9 @@ Now we can install and configure Use Package itself:
 
 #+BEGIN_SRC emacs-lisp
   (my/ensure-installed 'use-package)
-  (require 'use-package)
-  (setq use-package-always-ensure t)
+  (eval-when-compile
+    (require 'use-package)
+    (setq use-package-always-ensure t))
 #+END_SRC
 
 All  other packages  were  split to  individual  categories much  like
@@ -1221,14 +1222,6 @@ ever decide to export Org to Markdown, I'll need this:
   (require 'ox-md nil t)
 #+END_SRC
 
-*** [[https://www.flycheck.org/en/latest/][Flycheck Mode]]
-Flycheck  is useful  tool, which  can provide  syntax checking  on the
-fly. Let's enable it for bunch of languages here.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
-#+END_SRC
-
 *** Doc View Mode
 Default resolution is too low:
 
@@ -1406,6 +1399,25 @@ Emacs.
     (setq nov-text-width 80)
     (add-hook 'nov-mode-hook #'visual-line-mode)
     (add-hook 'nov-mode-hook #'solaire-mode))
+#+END_SRC
+
+*** Flymake Mode
+This mode allows checking syntax in  the buffer.  I was using [[https://www.flycheck.org/en/latest/][Flycheck]]
+package  before,  but  I  don't   see  major  advantages  of  [[https://www.flycheck.org/en/latest/user/flycheck-versus-flymake.html#supported-languages][Flycheck
+supporting  50  languages  versus  4 in  Flymake]],  because  I'm  using
+language server protocol that integrates with Flymake, so as long as I
+have  server for  a  language, I  have support  for  this language  in
+Flymake.
+
+Also let's  use right  fringe for indication  of errors  and warnings,
+since it's never used, and left fringe is occupied by diff status.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flymake
+    :ensure nil
+    :init
+    (setq flymake-fringe-indicator-position 'right-fringe)
+    (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
 #+END_SRC
 
 ** Tools
@@ -1591,24 +1603,6 @@ variable, so it will be more performant with =fd=.
            ("C-h v" . counsel-describe-variable)
            ("C-h l" . counsel-find-library)))
 #+END_SRC
-
-*** [[https://www.flycheck.org/en/latest/][Flycheck]]
-A really  nice linting package that  helps me track errors  in most of
-languages.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck)
-#+END_SRC
-
-**** [[https://github.com/flycheck/flycheck-rust][Flycheck Rust]]
-This package makes flycheck work with Rust projects.
-
- #+BEGIN_SRC emacs-lisp
-   (use-package flycheck-rust
-     :commands (flycheck-rust-setup)
-     :init (with-eval-after-load 'rust-mode
-             (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
- #+END_SRC
 
 *** [[https://github.com/company-mode/company-mode][Company]]
 Complete anything framework. Nothing much to say. Does it's job.
