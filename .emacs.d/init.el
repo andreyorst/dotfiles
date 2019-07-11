@@ -511,15 +511,6 @@ are defining or executing a macro."
   (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
   (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
 
-(use-package org-bullets
-  :commands org-bullets-mode
-  :config
-  (setq-default org-bullets-bullet-list
-                '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-  :init
-  (when window-system
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-
 (use-package minions
   :commands minions-mode
   :config (setq minions-direct '(multiple-cursors-mode
@@ -531,6 +522,58 @@ are defining or executing a macro."
 (when window-system
   (setq window-divider-default-right-width 1)
   (window-divider-mode 1))
+
+(use-package centaur-tabs
+  :demand
+  :hook
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
+  :config
+  (setq centaur-tabs-set-modified-marker t
+        centaur-tabs-modified-marker "● "
+        centaur-tabs-close-button (concat centaur-tabs-close-button " ")
+        centaur-tabs-cycle-scope 'tabs
+        centaur-tabs-height 32
+        centaur-tabs-style "bar")
+  (defun centaur-tabs-buffer-groups ()
+    "Do not use groups."
+    (list
+     (cond
+      ((or (string-equal "*" (substring (buffer-name) 0 1))
+           (memq major-mode '(magit-process-mode
+                              magit-status-mode
+                              magit-diff-mode
+                              magit-log-mode
+                              magit-file-mode
+                              magit-blob-mode
+                              magit-blame-mode)))
+
+       "Emacs")
+      ((derived-mode-p 'prog-mode)
+       "Editing")
+      ((derived-mode-p 'dired-mode)
+       "Dired")
+      ((memq major-mode '(helpful-mode
+                          help-mode))
+       "Help")
+      ((memq major-mode '(org-mode
+                          org-agenda-clockreport-mode
+                          org-src-mode
+                          org-agenda-mode
+                          org-beamer-mode
+                          org-indent-mode
+                          org-bullets-mode
+                          org-cdlatex-mode
+                          org-agenda-log-mode
+                          diary-mode))
+       "Editing")
+      (t
+       (centaur-tabs-get-group-name (current-buffer))))))
+  (centaur-tabs-mode)
+  (centaur-tabs-headline-match))
 
 (require 'org)
 (add-hook 'org-mode-hook
@@ -697,26 +740,6 @@ are defining or executing a macro."
 
 (use-package toml-mode)
 
-(use-package editorconfig
-  :commands editorconfig-mode
-  :config
-  (editorconfig-mode 1))
-
-(use-package nov
-  :commands nov-mode
-  :functions solaire-mode
-  :mode "\\.epub$"
-  :init
-  (setq nov-text-width 80)
-  (add-hook 'nov-mode-hook #'visual-line-mode)
-  (add-hook 'nov-mode-hook #'solaire-mode))
-
-(use-package flymake
-  :ensure nil
-  :init
-  (setq flymake-fringe-indicator-position 'right-fringe)
-  (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
-
 (defun my/ansi-term-toggle ()
   "Toggle `ansi-term' window on and off with the same command."
   (interactive)
@@ -739,6 +762,17 @@ are defining or executing a macro."
       (delete-window)))
 
 (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
+
+(use-package editorconfig
+  :commands editorconfig-mode
+  :config
+  (editorconfig-mode 1))
+
+(use-package flymake
+  :ensure nil
+  :init
+  (setq flymake-fringe-indicator-position 'right-fringe)
+  (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
 
 (use-package hydra
   :commands (hydra-default-pre
@@ -897,8 +931,11 @@ are defining or executing a macro."
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydra-mc/body))
-  :config (defhydra hydra-mc (:hint nil)
+         ("C-c m" . hydra-mc/body)
+         ("C-d" . mc/mark-next-like-this-word))
+  :config
+  (use-package mc-extras)
+  (defhydra hydra-mc (:hint nil :color pink)
             "
 ^Select^                ^Discard^                    ^Move^
 ^──────^────────────────^───────^────────────────────^────^────────────
@@ -919,20 +956,6 @@ _C_:   select next line"
             ("d" mc/remove-duplicated-cursors)
             ("C" mc/mark-next-lines)
             ("q" mc/remove-duplicated-cursors :exit t)))
-
-(use-package iedit
-  :commands (iedit-mode
-             iedit-expand-down-to-occurrence)
-  :init
-  (setq iedit-toggle-key-default nil)
-  (defun my/iedit-select-current-or-add ()
-    "Select only current occurrence with `iedit-mode'.  Expand to
-next occurrence if `iedit-mode' is already active."
-    (interactive)
-    (if (bound-and-true-p iedit-mode)
-        (iedit-expand-down-to-occurrence)
-      (iedit-mode 1)))
-  (global-set-key (kbd "C-d") 'my/iedit-select-current-or-add))
 
 (use-package expand-region
   :commands (er/expand-region
@@ -1002,8 +1025,6 @@ _-_: reduce region _)_: around pairs
 (use-package gcmh
   :commands gcmh-mode
   :init (gcmh-mode 1))
-
-(use-package gnuplot)
 
 (use-package vlf-setup
   :ensure vlf

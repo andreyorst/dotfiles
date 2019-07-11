@@ -965,21 +965,6 @@ nicely with DOOM Themes and DOOM Modeline:
 
 #+END_SRC
 
-*** [[https://github.com/sabof/org-bullets][Org Bullets]]
-This package makes org headings use  fancy bullet symbols. But I don't
-quite like those, so I set them to these four symbols: =◉=, =○=, =•=, =◦=.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :commands org-bullets-mode
-    :config
-    (setq-default org-bullets-bullet-list
-                  '("◉" "○" "•" "◦" "◦" "◦" "◦" "◦" "◦" "◦" "◦"))
-    :init
-    (when window-system
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-#+END_SRC
-
 *** [[https://github.com/tarsius/minions][Minions]]
 This  package  implements   a  menu  that  lists   all  enabled  minor
 modes. Emacs mode  line can become pretty long, so  this can be handy,
@@ -1004,6 +989,63 @@ don't loose 1 pixel of width.
   (when window-system
     (setq window-divider-default-right-width 1)
     (window-divider-mode 1))
+#+END_SRC
+
+*** Centaur Tabs
+
+#+BEGIN_SRC emacs-lisp
+  (use-package centaur-tabs
+    :demand
+    :hook
+    (dashboard-mode . centaur-tabs-local-mode)
+    (term-mode . centaur-tabs-local-mode)
+    (calendar-mode . centaur-tabs-local-mode)
+    (org-agenda-mode . centaur-tabs-local-mode)
+    (helpful-mode . centaur-tabs-local-mode)
+    :config
+    (setq centaur-tabs-set-modified-marker t
+          centaur-tabs-modified-marker "● "
+          centaur-tabs-close-button (concat centaur-tabs-close-button " ")
+          centaur-tabs-cycle-scope 'tabs
+          centaur-tabs-height 32
+          centaur-tabs-style "bar")
+    (defun centaur-tabs-buffer-groups ()
+      "Do not use groups."
+      (list
+       (cond
+        ((or (string-equal "*" (substring (buffer-name) 0 1))
+             (memq major-mode '(magit-process-mode
+                                magit-status-mode
+                                magit-diff-mode
+                                magit-log-mode
+                                magit-file-mode
+                                magit-blob-mode
+                                magit-blame-mode)))
+
+         "Emacs")
+        ((derived-mode-p 'prog-mode)
+         "Editing")
+        ((derived-mode-p 'dired-mode)
+         "Dired")
+        ((memq major-mode '(helpful-mode
+                            help-mode))
+         "Help")
+        ((memq major-mode '(org-mode
+                            org-agenda-clockreport-mode
+                            org-src-mode
+                            org-agenda-mode
+                            org-beamer-mode
+                            org-indent-mode
+                            org-bullets-mode
+                            org-cdlatex-mode
+                            org-agenda-log-mode
+                            diary-mode))
+         "Editing")
+        (t
+         (centaur-tabs-get-group-name (current-buffer))))))
+    (centaur-tabs-mode)
+    (centaur-tabs-headline-match))
+
 #+END_SRC
 
 ** Modes
@@ -1375,51 +1417,6 @@ configure project.
   (use-package toml-mode)
 #+END_SRC
 
-*** [[https://github.com/editorconfig/editorconfig-emacs][EditorConfig]]
-=.editorconfig=  file  provides a  nice  way  to synchronize  my  editor
-configurations between projects and different editors.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package editorconfig
-    :commands editorconfig-mode
-    :config
-    (editorconfig-mode 1))
-#+END_SRC
-
-*** [[https://github.com/wasamasa/nov.el][Nov.el]]
-Package that  makes it  possible to read  [[https://en.wikipedia.org/wiki/EPUB][ePUB]] formatted  books inside
-Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package nov
-    :commands nov-mode
-    :functions solaire-mode
-    :mode "\\.epub$"
-    :init
-    (setq nov-text-width 80)
-    (add-hook 'nov-mode-hook #'visual-line-mode)
-    (add-hook 'nov-mode-hook #'solaire-mode))
-#+END_SRC
-
-*** Flymake Mode
-This mode allows checking syntax in  the buffer.  I was using [[https://www.flycheck.org/en/latest/][Flycheck]]
-package  before,  but  I  don't   see  major  advantages  of  [[https://www.flycheck.org/en/latest/user/flycheck-versus-flymake.html#supported-languages][Flycheck
-supporting  50  languages  versus  4 in  Flymake]],  because  I'm  using
-language server protocol that integrates with Flymake, so as long as I
-have  server for  a  language, I  have support  for  this language  in
-Flymake.
-
-Also let's  use right  fringe for indication  of errors  and warnings,
-since it's never used, and left fringe is occupied by diff status.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flymake
-    :ensure nil
-    :init
-    (setq flymake-fringe-indicator-position 'right-fringe)
-    (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
-#+END_SRC
-
 ** Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
@@ -1460,6 +1457,36 @@ Also, when I exit terminal, I'd like to kill its window automatically:
         (delete-window)))
 
   (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
+#+END_SRC
+
+*** [[https://github.com/editorconfig/editorconfig-emacs][EditorConfig]]
+=.editorconfig=  file  provides a  nice  way  to synchronize  my  editor
+configurations between projects and different editors.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package editorconfig
+    :commands editorconfig-mode
+    :config
+    (editorconfig-mode 1))
+#+END_SRC
+
+*** Flymake Mode
+This mode allows checking syntax in  the buffer.  I was using [[https://www.flycheck.org/en/latest/][Flycheck]]
+package  before,  but  I  don't   see  major  advantages  of  [[https://www.flycheck.org/en/latest/user/flycheck-versus-flymake.html#supported-languages][Flycheck
+supporting  50  languages  versus  4 in  Flymake]],  because  I'm  using
+language server protocol that integrates with Flymake, so as long as I
+have  server for  a  language, I  have support  for  this language  in
+Flymake.
+
+Also let's  use right  fringe for indication  of errors  and warnings,
+since it's never used, and left fringe is occupied by diff status.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flymake
+    :ensure nil
+    :init
+    (setq flymake-fringe-indicator-position 'right-fringe)
+    (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
 #+END_SRC
 
 *** [[https://github.com/abo-abo/hydra][Hydra]]
@@ -1727,8 +1754,11 @@ guess I'll figure out best mappings over time.
     :commands (mc/cycle-backward
                mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-           ("C-c m" . hydra-mc/body))
-    :config (defhydra hydra-mc (:hint nil)
+           ("C-c m" . hydra-mc/body)
+           ("C-d" . mc/mark-next-like-this-word))
+    :config
+    (use-package mc-extras)
+    (defhydra hydra-mc (:hint nil :color pink)
               "
   ^Select^                ^Discard^                    ^Move^
   ^──────^────────────────^───────^────────────────────^────^────────────
@@ -1749,29 +1779,6 @@ guess I'll figure out best mappings over time.
               ("d" mc/remove-duplicated-cursors)
               ("C" mc/mark-next-lines)
               ("q" mc/remove-duplicated-cursors :exit t)))
-#+END_SRC
-
-**** [[https://github.com/knu/mc-extras.el][MC Extras]]
-this package provides  some extra functions for  multiple cursors. I'm
-interested in  =mc/remove-duplicaded-cursors=.
-
-*** [[https://github.com/victorhge/iedit][Iedit]]
-Another package that allows editing several regions simultaneously.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package iedit
-    :commands (iedit-mode
-               iedit-expand-down-to-occurrence)
-    :init
-    (setq iedit-toggle-key-default nil)
-    (defun my/iedit-select-current-or-add ()
-      "Select only current occurrence with `iedit-mode'.  Expand to
-  next occurrence if `iedit-mode' is already active."
-      (interactive)
-      (if (bound-and-true-p iedit-mode)
-          (iedit-expand-down-to-occurrence)
-        (iedit-mode 1)))
-    (global-set-key (kbd "C-d") 'my/iedit-select-current-or-add))
 #+END_SRC
 
 *** [[https://github.com/magnars/expand-region.el][Expand Region]]
@@ -1899,14 +1906,6 @@ strategy to minimize GC interference with the activity.
   (use-package gcmh
     :commands gcmh-mode
     :init (gcmh-mode 1))
-#+END_SRC
-
-*** [[https://github.com/bruceravel/gnuplot-mode][GNU Plot]]
-This is a  package needed for making plots with  gnuplot.  Required by
-Org mode.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package gnuplot)
 #+END_SRC
 
 *** [[https://github.com/m00natic/vlfi][VLF]]
