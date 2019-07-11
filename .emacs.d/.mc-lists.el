@@ -44,6 +44,7 @@
         hydra-mc/mc/edit-ends-of-lines
         hydra-mc/mc/mark-all-in-region-regexp
         hydra-mc/mc/mark-next-like-this-word
+        hydra-mc/mc/mark-next-like-this-word-and-exit
         hydra-mc/mc/mark-next-lines
         hydra-mc/mc/mark-previous-like-this-word
         hydra-mc/mc/remove-current-cursor
