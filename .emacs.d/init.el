@@ -540,38 +540,10 @@ are defining or executing a macro."
         centaur-tabs-style "bar")
   (defun centaur-tabs-buffer-groups ()
     "Do not use groups."
-    (list
-     (cond
-      ((or (string-equal "*" (substring (buffer-name) 0 1))
-           (memq major-mode '(magit-process-mode
-                              magit-status-mode
-                              magit-diff-mode
-                              magit-log-mode
-                              magit-file-mode
-                              magit-blob-mode
-                              magit-blame-mode)))
-
-       "Emacs")
-      ((derived-mode-p 'prog-mode)
-       "Editing")
-      ((derived-mode-p 'dired-mode)
-       "Dired")
-      ((memq major-mode '(helpful-mode
-                          help-mode))
-       "Help")
-      ((memq major-mode '(org-mode
-                          org-agenda-clockreport-mode
-                          org-src-mode
-                          org-agenda-mode
-                          org-beamer-mode
-                          org-indent-mode
-                          org-bullets-mode
-                          org-cdlatex-mode
-                          org-agenda-log-mode
-                          diary-mode))
-       "Editing")
-      (t
-       (centaur-tabs-get-group-name (current-buffer))))))
+    (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
+                 "Emacs")
+                (t
+                 (centaur-tabs-get-group-name (current-buffer))))))
   (centaur-tabs-mode)
   (centaur-tabs-headline-match))
 
