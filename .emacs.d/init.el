@@ -542,6 +542,8 @@ are defining or executing a macro."
     "Do not use groups."
     (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
                  "Emacs")
+                ((string-equal "Magit" (substring (buffer-name) 0 5))
+                 "Magit")
                 (t
                  (centaur-tabs-get-group-name (current-buffer))))))
   (centaur-tabs-mode)
