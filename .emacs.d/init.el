@@ -538,6 +538,7 @@ are defining or executing a macro."
         centaur-tabs-cycle-scope 'tabs
         centaur-tabs-height 32
         centaur-tabs-style "bar")
+  (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
   (defun centaur-tabs-buffer-groups ()
     "Do not use groups."
     (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
