@@ -48,7 +48,7 @@ plug "andreyorst/fzf.kak" config %{
     set-option global fzf_project_use_tilda true
     evaluate-commands %sh{
         if [ -n "$(command -v fd)" ]; then
-            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn}"
+            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn --exclude '*.o'}"
         else
             echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
         fi
