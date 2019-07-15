@@ -46,11 +46,29 @@ plug "andreyorst/fzf.kak" config %{
 } defer fzf %{
     set-option global fzf_preview_width '65%'
     set-option global fzf_project_use_tilda true
+    declare-option str-list fzf_exclude_files "*.o" "*.bin" "*.obj"
+    declare-option str-list fzf_exclude_dirs ".git" ".svn" "rtlrun*"
     evaluate-commands %sh{
         if [ -n "$(command -v fd)" ]; then
-            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden --exclude .git --exclude .svn --exclude '*.o'}"
+            eval "set -- $kak_quoted_opt_fzf_exclude_files $kak_quoted_opt_fzf_exclude_dirs"
+            while [ $# -gt 0 ]; do
+                exclude="$exclude --exclude '$1'"
+                shift
+            done
+            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden $exclude}"
         else
-            echo "set-option global fzf_file_command %{find . \( -path '*/.svn*' -o -path '*/.git*' \) -prune -o -type f -follow -print}"
+            eval "set -- $kak_quoted_opt_fzf_exclude_files"
+            while [ $# -gt 0 ]; do
+                exclude="$exclude -name '$1' -o"
+                shift
+            done
+            eval "set -- $kak_quoted_opt_fzf_exclude_dirs"
+            while [ $# -gt 1 ]; do
+                exclude="$exclude -path '*/$1' -o"
+                shift
+            done
+            exclude="$exclude -path '*/$1'"
+            echo "set-option global fzf_file_command %{find . \( $exclude \) -prune -o -type f -follow -print}"
         fi
         [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_cmd bat"
         [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"

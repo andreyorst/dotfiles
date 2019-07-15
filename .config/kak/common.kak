@@ -18,6 +18,10 @@ evaluate-commands %sh{
     [ ! -z "$(command -v rg)" ] && printf "%s\n" "set-option global grepcmd 'rg -L --hidden --with-filename --column'"
 }
 
+hook global BufSetOption filetype=grep %{
+    remove-highlighter buffer/wrap
+}
+
 ## Tabstop and indentwidth
 ## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 set-option global tabstop 4
@@ -35,18 +39,16 @@ set-option global jumpclient client0
 
 # Highlighters
 # ‾‾‾‾‾‾‾‾‾‾‾‾
-set-face global delimiter rgb:aa3a03,default
+set-face global delimiter rgb:af3a03,default
 
-hook global WinCreate .* %{
-    try %{
-        add-highlighter buffer/numbers          number-lines -relative -hlcursor -separator ' '
-        add-highlighter buffer/matching         show-matching
-        add-highlighter buffer/wrap             wrap -word -indent -marker '↪'
-        add-highlighter buffer/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
-        add-highlighter buffer/operators        regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~) 0:operator
-        add-highlighter buffer/delimiters       regex (\(|\)|\[|\]|\{|\}|\;|'|`) 0:delimiter
-    }
-}
+hook global WinCreate .* %{ try %{
+    add-highlighter buffer/numbers          number-lines -relative -hlcursor -separator ' '
+    add-highlighter buffer/matching         show-matching
+    add-highlighter buffer/wrap             wrap -word -indent -marker '↪'
+    add-highlighter buffer/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
+    add-highlighter buffer/operators        regex (\+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~) 0:operator
+    add-highlighter buffer/delimiters       regex (\(|\)|\[|\]|\{|\}|\;|`) 0:delimiter
+}}
 
 # Hooks
 # ‾‾‾‾‾
@@ -69,7 +71,7 @@ hook global BufCreate '^\*scratch\*$' %{
     execute-keys -buffer *scratch* '%d'
     hook -once -always global BufCreate '^(?!\*scratch\*).*$' %{ try %{
         # throw if the buffer has something other than newlines in the beginning of lines
-        execute-keys -buffer *scratch* '%<a-s><a-K>^[^\n]<ret>'
+        execute-keys -buffer *scratch* '%s\A\n\z<ret>'
         delete-buffer *scratch*
     }}
 }
