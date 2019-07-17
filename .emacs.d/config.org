@@ -1020,8 +1020,7 @@ buffers. It's good for navigation with the mouse, and looks fancy.
                    "Magit")
                   (t
                    (centaur-tabs-get-group-name (current-buffer))))))
-    (centaur-tabs-mode)
-    (centaur-tabs-headline-match))
+    (centaur-tabs-mode))
 #+END_SRC
 
 ** Modes

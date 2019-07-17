@@ -547,8 +547,7 @@ are defining or executing a macro."
                  "Magit")
                 (t
                  (centaur-tabs-get-group-name (current-buffer))))))
-  (centaur-tabs-mode)
-  (centaur-tabs-headline-match))
+  (centaur-tabs-mode))
 
 (require 'org)
 (add-hook 'org-mode-hook
