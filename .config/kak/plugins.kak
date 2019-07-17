@@ -24,7 +24,7 @@ plug "andreyorst/plug.kak" noload config %{
     }
 }
 
-plug "andreyorst/kakoune-snippet-collection"
+nop plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-sudo-write"
@@ -70,7 +70,7 @@ plug "andreyorst/fzf.kak" config %{
             exclude="$exclude -path '*/$1'"
             echo "set-option global fzf_file_command %{find . \( $exclude \) -prune -o -type f -follow -print}"
         fi
-        [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_cmd bat"
+        [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_command bat"
         [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"
     }
 }
@@ -140,6 +140,7 @@ plug "andreyorst/smarttab.kak" %{
 
 plug "alexherbo2/auto-pairs.kak" %{
     map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
+    hook global WinCreate .* auto-pairs-enable
 }
 
 plug "alexherbo2/replace.kak" config %{
@@ -151,7 +152,7 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
-plug "occivink/kakoune-snippets" branch "auto-discard" config %{
+nop plug "occivink/kakoune-snippets" branch "auto-discard" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
     map global insert '<tab>' "<a-;>: expand-or-jump-or-key tab<ret>"
