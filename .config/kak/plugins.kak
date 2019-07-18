@@ -107,7 +107,7 @@ if '-n "${PATH##*termux*}"' %{
         set-option -add window clang_options %sh{ (
             while [ "$PWD" != "$HOME" ]; do
                 if [ -e "$PWD/compile_flags.txt" ]; then
-                    printf "%s\n" "$(cat "$PWD/compile_flags.txt" | tr '\n' ' ')"
+                    printf "%s\n" "$(cat '$PWD/compile_flags.txt' | tr '\n' ' ')"
                     exit
                 fi
                 cd ..
