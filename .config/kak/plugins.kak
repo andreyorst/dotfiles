@@ -93,9 +93,10 @@ if '-n "${PATH##*termux*}"' %{
             set-face window DiagnosticError default+u
             set-face window DiagnosticWarning default+u
         }
-        hook global WinSetOption filetype=rust %{
-            set-option window lsp_server_configuration rust.clippy_preference="on"
-        }
+        # bug https://github.com/ul/kak-lsp/issues/217#issuecomment-512793942
+        # hook global WinSetOption filetype=rust %{
+        #     set-option window lsp_server_configuration rust.clippy_preference="on"
+        # }
     }
 } else %{
     hook global WinSetOption filetype=(c|cpp) %{
