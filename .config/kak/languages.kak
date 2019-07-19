@@ -66,25 +66,27 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
 hook global WinSetOption filetype=rust %{
     set-option buffer formatcmd 'rustfmt'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
+    remove-highlighter shared/rust
+    remove-highlighter window/rust
 }
 
-hook global ModuleLoaded rust %{ try %{ evaluate-commands %sh{
-    # Taken from rc/filetype/rust.kak
-    rust_keywords="let as fn return match if else loop for in while
-                   break continue move box where impl dyn pub unsafe"
+# hook global ModuleLoaded rust %{ try %{ evaluate-commands %sh{
+#     # Taken from rc/filetype/rust.kak
+#     rust_keywords="let as fn return match if else loop for in while
+#                    break continue move box where impl dyn pub unsafe"
 
-    join() { sep=$2; eval set -- $1; IFS="$sep"; echo "$*"; }
+#     join() { sep=$2; eval set -- $1; IFS="$sep"; echo "$*"; }
 
-    # Highlight functions ignoring Rust specific keywords
-    printf "%s\n" "add-highlighter shared/rust/code/functions regex ([a-z_]*?\w*?)\b($(join '${rust_keywords}' '|'))?\h*(?=\() 1:function"
+#     # Highlight functions ignoring Rust specific keywords
+#     printf "%s\n" "add-highlighter shared/rust/code/functions regex ([a-z_]*?\w*?)\b($(join '${rust_keywords}' '|'))?\h*(?=\() 1:function"
 
-    # Common highlightings for Rust
-    printf "%s\n" "add-highlighter shared/rust/code/field     regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?\b(?![>\"\(]) 0:meta
-                   add-highlighter shared/rust/code/method    regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?(\h+)?(?=\() 0:function
-                   add-highlighter shared/rust/code/return    regex \breturn\b 0:meta
-                   add-highlighter shared/rust/code/usertype  regex \b[A-Z]\w*\b 0:type
-                   add-highlighter shared/rust/code/namespace regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:module"
-}}}
+#     # Common highlightings for Rust
+#     printf "%s\n" "add-highlighter shared/rust/code/field     regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?\b(?![>\"\(]) 0:meta
+#                    add-highlighter shared/rust/code/method    regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?(\h+)?(?=\() 0:function
+#                    add-highlighter shared/rust/code/return    regex \breturn\b 0:meta
+#                    add-highlighter shared/rust/code/usertype  regex \b[A-Z]\w*\b 0:type
+#                    add-highlighter shared/rust/code/namespace regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:module"
+# }}}
 
 # Makefile
 # ‾‾‾‾‾‾‾‾
