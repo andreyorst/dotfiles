@@ -16,7 +16,7 @@ smart-select -params 1 %{ evaluate-commands %sh{
         (word) keys="w" ;;
         (*)    printf "%s\n" "fail %{wrong word type '$1'}"; exit ;;
     esac
-    if [ $(printf "%s\n" ${kak_selection} | wc -m) -eq 2 ]; then
+    if [ $(printf "%s" "${kak_selection}" | wc -m) -eq 1 ]; then
         printf "%s\n" "execute-keys -save-regs '' <a-i>${keys}"
     fi
 }}
