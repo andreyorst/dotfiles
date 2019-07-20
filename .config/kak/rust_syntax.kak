@@ -26,8 +26,8 @@ add-highlighter shared/rust_syntax/line_comment region //          $            
 # https://doc.rust-lang.org/reference.html#number-literals
 # the language keywords are defined here, but many of them are reserved and unused yet:
 # https://doc.rust-lang.org/grammar.html#keywords
-add-highlighter shared/rust_syntax/code/ regex "'\\\\?.'" 0:value
-add-highlighter shared/rust_syntax/code/ regex "('\w+)[^']" 1:meta
+add-highlighter shared/rust_syntax/code/byte_literal regex "'\\\\?.'" 0:value
+add-highlighter shared/rust_syntax/code/long_quoted regex "('\w+)[^']" 1:meta
 
 add-highlighter shared/rust_syntax/code/field_or_parameter   regex (_?\w+)(?::)(?!:) 1:variable
 add-highlighter shared/rust_syntax/code/values               regex \b(?:self|true|false|[0-9][_0-9]*(?:\.[0-9][_0-9]*|(?:\.[0-9][_0-9]*)?E[\+\-][_0-9]+)(?:f(?:32|64))?|(?:0x[_0-9a-fA-F]+|0o[_0-7]+|0b[_01]+|[0-9][_0-9]*)(?:(?:i|u|f)(?:8|16|32|64|128|size))?)\b 0:value
@@ -44,4 +44,13 @@ add-highlighter shared/rust_syntax/code/macros               regex \b[A-z0-9_]+!
 
 §
 
+provide-module rust_syntax_extra %§
 
+
+add-highlighter shared/rust_syntax_extra regions
+add-highlighter shared/rust_syntax_extra/code default-region group
+add-highlighter shared/rust_syntax_extra/code/field     regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?\b(?![>\"\(]) 0:meta
+add-highlighter shared/rust_syntax_extra/code/method    regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?(\h+)?(?=\() 0:function
+add-highlighter shared/rust_syntax_extra/code/return    regex \breturn\b 0:meta
+add-highlighter shared/rust_syntax_extra/operators regex \+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\] 0:operator
+§
