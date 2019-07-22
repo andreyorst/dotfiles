@@ -93,6 +93,7 @@ if '-n "${PATH##*termux*}"' %{
             set-face window DiagnosticError default+u
             set-face window DiagnosticWarning default+u
         }
+        # bug https://github.com/ul/kak-lsp/issues/217#issuecomment-512793942
         hook global WinSetOption filetype=rust %{
             set-option window lsp_server_configuration rust.clippy_preference="on"
         }
@@ -106,7 +107,7 @@ if '-n "${PATH##*termux*}"' %{
         set-option -add window clang_options %sh{ (
             while [ "$PWD" != "$HOME" ]; do
                 if [ -e "$PWD/compile_flags.txt" ]; then
-                    printf "%s\n" "$(cat "$PWD/compile_flags.txt" | tr '\n' ' ')"
+                    printf "%s\n" "$(cat '$PWD/compile_flags.txt' | tr '\n' ' ')"
                     exit
                 fi
                 cd ..
