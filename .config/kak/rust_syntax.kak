@@ -1,8 +1,14 @@
-# http://rust_syntax-lang.org
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-
-# Initialization
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+# ╭─────────────╥──────────────────╮
+# │ Author:     ║ File:            │
+# │ Andrey Orst ║ kakrc            │
+# ╞═════════════╩══════════════════╡
+# │ Rust highlighting overrides.   │
+# │ Based om builtin script and    │
+# │ http://rust_syntax-lang.org    │
+# ╞════════════════════════════════╡
+# │ Rest of .dotfiles:             │
+# │ GitHub.com/andreyorst/dotfiles │
+# ╰────────────────────────────────╯
 
 hook -group rust-syntax-highlight global WinSetOption filetype=rust %{
     require-module rust_syntax
@@ -10,9 +16,6 @@ hook -group rust-syntax-highlight global WinSetOption filetype=rust %{
 }
 
 provide-module rust_syntax %§
-
-# Highlighters
-# ‾‾‾‾‾‾‾‾‾‾‾‾
 
 add-highlighter shared/rust_syntax regions
 add-highlighter shared/rust_syntax/code default-region group
