@@ -15,15 +15,6 @@
 hook global WinSetOption filetype=(c|cpp) %{
     set-option buffer formatcmd 'clang-format'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
-
-    try %{
-        remove-highlighter buffer/operators
-        add-highlighter    buffer/operators regex \+|-|\*|&|=|\\|\?|%|\|-|!|\||->|\.|,|<|>|:|\^|/|~|\[|\] 0:operator
-    }
-    try %{
-        remove-highlighter buffer/delimiters
-        add-highlighter    buffer/delimiters regex \(|\)|\{|\}|\;|'|` 0:delimiter
-    }
 }
 
 hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
@@ -56,37 +47,22 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
                        add-highlighter shared/$filetype/code/my_types_2 regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
                        add-highlighter shared/$filetype/code/my_types_3 regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
                        add-highlighter shared/$filetype/code/my_types_4 regex \b\w+_t\b 0:type
+                       add-highlighter shared/$filetype/code/function_type regex \w+\s+(?:\w+::)?\w+\(\s*(?:(\w+)\s+\w+(?:,\s+)?)+\s*\) 1:type
                        add-highlighter shared/$filetype/code/my_types_5 regex \((\w+)\h*\*\)\h*\w+ 1:type"
     done
 }}}
 
+void vaiv(int a, int b)
 
 # Rust
 # ‾‾‾‾
 hook global WinSetOption filetype=rust %{
     set-option buffer formatcmd 'rustfmt'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
+    # I use my own highlighting defined in 'rust_syntax.kak'
     remove-highlighter shared/rust
     remove-highlighter window/rust
 }
-
-# hook global ModuleLoaded rust %{ try %{ evaluate-commands %sh{
-#     # Taken from rc/filetype/rust.kak
-#     rust_keywords="let as fn return match if else loop for in while
-#                    break continue move box where impl dyn pub unsafe"
-
-#     join() { sep=$2; eval set -- $1; IFS="$sep"; echo "$*"; }
-
-#     # Highlight functions ignoring Rust specific keywords
-#     printf "%s\n" "add-highlighter shared/rust/code/functions regex ([a-z_]*?\w*?)\b($(join '${rust_keywords}' '|'))?\h*(?=\() 1:function"
-
-#     # Common highlightings for Rust
-#     printf "%s\n" "add-highlighter shared/rust/code/field     regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?\b(?![>\"\(]) 0:meta
-#                    add-highlighter shared/rust/code/method    regex ((?<!\.\.)(?<=\.))[_a-zA-Z](\w+)?(\h+)?(?=\() 0:function
-#                    add-highlighter shared/rust/code/return    regex \breturn\b 0:meta
-#                    add-highlighter shared/rust/code/usertype  regex \b[A-Z]\w*\b 0:type
-#                    add-highlighter shared/rust/code/namespace regex [a-zA-Z](\w+)?(\h+)?(?=::) 0:module"
-# }}}
 
 # Makefile
 # ‾‾‾‾‾‾‾‾

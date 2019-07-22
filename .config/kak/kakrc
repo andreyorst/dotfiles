@@ -29,4 +29,3 @@ evaluate-commands %sh{
         }"
     done
 }
-
