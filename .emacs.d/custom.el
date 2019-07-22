@@ -12,7 +12,7 @@
  '(diff-hl-margin-mode nil)
  '(package-selected-packages
    (quote
-    (centaur-tabs mc-extras iedit isearch-recursive-edit eldoc-box imenu-list vlf company-flx doom-modeline treemacs-magit treemacs gcmh cargo diff-hl eglot clang-format solaire-mode doom-themes minions moody eyebrowse phi-search expand-region multiple-cursors vdiff-magit vdiff magit editorconfig toml-mode racer rust-mode gnuplot yasnippet undo-tree company counsel ivy flx parinfer geiser markdown-mode hydra use-package))))
+    (yasnippet-snippets centaur-tabs mc-extras iedit isearch-recursive-edit eldoc-box imenu-list vlf company-flx doom-modeline treemacs-magit treemacs gcmh cargo diff-hl eglot clang-format solaire-mode doom-themes minions moody eyebrowse phi-search expand-region multiple-cursors vdiff-magit vdiff magit editorconfig toml-mode racer rust-mode gnuplot yasnippet undo-tree company counsel ivy flx parinfer geiser markdown-mode hydra use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

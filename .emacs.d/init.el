@@ -206,20 +206,20 @@ are defining or executing a macro."
 (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
 (add-hook 'org-src-mode-hook 'my/real-buffer-setup)
 
-(defvar org-format-latex-options)
-(defun my/update-org-latex-preview-bg (&rest _)
-  "Update background color for LaTeX images."
-  (setq-default
-   org-format-latex-options
-   (plist-put org-format-latex-options
-              :background
-              (face-attribute
-               (or
-                (cadr (assq 'default face-remapping-alist))
-                'default)
-               :background nil t))))
+;; (defvar org-format-latex-options)
+;; (defun my/update-org-latex-preview-bg (&rest _)
+;;   "Update background color for LaTeX images."
+;;   (setq-default
+;;    org-format-latex-options
+;;    (plist-put org-format-latex-options
+;;               :background
+;;               (face-attribute
+;;                (or
+;;                 (cadr (assq 'default face-remapping-alist))
+;;                 'default)
+;;                :background nil t))))
 
-(add-hook 'solaire-mode-hook 'my/update-org-latex-preview-bg)
+;; (add-hook 'solaire-mode-hook 'my/update-org-latex-preview-bg)
 
 (use-package doom-modeline
   :commands (doom-modeline-mode
