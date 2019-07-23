@@ -74,9 +74,9 @@ hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
     evaluate-commands -save-regs 'a' %{ try %{
         execute-keys -draft <a-i>w"ay
         evaluate-commands %sh{ (
-            color=$(echo "$kak_reg_a" | perl -pe "s/'//g")
+            color="${kak_reg_a}"
             inverted_color=$(echo "${color}" | perl -pe 'tr/0123456789abcdefABCDEF/fedcba9876543210543210/')
-            printf "%s\n" "evaluate-commands -client $kak_client %{ try %{ echo -markup %{{rgb:${inverted_color},rgb:${color}+b}  #${color}  } } }" | kak -p $kak_session
+            printf "%s\n" "evaluate-commands -client $kak_client %{ try %{ echo -markup %{{rgb:${inverted_color},rgb:${color}+b}   #${color}   } } }" | kak -p $kak_session
         ) >/dev/null 2>&1 </dev/null & }
     }}
 }}
@@ -99,49 +99,9 @@ hook -once global WinSetOption filetype=markdown %{
             eval "set -- $kak_reg_a"
             while [ $# -gt 0 ]; do
                 case $1 in
-                    c|cpp|c++|objc) module="c-family"   ;;
-                    cabal)          module="cabal"      ;;
-                    clojure)        module="clojure"    ;;
-                    coffee)         module="coffee"     ;;
-                    css)            module="css"        ;;
-                    cucumber)       module="cucumber"   ;;
-                    d)              module="d"          ;;
-                    dockerfile)     module="dockerfile" ;;
-                    fish)           module="fish"       ;;
-                    gas)            module="gas"        ;;
-                    go)             module="go"         ;;
-                    haml)           module="haml"       ;;
-                    haskell)        module="haskell"    ;;
-                    html)           module="html"       ;;
-                    ini)            module="ini"        ;;
-                    java)           module="java"       ;;
-                    javascript)     module="javascript" ;;
-                    json)           module="json"       ;;
-                    julia)          module="julia"      ;;
-                    kak)            module="kakrc"      ;;
-                    kickstart)      module="kickstart"  ;;
-                    latex)          module="latex"      ;;
-                    lisp)           module="lisp"       ;;
-                    lua)            module="lua"        ;;
-                    makefile)       module="makefile"   ;;
-                    markdown)       module="markdown"   ;;
-                    moon)           module="moon"       ;;
-                    perl)           module="perl"       ;;
-                    pug)            module="pug"        ;;
-                    python)         module="python"     ;;
-                    ragel)          module="ragel"      ;;
-                    ruby)           module="ruby"       ;;
-                    rust)           module="rust"       ;;
-                    sass)           module="sass"       ;;
-                    scala)          module="scala"      ;;
-                    scss)           odule="scss"       ;;
-                    sh)             module="sh"         ;;
-                    swift)          module="swift"      ;;
-                    toml)           module="toml"       ;;
-                    tupfile)        module="tupfile"    ;;
-                    typescript)     module="typescript" ;;
-                    yaml)           module="yaml"       ;;
-                    sql)            module="sql"        ;;
+                    c|cpp|c++|objc) module="c-family" ;;
+                    kak)            module="kakrc"    ;;
+                    *)              module="$1"       ;;
                 esac
                 [ -n "$module" ] && printf "%s\n" "evaluate-commands -client $kak_client %{ require-module $module }"
                 module=
@@ -149,7 +109,6 @@ hook -once global WinSetOption filetype=markdown %{
             done | kak -p $kak_session
         ) > /dev/null 2>&1 < /dev/null & }
     }}}
-
 
     hook buffer NormalIdle .* markdown-require-highlighters
     hook buffer InsertIdle .* markdown-require-highlighters

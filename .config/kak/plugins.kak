@@ -93,26 +93,17 @@ if '-n "${PATH##*termux*}"' %{
             set-face window DiagnosticError default+u
             set-face window DiagnosticWarning default+u
         }
-        # bug https://github.com/ul/kak-lsp/issues/217#issuecomment-512793942
         hook global WinSetOption filetype=rust %{
             set-option window lsp_server_configuration rust.clippy_preference="on"
         }
     }
 } else %{
     hook global WinSetOption filetype=(c|cpp) %{
+        clang-find-and-parse-compile-flags
         clang-enable-autocomplete
         clang-enable-diagnostics
         hook window BufWritePre .* %{ clang-parse }
-        alias window lint clang-parse
-        set-option -add window clang_options %sh{ (
-            while [ "$PWD" != "$HOME" ]; do
-                if [ -e "$PWD/compile_flags.txt" ]; then
-                    printf "%s\n" "$(cat '$PWD/compile_flags.txt' | tr '\n' ' ')"
-                    exit
-                fi
-                cd ..
-            done
-        ) }
+        hook window InsertEnd .* %{ clang-parse }
         map -docstring "next diagnostics error" window goto n '<esc>: clang-diagnostics-next<ret>'
     }
     hook global WinSetOption filetype=rust) %{
@@ -132,8 +123,12 @@ plug "andreyorst/powerline.kak" defer powerline %{
 }
 
 
-plug "andreyorst/smarttab.kak" %{
+plug "andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
+    set-option global smarttab_expandtab_mode_name '⋅⋅t⋅'
+    set-option global smarttab_noexpandtab_mode_name '→t→→'
+    set-option global smarttab_smarttab_mode_name '→t⋅⋅'
+} config %{
     hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme|sh|perl) expandtab
     hook global WinSetOption filetype=(makefile|gas) noexpandtab
     hook global WinSetOption filetype=(c|cpp) smarttab

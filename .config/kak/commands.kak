@@ -202,7 +202,7 @@ file -shell-script-candidates %{
 
 alias global $ file
 
-try %{ require-module kak }
+require-module kak
 add-highlighter shared/kakrc/code/if_else regex \b(if|else)\b 0:keyword
 
 define-command -docstring "if <condition> <expression> [else <expression>]: if statement that accepts shell-valid condition string" \
@@ -219,7 +219,7 @@ if -params 2..4 %{ evaluate-commands %sh{
     fi
 }}
 
-define-command -override -docstring "flygrep: run grep on every key" \
+define-command -docstring "flygrep: run grep on every key" \
 flygrep %{
     edit -scratch *grep*
     prompt "flygrep: " -on-change %{
@@ -227,7 +227,7 @@ flygrep %{
     } nop
 }
 
-define-command -override flygrep-call-grep -params 1 %{ evaluate-commands %sh{
+define-command flygrep-call-grep -params 1 %{ evaluate-commands %sh{
     [ -z "${1##*&*}" ] && text=$(printf "%s\n" "$1" | sed "s/&/&&/g") || text="$1"
     if [ ${#1} -gt 2 ]; then
         printf "%s\n" "info"
@@ -237,3 +237,14 @@ define-command -override flygrep-call-grep -params 1 %{ evaluate-commands %sh{
     fi
 }}
 
+define-command clang-find-and-parse-compile-flags %{
+    set-option -add window clang_options %sh{ (
+        while [ "$PWD" != "$HOME" ]; do
+            if [ -e "$PWD/compile_flags.txt" ]; then
+                printf "%s\n" "$(cat '$PWD/compile_flags.txt' | tr '\n' ' ')"
+                exit
+            fi
+            cd ..
+        done
+    ) }
+}
