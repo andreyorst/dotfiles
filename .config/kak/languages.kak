@@ -52,8 +52,6 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
     done
 }}}
 
-void vaiv(int a, int b)
-
 # Rust
 # ‾‾‾‾
 hook global WinSetOption filetype=rust %{
