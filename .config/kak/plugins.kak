@@ -85,6 +85,8 @@ if '-n "${PATH##*termux*}"' %{
         set-option global lsp_diagnostic_line_warning_sign "?"
         hook global WinSetOption filetype=(c|cpp|rust) %{
             map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
+            map window lsp "n" "<esc>: lsp-find-error --include-warnings<ret>" -docstring "find next error or warning"
+            map window lsp "p" "<esc>: lsp-find-error --previous --include-warnings<ret>" -docstring "find previous error or warning"
             lsp-enable-window
             hook -always global KakEnd .* lsp-exit
             lsp-auto-hover-enable
