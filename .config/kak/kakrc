@@ -15,9 +15,9 @@ evaluate-commands %sh{
         commands.kak
         mappings.kak
         languages.kak
+        rust_syntax.kak
         recentf.kak
         plugins.kak
-        rust_syntax.kak
     "
 
     for file in $config_files; do

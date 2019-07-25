@@ -122,6 +122,8 @@ plug "andreyorst/powerline.kak" defer powerline %{
         set-option global powerline_separator_thin ''
     }
     powerline-theme base16-gruvbox
+} config %{
+    hook global -once -always WinCreate .* powerline-enable
 }
 
 
