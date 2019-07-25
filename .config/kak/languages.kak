@@ -47,7 +47,6 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
                        add-highlighter shared/$filetype/code/my_types_2 regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)(_t)?\b 0:type
                        add-highlighter shared/$filetype/code/my_types_3 regex \b(v|u|vu)(_|__)?(int|short|char|long)(_t)?\b 0:type
                        add-highlighter shared/$filetype/code/my_types_4 regex \b\w+_t\b 0:type
-                       add-highlighter shared/$filetype/code/function_type regex \w+\s+(?:\w+::)?\w+\(\s*(?:(\w+)\s+\w+(?:,\s+)?)+\s*\) 1:type
                        add-highlighter shared/$filetype/code/my_types_5 regex \((\w+)\h*\*\)\h*\w+ 1:type"
     done
 }}}
@@ -57,9 +56,6 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
 hook global WinSetOption filetype=rust %{
     set-option buffer formatcmd 'rustfmt'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
-    # I use my own highlighting defined in 'rust_syntax.kak'
-    remove-highlighter shared/rust
-    remove-highlighter window/rust
 }
 
 # Makefile
@@ -76,7 +72,9 @@ hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
         evaluate-commands %sh{ (
             color="${kak_reg_a}"
             inverted_color=$(echo "${color}" | perl -pe 'tr/0123456789abcdefABCDEF/fedcba9876543210543210/')
-            printf "%s\n" "evaluate-commands -client $kak_client %{ try %{ echo -markup %{{rgb:${inverted_color},rgb:${color}+b}   #${color}   } } }" | kak -p $kak_session
+            printf "%s\n" "evaluate-commands -client $kak_client %{ try %{
+                               echo -markup %{{rgb:${inverted_color},rgb:${color}+b}   #${color}   }
+                           }}" | kak -p $kak_session
         ) >/dev/null 2>&1 </dev/null & }
     }}
 }}
@@ -91,25 +89,3 @@ hook global WinSetOption filetype=gas %{
 hook global ModuleLoaded gas %{ try %{
     add-highlighter shared/gas/c_line_comment region // (?<!\\\\)(?=\n) fill comment
 }}
-
-hook -once global WinSetOption filetype=markdown %{
-    define-command markdown-require-highlighters %{ evaluate-commands -save-regs 'a' %{ try %{
-        execute-keys -draft 'gtGbGls```\h*\K[^\s]+<ret>"ay'
-        nop %sh{ (
-            eval "set -- $kak_reg_a"
-            while [ $# -gt 0 ]; do
-                case $1 in
-                    c|cpp|c++|objc) module="c-family" ;;
-                    kak)            module="kakrc"    ;;
-                    *)              module="$1"       ;;
-                esac
-                [ -n "$module" ] && printf "%s\n" "evaluate-commands -client $kak_client %{ require-module $module }"
-                module=
-                shift
-            done | kak -p $kak_session
-        ) > /dev/null 2>&1 < /dev/null & }
-    }}}
-
-    hook buffer NormalIdle .* markdown-require-highlighters
-    hook buffer InsertIdle .* markdown-require-highlighters
-}
