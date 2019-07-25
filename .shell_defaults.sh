@@ -14,7 +14,7 @@ else
     export EDITOR="vi"
 fi
 
-mkcd() { mkdir "$1" && cd "$1"; }
+mkcd() { mkdir $1 && cd $1; }
 
 webmp4() {
     while [ $# -ne 0 ]; do
@@ -46,11 +46,11 @@ pm_yay() {
     cmd=$1
     shift
     case $cmd in
-        install) yay -S $@    ;;
-        update)  yay -Syyu $@ ;;
-        remove)  yay -Rsc $@  ;;
-        search)  yay -Ss $@   ;;
-        *)       yay $cmd $@  ;;
+        (install) yay -S "$@"     ;;
+        (update)  yay -Syyu "$@"  ;;
+        (remove)  yay -Rsc "$@"   ;;
+        (search)  yay -Ss "$@"    ;;
+        (*)       yay "$cmd" "$@" ;;
     esac
 }
 
@@ -58,11 +58,11 @@ pm_packman() {
     cmd=$1
     shift
     case $cmd in
-        install) sudo pacman -S $@    ;;
-        update)  sudo pacman -Syyu $@ ;;
-        remove)  sudo pacman -Rsc $@  ;;
-        search)  pacman -Ss $@        ;;
-        *)       sudo pacman $cmd $@  ;;
+        (install) sudo pacman -S "$@"     ;;
+        (update)  sudo pacman -Syyu "$@"  ;;
+        (remove)  sudo pacman -Rsc "$@"   ;;
+        (search)  pacman -Ss "$@"         ;;
+        (*)       sudo pacman "$cmd" "$@" ;;
     esac
 }
 
@@ -70,11 +70,11 @@ pm_dnf() {
     cmd=$1
     shift
     case $cmd in
-        install) sudo dnf install $@ ;;
-        update)  sudo dnf upgrade $@ ;;
-        remove)  sudo dnf remove $@  ;;
-        search)  dnf search $@       ;;
-        *)       sudo dnf $cmd $@    ;;
+        (install) sudo dnf install "$@" ;;
+        (update)  sudo dnf upgrade "$@" ;;
+        (remove)  sudo dnf remove "$@"  ;;
+        (search)  dnf search "$@"       ;;
+        (*)       sudo dnf "$cmd" "$@"  ;;
     esac
 }
 
@@ -82,11 +82,11 @@ pm_yum() {
     cmd=$1
     shift
     case $cmd in
-        install) sudo yum install $@ ;;
-        update)  sudo yum update $@  ;;
-        remove)  sudo yum remove $@  ;;
-        search)  yum search $@       ;;
-        *)       sudo yum $cmd $@    ;;
+        (install) sudo yum install "$@" ;;
+        (update)  sudo yum update "$@"  ;;
+        (remove)  sudo yum remove "$@"  ;;
+        (search)  yum search "$@"       ;;
+        (*)       sudo yum "$cmd" "$@"  ;;
     esac
 }
 
@@ -95,11 +95,11 @@ if [ -n "${PATH##*termux*}" ]; then
         cmd=$1
         shift
         case $cmd in
-            install) sudo apt install $@ ;;
-            update)  sudo apt update $@  ;;
-            remove)  sudo apt remove $@  ;;
-            search)  apt search $@       ;;
-            *)       sudo apt $cmd $@    ;;
+            (install) sudo apt install "$@" ;;
+            (update)  sudo apt update "$@"  ;;
+            (remove)  sudo apt remove "$@"  ;;
+            (search)  apt search "$@"       ;;
+            (*)       sudo apt "$cmd" "$@"  ;;
         esac
     }
 else
@@ -107,11 +107,11 @@ else
         cmd=$1
         shift
         case $cmd in
-            install) apt install $@ ;;
-            update)  apt update && apt upgrade $@  ;;
-            remove)  apt remove $@  ;;
-            search)  apt search $@  ;;
-            *)       apt $cmd $@    ;;
+            (install) apt install "$@" ;;
+            (update)  apt update && apt upgrade "$@"  ;;
+            (remove)  apt remove "$@" ;;
+            (search)  apt search "$@" ;;
+            (*)       apt "$cmd" "$@" ;;
         esac
     }
 fi
