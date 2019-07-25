@@ -43,9 +43,9 @@ for pm in yay pacman dnf yum apt; do
 done
 
 pm_yay() {
-    cmd=$1
+    cmd="$1"
     shift
-    case $cmd in
+    case "$cmd" in
         (install) yay -S "$@"     ;;
         (update)  yay -Syyu "$@"  ;;
         (remove)  yay -Rsc "$@"   ;;
@@ -55,9 +55,9 @@ pm_yay() {
 }
 
 pm_packman() {
-    cmd=$1
+    cmd="$1"
     shift
-    case $cmd in
+    case "$cmd" in
         (install) sudo pacman -S "$@"     ;;
         (update)  sudo pacman -Syyu "$@"  ;;
         (remove)  sudo pacman -Rsc "$@"   ;;
@@ -67,9 +67,9 @@ pm_packman() {
 }
 
 pm_dnf() {
-    cmd=$1
+    cmd="$1"
     shift
-    case $cmd in
+    case "$cmd" in
         (install) sudo dnf install "$@" ;;
         (update)  sudo dnf upgrade "$@" ;;
         (remove)  sudo dnf remove "$@"  ;;
@@ -79,9 +79,9 @@ pm_dnf() {
 }
 
 pm_yum() {
-    cmd=$1
+    cmd="$1"
     shift
-    case $cmd in
+    case "$cmd" in
         (install) sudo yum install "$@" ;;
         (update)  sudo yum update "$@"  ;;
         (remove)  sudo yum remove "$@"  ;;
@@ -92,9 +92,9 @@ pm_yum() {
 
 if [ -n "${PATH##*termux*}" ]; then
     pm_apt() {
-        cmd=$1
+        cmd="$1"
         shift
-        case $cmd in
+        case "$cmd" in
             (install) sudo apt install "$@" ;;
             (update)  sudo apt update "$@"  ;;
             (remove)  sudo apt remove "$@"  ;;
@@ -104,9 +104,9 @@ if [ -n "${PATH##*termux*}" ]; then
     }
 else
     pm_apt() {
-        cmd=$1
+        cmd="$1"
         shift
-        case $cmd in
+        case "$cmd" in
             (install) apt install "$@" ;;
             (update)  apt update && apt upgrade "$@"  ;;
             (remove)  apt remove "$@" ;;
