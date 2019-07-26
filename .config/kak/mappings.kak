@@ -58,3 +58,22 @@ map -docstring "next buffer"                    global goto 'b'     '<esc>: buff
 map -docstring "previous buffer"                global goto 'B'     '<esc>: buffer-previous<ret>'
 map -docstring "search tag in current file"     global goto '['     '<esc><c-s>: smart-select word; symbol<ret>'
 map -docstring "search tag in global tags file" global goto ']'     '<esc><c-s>: smart-select word; ctags-search<ret>'
+
+# Arrows
+# ‾‾‾‾‾‾
+map global normal <left>    nop
+map global normal <right>   nop
+map global normal <up>      nop
+map global normal <down>    nop
+map global normal <s-left>  nop
+map global normal <s-right> nop
+map global normal <s-up>    nop
+map global normal <s-down>  nop
+map global insert <left>    <left><right>
+map global insert <right>   <right><left>
+map global insert <up>      <up><down>
+map global insert <down>    <down><up>
+map global insert <s-left>  <s-left><s-right>
+map global insert <s-right> <s-right><s-left>
+map global insert <s-up>    <s-up><s-down>
+map global insert <s-down>  <s-down><s-up>
