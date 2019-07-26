@@ -14,7 +14,7 @@ else
     export EDITOR="vi"
 fi
 
-mkcd() { mkdir $1 && cd $1; }
+mkcd() { mkdir -p $1 && cd $1; }
 
 webmp4() {
     while [ $# -ne 0 ]; do
