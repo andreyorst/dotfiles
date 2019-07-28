@@ -120,3 +120,24 @@ if [ -n "$(command -v dash)" ]; then
     export KAKOUNE_POSIX_SHELL=$(command -v dash)
 fi
 
+cnew() {
+    if [ $# -ne 1 ]; then
+        echoerr "wrong argument count"
+        exit 1
+    fi
+    mkdir $1 >/dev/null 2>&1
+    res=$?
+    if [ $res -ne 0 ]; then
+        echo "Error creating a project: $res" >&2
+        return $res
+    fi
+    cp ~/.dotfiles/.c_project_template/* $1/ >/dev/null 2>&1
+    res=$?
+    if [ $res -eq 0 ]; then
+        echo "Created project: $1"
+    else
+        rm -rf $1
+        echo "Error creating a project: $res" >&2
+        return $res
+    fi
+}
