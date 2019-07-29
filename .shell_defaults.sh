@@ -134,6 +134,7 @@ cnew() {
     cp ~/.dotfiles/.c_project_template/* $1/ >/dev/null 2>&1
     res=$?
     if [ $res -eq 0 ]; then
+        echo "# $1" > $1/README.md
         echo "Created project: $1"
     else
         rm -rf $1
