@@ -661,16 +661,18 @@ are defining or executing a macro."
                   indent-tabs-mode t
                   tab-width 4)))
 
-(mapc (lambda (mode)
-        (progn
-          (font-lock-add-keywords
-           mode
-           '(("\\<\\(\\sw+\\) *(" 1 'font-lock-function-name-face)
-             ("\\(->\\|\\.\\) *\\<\\([_a-zA-Z]\\w+\\)" 2 'error)
-             ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'org-footnote)
-             ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]" 0 'font-lock-constant-face))
-           t)))
-      '(c-mode c++-mode))
+(with-eval-after-load 'cc-mode
+  (mapc (lambda (mode)
+          (progn
+            (modify-syntax-entry ?_ "w" (symbol-value (intern (format "%s-syntax-table" mode))))
+            (font-lock-add-keywords
+             mode
+             '(("\\<\\(\\sw+\\) *(" 1 'font-lock-function-name-face)
+               ("\\(->\\|\\.\\) *\\<\\([_a-zA-Z]\\w+\\)" 2 'error)
+               ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'org-footnote)
+               ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]" 0 'font-lock-constant-face))
+             t)))
+        '(c-mode c++-mode)))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
