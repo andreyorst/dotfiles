@@ -24,7 +24,7 @@ plug "andreyorst/plug.kak" noload config %{
     }
 }
 
-nop plug "andreyorst/kakoune-snippet-collection"
+plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-sudo-write"
@@ -76,7 +76,7 @@ plug "andreyorst/fzf.kak" config %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "ul/kak-lsp" do %{
+    plug "ul/kak-lsp" load-path "~/kak-lsp/" do %{
         cargo install --force --path . --locked
     } config %{
         define-command lsp-restart %{ lsp-stop; lsp-start }
@@ -152,23 +152,21 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
-nop plug "occivink/kakoune-snippets" branch "auto-discard" config %{
+plug "occivink/kakoune-snippets" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
-    map global insert '<tab>' "<a-;>: expand-or-jump-or-key tab<ret>"
-    map global insert '<ret>' "<a-;>: expand-or-jump-or-key ret<ret>"
-    map global normal '<tab>' ":      expand-or-jump-or-key tab<ret>"
-    map global normal '<ret>' ":      expand-or-jump-or-key ret<ret>"
+    map global insert '<c-e>' "<esc>: expand-or-jump<ret>" -docstring "expand snippet under cursor"
+    map global normal '<c-e>' ":      expand-or-jump<ret>" -docstring "expand snippet under cursor"
 
     define-command -docstring "expand-or-jump-or-key <key>: expand snippet or jump to the placeholder or execute <key>" \
-    expand-or-jump-or-key -params 1 %{
+    expand-or-jump %{
         try %{ snippets-expand-trigger %{
             set-register / "%opt{snippets_triggers_regex}\z"
             execute-keys 'hGhs<ret>'
         }} catch %{
             snippets-select-next-placeholders
-        } catch %sh{
-            printf "%s\n" "execute-keys -with-hooks <$1>"
+        } catch %{
+            nop
         }
     }
 }
