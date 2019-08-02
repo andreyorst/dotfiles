@@ -76,7 +76,7 @@ plug "andreyorst/fzf.kak" config %{
 }
 
 if '-n "${PATH##*termux*}"' %{
-    plug "ul/kak-lsp" load-path "~/kak-lsp/" do %{
+    plug "ul/kak-lsp" do %{
         cargo install --force --path . --locked
     } config %{
         define-command lsp-restart %{ lsp-stop; lsp-start }
