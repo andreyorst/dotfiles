@@ -11,13 +11,17 @@ filetypes = ["rust"]
 roots = ["Cargo.toml"]
 command = "rls"
 offset_encoding = "utf-8"
+
 [language.rust.initialization_options]
 offsetEncoding = ["utf-8"]
+formatTool = "rustfmt"
 
 [language.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_flags.txt", "compile_commands.json"]
 command = "clangd"
 offset_encoding = "utf-8"
+
 [language.c_cpp.initialization_options]
 offsetEncoding = ["utf-8"]
+formatTool = "clang-format"
