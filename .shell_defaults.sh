@@ -71,25 +71,80 @@ gif() {
 
 # Create new C project from template
 cnew() {
-    if [ $# -ne 1 ]; then
-        echoerr "wrong argument count"
+    if [ $# -lt 1 ]; then
+        echo "At leas 1 argument required" >&2
         return 1
     fi
-    mkdir $1 >/dev/null 2>&1
+
+    git=
+    readme=
+    empty=
+    while [ $# -gt 0 ]; do
+        case $1 in
+            (--add-flag) shift; flags="$flags\n$1" ;;
+            (--git) git="true"             ;;
+            (--readme) readme="true"       ;;
+            (--empty) empty="true"         ;;
+            (--help)
+                echo "usage: cnew [--add-flag <compile flag>] [--git] [--readme] [--help] project_name\n" >&2
+                echo "  --add-flag <flag>: add compile flag to project compile_flags.txt file" >&2
+                echo "  --git:             create git repository in project" >&2
+                echo "  --readme:          create empty readme file for a project" >&2
+                return 0 ;;
+            (*) project_name="$1" ;;
+        esac
+        shift
+    done
+
+    mkdir $project_name >/dev/null 2>&1
     res=$?
     if [ $res -ne 0 ]; then
-        echo "Error creating a project: $res" >&2
+        echo "Error creating a project '$project_name': $res" >&2
         return $res
     fi
-    cp ~/.dotfiles/.c_project_template/* $1/ >/dev/null 2>&1
-    res=$?
+
+    if [ -z "$empty" ]; then
+        cp ~/.dotfiles/.c_project_template/* $project_name/ >/dev/null 2>&1
+        res=$?
+        if [ $res -ne 0 ]; then
+            rm -rf $project_name
+            echo "Error creating a project '$project_name': $res" >&2
+            return $res
+        fi
+    fi
+
+    if [ -n "$flags" ] && [ -z "$empty" ]; then
+        printf "%s\n" "$flags" >> $project_name/compile_flags.txt
+        res=$?
+        if [ $res -ne 0 ]; then
+            rm -rf $project_name
+            echo "Error creating a project '$project_name': $res" >&2
+            return $res
+        fi
+    fi
+
+    if [ -n "$git" ]; then
+        git init $project_name
+        res=$?
+        if [ $res -ne 0 ]; then
+            rm -rf $project_name
+            echo "Error creating a project '$project_name': $res" >&2
+            return $res
+        fi
+    fi
+
+    if [ -n "$readme" ] && [ -z "$empty" ]; then
+        printf "%s\n" "# $project_name" > $project_name/README.md
+        res=$?
+        if [ $res -ne 0 ]; then
+            rm -rf $project_name
+            echo "Error creating a project '$project_name': $res" >&2
+            return $res
+        fi
+    fi
+
     if [ $res -eq 0 ]; then
-        echo "# $1" > $1/README.md
-        echo "Created project: $1"
-    else
-        rm -rf $1
-        echo "Error creating a project: $res" >&2
-        return $res
+        echo "Created project: $project_name"
     fi
 }
 
