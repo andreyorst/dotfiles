@@ -224,22 +224,19 @@ plug "delapouite/kakoune-select-view" %{
 
 if '-n "${PATH##*termux*}"' %{
     plug "andreyorst/kaktree" defer kaktree %{
+        map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
         set-option global kaktree_indentation 3
         set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂
         set-option global kaktree_dir_icon_close '▸ 🗀 ' # 📁
         set-option global kaktree_file_icon      '⠀⠀🖺'  # 🖹 🖻
-                                                # ^^ these are not spaces. It is invisible characters.
-                                                # This needed to make folding work correctly if you do
-                                                # space alignment of icons.
     } config %{
-        map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+        map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
         hook global WinSetOption filetype=kaktree %{
             remove-highlighter buffer/numbers
             remove-highlighter buffer/matching
             remove-highlighter buffer/wrap
             remove-highlighter buffer/show-whitespaces
         }
-        kaktree-enable
     }
 }
 
