@@ -102,14 +102,13 @@ leading-tabs-to-spaces %{
     execute-keys -draft %{%s^\h+<ret>@}
 }
 
-define-command -docstring "symbol [<symbol>]: jump to symbol definition in current file.
+define-command -override -docstring "symbol [<symbol>]: jump to symbol definition in current file.
 If no symbol given, current selection is used as a symbol name" \
 -shell-script-candidates %{
     tags="${TMPDIR:-/tmp}/tags-tmp"
     ctags -f "${tags}" "${kak_buffile}"
     cut -f 1 "${tags}" | grep -v '^!' | awk '!x[$0]++'
-} symbol -params ..1 %{ evaluate-commands %sh{
-    export tagname="${1:-${kak_selection}}"
+} symbol -params ..1 %[ evaluate-commands %sh[
     tags="${TMPDIR:-/tmp}/tags-tmp"
 
     if [ ! -s "${tags}" ]; then
@@ -122,28 +121,29 @@ If no symbol given, current selection is used as a symbol name" \
         tags_cmd='grep "^\b${tagname}\b.*\$/" "${tags}" -o'
     fi
 
-    eval "${tags_cmd}" | awk -F '\t|\n' '
+    eval "${tags_cmd}" | tagname="${1:-${kak_selection}}" awk -F '\t|\n' '
+        /^!TAGROOT\t/ { tagroot=$2 }
         /[^\t]+\t[^\t]+\t\/\^.*\$?\// {
-            opener = "\\{"; closer = "\\}"
             line = $0; sub(".*\t/\\^", "", line); sub("\\$?/$", "", line);
-            menu_info = line; gsub("#", "##", menu_info); gsub(/^[\t+ ]+/, "", menu_info); gsub(opener, "\\"opener, menu_info); gsub(/\t/, " ", menu_info);
-            keys = line; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys); gsub("#", "##", keys); gsub("&", "&&", keys); gsub("!", "!!", keys); gsub("\\|", "||", keys); gsub("\\\\/", "/", keys);
-            menu_item = $2; gsub("#", "##", menu_item);
-            edit_path = $2; gsub("&", "&&", edit_path); gsub("!", "!!", edit_path); gsub("\\|", "||", edit_path);
-            select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("#", "##", select); gsub("&", "&&", select); gsub("!", "!!", select); gsub("\\|", "||", select);
-            out = out "%#" menu_item ": {MenuInfo}" menu_info "# %#evaluate-commands %! try %& edit -existing %|" edit_path "|; execute-keys %|/\\Q" keys "<ret>vc| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & ! #"
+            menu_info = line; gsub("!", "!!", menu_info); gsub(/^[\t+ ]+/, "", menu_info); gsub("{", "\\{", menu_info); gsub(/\t/, " ", menu_info);
+            keys = line; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys); gsub("!", "!!", keys); gsub("&", "&&", keys); gsub("#", "##", keys); gsub("\\|", "||", keys); gsub("\\\\/", "/", keys);
+            menu_item = $2; gsub("!", "!!", menu_item);
+            edit_path = path($2); gsub("&", "&&", edit_path); gsub("#", "##", edit_path); gsub("\\|", "||", edit_path);
+            select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("!", "!!", select); gsub("&", "&&", select); gsub("#", "##", select); gsub("\\|", "||", select);
+            out = out "%!" menu_item ": {MenuInfo}" menu_info "! %!evaluate-commands %# try %& edit -existing %|" edit_path "|; execute-keys %|/\\Q" keys "<ret>vc| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & # !"
         }
         /[^\t]+\t[^\t]+\t[0-9]+/ {
-            opener = "\\{"; closer = "\\}"
-            menu_item = $2; gsub("#", "##", menu_item);
-            select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("#", "##", select); gsub("&", "&&", select); gsub("!", "!!", select); gsub("\\|", "||", select);
-            menu_info = $3; gsub("#", "##", menu_info); gsub(opener, "\\"opener, menu_info);
-            edit_path = $2; gsub("#", "##", edit_path); gsub("!", "!!", edit_path); gsub("&", "&&", edit_path); gsub("\\|", "||", edit_path);
+            menu_item = $2; gsub("!", "!!", menu_item);
+            select = $1; gsub(/</, "<lt>", select); gsub(/\t/, "<c-v><c-i>", select); gsub("!", "!!", select); gsub("&", "&&", select); gsub("#", "##", select); gsub("\\|", "||", select);
+            menu_info = $3; gsub("!", "!!", menu_info); gsub("{", "\\{", menu_info);
+            edit_path = path($2); gsub("!", "!!", edit_path); gsub("#", "##", edit_path); gsub("&", "&&", edit_path); gsub("\\|", "||", edit_path);
             line_number = $3;
-            out = out "%#" menu_item ": {MenuInfo}" menu_info "# %#evaluate-commands %! try %& edit -existing %|" edit_path "|; execute-keys %|" line_number "gx| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & ! #"
+            out = out "%!" menu_item ": {MenuInfo}" menu_info "! %!evaluate-commands %# try %& edit -existing %|" edit_path "|; execute-keys %|" line_number "gx| & catch %& echo -markup %|{Error}unable to find tag| &; try %& execute-keys %|s\\Q" select "<ret>| & # !"
         }
-        END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
-}}
+        END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }
+        # Ensure x is an absolute file path, by prepending with tagroot
+        function path(x) { return x ~/^\// ? x : tagroot x }'
+]]
 
 alias global @ symbol
 
