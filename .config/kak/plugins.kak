@@ -24,7 +24,7 @@ plug "andreyorst/plug.kak" noload config %{
     }
 }
 
-plug "andreyorst/kakoune-snippet-collection"
+nop plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-sudo-write"
@@ -152,7 +152,7 @@ plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
 }
 
-plug "occivink/kakoune-snippets" config %{
+nop plug "occivink/kakoune-snippets" config %{
     set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
     set-option global snippets_auto_expand false
     map global insert '<c-e>' "<esc>: expand-or-jump<ret>" -docstring "expand snippet under cursor"
