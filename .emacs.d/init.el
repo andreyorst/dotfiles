@@ -447,7 +447,6 @@ are defining or executing a macro."
               (lambda ()
                 (treemacs-load-theme "Atom")
                 (treemacs)
-                (treemacs-toggle-fixed-width)
                 (my/treemacs-expand-all-projects))))
 
   :init
