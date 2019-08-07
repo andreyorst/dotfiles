@@ -1,23 +1,32 @@
-PROGRAM=$(shell basename $(CURDIR))
-CFLAGS=$(shell cat compile_flags.txt | tr '\n' ' ')
+PROGRAM = $(shell basename $(CURDIR))
 
-all: $(PROGRAM).o
+CC      = clang
+CFLAGS  = $(shell cat compile_flags.txt | tr '\n' ' ')
+LDFLAGS =
 
-$(PROGRAM).o:
-	@clang -c $(CFLAGS) *.c
+SOURCES = $(wildcard *.c)
+OBJECTS = $(SOURCES:.c=.o)
+
+all: $(PROGRAM)
+
+${PROGRAM}: $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) -o $@ -c $< $(CFLAGS)
 	@mkdir -p ./bin
-	@clang -o ./bin/$(PROGRAM) *.o
+	$(CC) -o ./bin/$(PROGRAM) *.o
 
-.PHONY: clean run depend help
+.PHONY: $(PROGRAM) clean run depend help
 
 clean:
 	@rm -rf ./bin *.o .depend
 
-run:: $(PROGRAM).o
+run: main.o
 	@./bin/$(PROGRAM)
 
 .depend:
-	@clang -MM *.c > .depend
+	$(CC) -MM *.c > .depend
 
 help:
 	@echo "make      -- build executable"
