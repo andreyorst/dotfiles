@@ -25,7 +25,7 @@ run: $(PROGRAM)
 	@$(PROGRAM)
 
 .depend:
-	$(CC) -MM *.c > .depend
+	$(CC) -MM $(CFLAGS) *.c > .depend
 
 help:
 	@echo "make      -- build executable"
