@@ -1,4 +1,4 @@
-PROGRAM = $(shell basename $(CURDIR))
+PROGRAM = ./bin/$(shell basename $(CURDIR))
 
 CC      = clang
 CFLAGS  = $(shell cat compile_flags.txt | tr '\n' ' ')
@@ -7,22 +7,22 @@ LDFLAGS = $(CFLAGS)
 SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:.c=.o)
 
-all: ./bin/$(PROGRAM)
+all: $(PROGRAM)
 
-./bin/${PROGRAM}: $(OBJECTS)
+${PROGRAM}: $(OBJECTS)
 	@mkdir -p ./bin
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-.PHONY: $(PROGRAM) clean run depend help
+.PHONY: clean run depend help
 
 clean:
 	@rm -rf ./bin *.o .depend
 
-run: ./bin/$(PROGRAM)
-	@./bin/$(PROGRAM)
+run: $(PROGRAM)
+	@$(PROGRAM)
 
 .depend:
 	$(CC) -MM *.c > .depend
