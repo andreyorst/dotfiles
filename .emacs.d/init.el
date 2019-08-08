@@ -819,7 +819,7 @@ are defining or executing a macro."
              counsel-find-library)
   :init
   (when (executable-find "fd")
-    (setq counsel-file-jump-args "-L --type f --hidden"))
+    (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
   (setq counsel-rg-base-command
         "rg -S --no-heading --hidden --line-number --color never %s .")
   (setenv "FZF_DEFAULT_COMMAND"
