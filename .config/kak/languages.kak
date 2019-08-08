@@ -46,7 +46,7 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
                        add-highlighter shared/$ft/code/my_types_3   regex \b(v|u|vu)(_|__)?(int|short|char|long)\b 0:type
                        add-highlighter shared/$ft/code/struct_type  regex struct\h+(\w+) 1:type
                        add-highlighter shared/$ft/code/generic_type regex \b\w+_t\b 0:type
-                       add-highlighter shared/$ft/code/type_cast    regex \((?:volatile\h*)?([^(]\w+\h*[^)*]*)(?:\*\h*)\)\h*(?:\(|\w+) 1:type
+                       add-highlighter shared/$ft/code/type_cast    regex \((?:volatile\h*)?([^(]\w+\h*[^()*]*)(?:\*\h*)\)\h*(?:\(|\w+) 1:type
                        add-highlighter shared/$ft/code/func_pointer regex (\w+)\h*\(\*\h*(\w+)\)\([^)]*\) 1:type 2:function"
     done
 }}}
