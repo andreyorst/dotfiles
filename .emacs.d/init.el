@@ -102,6 +102,13 @@ are defining or executing a macro."
 
 (global-set-key [remap keyboard-quit] #'my/escape)
 
+(defun my/command-error-function (data context caller)
+  "Ignore the `text-read-only' signal; pass the rest to the default handler."
+  (when (not (eq (car data) 'text-read-only))
+    (command-error-default-function data context caller)))
+
+(setq command-error-function #'my/command-error-function)
+
 (defun my/ensure-installed (package)
   "Ensure that PACKAGE is installed."
   (when (not (package-installed-p package))

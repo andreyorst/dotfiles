@@ -286,6 +286,19 @@ Let's remap default =keyboard-quit= key with this function.
   (global-set-key [remap keyboard-quit] #'my/escape)
 #+END_SRC
 
+When using some commands that provide  prompt, like pushing to git, or
+=eval-expression=,  there's  annoying message  =text  is  read only=  when
+deleting past first symbol. Let's disable it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/command-error-function (data context caller)
+    "Ignore the `text-read-only' signal; pass the rest to the default handler."
+    (when (not (eq (car data) 'text-read-only))
+      (command-error-default-function data context caller)))
+
+  (setq command-error-function #'my/command-error-function)
+#+END_SRC
+
 ** Use Package
 I use =use-package= to install, load  and configure my packages.  I find
 this way very consistent and easy  to understand and maintain.  What I
