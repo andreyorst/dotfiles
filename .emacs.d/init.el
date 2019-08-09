@@ -252,241 +252,242 @@ are defining or executing a macro."
         doom-modeline-lsp nil
         find-file-visit-truename t))
 
-(use-package treemacs
-  :commands (treemacs
-             treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode
-             treemacs--expand-root-node
-             treemacs--maybe-recenter
-             treemacs-TAB-action
-             treemacs-load-theme
-             treemacs-toggle-fixed-width)
-  :functions (my/treemacs-expand-all-projects
-              my/treemacs-variable-pitch-labels
-              doom-color
-              all-the-icons-octicon)
-  :bind (("<f7>" . treemacs)
-         ("<f8>" . treemacs-select-window))
-  :config
-  (set-face-attribute 'treemacs-root-face nil
-                      :foreground (doom-color 'fg)
-                      :height 1.0
-                      :weight 'normal)
-  (treemacs-create-theme "Atom"
+(when window-system
+  (use-package treemacs
+    :commands (treemacs
+               treemacs-follow-mode
+               treemacs-filewatch-mode
+               treemacs-fringe-indicator-mode
+               treemacs--expand-root-node
+               treemacs--maybe-recenter
+               treemacs-TAB-action
+               treemacs-load-theme
+               treemacs-toggle-fixed-width)
+    :functions (my/treemacs-expand-all-projects
+                my/treemacs-variable-pitch-labels
+                doom-color
+                all-the-icons-octicon)
+    :bind (("<f7>" . treemacs)
+           ("<f8>" . treemacs-select-window))
     :config
-    (progn
-      (treemacs-create-icon
-       :icon (format " %s\t"
-                     (all-the-icons-octicon
-                      "repo"
-                      :v-adjust -0.1
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (root))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-down"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
-                     (all-the-icons-octicon
-                      "file-directory"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (dir-open))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-right"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
-                     (all-the-icons-octicon
-                      "file-directory"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (dir-closed))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-down"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
-                     (all-the-icons-octicon
-                      "package"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (tag-open))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-right"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
-                     (all-the-icons-octicon
-                      "package"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (tag-closed))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "tag"
-                      :height 0.9
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (tag-leaf))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "flame"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (error))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "stop"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (warning))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "info"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (info))
-      (treemacs-create-icon
-       :icon (format "  %s\t"
-                     (all-the-icons-octicon
-                      "file-media"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                    "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                    "wav" "mp3" "ogg" "midi"))
-      (treemacs-create-icon
-       :icon (format "  %s\t"
-                     (all-the-icons-octicon
-                      "file-code"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
-                    "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
-                    "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
-                    "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
-                    "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
-                    "vagrantfile" "j2" "jinja2" "tex" "racket" "rkt" "rktl" "rktd"
-                    "scrbl" "scribble" "plt" "makefile" "elm" "xml" "xsl" "rb"
-                    "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
-                    "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
-                    "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                    "gitconfig"))
-      (treemacs-create-icon
-       :icon (format "  %s\t"
-                     (all-the-icons-octicon
-                      "book"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
-                    "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
-                    "azw3" "kf8" "kfx" "lit" "prc" "mobi" "exe" "or" "html"
-                    "pkg" "opf" "txt" "pdb" "ps" "rtf" "pdg" "xml" "tr2"
-                    "tr3" "oxps" "xps"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-text"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("md" "markdown" "rst" "log" "org" "txt"
-                    "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-binary"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("exe" "dll" "obj" "so" "o" "out"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-pdf"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("pdf"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-zip"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-text"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
-       :extensions (fallback))))
+    (set-face-attribute 'treemacs-root-face nil
+                        :foreground (doom-color 'fg)
+                        :height 1.0
+                        :weight 'normal)
+    (treemacs-create-theme "Atom"
+      :config
+      (progn
+        (treemacs-create-icon
+         :icon (format " %s\t"
+                       (all-the-icons-octicon
+                        "repo"
+                        :v-adjust -0.1
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (root))
+        (treemacs-create-icon
+         :icon (format "%s\t%s\t"
+                       (all-the-icons-octicon
+                        "chevron-down"
+                        :height 0.75
+                        :v-adjust 0.1
+                        :face '(:inherit font-lock-doc-face :slant normal))
+                       (all-the-icons-octicon
+                        "file-directory"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (dir-open))
+        (treemacs-create-icon
+         :icon (format "%s\t%s\t"
+                       (all-the-icons-octicon
+                        "chevron-right"
+                        :height 0.75
+                        :v-adjust 0.1
+                        :face '(:inherit font-lock-doc-face :slant normal))
+                       (all-the-icons-octicon
+                        "file-directory"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (dir-closed))
+        (treemacs-create-icon
+         :icon (format "%s\t%s\t"
+                       (all-the-icons-octicon
+                        "chevron-down"
+                        :height 0.75
+                        :v-adjust 0.1
+                        :face '(:inherit font-lock-doc-face :slant normal))
+                       (all-the-icons-octicon
+                        "package"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (tag-open))
+        (treemacs-create-icon
+         :icon (format "%s\t%s\t"
+                       (all-the-icons-octicon
+                        "chevron-right"
+                        :height 0.75
+                        :v-adjust 0.1
+                        :face '(:inherit font-lock-doc-face :slant normal))
+                       (all-the-icons-octicon
+                        "package"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (tag-closed))
+        (treemacs-create-icon
+         :icon (format "%s\t"
+                       (all-the-icons-octicon
+                        "tag"
+                        :height 0.9
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (tag-leaf))
+        (treemacs-create-icon
+         :icon (format "%s\t"
+                       (all-the-icons-octicon
+                        "flame"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (error))
+        (treemacs-create-icon
+         :icon (format "%s\t"
+                       (all-the-icons-octicon
+                        "stop"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (warning))
+        (treemacs-create-icon
+         :icon (format "%s\t"
+                       (all-the-icons-octicon
+                        "info"
+                        :height 0.75
+                        :v-adjust 0.1
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (info))
+        (treemacs-create-icon
+         :icon (format "  %s\t"
+                       (all-the-icons-octicon
+                        "file-media"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                      "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                      "wav" "mp3" "ogg" "midi"))
+        (treemacs-create-icon
+         :icon (format "  %s\t"
+                       (all-the-icons-octicon
+                        "file-code"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
+                      "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
+                      "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
+                      "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
+                      "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
+                      "vagrantfile" "j2" "jinja2" "tex" "racket" "rkt" "rktl" "rktd"
+                      "scrbl" "scribble" "plt" "makefile" "elm" "xml" "xsl" "rb"
+                      "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
+                      "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
+                      "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
+                      "gitconfig"))
+        (treemacs-create-icon
+         :icon (format "  %s\t"
+                       (all-the-icons-octicon
+                        "book"
+                        :v-adjust 0
+                        :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
+                      "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
+                      "azw3" "kf8" "kfx" "lit" "prc" "mobi" "exe" "or" "html"
+                      "pkg" "opf" "txt" "pdb" "ps" "rtf" "pdg" "xml" "tr2"
+                      "tr3" "oxps" "xps"))
+        (treemacs-create-icon
+         :icon (format "  %s\t" (all-the-icons-octicon
+                                 "file-text"
+                                 :v-adjust 0
+                                 :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("md" "markdown" "rst" "log" "org" "txt"
+                      "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
+        (treemacs-create-icon
+         :icon (format "  %s\t" (all-the-icons-octicon
+                                 "file-binary"
+                                 :v-adjust 0
+                                 :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("exe" "dll" "obj" "so" "o" "out"))
+        (treemacs-create-icon
+         :icon (format "  %s\t" (all-the-icons-octicon
+                                 "file-pdf"
+                                 :v-adjust 0
+                                 :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("pdf"))
+        (treemacs-create-icon
+         :icon (format "  %s\t" (all-the-icons-octicon
+                                 "file-zip"
+                                 :v-adjust 0
+                                 :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
+        (treemacs-create-icon
+         :icon (format "  %s\t" (all-the-icons-octicon
+                                 "file-text"
+                                 :v-adjust 0
+                                 :face '(:inherit font-lock-doc-face :slant normal)))
+         :extensions (fallback))))
 
-  (add-hook 'treemacs-mode-hook
-            (lambda()
-              (setq tab-width 1
-                    mode-line-format nil
-                    line-spacing 5)
-              (set-window-fringes nil 0 0 nil)
-              (my/treemacs-variable-pitch-labels)))
-
-  (advice-add #'treemacs-select-window :after
+    (add-hook 'treemacs-mode-hook
               (lambda()
+                (setq tab-width 1
+                      mode-line-format nil
+                      line-spacing 5)
                 (set-window-fringes nil 0 0 nil)
                 (my/treemacs-variable-pitch-labels)))
 
-  (when window-system
-    (add-hook 'after-init-hook
-              (lambda ()
-                (treemacs-load-theme "Atom")
-                (treemacs)
-                (my/treemacs-expand-all-projects))))
+    (advice-add #'treemacs-select-window :after
+                (lambda()
+                  (set-window-fringes nil 0 0 nil)
+                  (my/treemacs-variable-pitch-labels)))
 
-  :init
-  (defun my/treemacs-expand-all-projects (&optional _)
-    "Expand all projects."
-    (save-excursion
-      (treemacs--forget-last-highlight)
-      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
-        (-when-let (pos (treemacs-project->position project))
-          (when (eq 'root-node-closed (treemacs-button-get pos :state))
-            (goto-char pos)
-            (treemacs--expand-root-node pos)))))
-    (treemacs--maybe-recenter 'on-distance))
+    (when window-system
+      (add-hook 'after-init-hook
+                (lambda ()
+                  (treemacs-load-theme "Atom")
+                  (treemacs)
+                  (my/treemacs-expand-all-projects))))
 
-  (defun my/treemacs-variable-pitch-labels (&rest _)
-    (dolist (face '(treemacs-root-face
-                    treemacs-git-unmodified-face
-                    treemacs-git-modified-face
-                    treemacs-git-renamed-face
-                    treemacs-git-ignored-face
-                    treemacs-git-untracked-face
-                    treemacs-git-added-face
-                    treemacs-git-conflict-face
-                    treemacs-directory-face
-                    treemacs-directory-collapsed-face
-                    treemacs-file-face
-                    treemacs-tags-face))
-      (let ((faces (face-attribute face :inherit nil)))
-        (set-face-attribute
-         face nil :inherit
-         `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
+    :init
+    (defun my/treemacs-expand-all-projects (&optional _)
+      "Expand all projects."
+      (save-excursion
+        (treemacs--forget-last-highlight)
+        (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+          (-when-let (pos (treemacs-project->position project))
+            (when (eq 'root-node-closed (treemacs-button-get pos :state))
+              (goto-char pos)
+              (treemacs--expand-root-node pos)))))
+      (treemacs--maybe-recenter 'on-distance))
 
-  (setq treemacs-width 27
-        treemacs-is-never-other-window t
-        treemacs-space-between-root-nodes nil)
+    (defun my/treemacs-variable-pitch-labels (&rest _)
+      (dolist (face '(treemacs-root-face
+                      treemacs-git-unmodified-face
+                      treemacs-git-modified-face
+                      treemacs-git-renamed-face
+                      treemacs-git-ignored-face
+                      treemacs-git-untracked-face
+                      treemacs-git-added-face
+                      treemacs-git-conflict-face
+                      treemacs-directory-face
+                      treemacs-directory-collapsed-face
+                      treemacs-file-face
+                      treemacs-tags-face))
+        (let ((faces (face-attribute face :inherit nil)))
+          (set-face-attribute
+           face nil :inherit
+           `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
 
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode nil))
+    (setq treemacs-width 27
+          treemacs-is-never-other-window t
+          treemacs-space-between-root-nodes nil)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode nil)))
 
 (use-package treemacs-magit)
 
@@ -965,8 +966,9 @@ _-_: reduce region _)_: around pairs
   :bind (("C-s" . phi-search)
          ("C-r" . phi-search-backward)))
 
-(when (or (executable-find "clangd")
-          (executable-find "rls"))
+(when (and (or (executable-find "clangd")
+               (executable-find "rls"))
+           window-system)
   (use-package eglot
     :commands (eglot eglot-ensure)
     :config
