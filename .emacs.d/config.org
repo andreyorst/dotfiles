@@ -111,7 +111,6 @@ with different methods of installation.
 
 #+BEGIN_SRC emacs-lisp
   (require 'package)
-  (setq package-enable-at-startup nil)
   (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                            ("melpa" . "https://melpa.org/packages/")))
 #+END_SRC
