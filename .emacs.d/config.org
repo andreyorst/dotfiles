@@ -117,6 +117,12 @@ with different methods of installation.
 
 Note for Windows users: change =https= to =http=
 
+There's recent bug with downloading from elpa. This line fixes it:
+
+#+BEGIN_SRC emacs-lisp
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+#+END_SRC
+
 This basic  piece of code  is used to  update package list  if there's
 none.
 

@@ -31,6 +31,8 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
