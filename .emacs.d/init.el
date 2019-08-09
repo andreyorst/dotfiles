@@ -28,7 +28,6 @@
       package--init-file-ensured t)
 
 (require 'package)
-(setq package-enable-at-startup nil)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 
@@ -494,12 +493,13 @@ are defining or executing a macro."
   :init
   (eyebrowse-mode t))
 
-(use-package diff-hl
-  :commands global-diff-hl-mode
-  :init
-  (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-  (global-diff-hl-mode 1))
+(when window-system
+  (use-package diff-hl
+    :commands global-diff-hl-mode
+    :init
+    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    (global-diff-hl-mode 1)))
 
 (defun my/setup-fringe-bitmaps ()
   "Set fringe bitmaps."
@@ -522,31 +522,32 @@ are defining or executing a macro."
   (setq window-divider-default-right-width 1)
   (window-divider-mode 1))
 
-(use-package centaur-tabs
-  :demand
-  :hook
-  (dashboard-mode . centaur-tabs-local-mode)
-  (term-mode . centaur-tabs-local-mode)
-  (calendar-mode . centaur-tabs-local-mode)
-  (org-agenda-mode . centaur-tabs-local-mode)
-  (helpful-mode . centaur-tabs-local-mode)
-  :config
-  (setq centaur-tabs-set-modified-marker t
-        centaur-tabs-modified-marker "● "
-        centaur-tabs-close-button (concat centaur-tabs-close-button " ")
-        centaur-tabs-cycle-scope 'tabs
-        centaur-tabs-height 32
-        centaur-tabs-style "bar")
-  (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
-  (defun centaur-tabs-buffer-groups ()
-    "Do not use groups."
-    (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                 "Emacs")
-                ((string-equal "magit" (substring (buffer-name) 0 5))
-                 "Magit")
-                (t
-                 (centaur-tabs-get-group-name (current-buffer))))))
-  (centaur-tabs-mode))
+(when window-system
+  (use-package centaur-tabs
+    :demand
+    :hook
+    (dashboard-mode . centaur-tabs-local-mode)
+    (term-mode . centaur-tabs-local-mode)
+    (calendar-mode . centaur-tabs-local-mode)
+    (org-agenda-mode . centaur-tabs-local-mode)
+    (helpful-mode . centaur-tabs-local-mode)
+    :config
+    (setq centaur-tabs-set-modified-marker t
+          centaur-tabs-modified-marker "● "
+          centaur-tabs-close-button (concat centaur-tabs-close-button " ")
+          centaur-tabs-cycle-scope 'tabs
+          centaur-tabs-height 32
+          centaur-tabs-style "bar")
+    (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
+    (defun centaur-tabs-buffer-groups ()
+      "Do not use groups."
+      (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
+                   "Emacs")
+                  ((string-equal "magit" (substring (buffer-name) 0 5))
+                   "Magit")
+                  (t
+                   (centaur-tabs-get-group-name (current-buffer))))))
+    (centaur-tabs-mode)))
 
 (require 'org)
 (add-hook 'org-mode-hook
@@ -962,15 +963,17 @@ _-_: reduce region _)_: around pairs
   :bind (("C-s" . phi-search)
          ("C-r" . phi-search-backward)))
 
-(use-package eglot
-  :commands (eglot eglot-ensure)
-  :config
-  (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
-  (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-  :init
-  (add-hook 'c-mode-hook 'eglot-ensure)
-  (add-hook 'c++-mode-hook 'eglot-ensure)
-  (add-hook 'rust-mode-hook 'eglot-ensure))
+(when (or (executable-find "clangd")
+          (executable-find "rls"))
+  (use-package eglot
+    :commands (eglot eglot-ensure)
+    :config
+    (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
+    (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
+    :init
+    (add-hook 'c-mode-hook 'eglot-ensure)
+    (add-hook 'c++-mode-hook 'eglot-ensure)
+    (add-hook 'rust-mode-hook 'eglot-ensure)))
 
 (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
   "Files or directories that indicate the root of a project.")

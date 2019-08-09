@@ -883,12 +883,13 @@ This package  provides nice way  of diffing buffers. It  displays thin
 bar inside fringe marking unstaged changes.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package diff-hl
-    :commands global-diff-hl-mode
-    :init
-    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (global-diff-hl-mode 1))
+  (when window-system
+    (use-package diff-hl
+      :commands global-diff-hl-mode
+      :init
+      (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
+      (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+      (global-diff-hl-mode 1)))
 #+END_SRC
 
 But I don't quite  like how it looks. So there's  another thing that I
@@ -939,31 +940,32 @@ This  package  adds  tabs  over  main  windows,  that  display  opened
 buffers. It's good for navigation with the mouse, and looks fancy.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package centaur-tabs
-    :demand
-    :hook
-    (dashboard-mode . centaur-tabs-local-mode)
-    (term-mode . centaur-tabs-local-mode)
-    (calendar-mode . centaur-tabs-local-mode)
-    (org-agenda-mode . centaur-tabs-local-mode)
-    (helpful-mode . centaur-tabs-local-mode)
-    :config
-    (setq centaur-tabs-set-modified-marker t
-          centaur-tabs-modified-marker "● "
-          centaur-tabs-close-button (concat centaur-tabs-close-button " ")
-          centaur-tabs-cycle-scope 'tabs
-          centaur-tabs-height 32
-          centaur-tabs-style "bar")
-    (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
-    (defun centaur-tabs-buffer-groups ()
-      "Do not use groups."
-      (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                   "Emacs")
-                  ((string-equal "magit" (substring (buffer-name) 0 5))
-                   "Magit")
-                  (t
-                   (centaur-tabs-get-group-name (current-buffer))))))
-    (centaur-tabs-mode))
+  (when window-system
+    (use-package centaur-tabs
+      :demand
+      :hook
+      (dashboard-mode . centaur-tabs-local-mode)
+      (term-mode . centaur-tabs-local-mode)
+      (calendar-mode . centaur-tabs-local-mode)
+      (org-agenda-mode . centaur-tabs-local-mode)
+      (helpful-mode . centaur-tabs-local-mode)
+      :config
+      (setq centaur-tabs-set-modified-marker t
+            centaur-tabs-modified-marker "● "
+            centaur-tabs-close-button (concat centaur-tabs-close-button " ")
+            centaur-tabs-cycle-scope 'tabs
+            centaur-tabs-height 32
+            centaur-tabs-style "bar")
+      (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
+      (defun centaur-tabs-buffer-groups ()
+        "Do not use groups."
+        (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
+                     "Emacs")
+                    ((string-equal "magit" (substring (buffer-name) 0 5))
+                     "Magit")
+                    (t
+                     (centaur-tabs-get-group-name (current-buffer))))))
+      (centaur-tabs-mode)))
 #+END_SRC
 
 ** Modes
@@ -1746,15 +1748,17 @@ This search mode is compatible with multiple cursors.
 Emacs polyglot. LSP client.
 
  #+BEGIN_SRC emacs-lisp
-   (use-package eglot
-     :commands (eglot eglot-ensure)
-     :config
-     (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
-     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-     :init
-     (add-hook 'c-mode-hook 'eglot-ensure)
-     (add-hook 'c++-mode-hook 'eglot-ensure)
-     (add-hook 'rust-mode-hook 'eglot-ensure))
+   (when (or (executable-find "clangd")
+             (executable-find "rls"))
+     (use-package eglot
+       :commands (eglot eglot-ensure)
+       :config
+       (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
+       (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
+       :init
+       (add-hook 'c-mode-hook 'eglot-ensure)
+       (add-hook 'c++-mode-hook 'eglot-ensure)
+       (add-hook 'rust-mode-hook 'eglot-ensure)))
 #+END_SRC
 
 There's still one  problem though. [[Eglot]] use =project.el=  to detect the
