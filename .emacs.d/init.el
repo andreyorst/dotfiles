@@ -534,6 +534,7 @@ are defining or executing a macro."
     (calendar-mode . centaur-tabs-local-mode)
     (org-agenda-mode . centaur-tabs-local-mode)
     (helpful-mode . centaur-tabs-local-mode)
+    (imenu-list-major-mode . centaur-tabs-local-mode)
     :config
     (setq centaur-tabs-set-modified-marker t
           centaur-tabs-modified-marker "● "

@@ -956,6 +956,7 @@ buffers. It's good for navigation with the mouse, and looks fancy.
       (calendar-mode . centaur-tabs-local-mode)
       (org-agenda-mode . centaur-tabs-local-mode)
       (helpful-mode . centaur-tabs-local-mode)
+      (imenu-list-major-mode . centaur-tabs-local-mode)
       :config
       (setq centaur-tabs-set-modified-marker t
             centaur-tabs-modified-marker "● "
