@@ -705,16 +705,18 @@ are defining or executing a macro."
                        (electric-pair-mode)
                        (setq company-tooltip-align-annotations t))))
 
-(use-package racer
-  :config (add-hook 'racer-mode-hook #'eldoc-mode)
-  :init
-  (defun org-babel-edit-prep:rust (&optional babel-info)
-    "Run racer mode for Org Babel."
-    (racer-mode 1)))
+(when (executable-find "racer")
+  (use-package racer
+    :config (add-hook 'racer-mode-hook #'eldoc-mode)
+    :init
+    (defun org-babel-edit-prep:rust (&optional babel-info)
+      "Run racer mode for Org Babel."
+      (racer-mode 1))))
 
-(use-package cargo
-  :config
-  (add-hook 'rust-mode-hook 'cargo-minor-mode))
+(when (executable-find "cargo")
+  (use-package cargo
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode)))
 
 (modify-syntax-entry ?_ "w" rust-mode-syntax-table)
 (font-lock-add-keywords
@@ -832,10 +834,11 @@ are defining or executing a macro."
   :init
   (when (executable-find "fd")
     (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
-  (setq counsel-rg-base-command
-        "rg -S --no-heading --hidden --line-number --color never %s .")
-  (setenv "FZF_DEFAULT_COMMAND"
-          "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'")
+  (when (executable-find "rg")
+    (setq counsel-rg-base-command
+          "rg -S --no-heading --hidden --line-number --color never %s .")
+    (setenv "FZF_DEFAULT_COMMAND"
+            "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x f" . counsel-fzf)
