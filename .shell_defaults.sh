@@ -76,69 +76,84 @@ cnew() {
         return 1
     fi
 
-    git=
+    vcs="git"
     readme=
     empty=
     while [ $# -gt 0 ]; do
-        case $1 in
-            (--add-flag) shift; flags="$flags\n$1" ;;
-            (--git) git="true"             ;;
-            (--readme) readme="true"       ;;
-            (--empty) empty="true"         ;;
-            (--help)
-                echo "usage: cnew [--add-flag <compile flag>] [--git] [--readme] [--help] project_name\n" >&2
-                echo "  --add-flag <flag>: add compile flag to project compile_flags.txt file" >&2
-                echo "  --git:             create git repository in project" >&2
-                echo "  --readme:          create empty readme file for a project" >&2
+        case "$1" in
+            (-add-flag)
+                shift
+                flags=$([ -z "$flags" ] && printf "%s" "$1" || printf "%s\n%s" "$flags" "$1") ;;
+            (-vcs) vcs="$1"         ;;
+            (-readme) readme="true" ;;
+            (-empty) empty="true"   ;;
+            (-help)
+                echo "usage: cnew [-add-flag <compile flag>] [-git] [-readme] [-help] project_name\n" >&2
+                echo "  -add-flag <flag>:  add compile flag to project compile_flags.txt file" >&2
+                echo "  -vcs [git | none]: create git repository in project" >&2
+                echo "  -readme:           create empty readme file for a project" >&2
                 return 0 ;;
             (*) project_name="$1" ;;
         esac
         shift
     done
 
-    mkdir $project_name >/dev/null 2>&1
+    mkdir "$project_name" >/dev/null 2>&1
     res=$?
     if [ $res -ne 0 ]; then
-        echo "Error creating a project '$project_name': $res" >&2
+        echo "Error creating a project '$project_name': Could not create directory($res)" >&2
         return $res
     fi
 
     if [ -z "$empty" ]; then
-        cp ~/.dotfiles/.c_project_template/* $project_name/ >/dev/null 2>&1
+        cp -r ~/.dotfiles/.c_project_template/. "$project_name/" >/dev/null 2>&1
         res=$?
         if [ $res -ne 0 ]; then
-            rm -rf $project_name
-            echo "Error creating a project '$project_name': $res" >&2
+            rm -rf "$project_name"
+            echo "Error creating a project '$project_name'" >&2
+            echo "Could not initialize project with files ($res)" >&2
             return $res
         fi
     fi
 
     if [ -n "$flags" ] && [ -z "$empty" ]; then
-        printf "%s\n" "$flags" >> $project_name/compile_flags.txt
+        printf "%s\n" "$flags" >> "$project_name/compile_flags.txt"
         res=$?
         if [ $res -ne 0 ]; then
-            rm -rf $project_name
-            echo "Error creating a project '$project_name': $res" >&2
+            rm -rf "$project_name"
+            echo "Error creating a project '$project_name'" >&2
+            echo "Could not specify additional flags ($res)" >&2
             return $res
         fi
     fi
 
-    if [ -n "$git" ]; then
-        git init $project_name
-        res=$?
+    if [ "$vcs" = "git" ]; then
+        if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            git init "$project_name" >/dev/null 2>&1
+            res=$?
+        fi
         if [ $res -ne 0 ]; then
-            rm -rf $project_name
-            echo "Error creating a project '$project_name': $res" >&2
+            rm -rf "$project_name"
+            echo "Error creating a project '$project_name'" >&2
+            echo "Could not initialize git repository ($res)" >&2
             return $res
         fi
+    elif [ "$vcs" = "none" ]; then
+        res=0
+    else
+        rm -rf "$project_name"
+        echo "Error creating a project '$project_name'" >&2
+        echo "VCS '$vcs' is not supported by the script (1)" >&2
+        return 1
     fi
 
     if [ -n "$readme" ] && [ -z "$empty" ]; then
-        printf "%s\n" "# $project_name" > $project_name/README.md
+        printf "%s\n" "# $project_name" > "$project_name/README.md"
         res=$?
         if [ $res -ne 0 ]; then
-            rm -rf $project_name
-            echo "Error creating a project '$project_name': $res" >&2
+            rm -rf "$project_name"
+            echo "Error creating a project '$project_name'" >&2
+            echo "Could not create README.md ($res)" >&2
             return $res
         fi
     fi
