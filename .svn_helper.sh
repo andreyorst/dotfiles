@@ -15,7 +15,11 @@ svn() {
 
 ## calls svn diff with colors piped to less if needed.
 svn_diff() {
-    command svn diff -x -w "$@" | colordiff | less -RF
+    if [ -n "$(command -v colordiff)" ]; then
+        command svn diff -x -w "$@" | colordiff | less -RF
+    else
+        command svn diff -x -w "$@" | less -F
+    fi
 }
 
 ## calls svn log piped to less when log
@@ -33,4 +37,3 @@ svn_st() {
 svn_blame() {
     command svn blame "$@" | less -F
 }
-
