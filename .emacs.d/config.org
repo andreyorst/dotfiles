@@ -972,17 +972,18 @@ buffers. It's good for navigation with the mouse, and looks fancy.
       (imenu-list-major-mode . centaur-tabs-local-mode)
       :config
       (setq centaur-tabs-set-modified-marker t
-            centaur-tabs-modified-marker "● "
-            centaur-tabs-close-button (concat centaur-tabs-close-button " ")
+            centaur-tabs-modified-marker "●"
             centaur-tabs-cycle-scope 'tabs
             centaur-tabs-height 32
-            centaur-tabs-style "bar")
+            centaur-tabs-style "bar"
+            centaur-tabs-set-icons t
+            centaur-tabs-gray-out-icons 'buffer)
       (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
       (defun centaur-tabs-buffer-groups ()
-        "Do not use groups."
+        "Use as few groups as possible."
         (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                     "Emacs")
-                    ((string-equal "magit" (substring (buffer-name) 0 5))
+                     "Tools")
+                    ((string-equal "magit" (downcase (substring (buffer-name) 0 5)))
                      "Magit")
                     (t
                      (centaur-tabs-get-group-name (current-buffer))))))
