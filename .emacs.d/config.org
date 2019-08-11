@@ -877,7 +877,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
 This supplement  package makes  some nice integration  with Magit.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package treemacs-magit)
+  (when (package-installed-p 'treemacs)
+    (use-package treemacs-magit))
 #+END_SRC
 
 Before using Treemacs I was a  happy user of another filetree package:

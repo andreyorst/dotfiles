@@ -496,7 +496,8 @@ are defining or executing a macro."
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)))
 
-(use-package treemacs-magit)
+(when (package-installed-p 'treemacs)
+  (use-package treemacs-magit))
 
 (use-package eyebrowse
   :commands eyebrowse-mode
