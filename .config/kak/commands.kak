@@ -125,7 +125,7 @@ If no symbol given, current selection is used as a symbol name" \
     eval "${tags_cmd}" | tagname="$tagname" awk -F '\t|\n' '
         /[^\t]+\t[^\t]+\t\/\^.*\$?\// {
             line = $0; sub(".*\t/\\^", "", line); sub("\\$?/.*$", "", line);
-            menu_info = line; gsub("!", "!!", menu_info); gsub(/^[\t+ ]+/, "", menu_info); gsub("{", "\\{", menu_info); gsub(/\t/, " ", menu_info);
+            menu_info = line; gsub("!", "!!", menu_info); gsub(/^[\t ]+/, "", menu_info); gsub("{", "\\{", menu_info); gsub(/\t/, " ", menu_info);
             keys = line; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys); gsub("!", "!!", keys); gsub("&", "&&", keys); gsub("#", "##", keys); gsub("\\|", "||", keys); gsub("\\\\/", "/", keys);
             menu_item = $2; gsub("!", "!!", menu_item);
             edit_path = $2; gsub("&", "&&", edit_path); gsub("#", "##", edit_path); gsub("\\|", "||", edit_path);
