@@ -818,8 +818,8 @@ are defining or executing a macro."
         ivy-minibuffer-faces nil)
   (ivy-mode 1))
 
-(when (executable-find "fd")
-  (setq find-program "fd"))
+;; (when (executable-find "fd")
+;;   (setq find-program "fd"))
 
 (use-package counsel
   :commands (counsel-M-x
@@ -833,8 +833,8 @@ are defining or executing a macro."
              counsel-describe-variable
              counsel-find-library)
   :init
-  (when (executable-find "fd")
-    (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
+  ;; (when (executable-find "fd")
+  ;;   (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
   (when (executable-find "rg")
     (setq counsel-rg-base-command
           "rg -S --no-heading --hidden --line-number --color never %s .")

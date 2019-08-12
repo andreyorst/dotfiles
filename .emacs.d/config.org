@@ -1539,8 +1539,8 @@ is replaced  by something  that is completely  different, am  I right?/
 Well I hope that it is used by =grep.el= only which I don't use anyways.
 
 #+BEGIN_SRC emacs-lisp
-  (when (executable-find "fd")
-    (setq find-program "fd"))
+  ;; (when (executable-find "fd")
+  ;;   (setq find-program "fd"))
 #+END_SRC
 
 Counsel  has nice  =counsel-file-fump=  command  that uses  =find-program=
@@ -1559,8 +1559,8 @@ variable, so it will be more performant with =fd=.
                counsel-describe-variable
                counsel-find-library)
     :init
-    (when (executable-find "fd")
-      (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
+    ;; (when (executable-find "fd")
+    ;;   (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
     (when (executable-find "rg")
       (setq counsel-rg-base-command
             "rg -S --no-heading --hidden --line-number --color never %s .")
