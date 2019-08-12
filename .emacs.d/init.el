@@ -523,10 +523,6 @@ are defining or executing a macro."
 
 (use-package minions
   :commands minions-mode
-  :config (setq minions-direct '(multiple-cursors-mode
-                                 flycheck-mode
-                                 flyspell-mode
-                                 parinfer-mode))
   :init (minions-mode 1))
 
 (when window-system
@@ -544,6 +540,8 @@ are defining or executing a macro."
     (helpful-mode . centaur-tabs-local-mode)
     (imenu-list-major-mode . centaur-tabs-local-mode)
     :config
+    (global-set-key (kbd "C-c n") 'centaur-tabs-forward)
+    (global-set-key (kbd "C-c p") 'centaur-tabs-backward)
     (setq centaur-tabs-set-modified-marker t
           centaur-tabs-modified-marker "●"
           centaur-tabs-cycle-scope 'tabs
@@ -789,7 +787,8 @@ are defining or executing a macro."
 (use-package parinfer
   :commands parinfer-mode
   :bind
-  (("C-," . parinfer-toggle-mode))
+  (:map parinfer-mode-map
+        ("C-," . parinfer-toggle-mode))
   :init
   (progn
     (setq parinfer-extensions
@@ -925,9 +924,9 @@ are defining or executing a macro."
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydra-mc/body)
          ("C-d" . mc/mark-next-like-this-word))
-  :config
+  :init
   (use-package mc-extras)
-  (defhydra hydra-mc (:hint nil :color pink)
+  (defhydra hydra-mc (:hiint nil :color pink)
             "
 ^Select^                ^Discard^                    ^Move^
 ^──────^────────────────^───────^────────────────────^────^────────────
