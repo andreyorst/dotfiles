@@ -192,17 +192,15 @@ code and Makefile rules.
 #+END_SRC
 
 I  don't like  custom,  and  especially would  like  to  stop it  from
-interfering to  my configuration  files, so lets  move it  to separate
-file.
+interfering to my configuration files, so lets set it to =/dev/null=.
 
 #+BEGIN_SRC emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file :noerror)
+  (setq custom-file "/dev/null")
 #+END_SRC
 
 I also don't like that Emacs  has disabled commands, and enabling them
-modifies  my =init.el=  that  I  don't modify  myself.  Let's put  those
-commands to =custom.el= instead:
+modifies  my =init.el=  that I  don't  modify myself.   Let's put  those
+commands to =custom-file= instead:
 
 #+BEGIN_SRC emacs-lisp
   (defadvice en/disable-command (around put-in-custom-file activate)

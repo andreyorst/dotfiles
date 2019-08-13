@@ -58,8 +58,7 @@
               mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file :noerror)
+(setq custom-file "/dev/null")
 
 (defadvice en/disable-command (around put-in-custom-file activate)
   "Put declarations in `custom-file'."
