@@ -553,11 +553,14 @@ are defining or executing a macro."
     (defun centaur-tabs-buffer-groups ()
       "Use as few groups as possible."
       (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                   "Tools")
+                   (cond ((string-equal "eglot" (downcase (substring (buffer-name) 1 6)))
+                          "Eglot")
+                         (t
+                          "Tools")))
                   ((string-equal "magit" (downcase (substring (buffer-name) 0 5)))
                    "Magit")
                   (t
-                   (centaur-tabs-get-group-name (current-buffer))))))
+                   "Default"))))
     (centaur-tabs-mode)))
 
 (require 'org)
