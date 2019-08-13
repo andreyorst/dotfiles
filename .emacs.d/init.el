@@ -93,8 +93,6 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
-        ((when (bound-and-true-p iedit-mode)
-           (iedit-mode)))
         (t
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
@@ -103,7 +101,7 @@ are defining or executing a macro."
 (global-set-key [remap keyboard-quit] #'my/escape)
 
 (defun my/command-error-function (data context caller)
-  "Ignore the `text-read-only' signal; pass the rest to the default handler."
+  "Ignore the `text-read-only' signal; pass the rest DATA CONTEXT CALLER to the default handler."
   (when (not (eq (car data) 'text-read-only))
     (command-error-default-function data context caller)))
 
@@ -186,11 +184,10 @@ are defining or executing a macro."
              solaire-mode-in-minibuffer
              solaire-mode-reset)
   :config
-  (with-no-warnings
-    (cond ((not (boundp 'after-focus-change-function))
-           (add-hook 'focus-in-hook  #'solaire-mode-reset))
-          (t
-           (add-function :after after-focus-change-function #'solaire-mode-reset))))
+  (cond ((not (boundp 'after-focus-change-function))
+         (add-hook 'focus-in-hook  #'solaire-mode-reset))
+        (t
+         (add-function :after after-focus-change-function #'solaire-mode-reset)))
   (add-hook 'after-revert-hook #'turn-on-solaire-mode)
   (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
@@ -506,11 +503,14 @@ are defining or executing a macro."
 
 (when window-system
   (use-package diff-hl
-    :commands global-diff-hl-mode
+    :commands (global-diff-hl-mode
+               diff-hl-flydiff-mode
+               diff-hl-margin-mode)
     :init
     (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (global-diff-hl-mode 1)))
+    (global-diff-hl-mode 1)
+    (diff-hl-flydiff-mode t)))
 
 (defun my/setup-fringe-bitmaps ()
   "Set fringe bitmaps."
@@ -550,6 +550,7 @@ are defining or executing a macro."
           centaur-tabs-set-icons t
           centaur-tabs-gray-out-icons 'buffer)
     (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
+    (set-face-attribute 'centaur-tabs-selected nil :weight 'bold)
     (defun centaur-tabs-buffer-groups ()
       "Use as few groups as possible."
       (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
@@ -715,7 +716,7 @@ are defining or executing a macro."
   (use-package racer
     :config (add-hook 'racer-mode-hook #'eldoc-mode)
     :init
-    (defun org-babel-edit-prep:rust (&optional babel-info)
+    (defun org-babel-edit-prep:rust (&optional _babel-info)
       "Run racer mode for Org Babel."
       (racer-mode 1))))
 
@@ -766,8 +767,7 @@ are defining or executing a macro."
 (use-package flymake
   :ensure nil
   :init
-  (setq flymake-fringe-indicator-position 'right-fringe)
-  (add-hook 'emacs-lisp-mode-hook 'flymake-mode))
+  (setq flymake-fringe-indicator-position 'right-fringe))
 
 (use-package hydra
   :commands (hydra-default-pre
@@ -1022,6 +1022,7 @@ _-_: reduce region _)_: around pairs
 
 (use-package clang-format
   :init
+  (defvar c-mode-base-map)
   (with-eval-after-load 'cc-mode
     (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
     (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
