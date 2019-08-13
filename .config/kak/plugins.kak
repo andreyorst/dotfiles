@@ -46,7 +46,7 @@ plug "andreyorst/fzf.kak" config %{
 } defer fzf %{
     set-option global fzf_preview_width '65%'
     set-option global fzf_project_use_tilda true
-    declare-option str-list fzf_exclude_files "*.o" "*.bin" "*.obj"
+    declare-option str-list fzf_exclude_files "*.o" "*.bin" "*.obj" ".*cleanfiles"
     declare-option str-list fzf_exclude_dirs ".git" ".svn" "rtlrun*"
     evaluate-commands %sh{
         if [ -n "$(command -v fd)" ]; then
