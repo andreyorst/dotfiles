@@ -200,7 +200,8 @@ are defining or executing a macro."
   "Wrapper around `set-window-fringes' function."
   (when (my/real-buffer-p)
     (set-window-fringes nil 8 8 nil)
-    (when (fboundp 'doom-color)
+    (when (and (fboundp 'doom-color)
+               window-system)
       (set-face-attribute 'line-number-current-line nil
                           :foreground (doom-color 'fg-alt)
                           :background (doom-color 'bg)))
@@ -887,9 +888,7 @@ are defining or executing a macro."
   :init
   (global-undo-tree-mode 1))
 
-(use-package yasnippet
-  :commands yas-reload-all
-  :init (yas-reload-all))
+(use-package yasnippet)
 
 (use-package yasnippet-snippets)
 
