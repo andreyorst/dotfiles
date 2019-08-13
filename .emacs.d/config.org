@@ -1310,11 +1310,15 @@ settings for Rust mode.
 
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
-    :config (add-hook 'rust-mode-hook
+    :commands (rust-format-buffer)
+    :init (add-hook 'rust-mode-hook
                       '(lambda()
                          (yas-minor-mode)
                          (electric-pair-mode)
-                         (setq company-tooltip-align-annotations t))))
+                         (setq company-tooltip-align-annotations t)))
+    :bind (:map rust-mode-map
+                ("C-c C-f" . rust-format-buffer)))
+
 #+END_SRC
 
 This also means  that I could use something  to automatically complete
@@ -1845,7 +1849,11 @@ Now  we  can   add  =my/project-find-root=  function  to   the  list  of
 A package to format C code with Clang Format.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package clang-format)
+  (use-package clang-format
+    :init
+    (with-eval-after-load 'cc-mode
+      (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
+      (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
 #+END_SRC
 
 *** GCMH

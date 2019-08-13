@@ -699,11 +699,14 @@ are defining or executing a macro."
              (auto-fill-mode)))
 
 (use-package rust-mode
-  :config (add-hook 'rust-mode-hook
+  :commands (rust-format-buffer)
+  :init (add-hook 'rust-mode-hook
                     '(lambda()
                        (yas-minor-mode)
                        (electric-pair-mode)
-                       (setq company-tooltip-align-annotations t))))
+                       (setq company-tooltip-align-annotations t)))
+  :bind (:map rust-mode-map
+              ("C-c C-f" . rust-format-buffer)))
 
 (when (executable-find "racer")
   (use-package racer
@@ -1014,7 +1017,11 @@ _-_: reduce region _)_: around pairs
 (with-eval-after-load 'project
   (add-to-list 'project-find-functions #'my/project-find-root))
 
-(use-package clang-format)
+(use-package clang-format
+  :init
+  (with-eval-after-load 'cc-mode
+    (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
+    (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
 
 (use-package gcmh
   :commands gcmh-mode
