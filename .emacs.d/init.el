@@ -58,7 +58,8 @@
               mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)
 
-(setq custom-file "/dev/null")
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file :noerror)
 
 (defadvice en/disable-command (around put-in-custom-file activate)
   "Put declarations in `custom-file'."
@@ -150,6 +151,8 @@ are defining or executing a macro."
 (setq mode-line-in-non-selected-windows nil)
 
 (use-package all-the-icons)
+  ;:config (unless (member "all-the-icons" (font-family-list))
+  ;          (all-the-icons-install-fonts t))
 
 (use-package doom-themes
   :commands (doom-themes-org-config)

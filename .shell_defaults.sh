@@ -84,7 +84,7 @@ cnew() {
             (-add-flag)
                 shift
                 flags=$([ -z "$flags" ] && printf "%s" "$1" || printf "%s\n%s" "$flags" "$1") ;;
-            (-vcs) vcs="$1"         ;;
+            (-vcs) shift; vcs="$1"  ;;
             (-readme) readme="true" ;;
             (-empty) empty="true"   ;;
             (-help)
