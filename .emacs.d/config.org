@@ -1769,7 +1769,10 @@ This search mode is compatible with multiple cursors.
 #+BEGIN_SRC emacs-lisp
   (use-package phi-search
     :bind (("C-s" . phi-search)
-           ("C-r" . phi-search-backward)))
+           ("C-r" . phi-search-backward))
+    :config
+    (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
+    (set-face-attribute 'phi-search-match-face nil :inherit 'region))
 #+END_SRC
 
 *** Eglot

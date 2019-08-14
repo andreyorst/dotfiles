@@ -980,7 +980,10 @@ _-_: reduce region _)_: around pairs
 
 (use-package phi-search
   :bind (("C-s" . phi-search)
-         ("C-r" . phi-search-backward)))
+         ("C-r" . phi-search-backward))
+  :config
+  (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
+  (set-face-attribute 'phi-search-match-face nil :inherit 'region))
 
 (when (and (or (executable-find "clangd")
                (executable-find "rls"))
