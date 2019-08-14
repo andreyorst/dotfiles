@@ -1763,6 +1763,18 @@ in most languages that I work with inside Emacs.
               ("Q" er/mark-outside-quotes)))
 #+END_SRC
 
+*** COMMENT Isearch
+Emacs =Isearch=  uses same faces for  current match and the  rest of the
+matches which makes it harder to see which match is selected.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package isearch
+    :ensure nil
+    :config
+    (set-face-attribute 'lazy-highlight nil :background
+                        (face-attribute 'region :background)))
+#+END_SRC
+
 *** Phi Search
 This search mode is compatible with multiple cursors.
 
