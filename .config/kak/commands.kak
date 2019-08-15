@@ -225,7 +225,7 @@ flygrep %{
     } nop
 }
 
-define-command flygrep-call-grep -params 1 %{ evaluate-commands %sh{
+define-command -hidden flygrep-call-grep -params 1 %{ evaluate-commands %sh{
     [ -z "${1##*&*}" ] && text=$(printf "%s\n" "$1" | sed "s/&/&&/g") || text="$1"
     if [ ${#1} -gt 2 ]; then
         printf "%s\n" "info"
@@ -235,7 +235,7 @@ define-command flygrep-call-grep -params 1 %{ evaluate-commands %sh{
     fi
 }}
 
-define-command clang-find-and-parse-compile-flags %{
+define-command -hidden clang-find-and-parse-compile-flags %{
     set-option -add window clang_options %sh{ (
         while [ "$PWD" != "$HOME" ]; do
             if [ -e "$PWD/compile_flags.txt" ]; then
