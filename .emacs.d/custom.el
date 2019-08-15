@@ -10,8 +10,13 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (vdiff-magit imenu-list vlf gcmh clang-format eglot phi-search expand-region mc-extras multiple-cursors yasnippet-snippets yasnippet undo-tree company-flx company counsel ivy flx parinfer geiser editorconfig toml-mode cargo racer rust-mode markdown-mode centaur-tabs minions diff-hl eyebrowse treemacs-magit treemacs doom-modeline solaire-mode doom-themes all-the-icons use-package))))
-(custom-set-faces)
+    (beacon vdiff-magit imenu-list vlf gcmh clang-format eglot phi-search expand-region mc-extras multiple-cursors yasnippet-snippets yasnippet undo-tree company-flx company counsel ivy flx parinfer geiser editorconfig toml-mode cargo racer rust-mode markdown-mode centaur-tabs minions diff-hl eyebrowse treemacs-magit treemacs doom-modeline solaire-mode doom-themes all-the-icons use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.

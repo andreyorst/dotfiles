@@ -1906,6 +1906,18 @@ when =imenu-list= was toggled to be shown.
                 imenu-list-focus-after-activation t))
 #+END_SRC
 
+*** Beacon
+Helps noticing huge cursor jumps.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :commands (beacon-mode)
+    :init
+    (setq beacon-blink-duration 0.2
+          beacon-blink-delay 0.2)
+    (beacon-mode))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to

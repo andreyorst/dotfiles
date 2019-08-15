@@ -1050,5 +1050,12 @@ _-_: reduce region _)_: around pairs
               imenu-list-size 27
               imenu-list-focus-after-activation t))
 
+(use-package beacon
+  :commands (beacon-mode)
+  :init
+  (setq beacon-blink-duration 0.2
+        beacon-blink-delay 0.2)
+  (beacon-mode))
+
 (provide 'init)
 ;;; init.el ends here
