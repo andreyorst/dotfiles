@@ -549,9 +549,7 @@ are defining or executing a macro."
           centaur-tabs-modified-marker "●"
           centaur-tabs-cycle-scope 'tabs
           centaur-tabs-height 32
-          centaur-tabs-style "bar"
-          centaur-tabs-set-icons t
-          centaur-tabs-gray-out-icons 'buffer)
+          centaur-tabs-style "bar")
     (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
     (set-face-attribute 'centaur-tabs-selected nil :weight 'bold)
     (defun centaur-tabs-buffer-groups ()
