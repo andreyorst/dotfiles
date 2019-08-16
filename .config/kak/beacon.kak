@@ -9,9 +9,10 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
+declare-option -hidden int beacon__current_line 0
 declare-option str beacon_final_bg "32302F"
 declare-option str beacon_delay "0.03"
-declare-option str beacon_transition %sh{
+declare-option -hidden str beacon__transition %sh{
     bg=$kak_opt_beacon_final_bg
     while true; do
         bg=$(echo "obase=16; ibase=16; $bg+111111" | bc)
@@ -24,8 +25,8 @@ declare-option str beacon_transition %sh{
     echo "$colors"
 }
 
-define-command -override beacon %{ nop %sh{ (
-    for color in $kak_opt_beacon_transition; do
+define-command beacon %{ nop %sh{ (
+    for color in $kak_opt_beacon__transition; do
         printf "%s\n" "
             evaluate-commands -client $kak_client %{
                 eval -draft %{
@@ -36,9 +37,22 @@ define-command -override beacon %{ nop %sh{ (
         }" | kak -p $kak_session
         sleep $kak_opt_beacon_delay
     done
-    for color in $kak_opt_beacon_transition; do
+    for color in $kak_opt_beacon__transition; do
         printf "%s\n" "evaluate-commands -client $kak_client %{ remove-highlighter buffer/beacon-$color }" | kak -p $kak_session
     done
 ) >/dev/null 2>&1 </dev/null & }}
 
-map global user b ": beacon<ret>" -docstring "beacon"
+define-command beacon-jump %{
+    evaluate-commands %sh{
+        if [ $kak_cursor_line -gt $kak_opt_beacon__current_line ]; then
+            [ $(($kak_cursor_line - $kak_opt_beacon__current_line)) -gt 10 ] && echo "beacon"
+        else
+            [ $(($kak_opt_beacon__current_line - $kak_cursor_line)) -gt 10 ] && echo "beacon"
+        fi
+    }
+    set-option buffer beacon__current_line "%val{cursor_line}"
+}
+
+hook global -group beacon FocusIn .* beacon
+hook global -group beacon WinDisplay .* beacon
+hook global -group beacon NormalIdle .* beacon-jump
