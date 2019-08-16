@@ -13,6 +13,7 @@ evaluate-commands %sh{
         common.kak
         defperl.kak
         commands.kak
+        beacon.kak
         mappings.kak
         languages.kak
         recentf.kak
