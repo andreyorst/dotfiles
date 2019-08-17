@@ -9,9 +9,13 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-declare-option -hidden int beacon__current_line 0
-declare-option str beacon_final_bg "32302F"
-declare-option str beacon_delay "0.03"
+declare-option -docstring "color of background that beacon will fade to." \
+str beacon_final_bg "32302F"
+
+declare-option -docstring "interval between color transitions of beacon" \
+str beacon_refresh_interval "0.03"
+
+declare-option -hidden bool beacon__in_process false
 declare-option -hidden str beacon__transition %sh{
     bg=$kak_opt_beacon_final_bg
     while true; do
@@ -26,6 +30,10 @@ declare-option -hidden str beacon__transition %sh{
 }
 
 define-command beacon %{ nop %sh{ (
+    printf "%s\n" "evaluate-commands -client $kak_client %{
+                       try %{ add-highlighter buffer/beacon group }
+                   }" | kak -p $kak_session
+
     for color in $kak_opt_beacon__transition; do
         printf "%s\n" "
             evaluate-commands -client $kak_client %{
@@ -33,26 +41,15 @@ define-command beacon %{ nop %sh{ (
                     exec <a-l>
                     declare-option range-specs beacon_range %val{timestamp} \"%val{selection_desc}|default,$color\"
                 }
-            add-highlighter buffer/beacon-$color ranges beacon_range
+            try %{ add-highlighter buffer/beacon/$color ranges beacon_range } 
         }" | kak -p $kak_session
-        sleep $kak_opt_beacon_delay
+        sleep $kak_opt_beacon_refresh_interval
     done
-    for color in $kak_opt_beacon__transition; do
-        printf "%s\n" "evaluate-commands -client $kak_client %{ remove-highlighter buffer/beacon-$color }" | kak -p $kak_session
-    done
-) >/dev/null 2>&1 </dev/null & }}
 
-define-command beacon-jump %{
-    evaluate-commands %sh{
-        if [ $kak_cursor_line -gt $kak_opt_beacon__current_line ]; then
-            [ $(($kak_cursor_line - $kak_opt_beacon__current_line)) -gt 10 ] && echo "beacon"
-        else
-            [ $(($kak_opt_beacon__current_line - $kak_cursor_line)) -gt 10 ] && echo "beacon"
-        fi
-    }
-    set-option buffer beacon__current_line "%val{cursor_line}"
-}
+    printf "%s\n" "evaluate-commands -client $kak_client %{
+                       try %{ remove-highlighter buffer/beacon }
+                   }" | kak -p $kak_session
+) >/dev/null 2>&1 </dev/null & }}
 
 hook global -group beacon FocusIn .* beacon
 hook global -group beacon WinDisplay .* beacon
-hook global -group beacon NormalIdle .* beacon-jump
