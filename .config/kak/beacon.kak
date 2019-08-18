@@ -51,5 +51,8 @@ define-command beacon %{ nop %sh{ (
                    }" | kak -p $kak_session
 ) >/dev/null 2>&1 </dev/null & }}
 
-hook global -group beacon FocusIn .* beacon
-hook global -group beacon WinDisplay .* beacon
+
+if '-n "${PATH##*termux*}"' %{
+    hook global -group beacon FocusIn .* beacon
+    hook global -group beacon WinDisplay .* beacon
+}
