@@ -21,6 +21,16 @@ smart-select -params 1 %{ evaluate-commands %sh{
     fi
 }}
 
+    define-command -hidden \
+    -docstring "alt-x: wrapper around alt x" \
+    alt-x %{ evaluate-commands %sh{
+        if [ $(printf "%s" "${kak_selection}" | wc -m) -eq 1 ]; then
+            printf "%s\n" "execute-keys <a-x>"
+        else
+            printf "%s\n" "execute-keys J<a-x>"
+        fi
+    }}
+
 define-command -docstring \
 "search-file <filename>: search for file recusively under path option: %opt{path}" \
 search-file -params 1 %{ evaluate-commands %sh{
