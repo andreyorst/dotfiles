@@ -30,13 +30,6 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
                   reinterpret_cast return sizeof static_assert static_cast switch
                   throw try typedef typeid using while xor xor_eq'
 
-    # Highlight functions ignoring C and C++ specific keywords. Ugly hack, because we must not override keyword highlighting
-    printf "%s\n" "add-highlighter shared/c/code/my_functions   regex (\w*?)\b($(join '${c_keywords}' '|'))?(\h+)?(?=\() 1:function
-                   add-highlighter shared/cpp/code/my_functions regex (\w*?)\b($(join '${cpp_keywords}' '|'))?(\h+)?(?=\() 1:function"
-
-    # Namespace highlighting for C++
-    printf "%s\n" "add-highlighter shared/cpp/code/namespace regex _?[a-zA-Z](\w+)?(\h+)?(?=::) 0:module"
-
     # Types and common highlightings. Same for C and C++
     for ft in c cpp; do
         printf "%s\n" "add-highlighter shared/$ft/code/my_field     regex (?:(?<!\.\.)(?<=\.)|(?<=->))(_?[a-zA-Z]\w*)\b(?![>\"\(]) 1:meta
@@ -44,11 +37,21 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
                        add-highlighter shared/$ft/code/my_types_1   regex \b(v|u|vu)\w+(8|16|32|64)\b 0:type
                        add-highlighter shared/$ft/code/my_types_2   regex \b(v|u|vu)?(_|__)?(s|u)(8|16|32|64)\b 0:type
                        add-highlighter shared/$ft/code/my_types_3   regex \b(v|u|vu)(_|__)?(int|short|char|long)\b 0:type
-                       add-highlighter shared/$ft/code/struct_type  regex struct\h+(\w+) 1:type
+                       add-highlighter shared/$ft/code/struct_type  regex \bstruct\h+(\w+) 1:type
+                       add-highlighter shared/$ft/code/enum_type    regex \benum\h+(\w+) 1:type
+                       add-highlighter shared/$ft/code/union_type   regex \bunion\h+(\w+) 1:type
                        add-highlighter shared/$ft/code/generic_type regex \b\w+_t\b 0:type
                        add-highlighter shared/$ft/code/type_cast    regex \((?:volatile\h*)?([^(]\w+\h*[^()*]*)(?:\*\h*)\)\h*(?:\(|[&*]?\w+) 1:type
                        add-highlighter shared/$ft/code/func_pointer regex (\w+)\h*\(\*\h*(\w+)\)\([^)]*\) 1:type 2:function"
     done
+
+    # Highlight functions ignoring C and C++ specific keywords. Ugly hack, because we must not override keyword highlighting
+    printf "%s\n" "add-highlighter shared/c/code/my_functions   regex (\w*?)\b($(join '${c_keywords}' '|'))?(\h+)?(?=\() 1:function
+                   add-highlighter shared/cpp/code/my_functions regex (\w*?)\b($(join '${cpp_keywords}' '|'))?(\h+)?(?=\() 1:function"
+
+    # Namespace highlighting for C++
+    printf "%s\n" "add-highlighter shared/cpp/code/namespace regex _?[a-zA-Z](\w+)?(\h+)?(?=::) 0:module"
+
 }}}
 
 # Rust
