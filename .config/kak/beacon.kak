@@ -41,7 +41,7 @@ define-command beacon %{ nop %sh{ (
                     exec <a-l>
                     declare-option range-specs beacon_range %val{timestamp} \"%val{selection_desc}|default,$color\"
                 }
-            try %{ add-highlighter buffer/beacon/$color ranges beacon_range } 
+            try %{ add-highlighter buffer/beacon/$color ranges beacon_range }
         }" | kak -p $kak_session
         sleep $kak_opt_beacon_refresh_interval
     done
@@ -53,6 +53,8 @@ define-command beacon %{ nop %sh{ (
 
 
 if '-n "${PATH##*termux*}"' %{
-    hook global -group beacon FocusIn .* beacon
-    hook global -group beacon WinDisplay .* beacon
+    hook global KakBegin .* %{
+        hook global -group beacon FocusIn .* beacon
+        hook global -group beacon WinDisplay .* beacon
+    }
 }

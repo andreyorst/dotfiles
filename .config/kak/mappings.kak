@@ -13,7 +13,7 @@
 map -docstring "comment/uncomment selection (<c-/>)"    global normal ''     ': comment-line<ret>'
 map -docstring "add currsor/jump on current word"       global normal '<c-d>' ': select-or-add-cursor<ret>'
 map -docstring "undo X, or select one line upwards"     global normal <a-X> K<a-x>
-map -docstring "undo a-X, or select one line downwards" global normal <a-x> J<a-x>
+map -docstring "undo a-X, or select one line downwards" global normal <a-x> :<space>alt-x<ret>
 
 # Avoid escape key
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
