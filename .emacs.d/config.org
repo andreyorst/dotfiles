@@ -982,11 +982,11 @@ buffers. It's good for navigation with the mouse, and looks fancy.
       (defun centaur-tabs-buffer-groups ()
         "Use as few groups as possible."
         (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                     (cond ((string-equal "eglot" (downcase (substring (buffer-name) 1 6)))
+                     (cond ((ignore-errors (string-equal "eglot" (downcase (substring (buffer-name) 1 6))))
                             "Eglot")
                            (t
                             "Tools")))
-                    ((string-equal "magit" (downcase (substring (buffer-name) 0 5)))
+                    ((ignore-errors (string-equal "magit" (downcase (substring (buffer-name) 0 5))))
                      "Magit")
                     (t
                      "Default"))))
@@ -1906,7 +1906,7 @@ when =imenu-list= was toggled to be shown.
                 imenu-list-focus-after-activation t))
 #+END_SRC
 
-*** Beacon
+*** COMMENT Beacon
 Helps noticing huge cursor jumps.
 
 #+BEGIN_SRC emacs-lisp

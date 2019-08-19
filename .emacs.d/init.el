@@ -555,11 +555,11 @@ are defining or executing a macro."
     (defun centaur-tabs-buffer-groups ()
       "Use as few groups as possible."
       (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                   (cond ((string-equal "eglot" (downcase (substring (buffer-name) 1 6)))
+                   (cond ((ignore-errors (string-equal "eglot" (downcase (substring (buffer-name) 1 6))))
                           "Eglot")
                          (t
                           "Tools")))
-                  ((string-equal "magit" (downcase (substring (buffer-name) 0 5)))
+                  ((ignore-errors (string-equal "magit" (downcase (substring (buffer-name) 0 5))))
                    "Magit")
                   (t
                    "Default"))))
@@ -1049,13 +1049,6 @@ _-_: reduce region _)_: around pairs
   :init (setq imenu-list-idle-update-delay-time 0.1
               imenu-list-size 27
               imenu-list-focus-after-activation t))
-
-(use-package beacon
-  :commands (beacon-mode)
-  :init
-  (setq beacon-blink-duration 0.2
-        beacon-blink-delay 0.2)
-  (beacon-mode))
 
 (provide 'init)
 ;;; init.el ends here
