@@ -803,59 +803,59 @@ are defining or executing a macro."
 
 (use-package ivy
   :commands ivy-mode
-  :init
-  (setq ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t)
   :bind (("C-x C-b" . ivy-switch-buffer)
          ("C-x b" . ivy-switch-buffer))
   :init
+  (use-package counsel
+    :commands (counsel-M-x
+               counsel-find-file
+               counsel-fzf
+               counsel-file-jump
+               counsel-recentf
+               counsel-git-grep
+               counsel-rg
+               counsel-describe-function
+               counsel-describe-variable
+               counsel-find-library)
+    :init
+    ;; (when (executable-find "fd")
+    ;;   (setq find-program "fd"
+    ;;         counsel-file-jump-args (split-string "-L --type f --hidden")))
+    (when (executable-find "rg")
+      (setq counsel-rg-base-command
+            "rg -S --no-heading --hidden --line-number --color never %s .")
+      (setenv "FZF_DEFAULT_COMMAND"
+              "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
+    :bind (("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("C-x f" . counsel-fzf)
+           ("C-x p" . counsel-file-jump)
+           ("C-x C-r" . counsel-recentf)
+           ("C-c g" . counsel-git-grep)
+           ("C-c r" . counsel-rg)
+           ("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-h l" . counsel-find-library)))
   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format ""
         ivy-display-style nil
-        ivy-minibuffer-faces nil)
+        ivy-minibuffer-faces nil
+        ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t)
   (ivy-mode 1))
 
-;; (when (executable-find "fd")
-;;   (setq find-program "fd"))
-
-(use-package counsel
-  :commands (counsel-M-x
-             counsel-find-file
-             counsel-fzf
-             counsel-file-jump
-             counsel-recentf
-             counsel-git-grep
-             counsel-rg
-             counsel-describe-function
-             counsel-describe-variable
-             counsel-find-library)
-  :init
-  ;; (when (executable-find "fd")
-  ;;   (setq counsel-file-jump-args (split-string "-L --type f --hidden")))
-  (when (executable-find "rg")
-    (setq counsel-rg-base-command
-          "rg -S --no-heading --hidden --line-number --color never %s .")
-    (setenv "FZF_DEFAULT_COMMAND"
-            "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-x f" . counsel-fzf)
-         ("C-x p" . counsel-file-jump)
-         ("C-x C-r" . counsel-recentf)
-         ("C-c g" . counsel-git-grep)
-         ("C-c r" . counsel-rg)
-         ("C-h f" . counsel-describe-function)
-         ("C-h v" . counsel-describe-variable)
-         ("C-h l" . counsel-find-library)))
-
 (use-package company
+  :commands global-company-mode
   :bind (:map company-active-map
               ("TAB" . company-complete-common-or-cycle)
               ("<tab>" . company-complete-common-or-cycle)
               ("<S-Tab>" . company-select-previous)
               ("<backtab>" . company-select-previous))
   :init
-  (add-hook 'after-init-hook 'global-company-mode)
+    (use-package company-flx)
+    :commands company-flx-mode
+    :init (with-eval-after-load 'company
+            (company-flx-mode +1))
   (setq company-require-match 'never
         company-minimum-prefix-length 3
         company-tooltip-align-annotations t
@@ -864,24 +864,19 @@ are defining or executing a macro."
           company-preview-frontend
           company-echo-metadata-frontend))
   :config
+  (add-hook 'after-init-hook 'global-company-mode)
   (setq company-backends (remove 'company-clang company-backends)
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends)
         company-backends (remove 'company-gtags company-backends)))
-
-(use-package company-flx
- :commands company-flx-mode
- :init (with-eval-after-load 'company
-         (company-flx-mode +1)))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
   :init
   (global-undo-tree-mode 1))
 
-(use-package yasnippet)
-
-(use-package yasnippet-snippets)
+(use-package yasnippet
+  :config (use-package yasnippet-snippets))
 
 (use-package magit)
 
