@@ -19,20 +19,20 @@ declare-option -hidden bool beacon__in_process false
 declare-option -hidden str beacon__transition %sh{
     bg=$kak_opt_beacon_final_bg
     while true; do
-        bg=$(echo "obase=16; ibase=16; $bg+111111" | bc)
+        bg=$(echo "obase=16; ibase=16; $bg+222222" | bc)
         if [ ${#bg} -eq 6 ] && [ "$bg" != "FFFFFF" ]; then
             colors="rgb:$bg $colors"
         else
             break
         fi
     done
-    echo "$colors"
+    printf "%s\n" "$colors"
 }
 
 define-command beacon %{ nop %sh{ (
-    printf "%s\n" "evaluate-commands -client $kak_client %{
-                       try %{ add-highlighter buffer/beacon group }
-                   }" | kak -p $kak_session
+    printf "%s\n" "evaluate-commands -client $kak_client %{ try %{
+                       add-highlighter buffer/beacon group
+                   }}" | kak -p $kak_session
 
     for color in $kak_opt_beacon__transition; do
         printf "%s\n" "
