@@ -582,14 +582,6 @@ are defining or executing a macro."
 
 (setq org-src-fontify-natively t)
 
-(defvar flycheck-disabled-checkers)
-
-(defun my/disable-flycheck-in-org-src-block ()
-  "Disable checkdoc in emacs-lisp buffers."
-  (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
-(add-hook 'org-src-mode-hook 'my/disable-flycheck-in-org-src-block)
-
 (defun my/org-tangle-on-config-save ()
   "Tangle source code blocks when configuration file is saved."
   (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
@@ -653,8 +645,6 @@ are defining or executing a macro."
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-(require 'ox-md nil t)
 
 (setq-default doc-view-resolution 192)
 

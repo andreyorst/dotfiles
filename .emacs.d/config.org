@@ -1040,24 +1040,6 @@ This will fontify code inside =SRC_BLOCK= sections:
 #+END_SRC
 
 **** Source Code Blocks
-Since I'm using Emacs to configure Emacs, I want flycheck to run while
-I'm editing =emacs-lisp= source blocks. But I find it distracting to see
-warnings like =;;; Code=, so let's disable it:
-
-#+BEGIN_SRC emacs-lisp
-  (defvar flycheck-disabled-checkers)
-
-  (defun my/disable-flycheck-in-org-src-block ()
-    "Disable checkdoc in emacs-lisp buffers."
-    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-#+END_SRC
-
-Now we need to call this function when editing source blocks:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-src-mode-hook 'my/disable-flycheck-in-org-src-block)
-#+END_SRC
-
 I often  edit my configuration,  so it would  be cool to  update Emacs
 config automatically on save. This function will handle it:
 
@@ -1199,14 +1181,6 @@ headings. This is a hacky way but it works:
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-#+END_SRC
-
-**** Markdown Export
-I don't  think that I gonna  use this much,  but just in case  if I'll
-ever decide to export Org to Markdown, I'll need this:
-
-#+BEGIN_SRC emacs-lisp
-  (require 'ox-md nil t)
 #+END_SRC
 
 *** Doc View Mode
@@ -1904,18 +1878,6 @@ when =imenu-list= was toggled to be shown.
     :init (setq imenu-list-idle-update-delay-time 0.1
                 imenu-list-size 27
                 imenu-list-focus-after-activation t))
-#+END_SRC
-
-*** COMMENT Beacon
-Helps noticing huge cursor jumps.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package beacon
-    :commands (beacon-mode)
-    :init
-    (setq beacon-blink-duration 0.2
-          beacon-blink-delay 0.2)
-    (beacon-mode))
 #+END_SRC
 
 * Postscript
