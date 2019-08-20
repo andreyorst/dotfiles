@@ -9,35 +9,21 @@
 # ╰────────────────────────────────╯
 
 define-command -hidden \
--docstring "smart-select: select WORD if current selection is only one character" \
-smart-select -params 1 %{ evaluate-commands %sh{
-    case $1 in
-        (WORD) keys="<a-w>" ;;
-        (word) keys="w" ;;
-        (*)    printf "%s\n" "fail %{wrong word type '$1'}"; exit ;;
-    esac
-    if [ $(printf "%s" "${kak_selection}" | wc -m) -eq 1 ]; then
-        printf "%s\n" "execute-keys -save-regs '' <a-i>${keys}"
-    fi
-}}
-
-define-command -hidden \
--docstring "alt-x: wrapper around alt x" \
-alt-x %{
+-docstring "smart-select <w|a-w>: select <word> if current selection is only one character" \
+smart-select -params 1 %{
     try %{
-        execute-keys "<a-k>.\n<ret>"
-        execute-keys "J<a-x>"
+        execute-keys "<a-k>..<ret>"
     } catch %{
-        execute-keys "<a-x>"
-    }
+        execute-keys "<a-i><%arg{1}>"
+    } catch nop
 }
 
 define-command -hidden \
--docstring "alt-X: opposite command to alt-x" \
-alt-X %{
+-docstring "alt-x <J|K>: wrapper around alt x" \
+alt-x -params 1 %{
     try %{
         execute-keys "<a-k>.\n<ret>"
-        execute-keys "K<a-x>"
+        execute-keys "%arg{1}<a-x>"
     } catch %{
         execute-keys "<a-x>"
     }
@@ -104,15 +90,16 @@ search-file -params 1 %{ evaluate-commands %sh{
     printf "%s\n" "echo -markup %{{Error}unable to find file '${file}'}"
 }}
 
-define-command -docstring \
+define-command -hidden -docstring \
 "select a word under cursor, or add cursor on next occurrence of current selection" \
-select-or-add-cursor %{ execute-keys -save-regs '' %sh{
-    if [ $(printf "%s\n" ${kak_selection} | wc -m) -eq 2 ]; then
-        printf "%s\n" "<a-i>w*"
-    else
-        printf "%s\n" "*<s-n>"
-    fi
-}}
+select-or-add-cursor %{
+    try %{
+        execute-keys "<a-k>\A.\z<ret>"
+        execute-keys -save-regs '' "<a-i>w*"
+    } catch %{
+        execute-keys -save-regs '' "*<s-n>"
+    }
+}
 
 define-command -docstring "Convert all leading spaces to tabs" \
 leading-spaces-to-tabs %{
