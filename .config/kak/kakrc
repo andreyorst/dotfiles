@@ -13,7 +13,6 @@ evaluate-commands %sh{
         common.kak
         defperl.kak
         commands.kak
-        beacon.kak
         mappings.kak
         languages.kak
         recentf.kak
@@ -21,12 +20,13 @@ evaluate-commands %sh{
     "
 
     for file in $config_files; do
-        printf "%s\n" "
-        try %{
-            source \"%val{config}/$file\"
-        } catch %{
-            echo -debug %val{error}
-        }"
+        printf "%s" "
+            try %{
+                source \"%val{config}/$file\"
+            } catch %{
+                echo -debug %val{error}
+            }
+        "
     done
 }
 
