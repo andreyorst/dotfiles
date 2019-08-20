@@ -22,7 +22,7 @@ evaluate-commands %sh{
     for file in $config_files; do
         printf "%s" "
             try %{
-                source \"%val{config}/$file\"
+                source '$kak_config/$file'
             } catch %{
                 echo -debug %val{error}
             }
