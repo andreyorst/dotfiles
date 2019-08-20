@@ -9,6 +9,7 @@ svn() {
         (log)   svn_log "$@"            ;;
         (st)    svn_st "$@"             ;;
         (blame) svn_blame "$@"          ;;
+        (clean) svn_clean               ;;
         (*)     command svn "$cmd" "$@" ;;
     esac
 }
@@ -36,4 +37,8 @@ svn_st() {
 ## calls svn blame, and puts it ouptup to less if needed
 svn_blame() {
     command svn blame "$@" | less -F
+}
+
+svn_clean() {
+    command svn st | grep '^?' | awk '{ sub(/^.[\t ]+/, "", $0); gsub(/ /, "\\ ", $0);  print $0 }'
 }
