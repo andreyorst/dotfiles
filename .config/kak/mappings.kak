@@ -28,12 +28,16 @@ map -docstring "convert leading tabs to spaces" global user '<a-T>' ': leading-t
 
 ## System clipboard mappings
 ## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
-map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
-map -docstring "cut to system clipboard, enter insert mode" global user 'c' '|xsel -b -i<ret>i'
-map -docstring "paste from system clipboard before cursor"  global user 'P' '!xsel --output --clipboard<ret>'
-map -docstring "paste from system clipboard after cursor"   global user 'p' '<a-!>xsel --output --clipboard<ret>'
-map -docstring "replace selection with system clipboard"    global user 'R' '|xsel --output --clipboard<ret>'
+if '-n $(command -v xsel)' %{
+    map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
+    map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
+    map -docstring "cut to system clipboard, enter insert mode" global user 'c' '|xsel -b -i<ret>i'
+    map -docstring "paste from system clipboard before cursor"  global user 'P' '!xsel --output --clipboard<ret>'
+    map -docstring "paste from system clipboard after cursor"   global user 'p' '<a-!>xsel --output --clipboard<ret>'
+    map -docstring "replace selection with system clipboard"    global user 'R' '|xsel --output --clipboard<ret>'
+} else %{
+    echo -debug "'xsel' is not installed"
+}
 
 # Insert Mode Mappings
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -63,19 +67,19 @@ map -docstring "search tag in global tags file" global goto ']'     '<esc><c-s>:
 
 # Arrows
 # ‾‾‾‾‾‾
-map global normal <left>    ":<space>nop<ret>"
-map global normal <right>   ":<space>nop<ret>"
-map global normal <up>      ":<space>nop<ret>"
-map global normal <down>    ":<space>nop<ret>"
-map global normal <s-left>  ":<space>nop<ret>"
-map global normal <s-right> ":<space>nop<ret>"
-map global normal <s-up>    ":<space>nop<ret>"
-map global normal <s-down>  ":<space>nop<ret>"
-map global insert <left>    "<a-;>:<space>nop<ret>"
-map global insert <right>   "<a-;>:<space>nop<ret>"
-map global insert <up>      "<a-;>:<space>nop<ret>"
-map global insert <down>    "<a-;>:<space>nop<ret>"
-map global insert <s-left>  "<a-;>:<space>nop<ret>"
-map global insert <s-right> "<a-;>:<space>nop<ret>"
-map global insert <s-up>    "<a-;>:<space>nop<ret>"
-map global insert <s-down>  "<a-;>:<space>nop<ret>"
+map global normal '<left>'    ': nop<ret>'
+map global normal '<right>'   ': nop<ret>'
+map global normal '<up>'      ': nop<ret>'
+map global normal '<down>'    ': nop<ret>'
+map global normal '<s-left>'  ': nop<ret>'
+map global normal '<s-right>' ': nop<ret>'
+map global normal '<s-up>'    ': nop<ret>'
+map global normal '<s-down>'  ': nop<ret>'
+map global insert '<left>'    '<a-;>: nop<ret>'
+map global insert '<right>'   '<a-;>: nop<ret>'
+map global insert '<up>'      '<a-;>: nop<ret>'
+map global insert '<down>'    '<a-;>: nop<ret>'
+map global insert '<s-left>'  '<a-;>: nop<ret>'
+map global insert '<s-right>' '<a-;>: nop<ret>'
+map global insert '<s-up>'    '<a-;>: nop<ret>'
+map global insert '<s-down>'  '<a-;>: nop<ret>'

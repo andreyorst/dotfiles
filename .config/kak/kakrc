@@ -10,9 +10,9 @@
 
 evaluate-commands %sh{
     config_files="
-        common.kak
         defperl.kak
         commands.kak
+        common.kak
         mappings.kak
         languages.kak
         recentf.kak

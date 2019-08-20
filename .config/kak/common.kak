@@ -14,8 +14,8 @@ set-option global scrolloff 4,4
 
 ## Grep
 ## ‾‾‾‾
-evaluate-commands %sh{
-    [ ! -z "$(command -v rg)" ] && printf "%s\n" "set-option global grepcmd 'rg -L --hidden --with-filename --column'"
+if '-n "$(command -v rg)"' %{
+    set-option global grepcmd 'rg -L --hidden --with-filename --column'
 }
 
 hook global BufSetOption filetype=grep %{
