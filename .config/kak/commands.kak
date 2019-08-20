@@ -226,9 +226,13 @@ if -params 2.. %{ evaluate-commands %sh{
         elif [ $# -eq 4 ]; then
             [ -n "${4##*&*}" ] && arg="$4" || arg="$(printf '%s' "$4" | sed 's/&/&&/g')"
             printf "%s\n" "evaluate-commands %& $arg &"
-        elif [ $# -gt 4 ] && [ "$4" = "if" ]; then
-            shift 4
-            continue
+        elif [ $# -gt 4 ]; then
+            if [ "$4" = "if" ]; then
+                shift 4
+                continue
+            else
+                printf "%s\n" "fail %{if: wrong argument count}"
+            fi
         fi
         exit
     done
