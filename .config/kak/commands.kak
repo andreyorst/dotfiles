@@ -32,6 +32,17 @@ alt-x %{
     }
 }
 
+define-command -hidden \
+-docstring "alt-X: opposite command to alt-x" \
+alt-X %{
+    try %{
+        execute-keys "<a-k>.\n<ret>"
+        execute-keys "K<a-x>"
+    } catch %{
+        execute-keys "<a-x>"
+    }
+}
+
 define-command -docstring \
 "search-file <filename>: search for file recusively under path option: %opt{path}" \
 search-file -params 1 %{ evaluate-commands %sh{
