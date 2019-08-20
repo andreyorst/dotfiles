@@ -223,12 +223,12 @@ if -params 2.. %{ evaluate-commands %sh{
         elif eval $condition; then
             [ -n "${2##*&*}" ] && arg="$2" || arg="$(printf '%s' "$2" | sed 's/&/&&/g')"
             printf "%s\n" "evaluate-commands %& $arg &"
-        elif [ $# -ge 4 ] && [ "$4" = "if" ]; then
-            shift 4
-            continue
         elif [ $# -eq 4 ]; then
             [ -n "${4##*&*}" ] && arg="$4" || arg="$(printf '%s' "$4" | sed 's/&/&&/g')"
             printf "%s\n" "evaluate-commands %& $arg &"
+        elif [ $# -gt 4 ] && [ "$4" = "if" ]; then
+            shift 4
+            continue
         fi
         exit
     done
@@ -244,9 +244,10 @@ flygrep %{
 
 define-command -hidden flygrep-call-grep -params 1 %{ evaluate-commands %sh{
     [ -z "${1##*&*}" ] && text=$(printf "%s\n" "$1" | sed "s/&/&&/g") || text="$1"
+    [ -z "${1##*@*}" ] && text=$(printf "%s\n" "$text" | sed "s/@/@@/g") || text="$text"
     if [ ${#1} -gt 2 ]; then
         printf "%s\n" "info"
-        printf "%s\n" "evaluate-commands %&grep '$text'&"
+        printf "%s\n" "evaluate-commands %&grep %@$text@&"
     else
         printf "%s\n" "info -title flygrep %{$((3-${#1})) more chars}"
     fi

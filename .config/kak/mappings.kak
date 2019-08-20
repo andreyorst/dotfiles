@@ -28,7 +28,7 @@ map -docstring "convert leading tabs to spaces" global user '<a-T>' ': leading-t
 
 ## System clipboard mappings
 ## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-if '-n $(command -v xsel)' %{
+if %[ -n "$(command -v xsel)" ] %{
     map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
     map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
     map -docstring "cut to system clipboard, enter insert mode" global user 'c' '|xsel -b -i<ret>i'

@@ -14,7 +14,7 @@ set-option global scrolloff 4,4
 
 ## Grep
 ## ‾‾‾‾
-if '-n "$(command -v rg)"' %{
+if %[ -n "$(command -v rg)" ] %{
     set-option global grepcmd 'rg -L --hidden --with-filename --column'
 }
 

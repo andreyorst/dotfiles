@@ -34,7 +34,7 @@ plug "occivink/kakoune-find" config %{
 }
 
 plug "andreyorst/base16-gruvbox.kak" theme %{
-    if '-n "${PATH##*termux*}"' %{
+    if %[ -n "${PATH##*termux*}" ] %{
         colorscheme base16-gruvbox-dark-soft
     } else %{
         colorscheme base16-gruvbox-dark-hard
@@ -75,7 +75,7 @@ plug "andreyorst/fzf.kak" config %{
     }
 }
 
-if '-n "${PATH##*termux*}"' %{
+if %[ -n "${PATH##*termux*}" ] %{
     plug "ul/kak-lsp" do %{
         cargo install --force --path . --locked
     } config %{
@@ -117,7 +117,7 @@ if '-n "${PATH##*termux*}"' %{
 plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
-    if '! -n "${PATH##*termux*}"' %{
+    if %[ ! -n "${PATH##*termux*}" ] %{
         set-option global powerline_separator ''
         set-option global powerline_separator_thin ''
     }
@@ -171,7 +171,7 @@ nop plug "occivink/kakoune-snippets" config %{
     }
 }
 
-if '-n "${PATH##*termux*}"' %{
+if %[ -n "${PATH##*termux*}" ] %{
     plug "andreyorst/tagbar.kak" defer tagbar %{
         set-option global tagbar_sort false
         set-option global tagbar_size 40
@@ -222,7 +222,7 @@ plug "delapouite/kakoune-select-view" %{
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
 
-if '-n "${PATH##*termux*}"' %{
+if %[ -n "${PATH##*termux*}" ] %{
     plug "andreyorst/kaktree" defer kaktree %{
         map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
         set-option global kaktree_indentation 3

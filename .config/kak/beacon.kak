@@ -52,7 +52,7 @@ define-command beacon %{ nop %sh{ (
 ) >/dev/null 2>&1 </dev/null & }}
 
 
-if '-n "${PATH##*termux*}"' %{
+if %[ -n "${PATH##*termux*}" ] %{
     hook global KakBegin .* %{
         hook global -group beacon FocusIn .* beacon
         hook global -group beacon WinDisplay .* beacon
