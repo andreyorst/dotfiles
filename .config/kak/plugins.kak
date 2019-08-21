@@ -114,7 +114,7 @@ if %[ -n "${PATH##*termux*}" ] %{
     }
 }
 
-plug "andreyorst/powerline.kak" defer powerline %{
+plug "andreyorst/powerline.kak" branch "toggling" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
     if %[ ! -n "${PATH##*termux*}" ] %{
