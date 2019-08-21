@@ -9,13 +9,52 @@
 # ╰────────────────────────────────╯
 
 define-command -hidden \
--docstring "smart-select <w|a-w>: select <word> if current selection is only one character" \
+-docstring "smart-select <w|a-w>: select <word> if current selection is only one character." \
 smart-select -params 1 %{
     try %{
         execute-keys "<a-k>..<ret>"
     } catch %{
         execute-keys "<a-i><%arg{1}>"
     } catch nop
+}
+
+define-command -override -hidden \
+-docstring "smart-select-file: tries to select file path in current line automatically." \
+smart-select-file %{
+    try %{
+        # try selecting inside first <...> (C include)
+        execute-keys "<a-x>s<<ret>)<space>"
+        execute-keys "<a-i>a"
+    } catch %{
+        # try selecting inside first "..."
+        execute-keys '<a-x>s<"ret>)<space>'
+        execute-keys "<a-i>Q"
+    } catch %{
+        # try selecting inside first '...'
+        execute-keys "<a-x>s'<ret>)<space>"
+        execute-keys "<a-i>q"
+    } catch %{
+        # try select current word
+        execute-keys "<a-k>\w<ret>"
+        execute-keys "<a-i>w"
+    } catch %{
+        # try select current WORD
+        execute-keys "<a-k>\w<ret>"
+        execute-keys "<a-i><a-w>"
+    } catch %{
+        # try select from cursor to the end of the line
+        execute-keys "<a-l><a-k>\w<ret>"
+    } catch %{
+        # try select from beginning to the end of the line
+        execute-keys "Gi<a-l><a-k>\w<ret>"
+    } catch %{
+        fail "no file can be selected"
+    }
+    try %{
+        execute-keys "s/?\w[\S]+(?!/)<ret>)<space>"
+    } catch %{
+        fail "no file can be selected"
+    }
 }
 
 define-command -hidden \
