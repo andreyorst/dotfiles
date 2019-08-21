@@ -22,25 +22,21 @@ define-command -override -hidden \
 -docstring "smart-select-file: tries to select file path in current line automatically." \
 smart-select-file %{
     try %{
-        # try selecting inside first <...> (C include)
+        # guess we have nonblank character under cursor
+        execute-keys "<a-k>\w<ret>"
+        execute-keys "<a-i><a-w>"
+    } catch %{
+        # try selecting inside first occurrence of <...> string
         execute-keys "<a-x>s<<ret>)<space>"
         execute-keys "<a-i>a"
     } catch %{
-        # try selecting inside first "..."
+        # try selecting inside first occurrence of "..."
         execute-keys '<a-x>s<"ret>)<space>'
         execute-keys "<a-i>Q"
     } catch %{
-        # try selecting inside first '...'
+        # try selecting inside first  occurrence of '...'
         execute-keys "<a-x>s'<ret>)<space>"
         execute-keys "<a-i>q"
-    } catch %{
-        # try select current word
-        execute-keys "<a-k>\w<ret>"
-        execute-keys "<a-i>w"
-    } catch %{
-        # try select current WORD
-        execute-keys "<a-k>\w<ret>"
-        execute-keys "<a-i><a-w>"
     } catch %{
         # try select from cursor to the end of the line
         execute-keys "<a-l><a-k>\w<ret>"
@@ -53,7 +49,7 @@ smart-select-file %{
     try %{
         execute-keys "s/?\w[\S]+(?!/)<ret>)<space>"
     } catch %{
-        fail "no file can be selected"
+        fail "failed to select file"
     }
 }
 
