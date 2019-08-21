@@ -660,7 +660,6 @@ are defining or executing a macro."
 
 (add-hook 'c-mode-common-hook
           (lambda ()
-            (yas-minor-mode)
             (electric-pair-mode)
             (setq c-basic-offset 4
                   c-default-style "linux"
@@ -697,7 +696,6 @@ are defining or executing a macro."
   :commands (rust-format-buffer)
   :init (add-hook 'rust-mode-hook
                     '(lambda()
-                       (yas-minor-mode)
                        (electric-pair-mode)
                        (setq company-tooltip-align-annotations t)))
   :bind (:map rust-mode-map
@@ -818,9 +816,9 @@ are defining or executing a macro."
                counsel-describe-variable
                counsel-find-library)
     :init
-    ;; (when (executable-find "fd")
-    ;;   (setq find-program "fd"
-    ;;         counsel-file-jump-args (split-string "-L --type f --hidden")))
+    (when (executable-find "fd")
+      (setq find-program "fd"
+            counsel-file-jump-args (split-string "-L --type f --hidden")))
     (when (executable-find "rg")
       (setq counsel-rg-base-command
             "rg -S --no-heading --hidden --line-number --color never %s .")
@@ -876,7 +874,13 @@ are defining or executing a macro."
   (global-undo-tree-mode 1))
 
 (use-package yasnippet
-  :config (use-package yasnippet-snippets))
+  :commands yas-reload-all
+  :hook
+  (rust-mode . yas-minor-mode)
+  (c-mode-common . yas-minor-mode)
+  :config
+  (use-package yasnippet-snippets)
+  (yas-reload-all))
 
 (use-package magit)
 

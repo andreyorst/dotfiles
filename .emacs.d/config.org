@@ -1231,7 +1231,6 @@ Now we can create a hook that will run for all C related modes:
 #+BEGIN_SRC emacs-lisp
   (add-hook 'c-mode-common-hook
             (lambda ()
-              (yas-minor-mode)
               (electric-pair-mode)
               (setq c-basic-offset 4
                     c-default-style "linux"
@@ -1291,7 +1290,6 @@ settings for Rust mode.
     :commands (rust-format-buffer)
     :init (add-hook 'rust-mode-hook
                       '(lambda()
-                         (yas-minor-mode)
                          (electric-pair-mode)
                          (setq company-tooltip-align-annotations t)))
     :bind (:map rust-mode-map
@@ -1521,9 +1519,9 @@ anyways.   Counsel  has  nice   =counsel-file-fump=  command  that  uses
                  counsel-describe-variable
                  counsel-find-library)
       :init
-      ;; (when (executable-find "fd")
-      ;;   (setq find-program "fd"
-      ;;         counsel-file-jump-args (split-string "-L --type f --hidden")))
+      (when (executable-find "fd")
+        (setq find-program "fd"
+              counsel-file-jump-args (split-string "-L --type f --hidden")))
       (when (executable-find "rg")
         (setq counsel-rg-base-command
               "rg -S --no-heading --hidden --line-number --color never %s .")
@@ -1597,7 +1595,13 @@ a separate package
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :config (use-package yasnippet-snippets))
+    :commands yas-reload-all
+    :hook
+    (rust-mode . yas-minor-mode)
+    (c-mode-common . yas-minor-mode)
+    :config
+    (use-package yasnippet-snippets)
+    (yas-reload-all))
 #+END_SRC
 
 *** Magit

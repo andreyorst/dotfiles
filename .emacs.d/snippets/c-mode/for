@@ -1,5 +1,5 @@
 # -*- mode: C -*-
-# name: for
+# name: for (my)
 # key: for
 # --
 for (${1:int} ${2:i} = 0; $2 ${3:< 10}; $2${4:++}) {
