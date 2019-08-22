@@ -725,14 +725,6 @@ are defining or executing a macro."
 
 (use-package toml-mode)
 
-(use-package god-mode
-  :commands (god-local-mode
-             god-mode-all)
-  :config
-  (global-set-key (kbd "<escape>") 'god-local-mode)
-  :init
-  (god-mode-all))
-
 (use-package racket-mode)
 
 (defun my/ansi-term-toggle ()
