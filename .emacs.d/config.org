@@ -93,38 +93,6 @@ We need a hook that restores initial values once initialization done:
                     file-name-handler-alist my--file-name-handler-alist)))
 #+END_SRC
 
-*** =package.el= initialization
-Doom Emacs  uses this  to speedup initialization,  so I'll  include it
-too.   In   the  Doom  Emacs   Wiki  it  is  stated   that  Package.el
-initialization is expensive.
-
-#+BEGIN_SRC emacs-lisp
-  (setq package-enable-at-startup nil
-        package--init-file-ensured t)
-#+END_SRC
-
-Melpa is a  package repository, that I use to  get packages. Since all
-packages that  I need can  be obtained  from there, I  didn't bothered
-with different methods of installation.
-
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                           ("melpa" . "https://melpa.org/packages/")))
-#+END_SRC
-
-Note for Windows users: change =https= to =http=
-
-There's recent bug with downloading from elpa. This line fixes it:
-
-#+BEGIN_SRC emacs-lisp
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (package-initialize 'noactive)
-#+END_SRC
-
 ** Default Behavior Fixes
 Emacs is  old. I  understand that  back then  it could  be appropriate
 decisions,  but as  of today  they are  completely obliterated  by the
@@ -290,6 +258,39 @@ deleting past first symbol. Let's disable it:
   (setq command-error-function #'my/command-error-function)
 #+END_SRC
 
+* Packages
+** =package.el=
+Doom Emacs  uses this  to speedup initialization,  so I'll  include it
+too.   In   the  Doom  Emacs   Wiki  it  is  stated   that  Package.el
+initialization is expensive.
+
+#+BEGIN_SRC emacs-lisp
+  (setq package-enable-at-startup nil
+        package--init-file-ensured t)
+#+END_SRC
+
+Melpa is a  package repository, that I use to  get packages. Since all
+packages that  I need can  be obtained  from there, I  didn't bothered
+with different methods of installation.
+
+#+BEGIN_SRC emacs-lisp
+  ;(require 'package)
+  (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                           ("melpa" . "https://melpa.org/packages/")))
+#+END_SRC
+
+Note for Windows users: change =https= to =http=
+
+There's recent bug with downloading from elpa. This line fixes it:
+
+#+BEGIN_SRC emacs-lisp
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (package-initialize)
+#+END_SRC
+
 ** Use Package
 I use =use-package= to install, load  and configure my packages.  I find
 this way very consistent and easy  to understand and maintain.  What I
@@ -302,9 +303,11 @@ system.
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
+#+END_SRC
 
-  (package-initialize)
+And =require= the package itself:
 
+#+BEGIN_SRC emacs-lisp
   (eval-when-compile
     (require 'use-package)
     (setq use-package-always-ensure t))
@@ -441,8 +444,7 @@ change a little bit of it.
     (doom-themes-org-config)
     (setq doom-themes-enable-bold t
           doom-themes-enable-italic t)
-    :init
-    (load-theme 'doom-one t))
+    :init (load-theme 'doom-one t))
 #+END_SRC
 
 Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
@@ -505,8 +507,7 @@ Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
     (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
     (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
     (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
-    :init
-    (solaire-global-mode +1))
+    :init (solaire-global-mode +1))
 #+END_SRC
 
 If only  certain buffers  could +be so  grossly incandescent+  *have damn
@@ -623,7 +624,12 @@ that Treemacs will look just as great as DOOM themed Emacs!
                   all-the-icons-octicon)
       :bind (("<f7>" . treemacs)
              ("<f8>" . treemacs-select-window))
+      :hook (after-init . (lambda ()
+                            (treemacs-load-theme "Atom")
+                            (treemacs)
+                            (my/treemacs-expand-all-projects)))
       :config
+      (use-package treemacs-magit)
       (set-face-attribute 'treemacs-root-face nil
                           :foreground (doom-color 'fg)
                           :height 1.0
@@ -797,15 +803,6 @@ that Treemacs will look just as great as DOOM themed Emacs!
                   (lambda()
                     (set-window-fringes nil 0 0 nil)
                     (my/treemacs-variable-pitch-labels)))
-
-      (when window-system
-        (add-hook 'after-init-hook
-                  (lambda ()
-                    (treemacs-load-theme "Atom")
-                    (treemacs)
-                    (my/treemacs-expand-all-projects))))
-
-      :init
       (defun my/treemacs-expand-all-projects (&optional _)
         "Expand all projects."
         (save-excursion
@@ -816,7 +813,6 @@ that Treemacs will look just as great as DOOM themed Emacs!
                 (goto-char pos)
                 (treemacs--expand-root-node pos)))))
         (treemacs--maybe-recenter 'on-distance))
-
       (defun my/treemacs-variable-pitch-labels (&rest _)
         (dolist (face '(treemacs-root-face
                         treemacs-git-unmodified-face
@@ -834,21 +830,12 @@ that Treemacs will look just as great as DOOM themed Emacs!
             (set-face-attribute
              face nil :inherit
              `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
-
       (setq treemacs-width 27
             treemacs-is-never-other-window t
             treemacs-space-between-root-nodes nil)
-
       (treemacs-follow-mode t)
       (treemacs-filewatch-mode t)
       (treemacs-fringe-indicator-mode nil)))
-#+END_SRC
-
-This supplement  package makes  some nice integration  with Magit.
-
-#+BEGIN_SRC emacs-lisp
-  (when (package-installed-p 'treemacs)
-    (use-package treemacs-magit))
 #+END_SRC
 
 Before using Treemacs I was a  happy user of another filetree package:
@@ -865,8 +852,7 @@ window configurations. It works much like Vim tabs, or Tmux windows.
 #+BEGIN_SRC emacs-lisp
   (use-package eyebrowse
     :commands eyebrowse-mode
-    :init
-    (eyebrowse-mode t))
+    :init (eyebrowse-mode t))
 #+END_SRC
 
 *** Diff HL Mode
@@ -971,183 +957,70 @@ writing books, literate programming, and  many other things. I primary
 use it for taking notes on different programming languages, and manage
 my Emacs configuration with it.
 
-**** Startup Settings
-For Org  Mode I  need spell  checking to be  enabled by  default. Also
-Org-mode plays nicely with justification, so I'll set it to =full=, as I
-think that it  is the most appropriate format for  text. Org files are
-capable of displaying images, so let's enable them by default. There's
-also  a nice  mode called  =org-indent-mode=  that makes  easier to  see
-different sub-trees.  Speaking of sub-trees, =org-startup-folded= can be
-set to ='content=, so every document will look like table of contents by
-default. Last but not least, let's enable =auto-fill-mode= for org mode,
-so all text will be folded  and re-filled after its length reaches the
-=fill-column= value.  document
-
 #+BEGIN_SRC emacs-lisp
-  (require 'org)
-  (add-hook 'org-mode-hook
-            (lambda()
-              (flyspell-mode)
-              (setq default-justification 'full
-                    org-startup-with-inline-images t
-                    org-startup-folded 'content
-                    org-hide-emphasis-markers t
-                    org-adapt-indentation nil
-                    org-hide-leading-stars t
-                    org-highlight-latex-and-related '(latex)
-                    revert-without-query '(".*\.pdf")
-                    org-preview-latex-default-process 'dvisvgm)
-              (auto-fill-mode)))
-#+END_SRC
-
-This will fontify code inside =SRC_BLOCK= sections:
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t)
-#+END_SRC
-
-**** Source Code Blocks
-I often  edit my configuration,  so it would  be cool to  update Emacs
-config automatically on save. This function will handle it:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/org-tangle-on-config-save ()
-    "Tangle source code blocks when configuration file is saved."
-    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-      (org-babel-tangle)))
-#+END_SRC
-
-To actually make it work we need to add this hook:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'after-save-hook 'my/org-tangle-on-config-save)
-#+END_SRC
-
-**** Inline Images
-Since Org-mode allows inline images, we  need a way to update them, if
-image changes for some reason.  We will use hook to call this function
-is supposed to automatically update inline images in org buffers, when
-for some reason image was changed.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar org-inline-image-overlays)
-
-  (defun my/org-update-inline-images ()
-    "Update inline images in Org-mode."
-    (when org-inline-image-overlays
-      (org-redisplay-inline-images)))
-
-  (add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
-#+END_SRC
-
-***** Inline LaTeX Preview
-Latex preview  feature is  really awesome, but  I don't  want produced
-images to be stored in plain sight. At least use hidden folder.
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-preview-latex-image-directory ".ltximg/")
-#+END_SRC
-
-**** Org Mappings
-I don't like  that my =S-tab= mapping for  Company triggers =org-shifftab=
-function, so I'll remap it to use =C-tab= instead.
-
-#+BEGIN_SRC emacs-lisp
-  (define-key org-mode-map [backtab] nil)
-  (define-key org-mode-map [S-iso-lefttab] nil)
-  (define-key org-mode-map [C-tab] nil)
-  (define-key org-mode-map [C-tab] 'org-shifttab)
-#+END_SRC
-
-**** Syntax Highlighting in Exported PDFs
-To  highlight code  blocks  when  exporting to  LaTeX  we need  =minted=
-package   installed   system-wide   and    this   code   (taken   from
-[[https://emacs.stackexchange.com/questions/20839/exporting-code-blocks-to-pdf-via-latex/20841#20841][emacs.stackexchange.com]]):
-
-#+BEGIN_SRC emacs-lisp
-  (require 'ox-latex)
-  (setq org-latex-listings 'minted)
-#+END_SRC
-
-Minted creates annoying directories  named =_minted-documentname=, and I
-don't want  them to  be in plain  sight.  So this  code here  will put
-those directories to temporary folder on my system.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar minted-cache-dir
-    (file-name-as-directory
-     (expand-file-name ".minted/\\jombname"
-                       temporary-file-directory)))
-
-  (add-to-list 'org-latex-packages-alist
-               `(,(concat "cachedir=" minted-cache-dir)
-                 "minted" nil))
-#+END_SRC
-
-Now we need  to tell =pdflatex= to use these  escape sequence for proper
-colors. This part is worth checking  for a more proper way of handling
-highlighting, because right  now code blocks written  in language that
-=minted= doesn't  support will  not be  exported to PDF  at all.   But I
-don't know how to fix this.
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
-
-**** Cleanup After Export
-Since I'm exporting my notes to PDF as final file format, I don't need
-intermediary =.tex= file to stay.  Let's assume that these files are log
-files, so Org mode will remove those after exporting is finished.
-
-#+BEGIN_SRC emacs-lisp
-  (eval-after-load 'org
-    '(add-to-list 'org-latex-logfiles-extensions "tex"))
-#+END_SRC
-
-This will get rid of =.tex= files.
-
-**** Executable Languages
-A nice feature of Org-mode over Markdown is that we can execute source
-code  blocks with  a keybinding  and see  results inside  the document
-itself.   Let's define  what languages  can be  executed with  =C-c C-c=
-shortcut from org mode:
-
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((gnuplot . t)
-     (scheme . t)))
-#+END_SRC
-
-And  to prevent  Emacs from  constantly asking  if I  want to  execute
-source code, lets set =org-confirm-babel-evaluate= to =nil=
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-confirm-babel-evaluate nil)
-#+END_SRC
-
-**** Paragraphs
-I would like to use the same level headings after certain part, so all
-my   deeply   nested   notes   contained   right   section   separator
-headings. This is a hacky way but it works:
-
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-latex-classes
-               '("article"
-                 "\\documentclass{article}"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (use-package org
+    :ensure nil
+    :hook ((org-mode . flyspell-mode)
+           (org-mode . auto-fill-mode)
+           (after-save . my/org-tangle-on-config-save)
+           (ofg-babel-after-execute-hook . my/org-update-inline-images))
+    :bind (:map org-mode-map
+                ([backtab] . nil)
+                ([S-iso-lefttab] . nil)
+                ([C-tab] . nil)
+                ([C-tab] . org-shifttab))
+    :config
+    (use-package ox-latex
+      :ensure nil)
+    (setq default-justification 'full
+          org-startup-with-inline-images t
+          org-startup-folded 'content
+          org-hide-emphasis-markers t
+          org-adapt-indentation nil
+          org-hide-leading-stars t
+          org-highlight-latex-and-related '(latex)
+          revert-without-query '(".*\.pdf")
+          org-preview-latex-default-process 'dvisvgm
+          org-src-fontify-natively t
+          org-preview-latex-image-directory ".ltximg/"
+          org-latex-listings 'minted
+          org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                  "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                  "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+          org-confirm-babel-evaluate nil)
+    (defun my/org-tangle-on-config-save ()
+      "Tangle source code blocks when configuration file is saved."
+      (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+        (org-babel-tangle)))
+    (defun my/org-update-inline-images ()
+      "Update inline images in Org-mode."
+      (when org-inline-image-overlays
+        (org-redisplay-inline-images)))
+    (defvar minted-cache-dir
+      (file-name-as-directory
+       (expand-file-name ".minted/\\jombname"
+                         temporary-file-directory)))
+    (add-to-list 'org-latex-packages-alist
+                 `(,(concat "cachedir=" minted-cache-dir)
+                   "minted" nil))
+    (add-to-list 'org-latex-logfiles-extensions "tex")
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((gnuplot . t)
+       (scheme . t)))
+    (add-to-list 'org-latex-classes
+                 '("article"
+                   "\\documentclass{article}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 #+END_SRC
 
 *** Doc View Mode
@@ -1266,13 +1139,6 @@ configure project.
 
 #+BEGIN_SRC emacs-lisp
   (use-package toml-mode)
-#+END_SRC
-
-*** Racket Mode
-Racket is a nice Lisp dialect. I think I'm going to use it.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package racket-mode)
 #+END_SRC
 
 ** Tools
@@ -1474,8 +1340,7 @@ anyways.   Counsel  has  nice   =counsel-file-fump=  command  that  uses
           ivy-minibuffer-faces nil
           ivy-use-virtual-buffers t
           enable-recursive-minibuffers t)
-    :init
-    (ivy-mode 1))
+    :init (ivy-mode 1))
 #+END_SRC
 
 *** Company
@@ -1514,8 +1379,7 @@ mapping to redo.
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :commands global-undo-tree-mode
-    :init
-    (global-undo-tree-mode 1))
+    :init (global-undo-tree-mode 1))
 #+END_SRC
 
 *** Yasnippet
@@ -1526,9 +1390,8 @@ a separate package
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :commands yas-reload-all
-    :hook
-    (rust-mode . yas-minor-mode)
-    (c-mode-common . yas-minor-mode)
+    :hook ((rust-mode . yas-minor-mode)
+           (c-mode-common . yas-minor-mode))
     :config
     (use-package yasnippet-snippets)
     (yas-reload-all))
@@ -1637,8 +1500,8 @@ in most languages that I work with inside Emacs.
   ^ ^                _q_: inside quotes
   ^ ^                _Q_: around quotes
   ^ ^                _p_: paragraph"
-              ("e" er/expand-region :post hydra-er/body)
-              ("-" er/contract-region :post hydra-er/body)
+              ("e" er/expand-region :color pink)
+              ("-" er/contract-region :color pink)
               ("p" er/mark-paragraph)
               ("(" er/mark-inside-pairs)
               (")" er/mark-outside-pairs)
@@ -1733,15 +1596,11 @@ Now  we  can   add  =my/project-find-root=  function  to   the  list  of
 A package to format C code with Clang Format.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package clang-format
-    :bind (:map c-mode-base-map
-                ("C-c C-f" . clang-format-buffer)
-                ("C-c C-S-f" . clang-format-region)))
-    ;; :init
-    ;; (defvar c-mode-base-map)
-    ;; (with-eval-after-load 'cc-mode
-    ;;   (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
-    ;;   (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
+  (with-eval-after-load 'cc-mode
+    (use-package clang-format
+      :bind (:map c-mode-base-map
+                  ("C-c C-f" . clang-format-buffer)
+                  ("C-c C-S-f" . clang-format-region))))
 #+END_SRC
 
 *** GCMH
@@ -1784,9 +1643,9 @@ when =imenu-list= was toggled to be shown.
                 (lambda()
                   (setq window-size-fixed 'width
                         mode-line-format nil)))
-    :init (setq imenu-list-idle-update-delay-time 0.1
-                imenu-list-size 27
-                imenu-list-focus-after-activation t))
+    (setq imenu-list-idle-update-delay-time 0.1
+          imenu-list-size 27
+          imenu-list-focus-after-activation t))
 #+END_SRC
 
 * Postscript

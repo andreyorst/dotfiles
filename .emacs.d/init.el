@@ -22,17 +22,6 @@
                   gc-cons-percentage my--gc-cons-percentage
                   file-name-handler-alist my--file-name-handler-alist)))
 
-(setq package-enable-at-startup nil
-      package--init-file-ensured t)
-
-(require 'package)
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
-
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
-(package-initialize 'noactive)
-
 (setq ring-bell-function 'ignore)
 
 (setq backup-by-copying t
@@ -103,11 +92,20 @@ are defining or executing a macro."
 
 (setq command-error-function #'my/command-error-function)
 
+(setq package-enable-at-startup nil
+      package--init-file-ensured t)
+
+;(require 'package)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
+(package-initialize)
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
-(package-initialize)
 
 (eval-when-compile
   (require 'use-package)
@@ -156,8 +154,7 @@ are defining or executing a macro."
   (doom-themes-org-config)
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  :init
-  (load-theme 'doom-one t))
+  :init (load-theme 'doom-one t))
 
 (defun my/set-frame-dark (&optional frame)
   "Set FRAME titlebar colorscheme to dark variant."
@@ -193,8 +190,7 @@ are defining or executing a macro."
   (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
   (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
-  :init
-  (solaire-global-mode +1))
+  :init (solaire-global-mode +1))
 
 (defun my/real-buffer-setup (&rest _)
   "Wrapper around `set-window-fringes' function."
@@ -263,7 +259,12 @@ are defining or executing a macro."
                 all-the-icons-octicon)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window))
+    :hook (after-init . (lambda ()
+                          (treemacs-load-theme "Atom")
+                          (treemacs)
+                          (my/treemacs-expand-all-projects)))
     :config
+    (use-package treemacs-magit)
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (doom-color 'fg)
                         :height 1.0
@@ -437,15 +438,6 @@ are defining or executing a macro."
                 (lambda()
                   (set-window-fringes nil 0 0 nil)
                   (my/treemacs-variable-pitch-labels)))
-
-    (when window-system
-      (add-hook 'after-init-hook
-                (lambda ()
-                  (treemacs-load-theme "Atom")
-                  (treemacs)
-                  (my/treemacs-expand-all-projects))))
-
-    :init
     (defun my/treemacs-expand-all-projects (&optional _)
       "Expand all projects."
       (save-excursion
@@ -456,7 +448,6 @@ are defining or executing a macro."
               (goto-char pos)
               (treemacs--expand-root-node pos)))))
       (treemacs--maybe-recenter 'on-distance))
-
     (defun my/treemacs-variable-pitch-labels (&rest _)
       (dolist (face '(treemacs-root-face
                       treemacs-git-unmodified-face
@@ -474,22 +465,16 @@ are defining or executing a macro."
           (set-face-attribute
            face nil :inherit
            `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
-
     (setq treemacs-width 27
           treemacs-is-never-other-window t
           treemacs-space-between-root-nodes nil)
-
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)))
 
-(when (package-installed-p 'treemacs)
-  (use-package treemacs-magit))
-
 (use-package eyebrowse
   :commands eyebrowse-mode
-  :init
-  (eyebrowse-mode t))
+  :init (eyebrowse-mode t))
 
 (when window-system
   (use-package diff-hl
@@ -549,86 +534,69 @@ are defining or executing a macro."
                   (t "Default"))))
     (centaur-tabs-mode)))
 
-(require 'org)
-(add-hook 'org-mode-hook
-          (lambda()
-            (flyspell-mode)
-            (setq default-justification 'full
-                  org-startup-with-inline-images t
-                  org-startup-folded 'content
-                  org-hide-emphasis-markers t
-                  org-adapt-indentation nil
-                  org-hide-leading-stars t
-                  org-highlight-latex-and-related '(latex)
-                  revert-without-query '(".*\.pdf")
-                  org-preview-latex-default-process 'dvisvgm)
-            (auto-fill-mode)))
-
-(setq org-src-fontify-natively t)
-
-(defun my/org-tangle-on-config-save ()
-  "Tangle source code blocks when configuration file is saved."
-  (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-    (org-babel-tangle)))
-
-(add-hook 'after-save-hook 'my/org-tangle-on-config-save)
-
-(defvar org-inline-image-overlays)
-
-(defun my/org-update-inline-images ()
-  "Update inline images in Org-mode."
-  (when org-inline-image-overlays
-    (org-redisplay-inline-images)))
-
-(add-hook 'org-babel-after-execute-hook 'my/org-update-inline-images)
-
-(setq org-preview-latex-image-directory ".ltximg/")
-
-(define-key org-mode-map [backtab] nil)
-(define-key org-mode-map [S-iso-lefttab] nil)
-(define-key org-mode-map [C-tab] nil)
-(define-key org-mode-map [C-tab] 'org-shifttab)
-
-(require 'ox-latex)
-(setq org-latex-listings 'minted)
-
-(defvar minted-cache-dir
-  (file-name-as-directory
-   (expand-file-name ".minted/\\jombname"
-                     temporary-file-directory)))
-
-(add-to-list 'org-latex-packages-alist
-             `(,(concat "cachedir=" minted-cache-dir)
-               "minted" nil))
-
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
-(eval-after-load 'org
-  '(add-to-list 'org-latex-logfiles-extensions "tex"))
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((gnuplot . t)
-   (scheme . t)))
-
-(setq org-confirm-babel-evaluate nil)
-
-(add-to-list 'org-latex-classes
-             '("article"
-               "\\documentclass{article}"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+(use-package org
+  :ensure nil
+  :hook ((org-mode . flyspell-mode)
+         (org-mode . auto-fill-mode)
+         (after-save . my/org-tangle-on-config-save)
+         (ofg-babel-after-execute-hook . my/org-update-inline-images))
+  :bind (:map org-mode-map
+              ([backtab] . nil)
+              ([S-iso-lefttab] . nil)
+              ([C-tab] . nil)
+              ([C-tab] . org-shifttab))
+  :config
+  (use-package ox-latex
+    :ensure nil)
+  (setq default-justification 'full
+        org-startup-with-inline-images t
+        org-startup-folded 'content
+        org-hide-emphasis-markers t
+        org-adapt-indentation nil
+        org-hide-leading-stars t
+        org-highlight-latex-and-related '(latex)
+        revert-without-query '(".*\.pdf")
+        org-preview-latex-default-process 'dvisvgm
+        org-src-fontify-natively t
+        org-preview-latex-image-directory ".ltximg/"
+        org-latex-listings 'minted
+        org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+        org-confirm-babel-evaluate nil)
+  (defun my/org-tangle-on-config-save ()
+    "Tangle source code blocks when configuration file is saved."
+    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+      (org-babel-tangle)))
+  (defun my/org-update-inline-images ()
+    "Update inline images in Org-mode."
+    (when org-inline-image-overlays
+      (org-redisplay-inline-images)))
+  (defvar minted-cache-dir
+    (file-name-as-directory
+     (expand-file-name ".minted/\\jombname"
+                       temporary-file-directory)))
+  (add-to-list 'org-latex-packages-alist
+               `(,(concat "cachedir=" minted-cache-dir)
+                 "minted" nil))
+  (add-to-list 'org-latex-logfiles-extensions "tex")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((gnuplot . t)
+     (scheme . t)))
+  (add-to-list 'org-latex-classes
+               '("article"
+                 "\\documentclass{article}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
 (setq-default doc-view-resolution 192)
 
@@ -679,8 +647,6 @@ are defining or executing a macro."
     :hook (rust-mode . cargo-minor-mode)))
 
 (use-package toml-mode)
-
-(use-package racket-mode)
 
 (defun my/ansi-term-toggle ()
   "Toggle `ansi-term' window on and off with the same command."
@@ -794,8 +760,7 @@ are defining or executing a macro."
         ivy-minibuffer-faces nil
         ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
-  :init
-  (ivy-mode 1))
+  :init (ivy-mode 1))
 
 (use-package company
   :commands global-company-mode
@@ -823,14 +788,12 @@ are defining or executing a macro."
 
 (use-package undo-tree
   :commands global-undo-tree-mode
-  :init
-  (global-undo-tree-mode 1))
+  :init (global-undo-tree-mode 1))
 
 (use-package yasnippet
   :commands yas-reload-all
-  :hook
-  (rust-mode . yas-minor-mode)
-  (c-mode-common . yas-minor-mode)
+  :hook ((rust-mode . yas-minor-mode)
+         (c-mode-common . yas-minor-mode))
   :config
   (use-package yasnippet-snippets)
   (yas-reload-all))
@@ -912,8 +875,8 @@ _-_: reduce region _)_: around pairs
 ^ ^                _q_: inside quotes
 ^ ^                _Q_: around quotes
 ^ ^                _p_: paragraph"
-            ("e" er/expand-region :post hydra-er/body)
-            ("-" er/contract-region :post hydra-er/body)
+            ("e" er/expand-region :color pink)
+            ("-" er/contract-region :color pink)
             ("p" er/mark-paragraph)
             ("(" er/mark-inside-pairs)
             (")" er/mark-outside-pairs)
@@ -962,15 +925,11 @@ _-_: reduce region _)_: around pairs
 (with-eval-after-load 'project
   (add-to-list 'project-find-functions #'my/project-find-root))
 
-(use-package clang-format
-  :bind (:map c-mode-base-map
-              ("C-c C-f" . clang-format-buffer)
-              ("C-c C-S-f" . clang-format-region)))
-  ;; :init
-  ;; (defvar c-mode-base-map)
-  ;; (with-eval-after-load 'cc-mode
-  ;;   (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
-  ;;   (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
+(with-eval-after-load 'cc-mode
+  (use-package clang-format
+    :bind (:map c-mode-base-map
+                ("C-c C-f" . clang-format-buffer)
+                ("C-c C-S-f" . clang-format-region))))
 
 (use-package gcmh
   :commands gcmh-mode
@@ -989,9 +948,9 @@ _-_: reduce region _)_: around pairs
               (lambda()
                 (setq window-size-fixed 'width
                       mode-line-format nil)))
-  :init (setq imenu-list-idle-update-delay-time 0.1
-              imenu-list-size 27
-              imenu-list-focus-after-activation t))
+  (setq imenu-list-idle-update-delay-time 0.1
+        imenu-list-size 27
+        imenu-list-focus-after-activation t))
 
 (provide 'init)
 ;;; init.el ends here
