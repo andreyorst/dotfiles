@@ -227,7 +227,10 @@ are defining or executing a macro."
                   doom-modeline-bar
                   doom-modeline-panel
                   doom-modeline-buffer-major-mode
-                  doom-modeline-buffer-file))
+                  doom-modeline-buffer-file
+                  doom-modeline-lsp-success
+                  doom-modeline-lsp-warning
+                  doom-modeline-lsp-error))
     (set-face-attribute face nil :foreground (doom-color 'fg) :weight 'normal))
   (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
   (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
@@ -238,7 +241,6 @@ are defining or executing a macro."
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
-        doom-modeline-lsp nil
         find-file-visit-truename t)
   :init (doom-modeline-mode 1))
 
