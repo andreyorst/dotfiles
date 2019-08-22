@@ -33,7 +33,7 @@ As  I've  mentioned  earlier,  I'm  using  Org  Mode  function  called
 =org-babel-tangle= to  build my =init.el=  file. This means that  you only
 need  this  file  in order  to  get  my  config  and compile  it  with
 =org-babel-tangle= function for  the first time. After  that, every time
-this file is edited and  saved it gets re-tangled automatically.
+this file is edited and saved it gets re-tangled automatically.
 
 Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
 starts with commentary:
@@ -63,7 +63,7 @@ Once I switch  to Emacs 27 most  of these settings will  be tangled to
 *** Garbage collection and file handler
 The  main  problem  with  Emacs startup  file  is  garbage  collection
 system. It invoked  so many times on startup that  it causes quite big
-impact on  startup time.  We're talking /seconds/.  One can  raise limit
+impact on startup  time.  We're talking /seconds/.  One  can raise limit
 when to trigger garbage collection, but this will end up in unpleasant
 editing experience. So I'm declaring  these variables to store default
 values for the GC, to restore them after initialization is finished:
@@ -212,9 +212,9 @@ will get rid of those automatically for me.
 #+END_SRC
 
 One thing  that bothered  me is  that =C-g= is  universal way  to cancel
-things  in  Emacs, gut  you  have  to be  in  exact  window to  cancel
-action.  This function  intelligently  tries to  cancel regardless  of
-active window:
+things in Emacs, gut you have to  be in exact window to cancel action.
+This  function  intelligently tries  to  cancel  regardless of  active
+window:
 
 #+BEGIN_SRC emacs-lisp
   ;; suppress byte-compiler warnings
@@ -279,7 +279,7 @@ with different methods of installation.
                            ("melpa" . "https://melpa.org/packages/")))
 #+END_SRC
 
-Note for Windows users: change =https= to =http=
+Note for Windows users: change =https= to =http=.
 
 There's recent bug with downloading from elpa. This line fixes it:
 
@@ -313,9 +313,9 @@ And =require= the package itself:
     (setq use-package-always-ensure t))
 #+END_SRC
 
-All  other packages  were  split to  individual  categories much  like
-Emacs  settings above.  This  helps  me to  keep  track  of things  in
-different packages and do not rely on search that much.
+All other packages were split to individual categories much like Emacs
+settings above.   This helps me to  keep track of things  in different
+packages and do not rely on search that much.
 
 ** User Interface
 All user interface related settings are presented in this section. I'm
@@ -347,8 +347,8 @@ all of those by default, so let's disable them as early as possible:
     (tool-bar-mode -1))
 #+END_SRC
 
-Also let's  use bar  cursor when  in window  system, which  is visible
-only in active window:
+Also let's use bar cursor when in window system, which is visible only
+in active window:
 
 #+BEGIN_SRC emacs-lisp
     (when window-system
@@ -365,9 +365,9 @@ for some reason.
 #+END_SRC
 
 Also,  why initial  frame size  is so  small? When  I launch  Emacs in
-terminal it  occupies whole window.  When I launch it  under graphical
+terminal it occupies  whole window.  When I launch  it under graphical
 environment it defaults to really  small window, which is smaller than
-my   terminal.  My   window   manager  doesn't   adjust  window   size
+my   terminal.   My   window  manager   doesn't  adjust   window  size
 automatically so let's just set little bit bigger initial size:
 
 #+BEGIN_SRC emacs-lisp
@@ -406,7 +406,7 @@ to empty space, because it isn't ready on Emacs init.
     (set-display-table-slot standard-display-table 0 ?\ ))
 #+END_SRC
 
-Small  tweak to  mode line,  that disables  changing appearance  in non
+Small tweak  to mode  line, that disables  changing appearance  in non
 active window.
 
 #+BEGIN_SRC emacs-lisp
@@ -417,7 +417,7 @@ Now  I can  list  some amazing  packages that  provide  some real  GUI
 goodies to Emacs.
 
 *** All The Icons
-This  package provides  nice icons  for emacs  via custom  fonts. Just
+This  package provides  nice icons  for Emacs  via custom  fonts. Just
 don't forget to use =M-x all-the-icons-install-fonts RET= after install.
 
 #+BEGIN_SRC emacs-lisp
@@ -541,7 +541,7 @@ Let's assign it to these hooks:
 I've tried bunch of different modelines:
 
 - [[https://github.com/TheBB/spaceline][Spaceline]]
-  Great modeline, but I was  experiencing slowdowns in Emacs startup,
+  Great modeline, but  I was experiencing slowdowns  in Emacs startup,
   and I like my Emacs to start fast.
 - [[https://github.com/dbordak/telephone-line][Telephone Line]]
   Another good modeline, but I was lazy to configure it.
@@ -553,7 +553,7 @@ I've tried bunch of different modelines:
   used for quite a some time.
 
 They're all  great, but  I esperienced some  troubles with  DOOM Theme
-that I use,  so I've decided to  try out DOOM Modeline.  And turns out
+that I use, so  I've decided to try out DOOM  Modeline.  And turns out
 it's great!
 
 #+BEGIN_SRC emacs-lisp
@@ -595,7 +595,7 @@ it's great!
 
 I guess that this is all for DOOM  packages for now, but I have to say
 that I really  appreciate *[[https://github.com/hlissner][@hlissner]]* work. These  packages already make
-Emacs look  outstanding.
+Emacs look outstanding.
 
 *** Treemacs
 To make Emacs look more like  a traditional modern text editor we need
@@ -857,7 +857,11 @@ window configurations. It works much like Vim tabs, or Tmux windows.
 
 *** Diff HL Mode
 This package  provides nice way  of diffing buffers. It  displays thin
-bar inside fringe marking unstaged changes.
+bar inside fringe marking unstaged changes. But I don't quite like how
+it looks.  So there's another  thing that  I borrowed from  DOOM Emacs
+configuration. This function sets  fringe diff highlighting bitmaps to
+get nice looking thin vertical bars which play nicely with DOOM Themes
+and DOOM Modeline.
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
@@ -867,24 +871,17 @@ bar inside fringe marking unstaged changes.
                  diff-hl-margin-mode)
       :hook ((diff-hl-mode . my/setup-fringe-bitmaps)
              (magit-post-refresh . diff-hl-magit-post-refresh))
-      :config (diff-hl-flydiff-mode t)
+      :config
+      (defun my/setup-fringe-bitmaps ()
+        "Set fringe bitmaps."
+        (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+        (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+        (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+        (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+        (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+        (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+      (diff-hl-flydiff-mode t)
       :init (global-diff-hl-mode 1)))
-#+END_SRC
-
-But I don't quite  like how it looks. So there's  another thing that I
-borrowed from DOOM Emacs configuration. This function sets fringe diff
-highlighting bitmaps to get nice looking thin vertical bars which play
-nicely with DOOM Themes and DOOM Modeline:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/setup-fringe-bitmaps ()
-    "Set fringe bitmaps."
-    (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
 #+END_SRC
 
 *** Minions
@@ -960,20 +957,20 @@ my Emacs configuration with it.
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure nil
+    :defines default-justification
     :hook ((org-mode . flyspell-mode)
            (org-mode . auto-fill-mode)
            (after-save . my/org-tangle-on-config-save)
-           (ofg-babel-after-execute-hook . my/org-update-inline-images))
+           (org-babel-after-execute . my/org-update-inline-images)
+           (org-mode . (lambda () (setq default-justification 'full))))
     :bind (:map org-mode-map
                 ([backtab] . nil)
                 ([S-iso-lefttab] . nil)
-                ([C-tab] . nil)
                 ([C-tab] . org-shifttab))
     :config
     (use-package ox-latex
       :ensure nil)
-    (setq default-justification 'full
-          org-startup-with-inline-images t
+    (setq org-startup-with-inline-images t
           org-startup-folded 'content
           org-hide-emphasis-markers t
           org-adapt-indentation nil
@@ -1041,48 +1038,37 @@ doesn't lag. I don't like that it changes width, so let's change it:
 
 *** Prog Mode
 This isn't really a configuration of  Prog Mode itself, but some hooks
-that change how programming related modes behave.
-
-Here, I want all programming modes to include line numbers by default:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-#+END_SRC
-
-One feature that I think  is really important, especially when working
-with lisp code, is ability to  see matching bracket when cursor stands
-near the other bracket. So I enable it for every programming language.
+that change how  programming related modes behave. One  feature that I
+think is really important, especially  when working with lisp code, is
+ability  to see  matching bracket  when cursor  stands near  the other
+bracket. So I enable it for every programming language.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'show-paren-mode)
+    (use-package prog-mode
+      :ensure nil
+      :hook ((prog-mode . show-paren-mode)
+             (prog-mode . electric-pair-mode)
+             (prog-mode . display-line-numbers-mode)))
 #+END_SRC
 
 *** CC Mode
-These settings are for editing C source files. First, to suppress byte
-compilation warning lets declare variables:
+These settings are for editing C source files.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar c-basic-offset)
-  (defvar c-default-style)
-#+END_SRC
-
-Now we can create a hook that will run for all C related modes:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (electric-pair-mode)
-              (setq c-basic-offset 4
-                    c-default-style "linux"
-                    indent-tabs-mode t
-                    tab-width 4)))
+  (use-package cc-mode
+    :ensure nil
+    :hook (c-mode-common . (lambda ()
+                             (electric-pair-mode)
+                             (setq c-basic-offset 4
+                                   c-default-style "linux"
+                                   indent-tabs-mode t
+                                   tab-width 4))))
 #+END_SRC
 
 *** Markdown Mode
 Sometimes I need to edit Markdown documents, so this package is handy.
 For markdown  mode I would like  to have automatic spell  checking and
 filling. Basically the same setup as for Org Mode.
-
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -1112,8 +1098,8 @@ settings for Rust mode.
 #+END_SRC
 
 This also means  that I could use something  to automatically complete
-Rust  language facilities.  Rust  ecosystem provides  two options  for
-that:  [[https://github.com/racer-rust/emacs-racer][Racer]], and  [[https://github.com/rust-lang/rls][RLS]].  I'm  planning to  use  Racer  when RLS  isn't
+Rust  language facilities.   Rust ecosystem  provides two  options for
+that:  [[https://github.com/racer-rust/emacs-racer][Racer]], and  [[https://github.com/rust-lang/rls][RLS]].   I'm planning  to use  Racer  when RLS  isn't
 possible to use, like in Org Mode.
 
 #+BEGIN_SRC emacs-lisp
@@ -1147,40 +1133,33 @@ comfortable user experience.
 
 *** Ansi Term
 I'm using  it more  and more,  so I've  decided that  I should  have a
-proper  shortcut  for it.  This  function  toggles bottom  split  with
-=ansi-term= inside it:
+proper shortcut  for it.  =my/ansi-term-toggle= function  toggles bottom
+split with =ansi-term= inside it.  /Ctrl+`/ seems great shortcut for this.
+Also, when I exit terminal, I'd like to kill its window automatically.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/ansi-term-toggle ()
-    "Toggle `ansi-term' window on and off with the same command."
-    (interactive)
-    (cond ((get-buffer-window "*ansi-term*")
-           (ignore-errors (delete-window
-                           (get-buffer-window "*ansi-term*"))))
-          (t (split-window-below)
-             (other-window 1)
-             (cond ((get-buffer "*ansi-term*")
-                    (switch-to-buffer "*ansi-term*"))
-                   (t (ansi-term "bash")
-                      (set-frame-font "Hack" t))))))
-#+END_SRC
-
-/Ctrl+`/ seems great shortcut for this.
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-`") 'my/ansi-term-toggle)
-#+END_SRC
-
-Also, when I exit terminal, I'd like to kill its window automatically:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/autokill-when-no-processes (&rest _)
-    "Kill buffer and its window when there's no processes left."
-    (when (null (get-buffer-process (current-buffer)))
-        (kill-buffer (current-buffer))
-        (delete-window)))
-
-  (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
+  (use-package term
+    :ensure nil
+    :bind ("C-`" . my/ansi-term-toggle)
+    :config
+    (defun my/ansi-term-toggle ()
+      "Toggle `ansi-term' window on and off with the same command."
+      (interactive)
+      (cond ((get-buffer-window "*ansi-term*")
+             (ignore-errors (delete-window
+                             (get-buffer-window "*ansi-term*"))))
+            (t (split-window-below)
+               (other-window 1)
+               (cond ((get-buffer "*ansi-term*")
+                      (switch-to-buffer "*ansi-term*"))
+                     (t (ansi-term "bash")
+                        (set-frame-font "Hack" t))))))
+    (defun my/autokill-when-no-processes (&rest _)
+      "Kill buffer and its window when there's no processes left."
+      (when (null (get-buffer-process (current-buffer)))
+          (kill-buffer (current-buffer))
+          (delete-window)))
+    (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes))
 #+END_SRC
 
 *** EditorConfig
@@ -1196,8 +1175,8 @@ configurations between projects and different editors.
 
 *** Flymake Mode
 This mode allows checking syntax in  the buffer.  I was using [[https://www.flycheck.org/en/latest/][Flycheck]]
-package  before,  but  I  don't   see  major  advantages  of  [[https://www.flycheck.org/en/latest/user/flycheck-versus-flymake.html#supported-languages][Flycheck
-supporting  50  languages  versus  4 in  Flymake]],  because  I'm  using
+package  before,  but  I  don't   see  major  advantages  of  Flycheck
+supporting 50  languages versus  4 in Flymake  [[https://www.flycheck.org/en/latest/user/flycheck-versus-flymake.html#supported-languages][(1)]], because  I'm using
 language server protocol that integrates with Flymake, so as long as I
 have  server for  a  language, I  have support  for  this language  in
 Flymake.
@@ -1254,9 +1233,6 @@ here, since it also provides completion for it.
 *** Parinfer
 Now that's a quality package. It makes writing LISP so easy, that I've
 never thought it could be.
-
-There's  a lot  of configuration  here, but  it was  taken as  is from
-Parinfer Mode repository.
 
 #+BEGIN_SRC emacs-lisp
   (use-package parinfer
@@ -1543,52 +1519,38 @@ root of current  project to run server in. Which  results in the roots
 of the  project is found not  exactly where the project  root actually
 is, e.g. when multiple projects are stored in single repository.
 
-*** =project.el=
+*** Project
 In  order to  migrate  the problem  with  [[Eglot]] I've  used  to have  a
 function wrapper over projectile, described in this [[https://github.com/joaotavora/eglot/issues/129#issuecomment-444130367][issue comment]]. But
 I do not want to use projectile for that, since Emacs already features
 =project.el= and Eglot uses it.  So first we need a list of project root
-markers, that will hold file names which we will look up recursively:
+markers,  that   will  hold   file  names  which   we  will   look  up
+recursively. we need  a function that will test  current directory for
+several conditions,  like does it have  any of project markers,  is it
+root directory, and  if everything fails, it will go  up one directory
+and repeat.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
-    "Files or directories that indicate the root of a project.")
-#+END_SRC
-
-Now we  need a function that  will test current directory  for several
-conditions,  like does  it have  any of  project markers,  is it  root
-directory, and  if everything fails, it  will go up one  directory and
-repeat:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/project-find-root (path)
-    "Tail-recursive search in PATH for root markers."
-    (let* ((this-dir (file-name-as-directory (file-truename path)))
-           (parent-dir (expand-file-name (concat this-dir "../")))
-           (system-root-dir (expand-file-name "/")))
-      (cond
-       ((my/project-root-p this-dir) (cons 'transient this-dir))
-       ((equal system-root-dir this-dir) nil)
-       (t (my/project-find-root parent-dir)))))
-#+END_SRC
-
-This  is helper  function that  checks  if current  path contains  any
-marker from the list:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/project-root-p (path)
-    "Check if current PATH has any of project root markers."
-    (let ((results (mapcar (lambda (marker)
-                             (file-exists-p (concat path marker)))
-                           project-root-markers)))
-      (eval `(or ,@ results))))
-#+END_SRC
-
-Now  we  can   add  =my/project-find-root=  function  to   the  list  of
-=project-find-functions= that project.el uses:
-
-#+BEGIN_SRC emacs-lisp
-  (with-eval-after-load 'project
+  (use-package project
+    :ensure nil
+    :config
+    (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
+      "Files or directories that indicate the root of a project.")
+    (defun my/project-find-root (path)
+      "Tail-recursive search in PATH for root markers."
+      (let* ((this-dir (file-name-as-directory (file-truename path)))
+             (parent-dir (expand-file-name (concat this-dir "../")))
+             (system-root-dir (expand-file-name "/")))
+        (cond
+         ((my/project-root-p this-dir) (cons 'transient this-dir))
+         ((equal system-root-dir this-dir) nil)
+         (t (my/project-find-root parent-dir)))))
+    (defun my/project-root-p (path)
+      "Check if current PATH has any of project root markers."
+      (let ((results (mapcar (lambda (marker)
+                               (file-exists-p (concat path marker)))
+                             project-root-markers)))
+        (eval `(or ,@ results))))
     (add-to-list 'project-find-functions #'my/project-find-root))
 #+END_SRC
 

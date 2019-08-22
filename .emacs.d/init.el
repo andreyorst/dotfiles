@@ -483,17 +483,17 @@ are defining or executing a macro."
                diff-hl-margin-mode)
     :hook ((diff-hl-mode . my/setup-fringe-bitmaps)
            (magit-post-refresh . diff-hl-magit-post-refresh))
-    :config (diff-hl-flydiff-mode t)
+    :config
+    (defun my/setup-fringe-bitmaps ()
+      "Set fringe bitmaps."
+      (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
+      (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+      (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
+      (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
+      (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
+      (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+    (diff-hl-flydiff-mode t)
     :init (global-diff-hl-mode 1)))
-
-(defun my/setup-fringe-bitmaps ()
-  "Set fringe bitmaps."
-  (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
 
 (use-package minions
   :commands minions-mode
@@ -536,20 +536,20 @@ are defining or executing a macro."
 
 (use-package org
   :ensure nil
+  :defines default-justification
   :hook ((org-mode . flyspell-mode)
          (org-mode . auto-fill-mode)
          (after-save . my/org-tangle-on-config-save)
-         (ofg-babel-after-execute-hook . my/org-update-inline-images))
+         (org-babel-after-execute . my/org-update-inline-images)
+         (org-mode . (lambda () (setq default-justification 'full))))
   :bind (:map org-mode-map
               ([backtab] . nil)
               ([S-iso-lefttab] . nil)
-              ([C-tab] . nil)
               ([C-tab] . org-shifttab))
   :config
   (use-package ox-latex
     :ensure nil)
-  (setq default-justification 'full
-        org-startup-with-inline-images t
+  (setq org-startup-with-inline-images t
         org-startup-folded 'content
         org-hide-emphasis-markers t
         org-adapt-indentation nil
@@ -603,20 +603,20 @@ are defining or executing a macro."
 (setq-default display-line-numbers-grow-only t
               display-line-numbers-width-start t)
 
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(use-package prog-mode
+  :ensure nil
+  :hook ((prog-mode . show-paren-mode)
+         (prog-mode . electric-pair-mode)
+         (prog-mode . display-line-numbers-mode)))
 
-(add-hook 'prog-mode-hook 'show-paren-mode)
-
-(defvar c-basic-offset)
-(defvar c-default-style)
-
-(add-hook 'c-mode-common-hook
-          (lambda ()
-            (electric-pair-mode)
-            (setq c-basic-offset 4
-                  c-default-style "linux"
-                  indent-tabs-mode t
-                  tab-width 4)))
+(use-package cc-mode
+  :ensure nil
+  :hook (c-mode-common . (lambda ()
+                           (electric-pair-mode)
+                           (setq c-basic-offset 4
+                                 c-default-style "linux"
+                                 indent-tabs-mode t
+                                 tab-width 4))))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
@@ -648,28 +648,28 @@ are defining or executing a macro."
 
 (use-package toml-mode)
 
-(defun my/ansi-term-toggle ()
-  "Toggle `ansi-term' window on and off with the same command."
-  (interactive)
-  (cond ((get-buffer-window "*ansi-term*")
-         (ignore-errors (delete-window
-                         (get-buffer-window "*ansi-term*"))))
-        (t (split-window-below)
-           (other-window 1)
-           (cond ((get-buffer "*ansi-term*")
-                  (switch-to-buffer "*ansi-term*"))
-                 (t (ansi-term "bash")
-                    (set-frame-font "Hack" t))))))
-
-(global-set-key (kbd "C-`") 'my/ansi-term-toggle)
-
-(defun my/autokill-when-no-processes (&rest _)
-  "Kill buffer and its window when there's no processes left."
-  (when (null (get-buffer-process (current-buffer)))
-      (kill-buffer (current-buffer))
-      (delete-window)))
-
-(advice-add 'term-handle-exit :after 'my/autokill-when-no-processes)
+(use-package term
+  :ensure nil
+  :bind ("C-`" . my/ansi-term-toggle)
+  :config
+  (defun my/ansi-term-toggle ()
+    "Toggle `ansi-term' window on and off with the same command."
+    (interactive)
+    (cond ((get-buffer-window "*ansi-term*")
+           (ignore-errors (delete-window
+                           (get-buffer-window "*ansi-term*"))))
+          (t (split-window-below)
+             (other-window 1)
+             (cond ((get-buffer "*ansi-term*")
+                    (switch-to-buffer "*ansi-term*"))
+                   (t (ansi-term "bash")
+                      (set-frame-font "Hack" t))))))
+  (defun my/autokill-when-no-processes (&rest _)
+    "Kill buffer and its window when there's no processes left."
+    (when (null (get-buffer-process (current-buffer)))
+        (kill-buffer (current-buffer))
+        (delete-window)))
+  (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes))
 
 (use-package editorconfig
   :commands editorconfig-mode
@@ -902,27 +902,26 @@ _-_: reduce region _)_: around pairs
            (c++-mode . eglot-ensure)
            (rust-mode . eglot-ensure))))
 
-(defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
-  "Files or directories that indicate the root of a project.")
-
-(defun my/project-find-root (path)
-  "Tail-recursive search in PATH for root markers."
-  (let* ((this-dir (file-name-as-directory (file-truename path)))
-         (parent-dir (expand-file-name (concat this-dir "../")))
-         (system-root-dir (expand-file-name "/")))
-    (cond
-     ((my/project-root-p this-dir) (cons 'transient this-dir))
-     ((equal system-root-dir this-dir) nil)
-     (t (my/project-find-root parent-dir)))))
-
-(defun my/project-root-p (path)
-  "Check if current PATH has any of project root markers."
-  (let ((results (mapcar (lambda (marker)
-                           (file-exists-p (concat path marker)))
-                         project-root-markers)))
-    (eval `(or ,@ results))))
-
-(with-eval-after-load 'project
+(use-package project
+  :ensure nil
+  :config
+  (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
+    "Files or directories that indicate the root of a project.")
+  (defun my/project-find-root (path)
+    "Tail-recursive search in PATH for root markers."
+    (let* ((this-dir (file-name-as-directory (file-truename path)))
+           (parent-dir (expand-file-name (concat this-dir "../")))
+           (system-root-dir (expand-file-name "/")))
+      (cond
+       ((my/project-root-p this-dir) (cons 'transient this-dir))
+       ((equal system-root-dir this-dir) nil)
+       (t (my/project-find-root parent-dir)))))
+  (defun my/project-root-p (path)
+    "Check if current PATH has any of project root markers."
+    (let ((results (mapcar (lambda (marker)
+                             (file-exists-p (concat path marker)))
+                           project-root-markers)))
+      (eval `(or ,@ results))))
   (add-to-list 'project-find-functions #'my/project-find-root))
 
 (with-eval-after-load 'cc-mode
