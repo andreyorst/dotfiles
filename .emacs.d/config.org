@@ -1342,6 +1342,28 @@ configure project.
   (use-package toml-mode)
 #+END_SRC
 
+*** God Mode
+If God himself uses Emacs, I as a mere mortal want to be God too. This
+mode  makes Emacs  assume that  every key  is pressed  with a  Control
+modifier, thus transforming =C-a C-SPC C-e M-w= into =a SPC e g w=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package god-mode
+    :commands (god-local-mode
+               god-mode-all)
+    :config
+    (global-set-key (kbd "<escape>") 'god-local-mode)
+    :init
+    (god-mode-all))
+#+END_SRC
+
+*** Racket Mode
+Racket is a nice Lisp dialect. I think I'm going to use it.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racket-mode)
+#+END_SRC
+
 ** Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
