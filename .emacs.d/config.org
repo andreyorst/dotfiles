@@ -1560,11 +1560,11 @@ and repeat.
 A package to format C code with Clang Format.
 
 #+BEGIN_SRC emacs-lisp
-  (with-eval-after-load 'cc-mode
-    (use-package clang-format
-      :bind (:map c-mode-base-map
-                  ("C-c C-f" . clang-format-buffer)
-                  ("C-c C-S-f" . clang-format-region))))
+  (use-package clang-format
+    :after cc-mode
+    :bind (:map c-mode-base-map
+                ("C-c C-f" . clang-format-buffer)
+                ("C-c C-S-f" . clang-format-region)))
 #+END_SRC
 
 *** GCMH

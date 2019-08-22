@@ -926,11 +926,11 @@ _-_: reduce region _)_: around pairs
       (eval `(or ,@ results))))
   (add-to-list 'project-find-functions #'my/project-find-root))
 
-(with-eval-after-load 'cc-mode
-  (use-package clang-format
-    :bind (:map c-mode-base-map
-                ("C-c C-f" . clang-format-buffer)
-                ("C-c C-S-f" . clang-format-region))))
+(use-package clang-format
+  :after cc-mode
+  :bind (:map c-mode-base-map
+              ("C-c C-f" . clang-format-buffer)
+              ("C-c C-S-f" . clang-format-region)))
 
 (use-package gcmh
   :commands gcmh-mode
