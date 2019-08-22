@@ -14,8 +14,6 @@
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6
       message-log-max 16384
-      auto-window-vscroll nil
-      package-enable-at-startup nil
       file-name-handler-alist nil)
 
 (add-hook 'after-init-hook
@@ -33,9 +31,7 @@
 
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
-(package-initialize)
-(when (not package-archive-contents)
-  (package-refresh-contents))
+(package-initialize 'noactive)
 
 (setq ring-bell-function 'ignore)
 
@@ -107,12 +103,12 @@ are defining or executing a macro."
 
 (setq command-error-function #'my/command-error-function)
 
-(defun my/ensure-installed (package)
-  "Ensure that PACKAGE is installed."
-  (when (not (package-installed-p package))
-    (package-install package)))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-(my/ensure-installed 'use-package)
+(package-initialize)
+
 (eval-when-compile
   (require 'use-package)
   (setq use-package-always-ensure t))
@@ -156,11 +152,12 @@ are defining or executing a macro."
 
 (use-package doom-themes
   :commands (doom-themes-org-config)
-  :init
-  (load-theme 'doom-one t)
+  :config
   (doom-themes-org-config)
   (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t))
+        doom-themes-enable-italic t)
+  :init
+  (load-theme 'doom-one t))
 
 (defun my/set-frame-dark (&optional frame)
   "Set FRAME titlebar colorscheme to dark variant."
@@ -186,6 +183,8 @@ are defining or executing a macro."
              solaire-mode-in-minibuffer
              solaire-mode-reset)
   :config
+  (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
+  (solaire-mode-swap-bg)
   (cond ((not (boundp 'after-focus-change-function))
          (add-hook 'focus-in-hook  #'solaire-mode-reset))
         (t
@@ -195,9 +194,7 @@ are defining or executing a macro."
   (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
   (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init
-  (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
-  (solaire-global-mode +1)
-  (solaire-mode-swap-bg))
+  (solaire-global-mode +1))
 
 (defun my/real-buffer-setup (&rest _)
   "Wrapper around `set-window-fringes' function."
@@ -214,50 +211,40 @@ are defining or executing a macro."
 (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
 (add-hook 'org-src-mode-hook 'my/real-buffer-setup)
 
-;; (defvar org-format-latex-options)
-;; (defun my/update-org-latex-preview-bg (&rest _)
-;;   "Update background color for LaTeX images."
-;;   (setq-default
-;;    org-format-latex-options
-;;    (plist-put org-format-latex-options
-;;               :background
-;;               (face-attribute
-;;                (or
-;;                 (cadr (assq 'default face-remapping-alist))
-;;                 'default)
-;;                :background nil t))))
-
-;; (add-hook 'solaire-mode-hook 'my/update-org-latex-preview-bg)
-
 (use-package doom-modeline
   :commands (doom-modeline-mode
              doom-modeline-set-selected-window)
   :functions (doom-color)
-  :init (doom-modeline-mode 1)
-  (set-face-attribute 'doom-modeline-buffer-path nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-buffer-file nil :foreground (doom-color 'fg) :weight 'semi-bold)
-  (set-face-attribute 'doom-modeline-buffer-modified nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-buffer-major-mode nil :foreground (doom-color 'fg) :weight 'semi-bold)
-  (set-face-attribute 'doom-modeline-buffer-minor-mode nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-project-parent-dir nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-project-dir nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-project-root-dir nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-highlight nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-panel nil :foreground (doom-color 'fg) :background (doom-color 'bg-alt))
-  (set-face-attribute 'doom-modeline-debug nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-info nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-warning nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-urgent nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-unread-number nil :foreground (doom-color 'fg) :weight 'normal)
-  (set-face-attribute 'doom-modeline-bar nil :foreground (doom-color 'fg) :background (doom-color 'bg-alt) :weight 'normal)
   :config
+  (dolist (face '(doom-modeline-buffer-modified
+                  doom-modeline-buffer-minor-mode
+                  doom-modeline-project-parent-dir
+                  doom-modeline-project-dir
+                  doom-modeline-project-root-dir
+                  doom-modeline-highlight
+                  doom-modeline-debug
+                  doom-modeline-info
+                  doom-modeline-warning
+                  doom-modeline-urgent
+                  doom-modeline-unread-number
+                  doom-modeline-buffer-path
+                  doom-modeline-bar
+                  doom-modeline-panel
+                  doom-modeline-buffer-major-mode
+                  doom-modeline-buffer-file))
+    (set-face-attribute face nil :foreground (doom-color 'fg) :weight 'normal))
+  (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
+  (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
+  (set-face-attribute 'doom-modeline-panel nil :background (doom-color 'bg-alt))
+  (set-face-attribute 'doom-modeline-bar nil :background (doom-color 'bg-alt))
   (advice-add #'select-window :after #'doom-modeline-set-selected-window)
   (setq doom-modeline-bar-width 3
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
         doom-modeline-lsp nil
-        find-file-visit-truename t))
+        find-file-visit-truename t)
+  :init (doom-modeline-mode 1))
 
 (when window-system
   (use-package treemacs
@@ -509,11 +496,10 @@ are defining or executing a macro."
     :commands (global-diff-hl-mode
                diff-hl-flydiff-mode
                diff-hl-margin-mode)
-    :init
-    (add-hook 'diff-hl-mode-hook #'my/setup-fringe-bitmaps)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (global-diff-hl-mode 1)
-    (diff-hl-flydiff-mode t)))
+    :hook ((diff-hl-mode . my/setup-fringe-bitmaps)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
+    :config (diff-hl-flydiff-mode t)
+    :init (global-diff-hl-mode 1)))
 
 (defun my/setup-fringe-bitmaps ()
   "Set fringe bitmaps."
@@ -555,14 +541,12 @@ are defining or executing a macro."
     (defun centaur-tabs-buffer-groups ()
       "Use as few groups as possible."
       (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                   (cond ((ignore-errors (string-equal "eglot" (downcase (substring (buffer-name) 1 6))))
-                          "Eglot")
-                         (t
-                          "Tools")))
-                  ((ignore-errors (string-equal "magit" (downcase (substring (buffer-name) 0 5))))
-                   "Magit")
-                  (t
-                   "Default"))))
+                   (cond ((string-match-p (regexp-quote "eglot") (buffer-name)) "Eglot")
+                         ((or (string-match-p (regexp-quote "repl") (buffer-name))
+                              (string-match-p (regexp-quote "geiser") (buffer-name))) "Geiser")
+                         (t "Tools")))
+                  ((string-match-p (regexp-quote "magit") (buffer-name)) "Magit")
+                  (t "Default"))))
     (centaur-tabs-mode)))
 
 (require 'org)
@@ -666,62 +650,33 @@ are defining or executing a macro."
                   indent-tabs-mode t
                   tab-width 4)))
 
-(with-eval-after-load 'cc-mode
-  (mapc (lambda (mode)
-          (progn
-            (modify-syntax-entry ?_ "w" (symbol-value (intern (format "%s-syntax-table" mode))))
-            (font-lock-add-keywords
-             mode
-             '(("\\<\\(\\sw+\\) *(" 1 'font-lock-function-name-face)
-               ("\\(->\\|\\.\\) *\\<\\([_a-zA-Z]\\w+\\)" 2 'error)
-               ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'org-footnote)
-               ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]" 0 'font-lock-constant-face))
-             t)))
-        '(c-mode c++-mode)))
-
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init (defvar markdown-command "multimarkdown"))
-
-(add-hook 'markdown-mode-hook
-          '(lambda()
-             (flyspell-mode)
-             (setq fill-column 80
-                   default-justification 'left)
-             (auto-fill-mode)))
+  :config (defvar markdown-command "multimarkdown")
+  :hook (markdown-mode . (lambda()
+                           (flyspell-mode)
+                           (setq fill-column 80
+                                 default-justification 'left)
+                           (auto-fill-mode))))
 
 (use-package rust-mode
   :commands (rust-format-buffer)
-  :init (add-hook 'rust-mode-hook
-                    '(lambda()
-                       (electric-pair-mode)
-                       (setq company-tooltip-align-annotations t)))
+  :hook (rust-mode . electric-pair-mode)
   :bind (:map rust-mode-map
               ("C-c C-f" . rust-format-buffer)))
 
 (when (executable-find "racer")
   (use-package racer
-    :config (add-hook 'racer-mode-hook #'eldoc-mode)
-    :init
-    (defun org-babel-edit-prep:rust (&optional _babel-info)
-      "Run racer mode for Org Babel."
-      (racer-mode 1))))
+    :hook (racer-mode . eldoc-mode)
+    :config (defun org-babel-edit-prep:rust (&optional _babel-info)
+              "Run racer mode for Org Babel."
+              (racer-mode 1))))
 
 (when (executable-find "cargo")
   (use-package cargo
-    :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode)))
-
-(modify-syntax-entry ?_ "w" rust-mode-syntax-table)
-(font-lock-add-keywords
- 'rust-mode
- '(("\\<\\(\\sw+\\) *(" 1 'font-lock-function-name-face)
-   ("\\. *\\<\\([_a-zA-Z]\\w+\\)" 1 'error)
-   ("\\<-?\\(0x[0-9a-fA-F]+\\|[0-9]+\\(\\.[0-9]+\\)?\\)\\([uU][lL]\\{0,2\\}\\|[lL]\\{1,2\\}[uU]?\\|[fFdDiI]\\|\\([eE][-+]?\\d+\\)\\)?\\|'\\(\\.?\\|[^'\\]\\)'" 0 'org-footnote)
-   ("->\\|\\.\\|*\\|+\\|/\\|-\\|<\\|>\\|&\\||\\|=\\|\\[\\|\\]\\|\\^" 0 'font-lock-constant-face))
- t)
+    :hook (rust-mode . cargo-minor-mode)))
 
 (use-package toml-mode)
 
@@ -757,8 +712,7 @@ are defining or executing a macro."
 
 (use-package flymake
   :ensure nil
-  :init
-  (setq flymake-fringe-indicator-position 'right-fringe))
+  :config (setq flymake-fringe-indicator-position 'right-fringe))
 
 (use-package hydra
   :commands (hydra-default-pre
@@ -775,29 +729,27 @@ are defining or executing a macro."
     ("0" (text-scale-set 0) "reset")))
 
 (use-package geiser
+  :hook (scheme-mode . geiser-mode)
   :config
-  (add-hook 'scheme-mode-hook 'geiser-mode)
-  :init
-  (setq-default geiser-active-implementations '(guile)
-                geiser-default-implementation 'guile))
+  (setq geiser-active-implementations '(guile racket)
+        geiser-default-implementation 'guile))
 
 (use-package parinfer
-  :commands parinfer-mode
-  :bind
-  (:map parinfer-mode-map
-        ("C-," . parinfer-toggle-mode))
-  :init
-  (progn
-    (setq parinfer-extensions
-          '(defaults
-             pretty-parens
-             smart-tab
-             smart-yank))
-    (add-hook 'clojure-mode-hook #'parinfer-mode)
-    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'common-lisp-mode-hook #'parinfer-mode)
-    (add-hook 'scheme-mode-hook #'parinfer-mode)
-    (add-hook 'lisp-mode-hook #'parinfer-mode)))
+  :commands (parinfer-mode
+             parinfer-toggle-mode)
+  :hook ((clojure-mode . parinfer-mode)
+         (emacs-lisp-mode . parinfer-mode)
+         (common-lisp-mode . parinfer-mode)
+         (scheme-mode . parinfer-mode)
+         (lisp-mode . parinfer-mode)
+         (racket-mode . parinfer-mode))
+  :bind (:map parinfer-mode-map
+              ("C-," . parinfer-toggle-mode))
+  :config (setq parinfer-extensions
+                '(defaults
+                   pretty-parens
+                   smart-tab
+                   smart-yank)))
 
 (use-package flx)
 
@@ -805,7 +757,7 @@ are defining or executing a macro."
   :commands ivy-mode
   :bind (("C-x C-b" . ivy-switch-buffer)
          ("C-x b" . ivy-switch-buffer))
-  :init
+  :config
   (use-package counsel
     :commands (counsel-M-x
                counsel-find-file
@@ -817,7 +769,7 @@ are defining or executing a macro."
                counsel-describe-function
                counsel-describe-variable
                counsel-find-library)
-    :init
+    :config
     (when (executable-find "fd")
       (setq find-program "fd"
             counsel-file-jump-args (split-string "-L --type f --hidden")))
@@ -842,6 +794,7 @@ are defining or executing a macro."
         ivy-minibuffer-faces nil
         ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
+  :init
   (ivy-mode 1))
 
 (use-package company
@@ -851,11 +804,11 @@ are defining or executing a macro."
               ("<tab>" . company-complete-common-or-cycle)
               ("<S-Tab>" . company-select-previous)
               ("<backtab>" . company-select-previous))
-  :init
-    (use-package company-flx)
+  :hook (after-init . global-company-mode)
+  :config
+  (use-package company-flx
     :commands company-flx-mode
-    :init (with-eval-after-load 'company
-            (company-flx-mode +1))
+    :init (company-flx-mode +1))
   (setq company-require-match 'never
         company-minimum-prefix-length 3
         company-tooltip-align-annotations t
@@ -863,8 +816,6 @@ are defining or executing a macro."
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-frontend
           company-echo-metadata-frontend))
-  :config
-  (add-hook 'after-init-hook 'global-company-mode)
   (setq company-backends (remove 'company-clang company-backends)
         company-backends (remove 'company-xcode company-backends)
         company-backends (remove 'company-cmake company-backends)
@@ -887,32 +838,31 @@ are defining or executing a macro."
 (use-package magit)
 
 (use-package vdiff
-  :init (setq vdiff-lock-scrolling t
-              vdiff-diff-algorithm 'diff
-              vdiff-disable-folding nil
-              vdiff-min-fold-size 4
-              vdiff-subtraction-style 'full
-              vdiff-subtraction-fill-char ?\ )
   :config
+  (use-package vdiff-magit
+    :commands (vdiff-magit-dwim vdiff-magit)
+    :functions (transient-suffix-put)
+    :bind (:map magit-mode-map
+                ("e" . 'vdiff-magit-dwim)
+                ("E" . 'vdiff-magit))
+    :config
+    (setq vdiff-magit-stage-is-2way t)
+    (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
+    (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
+    (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
+    (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
+    (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
+  (setq vdiff-lock-scrolling t
+        vdiff-diff-algorithm 'diff
+        vdiff-disable-folding nil
+        vdiff-min-fold-size 4
+        vdiff-subtraction-style 'full
+        vdiff-subtraction-fill-char ?\ )
   (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
   (set-face-attribute 'vdiff-subtraction-face nil :background "#4F343A" :foreground "#F36868")
   (set-face-attribute 'vdiff-addition-face nil :background "#3E493D" :foreground "#98BE65")
   (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7")
   (add-hook 'vdiff-mode-hook #'outline-show-all))
-
-(use-package vdiff-magit
-  :commands (vdiff-magit-dwim vdiff-magit)
-  :functions (transient-suffix-put)
-  :bind (:map magit-mode-map
-              ("e" . 'vdiff-magit-dwim)
-              ("E" . 'vdiff-magit))
-  :init
-  (setq vdiff-magit-stage-is-2way t)
-  (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
-  (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
-  (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
-  (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
-  (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
 
 (use-package multiple-cursors
   :commands (mc/cycle-backward
@@ -920,10 +870,10 @@ are defining or executing a macro."
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydra-mc/body)
          ("C-d" . mc/mark-next-like-this-word))
-  :init
+  :config
   (use-package mc-extras)
-  (defhydra hydra-mc (:hiint nil :color pink)
-            "
+  (defhydra hydra-mc (:hint nil :color pink)
+    "
 ^Select^                ^Discard^                    ^Move^
 ^──────^────────────────^───────^────────────────────^────^────────────
 _M-s_: split lines      _M-SPC_: discard current     _&_: align
@@ -931,18 +881,18 @@ _s_:   select regexp    _b_:     discard blank lines _(_: cycle backward
 _n_:   select next      _d_:     remove duplicated   _)_: cycle forward
 _p_:   select previous  _q_:     exit                ^ ^
 _C_:   select next line"
-            ("M-s" mc/edit-ends-of-lines)
-            ("s" mc/mark-all-in-region-regexp)
-            ("n" mc/mark-next-like-this-word)
-            ("p" mc/mark-previous-like-this-word)
-            ("&" mc/vertical-align-with-space)
-            ("(" mc/cycle-backward)
-            (")" mc/cycle-forward)
-            ("M-SPC" mc/remove-current-cursor)
-            ("b" mc/remove-cursors-on-blank-lines)
-            ("d" mc/remove-duplicated-cursors)
-            ("C" mc/mark-next-lines)
-            ("q" mc/remove-duplicated-cursors :exit t)))
+    ("M-s" mc/edit-ends-of-lines)
+    ("s" mc/mark-all-in-region-regexp)
+    ("n" mc/mark-next-like-this-word)
+    ("p" mc/mark-previous-like-this-word)
+    ("&" mc/vertical-align-with-space)
+    ("(" mc/cycle-backward)
+    (")" mc/cycle-forward)
+    ("M-SPC" mc/remove-current-cursor)
+    ("b" mc/remove-cursors-on-blank-lines)
+    ("d" mc/remove-duplicated-cursors)
+    ("C" mc/mark-next-lines)
+    ("q" mc/remove-duplicated-cursors :exit t)))
 
 (use-package expand-region
   :commands (er/expand-region
@@ -985,10 +935,9 @@ _-_: reduce region _)_: around pairs
     :config
     (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-    :init
-    (add-hook 'c-mode-hook 'eglot-ensure)
-    (add-hook 'c++-mode-hook 'eglot-ensure)
-    (add-hook 'rust-mode-hook 'eglot-ensure)))
+    :hook ((c-mode . eglot-ensure)
+           (c++-mode . eglot-ensure)
+           (rust-mode . eglot-ensure))))
 
 (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
   "Files or directories that indicate the root of a project.")
@@ -1014,11 +963,14 @@ _-_: reduce region _)_: around pairs
   (add-to-list 'project-find-functions #'my/project-find-root))
 
 (use-package clang-format
-  :init
-  (defvar c-mode-base-map)
-  (with-eval-after-load 'cc-mode
-    (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
-    (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
+  :bind (:map c-mode-base-map
+              ("C-c C-f" . clang-format-buffer)
+              ("C-c C-S-f" . clang-format-region)))
+  ;; :init
+  ;; (defvar c-mode-base-map)
+  ;; (with-eval-after-load 'cc-mode
+  ;;   (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-buffer)
+  ;;   (define-key c-mode-base-map (kbd "C-c C-S-f") 'clang-format-region)))
 
 (use-package gcmh
   :commands gcmh-mode
