@@ -1071,12 +1071,14 @@ These settings are for editing C source files.
 #+BEGIN_SRC emacs-lisp
   (use-package cc-mode
     :ensure nil
-    :hook (c-mode-common . (lambda ()
-                             (electric-pair-mode)
-                             (setq c-basic-offset 4
-                                   c-default-style "linux"
-                                   indent-tabs-mode t
-                                   tab-width 4))))
+    :config
+    (defun my/cc-mode-setup ()
+      (setq c-basic-offset 4
+            c-default-style "linux"
+            indent-tabs-mode t
+            tab-width 4))
+    :hook (c-mode-common . my/cc-mode-setup))
+
 #+END_SRC
 
 *** Markdown Mode

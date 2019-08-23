@@ -623,12 +623,13 @@ are defining or executing a macro."
 
 (use-package cc-mode
   :ensure nil
-  :hook (c-mode-common . (lambda ()
-                           (electric-pair-mode)
-                           (setq c-basic-offset 4
-                                 c-default-style "linux"
-                                 indent-tabs-mode t
-                                 tab-width 4))))
+  :config
+  (defun my/cc-mode-setup ()
+    (setq c-basic-offset 4
+          c-default-style "linux"
+          indent-tabs-mode t
+          tab-width 4))
+  :hook (c-mode-common . my/cc-mode-setup))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
