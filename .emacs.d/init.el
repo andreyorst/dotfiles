@@ -245,11 +245,6 @@ are defining or executing a macro."
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
         find-file-visit-truename t)
-  (defun doom-modeline-lsp-icon (text face)
-    "Display LSP icon (or TEXT in terminal) with FACE."
-    (if doom-modeline-icon
-        (all-the-icons-faicon "cogs" :height 1.0 :face face :v-adjust -0.0575)
-      (propertize text 'face face)))
   :init (doom-modeline-mode 1))
 
 (when window-system
