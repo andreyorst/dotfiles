@@ -1147,6 +1147,14 @@ configure project.
   (use-package toml-mode)
 #+END_SRC
 
+*** COMMENT Racket Mode
+Racket is nice LISP/Scheme language that I might to get into.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racket-mode
+    :mode ("\\.rkt\\'" . racket-mode))
+#+END_SRC
+
 ** Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
