@@ -149,8 +149,6 @@ are defining or executing a macro."
   (setq use-package-always-ensure t))
 
 (use-package all-the-icons)
-  ;:config (unless (member "all-the-icons" (font-family-list))
-  ;          (all-the-icons-install-fonts t))
 
 (use-package doom-themes
   :commands (doom-themes-org-config)

@@ -428,8 +428,6 @@ don't forget to use =M-x all-the-icons-install-fonts RET= after install.
 
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons)
-    ;:config (unless (member "all-the-icons" (font-family-list))
-    ;          (all-the-icons-install-fonts t))
 #+END_SRC
 
 I don't use  this package directly yet, but some  other packages, like
