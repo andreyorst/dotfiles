@@ -260,14 +260,14 @@ are defining or executing a macro."
                treemacs-toggle-fixed-width)
     :functions (my/treemacs-expand-all-projects
                 my/treemacs-variable-pitch-labels
+                my/tremacs-init-setup
+                my/treemacs-setup
+                my/treemacs-setup-fringes
                 doom-color
                 all-the-icons-octicon)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window))
-    :hook (after-init . (lambda ()
-                          (treemacs-load-theme "Atom")
-                          (treemacs)
-                          (my/treemacs-expand-all-projects)))
+    :hook (after-init . my/treemacs-init-setup)
     :config
     (use-package treemacs-magit)
     (set-face-attribute 'treemacs-root-face nil
@@ -430,19 +430,9 @@ are defining or executing a macro."
                                  :v-adjust 0
                                  :face '(:inherit font-lock-doc-face :slant normal)))
          :extensions (fallback))))
+    (add-hook 'treemacs-mode-hook #'my/treemacs-setup)
+    (advice-add #'treemacs-select-window :after #'my/treemacs-setup-fringes)
 
-    (add-hook 'treemacs-mode-hook
-              (lambda()
-                (setq tab-width 1
-                      mode-line-format nil
-                      line-spacing 5)
-                (set-window-fringes nil 0 0 nil)
-                (my/treemacs-variable-pitch-labels)))
-
-    (advice-add #'treemacs-select-window :after
-                (lambda()
-                  (set-window-fringes nil 0 0 nil)
-                  (my/treemacs-variable-pitch-labels)))
     (defun my/treemacs-expand-all-projects (&optional _)
       "Expand all projects."
       (save-excursion
@@ -470,6 +460,22 @@ are defining or executing a macro."
           (set-face-attribute
            face nil :inherit
            `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
+    (defun my/treemacs-init-setup ()
+      "Set treemacs theme, open treemacs, and expand all projects."
+      (treemacs-load-theme "Atom")
+      (treemacs)
+      (my/treemacs-expand-all-projects))
+    (defun my/treemacs-setup ()
+      "Set treemacs buffer common settings."
+      (setq tab-width 1
+            mode-line-format nil
+            line-spacing 5)
+      (set-window-fringes nil 0 0 nil)
+      (my/treemacs-variable-pitch-labels))
+    (defun my/treemacs-setup-fringes ()
+      "Set treemacs buffer fringes."
+      (set-window-fringes nil 0 0 nil)
+      (my/treemacs-variable-pitch-labels))
     (setq treemacs-width 27
           treemacs-is-never-other-window t
           treemacs-space-between-root-nodes nil)
@@ -546,7 +552,7 @@ are defining or executing a macro."
          (org-mode . auto-fill-mode)
          (after-save . my/org-tangle-on-config-save)
          (org-babel-after-execute . my/org-update-inline-images)
-         (org-mode . (lambda () (setq default-justification 'full))))
+         (org-mode . my/org-init-setup))
   :bind (:map org-mode-map
               ([backtab] . nil)
               ([S-iso-lefttab] . nil)
@@ -577,6 +583,9 @@ are defining or executing a macro."
     "Update inline images in Org-mode."
     (when org-inline-image-overlays
       (org-redisplay-inline-images)))
+  (defun my/org-init-setup ()
+    "Set buffer local values."
+    (setq default-justification 'full))
   (defvar minted-cache-dir
     (file-name-as-directory
      (expand-file-name ".minted/\\jombname"
@@ -629,11 +638,13 @@ are defining or executing a macro."
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :config (defvar markdown-command "multimarkdown")
-  :hook (markdown-mode . (lambda()
-                           (flyspell-mode)
-                           (setq fill-column 80
-                                 default-justification 'left)
-                           (auto-fill-mode))))
+  (defun my/markdown-setup ()
+    "Set buffer local variables."
+    (setq fill-column 80
+          default-justification 'left))
+  :hook ((markdown-mode . flyspell-mode)
+         (markdown-mode . auto-fill-mode)
+         (markdown-mode . my/markdown-setup)))
 
 (use-package rust-mode
   :commands (rust-format-buffer)
@@ -949,10 +960,11 @@ _-_: reduce region _)_: around pairs
   :bind (("<f9>" . imenu-list-smart-toggle)
          ("<f10>". imenu-list-show))
   :config
-  (advice-add 'imenu-list-smart-toggle :after-while
-              (lambda()
-                (setq window-size-fixed 'width
-                      mode-line-format nil)))
+  (defun my/imenu-list-setup ()
+    "Setings for imenu-list"
+    (setq window-size-fixed 'width
+          mode-line-format nil))
+  (advice-add 'imenu-list-smart-toggle :after-while #'my/imenu-list-setup)
   (setq imenu-list-idle-update-delay-time 0.1
         imenu-list-size 27
         imenu-list-focus-after-activation t))
