@@ -239,7 +239,6 @@ are defining or executing a macro."
   (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
   (set-face-attribute 'doom-modeline-panel nil :background (doom-color 'bg-alt))
   (set-face-attribute 'doom-modeline-bar nil :background (doom-color 'bg-alt))
-  (advice-add #'select-window :after #'doom-modeline-set-selected-window)
   (setq doom-modeline-bar-width 3
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-file-name-style 'file-name
