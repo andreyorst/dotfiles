@@ -1145,7 +1145,7 @@ configure project.
   (use-package toml-mode)
 #+END_SRC
 
-*** COMMENT Racket Mode
+*** Racket Mode
 Racket is nice LISP/Scheme language that I might to get into.
 
 #+BEGIN_SRC emacs-lisp

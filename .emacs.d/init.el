@@ -663,6 +663,9 @@ are defining or executing a macro."
 
 (use-package toml-mode)
 
+(use-package racket-mode
+  :mode ("\\.rkt\\'" . racket-mode))
+
 (use-package term
   :ensure nil
   :bind ("C-`" . my/ansi-term-toggle)
