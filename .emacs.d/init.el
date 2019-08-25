@@ -516,13 +516,12 @@ are defining or executing a macro."
 (when window-system
   (use-package centaur-tabs
     :demand
-    :hook
-    (dashboard-mode . centaur-tabs-local-mode)
-    (term-mode . centaur-tabs-local-mode)
-    (calendar-mode . centaur-tabs-local-mode)
-    (org-agenda-mode . centaur-tabs-local-mode)
-    (helpful-mode . centaur-tabs-local-mode)
-    (imenu-list-major-mode . centaur-tabs-local-mode)
+    :hook ((dashboard-mode . centaur-tabs-local-mode)
+           (term-mode . centaur-tabs-local-mode)
+           (calendar-mode . centaur-tabs-local-mode)
+           (org-agenda-mode . centaur-tabs-local-mode)
+           (helpful-mode . centaur-tabs-local-mode)
+           (imenu-list-major-mode . centaur-tabs-local-mode))
     :config
     (global-set-key (kbd "C-c n") 'centaur-tabs-forward)
     (global-set-key (kbd "C-c p") 'centaur-tabs-backward)
