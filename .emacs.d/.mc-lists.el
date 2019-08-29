@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        backward-sexp
         beginning-of-buffer
         c-electric-brace
         c-electric-paren
