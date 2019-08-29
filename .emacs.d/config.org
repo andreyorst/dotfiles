@@ -373,21 +373,15 @@ packages that  I need can  be obtained  from there, I  didn't bothered
 with different methods of installation.
 
 #+BEGIN_SRC emacs-lisp
-  (if (string-equal system-type "windows-nt")
-      (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                               ("melpa" . "http://melpa.org/packages/")))
-    (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                             ("melpa" . "https://melpa.org/packages/"))))
-
+  (setq package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")))
 #+END_SRC
 
 There's recent bug with downloading from elpa. This line fixes it:
 
 #+BEGIN_SRC emacs-lisp
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
   (package-initialize)
 #+END_SRC
 

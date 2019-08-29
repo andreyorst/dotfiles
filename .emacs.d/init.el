@@ -130,14 +130,11 @@ are defining or executing a macro."
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
 
-(if (string-equal system-type "windows-nt")
-    (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                             ("melpa" . "http://melpa.org/packages/")))
-  (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                           ("melpa" . "https://melpa.org/packages/"))))
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")))
 
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
