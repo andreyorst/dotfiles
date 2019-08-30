@@ -13,6 +13,7 @@
         downcase-region
         electric-newline-and-maybe-indent
         end-of-buffer
+        end-of-defun
         forward-sexp
         hydra-er/er/contract-region
         hydra-er/er/expand-region
