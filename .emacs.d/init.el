@@ -661,7 +661,14 @@ are defining or executing a macro."
 (use-package toml-mode)
 
 (use-package racket-mode
-  :mode ("\\.rkt\\'" . racket-mode))
+  :mode ("\\.rkt\\'" . racket-mode)
+  :config
+  (when (fboundp 'doom-color)
+    (progn
+      (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground "#000000")
+      (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
+      (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
+      (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
 
 (use-package term
   :ensure nil
