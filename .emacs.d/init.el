@@ -662,12 +662,9 @@ are defining or executing a macro."
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
+  :hook (racket-repl-mode . electric-pair-mode)
   :bind (:map racket-mode-map
               ("C-c C-d" . racket-run-with-debugging)
-              (")" . self-insert-command)
-              ("]" . self-insert-command)
-              ("}" . self-insert-command)
-              :map racket-repl-mode-map
               (")" . self-insert-command)
               ("]" . self-insert-command)
               ("}" . self-insert-command))
