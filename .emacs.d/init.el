@@ -615,7 +615,6 @@ are defining or executing a macro."
 (use-package prog-mode
   :ensure nil
   :hook ((prog-mode . show-paren-mode)
-         (prog-mode . electric-pair-mode)
          (prog-mode . display-line-numbers-mode)))
 
 (use-package cc-mode
@@ -626,7 +625,8 @@ are defining or executing a macro."
           c-default-style "linux"
           indent-tabs-mode t
           tab-width 4))
-  :hook (c-mode-common . my/cc-mode-setup))
+  :hook ((c-mode-common . my/cc-mode-setup)
+         (c-mode-common . electric-pair-mode)))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
@@ -662,13 +662,21 @@ are defining or executing a macro."
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
-  :config
-  (when (fboundp 'doom-color)
-    (progn
-      (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground "#000000")
-      (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
-      (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
-      (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
+  :bind (:map racket-mode-map
+              ("C-c C-d" . racket-run-with-debugging)
+              (")" . self-insert-command)
+              ("]" . self-insert-command)
+              ("}" . self-insert-command)
+              :map racket-repl-mode-map
+              (")" . self-insert-command)
+              ("]" . self-insert-command)
+              ("}" . self-insert-command))
+  :config (when (fboundp 'doom-color)
+            (progn
+              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground "#000000")
+              (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
+              (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
+              (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
 
 (use-package term
   :ensure nil

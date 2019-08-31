@@ -123,7 +123,7 @@ plug "andreyorst/powerline.kak" branch "toggling" defer powerline %{
     }
     powerline-theme base16-gruvbox
 } config %{
-    hook global -once -always WinCreate .* powerline-enable
+    powerline-start
 }
 
 
