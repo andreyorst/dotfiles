@@ -619,12 +619,11 @@ are defining or executing a macro."
 
 (use-package cc-mode
   :ensure nil
-  :config
-  (defun my/cc-mode-setup ()
-    (setq c-basic-offset 4
-          c-default-style "linux"
-          indent-tabs-mode t
-          tab-width 4))
+  :config (defun my/cc-mode-setup ()
+            (setq c-basic-offset 4
+                  c-default-style "linux"
+                  indent-tabs-mode t
+                  tab-width 4))
   :hook ((c-mode-common . my/cc-mode-setup)
          (c-mode-common . electric-pair-mode)))
 
@@ -632,7 +631,8 @@ are defining or executing a macro."
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :config (defvar markdown-command "multimarkdown")
+  :config
+  (defvar markdown-command "multimarkdown")
   (defun my/markdown-setup ()
     "Set buffer local variables."
     (setq fill-column 80
@@ -703,8 +703,7 @@ are defining or executing a macro."
 
 (use-package editorconfig
   :commands editorconfig-mode
-  :config
-  (editorconfig-mode 1))
+  :config (editorconfig-mode 1))
 
 (use-package flymake
   :ensure nil
@@ -717,18 +716,16 @@ are defining or executing a macro."
              hydra-show-hint
              hydra-set-transient-map)
   :bind (("<f5>" . hydra-zoom/body))
-  :config
-  (defhydra hydra-zoom (:hint nil)
-    "Scale text"
-    ("+" text-scale-increase "in")
-    ("-" text-scale-decrease "out")
-    ("0" (text-scale-set 0) "reset")))
+  :config (defhydra hydra-zoom (:hint nil)
+            "Scale text"
+            ("+" text-scale-increase "in")
+            ("-" text-scale-decrease "out")
+            ("0" (text-scale-set 0) "reset")))
 
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
-  :config
-  (setq geiser-active-implementations '(guile racket)
-        geiser-default-implementation 'guile))
+  :config (setq geiser-active-implementations '(guile racket)
+                geiser-default-implementation 'guile))
 
 (use-package parinfer
   :commands (parinfer-mode

@@ -550,7 +550,7 @@ I've tried bunch of different modelines:
   Really lightweight  configuration for  default modeline,  which I've
   used for quite a some time.
 
-They're all  great, but  I esperienced some  troubles with  DOOM Theme
+They're all  great, but  I experienced some  troubles with  DOOM Theme
 that I use, so  I've decided to try out DOOM  Modeline.  And turns out
 it's great!
 
@@ -1064,12 +1064,11 @@ These settings are for editing C source files.
 #+BEGIN_SRC emacs-lisp
   (use-package cc-mode
     :ensure nil
-    :config
-    (defun my/cc-mode-setup ()
-      (setq c-basic-offset 4
-            c-default-style "linux"
-            indent-tabs-mode t
-            tab-width 4))
+    :config (defun my/cc-mode-setup ()
+              (setq c-basic-offset 4
+                    c-default-style "linux"
+                    indent-tabs-mode t
+                    tab-width 4))
     :hook ((c-mode-common . my/cc-mode-setup)
            (c-mode-common . electric-pair-mode)))
 #+END_SRC
@@ -1084,7 +1083,8 @@ filling. Basically the same setup as for Org Mode.
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
-    :config (defvar markdown-command "multimarkdown")
+    :config
+    (defvar markdown-command "multimarkdown")
     (defun my/markdown-setup ()
       "Set buffer local variables."
       (setq fill-column 80
@@ -1165,7 +1165,7 @@ Racket is nice LISP/Scheme language that I might to get into.
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
 
-*** Ansi Term
+*** ANSI Term
 I'm using  it more  and more,  so I've  decided that  I should  have a
 proper shortcut  for it.  =my/ansi-term-toggle= function  toggles bottom
 split with =ansi-term= inside it.  /Ctrl+`/ seems great shortcut for this.
@@ -1203,8 +1203,7 @@ configurations between projects and different editors.
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
     :commands editorconfig-mode
-    :config
-    (editorconfig-mode 1))
+    :config (editorconfig-mode 1))
 #+END_SRC
 
 *** Flymake Mode
@@ -1242,12 +1241,11 @@ provide sane keybindings.
                hydra-show-hint
                hydra-set-transient-map)
     :bind (("<f5>" . hydra-zoom/body))
-    :config
-    (defhydra hydra-zoom (:hint nil)
-      "Scale text"
-      ("+" text-scale-increase "in")
-      ("-" text-scale-decrease "out")
-      ("0" (text-scale-set 0) "reset")))
+    :config (defhydra hydra-zoom (:hint nil)
+              "Scale text"
+              ("+" text-scale-increase "in")
+              ("-" text-scale-decrease "out")
+              ("0" (text-scale-set 0) "reset")))
 #+END_SRC
 
 *** Geiser
@@ -1259,9 +1257,8 @@ here, since it also provides completion for it.
 #+BEGIN_SRC emacs-lisp
   (use-package geiser
     :hook (scheme-mode . geiser-mode)
-    :config
-    (setq geiser-active-implementations '(guile racket)
-          geiser-default-implementation 'guile))
+    :config (setq geiser-active-implementations '(guile racket)
+                  geiser-default-implementation 'guile))
 #+END_SRC
 
 *** Parinfer
