@@ -291,9 +291,9 @@ Also let's use bar cursor when in window system, which is visible only
 in active window:
 
 #+BEGIN_SRC emacs-lisp
-    (when window-system
-      (setq-default cursor-type 'bar
-                    cursor-in-non-selected-windows nil))
+  (when window-system
+    (setq-default cursor-type 'bar
+                  cursor-in-non-selected-windows nil))
 #+END_SRC
 
 Emacs uses weird method of naming a window, I'd like to see a file I'm
@@ -323,27 +323,6 @@ other editor, for some reason I find this font just right for Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'default nil :font "Source Code Pro-10")
-#+END_SRC
-
-I want fringes  to appear only in certain buffers  where I really need
-them, so let's  disable it entirely on startup and  set them with some
-hooks later.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (fringe-mode 0))
-#+END_SRC
-
-But this adds another problem. Emacs displays =$= sign at the end of the
-window if line is being truncated. Damn,  why it is so hard to make it
-work how I want.. And you can't simply set =standard-display-table= slot
-to empty space, because it isn't ready on Emacs init.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (or standard-display-table
-        (setq standard-display-table (make-display-table)))
-    (set-display-table-slot standard-display-table 0 ?\ ))
 #+END_SRC
 
 Small tweak  to mode  line, that disables  changing appearance  in non
@@ -474,17 +453,7 @@ name! =\[T]/=
 
 I really want  Solaire to treat =*scratch*= buffer as  real.  For that I
 need to define my  own function that will decide if  buffer is real or
-not:
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/real-buffer-p ()
-    "Determines whether buffer is real."
-    (or (and (not (minibufferp))
-             (buffer-file-name))
-        (string-equal (buffer-name) "*scratch*")))
-#+END_SRC
-
-Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
+not. Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
 =solaire-mode-real-buffer-fn=.
 
 #+BEGIN_SRC emacs-lisp
@@ -494,45 +463,63 @@ Now  we  can  set  up  Solaire Mode  and  assign  =my/real-buffer-p=  to
                turn-on-solaire-mode
                solaire-mode-in-minibuffer
                solaire-mode-reset)
+    :hook (((after-revert
+             change-major-mode
+             org-capture-mode
+             org-src-mode) . turn-on-solaire-mode)
+           (snippet-mode . solaire-mode))
     :config
+    (defun my/real-buffer-p ()
+      "Determines whether buffer is real."
+      (or (and (not (minibufferp))
+               (buffer-file-name))
+          (string-equal (buffer-name) "*scratch*")))
     (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
     (solaire-mode-swap-bg)
     (cond ((not (boundp 'after-focus-change-function))
            (add-hook 'focus-in-hook  #'solaire-mode-reset))
           (t
            (add-function :after after-focus-change-function #'solaire-mode-reset)))
-    (add-hook 'after-revert-hook #'turn-on-solaire-mode)
-    (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
-    (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
-    (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
     :init (solaire-global-mode +1))
 #+END_SRC
 
+*** Fringe
 If only  certain buffers  could +be so  grossly incandescent+  *have damn
-fringes!* With  this package  Emacs becomes way  more like  true editor
+fringes!* With  Solaire Mode  Emacs becomes way  more like  true editor
 with  actual   graphical  interface,   but  these  fringes   drive  me
-crazy. That's why I wrote this  function, that enables fringes only in
-buffers that are affected by Solaire Mode:
+crazy.  That's  why  I  wrote a  function  =my/real-buffer-setup=,  that
+enables fringes only in buffers that  are affected by Solaire Mode.  I
+want fringes  to appear only  in certain  buffers where I  really need
+them, so let's  disable it entirely on startup and  set them with some
+hooks later.  But this adds another problem.  Emacs displays =$= sign at
+the end of the  window if line is being truncated. Damn,  why it is so
+hard  to  make  it  work  how  I  want..  And  you  can't  simply  set
+=standard-display-table= slot to empty space,  because it isn't ready on
+Emacs init.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/real-buffer-setup (&rest _)
-    "Wrapper around `set-window-fringes' function."
-    (when (my/real-buffer-p)
-      (set-window-fringes nil 8 8 nil)
-      (when (and (fboundp 'doom-color)
-                 window-system)
-        (set-face-attribute 'line-number-current-line nil
-                            :foreground (doom-color 'fg-alt)
-                            :background (doom-color 'bg)))
-      (setq-local scroll-margin 3)))
-#+END_SRC
-
-Let's assign it to these hooks:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
-  (add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
-  (add-hook 'org-src-mode-hook 'my/real-buffer-setup)
+  (use-package fringe
+    :ensure nil
+    :hook ((window-configuration-change
+            org-capture-mode
+            org-src-mode) . my/real-buffer-setup)
+    :config
+    (defun my/real-buffer-setup (&rest _)
+      "Wrapper around `set-window-fringes' function."
+      (when (my/real-buffer-p)
+        (set-window-fringes nil 8 8 nil)
+        (when (and (fboundp 'doom-color)
+                   window-system)
+          (set-face-attribute 'line-number-current-line nil
+                              :foreground (doom-color 'fg-alt)
+                              :background (doom-color 'bg)))
+        (setq-local scroll-margin 3)))
+    :init
+    (when window-system
+      (fringe-mode 0)
+      (or standard-display-table
+          (setq standard-display-table (make-display-table)))
+      (set-display-table-slot standard-display-table 0 ?\ )))
 #+END_SRC
 
 *** DOOM Modeline

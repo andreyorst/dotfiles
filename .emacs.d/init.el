@@ -117,14 +117,6 @@ are defining or executing a macro."
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
-(when window-system
-  (fringe-mode 0))
-
-(when window-system
-  (or standard-display-table
-      (setq standard-display-table (make-display-table)))
-  (set-display-table-slot standard-display-table 0 ?\ ))
-
 (setq mode-line-in-non-selected-windows nil)
 
 (setq package-enable-at-startup nil
@@ -166,45 +158,53 @@ are defining or executing a macro."
   (my/set-frame-dark)
   (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
 
-(defun my/real-buffer-p ()
-  "Determines whether buffer is real."
-  (or (and (not (minibufferp))
-           (buffer-file-name))
-      (string-equal (buffer-name) "*scratch*")))
-
 (use-package solaire-mode
   :commands (solaire-global-mode
              solaire-mode-swap-bg
              turn-on-solaire-mode
              solaire-mode-in-minibuffer
              solaire-mode-reset)
+  :hook (((after-revert
+           change-major-mode
+           org-capture-mode
+           org-src-mode) . turn-on-solaire-mode)
+         (snippet-mode . solaire-mode))
   :config
+  (defun my/real-buffer-p ()
+    "Determines whether buffer is real."
+    (or (and (not (minibufferp))
+             (buffer-file-name))
+        (string-equal (buffer-name) "*scratch*")))
   (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
   (solaire-mode-swap-bg)
   (cond ((not (boundp 'after-focus-change-function))
          (add-hook 'focus-in-hook  #'solaire-mode-reset))
         (t
          (add-function :after after-focus-change-function #'solaire-mode-reset)))
-  (add-hook 'after-revert-hook #'turn-on-solaire-mode)
-  (add-hook 'change-major-mode-hook #'turn-on-solaire-mode)
-  (add-hook 'org-capture-mode-hook #'turn-on-solaire-mode :after)
-  (add-hook 'org-src-mode-hook #'turn-on-solaire-mode :after)
   :init (solaire-global-mode +1))
 
-(defun my/real-buffer-setup (&rest _)
-  "Wrapper around `set-window-fringes' function."
-  (when (my/real-buffer-p)
-    (set-window-fringes nil 8 8 nil)
-    (when (and (fboundp 'doom-color)
-               window-system)
-      (set-face-attribute 'line-number-current-line nil
-                          :foreground (doom-color 'fg-alt)
-                          :background (doom-color 'bg)))
-    (setq-local scroll-margin 3)))
-
-(add-hook 'window-configuration-change-hook 'my/real-buffer-setup)
-(add-hook 'org-capture-mode-hook 'my/real-buffer-setup)
-(add-hook 'org-src-mode-hook 'my/real-buffer-setup)
+(use-package fringe
+  :ensure nil
+  :hook ((window-configuration-change
+          org-capture-mode
+          org-src-mode) . my/real-buffer-setup)
+  :config
+  (defun my/real-buffer-setup (&rest _)
+    "Wrapper around `set-window-fringes' function."
+    (when (my/real-buffer-p)
+      (set-window-fringes nil 8 8 nil)
+      (when (and (fboundp 'doom-color)
+                 window-system)
+        (set-face-attribute 'line-number-current-line nil
+                            :foreground (doom-color 'fg-alt)
+                            :background (doom-color 'bg)))
+      (setq-local scroll-margin 3)))
+  :init
+  (when window-system
+    (fringe-mode 0)
+    (or standard-display-table
+        (setq standard-display-table (make-display-table)))
+    (set-display-table-slot standard-display-table 0 ?\ )))
 
 (use-package doom-modeline
   :commands (doom-modeline-mode
