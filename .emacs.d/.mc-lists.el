@@ -27,6 +27,7 @@
         org-kill-line
         org-self-insert-command
         org-yank
+        overwrite-mode
         parinfer-backward-delete-char
         parinfer-double-quote
         parinfer-region-delete-region
@@ -65,6 +66,7 @@
         org-edit-src-save
         org-shifttab
         parinfer-mouse-drag-region
+        parinfer-toggle-mode
         phi-search
         xref-find-definitions
         yank-rectangle
