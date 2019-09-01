@@ -721,7 +721,7 @@ are defining or executing a macro."
 
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
-  :config (setq geiser-active-implementations '(guile racket)
+  :config (setq geiser-active-implementations '(guile)
                 geiser-default-implementation 'guile))
 
 (use-package parinfer
