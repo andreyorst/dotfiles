@@ -424,26 +424,24 @@ change a little bit of it.
     :init (load-theme 'doom-one t))
 #+END_SRC
 
+*** Frame
 Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
 want title bar  to be dark as  well. It is quite  difficult to achieve
-this in GNOME Shell, but I found this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]]:
+this in GNOME  Shell, but I found  this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]].  So if I
+use =window-system=  I want this  function to run  during initialization
+process, and when new frame is created.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/set-frame-dark (&optional frame)
-    "Set FRAME titlebar colorscheme to dark variant."
-    (with-selected-frame (or frame (selected-frame))
-      (call-process-shell-command
-       (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-               (frame-parameter frame 'name)))))
-#+END_SRC
-
-So  if  I  use  =window-system=  I want  this  function  to  run  during
-initialization process, and when new frame is created.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (my/set-frame-dark)
-    (add-hook 'after-make-frame-functions 'my/set-frame-dark :after))
+  (use-package frame
+    :ensure nil
+    :hook ((after-make-frame-functions after-init) . my/set-frame-dark)
+    :commands (my/set-frame-dark)
+    :config (defun my/set-frame-dark (&optional frame)
+              "Set FRAME titlebar colorscheme to dark variant."
+              (with-selected-frame (or frame (selected-frame))
+                (call-process-shell-command
+                 (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                         (frame-parameter frame 'name))))))
 #+END_SRC
 
 *** Solaire Mode
