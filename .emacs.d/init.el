@@ -816,8 +816,9 @@ are defining or executing a macro."
 
 (use-package yasnippet
   :commands yas-reload-all
-  :hook ((rust-mode . yas-minor-mode)
-         (c-mode-common . yas-minor-mode))
+  :hook ((rust-mode
+          c-mode-common
+          racket-mode). yas-minor-mode)
   :config
   (use-package yasnippet-snippets)
   (yas-reload-all))
