@@ -513,12 +513,12 @@ are defining or executing a macro."
 (when window-system
   (use-package centaur-tabs
     :demand
-    :hook ((dashboard-mode . centaur-tabs-local-mode)
-           (term-mode . centaur-tabs-local-mode)
-           (calendar-mode . centaur-tabs-local-mode)
-           (org-agenda-mode . centaur-tabs-local-mode)
-           (helpful-mode . centaur-tabs-local-mode)
-           (imenu-list-major-mode . centaur-tabs-local-mode))
+    :hook ((dashboard-mode
+            term-mode
+            calendar-mode
+            org-agenda-mode
+            helpful-mode
+            imenu-list-major-mode) . centaur-tabs-local-mode)
     :config
     (global-set-key (kbd "C-c n") 'centaur-tabs-forward)
     (global-set-key (kbd "C-c p") 'centaur-tabs-backward)
@@ -727,12 +727,12 @@ are defining or executing a macro."
 (use-package parinfer
   :commands (parinfer-mode
              parinfer-toggle-mode)
-  :hook ((clojure-mode . parinfer-mode)
-         (emacs-lisp-mode . parinfer-mode)
-         (common-lisp-mode . parinfer-mode)
-         (scheme-mode . parinfer-mode)
-         (lisp-mode . parinfer-mode)
-         (racket-mode . parinfer-mode))
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode) . parinfer-mode)
   :bind (:map parinfer-mode-map
               ("C-," . parinfer-toggle-mode))
   :config (setq parinfer-extensions
@@ -920,12 +920,10 @@ _-_: reduce region _)_: around pairs
            window-system)
   (use-package eglot
     :commands (eglot eglot-ensure)
+    :hook ((c-mode c++-mode rust-mode) . eglot-ensure)
     :config
     (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
-    (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-    :hook ((c-mode . eglot-ensure)
-           (c++-mode . eglot-ensure)
-           (rust-mode . eglot-ensure))))
+    (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))
 
 (use-package project
   :ensure nil
