@@ -40,6 +40,8 @@
 (setq mc/cmds-to-run-once
       '(
         counsel-describe-function
+        hydra--digit-argument
+        hydra--negative-argument
         hydra-er/body
         hydra-mc/body
         hydra-mc/lambda-M-s
