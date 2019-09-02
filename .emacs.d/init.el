@@ -624,7 +624,7 @@ are defining or executing a macro."
                   indent-tabs-mode t
                   tab-width 4))
   :hook ((c-mode-common . my/cc-mode-setup)
-         (c-mode-common . electric-pair-mode)))
+         (c-mode-common . electric-pair-local-mode)))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
@@ -642,7 +642,7 @@ are defining or executing a macro."
 
 (use-package rust-mode
   :commands (rust-format-buffer)
-  :hook (rust-mode . electric-pair-mode)
+  :hook (rust-mode . electric-pair-local-mode)
   :bind (:map rust-mode-map
               ("C-c C-f" . rust-format-buffer)))
 
@@ -661,7 +661,7 @@ are defining or executing a macro."
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
-  :hook (racket-repl-mode . electric-pair-mode)
+  :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
               ("C-c C-d" . racket-run-with-debugging))
   :config (when (fboundp 'doom-color)

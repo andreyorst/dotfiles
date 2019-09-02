@@ -1054,7 +1054,7 @@ These settings are for editing C source files.
                     indent-tabs-mode t
                     tab-width 4))
     :hook ((c-mode-common . my/cc-mode-setup)
-           (c-mode-common . electric-pair-mode)))
+           (c-mode-common . electric-pair-local-mode)))
 #+END_SRC
 
 *** Markdown Mode
@@ -1087,7 +1087,7 @@ settings for Rust mode.
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
     :commands (rust-format-buffer)
-    :hook (rust-mode . electric-pair-mode)
+    :hook (rust-mode . electric-pair-local-mode)
     :bind (:map rust-mode-map
                 ("C-c C-f" . rust-format-buffer)))
 #+END_SRC
@@ -1128,7 +1128,7 @@ Racket is nice LISP/Scheme language that I might to get into.
 #+BEGIN_SRC emacs-lisp
   (use-package racket-mode
     :mode ("\\.rkt\\'" . racket-mode)
-    :hook (racket-repl-mode . electric-pair-mode)
+    :hook (racket-repl-mode . electric-pair-local-mode)
     :bind (:map racket-mode-map
                 ("C-c C-d" . racket-run-with-debugging))
     :config (when (fboundp 'doom-color)
