@@ -39,8 +39,7 @@ Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
 starts with commentary:
 
 #+BEGIN_SRC emacs-lisp
-  ;;;  -*- lexical-binding: t; -*-
-  ;;; init.el --- Emacs main configuration file
+  ;;; init.el --- Emacs main configuration file -*- lexical-binding: t;  buffer-read-only: t -*-
   ;;;
   ;;; Commentary:
   ;;; Emacs config by Andrey Orst.
@@ -342,6 +341,7 @@ directly we will use =use-package= to manage package configurations.
 =package.el= initialization is expensive so we disable it at startup:
 
 #+BEGIN_SRC emacs-lisp
+  (defvar package--init-file-ensured)
   (setq package-enable-at-startup nil
         package--init-file-ensured t)
 #+END_SRC
@@ -351,6 +351,7 @@ packages that  I need can  be obtained  from there, I  didn't bothered
 with different methods of installation.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar package-archives)
   (setq package-archives
         '(("gnu" . "https://elpa.gnu.org/packages/")
           ("melpa" . "https://melpa.org/packages/")))

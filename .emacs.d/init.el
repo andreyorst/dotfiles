@@ -1,5 +1,4 @@
-;;;  -*- lexical-binding: t; -*-
-;;; init.el --- Emacs main configuration file
+;;; init.el --- Emacs main configuration file -*- lexical-binding: t;  buffer-read-only: t -*-
 ;;;
 ;;; Commentary:
 ;;; Emacs config by Andrey Orst.
@@ -118,9 +117,11 @@ are defining or executing a macro."
 
 (setq mode-line-in-non-selected-windows nil)
 
+(defvar package--init-file-ensured)
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
 
+(defvar package-archives)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
