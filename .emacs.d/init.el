@@ -546,7 +546,8 @@ are defining or executing a macro."
          (org-mode . auto-fill-mode)
          (after-save . my/org-tangle-on-config-save)
          (org-babel-after-execute . my/org-update-inline-images)
-         (org-mode . my/org-init-setup))
+         (org-mode . my/org-init-setup)
+         ((org-capture-mode org-src-mode) . my/discard-history))
   :bind (:map org-mode-map
               ([backtab] . nil)
               ([S-iso-lefttab] . nil)
@@ -580,6 +581,10 @@ are defining or executing a macro."
   (defun my/org-init-setup ()
     "Set buffer local values."
     (setq default-justification 'full))
+  (defun my/discard-history ()
+    "Discard undo history of org src and capture blocks."
+    (setq buffer-undo-list nil)
+    (set-buffer-modified-p nil))
   (defvar minted-cache-dir
     (file-name-as-directory
      (expand-file-name ".minted/\\jombname"
