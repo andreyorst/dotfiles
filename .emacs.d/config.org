@@ -1130,10 +1130,7 @@ Racket is nice LISP/Scheme language that I might to get into.
     :mode ("\\.rkt\\'" . racket-mode)
     :hook (racket-repl-mode . electric-pair-mode)
     :bind (:map racket-mode-map
-                ("C-c C-d" . racket-run-with-debugging)
-                (")" . self-insert-command)
-                ("]" . self-insert-command)
-                ("}" . self-insert-command))
+                ("C-c C-d" . racket-run-with-debugging))
     :config (when (fboundp 'doom-color)
               (progn
                 (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground "#000000")
