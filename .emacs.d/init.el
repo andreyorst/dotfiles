@@ -696,12 +696,14 @@ are defining or executing a macro."
              (cond ((get-buffer "*ansi-term*")
                     (switch-to-buffer "*ansi-term*"))
                    (t (ansi-term "bash")
-                      (set-frame-font "Hack" t))))))
+                      (set-frame-font "Hack" t)))
+             (set-window-dedicated-p nil t)
+             (set-window-parameter nil 'no-delete-other-windows t))))
   (defun my/autokill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
-        (kill-buffer (current-buffer))
-        (delete-window)))
+      (kill-buffer (current-buffer))
+      (delete-window)))
   (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes))
 
 (use-package editorconfig
