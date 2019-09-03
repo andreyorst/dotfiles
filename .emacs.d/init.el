@@ -947,6 +947,13 @@ _-_: reduce region _)_: around pairs
                              (file-exists-p (concat path marker)))
                            project-root-markers)))
       (eval `(or ,@ results))))
+  (defvar my--project-find-file-function (symbol-function 'project-find-file)
+    "Save old function to call it inside wrapper function.")
+  (defun project-find-file ()
+    "Wrapper for `project-find-file' that sets `find-program' back to find."
+    (interactive)
+    (let ((find-program "find"))
+      (funcall my--project-find-file-function)))
   (add-to-list 'project-find-functions #'my/project-find-root))
 
 (use-package clang-format
