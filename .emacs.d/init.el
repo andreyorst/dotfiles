@@ -769,8 +769,10 @@ are defining or executing a macro."
                counsel-find-library)
     :config
     (when (executable-find "fd")
-      (setq find-program "fd"
-            counsel-file-jump-args (split-string "-L --type f --hidden")))
+      (define-advice counse-file-jump (:around (old-fn))
+        (let* ((find-program "fd")
+               (counsel-file-jump-args (split-string "-L --type f --hidden")))
+          (call-interactively old-fn))))
     (when (executable-find "rg")
       (setq counsel-rg-base-command
             "rg -S --no-heading --hidden --line-number --color never %s .")
@@ -953,13 +955,6 @@ _-_: reduce region _)_: around pairs
                              (file-exists-p (concat path marker)))
                            project-root-markers)))
       (eval `(or ,@ results))))
-  (defvar my--project-find-file-function (symbol-function 'project-find-file)
-    "Save old function to call it inside wrapper function.")
-  (defun project-find-file ()
-    "Wrapper for `project-find-file' that sets `find-program' back to find."
-    (interactive)
-    (let ((find-program "find"))
-      (funcall my--project-find-file-function)))
   (add-to-list 'project-find-functions #'my/project-find-root))
 
 (use-package clang-format
