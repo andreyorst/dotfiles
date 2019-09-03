@@ -933,6 +933,16 @@ buffers. It's good for navigation with the mouse, and looks fancy.
       (centaur-tabs-mode)))
 #+END_SRC
 
+*** Uniquify
+This package makes files with  identical names more distinguishable by
+adding directory name in the buffer name.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package uniquify
+    :ensure nil
+    :config (setq uniquify-buffer-name-style 'forward))
+#+END_SRC
+
 ** Modes
 In Emacs  world Modes  are the  main thing. I'm  using Org  Mode quite
 heavily right now, as well as  a lot of other modes. Configurations of

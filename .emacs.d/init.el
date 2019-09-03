@@ -540,6 +540,10 @@ are defining or executing a macro."
                   (t "Default"))))
     (centaur-tabs-mode)))
 
+(use-package uniquify
+  :ensure nil
+  :config (setq uniquify-buffer-name-style 'forward))
+
 (use-package org
   :ensure nil
   :defines default-justification
