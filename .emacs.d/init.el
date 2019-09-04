@@ -768,10 +768,10 @@ are defining or executing a macro."
                counsel-find-library)
     :config
     (when (executable-find "fd")
-      (define-advice counse-file-jump (:around (old-fn))
-        (let* ((find-program "fd")
-               (counsel-file-jump-args (split-string "-L --type f --hidden")))
-          (call-interactively old-fn))))
+      (define-advice counsel-file-jump (:around (foo))
+        (let ((find-program "fd")
+              (counsel-file-jump-args (split-string "-L --type f --hidden")))
+          (call-interactively foo))))
     (when (executable-find "rg")
       (setq counsel-rg-base-command
             "rg -S --no-heading --hidden --line-number --color never %s .")
