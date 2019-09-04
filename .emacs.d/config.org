@@ -168,10 +168,13 @@ modifies  my =init.el=  that I  don't  modify myself.   Let's put  those
 commands to =custom-file= instead:
 
 #+BEGIN_SRC emacs-lisp
+  (defvar disabled-commands (expand-file-name ".disabled.el" user-emacs-directory)
+    "File to store disabled commands, that were enabled permamently.")
   (defadvice en/disable-command (around put-in-custom-file activate)
     "Put declarations in disabled.el."
-    (let ((user-init-file (expand-file-name "disabled.el" user-emacs-directory)))
+    (let ((user-init-file disabled-commands))
       ad-do-it))
+  (load disabled-commands :noerror)
 #+END_SRC
 
 Another feature I  want is history between sessions. I'm  not sure why
@@ -1186,8 +1189,7 @@ Also, when I exit terminal, I'd like to kill its window automatically.
     (defun my/autokill-when-no-processes (&rest _)
       "Kill buffer and its window when there's no processes left."
       (when (null (get-buffer-process (current-buffer)))
-        (kill-buffer (current-buffer))
-        (delete-window)))
+        (kill-buffer (current-buffer))))
     (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes))
 #+END_SRC
 

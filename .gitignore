@@ -14,5 +14,6 @@ saved_workspaces
 !.emacs.d/snippets/
 !.emacs.d/.sceenshot.png
 !.emacs.d/.mc-lists.el
+!.emacs.d/.disabled.el
 !.emacs.d/elisp/
 .recentf

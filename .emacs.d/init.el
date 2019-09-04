@@ -46,10 +46,13 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
 
+(defvar disabled-commands (expand-file-name ".disabled.el" user-emacs-directory)
+  "File to store disabled commands, that were enabled permamently.")
 (defadvice en/disable-command (around put-in-custom-file activate)
   "Put declarations in disabled.el."
-  (let ((user-init-file (expand-file-name "disabled.el" user-emacs-directory)))
+  (let ((user-init-file disabled-commands))
     ad-do-it))
+(load disabled-commands :noerror)
 
 (savehist-mode 1)
 
@@ -701,8 +704,7 @@ are defining or executing a macro."
   (defun my/autokill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
-      (kill-buffer (current-buffer))
-      (delete-window)))
+      (kill-buffer (current-buffer))))
   (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes))
 
 (use-package editorconfig
