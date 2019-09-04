@@ -70,6 +70,7 @@
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
+        term-send-raw
         xref-find-definitions
         yank-rectangle
         ))
