@@ -1409,7 +1409,7 @@ features, so I want to try it out.
   (use-package magit)
 #+END_SRC
 
-*** Vdiff
+*** COMMENT Vdiff
 =vdiff= is a package, that works similar to Vimdiff.  Ediff isn't really
 comfortable to  use, and vdiff also  has integration with Magit,  so I
 gonna try it  out. =vdiff-magit= is a supplement  package, that provides

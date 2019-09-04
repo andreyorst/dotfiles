@@ -834,33 +834,6 @@ are defining or executing a macro."
 
 (use-package magit)
 
-(use-package vdiff
-  :config
-  (use-package vdiff-magit
-    :commands (vdiff-magit-dwim vdiff-magit)
-    :functions (transient-suffix-put)
-    :bind (:map magit-mode-map
-                ("e" . 'vdiff-magit-dwim)
-                ("E" . 'vdiff-magit))
-    :config
-    (setq vdiff-magit-stage-is-2way t)
-    (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
-    (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
-    (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
-    (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
-    (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
-  (setq vdiff-lock-scrolling t
-        vdiff-diff-algorithm 'diff
-        vdiff-disable-folding nil
-        vdiff-min-fold-size 4
-        vdiff-subtraction-style 'full
-        vdiff-subtraction-fill-char ?\ )
-  (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
-  (set-face-attribute 'vdiff-subtraction-face nil :background "#4F343A" :foreground "#F36868")
-  (set-face-attribute 'vdiff-addition-face nil :background "#3E493D" :foreground "#98BE65")
-  (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7")
-  (add-hook 'vdiff-mode-hook #'outline-show-all))
-
 (use-package multiple-cursors
   :commands (mc/cycle-backward
              mc/cycle-forward)
