@@ -1170,13 +1170,15 @@ Also, when I exit terminal, I'd like to kill its window automatically.
     :ensure nil
     :bind ("C-`" . my/ansi-term-toggle)
     :config
-    (defun my/ansi-term-toggle ()
+    (defun my/ansi-term-toggle (&optional arg)
       "Toggle `ansi-term' window on and off with the same command."
-      (interactive)
+      (interactive "P")
       (cond ((get-buffer-window "*ansi-term*")
              (ignore-errors (delete-window
                              (get-buffer-window "*ansi-term*"))))
-            (t (split-window-below)
+            (t (if (symbolp arg)
+                   (split-window-below)
+                 (split-window-right))
                (other-window 1)
                (cond ((get-buffer "*ansi-term*")
                       (switch-to-buffer "*ansi-term*"))
