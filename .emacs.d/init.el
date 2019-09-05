@@ -694,13 +694,18 @@ are defining or executing a macro."
     (let ((window (get-buffer-window "*ansi-term*")))
       (if window
           (ignore-errors (delete-window window))
-        (let ((window (if (symbolp arg) (split-window-below) (split-window-right))))
+        (let* ((win-side (if (symbolp arg)
+                            (cons (split-window-below) 'bot)
+                          (cons (split-window-right) 'right)))
+               (window (car win-side))
+               (side (cdr win-side)))
           (select-window window)
           (cond ((get-buffer "*ansi-term*")
                  (switch-to-buffer "*ansi-term*"))
                 (t (ansi-term "bash")))
           (set-window-dedicated-p window t)
-          (set-window-parameter window 'no-delete-other-windows t)))))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-parameter window 'window-side side)))))
   (defun my/autokill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
@@ -770,10 +775,10 @@ are defining or executing a macro."
                counsel-find-library)
     :config
     (when (executable-find "fd")
-      (define-advice counsel-file-jump (:around (foo))
+      (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory))
         (let ((find-program "fd")
               (counsel-file-jump-args (split-string "-L --type f --hidden")))
-          (call-interactively foo))))
+          (funcall foo))))
     (when (executable-find "rg")
       (setq counsel-rg-base-command
             "rg -S --no-heading --hidden --line-number --color never %s .")
