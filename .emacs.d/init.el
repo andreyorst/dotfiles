@@ -475,6 +475,12 @@ are defining or executing a macro."
       "Set treemacs buffer fringes."
       (set-window-fringes nil 0 0 nil)
       (my/treemacs-variable-pitch-labels))
+    (defun my/treemacs-ignore (file _)
+      (or (s-ends-with? ".elc" file)
+          (s-ends-with? ".o" file)
+          (s-ends-with? ".a" file)
+          (string= file ".svn")))
+    (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
     (setq treemacs-width 27
           treemacs-is-never-other-window t
           treemacs-space-between-root-nodes nil)
@@ -521,7 +527,8 @@ are defining or executing a macro."
             calendar-mode
             org-agenda-mode
             helpful-mode
-            imenu-list-major-mode) . centaur-tabs-local-mode)
+            imenu-list-major-mode
+            ediff-mode) . centaur-tabs-local-mode)
     :config
     (global-set-key (kbd "C-c n") 'centaur-tabs-forward)
     (global-set-key (kbd "C-c p") 'centaur-tabs-backward)
@@ -840,6 +847,12 @@ are defining or executing a macro."
   (yas-reload-all))
 
 (use-package magit)
+
+(use-package ediff
+  :ensure nil
+  :config
+  (advice-add 'ediff-window-display-p :override #'ignore)
+  (setq ediff-split-window-function 'split-window-horizontally))
 
 (use-package multiple-cursors
   :commands (mc/cycle-backward

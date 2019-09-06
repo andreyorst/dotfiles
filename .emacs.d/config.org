@@ -824,6 +824,12 @@ that Treemacs will look just as great as DOOM themed Emacs!
         "Set treemacs buffer fringes."
         (set-window-fringes nil 0 0 nil)
         (my/treemacs-variable-pitch-labels))
+      (defun my/treemacs-ignore (file _)
+        (or (s-ends-with? ".elc" file)
+            (s-ends-with? ".o" file)
+            (s-ends-with? ".a" file)
+            (string= file ".svn")))
+      (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
       (setq treemacs-width 27
             treemacs-is-never-other-window t
             treemacs-space-between-root-nodes nil)
@@ -913,7 +919,8 @@ buffers. It's good for navigation with the mouse, and looks fancy.
               calendar-mode
               org-agenda-mode
               helpful-mode
-              imenu-list-major-mode) . centaur-tabs-local-mode)
+              imenu-list-major-mode
+              ediff-mode) . centaur-tabs-local-mode)
       :config
       (global-set-key (kbd "C-c n") 'centaur-tabs-forward)
       (global-set-key (kbd "C-c p") 'centaur-tabs-backward)
@@ -1416,39 +1423,17 @@ features, so I want to try it out.
   (use-package magit)
 #+END_SRC
 
-*** COMMENT Vdiff
-=vdiff= is a package, that works similar to Vimdiff.  Ediff isn't really
-comfortable to  use, and vdiff also  has integration with Magit,  so I
-gonna try it  out. =vdiff-magit= is a supplement  package, that provides
-integration with Magit package.
+*** Ediff
+This is a built  in mode for diffing files in  Emacs. Previously I was
+using  [[https://github.com/justbur/emacs-vdiff][Vdiff]] but  I have  to say  that I've  used it  so rarely,  so I
+decided to avoid extra dependency and configure Ediff.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package vdiff
+  (use-package ediff
+    :ensure nil
     :config
-    (use-package vdiff-magit
-      :commands (vdiff-magit-dwim vdiff-magit)
-      :functions (transient-suffix-put)
-      :bind (:map magit-mode-map
-                  ("e" . 'vdiff-magit-dwim)
-                  ("E" . 'vdiff-magit))
-      :config
-      (setq vdiff-magit-stage-is-2way t)
-      (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
-      (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
-      (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
-      (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)
-      (advice-add 'vdiff-magit-dwim :before 'eyebrowse-create-window-config))
-    (setq vdiff-lock-scrolling t
-          vdiff-diff-algorithm 'diff
-          vdiff-disable-folding nil
-          vdiff-min-fold-size 4
-          vdiff-subtraction-style 'full
-          vdiff-subtraction-fill-char ?\ )
-    (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
-    (set-face-attribute 'vdiff-subtraction-face nil :background "#4F343A" :foreground "#F36868")
-    (set-face-attribute 'vdiff-addition-face nil :background "#3E493D" :foreground "#98BE65")
-    (set-face-attribute 'vdiff-change-face nil :background "#293239" :foreground "#4f97d7")
-    (add-hook 'vdiff-mode-hook #'outline-show-all))
+    (advice-add 'ediff-window-display-p :override #'ignore)
+    (setq ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
 
 *** Multiple Cursors
