@@ -85,7 +85,6 @@ are defining or executing a macro."
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
            (keyboard-quit)))))
-
 (global-set-key [remap keyboard-quit] #'my/escape)
 
 (defun my/command-error-function (data context caller)
@@ -94,6 +93,18 @@ are defining or executing a macro."
     (command-error-default-function data context caller)))
 
 (setq command-error-function #'my/command-error-function)
+
+(defun my/smart-move-beginning-of-line ()
+  "Move point to first non-whitespace character or beginning-of-line.
+
+Move point to the first non-whitespace character on this line.
+If point was already at that position, move point to beginning of line."
+  (interactive)
+  (let ((oldpos (point)))
+    (back-to-indentation)
+    (when (= oldpos (point))
+      (beginning-of-line))))
+(global-set-key [remap move-beginning-of-line] #'my/smart-move-beginning-of-line)
 
 (setq inhibit-splash-screen t
       initial-major-mode 'org-mode

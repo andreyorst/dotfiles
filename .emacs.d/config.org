@@ -242,11 +242,6 @@ window:
            ;; ignore top level quits for macros
            (unless (or defining-kbd-macro executing-kbd-macro)
              (keyboard-quit)))))
-#+END_SRC
-
-Let's remap default =keyboard-quit= key with this function.
-
-#+BEGIN_SRC emacs-lisp
   (global-set-key [remap keyboard-quit] #'my/escape)
 #+END_SRC
 
@@ -261,6 +256,26 @@ deleting past first symbol. Let's disable it:
       (command-error-default-function data context caller)))
 
   (setq command-error-function #'my/command-error-function)
+#+END_SRC
+
+Emacs has built  in way to jump  to the first non-blank  symbol in the
+line, but  it is  mapped to  the =M-m=  by default  and it's  not really
+convenient mapping. Instead  of that, we can make  default =C-a= mapping
+little  bit  smarter. The  first  press  will  move  us to  the  first
+non-whitespace character, and the second to the beginning of the line:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/smart-move-beginning-of-line ()
+    "Move point to first non-whitespace character or beginning-of-line.
+
+  Move point to the first non-whitespace character on this line.
+  If point was already at that position, move point to beginning of line."
+    (interactive)
+    (let ((oldpos (point)))
+      (back-to-indentation)
+      (when (= oldpos (point))
+        (beginning-of-line))))
+  (global-set-key [remap move-beginning-of-line] #'my/smart-move-beginning-of-line)
 #+END_SRC
 
 ** User Interface
