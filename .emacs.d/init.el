@@ -188,7 +188,8 @@ If point was already at that position, move point to beginning of line."
     "Determines whether buffer is real."
     (or (and (not (minibufferp))
              (buffer-file-name))
-        (string-equal (buffer-name) "*scratch*")))
+        (or (string-equal "*scratch*" (buffer-name))
+            (string-match-p ".~{index}~" (buffer-name)))))
   (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
   (solaire-mode-swap-bg)
   (cond ((not (boundp 'after-focus-change-function))
@@ -201,7 +202,8 @@ If point was already at that position, move point to beginning of line."
   :ensure nil
   :hook ((window-configuration-change
           org-capture-mode
-          org-src-mode) . my/real-buffer-setup)
+          org-src-mode
+          ediff-after-setup-windows-hook) . my/real-buffer-setup)
   :config
   (defun my/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
@@ -554,10 +556,10 @@ If point was already at that position, move point to beginning of line."
       "Use as few groups as possible."
       (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
                    (cond ((string-match-p (regexp-quote "eglot") (buffer-name)) "Eglot")
-                         ((or (string-match-p (regexp-quote "repl") (buffer-name))
-                              (string-match-p (regexp-quote "geiser") (buffer-name))) "Geiser")
+                         ((or (string-match-p "geiser" (buffer-name))
+                              (string-match-p "repl *" (buffer-name))) "Geiser")
                          (t "Tools")))
-                  ((string-match-p (regexp-quote "magit") (buffer-name)) "Magit")
+                  ((string-match-p "magit" (buffer-name)) "Magit")
                   (t "Default"))))
     (centaur-tabs-mode)))
 
@@ -697,7 +699,7 @@ If point was already at that position, move point to beginning of line."
               ("C-c C-d" . racket-run-with-debugging))
   :config (when (fboundp 'doom-color)
             (progn
-              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground "#000000")
+              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
               (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
               (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
               (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
@@ -857,7 +859,8 @@ If point was already at that position, move point to beginning of line."
   (use-package yasnippet-snippets)
   (yas-reload-all))
 
-(use-package magit)
+(use-package magit
+  :config (setq magit-ediff-dwim-show-on-hunks t))
 
 (use-package ediff
   :ensure nil
