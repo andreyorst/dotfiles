@@ -280,7 +280,8 @@ If point was already at that position, move point to beginning of line."
                 all-the-icons-octicon)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window))
-    :hook (after-init . my/treemacs-init-setup)
+    :hook ((after-init . my/treemacs-init-setup)
+           (treemacs-mode . my/treemacs-setup))
     :config
     (use-package treemacs-magit)
     (set-face-attribute 'treemacs-root-face nil
@@ -443,9 +444,6 @@ If point was already at that position, move point to beginning of line."
                                  :v-adjust 0
                                  :face '(:inherit font-lock-doc-face :slant normal)))
          :extensions (fallback))))
-    (add-hook 'treemacs-mode-hook #'my/treemacs-setup)
-    (advice-add #'treemacs-select-window :after #'my/treemacs-setup-fringes)
-
     (defun my/treemacs-expand-all-projects (&optional _)
       "Expand all projects."
       (save-excursion
@@ -489,6 +487,7 @@ If point was already at that position, move point to beginning of line."
       "Set treemacs buffer fringes."
       (set-window-fringes nil 0 0 nil)
       (my/treemacs-variable-pitch-labels))
+    (advice-add #'treemacs-select-window :after #'my/treemacs-setup-fringes)
     (defun my/treemacs-ignore (file _)
       (or (s-ends-with? ".elc" file)
           (s-ends-with? ".o" file)
@@ -535,7 +534,6 @@ If point was already at that position, move point to beginning of line."
 
 (when window-system
   (use-package centaur-tabs
-    :demand
     :hook ((dashboard-mode
             term-mode
             calendar-mode
@@ -556,12 +554,13 @@ If point was already at that position, move point to beginning of line."
     (defun centaur-tabs-buffer-groups ()
       "Use as few groups as possible."
       (list (cond ((string-equal "*" (substring (buffer-name) 0 1))
-                   (cond ((string-match-p (regexp-quote "eglot") (buffer-name)) "Eglot")
+                   (cond ((string-match-p "eglot" (buffer-name)) "Eglot")
                          ((or (string-match-p "geiser" (buffer-name))
-                              (string-match-p "repl *" (buffer-name))) "Geiser")
+                              (string-match-p "repl \\*" (buffer-name))) "Geiser")
                          (t "Tools")))
                   ((string-match-p "magit" (buffer-name)) "Magit")
                   (t "Default"))))
+    :init
     (centaur-tabs-mode)))
 
 (use-package uniquify
