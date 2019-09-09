@@ -140,7 +140,8 @@ If point was already at that position, move point to beginning of line."
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
 
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(when (version= emacs-version "26.2")
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)

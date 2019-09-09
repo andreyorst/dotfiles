@@ -378,7 +378,8 @@ with different methods of installation.
 There's recent bug with downloading from elpa. This line fixes it:
 
 #+BEGIN_SRC emacs-lisp
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+  (when (version= emacs-version "26.2")
+    (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
   (package-initialize)
 #+END_SRC
 
