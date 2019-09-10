@@ -9,3 +9,5 @@
 	cim = commit -m
 	br = branch
 	bra = branch -a
+[include]
+	path = .gitconfig.local
