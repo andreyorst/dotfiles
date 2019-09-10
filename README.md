@@ -2,15 +2,10 @@
 I really love to configure text editors.  [Kakoune][1] and [Emacs][2]
 configurations are stored in this repository. There also was NeoVim config, but
 since I'm no longer using and maintaining its configuration, it was removed. If
-you're interested in it, you can browse this repository at [this commit][3].
+you're interested in it, you can browse the repository at [this commit][3].
 
-Also includes settings for Termite, Tmux, KDE scripts, KDE color schemes, and
-other misc stuff, that is usual for Linux.
-
-### Different colorschemes for different applications
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/19470159/38469373-5a671066-3b5c-11e8-8810-488c9e938ed2.png">
-</p>
+Also includes settings for Termite, Tmux, and other misc stuff, that is usual
+for Linux.
 
 ### Termite colorscheme based on Base16 Gruvbox Dark Soft
 <p align="center">
