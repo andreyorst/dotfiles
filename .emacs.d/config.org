@@ -954,6 +954,7 @@ buffers. It's good for navigation with the mouse, and looks fancy.
                            ((or (string-match-p "geiser" (buffer-name))
                                 (string-match-p "repl \\*" (buffer-name))) "Geiser")
                            (t "Tools")))
+                    ((string-equal " " (substring (buffer-name) 0 1)) "Hidden")
                     ((string-match-p "magit" (buffer-name)) "Magit")
                     (t "Default"))))
       :init

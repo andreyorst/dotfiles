@@ -558,6 +558,7 @@ If point was already at that position, move point to beginning of line."
                          ((or (string-match-p "geiser" (buffer-name))
                               (string-match-p "repl \\*" (buffer-name))) "Geiser")
                          (t "Tools")))
+                  ((string-equal " " (substring (buffer-name) 0 1)) "Hidden")
                   ((string-match-p "magit" (buffer-name)) "Magit")
                   (t "Default"))))
     :init
