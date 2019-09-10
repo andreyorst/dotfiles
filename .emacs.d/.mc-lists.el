@@ -20,6 +20,7 @@
         indent-for-tab-command
         kill-region
         my/select-line
+        my/smart-move-beginning-of-line
         org-beginning-of-line
         org-delete-char
         org-end-of-line
