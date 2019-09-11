@@ -41,6 +41,7 @@
 (setq mc/cmds-to-run-once
       '(
         counsel-describe-function
+        counsel-find-file
         hydra--digit-argument
         hydra--negative-argument
         hydra-er/body
@@ -60,6 +61,11 @@
         hydra-mc/mc/remove-duplicated-cursors-and-exit
         hydra-mc/mc/vertical-align-with-space
         iedit-switch-to-mc-mode
+        isearch-abort
+        isearch-delete-char
+        isearch-exit
+        isearch-forward-regexp
+        isearch-printing-char
         magit-commit
         magit-next-line
         magit-refresh-all
