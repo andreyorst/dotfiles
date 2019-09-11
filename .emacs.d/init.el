@@ -1,4 +1,4 @@
-;;; init.el --- Emacs main configuration file -*- lexical-binding: t;  buffer-read-only: t -*-
+;;; init.el --- Emacs main configuration file -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
 ;;;
 ;;; Commentary:
 ;;; Emacs config by Andrey Orst.
