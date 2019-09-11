@@ -863,8 +863,7 @@ are defining or executing a macro."
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydra-mc/body)
-         ("C-d" . mc/mark-next-like-this-word))
+         ("C-c m" . hydra-mc/body))
   :config
   (use-package mc-extras)
   (defhydra hydra-mc (:hint nil :color pink)
