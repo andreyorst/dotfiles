@@ -548,8 +548,10 @@ are defining or executing a macro."
                                 (string-match-p "repl \\*" bufname)) "Geiser")
                            (t "Tools")))
                     ((string-match-p "magit" bufname) "Magit")
+                    ((eq major-mode 'dired-mode) "Dired")
                     ((or (string-match-p "Pfuture-Callback (" bufname)
-                         (string-equal " " (substring bufname 0 1))) "Ignored")
+                         (string-equal " " (substring bufname 0 1))
+                         (eq major-mode 'minibuffer-inactive-mode)) "Ignored")
                     (t "Default")))))
     :init
     (centaur-tabs-mode)))
