@@ -22,6 +22,8 @@ define-command -override -hidden \
 -docstring "smart-select-file: tries to select file path in current line automatically." \
 smart-select-file %{
     try %{
+        execute-keys "<a-k>..<ret>"
+    } catch %{
         # guess we have nonblank character under cursor
         execute-keys "<a-k>\w<ret>"
         execute-keys "<a-i><a-w>"
