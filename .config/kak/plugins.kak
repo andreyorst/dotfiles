@@ -126,7 +126,6 @@ plug "andreyorst/powerline.kak" branch "toggling" defer powerline %{
     powerline-start
 }
 
-
 plug "andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
     set-option global smarttab_expandtab_mode_name '⋅t⋅'

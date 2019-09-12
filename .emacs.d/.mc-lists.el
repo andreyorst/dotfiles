@@ -77,6 +77,7 @@
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
+        term-line-mode
         term-send-raw
         xref-find-definitions
         yank-rectangle
