@@ -522,6 +522,7 @@ are defining or executing a macro."
 
 (when window-system
   (use-package centaur-tabs
+    :load-path "~/centaur-tabs/"
     :hook ((dashboard-mode
             term-mode
             calendar-mode
@@ -985,6 +986,14 @@ _-_: reduce region _)_: around pairs
   (setq imenu-list-idle-update-delay-time 0.1
         imenu-list-size 27
         imenu-list-focus-after-activation t))
+
+(use-package dumb-jump
+  :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go))
+  :config
+  (setq dumb-jump-selector 'ivy)
+  (when (executable-find "rg")
+    (setq dumb-jump-force-searcher 'rg)))
 
 (provide 'init)
 ;;; init.el ends here

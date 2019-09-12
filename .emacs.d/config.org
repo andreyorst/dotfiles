@@ -910,6 +910,7 @@ buffers. It's good for navigation with the mouse, and looks fancy.
 #+BEGIN_SRC emacs-lisp
   (when window-system
     (use-package centaur-tabs
+      :load-path "~/centaur-tabs/"
       :hook ((dashboard-mode
               term-mode
               calendar-mode
@@ -1635,6 +1636,22 @@ when =imenu-list= was toggled to be shown.
     (setq imenu-list-idle-update-delay-time 0.1
           imenu-list-size 27
           imenu-list-focus-after-activation t))
+#+END_SRC
+
+*** Dumb Jump
+This package adds ability to jump to the definition for languages that
+aren't  likely supported  by any  of my  tools, by  using simple  text
+search and patterns.  It supports more than 40  languages, which makes
+it great candidate for a /Just Works/ solution for jumping.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dumb-jump
+    :bind (("M-g o" . dumb-jump-go-other-window)
+           ("M-g j" . dumb-jump-go))
+    :config
+    (setq dumb-jump-selector 'ivy)
+    (when (executable-find "rg")
+      (setq dumb-jump-force-searcher 'rg)))
 #+END_SRC
 
 * Postscript
