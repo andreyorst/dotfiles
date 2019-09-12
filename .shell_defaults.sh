@@ -176,7 +176,7 @@ pm_yay() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) yay -S "$@"     ;;
+        (install) yay -Syu "$@"   ;;
         (update)  yay -Syyu "$@"  ;;
         (remove)  yay -Rsc "$@"   ;;
         (search)  yay -Ss "$@"    ;;
@@ -188,11 +188,11 @@ pm_packman() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) sudo pacman -S "$@"     ;;
-        (update)  sudo pacman -Syyu "$@"  ;;
-        (remove)  sudo pacman -Rsc "$@"   ;;
-        (search)  pacman -Ss "$@"         ;;
-        (*)       sudo pacman "$cmd" "$@" ;;
+        (install) sudo pacman -Syu "$@"  ;;
+        (update)  sudo pacman -Syyu "$@" ;;
+        (remove)  sudo pacman -Rsc "$@"  ;;
+        (search)  pacman -Ss "$@"        ;;
+        (*)       pacman "$cmd" "$@"     ;;
     esac
 }
 
@@ -204,7 +204,7 @@ pm_dnf() {
         (update)  sudo dnf upgrade "$@" ;;
         (remove)  sudo dnf remove "$@"  ;;
         (search)  dnf search "$@"       ;;
-        (*)       sudo dnf "$cmd" "$@"  ;;
+        (*)       dnf "$cmd" "$@"       ;;
     esac
 }
 
@@ -216,7 +216,7 @@ pm_yum() {
         (update)  sudo yum update "$@"  ;;
         (remove)  sudo yum remove "$@"  ;;
         (search)  yum search "$@"       ;;
-        (*)       sudo yum "$cmd" "$@"  ;;
+        (*)       yum "$cmd" "$@"       ;;
     esac
 }
 
@@ -229,7 +229,7 @@ if [ -n "${PATH##*termux*}" ]; then
             (update)  sudo apt update "$@"  ;;
             (remove)  sudo apt remove "$@"  ;;
             (search)  apt search "$@"       ;;
-            (*)       sudo apt "$cmd" "$@"  ;;
+            (*)       apt "$cmd" "$@"       ;;
         esac
     }
 else
