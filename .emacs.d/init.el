@@ -657,6 +657,7 @@ are defining or executing a macro."
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :config
+  (use-package edit-indirect)
   (defvar markdown-command "multimarkdown")
   (defun my/markdown-setup ()
     "Set buffer local variables."

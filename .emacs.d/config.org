@@ -1088,7 +1088,10 @@ These settings are for editing C source files.
 *** Markdown Mode
 Sometimes I need to edit Markdown documents, so this package is handy.
 For markdown  mode I would like  to have automatic spell  checking and
-filling. Basically the same setup as for Org Mode.
+filling. Basically  the same setup  as for Org  Mode.  And one  of the
+features of Org mode is ability to edit source code blocks in separate
+window  with  appropriate  major  mode.  This  can  be  achieved  with
+=edit-indirect= package.
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -1096,6 +1099,7 @@ filling. Basically the same setup as for Org Mode.
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
     :config
+    (use-package edit-indirect)
     (defvar markdown-command "multimarkdown")
     (defun my/markdown-setup ()
       "Set buffer local variables."
