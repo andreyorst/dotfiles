@@ -522,7 +522,7 @@ are defining or executing a macro."
 
 (when window-system
   (use-package centaur-tabs
-    :load-path "~/centaur-tabs/"
+    :load-path "~/Git/centaur-tabs/"
     :hook ((dashboard-mode
             term-mode
             calendar-mode
