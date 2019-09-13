@@ -838,10 +838,12 @@ that Treemacs will look just as great as DOOM themed Emacs!
                                                         5))
                                                    ?\ )
                                                   "Treemacs"))))
-        (face-remap-add-relative 'header-line
-                                 :box '(:line-width 7 :color "#21242b")
-                                 :background "#21242b"
-                                 :weight 'bold))
+        (let ((bg (face-attribute 'default :background)))
+          (message "bg: %s" bg)
+          (face-remap-add-relative 'header-line
+                                   :box (list :line-width 7 :color bg)
+                                   :background bg
+                                   :weight 'bold)))
       (setq treemacs-width 27
             treemacs-is-never-other-window t
             treemacs-space-between-root-nodes nil)
