@@ -224,6 +224,7 @@ plug "delapouite/kakoune-select-view" %{
 if %[ -n "${PATH##*termux*}" ] %{
     plug "andreyorst/kaktree" defer kaktree %{
         map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+        set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 3
         set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂
         set-option global kaktree_dir_icon_close '▸ 🗀 ' # 📁
