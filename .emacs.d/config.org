@@ -829,18 +829,19 @@ that Treemacs will look just as great as DOOM themed Emacs!
             (string= file ".svn")))
       (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
       (defun my/treemacs-header-line ()
-        (setq header-line-format (concat (make-string
-                                          (let ((width (window-width)))
-                                            (- (/ (if (= (% width 2) 0)
-                                                      width
-                                                    (1+ width))
-                                                  2)
-                                               5))
-                                          ?\ )
-                                         "Treemacs"))
+        (setq header-line-format '((:eval (concat (make-string
+                                                   (let ((width (window-width)))
+                                                     (- (/ (if (= (% width 2) 0)
+                                                               width
+                                                             (1+ width))
+                                                           2)
+                                                        5))
+                                                   ?\ )
+                                                  "Treemacs"))))
         (face-remap-add-relative 'header-line
                                  :box '(:line-width 7 :color "#21242b")
-                                 :background "#21242b"))
+                                 :background "#21242b"
+                                 :weight 'bold))
       (setq treemacs-width 27
             treemacs-is-never-other-window t
             treemacs-space-between-root-nodes nil)
