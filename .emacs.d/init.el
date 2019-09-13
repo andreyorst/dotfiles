@@ -484,15 +484,13 @@ are defining or executing a macro."
           (string= file ".svn")))
     (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
     (defun my/treemacs-header-line ()
-      (setq header-line-format '((:eval (concat (make-string
-                                                 (let ((width (window-width)))
-                                                   (- (/ (if (= (% width 2) 0)
-                                                             width
-                                                           (1+ width))
-                                                         2)
-                                                      5))
-                                                 ?\ )
-                                                "Treemacs"))))
+      (setq header-line-format
+            '((:eval (concat
+                      (make-string
+                       (let ((width (window-width)))
+                         (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
+                       ?\ )
+                      "Treemacs"))))
       (let ((bg (face-attribute 'default :background)))
         (message "bg: %s" bg)
         (face-remap-add-relative 'header-line

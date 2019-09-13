@@ -829,15 +829,13 @@ that Treemacs will look just as great as DOOM themed Emacs!
             (string= file ".svn")))
       (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
       (defun my/treemacs-header-line ()
-        (setq header-line-format '((:eval (concat (make-string
-                                                   (let ((width (window-width)))
-                                                     (- (/ (if (= (% width 2) 0)
-                                                               width
-                                                             (1+ width))
-                                                           2)
-                                                        5))
-                                                   ?\ )
-                                                  "Treemacs"))))
+        (setq header-line-format
+              '((:eval (concat
+                        (make-string
+                         (let ((width (window-width)))
+                           (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
+                         ?\ )
+                        "Treemacs"))))
         (let ((bg (face-attribute 'default :background)))
           (message "bg: %s" bg)
           (face-remap-add-relative 'header-line
@@ -1259,9 +1257,9 @@ since it's never used, and left fringe is occupied by diff status.
 #+END_SRC
 
 *** Hydra
-Hydra is  something like ability to  create mappings that sit  in it's
-own mode, like different user modes  in Kakoune. It allows me to press
-some shortcut and  be locked in a mode-like state  where keys that are
+This is something like ability to create mappings that sit in it's own
+mode, like different user modes in Kakoune. It allows me to press some
+shortcut  and be  locked  in a  mode-like state  where  keys that  are
 related  to  this  prefix  shortcut  are behaving  in  terms  of  this
 shortcut.
 
@@ -1442,8 +1440,8 @@ a separate package
 #+END_SRC
 
 *** Magit
-Magit is a Emacs  interface to Git.  I've heard that  it has many nice
-features, so I want to try it out.
+Emacs interface to Git.  I've heard that it has many nice features, so
+I want to try it out.
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
