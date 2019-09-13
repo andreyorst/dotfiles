@@ -614,7 +614,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
       :bind (("<f7>" . treemacs)
              ("<f8>" . treemacs-select-window))
       :hook ((after-init . my/treemacs-init-setup)
-             (treemacs-mode . my/treemacs-setup))
+             (treemacs-mode . my/treemacs-setup)
+             (treemacs-mode . my/treemacs-header-line))
       :config
       (use-package treemacs-magit)
       (set-face-attribute 'treemacs-root-face nil
@@ -827,6 +828,19 @@ that Treemacs will look just as great as DOOM themed Emacs!
             (s-ends-with? ".a" file)
             (string= file ".svn")))
       (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
+      (defun my/treemacs-header-line ()
+        (setq header-line-format (concat (make-string
+                                          (let ((width (window-width)))
+                                            (- (/ (if (= (% width 2) 0)
+                                                      width
+                                                    (1+ width))
+                                                  2)
+                                               5))
+                                          ?\ )
+                                         "Treemacs"))
+        (face-remap-add-relative 'header-line
+                                 :box '(:line-width 7 :color "#21242b")
+                                 :background "#21242b"))
       (setq treemacs-width 27
             treemacs-is-never-other-window t
             treemacs-space-between-root-nodes nil)
