@@ -495,8 +495,7 @@ are defining or executing a macro."
         (message "bg: %s" bg)
         (face-remap-add-relative 'header-line
                                  :box (list :line-width 7 :color bg)
-                                 :background bg
-                                 :weight 'bold)))
+                                 :background bg)))
     (setq treemacs-width 27
           treemacs-is-never-other-window t
           treemacs-space-between-root-nodes nil)
@@ -542,6 +541,7 @@ are defining or executing a macro."
             term-mode
             calendar-mode
             org-agenda-mode
+            org-src-mode
             helpful-mode
             imenu-list-major-mode
             ediff-mode) . centaur-tabs-local-mode)
