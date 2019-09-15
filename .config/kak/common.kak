@@ -56,6 +56,11 @@ hook global WinCreate .* %{ try %{
 hook global BufOpenFile .* editorconfig-load
 hook global BufNewFile  .* editorconfig-load
 
+## Git
+## ‾‾‾
+hook global -group fly-git NormalIdle .* %{ try %{ git show-diff } }
+hook global -group fly-git InsertIdle .* %{ try %{ git show-diff } }
+
 # Aliases
 # ‾‾‾‾‾‾‾
 alias global h doc
