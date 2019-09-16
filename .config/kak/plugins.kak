@@ -221,22 +221,22 @@ plug "delapouite/kakoune-select-view" %{
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
 
-if %[ -n "${PATH##*termux*}" ] %{
-    plug "andreyorst/kaktree" defer kaktree %{
-        map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+plug "andreyorst/kaktree" defer kaktree %{
+    map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+    if %[ -n "${PATH##*termux*}" ] %{
         set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 3
         set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂
         set-option global kaktree_dir_icon_close '▸ 🗀 ' # 📁
         set-option global kaktree_file_icon      '⠀⠀🖺'  # 🖹 🖻
-    } config %{
-        map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
-        hook global WinSetOption filetype=kaktree %{
-            remove-highlighter buffer/numbers
-            remove-highlighter buffer/matching
-            remove-highlighter buffer/wrap
-            remove-highlighter buffer/show-whitespaces
-        }
+    }
+} config %{
+    map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
+    hook global WinSetOption filetype=kaktree %{
+        remove-highlighter buffer/numbers
+        remove-highlighter buffer/matching
+        remove-highlighter buffer/wrap
+        remove-highlighter buffer/show-whitespaces
     }
 }
 
