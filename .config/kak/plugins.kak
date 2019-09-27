@@ -165,7 +165,7 @@ if %[ -n "${PATH##*termux*}" ] %{
         set-option global tagbar_powerline_format ""
     } config %{
         map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
-        hook global WinSetOption filetype=(c|cpp|rust|gas|markdown) %{
+        hook global WinSetOption filetype=(c|cpp|rust|gas) %{
             tagbar-enable
         }
         hook global WinSetOption filetype=tagbar %{
