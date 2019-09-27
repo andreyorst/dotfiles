@@ -47,14 +47,14 @@ plug "andreyorst/fzf.kak" config %{
     set-option global fzf_project_use_tilda true
     declare-option str-list fzf_exclude_files "*.o" "*.bin" "*.obj" ".*cleanfiles"
     declare-option str-list fzf_exclude_dirs ".git" ".svn" "rtlrun*"
-    evaluate-commands %sh{
+    set-option global fzf_file_command %sh{
         if [ -n "$(command -v fd)" ]; then
             eval "set -- $kak_quoted_opt_fzf_exclude_files $kak_quoted_opt_fzf_exclude_dirs"
             while [ $# -gt 0 ]; do
                 exclude="$exclude --exclude '$1'"
                 shift
             done
-            echo "set-option global fzf_file_command %{fd . --no-ignore --type f --follow --hidden $exclude}"
+            cmd="fd . --no-ignore --type f --follow --hidden $exclude"
         else
             eval "set -- $kak_quoted_opt_fzf_exclude_files"
             while [ $# -gt 0 ]; do
@@ -67,10 +67,15 @@ plug "andreyorst/fzf.kak" config %{
                 shift
             done
             exclude="$exclude -path '*/$1'"
-            echo "set-option global fzf_file_command %{find . \( $exclude \) -prune -o -type f -follow -print}"
+            cmd="find . \( $exclude \) -prune -o -type f -follow -print"
         fi
-        [ -n "$(command -v bat)" ] && echo "set-option global fzf_highlight_command bat"
-        [ -n "${kak_opt_grepcmd}" ] && echo "set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}"
+        echo "$cmd"
+    }
+    if %[ -n "$(command -v bat)" ] %{
+        set-option global fzf_highlight_command bat
+    }
+    if %[ -n "${kak_opt_grepcmd}" ] %{
+        set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}
     }
 }
 
@@ -107,9 +112,11 @@ if %[ -n "${PATH##*termux*}" ] %{
         hook window InsertEnd .* %{ clang-parse }
         map -docstring "next diagnostics error" window goto n '<esc>: clang-diagnostics-next<ret>'
     }
-    hook global WinSetOption filetype=rust) %{
-        racer-enable-autocomplete
-        map -docstring "go to definition" window goto d '<esc>: racer-go-definition<ret>'
+    if %[ -n "$(command -v racer)" ] %{
+        hook global WinSetOption filetype=rust %{
+            racer-enable-autocomplete
+            map -docstring "go to definition" window goto d '<esc>: racer-go-definition<ret>'
+        }
     }
 }
 
@@ -201,22 +208,22 @@ plug "delapouite/kakoune-select-view" %{
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
 
-if %[ -n "${PATH##*termux*}" ] %{
-    plug "andreyorst/kaktree" defer kaktree %{
-        map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+plug "andreyorst/kaktree" defer kaktree %{
+    map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+    if %[ -n "${PATH##*termux*}" ] %{
         set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 3
         set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂
         set-option global kaktree_dir_icon_close '▸ 🗀 ' # 📁
         set-option global kaktree_file_icon      '⠀⠀🖺'  # 🖹 🖻
-    } config %{
-        map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
-        hook global WinSetOption filetype=kaktree %{
-            remove-highlighter buffer/numbers
-            remove-highlighter buffer/matching
-            remove-highlighter buffer/wrap
-            remove-highlighter buffer/show-whitespaces
-        }
+    }
+} config %{
+    map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
+    hook global WinSetOption filetype=kaktree %{
+        remove-highlighter buffer/numbers
+        remove-highlighter buffer/matching
+        remove-highlighter buffer/wrap
+        remove-highlighter buffer/show-whitespaces
     }
 }
 
