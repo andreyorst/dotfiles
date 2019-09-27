@@ -24,7 +24,6 @@ plug "andreyorst/plug.kak" noload config %{
     }
 }
 
-nop plug "andreyorst/kakoune-snippet-collection"
 plug "delapouite/kakoune-text-objects"
 plug "occivink/kakoune-vertical-selection"
 plug "occivink/kakoune-sudo-write"
@@ -149,25 +148,6 @@ plug "alexherbo2/replace.kak" config %{
 plug "alexherbo2/move-line.kak" config %{
     map global normal '<a-up>'   ': move-line-above %val{count}<ret>'
     map global normal '<a-down>' ': move-line-below %val{count}<ret>'
-}
-
-nop plug "occivink/kakoune-snippets" config %{
-    set-option -add global snippets_directories "%opt{plug_install_dir}/kakoune-snippet-collection/snippets"
-    set-option global snippets_auto_expand false
-    map global insert '<c-e>' "<esc>: expand-or-jump<ret>" -docstring "expand snippet under cursor"
-    map global normal '<c-e>' ":      expand-or-jump<ret>" -docstring "expand snippet under cursor"
-
-    define-command -docstring "expand-or-jump-or-key <key>: expand snippet or jump to the placeholder or execute <key>" \
-    expand-or-jump %{
-        try %{ snippets-expand-trigger %{
-            set-register / "%opt{snippets_triggers_regex}\z"
-            execute-keys 'hGhs<ret>'
-        }} catch %{
-            snippets-select-next-placeholders
-        } catch %{
-            nop
-        }
-    }
 }
 
 if %[ -n "${PATH##*termux*}" ] %{
