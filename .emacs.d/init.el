@@ -492,7 +492,6 @@ are defining or executing a macro."
                        ?\ )
                       "Treemacs"))))
       (let ((bg (face-attribute 'default :background)))
-        (message "bg: %s" bg)
         (face-remap-add-relative 'header-line
                                  :box (list :line-width 7 :color bg)
                                  :background bg)))
