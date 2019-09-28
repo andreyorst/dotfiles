@@ -39,7 +39,6 @@
 
 (setq-default indent-tabs-mode nil
               scroll-step 1
-              scroll-conservatively 10000
               mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)
 
