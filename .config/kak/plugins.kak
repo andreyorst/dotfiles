@@ -203,7 +203,6 @@ plug "andreyorst/langmap.kak" defer langmap %{
 }
 
 plug "delapouite/kakoune-select-view" %{
-    # Suggested mappings
     map global normal <a-%> ': select-view<ret>' -docstring 'select view'
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
@@ -213,9 +212,9 @@ plug "andreyorst/kaktree" defer kaktree %{
     if %[ -n "${PATH##*termux*}" ] %{
         set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 3
-        set-option global kaktree_dir_icon_open  '▾ 🗁 ' # 📂
-        set-option global kaktree_dir_icon_close '▸ 🗀 ' # 📁
-        set-option global kaktree_file_icon      '⠀⠀🖺'  # 🖹 🖻
+        set-option global kaktree_dir_icon_open  '▾ 🗁 '
+        set-option global kaktree_dir_icon_close '▸ 🗀 '
+        set-option global kaktree_file_icon      '⠀⠀🖺'
     }
 } config %{
     map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
