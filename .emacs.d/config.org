@@ -432,14 +432,18 @@ process, and when new frame is created.
 #+BEGIN_SRC emacs-lisp
   (use-package frame
     :ensure nil
-    :hook ((after-make-frame-functions after-init) . my/set-frame-dark)
+    :hook (after-init . my/set-frame-dark)
     :commands (my/set-frame-dark)
-    :config (defun my/set-frame-dark (&optional frame)
-              "Set FRAME titlebar colorscheme to dark variant."
-              (with-selected-frame (or frame (selected-frame))
-                (call-process-shell-command
-                 (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-                         (frame-parameter frame 'name))))))
+    :config
+    (add-to-list 'after-make-frame-functions #'my/set-frame-dark)
+    (defun my/set-frame-dark (&optional frame)
+      "Set FRAME titlebar colorscheme to dark variant."
+      (with-selected-frame (or frame (selected-frame))
+        (message (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                         (frame-parameter frame 'name)))
+        (call-process-shell-command
+         (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                 (frame-parameter frame 'name))))))
 #+END_SRC
 
 *** Solaire Mode
