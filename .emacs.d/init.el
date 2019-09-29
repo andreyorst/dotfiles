@@ -67,7 +67,7 @@
 ;; suppress byte-compiler warnings
 (declare-function minibuffer-keyboard-quit "delsel" (&optional ARGS))
 
-(defun my/escape ()
+(defun aorst/escape ()
   "Quit in current context.
 
 When there is an active minibuffer and we are not inside it close
@@ -84,14 +84,14 @@ are defining or executing a macro."
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
            (keyboard-quit)))))
-(global-set-key [remap keyboard-quit] #'my/escape)
+(global-set-key [remap keyboard-quit] #a'orst/escape)
 
-(defun my/command-error-function (data context caller)
+(defun aorst/command-error-function (data context caller)
   "Ignore the `text-read-only' signal; pass the rest DATA CONTEXT CALLER to the default handler."
   (when (not (eq (car data) 'text-read-only))
     (command-error-default-function data context caller)))
 
-(setq command-error-function #'my/command-error-function)
+(setq command-error-function #a'orst/command-error-function)
 
 (setq inhibit-splash-screen t
       initial-major-mode 'org-mode
@@ -151,11 +151,11 @@ are defining or executing a macro."
 
 (use-package frame
   :ensure nil
-  :hook (after-init . my/set-frame-dark)
-  :commands (my/set-frame-dark)
+  :hook (after-init . aorst/set-frame-dark)
+  :commands (aorst/set-frame-dark)
   :config
-  (add-to-list 'after-make-frame-functions #'my/set-frame-dark)
-  (defun my/set-frame-dark (&optional frame)
+  (add-to-list 'after-make-frame-functions #a'orst/set-frame-dark)
+  (defun aorst/set-frame-dark (&optional frame)
     "Set FRAME titlebar colorscheme to dark variant."
     (with-selected-frame (or frame (selected-frame))
       (message (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
@@ -176,13 +176,13 @@ are defining or executing a macro."
            org-src-mode) . turn-on-solaire-mode)
          (snippet-mode . solaire-mode))
   :config
-  (defun my/real-buffer-p ()
+  (defun aorst/real-buffer-p ()
     "Determines whether buffer is real."
     (or (and (not (minibufferp))
              (buffer-file-name))
         (or (string-equal "*scratch*" (buffer-name))
             (string-match-p ".~{index}~" (buffer-name)))))
-  (setq solaire-mode-real-buffer-fn #'my/real-buffer-p)
+  (setq solaire-mode-real-buffer-fn #a'orst/real-buffer-p)
   (solaire-mode-swap-bg)
   (cond ((not (boundp 'after-focus-change-function))
          (add-hook 'focus-in-hook  #'solaire-mode-reset))
@@ -195,11 +195,11 @@ are defining or executing a macro."
   :hook ((window-configuration-change
           org-capture-mode
           org-src-mode
-          ediff-after-setup-windows-hook) . my/real-buffer-setup)
+          ediff-after-setup-windows-hook) . aorst/real-buffer-setup)
   :config
-  (defun my/real-buffer-setup (&rest _)
+  (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
-    (when (my/real-buffer-p)
+    (when (aorst/real-buffer-p)
       (set-window-fringes nil 8 8 nil)
       (when (and (fboundp 'doom-color)
                  window-system)
@@ -262,18 +262,18 @@ are defining or executing a macro."
                treemacs-TAB-action
                treemacs-load-theme
                treemacs-toggle-fixed-width)
-    :functions (my/treemacs-expand-all-projects
-                my/treemacs-variable-pitch-labels
-                my/tremacs-init-setup
-                my/treemacs-setup
-                my/treemacs-setup-fringes
+    :functions (aorst/treemacs-expand-all-projects
+                aorst/treemacs-variable-pitch-labels
+                aorst/tremacs-init-setup
+                aorst/treemacs-setup
+                aorst/treemacs-setup-fringes
                 doom-color
                 all-the-icons-octicon)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window))
-    :hook ((after-init . my/treemacs-init-setup)
-           (treemacs-mode . my/treemacs-setup)
-           (treemacs-mode . my/treemacs-header-line))
+    :hook ((after-init . aorst/treemacs-init-setup)
+           (treemacs-mode . aorst/treemacs-setup)
+           (treemacs-mode . aorst/treemacs-header-line))
     :config
     (use-package treemacs-magit)
     (set-face-attribute 'treemacs-root-face nil
@@ -436,7 +436,7 @@ are defining or executing a macro."
                                  :v-adjust 0
                                  :face '(:inherit font-lock-doc-face :slant normal)))
          :extensions (fallback))))
-    (defun my/treemacs-expand-all-projects (&optional _)
+    (defun aorst/treemacs-expand-all-projects (&optional _)
       "Expand all projects."
       (save-excursion
         (treemacs--forget-last-highlight)
@@ -446,7 +446,7 @@ are defining or executing a macro."
               (goto-char pos)
               (treemacs--expand-root-node pos)))))
       (treemacs--maybe-recenter 'on-distance))
-    (defun my/treemacs-variable-pitch-labels (&rest _)
+    (defun aorst/treemacs-variable-pitch-labels (&rest _)
       (dolist (face '(treemacs-root-face
                       treemacs-git-unmodified-face
                       treemacs-git-modified-face
@@ -463,30 +463,30 @@ are defining or executing a macro."
           (set-face-attribute
            face nil :inherit
            `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
-    (defun my/treemacs-init-setup ()
+    (defun aorst/treemacs-init-setup ()
       "Set treemacs theme, open treemacs, and expand all projects."
       (treemacs-load-theme "Atom")
       (treemacs)
-      (my/treemacs-expand-all-projects))
-    (defun my/treemacs-setup ()
+      (aorst/treemacs-expand-all-projects))
+    (defun aorst/treemacs-setup ()
       "Set treemacs buffer common settings."
       (setq tab-width 1
             mode-line-format nil
             line-spacing 5)
       (set-window-fringes nil 0 0 nil)
-      (my/treemacs-variable-pitch-labels))
-    (defun my/treemacs-setup-fringes ()
+      (aorst/treemacs-variable-pitch-labels))
+    (defun aorst/treemacs-setup-fringes ()
       "Set treemacs buffer fringes."
       (set-window-fringes nil 0 0 nil)
-      (my/treemacs-variable-pitch-labels))
-    (advice-add #'treemacs-select-window :after #'my/treemacs-setup-fringes)
-    (defun my/treemacs-ignore (file _)
+      (aorst/treemacs-variable-pitch-labels))
+    (advice-add #'treemacs-select-window :after #a'orst/treemacs-setup-fringes)
+    (defun aorst/treemacs-ignore (file _)
       (or (s-ends-with? ".elc" file)
           (s-ends-with? ".o" file)
           (s-ends-with? ".a" file)
           (string= file ".svn")))
-    (add-to-list 'treemacs-ignored-file-predicates #'my/treemacs-ignore)
-    (defun my/treemacs-header-line ()
+    (add-to-list 'treemacs-ignored-file-predicates #a'orst/treemacs-ignore)
+    (defun aorst/treemacs-header-line ()
       (setq header-line-format
             '((:eval (concat
                       (make-string
@@ -514,10 +514,10 @@ are defining or executing a macro."
     :commands (global-diff-hl-mode
                diff-hl-flydiff-mode
                diff-hl-margin-mode)
-    :hook ((diff-hl-mode . my/setup-fringe-bitmaps)
+    :hook ((diff-hl-mode . aorst/setup-fringe-bitmaps)
            (magit-post-refresh . diff-hl-magit-post-refresh))
     :config
-    (defun my/setup-fringe-bitmaps ()
+    (defun aorst/setup-fringe-bitmaps ()
       "Set fringe bitmaps."
       (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
       (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
@@ -583,10 +583,10 @@ are defining or executing a macro."
   :defines default-justification
   :hook ((org-mode . flyspell-mode)
          (org-mode . auto-fill-mode)
-         (after-save . my/org-tangle-on-config-save)
-         (org-babel-after-execute . my/org-update-inline-images)
-         (org-mode . my/org-init-setup)
-         ((org-capture-mode org-src-mode) . my/discard-history))
+         (after-save . aorst/org-tangle-on-config-save)
+         (org-babel-after-execute . aorst/org-update-inline-images)
+         (org-mode . aorst/org-init-setup)
+         ((org-capture-mode org-src-mode) . aorst/discard-history))
   :bind (:map org-mode-map
               ([backtab] . nil)
               ([S-iso-lefttab] . nil)
@@ -609,18 +609,18 @@ are defining or executing a macro."
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
         org-confirm-babel-evaluate nil)
-  (defun my/org-tangle-on-config-save ()
+  (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
       (org-babel-tangle)))
-  (defun my/org-update-inline-images ()
+  (defun aorst/org-update-inline-images ()
     "Update inline images in Org-mode."
     (when org-inline-image-overlays
       (org-redisplay-inline-images)))
-  (defun my/org-init-setup ()
+  (defun aorst/org-init-setup ()
     "Set buffer local values."
     (setq default-justification 'full))
-  (defun my/discard-history ()
+  (defun aorst/discard-history ()
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
@@ -662,12 +662,12 @@ are defining or executing a macro."
 
 (use-package cc-mode
   :ensure nil
-  :config (defun my/cc-mode-setup ()
+  :config (defun aorst/cc-mode-setup ()
             (setq c-basic-offset 4
                   c-default-style "linux"
                   indent-tabs-mode t
                   tab-width 4))
-  :hook ((c-mode-common . my/cc-mode-setup)
+  :hook ((c-mode-common . aorst/cc-mode-setup)
          (c-mode-common . electric-pair-local-mode)))
 
 (use-package markdown-mode
@@ -677,13 +677,13 @@ are defining or executing a macro."
   :config
   (use-package edit-indirect)
   (defvar markdown-command "multimarkdown")
-  (defun my/markdown-setup ()
+  (defun aorst/markdown-setup ()
     "Set buffer local variables."
     (setq fill-column 80
           default-justification 'left))
   :hook ((markdown-mode . flyspell-mode)
          (markdown-mode . auto-fill-mode)
-         (markdown-mode . my/markdown-setup)))
+         (markdown-mode . aorst/markdown-setup)))
 
 (use-package rust-mode
   :commands (rust-format-buffer)
@@ -718,9 +718,9 @@ are defining or executing a macro."
 
 (use-package term
   :ensure nil
-  :bind ("C-`" . my/ansi-term-toggle)
+  :bind ("C-`" . aorst/ansi-term-toggle)
   :config
-  (defun my/ansi-term-toggle (&optional arg)
+  (defun aorst/ansi-term-toggle (&optional arg)
     "Toggle `ansi-term' window on and off with the same command."
     (interactive "P")
     (let* ((bufname " *ansi-term*")
@@ -740,11 +740,11 @@ are defining or executing a macro."
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
           (set-window-parameter window 'window-side side)))))
-  (defun my/autokill-when-no-processes (&rest _)
+  (defun aorst/autokill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
       (kill-buffer (current-buffer))))
-  (advice-add 'term-handle-exit :after 'my/autokill-when-no-processes))
+  (advice-add 'term-handle-exit :after a'orst/autokill-when-no-processes))
 
 (use-package editorconfig
   :commands editorconfig-mode
@@ -959,22 +959,22 @@ _-_: reduce region _)_: around pairs
   :config
   (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
     "Files or directories that indicate the root of a project.")
-  (defun my/project-find-root (path)
+  (defun aorst/project-find-root (path)
     "Tail-recursive search in PATH for root markers."
     (let* ((this-dir (file-name-as-directory (file-truename path)))
            (parent-dir (expand-file-name (concat this-dir "../")))
            (system-root-dir (expand-file-name "/")))
       (cond
-       ((my/project-root-p this-dir) (cons 'transient this-dir))
+       ((aorst/project-root-p this-dir) (cons 'transient this-dir))
        ((equal system-root-dir this-dir) nil)
-       (t (my/project-find-root parent-dir)))))
-  (defun my/project-root-p (path)
+       (t (aorst/project-find-root parent-dir)))))
+  (defun aorst/project-root-p (path)
     "Check if current PATH has any of project root markers."
     (let ((results (mapcar (lambda (marker)
                              (file-exists-p (concat path marker)))
                            project-root-markers)))
       (eval `(or ,@ results))))
-  (add-to-list 'project-find-functions #'my/project-find-root))
+  (add-to-list 'project-find-functions #a'orst/project-find-root))
 
 (use-package clang-format
   :after cc-mode
@@ -995,11 +995,11 @@ _-_: reduce region _)_: around pairs
   :bind (("<f9>" . imenu-list-smart-toggle)
          ("<f10>". imenu-list-show))
   :config
-  (defun my/imenu-list-setup ()
+  (defun aorst/imenu-list-setup ()
     "Setings for imenu-list"
     (setq window-size-fixed 'width
           mode-line-format nil))
-  (advice-add 'imenu-list-smart-toggle :after-while #'my/imenu-list-setup)
+  (advice-add 'imenu-list-smart-toggle :after-while #a'orst/imenu-list-setup)
   (setq imenu-list-idle-update-delay-time 0.1
         imenu-list-size 27
         imenu-list-focus-after-activation t))
