@@ -802,10 +802,8 @@ are defining or executing a macro."
   (use-package counsel
     :commands (counsel-M-x
                counsel-find-file
-               counsel-fzf
                counsel-file-jump
                counsel-recentf
-               counsel-git-grep
                counsel-rg
                counsel-describe-function
                counsel-describe-variable
@@ -823,10 +821,8 @@ are defining or executing a macro."
               "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
     :bind (("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
-           ("C-x f" . counsel-fzf)
            ("C-x p" . counsel-file-jump)
            ("C-x C-r" . counsel-recentf)
-           ("C-c g" . counsel-git-grep)
            ("C-c r" . counsel-rg)
            ("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
