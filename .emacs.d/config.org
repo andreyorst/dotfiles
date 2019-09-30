@@ -1409,8 +1409,7 @@ Complete anything framework. Nothing much to say. Does it's job.
     :hook (after-init . global-company-mode)
     :config
     (use-package company-flx
-      :commands company-flx-mode
-      :init (company-flx-mode +1))
+      :config (company-flx-mode +1))
     (setq company-require-match 'never
           company-minimum-prefix-length 3
           company-tooltip-align-annotations t
