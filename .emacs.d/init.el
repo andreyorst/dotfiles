@@ -567,9 +567,10 @@ are defining or executing a macro."
                            (t "Tools")))
                     ((string-match-p "magit" bufname) "Magit")
                     ((eq major-mode 'dired-mode) "Dired")
-                    ((or (string-match-p "Pfuture-Callback (" bufname)
-                         (string-equal " " (substring bufname 0 1))
-                         (eq major-mode 'minibuffer-inactive-mode)) "Ignored")
+                    ((or (string-equal " " (substring bufname 0 1))
+                         (eq major-mode 'minibuffer-inactive-mode)
+                         (string-match-p "Treemacs" bufname)
+                         (string-match-p "Pfuture-Callback " bufname)) "Ignored")
                     (t "Default")))))
     :init
     (centaur-tabs-mode)))
