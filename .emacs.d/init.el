@@ -550,8 +550,6 @@ are defining or executing a macro."
             imenu-list-major-mode
             ediff-mode) . centaur-tabs-local-mode)
     :config
-    (global-set-key (kbd "C-c n") 'centaur-tabs-forward)
-    (global-set-key (kbd "C-c p") 'centaur-tabs-backward)
     (setq centaur-tabs-set-modified-marker t
           centaur-tabs-modified-marker "●"
           centaur-tabs-cycle-scope 'tabs
