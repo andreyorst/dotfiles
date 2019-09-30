@@ -82,6 +82,7 @@ plug "andreyorst/fzf.kak" config %{
 if %[ -n "${PATH##*termux*}" ] %{
     plug "ul/kak-lsp" do %{
         cargo install --force --path . --locked
+        cargo clean
     } config %{
         define-command lsp-restart %{ lsp-stop; lsp-start }
         set-option global lsp_completion_trigger "execute-keys 'h<a-h><a-k>\S[^\s,=;*(){}\[\]]\z<ret>'"
