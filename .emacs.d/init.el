@@ -84,14 +84,14 @@ are defining or executing a macro."
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
            (keyboard-quit)))))
-(global-set-key [remap keyboard-quit] #a'orst/escape)
+(global-set-key [remap keyboard-quit] #'aorst/escape)
 
 (defun aorst/command-error-function (data context caller)
   "Ignore the `text-read-only' signal; pass the rest DATA CONTEXT CALLER to the default handler."
   (when (not (eq (car data) 'text-read-only))
     (command-error-default-function data context caller)))
 
-(setq command-error-function #a'orst/command-error-function)
+(setq command-error-function #'aorst/command-error-function)
 
 (setq inhibit-splash-screen t
       initial-major-mode 'org-mode
@@ -154,7 +154,7 @@ are defining or executing a macro."
   :hook (after-init . aorst/set-frame-dark)
   :commands (aorst/set-frame-dark)
   :config
-  (add-to-list 'after-make-frame-functions #a'orst/set-frame-dark)
+  (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
   (defun aorst/set-frame-dark (&optional frame)
     "Set FRAME titlebar colorscheme to dark variant."
     (with-selected-frame (or frame (selected-frame))
@@ -182,7 +182,7 @@ are defining or executing a macro."
              (buffer-file-name))
         (or (string-equal "*scratch*" (buffer-name))
             (string-match-p ".~{index}~" (buffer-name)))))
-  (setq solaire-mode-real-buffer-fn #a'orst/real-buffer-p)
+  (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   (solaire-mode-swap-bg)
   (cond ((not (boundp 'after-focus-change-function))
          (add-hook 'focus-in-hook  #'solaire-mode-reset))
@@ -479,13 +479,13 @@ are defining or executing a macro."
       "Set treemacs buffer fringes."
       (set-window-fringes nil 0 0 nil)
       (aorst/treemacs-variable-pitch-labels))
-    (advice-add #'treemacs-select-window :after #a'orst/treemacs-setup-fringes)
+    (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
     (defun aorst/treemacs-ignore (file _)
       (or (s-ends-with? ".elc" file)
           (s-ends-with? ".o" file)
           (s-ends-with? ".a" file)
           (string= file ".svn")))
-    (add-to-list 'treemacs-ignored-file-predicates #a'orst/treemacs-ignore)
+    (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
     (defun aorst/treemacs-header-line ()
       (setq header-line-format
             '((:eval (concat
@@ -974,7 +974,7 @@ _-_: reduce region _)_: around pairs
                              (file-exists-p (concat path marker)))
                            project-root-markers)))
       (eval `(or ,@ results))))
-  (add-to-list 'project-find-functions #a'orst/project-find-root))
+  (add-to-list 'project-find-functions #'aorst/project-find-root))
 
 (use-package clang-format
   :after cc-mode
@@ -999,7 +999,7 @@ _-_: reduce region _)_: around pairs
     "Setings for imenu-list"
     (setq window-size-fixed 'width
           mode-line-format nil))
-  (advice-add 'imenu-list-smart-toggle :after-while #a'orst/imenu-list-setup)
+  (advice-add 'imenu-list-smart-toggle :after-while #'aorst/imenu-list-setup)
   (setq imenu-list-idle-update-delay-time 0.1
         imenu-list-size 27
         imenu-list-focus-after-activation t))
