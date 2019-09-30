@@ -1678,6 +1678,27 @@ it great candidate for a /Just Works/ solution for jumping.
       (setq dumb-jump-force-searcher 'rg)))
 #+END_SRC
 
+*** Iedit Mode
+Sometimes  Multiple Cursors  are  slow and  sluggish, especially  when
+there's a lot of them. In this case I'm going to use =iedit= mode.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package iedit
+    :bind ("C-q" . aorst/iedit-select-current-or-add)
+    :config
+    (setq iedit-toggle-key-default "")
+    (defun aorst/iedit-select-current-or-add ()
+      "Select only current occurrence with `iedit-mode'.  Expand to
+  next occurrence if `iedit-mode' is already active."
+      (interactive)
+      (if (bound-and-true-p iedit-mode)
+          (cond ((iedit-expand-down-to-occurrence))
+                (t
+                 (beginning-of-buffer)
+                 (iedit-expand-down-to-occurrence)))
+        (iedit-mode 1))))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to

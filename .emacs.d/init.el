@@ -1015,5 +1015,20 @@ _-_: reduce region _)_: around pairs
   (when (executable-find "rg")
     (setq dumb-jump-force-searcher 'rg)))
 
+(use-package iedit
+  :bind ("C-q" . aorst/iedit-select-current-or-add)
+  :config
+  (setq iedit-toggle-key-default "")
+  (defun aorst/iedit-select-current-or-add ()
+    "Select only current occurrence with `iedit-mode'.  Expand to
+next occurrence if `iedit-mode' is already active."
+    (interactive)
+    (if (bound-and-true-p iedit-mode)
+        (cond ((iedit-expand-down-to-occurrence))
+              (t
+               (beginning-of-buffer)
+               (iedit-expand-down-to-occurrence)))
+      (iedit-mode 1))))
+
 (provide 'init)
 ;;; init.el ends here
