@@ -654,8 +654,11 @@ are defining or executing a macro."
 
 (setq-default doc-view-resolution 192)
 
-(setq-default display-line-numbers-grow-only t
-              display-line-numbers-width-start t)
+(use-package display-line-numbers
+  :ensure nil
+  :config
+  (setq display-line-numbers-grow-only t
+        display-line-numbers-width-start t))
 
 (use-package prog-mode
   :ensure nil
