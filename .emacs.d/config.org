@@ -384,9 +384,14 @@ And =require= the package itself:
     (setq use-package-always-ensure t))
 #+END_SRC
 
-All other packages were split to individual categories much like Emacs
-settings above.   This helps me to  keep track of things  in different
-packages and do not rely on search that much.
+*** Compdef
+A package that allows configuration of company and =capf= backends based
+on active modes. It provides =use-package= keywords, that's why it is so
+early in the configuration.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package compdef)
+#+END_SRC
 
 ** User Interface Packages
 All user interface related settings are presented in this section. I'm
@@ -1410,10 +1415,7 @@ Complete anything framework. Nothing much to say. Does it's job.
           '(company-pseudo-tooltip-unless-just-one-frontend
             company-preview-frontend
             company-echo-metadata-frontend))
-    (setq company-backends (remove 'company-clang company-backends)
-          company-backends (remove 'company-xcode company-backends)
-          company-backends (remove 'company-cmake company-backends)
-          company-backends (remove 'company-gtags company-backends)))
+    (setq company-backends '((company-capf :with company-yasnippet) company-files)))
 #+END_SRC
 
 *** Undo Tree
@@ -1552,8 +1554,10 @@ Emacs polyglot. LSP client.
                   (executable-find "rls"))
               window-system)
      (use-package eglot
-       :commands (eglot eglot-ensure)
+       :commands eglot-ensure
        :hook ((c-mode c++-mode rust-mode) . eglot-ensure)
+       :compdef eglot--managed-mode-hook
+       :company (company-capf company-files)
        :config
        (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
        (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))

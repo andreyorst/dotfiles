@@ -139,6 +139,8 @@ are defining or executing a macro."
   (require 'use-package)
   (setq use-package-always-ensure t))
 
+(use-package compdef)
+
 (use-package all-the-icons)
 
 (use-package doom-themes
@@ -855,10 +857,7 @@ are defining or executing a macro."
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-frontend
           company-echo-metadata-frontend))
-  (setq company-backends (remove 'company-clang company-backends)
-        company-backends (remove 'company-xcode company-backends)
-        company-backends (remove 'company-cmake company-backends)
-        company-backends (remove 'company-gtags company-backends)))
+  (setq company-backends '((company-capf :with company-yasnippet) company-files)))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -948,8 +947,10 @@ _-_: reduce region _)_: around pairs
                (executable-find "rls"))
            window-system)
   (use-package eglot
-    :commands (eglot eglot-ensure)
+    :commands eglot-ensure
     :hook ((c-mode c++-mode rust-mode) . eglot-ensure)
+    :compdef eglot--managed-mode-hook
+    :company (company-capf company-files)
     :config
     (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))
