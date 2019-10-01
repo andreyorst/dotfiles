@@ -924,7 +924,7 @@ don't loose 1 pixel of width.
     (window-divider-mode 1))
 #+END_SRC
 
-*** Centaur Tabs
+*** COMMENT Centaur Tabs
 This  package  adds  tabs  over  main  windows,  that  display  opened
 buffers. It's good for navigation with the mouse, and looks fancy.
 

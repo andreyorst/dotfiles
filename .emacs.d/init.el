@@ -538,43 +538,6 @@ are defining or executing a macro."
   (setq window-divider-default-right-width 1)
   (window-divider-mode 1))
 
-(when window-system
-  (use-package centaur-tabs
-    :load-path "~/Git/centaur-tabs/"
-    :hook ((dashboard-mode
-            term-mode
-            calendar-mode
-            org-agenda-mode
-            org-src-mode
-            helpful-mode
-            imenu-list-major-mode
-            ediff-mode) . centaur-tabs-local-mode)
-    :config
-    (setq centaur-tabs-set-modified-marker t
-          centaur-tabs-modified-marker "●"
-          centaur-tabs-cycle-scope 'tabs
-          centaur-tabs-height 32
-          centaur-tabs-style "bar")
-    (set-face-attribute 'centaur-tabs-close-mouse-face nil :underline nil)
-    (set-face-attribute 'centaur-tabs-selected nil :weight 'bold)
-    (defun centaur-tabs-buffer-groups ()
-      "Use as few groups as possible."
-      (let ((bufname (buffer-name)))
-        (list (cond ((string-equal "*" (substring bufname 0 1))
-                     (cond ((string-match-p "eglot" bufname) "Eglot")
-                           ((or (string-match-p "geiser" bufname)
-                                (string-match-p "repl \\*" bufname)) "Geiser")
-                           (t "Tools")))
-                    ((string-match-p "magit" bufname) "Magit")
-                    ((eq major-mode 'dired-mode) "Dired")
-                    ((or (string-equal " " (substring bufname 0 1))
-                         (eq major-mode 'minibuffer-inactive-mode)
-                         (string-match-p "Treemacs" bufname)
-                         (string-match-p "Pfuture-Callback " bufname)) "Ignored")
-                    (t "Default")))))
-    :init
-    (centaur-tabs-mode)))
-
 (use-package uniquify
   :ensure nil
   :config (setq uniquify-buffer-name-style 'forward))
