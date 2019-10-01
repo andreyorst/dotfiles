@@ -49,7 +49,7 @@ mkcd() { mkdir -p $1 && cd $1; }
 
 # convert webm to mp4
 webmp4() {
-    if [ -n "$(command -v ffmpeg)" ]; then
+    if [ -z "$(command -v ffmpeg)" ]; then
         echo "ffmpeg is not installed" >&2
         return 1
     fi
@@ -61,7 +61,7 @@ webmp4() {
 
 # gifify wrapper for fast gif creating
 gif() {
-    if [ -n "$(command -v gifify)" ]; then
+    if [ -z "$(command -v gifify)" ]; then
         gifify $1 -o ${1#.*}.gif --colors 256 --compress 0 --fps 30
     else
         echo "gifify is not installed" >&2
