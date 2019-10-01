@@ -93,6 +93,8 @@ are defining or executing a macro."
 
 (setq command-error-function #'aorst/command-error-function)
 
+(server-start)
+
 (setq inhibit-splash-screen t
       initial-major-mode 'org-mode
       initial-scratch-message "")

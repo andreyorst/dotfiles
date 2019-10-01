@@ -257,6 +257,13 @@ deleting past first symbol. Let's disable it:
   (setq command-error-function #'aorst/command-error-function)
 #+END_SRC
 
+Also, can  we please open  all new files  in existing Emacs  client by
+default?
+
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+#+END_SRC
+
 ** User Interface
 Emacs displays splash screen once started  with no files. I don't need
 it, and  I would like to  start with =*scratch*= buffer  instead. Also I
