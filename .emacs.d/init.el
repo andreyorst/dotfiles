@@ -95,8 +95,6 @@ are defining or executing a macro."
 
 (setq command-error-function #'aorst/command-error-function)
 
-(server-start)
-
 (setq inhibit-splash-screen t
       initial-major-mode 'org-mode
       initial-scratch-message "")
@@ -1027,6 +1025,12 @@ next occurrence if `iedit-mode' is already active."
             (iedit-expand-down-to-occurrence)
           (iedit-expand-up-to-occurrence))
       (iedit-mode 1))))
+
+(use-package server
+  :ensure nil
+  :config
+  (unless (server-running-p)
+    (server-start)))
 
 (provide 'init)
 ;;; init.el ends here

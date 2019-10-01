@@ -259,13 +259,6 @@ deleting past first symbol. Let's disable it:
   (setq command-error-function #'aorst/command-error-function)
 #+END_SRC
 
-Also, can  we please open  all new files  in existing Emacs  client by
-default?
-
-#+BEGIN_SRC emacs-lisp
-  (server-start)
-#+END_SRC
-
 ** User Interface
 Emacs displays splash screen once started  with no files. I don't need
 it, and  I would like to  start with =*scratch*= buffer  instead. Also I
@@ -1701,6 +1694,47 @@ there's a lot of them. In this case I'm going to use =iedit= mode.
             (iedit-expand-up-to-occurrence))
         (iedit-mode 1))))
 #+END_SRC
+
+*** Server
+I'm using  =server-start= command not because  I do not want  to load my
+Emacs every time, but because I  want to have single instance of Emacs
+running at a time, so all files that I open from GUI will be opened in
+existing Emacs. If no Emacs exist, it should start one, start a server
+and open a file.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package server
+    :ensure nil
+    :config
+    (unless (server-running-p)
+      (server-start)))
+#+END_SRC
+
+To fully achieve this behavior one needs a =.desktop= file to exist that
+will decide which kind of Emacs to call: =emacs= or =emacsclient=:
+
+#+BEGIN_SRC conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes
+  [Desktop Entry]
+  Name=Emacs
+  GenericName=Text Editor
+  Comment=Edit text
+  MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
+  Exec=sh -c "if [ \$# -eq 0 ]; then emacs; else emacsclient -a emacs \"\$@\"; fi" dummy %F
+  Icon=emacs
+  Type=Application
+  Terminal=false
+  Categories=Development;TextEditor;Utility;
+  StartupWMClass=Emacs
+#+END_SRC
+
+This code above automatically creates user local =emacs.desktop= file in
+=~/.local/share/applications= that will:
+
+- call =emacs= if no arguments provided, or
+- call =emacsclient  -a emacs= with  arguments. =emacsclient= will  try to
+  connect to  a server,  and if  there's none, it  will fire  up =emacs=
+  which will create server, and opening new files will be done in this
+  instance of =emacs=.
 
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
