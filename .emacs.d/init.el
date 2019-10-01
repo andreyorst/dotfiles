@@ -96,7 +96,7 @@ are defining or executing a macro."
 (setq command-error-function #'aorst/command-error-function)
 
 (setq inhibit-splash-screen t
-      initial-major-mode 'org-mode
+      initial-major-mode 'fundamental-mode
       initial-scratch-message "")
 
 (tooltip-mode -1)
@@ -162,8 +162,6 @@ are defining or executing a macro."
   (defun aorst/set-frame-dark (&optional frame)
     "Set FRAME titlebar colorscheme to dark variant."
     (with-selected-frame (or frame (selected-frame))
-      (message (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-                       (frame-parameter frame 'name)))
       (call-process-shell-command
        (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
                (frame-parameter frame 'name))))))
