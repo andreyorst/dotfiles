@@ -44,6 +44,8 @@ alias sudo="sudo "
 # Functions
 # ‾‾‾‾‾‾‾‾‾
 
+emacs() { emacsclient -a 'emacs' -n "$@" 2>/dev/null || command emacs; }
+
 # create dir and cd into it
 mkcd() { mkdir -p $1 && cd $1; }
 
