@@ -748,7 +748,7 @@ are defining or executing a macro."
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
       (kill-buffer (current-buffer))))
-  (advice-add 'term-handle-exit :after a'orst/autokill-when-no-processes))
+  (advice-add 'term-handle-exit :after 'aorst/autokill-when-no-processes))
 
 (use-package editorconfig
   :commands editorconfig-mode
