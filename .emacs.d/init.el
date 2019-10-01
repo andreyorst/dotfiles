@@ -80,6 +80,8 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
+        ((bound-and-true-p iedit-mode)
+         (iedit-quit))
         (t
          ;; ignore top level quits for macros
          (unless (or defining-kbd-macro executing-kbd-macro)
@@ -1013,18 +1015,17 @@ _-_: reduce region _)_: around pairs
     (setq dumb-jump-force-searcher 'rg)))
 
 (use-package iedit
-  :bind ("C-q" . aorst/iedit-select-current-or-add)
+  :bind ("C-q" . aorst/iedit-current-or-expand)
   :config
   (setq iedit-toggle-key-default "")
-  (defun aorst/iedit-select-current-or-add ()
+  (defun aorst/iedit-current-or-expand (&optional arg)
     "Select only current occurrence with `iedit-mode'.  Expand to
 next occurrence if `iedit-mode' is already active."
-    (interactive)
+    (interactive "P")
     (if (bound-and-true-p iedit-mode)
-        (cond ((iedit-expand-down-to-occurrence))
-              (t
-               (beginning-of-buffer)
-               (iedit-expand-down-to-occurrence)))
+        (if (symbolp arg)
+            (iedit-expand-down-to-occurrence)
+          (iedit-expand-up-to-occurrence))
       (iedit-mode 1))))
 
 (provide 'init)
