@@ -1702,6 +1702,29 @@ This code above automatically creates user local =emacs.desktop= file in
   which will create server, and opening new files will be done in this
   instance of =emacs=.
 
+*** COMMENT Eldoc Box
+This nice  package displays eldoc in  child frame that can  hover near
+the cursor. It is really good for modes that support eldoc and removes
+distraction  that happen  every  time when  your  buffer size  changes
+because eldoc message appeared at  the bottom. It is commented because
+of the bug in Gnome Shell.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eldoc-box
+    :hook ((eldoc-mode . aorst/setup-eldoc-box))
+    :config
+    (defun aorst/setup-eldoc-box ()
+      "Enable eldoc-box hover at point mode."
+      (eldoc-box-hover-mode)
+      (eldoc-box-hover-at-point-mode))
+    (setq eldoc-box-max-pixel-width 1920
+          eldoc-box-max-pixel-height 1080)
+    (let ((color (if (fboundp 'doom-color)
+                     (doom-color 'base0)
+                   "#000000")))
+      (set-face-attribute 'eldoc-box-border nil :background color)))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to
