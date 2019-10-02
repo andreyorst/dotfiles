@@ -786,9 +786,8 @@ are defining or executing a macro."
               "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
     :bind (("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
-           ("C-x p" . counsel-file-jump)
+           ("C-x f" . counsel-file-jump)
            ("C-x C-r" . counsel-recentf)
-           ("C-c r" . counsel-rg)
            ("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
            ("C-h l" . counsel-find-library)))
@@ -918,6 +917,8 @@ _-_: reduce region _)_: around pairs
 
 (use-package project
   :ensure nil
+  :bind (("C-c p f" . project-find-file)
+         ("C-c p r" . project-find-regexp))
   :config
   (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
     "Files or directories that indicate the root of a project.")
