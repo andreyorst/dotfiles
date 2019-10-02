@@ -259,6 +259,14 @@ deleting past first symbol. Let's disable it:
   (setq command-error-function #'aorst/command-error-function)
 #+END_SRC
 
+Let's use =UTF8= if we can:
+
+#+BEGIN_SRC emacs-lisp
+  (prefer-coding-system 'utf-8)
+  (when (display-graphic-p)
+    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+END_SRC
+
 ** User Interface
 Emacs displays splash screen once started  with no files. I don't need
 it, and  I would like to  start with =*scratch*= buffer  instead. Also I

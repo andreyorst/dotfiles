@@ -95,6 +95,10 @@ are defining or executing a macro."
 
 (setq command-error-function #'aorst/command-error-function)
 
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+
 (setq inhibit-splash-screen t
       initial-major-mode 'fundamental-mode
       initial-scratch-message "")
