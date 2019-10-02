@@ -1707,7 +1707,7 @@ This nice  package displays eldoc in  child frame that can  hover near
 the cursor. It is really good for modes that support eldoc and removes
 distraction  that happen  every  time when  your  buffer size  changes
 because eldoc message appeared at  the bottom. It is commented because
-of the bug in Gnome Shell.
+of [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell.
 
 #+BEGIN_SRC emacs-lisp
   (use-package eldoc-box
