@@ -686,7 +686,8 @@ are defining or executing a macro."
 
 (use-package term
   :ensure nil
-  :bind ("C-`" . aorst/ansi-term-toggle)
+  :bind (("C-`" . aorst/ansi-term-toggle)
+         ("C-t" . aorst/ansi-term-focus))
   :config
   (defun aorst/ansi-term-toggle (&optional arg)
     "Toggle `ansi-term' window on and off with the same command."
@@ -707,7 +708,15 @@ are defining or executing a macro."
                    (rename-buffer bufname)))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-parameter window 'window-side side)))))
+          (set-window-parameter window 'window-side side)
+          (set-window-parameter window 'no-other-window t)))))
+  (defun aorst/ansi-term-focus (&optional arg)
+    "Focus `ansi-term` or open one if there's none."
+    (interactive "P")
+    (let ((window (get-buffer-window " *ansi-term*")))
+      (if window
+          (select-window window)
+        (aorst/ansi-term-toggle arg))))
   (defun aorst/autokill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
@@ -961,7 +970,8 @@ _-_: reduce region _)_: around pairs
   (defun aorst/imenu-list-setup ()
     "Setings for imenu-list"
     (setq window-size-fixed 'width
-          mode-line-format nil))
+          mode-line-format nil)
+    (set-window-parameter (get-buffer-window (current-buffer)) 'no-other-window t))
   (advice-add 'imenu-list-smart-toggle :after-while #'aorst/imenu-list-setup)
   (setq imenu-list-idle-update-delay-time 0.1
         imenu-list-size 27
