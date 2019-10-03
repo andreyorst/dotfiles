@@ -7,33 +7,25 @@
 
 [[file:.screenshot.png]]
 
-This  is my  Emacs configuration  file written  as Org  document.  The
-purpose of  this file  is to  provide convenient  way to  browse Emacs
-configuration  with  expressive  comments,  and  references  to  other
-people's work.
-
 * About this document
-This file is  my actual configuration file for Emacs.   I do all edits
-here, then /compile/ it to =init.el=  file. It is convenient because Emacs
-is complex tool,  so I can leave comments to  examine later by myself,
-but I  don't need to keep  track over several files,  like in Kakoune,
-where I try to manage configuration  and =readme= file. In case of Emacs
-I really need  to work with this  file only since this  document *is* my
-configuration file and a bunch of notes simultaneously.
+This is my Emacs configuration file written as Org document.  I do all
+edits here,  then /compile/ it to  =init.el= file. Emacs is  complex tool,
+and  by  having my  configuration  in  Org  Mode,  I can  separate  my
+configuration  in sections,  comment  each  configuration, and  toggle
+configuration parts on and off with ease.
 
 I  try to  maintain my  Emacs  configuration simple,  fast, and  small
 keeping as much  of vanilla Emacs behaviors  as I can, but  I'm a sane
 person so  some aspects which  are actually  insane in my  opinion are
 changed.
 
-Now to the configuration itself.
-
-* Configuration
-As  I've  mentioned  earlier,  I'm  using  Org  Mode  function  called
-=org-babel-tangle= to  build my =init.el=  file. This means that  you only
-need this file  in order to get my Emacs  configuration and compile it
-with =org-babel-tangle= function for the  first time.  After that, every
-time this file is saved it gets re-tangled automatically.
+Org Mode has a function  called =org-babel-tangle= that exports all code
+blocks accordingly to =header-args= property. Calling this function with
+this file as an argument will result in creation of =init.el= located at
+=.emacs.d= in  your home directory. This  means that you only  need this
+file  in order  to  get my  Emacs configuration  and  compile it  with
+=org-babel-tangle= function for the first  time.  After that, every time
+this file is saved it gets re-tangled automatically.
 
 Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
 starts with commentary:
