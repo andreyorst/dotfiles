@@ -300,16 +300,15 @@ are defining or executing a macro."
 
 (use-package frame
   :ensure nil
-  :hook (after-init . aorst/set-frame-dark)
-  :commands (aorst/set-frame-dark)
-  :config
-  (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+  :init
   (defun aorst/set-frame-dark (&optional frame)
     "Set FRAME titlebar colorscheme to dark variant."
     (with-selected-frame (or frame (selected-frame))
       (call-process-shell-command
        (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-               (frame-parameter frame 'name))))))
+               (frame-parameter frame 'name)))))
+  (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+  (aorst/set-frame-dark))
 
 (use-package solaire-mode
   :commands (solaire-global-mode
