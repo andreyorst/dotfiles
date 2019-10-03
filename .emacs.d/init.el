@@ -158,7 +158,8 @@ are defining or executing a macro."
   :bind (:map org-mode-map
               ([backtab] . nil)
               ([S-iso-lefttab] . nil)
-              ([C-tab] . org-shifttab))
+              ([C-tab] . org-shifttab)
+              ("C-c l" . org-store-link))
   :config
   (use-package ox-latex
     :ensure nil)
@@ -298,17 +299,21 @@ are defining or executing a macro."
         doom-themes-enable-italic t)
   :init (load-theme 'doom-one t))
 
-(use-package frame
-  :ensure nil
-  :init
-  (defun aorst/set-frame-dark (&optional frame)
-    "Set FRAME titlebar colorscheme to dark variant."
-    (with-selected-frame (or frame (selected-frame))
-      (call-process-shell-command
-       (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-               (frame-parameter frame 'name)))))
-  (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
-  (aorst/set-frame-dark))
+(when window-system
+  (use-package frame
+    :ensure nil
+    :config
+    (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+    (setq window-divider-default-right-width 1)
+    (window-divider-mode 1)
+    :init
+    (defun aorst/set-frame-dark (&optional frame)
+      "Set FRAME titlebar colorscheme to dark variant."
+      (with-selected-frame (or frame (selected-frame))
+        (call-process-shell-command
+         (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                 (frame-parameter frame 'name)))))
+    (aorst/set-frame-dark)))
 
 (use-package solaire-mode
   :commands (solaire-global-mode
