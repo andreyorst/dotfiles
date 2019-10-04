@@ -629,6 +629,13 @@ Racket is nice LISP/Scheme language that I might to get into.
                 (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
 #+END_SRC
 
+*** Cmake Mode
+A mode for editing cmake files.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cmake-mode)
+#+END_SRC
+
 ** User Interface Packages
 All user interface related settings are presented in this section. I'm
 big fan of  DOOM themes, and modeline,  so I'll refer to  them quite a

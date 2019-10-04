@@ -289,6 +289,8 @@ are defining or executing a macro."
               (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
               (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
 
+(use-package cmake-mode)
+
 (use-package all-the-icons)
 
 (use-package doom-themes
