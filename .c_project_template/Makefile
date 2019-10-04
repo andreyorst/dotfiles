@@ -4,7 +4,7 @@ CC      = clang
 CFLAGS  = $(shell cat compile_flags.txt | tr '\n' ' ')
 LDFLAGS = $(CFLAGS)
 
-SOURCES = $(wildcard *.c)
+SOURCES = $(shell find -type f -name '*.c')
 OBJECTS = $(SOURCES:.c=.o)
 
 all: $(PROGRAM)
