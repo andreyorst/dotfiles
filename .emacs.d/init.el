@@ -57,11 +57,6 @@
 
 (setq default-input-method 'russian-computer)
 
-(setq column-number-mode nil
-      line-number-mode nil
-      size-indication-mode nil
-      mode-line-position nil)
-
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; suppress byte-compiler warnings
@@ -95,6 +90,10 @@ are defining or executing a macro."
 
 (setq command-error-function #'aorst/command-error-function)
 
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+
 (setq inhibit-splash-screen t
       initial-major-mode 'fundamental-mode
       initial-scratch-message "")
@@ -118,7 +117,11 @@ are defining or executing a macro."
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
-(setq mode-line-in-non-selected-windows nil)
+(setq column-number-mode nil
+      line-number-mode nil
+      size-indication-mode nil
+      mode-line-position nil
+      mode-line-in-non-selected-windows nil)
 
 (defvar package--init-file-ensured)
 (setq package-enable-at-startup nil
@@ -143,6 +146,151 @@ are defining or executing a macro."
 
 (use-package compdef)
 
+(use-package org
+  :ensure nil
+  :defines default-justification
+  :hook ((org-mode . flyspell-mode)
+         (org-mode . auto-fill-mode)
+         (after-save . aorst/org-tangle-on-config-save)
+         (org-babel-after-execute . aorst/org-update-inline-images)
+         (org-mode . aorst/org-init-setup)
+         ((org-capture-mode org-src-mode) . aorst/discard-history))
+  :bind (:map org-mode-map
+              ([backtab] . nil)
+              ([S-iso-lefttab] . nil)
+              ([C-tab] . org-shifttab)
+              ("C-c l" . org-store-link))
+  :config
+  (use-package ox-latex
+    :ensure nil)
+  (setq org-startup-with-inline-images t
+        org-startup-folded 'content
+        org-hide-emphasis-markers t
+        org-adapt-indentation nil
+        org-hide-leading-stars t
+        org-highlight-latex-and-related '(latex)
+        revert-without-query '(".*\.pdf")
+        org-preview-latex-default-process 'dvisvgm
+        org-src-fontify-natively t
+        org-preview-latex-image-directory ".ltximg/"
+        org-latex-listings 'minted
+        org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+        org-confirm-babel-evaluate nil
+        org-imenu-depth 8)
+  (defun aorst/org-tangle-on-config-save ()
+    "Tangle source code blocks when configuration file is saved."
+    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+      (org-babel-tangle)))
+  (defun aorst/org-update-inline-images ()
+    "Update inline images in Org-mode."
+    (when org-inline-image-overlays
+      (org-redisplay-inline-images)))
+  (defun aorst/org-init-setup ()
+    "Set buffer local values."
+    (setq default-justification 'full))
+  (defun aorst/discard-history ()
+    "Discard undo history of org src and capture blocks."
+    (setq buffer-undo-list nil)
+    (set-buffer-modified-p nil))
+  (defvar minted-cache-dir
+    (file-name-as-directory
+     (expand-file-name ".minted/\\jombname"
+                       temporary-file-directory)))
+  (add-to-list 'org-latex-packages-alist
+               `(,(concat "cachedir=" minted-cache-dir)
+                 "minted" nil))
+  (add-to-list 'org-latex-logfiles-extensions "tex")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((gnuplot . t)
+     (scheme . t)))
+  (add-to-list 'org-latex-classes
+               '("article"
+                 "\\documentclass{article}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
+(setq-default doc-view-resolution 192)
+
+(use-package display-line-numbers
+  :ensure nil
+  :config
+  (setq display-line-numbers-grow-only t
+        display-line-numbers-width-start t))
+
+(use-package prog-mode
+  :ensure nil
+  :hook ((prog-mode . show-paren-mode)
+         (prog-mode . display-line-numbers-mode)))
+
+(use-package cc-mode
+  :ensure nil
+  :config (defun aorst/cc-mode-setup ()
+            (setq c-basic-offset 4
+                  c-default-style "linux"
+                  indent-tabs-mode t
+                  tab-width 4))
+  :hook ((c-mode-common . aorst/cc-mode-setup)
+         (c-mode-common . electric-pair-local-mode)))
+
+(use-package markdown-mode
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :config
+  (use-package edit-indirect)
+  (defvar markdown-command "multimarkdown")
+  (defun aorst/markdown-setup ()
+    "Set buffer local variables."
+    (setq fill-column 80
+          default-justification 'left))
+  :hook ((markdown-mode . flyspell-mode)
+         (markdown-mode . auto-fill-mode)
+         (markdown-mode . aorst/markdown-setup)))
+
+(use-package rust-mode
+  :commands (rust-format-buffer)
+  :hook (rust-mode . electric-pair-local-mode)
+  :bind (:map rust-mode-map
+              ("C-c C-f" . rust-format-buffer)))
+
+(when (executable-find "racer")
+  (use-package racer
+    :hook (racer-mode . eldoc-mode)
+    :config (defun org-babel-edit-prep:rust (&optional _babel-info)
+              "Run racer mode for Org Babel."
+              (racer-mode 1))))
+
+(when (executable-find "cargo")
+  (use-package cargo
+    :hook (rust-mode . cargo-minor-mode)))
+
+(use-package toml-mode)
+
+(use-package racket-mode
+  :mode ("\\.rkt\\'" . racket-mode)
+  :hook (racket-repl-mode . electric-pair-local-mode)
+  :bind (:map racket-mode-map
+              ("C-c C-d" . racket-run-with-debugging))
+  :config (when (fboundp 'doom-color)
+            (progn
+              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
+              (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
+              (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
+              (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
+
+(use-package cmake-mode)
+
 (use-package all-the-icons)
 
 (use-package doom-themes
@@ -153,18 +301,21 @@ are defining or executing a macro."
         doom-themes-enable-italic t)
   :init (load-theme 'doom-one t))
 
-(use-package frame
-  :ensure nil
-  :hook (after-init . aorst/set-frame-dark)
-  :commands (aorst/set-frame-dark)
-  :config
-  (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
-  (defun aorst/set-frame-dark (&optional frame)
-    "Set FRAME titlebar colorscheme to dark variant."
-    (with-selected-frame (or frame (selected-frame))
-      (call-process-shell-command
-       (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-               (frame-parameter frame 'name))))))
+(when window-system
+  (use-package frame
+    :ensure nil
+    :config
+    (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+    (setq window-divider-default-right-width 1)
+    (window-divider-mode 1)
+    :init
+    (defun aorst/set-frame-dark (&optional frame)
+      "Set FRAME titlebar colorscheme to dark variant."
+      (with-selected-frame (or frame (selected-frame))
+        (call-process-shell-command
+         (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                 (frame-parameter frame 'name)))))
+    (aorst/set-frame-dark)))
 
 (use-package solaire-mode
   :commands (solaire-global-mode
@@ -197,7 +348,7 @@ are defining or executing a macro."
   :hook ((window-configuration-change
           org-capture-mode
           org-src-mode
-          ediff-after-setup-windows-hook) . aorst/real-buffer-setup)
+          ediff-after-setup-windows) . aorst/real-buffer-setup)
   :config
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
@@ -404,9 +555,8 @@ are defining or executing a macro."
                         :face '(:inherit font-lock-doc-face :slant normal)))
          :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
                       "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
-                      "azw3" "kf8" "kfx" "lit" "prc" "mobi" "exe" "or" "html"
-                      "pkg" "opf" "txt" "pdb" "ps" "rtf" "pdg" "xml" "tr2"
-                      "tr3" "oxps" "xps"))
+                      "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
+                      "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
         (treemacs-create-icon
          :icon (format "  %s\t" (all-the-icons-octicon
                                  "file-text"
@@ -511,181 +661,18 @@ are defining or executing a macro."
   :commands eyebrowse-mode
   :init (eyebrowse-mode t))
 
-(when window-system
-  (use-package diff-hl
-    :commands (global-diff-hl-mode
-               diff-hl-flydiff-mode
-               diff-hl-margin-mode)
-    :hook ((diff-hl-mode . aorst/setup-fringe-bitmaps)
-           (magit-post-refresh . diff-hl-magit-post-refresh))
-    :config
-    (defun aorst/setup-fringe-bitmaps ()
-      "Set fringe bitmaps."
-      (define-fringe-bitmap 'diff-hl-bmp-top [224] nil nil '(center repeated))
-      (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-      (define-fringe-bitmap 'diff-hl-bmp-bottom [224] nil nil '(center repeated))
-      (define-fringe-bitmap 'diff-hl-bmp-insert [224] nil nil '(center repeated))
-      (define-fringe-bitmap 'diff-hl-bmp-single [224] nil nil '(center repeated))
-      (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
-    (diff-hl-flydiff-mode t)
-    :init (global-diff-hl-mode 1)))
-
 (use-package minions
   :commands minions-mode
   :init (minions-mode 1))
-
-(when window-system
-  (setq window-divider-default-right-width 1)
-  (window-divider-mode 1))
 
 (use-package uniquify
   :ensure nil
   :config (setq uniquify-buffer-name-style 'forward))
 
-(use-package org
-  :ensure nil
-  :defines default-justification
-  :hook ((org-mode . flyspell-mode)
-         (org-mode . auto-fill-mode)
-         (after-save . aorst/org-tangle-on-config-save)
-         (org-babel-after-execute . aorst/org-update-inline-images)
-         (org-mode . aorst/org-init-setup)
-         ((org-capture-mode org-src-mode) . aorst/discard-history))
-  :bind (:map org-mode-map
-              ([backtab] . nil)
-              ([S-iso-lefttab] . nil)
-              ([C-tab] . org-shifttab))
-  :config
-  (use-package ox-latex
-    :ensure nil)
-  (setq org-startup-with-inline-images t
-        org-startup-folded 'content
-        org-hide-emphasis-markers t
-        org-adapt-indentation nil
-        org-hide-leading-stars t
-        org-highlight-latex-and-related '(latex)
-        revert-without-query '(".*\.pdf")
-        org-preview-latex-default-process 'dvisvgm
-        org-src-fontify-natively t
-        org-preview-latex-image-directory ".ltximg/"
-        org-latex-listings 'minted
-        org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
-        org-confirm-babel-evaluate nil)
-  (defun aorst/org-tangle-on-config-save ()
-    "Tangle source code blocks when configuration file is saved."
-    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-      (org-babel-tangle)))
-  (defun aorst/org-update-inline-images ()
-    "Update inline images in Org-mode."
-    (when org-inline-image-overlays
-      (org-redisplay-inline-images)))
-  (defun aorst/org-init-setup ()
-    "Set buffer local values."
-    (setq default-justification 'full))
-  (defun aorst/discard-history ()
-    "Discard undo history of org src and capture blocks."
-    (setq buffer-undo-list nil)
-    (set-buffer-modified-p nil))
-  (defvar minted-cache-dir
-    (file-name-as-directory
-     (expand-file-name ".minted/\\jombname"
-                       temporary-file-directory)))
-  (add-to-list 'org-latex-packages-alist
-               `(,(concat "cachedir=" minted-cache-dir)
-                 "minted" nil))
-  (add-to-list 'org-latex-logfiles-extensions "tex")
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((gnuplot . t)
-     (scheme . t)))
-  (add-to-list 'org-latex-classes
-               '("article"
-                 "\\documentclass{article}"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
-
-(setq-default doc-view-resolution 192)
-
-(use-package display-line-numbers
-  :ensure nil
-  :config
-  (setq display-line-numbers-grow-only t
-        display-line-numbers-width-start t))
-
-(use-package prog-mode
-  :ensure nil
-  :hook ((prog-mode . show-paren-mode)
-         (prog-mode . display-line-numbers-mode)))
-
-(use-package cc-mode
-  :ensure nil
-  :config (defun aorst/cc-mode-setup ()
-            (setq c-basic-offset 4
-                  c-default-style "linux"
-                  indent-tabs-mode t
-                  tab-width 4))
-  :hook ((c-mode-common . aorst/cc-mode-setup)
-         (c-mode-common . electric-pair-local-mode)))
-
-(use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :config
-  (use-package edit-indirect)
-  (defvar markdown-command "multimarkdown")
-  (defun aorst/markdown-setup ()
-    "Set buffer local variables."
-    (setq fill-column 80
-          default-justification 'left))
-  :hook ((markdown-mode . flyspell-mode)
-         (markdown-mode . auto-fill-mode)
-         (markdown-mode . aorst/markdown-setup)))
-
-(use-package rust-mode
-  :commands (rust-format-buffer)
-  :hook (rust-mode . electric-pair-local-mode)
-  :bind (:map rust-mode-map
-              ("C-c C-f" . rust-format-buffer)))
-
-(when (executable-find "racer")
-  (use-package racer
-    :hook (racer-mode . eldoc-mode)
-    :config (defun org-babel-edit-prep:rust (&optional _babel-info)
-              "Run racer mode for Org Babel."
-              (racer-mode 1))))
-
-(when (executable-find "cargo")
-  (use-package cargo
-    :hook (rust-mode . cargo-minor-mode)))
-
-(use-package toml-mode)
-
-(use-package racket-mode
-  :mode ("\\.rkt\\'" . racket-mode)
-  :hook (racket-repl-mode . electric-pair-local-mode)
-  :bind (:map racket-mode-map
-              ("C-c C-d" . racket-run-with-debugging))
-  :config (when (fboundp 'doom-color)
-            (progn
-              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
-              (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
-              (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
-              (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
-
 (use-package term
   :ensure nil
-  :bind ("C-`" . aorst/ansi-term-toggle)
+  :bind (("C-`" . aorst/ansi-term-toggle)
+         ("C-t" . aorst/ansi-term-focus))
   :config
   (defun aorst/ansi-term-toggle (&optional arg)
     "Toggle `ansi-term' window on and off with the same command."
@@ -706,7 +693,15 @@ are defining or executing a macro."
                    (rename-buffer bufname)))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-parameter window 'window-side side)))))
+          (set-window-parameter window 'window-side side)
+          (set-window-parameter window 'no-other-window t)))))
+  (defun aorst/ansi-term-focus (&optional arg)
+    "Focus `ansi-term` or open one if there's none."
+    (interactive "P")
+    (let ((window (get-buffer-window " *ansi-term*")))
+      (if window
+          (select-window window)
+        (aorst/ansi-term-toggle arg))))
   (defun aorst/autokill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
@@ -785,9 +780,8 @@ are defining or executing a macro."
               "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
     :bind (("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
-           ("C-x p" . counsel-file-jump)
+           ("C-x f" . counsel-file-jump)
            ("C-x C-r" . counsel-recentf)
-           ("C-c r" . counsel-rg)
            ("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
            ("C-h l" . counsel-find-library)))
@@ -833,6 +827,7 @@ are defining or executing a macro."
   (yas-reload-all))
 
 (use-package magit
+  :bind (("<f12>" . magit-status))
   :config (setq magit-ediff-dwim-show-on-hunks t))
 
 (use-package ediff
@@ -917,6 +912,8 @@ _-_: reduce region _)_: around pairs
 
 (use-package project
   :ensure nil
+  :bind (("C-c p f" . project-find-file)
+         ("C-c p r" . project-find-regexp))
   :config
   (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
     "Files or directories that indicate the root of a project.")
@@ -959,7 +956,8 @@ _-_: reduce region _)_: around pairs
   (defun aorst/imenu-list-setup ()
     "Setings for imenu-list"
     (setq window-size-fixed 'width
-          mode-line-format nil))
+          mode-line-format nil)
+    (set-window-parameter (get-buffer-window (current-buffer)) 'no-other-window t))
   (advice-add 'imenu-list-smart-toggle :after-while #'aorst/imenu-list-setup)
   (setq imenu-list-idle-update-delay-time 0.1
         imenu-list-size 27
