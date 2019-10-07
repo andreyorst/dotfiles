@@ -178,7 +178,8 @@ are defining or executing a macro."
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
         org-confirm-babel-evaluate nil
-        org-imenu-depth 8)
+        org-imenu-depth 8
+        org-agenda-files (file-truename "~/Documents/Agendas/"))
   (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
