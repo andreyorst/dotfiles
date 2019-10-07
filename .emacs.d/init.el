@@ -680,6 +680,40 @@ are defining or executing a macro."
   :ensure nil
   :config (setq uniquify-buffer-name-style 'forward))
 
+(unless (version< emacs-version "27")
+  (use-package tab-line
+    :ensure nil
+    :config
+    (defun tab-line-close-tab (&optional e)
+      (interactive "e")
+      (let* ((posnp (event-start e))
+             (window (posn-window posnp))
+             (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+        (with-selected-window window
+          (cond ((cdr (get-buffer-window-list buffer))
+                 (cond ((cdr (tab-line-tabs))
+                        (if (eq buffer (current-buffer))
+                            (bury-buffer)
+                          (set-window-prev-buffers nil (assq-delete-all buffer (window-prev-buffers)))
+                          (set-window-next-buffers nil (delq buffer (window-next-buffers)))))
+                       (t
+                        (delete-window window))))
+                (t
+                 (kill-buffer buffer)
+                 (delete-window window))))
+       (force-mode-line-update)))
+    (setq tab-line-new-tab-choice nil
+          tab-line-close-button-show nil)
+    (when (fboundp 'doom-color)
+      (let ((bg (doom-color 'bg))
+            (fg (doom-color 'fg))
+            (base1 (doom-color 'base1))
+            (box-width 7))
+        (set-face-attribute 'tab-line nil :background base1 :foreground fg)
+        (set-face-attribute 'tab-line-tab nil :background bg :box (list :line-width box-width :color bg) :weight 'bold)
+        (set-face-attribute 'tab-line-tab-inactive nil :background base1 :box (list :line-width box-width :color base1))))
+    (global-tab-line-mode)))
+
 (use-package term
   :ensure nil
   :bind (("C-`" . aorst/ansi-term-toggle)
