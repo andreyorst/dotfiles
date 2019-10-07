@@ -424,10 +424,13 @@ are defining or executing a macro."
                 doom-color
                 all-the-icons-octicon)
     :bind (("<f7>" . treemacs)
-           ("<f8>" . treemacs-select-window))
+           ("<f8>" . treemacs-select-window)
+           :map treemacs-mode-map
+           ([C-tab] . aorst/treemacs-expand-all-projects))
     :hook ((after-init . aorst/treemacs-init-setup)
            (treemacs-mode . aorst/treemacs-setup)
-           (treemacs-mode . aorst/treemacs-header-line))
+           (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
+           (treemacs-mode . aorst/treemacs-setup-title))
     :config
     (use-package treemacs-magit)
     (set-face-attribute 'treemacs-root-face nil
@@ -591,6 +594,7 @@ are defining or executing a macro."
          :extensions (fallback))))
     (defun aorst/treemacs-expand-all-projects (&optional _)
       "Expand all projects."
+      (interactive)
       (save-excursion
         (treemacs--forget-last-highlight)
         (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
@@ -639,24 +643,30 @@ are defining or executing a macro."
           (s-ends-with? ".a" file)
           (string= file ".svn")))
     (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
-    (defun aorst/treemacs-header-line ()
-      (setq header-line-format
-            '((:eval (concat
-                      (make-string
-                       (let ((width (window-width)))
-                         (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
-                       ?\ )
-                      "Treemacs"))))
-      (let ((bg (face-attribute 'default :background)))
-        (face-remap-add-relative 'header-line
+    (defun aorst/treemacs-setup-title ()
+      (let ((format '((:eval (concat
+                              (make-string
+                               (let ((width (window-width)))
+                                 (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
+                               ?\ )
+                              "Treemacs")))))
+        (if (version<= emacs-version "27")
+            (setq header-line-format format)
+          (setq tab-line-format format)))
+      (let ((bg (face-attribute 'default :background))
+            (fg (face-attribute 'default :foreground))
+            (face (if (version<= emacs-version "27")
+                      'header-line
+                    'tab-line)))
+        (face-remap-add-relative face
                                  :box (list :line-width 7 :color bg)
-                                 :background bg)))
-    (setq treemacs-width 27
-          treemacs-is-never-other-window t
-          treemacs-space-between-root-nodes nil)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode nil)))
+                                 :background bg :foreground fg))))
+  (setq treemacs-width 27
+        treemacs-is-never-other-window t
+        treemacs-space-between-root-nodes nil)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode nil))
 
 (use-package eyebrowse
   :commands eyebrowse-mode
