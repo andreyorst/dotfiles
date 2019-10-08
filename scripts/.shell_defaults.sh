@@ -63,7 +63,7 @@ webmp4() {
 
 # gifify wrapper for fast gif creating
 gif() {
-    if [ -z "$(command -v gifify)" ]; then
+    if [ -n "$(command -v gifify)" ]; then
         gifify $1 -o ${1#.*}.gif --colors 256 --compress 0 --fps 30
     else
         echo "gifify is not installed" >&2
