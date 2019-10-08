@@ -348,8 +348,7 @@ are defining or executing a macro."
   :ensure nil
   :hook ((window-configuration-change
           org-capture-mode
-          org-src-mode
-          ediff-after-setup-windows) . aorst/real-buffer-setup)
+          org-src-mode) . aorst/real-buffer-setup)
   :config
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
