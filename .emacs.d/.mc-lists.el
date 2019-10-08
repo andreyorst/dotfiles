@@ -10,6 +10,7 @@
         c-electric-semi&comma
         c-indent-line-or-region
         counsel-M-x
+        delete-indentation
         downcase-region
         electric-newline-and-maybe-indent
         end-of-buffer
