@@ -13,6 +13,7 @@
 
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6
+      inhibit-compacting-font-caches t
       message-log-max 16384
       file-name-handler-alist nil)
 
@@ -348,8 +349,7 @@ are defining or executing a macro."
   :ensure nil
   :hook ((window-configuration-change
           org-capture-mode
-          org-src-mode
-          ediff-after-setup-windows) . aorst/real-buffer-setup)
+          org-src-mode) . aorst/real-buffer-setup)
   :config
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
@@ -683,25 +683,40 @@ are defining or executing a macro."
 (unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
+    :hook ((ediff-mode . aorst/disable-tab-line))
     :config
+    (require 'cl-lib)
+    (defun aorst/disable-tab-line ()
+      (setq tab-line-format nil))
     (defun tab-line-close-tab (&optional e)
+      "Close the selected tab.
+If tab presented in another window, close tab by using `bury-buffer` function.
+If tab is uniq to all existing windows, buffer is killed with `kill-buffer` function.
+Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
       (interactive "e")
       (let* ((posnp (event-start e))
              (window (posn-window posnp))
              (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
         (with-selected-window window
-          (cond ((cdr (get-buffer-window-list buffer))
-                 (cond ((cdr (tab-line-tabs))
-                        (if (eq buffer (current-buffer))
-                            (bury-buffer)
-                          (set-window-prev-buffers nil (assq-delete-all buffer (window-prev-buffers)))
-                          (set-window-next-buffers nil (delq buffer (window-next-buffers)))))
-                       (t
-                        (delete-window window))))
-                (t
-                 (kill-buffer buffer)
-                 (delete-window window))))
-       (force-mode-line-update)))
+          (let ((tab-list (tab-line-tabs))
+                (buffer-list (flatten-list
+                              (cl-reduce (lambda (l w)
+                                           (select-window w t)
+                                           (cons (tab-line-tabs) l))
+                                         (window-list) :initial-value nil))))
+            (select-window window)
+            (if (> (cl-count buffer buffer-list) 1)
+                (progn
+                  (if (eq buffer (current-buffer))
+                      (not (bury-buffer)))
+                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                  (set-window-next-buffers window (delq buffer (window-next-buffers)))
+                  (unless (cdr tab-list)
+                    (delete-window window)))
+              (and (kill-buffer buffer)
+                   (unless (cdr tab-list)
+                     (delete-window window))))))
+        (force-mode-line-update)))
     (setq tab-line-new-tab-choice nil
           tab-line-close-button-show nil)
     (when (fboundp 'doom-color)
@@ -712,6 +727,7 @@ are defining or executing a macro."
         (set-face-attribute 'tab-line nil :background base1 :foreground fg)
         (set-face-attribute 'tab-line-tab nil :background bg :box (list :line-width box-width :color bg) :weight 'bold)
         (set-face-attribute 'tab-line-tab-inactive nil :background base1 :box (list :line-width box-width :color base1))))
+    :init
     (global-tab-line-mode)))
 
 (use-package term
