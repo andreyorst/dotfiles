@@ -13,6 +13,7 @@
 
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6
+      inhibit-compacting-font-caches t
       message-log-max 16384
       file-name-handler-alist nil)
 
