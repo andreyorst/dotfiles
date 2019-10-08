@@ -688,6 +688,10 @@ are defining or executing a macro."
     (defun aorst/disable-tab-line ()
       (setq tab-line-format nil))
     (defun tab-line-close-tab (&optional e)
+      "Close the selected tab.
+If tab presented in another window, close tab by using `bury-buffer` function.
+If tab is uniq to all existing windows, buffer is killed with `kill-buffer` function.
+Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
       (interactive "e")
       (let* ((posnp (event-start e))
              (window (posn-window posnp))
