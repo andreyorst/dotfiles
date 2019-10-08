@@ -2,10 +2,12 @@
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
+    . /etc/bashrc
 fi
 
-. $HOME/.dotfiles/scripts/.shell_defaults.sh
+# Scripts and better defaults for shell
+. $HOME/.dotfiles/scripts/shell_defaults.sh
+. $HOME/.dotfiles/scripts/svn_helper.sh
 
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
@@ -19,5 +21,3 @@ if [ -n "$SSH_CONNECTION" ]; then
 else
     export PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]]\n\$(if [[ \$? == 0 ]]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
 fi
-
-source $HOME/.dotfiles/.shell_defaults.sh
