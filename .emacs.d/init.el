@@ -682,28 +682,36 @@ are defining or executing a macro."
 (unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
+    :hook ((ediff-mode . aorst/disable-tab-line))
     :config
+    (require 'cl-lib)
+    (defun aorst/disable-tab-line ()
+      (setq tab-line-format nil))
     (defun tab-line-close-tab (&optional e)
       (interactive "e")
       (let* ((posnp (event-start e))
              (window (posn-window posnp))
-             (buffer (get-pos-property 1 'tab (car (posn-string posnp))))
-             (window-list))
+             (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
         (with-selected-window window
-          (dolist (current-window (window-list) window-list)
-            (select-window current-window t)
-            (when (member buffer (tab-line-tabs))
-              (setq window-list (cons current-window window-list))))
-          (select-window window)
-          (unless (cdr (tab-line-tabs))
-            (delete-window window))
-          (if (cdr window-list)
-              (if (eq buffer (current-buffer))
-                  (bury-buffer)
-                (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                (set-window-next-buffers window (delq buffer (window-next-buffers))))
-            (kill-buffer buffer))))
-      (force-mode-line-update))
+          (let ((tab-list (tab-line-tabs))
+                (buffer-list (flatten-list
+                              (cl-reduce (lambda (l w)
+                                           (select-window w t)
+                                           (cons (tab-line-tabs) l))
+                                         (window-list) :initial-value nil))))
+            (select-window window)
+            (if (cdr buffer-list)
+                (progn
+                  (if (eq buffer (current-buffer))
+                      (bury-buffer)
+                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                  (unless (cdr tab-list)
+                    (delete-window window)))
+              (and (kill-buffer buffer)
+                   (unless (cdr tab-list)
+                     (delete-window window))))))
+        (force-mode-line-update)))
     (setq tab-line-new-tab-choice nil
           tab-line-close-button-show nil)
     (when (fboundp 'doom-color)
@@ -714,6 +722,7 @@ are defining or executing a macro."
         (set-face-attribute 'tab-line nil :background base1 :foreground fg)
         (set-face-attribute 'tab-line-tab nil :background bg :box (list :line-width box-width :color bg) :weight 'bold)
         (set-face-attribute 'tab-line-tab-inactive nil :background base1 :box (list :line-width box-width :color base1))))
+    :init
     (global-tab-line-mode)))
 
 (use-package term
