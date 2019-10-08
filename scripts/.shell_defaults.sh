@@ -167,7 +167,7 @@ cnew() {
 
 # Package manager wrappers
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-for pm in yay pacman dnf yum apt; do
+for pm in yay pacman rpm-ostree dnf yum apt; do
     if [ -n "$(command -v $pm)" ]; then
         alias pm="pm_$pm"
         break
@@ -219,6 +219,17 @@ pm_yum() {
         (remove)  sudo yum remove "$@"  ;;
         (search)  yum search "$@"       ;;
         (*)       yum "$cmd" "$@"       ;;
+    esac
+}
+
+pm_rpm-ostree() {
+    cmd="$1"
+    shift
+    case "$cmd" in
+        (install) rpm-ostree install "$@" ;;
+        (update)  rpm-ostree upgrade "$@" ;;
+        (remove)  rpm-ostree remove "$@"  ;;
+        (*)       rpm-ostree "$cmd" "$@"  ;;
     esac
 }
 
