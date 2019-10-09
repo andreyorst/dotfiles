@@ -685,12 +685,11 @@ are defining or executing a macro."
     :ensure nil
     :hook ((ediff-mode . aorst/disable-tab-line))
     :config
-    (require 'cl-lib)
     (defun aorst/disable-tab-line ()
       (setq tab-line-format nil))
     (defun tab-line-close-tab (&optional e)
       "Close the selected tab.
-If tab presented in another window, close tab by using `bury-buffer` function.
+If tab is presented in another window, close tab by using `bury-buffer` function.
 If tab is uniq to all existing windows, buffer is killed with `kill-buffer` function.
 Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
       (interactive "e")
@@ -700,17 +699,17 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         (with-selected-window window
           (let ((tab-list (tab-line-tabs))
                 (buffer-list (flatten-list
-                              (cl-reduce (lambda (l w)
-                                           (select-window w t)
-                                           (cons (tab-line-tabs) l))
-                                         (window-list) :initial-value nil))))
+                              (seq-reduce (lambda (list window)
+                                            (select-window window t)
+                                            (cons (tab-line-tabs) list))
+                                          (window-list) nil))))
             (select-window window)
-            (if (> (cl-count buffer buffer-list) 1)
+            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
                 (progn
                   (if (eq buffer (current-buffer))
-                      (not (bury-buffer)))
-                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                  (set-window-next-buffers window (delq buffer (window-next-buffers)))
+                      (bury-buffer)
+                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
                   (unless (cdr tab-list)
                     (delete-window window)))
               (and (kill-buffer buffer)
