@@ -683,14 +683,15 @@ are defining or executing a macro."
 (unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
-    :hook ((ediff-mode . aorst/disable-tab-line))
+    :hook ((ediff-mode . aorst/disable-tab-line)
+           (after-init . global-tab-line-mode))
     :config
     (defun aorst/disable-tab-line ()
       (setq tab-line-format nil))
     (defun tab-line-close-tab (&optional e)
       "Close the selected tab.
-If tab is presented in another window, close tab by using `bury-buffer` function.
-If tab is uniq to all existing windows, buffer is killed with `kill-buffer` function.
+If tab is presented in another window, close the tab by using `bury-buffer` function.
+If tab is uniq to all existing windows, kill the buffer with `kill-buffer` function.
 Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
       (interactive "e")
       (let* ((posnp (event-start e))
@@ -718,16 +719,13 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         (force-mode-line-update)))
     (setq tab-line-new-tab-choice nil
           tab-line-close-button-show nil)
-    (when (fboundp 'doom-color)
-      (let ((bg (doom-color 'bg))
-            (fg (doom-color 'fg))
-            (base1 (doom-color 'base1))
-            (box-width 7))
-        (set-face-attribute 'tab-line nil :background base1 :foreground fg)
-        (set-face-attribute 'tab-line-tab nil :background bg :box (list :line-width box-width :color bg) :weight 'bold)
-        (set-face-attribute 'tab-line-tab-inactive nil :background base1 :box (list :line-width box-width :color base1))))
-    :init
-    (global-tab-line-mode)))
+    (let ((bg (face-attribute 'default :background))
+          (fg (face-attribute 'default :foreground))
+          (base (face-attribute 'mode-line :background))
+          (box-width 7))
+      (set-face-attribute 'tab-line nil :background base :foreground nil)
+      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold)
+      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal))))
 
 (use-package term
   :ensure nil
