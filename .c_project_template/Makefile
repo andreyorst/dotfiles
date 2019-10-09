@@ -9,14 +9,14 @@ OBJECTS = $(SOURCES:.c=.o)
 
 all: $(PROGRAM)
 
+.PHONY: all clean run depend help
+
 ${PROGRAM}: $(OBJECTS)
 	@mkdir -p ./bin
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
-
-.PHONY: clean run depend help
 
 clean:
 	@rm -rf ./bin *.o .depend
@@ -28,7 +28,8 @@ run: $(PROGRAM)
 	$(CC) -MM $(CFLAGS) *.c > .depend
 
 help:
-	@echo "make      -- build executable"
-	@echo "make run  -- run executable. Build if 'bin/$(PROGRAM)' not exist"
+	@echo "make       -- build executable"
+	@echo "make run   -- run executable. Build if 'bin/$(PROGRAM)' not exist"
+	@echo "make clean -- clean project from build files and delete executable"
 
 -include .depend
