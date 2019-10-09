@@ -1156,15 +1156,15 @@ customize tab appearance to match my theme.
   (unless (version< emacs-version "27")
     (use-package tab-line
       :ensure nil
-      :hook ((ediff-mode . aorst/disable-tab-line))
+      :hook ((ediff-mode . aorst/disable-tab-line)
+             (after-init . global-tab-line-mode))
       :config
-      (require 'cl-lib)
       (defun aorst/disable-tab-line ()
         (setq tab-line-format nil))
       (defun tab-line-close-tab (&optional e)
         "Close the selected tab.
-  If tab presented in another window, close tab by using `bury-buffer` function.
-  If tab is uniq to all existing windows, buffer is killed with `kill-buffer` function.
+  If tab is presented in another window, close the tab by using `bury-buffer` function.
+  If tab is uniq to all existing windows, kill the buffer with `kill-buffer` function.
   Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
         (interactive "e")
         (let* ((posnp (event-start e))
@@ -1173,17 +1173,17 @@ customize tab appearance to match my theme.
           (with-selected-window window
             (let ((tab-list (tab-line-tabs))
                   (buffer-list (flatten-list
-                                (cl-reduce (lambda (l w)
-                                             (select-window w t)
-                                             (cons (tab-line-tabs) l))
-                                           (window-list) :initial-value nil))))
+                                (seq-reduce (lambda (list window)
+                                              (select-window window t)
+                                              (cons (tab-line-tabs) list))
+                                            (window-list) nil))))
               (select-window window)
-              (if (> (cl-count buffer buffer-list) 1)
+              (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
                   (progn
                     (if (eq buffer (current-buffer))
-                        (not (bury-buffer)))
-                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                    (set-window-next-buffers window (delq buffer (window-next-buffers)))
+                        (bury-buffer)
+                      (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                      (set-window-next-buffers window (delq buffer (window-next-buffers))))
                     (unless (cdr tab-list)
                       (delete-window window)))
                 (and (kill-buffer buffer)
@@ -1192,16 +1192,13 @@ customize tab appearance to match my theme.
           (force-mode-line-update)))
       (setq tab-line-new-tab-choice nil
             tab-line-close-button-show nil)
-      (when (fboundp 'doom-color)
-        (let ((bg (doom-color 'bg))
-              (fg (doom-color 'fg))
-              (base1 (doom-color 'base1))
-              (box-width 7))
-          (set-face-attribute 'tab-line nil :background base1 :foreground fg)
-          (set-face-attribute 'tab-line-tab nil :background bg :box (list :line-width box-width :color bg) :weight 'bold)
-          (set-face-attribute 'tab-line-tab-inactive nil :background base1 :box (list :line-width box-width :color base1))))
-      :init
-      (global-tab-line-mode)))
+      (let ((bg (face-attribute 'default :background))
+            (fg (face-attribute 'default :foreground))
+            (base (face-attribute 'mode-line :background))
+            (box-width 7))
+        (set-face-attribute 'tab-line nil :background base :foreground nil)
+        (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold)
+        (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal))))
 #+END_SRC
 
 ** Tools
@@ -1754,16 +1751,15 @@ This code above automatically creates user local =emacs.desktop= file in
   which will create server, and opening new files will be done in this
   instance of =emacs=.
 
-*** COMMENT Eldoc Box
+*** Eldoc Box
 This nice  package displays eldoc in  child frame that can  hover near
 the cursor. It is really good for modes that support eldoc and removes
 distraction  that happen  every  time when  your  buffer size  changes
-because eldoc message appeared at  the bottom. It is commented because
-of [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell.
+because eldoc message appeared at the bottom. This package is affected
+by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell.
 
 #+BEGIN_SRC emacs-lisp
   (use-package eldoc-box
-    :load-path "~/Git/eldoc-box"
     :hook ((eldoc-mode . eldoc-box-hover-at-point-mode))
     :config
     (setq eldoc-box-max-pixel-width 1920
