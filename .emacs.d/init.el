@@ -1049,5 +1049,15 @@ next occurrence if `iedit-mode' is already active."
   (unless (server-running-p)
     (server-start)))
 
+(use-package eldoc-box
+  :hook ((eldoc-mode . eldoc-box-hover-at-point-mode))
+  :config
+  (setq eldoc-box-max-pixel-width 1920
+        eldoc-box-max-pixel-height 1080)
+  (let ((color (if (fboundp 'doom-color)
+                   (doom-color 'base0)
+                 "#000000")))
+    (set-face-attribute 'eldoc-box-border nil :background color)))
+
 (provide 'init)
 ;;; init.el ends here

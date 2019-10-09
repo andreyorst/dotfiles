@@ -1751,16 +1751,15 @@ This code above automatically creates user local =emacs.desktop= file in
   which will create server, and opening new files will be done in this
   instance of =emacs=.
 
-*** COMMENT Eldoc Box
+*** Eldoc Box
 This nice  package displays eldoc in  child frame that can  hover near
 the cursor. It is really good for modes that support eldoc and removes
 distraction  that happen  every  time when  your  buffer size  changes
-because eldoc message appeared at  the bottom. It is commented because
-of [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell.
+because eldoc message appeared at the bottom. This package is affected
+by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell.
 
 #+BEGIN_SRC emacs-lisp
   (use-package eldoc-box
-    :load-path "~/Git/eldoc-box"
     :hook ((eldoc-mode . eldoc-box-hover-at-point-mode))
     :config
     (setq eldoc-box-max-pixel-width 1920
