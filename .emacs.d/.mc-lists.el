@@ -34,6 +34,7 @@
         parinfer-double-quote
         parinfer-region-delete-region
         parinfer-semicolon
+        parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
         upcase-region
