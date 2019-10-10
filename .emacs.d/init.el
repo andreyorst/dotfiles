@@ -716,14 +716,16 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                     (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
                     (set-window-next-buffers window (delq buffer (window-next-buffers))))
                   (unless (cdr tab-list)
-                    (delete-window window)))
+                    (ignore-errors (delete-window window))))
               (and (kill-buffer buffer)
                    (unless (cdr tab-list)
-                     (delete-window window))))))
+                     (ignore-errors (delete-window window)))))))
         (force-mode-line-update)))
     (setq tab-line-new-tab-choice nil
           tab-line-close-button-show nil)
-    (let ((bg (face-attribute 'default :background))
+    (let ((bg (if (facep 'solaire-default-face)
+                  (face-attribute 'solaire-default-face :background)
+                (face-attribute 'default :background)))
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
           (box-width 7))
@@ -739,8 +741,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (defun aorst/ansi-term-toggle (&optional arg)
     "Toggle `ansi-term' window on and off with the same command."
     (interactive "P")
-    (let* ((bufname " *ansi-term*")
-           (window (get-buffer-window bufname)))
+    (let* ((bufname "*ansi-term*")
+           (window (get-buffer-window bufname))
+           (shell (cond ((executable-find "zsh") "zsh")
+                        ((executable-find "bash") "bash")
+                        (t "sh"))))
       (if window
           (ignore-errors (delete-window window))
         (let* ((win-side (if (symbolp arg)
@@ -751,7 +756,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (select-window window)
           (cond ((get-buffer bufname)
                  (switch-to-buffer bufname))
-                (t (ansi-term "bash")
+                (t (ansi-term shell)
                    (rename-buffer bufname)))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
@@ -760,7 +765,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (defun aorst/ansi-term-focus (&optional arg)
     "Focus `ansi-term` or open one if there's none."
     (interactive "P")
-    (let ((window (get-buffer-window " *ansi-term*")))
+    (let ((window (get-buffer-window "*ansi-term*")))
       (if window
           (select-window window)
         (aorst/ansi-term-toggle arg))))
@@ -866,6 +871,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (use-package company-flx
     :config (company-flx-mode +1))
+  (use-package company-quickhelp
+    :config (company-quickhelp-mode))
   (setq company-require-match 'never
         company-minimum-prefix-length 3
         company-tooltip-align-annotations t
