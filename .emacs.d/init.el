@@ -155,6 +155,7 @@ are defining or executing a macro."
          (after-save . aorst/org-tangle-on-config-save)
          (org-babel-after-execute . aorst/org-update-inline-images)
          (org-mode . aorst/org-init-setup)
+         (ediff-prepare-buffer . outline-show-all)
          ((org-capture-mode org-src-mode) . aorst/discard-history))
   :bind (:map org-mode-map
               ([backtab] . nil)
@@ -327,14 +328,15 @@ are defining or executing a macro."
   :ensure nil
   :hook ((window-configuration-change
           org-capture-mode
-          org-src-mode) . aorst/real-buffer-setup)
+          org-src-mode
+          ediff-prepare-buffer) . aorst/real-buffer-setup)
   :config
   (defun aorst/real-buffer-p ()
     "Determines whether buffer is real."
     (or (and (not (minibufferp))
              (buffer-file-name))
         (or (string-equal "*scratch*" (buffer-name))
-            (string-match-p ".~{index}~" (buffer-name)))))
+            (string-match-p ".~.*~" (buffer-name)))))
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
     (when (aorst/real-buffer-p)
@@ -342,7 +344,6 @@ are defining or executing a macro."
       (when (and (fboundp 'doom-color)
                  window-system)
         (set-face-attribute 'line-number-current-line nil
-                            :foreground (doom-color 'fg-alt)
                             :background (doom-color 'bg)))
       (setq-local scroll-margin 3)))
   :init
