@@ -638,6 +638,16 @@ A mode for editing cmake files.
   (use-package cmake-mode)
 #+END_SRC
 
+*** Help Mode
+I want help  window to be selected automatically, so  I could close it
+with =q= after I've finished reading.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package help
+    :ensure nil
+    :config (setq help-window-select t))
+#+END_SRC
+
 ** User Interface Packages
 All user interface related settings are presented in this section. I'm
 big fan of  DOOM themes, and modeline,  so I'll refer to  them quite a

@@ -293,6 +293,10 @@ are defining or executing a macro."
 
 (use-package cmake-mode)
 
+(use-package help
+  :ensure nil
+  :config (setq help-window-select t))
+
 (use-package all-the-icons)
 
 (use-package doom-themes
