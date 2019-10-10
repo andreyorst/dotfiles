@@ -707,6 +707,51 @@ process, and when new frame is created.
       (aorst/set-frame-dark)))
 #+END_SRC
 
+*** Fringe
+If only  certain buffers  could +be so  grossly incandescent+  *have damn
+fringes!* With  Solaire Mode  Emacs becomes way  more like  true editor
+with actual  graphical interface,  but these  fringes drive  me crazy.
+That's why  I wrote  a function =aorst/real-buffer-setup=,  that enables
+fringes only  in buffers that  are affected  by Solaire Mode.   I want
+fringes to appear only in certain buffers where I really need them, so
+let's disable  it entirely  on startup  and set  them with  some hooks
+later.  But this  adds another problem.  Emacs displays =$=  sign at the
+end of the window if line is  being truncated. Damn, why it is so hard
+to  make   it  work   how  I   want..   And   you  can't   simply  set
+=standard-display-table= slot to empty space,  because it isn't ready on
+Emacs init.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package fringe
+    :ensure nil
+    :hook ((window-configuration-change
+            org-capture-mode
+            org-src-mode) . aorst/real-buffer-setup)
+    :config
+    (defun aorst/real-buffer-p ()
+      "Determines whether buffer is real."
+      (or (and (not (minibufferp))
+               (buffer-file-name))
+          (or (string-equal "*scratch*" (buffer-name))
+              (string-match-p ".~{index}~" (buffer-name)))))
+    (defun aorst/real-buffer-setup (&rest _)
+      "Wrapper around `set-window-fringes' function."
+      (when (aorst/real-buffer-p)
+        (set-window-fringes nil 8 8 nil)
+        (when (and (fboundp 'doom-color)
+                   window-system)
+          (set-face-attribute 'line-number-current-line nil
+                              :foreground (doom-color 'fg-alt)
+                              :background (doom-color 'bg)))
+        (setq-local scroll-margin 3)))
+    :init
+    (when window-system
+      (fringe-mode 0)
+      (or standard-display-table
+          (setq standard-display-table (make-display-table)))
+      (set-display-table-slot standard-display-table 0 ?\ )))
+#+END_SRC
+
 *** Solaire Mode
 This  package helps  distinguish  buffers that  have  file opened  and
 buffers that  are for utilities  like file  browser. Also it  has cool
@@ -730,12 +775,6 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
              org-src-mode) . turn-on-solaire-mode)
            (snippet-mode . solaire-mode))
     :config
-    (defun aorst/real-buffer-p ()
-      "Determines whether buffer is real."
-      (or (and (not (minibufferp))
-               (buffer-file-name))
-          (or (string-equal "*scratch*" (buffer-name))
-              (string-match-p ".~{index}~" (buffer-name)))))
     (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
     (solaire-mode-swap-bg)
     (cond ((not (boundp 'after-focus-change-function))
@@ -743,45 +782,6 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
           (t
            (add-function :after after-focus-change-function #'solaire-mode-reset)))
     :init (solaire-global-mode +1))
-#+END_SRC
-
-*** Fringe
-If only  certain buffers  could +be so  grossly incandescent+  *have damn
-fringes!* With  Solaire Mode  Emacs becomes way  more like  true editor
-with actual  graphical interface,  but these  fringes drive  me crazy.
-That's why  I wrote  a function =aorst/real-buffer-setup=,  that enables
-fringes only  in buffers that  are affected  by Solaire Mode.   I want
-fringes to appear only in certain buffers where I really need them, so
-let's disable  it entirely  on startup  and set  them with  some hooks
-later.  But this  adds another problem.  Emacs displays =$=  sign at the
-end of the window if line is  being truncated. Damn, why it is so hard
-to  make   it  work   how  I   want..   And   you  can't   simply  set
-=standard-display-table= slot to empty space,  because it isn't ready on
-Emacs init.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package fringe
-    :ensure nil
-    :hook ((window-configuration-change
-            org-capture-mode
-            org-src-mode) . aorst/real-buffer-setup)
-    :config
-    (defun aorst/real-buffer-setup (&rest _)
-      "Wrapper around `set-window-fringes' function."
-      (when (aorst/real-buffer-p)
-        (set-window-fringes nil 8 8 nil)
-        (when (and (fboundp 'doom-color)
-                   window-system)
-          (set-face-attribute 'line-number-current-line nil
-                              :foreground (doom-color 'fg-alt)
-                              :background (doom-color 'bg)))
-        (setq-local scroll-margin 3)))
-    :init
-    (when window-system
-      (fringe-mode 0)
-      (or standard-display-table
-          (setq standard-display-table (make-display-table)))
-      (set-display-table-slot standard-display-table 0 ?\ )))
 #+END_SRC
 
 *** DOOM Modeline

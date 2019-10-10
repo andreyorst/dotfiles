@@ -323,17 +323,11 @@ are defining or executing a macro."
                  (frame-parameter frame 'name)))))
     (aorst/set-frame-dark)))
 
-(use-package solaire-mode
-  :commands (solaire-global-mode
-             solaire-mode-swap-bg
-             turn-on-solaire-mode
-             solaire-mode-in-minibuffer
-             solaire-mode-reset)
-  :hook (((after-revert
-           change-major-mode
-           org-capture-mode
-           org-src-mode) . turn-on-solaire-mode)
-         (snippet-mode . solaire-mode))
+(use-package fringe
+  :ensure nil
+  :hook ((window-configuration-change
+          org-capture-mode
+          org-src-mode) . aorst/real-buffer-setup)
   :config
   (defun aorst/real-buffer-p ()
     "Determines whether buffer is real."
@@ -341,20 +335,6 @@ are defining or executing a macro."
              (buffer-file-name))
         (or (string-equal "*scratch*" (buffer-name))
             (string-match-p ".~{index}~" (buffer-name)))))
-  (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
-  (solaire-mode-swap-bg)
-  (cond ((not (boundp 'after-focus-change-function))
-         (add-hook 'focus-in-hook  #'solaire-mode-reset))
-        (t
-         (add-function :after after-focus-change-function #'solaire-mode-reset)))
-  :init (solaire-global-mode +1))
-
-(use-package fringe
-  :ensure nil
-  :hook ((window-configuration-change
-          org-capture-mode
-          org-src-mode) . aorst/real-buffer-setup)
-  :config
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
     (when (aorst/real-buffer-p)
@@ -371,6 +351,26 @@ are defining or executing a macro."
     (or standard-display-table
         (setq standard-display-table (make-display-table)))
     (set-display-table-slot standard-display-table 0 ?\ )))
+
+(use-package solaire-mode
+  :commands (solaire-global-mode
+             solaire-mode-swap-bg
+             turn-on-solaire-mode
+             solaire-mode-in-minibuffer
+             solaire-mode-reset)
+  :hook (((after-revert
+           change-major-mode
+           org-capture-mode
+           org-src-mode) . turn-on-solaire-mode)
+         (snippet-mode . solaire-mode))
+  :config
+  (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
+  (solaire-mode-swap-bg)
+  (cond ((not (boundp 'after-focus-change-function))
+         (add-hook 'focus-in-hook  #'solaire-mode-reset))
+        (t
+         (add-function :after after-focus-change-function #'solaire-mode-reset)))
+  :init (solaire-global-mode +1))
 
 (use-package doom-modeline
   :commands (doom-modeline-mode
