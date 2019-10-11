@@ -39,6 +39,10 @@ svn_blame() {
     command svn blame "$@" | less -F
 }
 
+## calls svn st, and greps all untracked files;
+## strips first column with `?[\t ]+', and prints null-terminated results with awk;
+## passes to `xargs -0', and deletes with `rm -rf'
+## WARNING: doesn't work with busybox awk
 svn_clean() {
-    command svn st | grep '^?' | awk '{ sub(/^.[\t ]+/, "", $0); gsub(/ /, "\\ ", $0);  print $0 }'
+    command svn st | grep '^?' | awk '{ sub(/^.[\t ]+/, "", $0); printf("%s%c", $0, 0); }' | xargs -0 rm -rf
 }
