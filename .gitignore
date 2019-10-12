@@ -1,5 +1,5 @@
 bundle
-ssfhs
+sshfs
 .netrwhist
 settings.json
 spell
@@ -11,6 +11,7 @@ saved_workspaces
 .emacs.d/*
 !.emacs.d/config.org
 !.emacs.d/init.el
+!.emacs.d/early-init.el
 !.emacs.d/snippets/
 !.emacs.d/.sceenshot.png
 !.emacs.d/.mc-lists.el

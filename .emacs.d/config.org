@@ -61,7 +61,7 @@ when to trigger garbage collection, but this will end up in unpleasant
 editing experience. So I'm declaring  these variables to store default
 values for the GC, to restore them after initialization is finished:
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el"
   (defvar my--gc-cons-threshold gc-cons-threshold)
   (defvar my--gc-cons-percentage gc-cons-percentage)
   (defvar my--file-name-handler-alist file-name-handler-alist)
@@ -69,7 +69,7 @@ values for the GC, to restore them after initialization is finished:
 
 Now we can tweak GC. We need to raise threshold to prevent it running:
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el"
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6
         inhibit-compacting-font-caches t
@@ -80,12 +80,28 @@ Now we can tweak GC. We need to raise threshold to prevent it running:
 Then we need  a hook that restores initial  values once initialization
 done:
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el"
   (add-hook 'after-init-hook
             (lambda ()
               (setq gc-cons-threshold my--gc-cons-threshold
                     gc-cons-percentage my--gc-cons-percentage
                     file-name-handler-alist my--file-name-handler-alist)))
+#+END_SRC
+
+Prevent the glimpse of un-styled  Emacs by disabling these UI elements
+early.
+
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el"
+  (push '(menu-bar-lines . 0) default-frame-alist)
+  (push '(tool-bar-lines . 0) default-frame-alist)
+  (push '(vertical-scroll-bars) default-frame-alist)
+#+END_SRC
+=package.el= initialization is expensive so we disable it at startup:
+
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el"
+  (defvar package--init-file-ensured)
+  (setq package-enable-at-startup nil
+        package--init-file-ensured t)
 #+END_SRC
 
 * Default Behavior Fixes
@@ -350,14 +366,6 @@ This section lists package configurations managed by =use-package=.
 To obtain  plugins we need  =package= package. Although this  is builtin
 and convenient,  it's also  slow and messy.  Instead of  using =package=
 directly we will use =use-package= to manage package configurations.
-
-=package.el= initialization is expensive so we disable it at startup:
-
-#+BEGIN_SRC emacs-lisp
-  (defvar package--init-file-ensured)
-  (setq package-enable-at-startup nil
-        package--init-file-ensured t)
-#+END_SRC
 
 Melpa is a  package repository, that I use to  get packages. Since all
 packages that  I need can  be obtained  from there, I  didn't bothered
