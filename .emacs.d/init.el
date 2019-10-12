@@ -145,8 +145,6 @@ are defining or executing a macro."
   (require 'use-package)
   (setq use-package-always-ensure t))
 
-(use-package compdef)
-
 (use-package org
   :ensure nil
   :defines default-justification
@@ -223,7 +221,9 @@ are defining or executing a macro."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
-(setq-default doc-view-resolution 192)
+(use-package doc-view
+  :ensure nil
+  :config (setq-default doc-view-resolution 192))
 
 (use-package display-line-numbers
   :ensure nil
@@ -819,8 +819,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                    smart-tab
                    smart-yank)))
 
-(use-package flx)
-
 (use-package ivy
   :commands ivy-mode
   :bind (("C-x C-b" . ivy-switch-buffer)
@@ -870,18 +868,22 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
               ("<backtab>" . company-select-previous))
   :hook (after-init . global-company-mode)
   :config
-  (use-package company-flx
-    :config (company-flx-mode +1))
-  (use-package company-quickhelp
-    :config (company-quickhelp-mode))
   (setq company-require-match 'never
         company-minimum-prefix-length 3
         company-tooltip-align-annotations t
-        company-frontends
-        '(company-pseudo-tooltip-unless-just-one-frontend
-          company-preview-frontend
-          company-echo-metadata-frontend))
-  (setq company-backends '((company-capf :with company-yasnippet) company-files)))
+        company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                            company-preview-frontend
+                            company-echo-metadata-frontend)
+        company-backends '(company-capf company-files)))
+
+(use-package company-flx
+  :after company
+  :config
+  (company-flx-mode +1))
+
+(use-package company-quickhelp
+  :after company
+  :config (company-quickhelp-mode))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -968,14 +970,10 @@ _-_: reduce region _)_: around pairs
   (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
   (set-face-attribute 'phi-search-match-face nil :inherit 'region))
 
-(when (and (or (executable-find "clangd")
-               (executable-find "rls"))
-           window-system)
+(when (or (executable-find "clangd")
+          (executable-find "rls"))
   (use-package eglot
-    :commands eglot-ensure
-    :hook ((c-mode c++-mode rust-mode) . eglot-ensure)
-    :compdef eglot--managed-mode-hook
-    :company (company-capf company-files)
+    :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
     :config
     (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))

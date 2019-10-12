@@ -400,15 +400,6 @@ And =require= the package itself:
     (setq use-package-always-ensure t))
 #+END_SRC
 
-*** Compdef
-A package that allows configuration of company and =capf= backends based
-on active modes. It provides =use-package= keywords, that's why it is so
-early in the configuration.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package compdef)
-#+END_SRC
-
 ** Modes
 In Emacs  world Modes  are the  main thing. I'm  using Org  Mode quite
 heavily right now, as well as  a lot of other modes. Configurations of
@@ -502,7 +493,9 @@ my Emacs configuration with it.
 Default resolution is too low:
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default doc-view-resolution 192)
+  (use-package doc-view
+    :ensure nil
+    :config (setq-default doc-view-resolution 192))
 #+END_SRC
 
 *** Display Line Numbers Mode
@@ -1359,13 +1352,6 @@ never thought it could be.
 
 Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
 
-*** Flx
-This package provides some kind of fuzzy matching for Emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flx)
-#+END_SRC
-
 *** Ivy and Counsel
 Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
 experience.  It  integrates with  Counsel that handles  minibuffer, so
@@ -1432,19 +1418,34 @@ Complete anything framework. Nothing much to say. Does it's job.
                 ("<backtab>" . company-select-previous))
     :hook (after-init . global-company-mode)
     :config
-    (use-package company-flx
-      :config (company-flx-mode +1))
-    (use-package company-quickhelp
-      :config (company-quickhelp-mode))
     (setq company-require-match 'never
           company-minimum-prefix-length 3
           company-tooltip-align-annotations t
-          company-frontends
-          '(company-pseudo-tooltip-unless-just-one-frontend
-            company-preview-frontend
-            company-echo-metadata-frontend))
-    (setq company-backends '((company-capf :with company-yasnippet) company-files)))
+          company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                              company-preview-frontend
+                              company-echo-metadata-frontend)
+          company-backends '(company-capf company-files)))
 #+END_SRC
+
+This package also requires these extra dependencies:
+
+- =company-flx= - provides fuzzy matching algorithms for company.
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package company-flx
+      :after company
+      :config
+      (company-flx-mode +1))
+  #+END_SRC
+
+- =company-quickhelp=  -  provides  documentation  popup  for  completed
+  items.
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package company-quickhelp
+      :after company
+      :config (company-quickhelp-mode))
+  #+END_SRC
 
 *** Undo Tree
 This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
@@ -1579,14 +1580,10 @@ This search mode is compatible with multiple cursors.
 Emacs polyglot. LSP client.
 
  #+BEGIN_SRC emacs-lisp
-   (when (and (or (executable-find "clangd")
-                  (executable-find "rls"))
-              window-system)
+   (when (or (executable-find "clangd")
+             (executable-find "rls"))
      (use-package eglot
-       :commands eglot-ensure
-       :hook ((c-mode c++-mode rust-mode) . eglot-ensure)
-       :compdef eglot--managed-mode-hook
-       :company (company-capf company-files)
+       :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
        :config
        (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
        (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))
