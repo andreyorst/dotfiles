@@ -11,6 +11,7 @@
 # Common options
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 set-option global scrolloff 4,4
+set-option global ui_options ncurses_set_title=false
 
 ## Grep
 ## ‾‾‾‾
