@@ -69,8 +69,11 @@ are defining or executing a macro."
 (global-set-key [remap keyboard-quit] #'aorst/escape)
 
 (defun aorst/command-error-function (data context caller)
-  "Ignore the `text-read-only' signal; pass the rest DATA CONTEXT CALLER to the default handler."
-  (when (not (eq (car data) 'text-read-only))
+  "Ignore the `text-read-only', `end-of-buffer', and `beginning-of-buffer' signals.
+Pass the rest DATA CONTEXT CALLER to the default handler."
+  (when (not (memq (car data) '(text-read-only
+                                end-of-buffer
+                                beginning-of-buffer)))
     (command-error-default-function data context caller)))
 
 (setq command-error-function #'aorst/command-error-function)
