@@ -77,7 +77,7 @@ search-file -params 1 %{ evaluate-commands %sh{
 
     file=$(printf "%s\n" $1 | sed -E "s:^~/:$HOME/:") # we want full path
 
-    eval "set -- ${kak_buflist}"
+    eval "set -- ${kak_quoted_buflist}"
     while [ $# -gt 0 ]; do            # Check if buffer with this
         if [ "${file}" = "$1" ]; then # file already exists. Basically
             printf "%s\n" "buffer $1" # emulating what edit command does
@@ -92,7 +92,7 @@ search-file -params 1 %{ evaluate-commands %sh{
     fi                                            # we start recursive searchimg
 
     # if everthing  above fails - search for file under `path'
-    eval "set -- ${kak_opt_path}"
+    eval "set -- ${kak_quoted_opt_path}"
     while [ $# -gt 0 ]; do                # Since we want to check fewer places,
         case $1 in                        # I've swapped ./ and %/ because
             (./) path=${kak_buffile%/*} ;; # %/ usually has smaller scope. So
