@@ -33,7 +33,7 @@ smart-select-file %{
         execute-keys "<a-i>a"
     } catch %{
         # try selecting inside first occurrence of "..."
-        execute-keys '<a-x>s<"ret>)<space>'
+        execute-keys '<a-x>s"<ret>)<space>'
         execute-keys "<a-i>Q"
     } catch %{
         # try selecting inside first  occurrence of '...'
