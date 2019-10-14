@@ -298,7 +298,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
     (setq window-divider-default-right-width 1)
     (window-divider-mode 1)
-    :init
     (defun aorst/set-frame-dark (&optional frame)
       "Set FRAME titlebar colorscheme to dark variant."
       (with-selected-frame (or frame (selected-frame))
@@ -717,6 +716,25 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal))))
 
+(use-package whitespace
+  :ensure nil
+  :hook (whitespace-mode . aorst/whitespace-mode-set-faces)
+  :config
+  (defun aorst/whitespace-mode-set-faces ()
+    (let ((fg (face-attribute whitespace-space :foreground)))
+      (dolist (face '(whitespace-big-indent
+                      whitespace-empty
+                      whitespace-hspace
+                      whitespace-indentation
+                      whitespace-line
+                      whitespace-newline
+                      whitespace-space
+                      whitespace-space-after-tab
+                      whitespace-space-before-tab
+                      whitespace-tab
+                      whitespace-trailing))
+        (set-face-attribute face nil :background nil :foreground fg)))))
+
 (use-package term
   :ensure nil
   :bind (("C-`" . aorst/ansi-term-toggle)
@@ -895,7 +913,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydra-mc/body))
+         ("C-c m" . hydra-mc/body)
+         ("C-q" . mc/mark-next-like-this-word))
   :config
   (use-package mc-extras)
   (defhydra hydra-mc (:hint nil :color pink)
@@ -1008,6 +1027,9 @@ _-_: reduce region _)_: around pairs
     "Setings for imenu-list"
     (setq window-size-fixed 'width
           mode-line-format nil)
+    (when (and (not (version<= emacs-version "27"))
+               (boundp 'tab-line-format))
+      (setq tab-line-format nil))
     (set-window-parameter (get-buffer-window (current-buffer)) 'no-other-window t))
   (advice-add 'imenu-list-smart-toggle :after-while #'aorst/imenu-list-setup)
   (setq imenu-list-idle-update-delay-time 0.1
@@ -1021,20 +1043,6 @@ _-_: reduce region _)_: around pairs
   (setq dumb-jump-selector 'ivy)
   (when (executable-find "rg")
     (setq dumb-jump-force-searcher 'rg)))
-
-(use-package iedit
-  :bind ("C-q" . aorst/iedit-current-or-expand)
-  :config
-  (setq iedit-toggle-key-default "")
-  (defun aorst/iedit-current-or-expand (&optional arg)
-    "Select only current occurrence with `iedit-mode'.  Expand to
-next occurrence if `iedit-mode' is already active."
-    (interactive "P")
-    (if (bound-and-true-p iedit-mode)
-        (if (symbolp arg)
-            (iedit-expand-down-to-occurrence)
-          (iedit-expand-up-to-occurrence))
-      (iedit-mode 1))))
 
 (use-package server
   :ensure nil
