@@ -125,6 +125,7 @@ if %[ -n "${PATH##*termux*}" ] %{
 plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
+    set-option global powerline_shorten_bufname 'short'
     if %[ ! -n "${PATH##*termux*}" ] %{
         set-option global powerline_separator ''
         set-option global powerline_separator_thin ''
@@ -229,3 +230,24 @@ plug "andreyorst/kaktree" defer kaktree %{
 }
 
 plug "occivink/kakoune-gdb"
+
+plug "KJ_Duncan/kakoune-racket.kak" domain "bitbucket.org" config %{
+    hook global WinSetOption filetype=racket %{ require-module lisp }
+}
+
+plug "eraserhd/parinfer-rust" do %{
+    cargo install --force --path . --locked
+    cargo clean
+} config %{
+    hook -group parinfer global WinSetOption filetype=(clojure|lisp|scheme|racket) %{
+        require-module parinfer
+        parinfer -if-enabled -paren
+        hook -group parinfer window NormalKey .* %{ parinfer -if-enabled -smart }
+        hook -group parinfer window InsertChar (?!\n).* %{ parinfer -if-enabled -smart }
+        hook -group parinfer window InsertDelete .* %{ parinfer -if-enabled -smart }
+    }
+
+    hook -group parinfer global WinSetOption filetype=(?!clojure)(?!lisp)(?!scheme)(?!racket).* %{
+        remove-hooks window parinfer
+    }
+}
