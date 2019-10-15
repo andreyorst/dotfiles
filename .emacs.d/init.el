@@ -349,17 +349,13 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   :config
   (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   (solaire-mode-swap-bg)
-  (cond ((not (boundp 'after-focus-change-function))
-         (add-hook 'focus-in-hook  #'solaire-mode-reset))
-        (t
-         (add-function :after after-focus-change-function #'solaire-mode-reset)))
+  (with-no-warnings
+   (if (boundp 'after-focus-change-function)
+       (add-function :after after-focus-change-function #'solaire-mode-reset)
+     (add-hook 'focus-in-hook  #'solaire-mode-reset)))
   :init (solaire-global-mode +1))
 
 (use-package doom-modeline
-  :commands (doom-modeline-mode
-             doom-modeline-set-selected-window
-             doom-modeline-lsp-icon)
-  :functions (doom-color)
   :config
   (dolist (face '(doom-modeline-buffer-modified
                   doom-modeline-buffer-minor-mode
@@ -390,7 +386,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
         find-file-visit-truename t)
-  :init (doom-modeline-mode 1))
+  (doom-modeline-mode 1))
 
 (when window-system
   (use-package treemacs
@@ -647,7 +643,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                     'tab-line)))
         (face-remap-add-relative face
                                  :box (list :line-width 7 :color bg)
-                                 :background bg :foreground fg))))
+                                 :background bg :foreground fg :height 1.0))))
   (setq treemacs-width 27
         treemacs-is-never-other-window t
         treemacs-space-between-root-nodes nil)
@@ -712,7 +708,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
           (box-width 7))
-      (set-face-attribute 'tab-line nil :background base :foreground nil)
+      (set-face-attribute 'tab-line nil :background base :foreground nil :height 1.0)
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal))))
 
