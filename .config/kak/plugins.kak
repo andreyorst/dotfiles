@@ -235,19 +235,12 @@ plug "KJ_Duncan/kakoune-racket.kak" domain "bitbucket.org" config %{
     hook global WinSetOption filetype=racket %{ require-module lisp }
 }
 
-plug "eraserhd/parinfer-rust" do %{
+plug "eraserhd/parinfer-rust" load-path "~/Git/parinfer-rust/" branch "parinfer-commands" do %{
     cargo install --force --path . --locked
     cargo clean
 } config %{
     hook -group parinfer global WinSetOption filetype=(clojure|lisp|scheme|racket) %{
-        require-module parinfer
-        parinfer -if-enabled -paren
-        hook -group parinfer window NormalKey .* %{ parinfer -if-enabled -smart }
-        hook -group parinfer window InsertChar (?!\n).* %{ parinfer -if-enabled -smart }
-        hook -group parinfer window InsertDelete .* %{ parinfer -if-enabled -smart }
-    }
-
-    hook -group parinfer global WinSetOption filetype=(?!clojure)(?!lisp)(?!scheme)(?!racket).* %{
-        remove-hooks window parinfer
+        parinfer-enable-window -smart
+        try %{ set-option buffer auto_pairs }
     }
 }
