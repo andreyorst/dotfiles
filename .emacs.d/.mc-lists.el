@@ -28,6 +28,7 @@
         org-fill-paragraph
         org-kill-line
         org-self-insert-command
+        org-toggle-comment
         org-yank
         overwrite-mode
         parinfer-backward-delete-char
