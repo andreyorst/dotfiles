@@ -174,18 +174,15 @@ for pm in yay pacman rpm-ostree dnf yum apt; do
     fi
 done
 
-PACMAN_DEFAULT_ARGS="--noconfirm"
-YAY_DEFAULT_ARGS="$PACMAN_DEFAULT_ARGS --devel --nodiffmenu --noeditmenu --noupgrademenu --removemake"
-
 pm_yay() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) yay -Sy "$@"                     ;;
-        (update)  yay -Syyu $YAY_DEFAULT_ARGS "$@" ;;
-        (remove)  yay -Rsc "$@"                    ;;
-        (search)  yay -Ss "$@"                     ;;
-        (*)       yay "$cmd" "$@"                  ;;
+        (install) yay -Sy "$@"                                                                              ;;
+        (update)  yay -Syyu --noconfirm --devel --nodiffmenu --noeditmenu --noupgrademenu --removemake "$@" ;;
+        (remove)  yay -Rsc "$@"                                                                             ;;
+        (search)  yay -Ss "$@"                                                                              ;;
+        (*)       yay "$cmd" "$@"                                                                           ;;
     esac
 }
 
@@ -193,11 +190,11 @@ pm_packman() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) sudo pacman -Sy "$@"                        ;;
-        (update)  sudo pacman -Syyu $PACMAN_DEFAULT_ARGS "$@" ;;
-        (remove)  sudo pacman -Rsc "$@"                       ;;
-        (search)  pacman -Ss "$@"                             ;;
-        (*)       pacman "$cmd" "$@"                          ;;
+        (install) sudo pacman -Sy "$@"               ;;
+        (update)  sudo pacman -Syyu --noconfirm "$@" ;;
+        (remove)  sudo pacman -Rsc "$@"              ;;
+        (search)  pacman -Ss "$@"                    ;;
+        (*)       pacman "$cmd" "$@"                 ;;
     esac
 }
 
