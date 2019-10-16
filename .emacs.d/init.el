@@ -708,9 +708,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
           (box-width 7))
-      (set-face-attribute 'tab-line nil :background base :foreground nil :height 1.0)
-      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold)
-      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal))))
+      (set-face-attribute 'tab-line nil :background base :foreground nil :height 1.0 :inherit nil)
+      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold :inherit nil)
+      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil))))
 
 (use-package whitespace
   :ensure nil
