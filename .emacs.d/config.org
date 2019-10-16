@@ -797,7 +797,7 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
     :init (solaire-global-mode +1))
 #+END_SRC
 
-*** DOOM Modeline
+*** COMMENT DOOM Modeline
 I've tried bunch of different modelines:
 
 - [[https://github.com/TheBB/spaceline][Spaceline]]
