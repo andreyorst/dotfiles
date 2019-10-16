@@ -349,10 +349,10 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   :config
   (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   (solaire-mode-swap-bg)
-  (with-no-warnings
-   (if (boundp 'after-focus-change-function)
-       (add-function :after after-focus-change-function #'solaire-mode-reset)
-     (add-hook 'focus-in-hook  #'solaire-mode-reset)))
+  ;; (with-no-warnings
+  ;; (if (boundp 'after-focus-change-function)
+  ;;     (add-function :after after-focus-change-function #'solaire-mode-reset)
+  ;;   (add-hook 'focus-in-hook  #'solaire-mode-reset)))
   :init (solaire-global-mode +1))
 
 (use-package doom-modeline
