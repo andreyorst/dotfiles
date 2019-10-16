@@ -7,6 +7,9 @@
 ;;;
 ;;; Code:
 
+(setq user-mail-address "andreyorst@gmail.com"
+      user-full-name "Andrey Orst")
+
 (setq ring-bell-function 'ignore)
 
 (setq backup-by-copying t

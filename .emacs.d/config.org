@@ -104,10 +104,19 @@ early.
         package--init-file-ensured t)
 #+END_SRC
 
-* Default Behavior Fixes
+* Defaults
 Emacs is  old. I  understand that  back then  it could  be appropriate
 decisions,  but as  of today  they are  completely obliterated  by the
 passage of time.
+
+** User
+Let's set Full Name and e-mail address in case I would send e-mail from
+Emacs:
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-mail-address "andreyorst@gmail.com"
+        user-full-name "Andrey Orst")
+#+END_SRC
 
 ** Bell
 I'm not  trying to  insult on anyone,  but usage of  the bell  is just
