@@ -744,18 +744,19 @@ Emacs init.
     :config
     (defun aorst/real-buffer-p ()
       "Determines whether buffer is real."
-      (or (and (not (minibufferp))
-               (buffer-file-name))
-          (or (string-equal "*scratch*" (buffer-name))
-              (string-match-p ".~.*~" (buffer-name)))))
+      (let ((buffer-name (buffer-name)))
+        (or (and (not (minibufferp))
+                 (buffer-file-name))
+            (or (string-equal "*scratch*" buffer-name)
+                (string-match-p ".~.*~" buffer-name)))))
     (defun aorst/real-buffer-setup (&rest _)
       "Wrapper around `set-window-fringes' function."
       (when (aorst/real-buffer-p)
         (set-window-fringes nil 8 8 nil)
-        (when (and (fboundp 'doom-color)
-                   window-system)
-          (set-face-attribute 'line-number-current-line nil
-                              :background (doom-color 'bg)))
+        ;; (when (and (fboundp 'doom-color)
+        ;;            window-system)
+        ;;   (set-face-attribute 'line-number-current-line nil
+        ;;                       :background (doom-color 'bg)))
         (setq-local scroll-margin 3)))
     :init
     (when window-system
@@ -790,10 +791,10 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
     :config
     (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
     (solaire-mode-swap-bg)
-    ;; (with-no-warnings
-    ;; (if (boundp 'after-focus-change-function)
-    ;;     (add-function :after after-focus-change-function #'solaire-mode-reset)
-    ;;   (add-hook 'focus-in-hook  #'solaire-mode-reset)))
+    (with-no-warnings
+      (if (boundp 'after-focus-change-function)
+          (add-function :after after-focus-change-function #'solaire-mode-reset)
+        (add-hook 'focus-in-hook  #'solaire-mode-reset)))
     :init (solaire-global-mode +1))
 #+END_SRC
 
@@ -1243,7 +1244,8 @@ In case I want to use =whitespace-mode= I'd like to disable these faces.
                         whitespace-space-before-tab
                         whitespace-tab
                         whitespace-trailing))
-          (set-face-attribute face nil :background nil :foreground fg)))))
+          (set-face-attribute face nil :background nil :foreground fg))))
+    (setq whitespace-display-mappings '((tab-mark 9 [187 9] [92 9]))))
 #+END_SRC
 
 ** Tools
@@ -1454,7 +1456,9 @@ Complete anything framework. Nothing much to say. Does it's job.
                 ("TAB" . company-complete-common-or-cycle)
                 ("<tab>" . company-complete-common-or-cycle)
                 ("<S-Tab>" . company-select-previous)
-                ("<backtab>" . company-select-previous))
+                ("<backtab>" . company-select-previous)
+                ("C-n" . company-select-next)
+                ("C-p" . company-select-previous))
     :hook (after-init . global-company-mode)
     :config
     (setq company-require-match 'never
