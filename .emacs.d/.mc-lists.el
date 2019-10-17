@@ -6,8 +6,10 @@
         backward-sexp
         beginning-of-buffer
         c-electric-brace
+        c-electric-delete-forward
         c-electric-paren
         c-electric-semi&comma
+        c-end-of-defun
         c-indent-line-or-region
         counsel-M-x
         delete-indentation
