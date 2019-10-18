@@ -17,6 +17,7 @@ evaluate-commands %sh{
         languages.kak
         recentf.kak
         plugins.kak
+        mnemonic-user-mode.kak
     "
 
     for file in $config_files; do
