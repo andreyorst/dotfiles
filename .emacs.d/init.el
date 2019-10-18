@@ -220,7 +220,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (use-package prog-mode
   :ensure nil
   :hook ((prog-mode . show-paren-mode)
-         (prog-mode . display-line-numbers-mode)))
+         (prog-mode . display-line-numbers-mode)
+         (prog-mode . hl-line-mode)))
 
 (use-package cc-mode
   :ensure nil
@@ -385,10 +386,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     "Wrapper around `set-window-fringes' function."
     (when (aorst/real-buffer-p)
       (set-window-fringes nil 8 8 nil)
-      ;; (when (and (fboundp 'doom-color)
-      ;;            window-system)
-      ;;   (set-face-attribute 'line-number-current-line nil
-      ;;                       :background (doom-color 'bg)))
       (setq-local scroll-margin 3)))
   :init
   (when window-system
