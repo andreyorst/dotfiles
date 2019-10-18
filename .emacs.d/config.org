@@ -1615,6 +1615,7 @@ I want to try it out.
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
+    :hook ((git-commit-mode . flyspell-mode))
     :bind (("<f12>" . magit-status))
     :config (setq magit-ediff-dwim-show-on-hunks t))
 #+END_SRC

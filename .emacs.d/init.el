@@ -935,6 +935,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (yas-reload-all))
 
 (use-package magit
+  :hook ((git-commit-mode . flyspell-mode))
   :bind (("<f12>" . magit-status))
   :config (setq magit-ediff-dwim-show-on-hunks t))
 
