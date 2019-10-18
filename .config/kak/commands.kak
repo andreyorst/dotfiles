@@ -132,10 +132,10 @@ define-command -hidden -docstring \
 select-or-add-cursor %{
     try %{
         execute-keys "<a-k>\A.\z<ret>"
-        execute-keys -save-regs '' "<a-i>w*"
+        execute-keys -save-regs '' "_<a-i>w*"
     } catch %{
-        execute-keys -save-regs '' "*<s-n>"
-    }
+        execute-keys -save-regs '' "_*<s-n>"
+    } catch nop
 }
 
 define-command -docstring "Convert all leading spaces to tabs" \
