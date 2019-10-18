@@ -1,3 +1,12 @@
+(defvar package-archives)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")))
+
+(when (version= emacs-version "26.2")
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+(package-initialize)
+
 ;;; init.el --- Emacs main configuration file -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
 ;;;
 ;;; Commentary:
@@ -113,15 +122,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       size-indication-mode nil
       mode-line-position nil
       mode-line-in-non-selected-windows nil)
-
-(defvar package-archives)
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")))
-
-(when (version= emacs-version "26.2")
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-(package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -847,6 +847,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :commands ivy-mode
   :bind (("C-x C-b" . ivy-switch-buffer)
          ("C-x b" . ivy-switch-buffer))
+  :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
+         (minibuffer-exit-hook . aorst/minibuffer-restore-garbage-collection))
   :config
   (use-package counsel
     :commands (counsel-M-x
@@ -881,7 +883,15 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         ivy-minibuffer-faces nil
         ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
-  :init (ivy-mode 1))
+  :init
+  (defun aorst/minibuffer-defer-garbage-collection ()
+    "Defer garbage collection for minibuffer"
+    (setq gc-cons-threshold most-positive-fixnum))
+  (defun aorst/minibuffer-restore-garbage-collection ()
+    "Resotre garbage collection settings."
+    (run-at-time
+     1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
+  (ivy-mode 1))
 
 (use-package company
   :commands global-company-mode
