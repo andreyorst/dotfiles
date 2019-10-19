@@ -1,12 +1,3 @@
-(defvar package-archives)
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")))
-
-(when (version= emacs-version "26.2")
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-(package-initialize)
-
 ;;; init.el --- Emacs main configuration file -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
 ;;;
 ;;; Commentary:
@@ -15,6 +6,15 @@
 ;;; Do not change this file.  Main config is located in .emacs.d/config.org
 ;;;
 ;;; Code:
+
+(defvar package-archives)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")))
+
+(when (version= emacs-version "26.2")
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+(package-initialize)
 
 (setq user-mail-address "andreyorst@gmail.com"
       user-full-name "Andrey Orst")
@@ -35,7 +35,6 @@
 (global-unset-key (kbd "S-<mouse-3>"))
 
 (setq-default indent-tabs-mode nil
-              scroll-step 1
               mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)
 
@@ -807,6 +806,12 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 (use-package flymake
   :ensure nil
   :config (setq flymake-fringe-indicator-position 'right-fringe))
+
+(use-package flyspell
+  :ensure nil
+  :config
+  (setq ispell-program-name (executable-find "hunspell")
+        ispell-dictionary "en_US"))
 
 (use-package hydra
   :commands (hydra-default-pre
