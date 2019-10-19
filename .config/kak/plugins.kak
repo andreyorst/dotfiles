@@ -235,12 +235,31 @@ plug "KJ_Duncan/kakoune-racket.kak" domain "bitbucket.org" config %{
     hook global WinSetOption filetype=racket %{ require-module lisp }
 }
 if %[ -n "${PATH##*termux*}" ] %<
-    plug "eraserhd/parinfer-rust" do %{
+    plug "eraserhd/parinfer-rust" load-path "/home/andreyorst/Git/parinfer-rust/" do %{
         cargo install --force --path . --locked
         cargo clean
     } config %<
         hook global WinSetOption filetype=(clojure|lisp|scheme|racket) %<
-            parinfer-enable-window
+            declare-user-mode parinfer
+            map global user 'P' ': enter-user-mode parinfer<ret>' -docstring "Change Parinfer mode"
+            map global parinfer 'p' ': parinfer-enable-window -paren<ret>' -docstring "Paren mode"
+            map global parinfer 'i' ': parinfer-enable-window -indent<ret>' -docstring "Indent mode"
+            map global parinfer 's' ': parinfer-enable-window -smart<ret>' -docstring "Smart mode"
+            map global parinfer 'q' ': parinfer-disable-window<ret>' -docstring "Disable Parinfer"
+
+            define-command -docstring "Toggle Parinfer between paren and indent modes." \
+            parinfer-toggle %{ evaluate-commands %sh{
+                if [ "$kak_opt_parinfer_current_mode" = "paren" ]; then
+                    printf "%s\n" "parinfer-enable-window -indent"
+                else
+                    printf "%s\n" "parinfer-enable-window -paren"
+                fi
+            }}
+            map global insert '' '<esc>: parinfer-toggle<ret>' -docstring "Toggle Parinfer between paren and indent modes (<c-]>)"
+            map global normal '' '<esc>: parinfer-toggle<ret>' -docstring "Toggle Parinfer between paren and indent modes (<c-]>)"
+
+            # parinfer-enable-window
+
             try %{ set-option buffer auto_pairs '"' '"' "'" "'" ` ` }
 
             # prefer Default color on all parens
