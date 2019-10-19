@@ -778,7 +778,11 @@ change a little bit of it.
                         ediff-odd-diff-C))
           (set-face-attribute face nil :extend t)))
       (with-eval-after-load 'hl-line
-        (set-face-attribute 'hl-line nil :extend t)))
+        (set-face-attribute 'hl-line nil :extend t))
+      (with-eval-after-load 'faces
+        (dolist (face '(region
+                        secondary-selection))
+          (set-face-attribute face nil :extend t))))
     :init (load-theme 'doom-one t))
 #+END_SRC
 
@@ -880,7 +884,7 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
     :init (solaire-global-mode +1))
 #+END_SRC
 
-*** COMMENT DOOM Modeline
+*** DOOM Modeline
 I've tried bunch of different modelines:
 
 - [[https://github.com/TheBB/spaceline][Spaceline]]
@@ -931,6 +935,11 @@ it's great!
           doom-modeline-buffer-file-name-style 'file-name
           doom-modeline-minor-modes t
           find-file-visit-truename t)
+    (setq internal-lisp-face-attributes
+          [nil
+           :family :foundry :swidth :height :weight :slant :underline :inverse
+           :foreground :background :stipple :overline :strike :box
+           :font :inherit :fontset :vector :extend])
     (doom-modeline-mode 1))
 #+END_SRC
 

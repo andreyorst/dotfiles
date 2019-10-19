@@ -349,7 +349,11 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                       ediff-odd-diff-C))
         (set-face-attribute face nil :extend t)))
     (with-eval-after-load 'hl-line
-      (set-face-attribute 'hl-line nil :extend t)))
+      (set-face-attribute 'hl-line nil :extend t))
+    (with-eval-after-load 'faces
+      (dolist (face '(region
+                      secondary-selection))
+        (set-face-attribute face nil :extend t))))
   :init (load-theme 'doom-one t))
 
 (when window-system
@@ -412,6 +416,44 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
         (add-function :after after-focus-change-function #'solaire-mode-reset)
       (add-hook 'focus-in-hook  #'solaire-mode-reset)))
   :init (solaire-global-mode +1))
+
+(use-package doom-modeline
+  :config
+  (dolist (face '(doom-modeline-buffer-modified
+                  doom-modeline-buffer-minor-mode
+                  doom-modeline-project-parent-dir
+                  doom-modeline-project-dir
+                  doom-modeline-project-root-dir
+                  doom-modeline-highlight
+                  doom-modeline-debug
+                  doom-modeline-info
+                  doom-modeline-warning
+                  doom-modeline-urgent
+                  doom-modeline-unread-number
+                  doom-modeline-buffer-path
+                  doom-modeline-bar
+                  doom-modeline-panel
+                  doom-modeline-buffer-major-mode
+                  doom-modeline-buffer-file
+                  doom-modeline-lsp-success
+                  doom-modeline-lsp-warning
+                  doom-modeline-lsp-error))
+    (set-face-attribute face nil :foreground (doom-color 'fg) :weight 'normal))
+  (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
+  (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
+  (set-face-attribute 'doom-modeline-panel nil :background (doom-color 'bg-alt))
+  (set-face-attribute 'doom-modeline-bar nil :background (doom-color 'bg-alt))
+  (setq doom-modeline-bar-width 3
+        doom-modeline-major-mode-color-icon nil
+        doom-modeline-buffer-file-name-style 'file-name
+        doom-modeline-minor-modes t
+        find-file-visit-truename t)
+  (setq internal-lisp-face-attributes
+        [nil
+         :family :foundry :swidth :height :weight :slant :underline :inverse
+         :foreground :background :stipple :overline :strike :box
+         :font :inherit :fontset :vector :extend])
+  (doom-modeline-mode 1))
 
 (when window-system
   (use-package treemacs
