@@ -16,6 +16,14 @@
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 (package-initialize)
 
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-when-compile
+  (require 'use-package)
+  (setq use-package-always-ensure t))
+
 (setq user-mail-address "andreyorst@gmail.com"
       user-full-name "Andrey Orst")
 
@@ -34,9 +42,10 @@
 (global-unset-key (kbd "<mouse-3>"))
 (global-unset-key (kbd "S-<mouse-3>"))
 
-(setq-default indent-tabs-mode nil
-              mouse-wheel-progressive-speed nil
+(setq-default mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)
+
+(setq-default indent-tabs-mode nil)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file :noerror)
@@ -93,9 +102,10 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
-(setq inhibit-splash-screen t
-      initial-major-mode 'fundamental-mode
+(setq initial-major-mode 'fundamental-mode
       initial-scratch-message "")
+
+(setq inhibit-splash-screen t)
 
 (tooltip-mode -1)
 (menu-bar-mode -1)
@@ -121,168 +131,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       size-indication-mode nil
       mode-line-position nil
       mode-line-in-non-selected-windows nil)
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-when-compile
-  (require 'use-package)
-  (setq use-package-always-ensure t))
-
-(use-package org
-  :ensure nil
-  :defines default-justification
-  :hook ((org-mode . flyspell-mode)
-         (org-mode . auto-fill-mode)
-         (after-save . aorst/org-tangle-on-config-save)
-         (org-babel-after-execute . aorst/org-update-inline-images)
-         (org-mode . aorst/org-init-setup)
-         (ediff-prepare-buffer . outline-show-all)
-         ((org-capture-mode org-src-mode) . aorst/discard-history))
-  :bind (:map org-mode-map
-              ([backtab] . nil)
-              ([S-iso-lefttab] . nil)
-              ([C-tab] . org-shifttab)
-              ("C-c l" . org-store-link))
-  :config
-  (use-package ox-latex
-    :ensure nil)
-  (setq org-startup-with-inline-images t
-        org-startup-folded 'content
-        org-hide-emphasis-markers t
-        org-adapt-indentation nil
-        org-hide-leading-stars t
-        org-highlight-latex-and-related '(latex)
-        revert-without-query '(".*\.pdf")
-        org-preview-latex-default-process 'dvisvgm
-        org-src-fontify-natively t
-        org-preview-latex-image-directory ".ltximg/"
-        org-latex-listings 'minted
-        org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
-        org-confirm-babel-evaluate nil
-        org-imenu-depth 8
-        org-agenda-files (file-truename "~/Documents/Agendas/"))
-  (defun aorst/org-tangle-on-config-save ()
-    "Tangle source code blocks when configuration file is saved."
-    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
-      (org-babel-tangle)))
-  (defun aorst/org-update-inline-images ()
-    "Update inline images in Org-mode."
-    (when org-inline-image-overlays
-      (org-redisplay-inline-images)))
-  (defun aorst/org-init-setup ()
-    "Set buffer local values."
-    (setq default-justification 'full))
-  (defun aorst/discard-history ()
-    "Discard undo history of org src and capture blocks."
-    (setq buffer-undo-list nil)
-    (set-buffer-modified-p nil))
-  (defvar minted-cache-dir
-    (file-name-as-directory
-     (expand-file-name ".minted/\\jombname"
-                       temporary-file-directory)))
-  (add-to-list 'org-latex-packages-alist
-               `(,(concat "cachedir=" minted-cache-dir)
-                 "minted" nil))
-  (add-to-list 'org-latex-logfiles-extensions "tex")
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((gnuplot . t)
-     (scheme . t)))
-  (add-to-list 'org-latex-classes
-               '("article"
-                 "\\documentclass{article}"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
-
-(use-package doc-view
-  :ensure nil
-  :config (setq-default doc-view-resolution 192))
-
-(use-package display-line-numbers
-  :ensure nil
-  :config
-  (setq display-line-numbers-grow-only t
-        display-line-numbers-width-start t))
-
-(use-package prog-mode
-  :ensure nil
-  :hook ((prog-mode . show-paren-mode)
-         (prog-mode . display-line-numbers-mode)
-         (prog-mode . hl-line-mode)))
-
-(use-package cc-mode
-  :ensure nil
-  :config (defun aorst/cc-mode-setup ()
-            (setq c-basic-offset 4
-                  c-default-style "linux"
-                  indent-tabs-mode t
-                  tab-width 4))
-  :hook ((c-mode-common . aorst/cc-mode-setup)
-         (c-mode-common . electric-pair-local-mode)))
-
-(use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :config
-  (use-package edit-indirect)
-  (defvar markdown-command "multimarkdown")
-  (defun aorst/markdown-setup ()
-    "Set buffer local variables."
-    (setq fill-column 80
-          default-justification 'left))
-  :hook ((markdown-mode . flyspell-mode)
-         (markdown-mode . auto-fill-mode)
-         (markdown-mode . aorst/markdown-setup)))
-
-(use-package rust-mode
-  :commands (rust-format-buffer)
-  :hook (rust-mode . electric-pair-local-mode)
-  :bind (:map rust-mode-map
-              ("C-c C-f" . rust-format-buffer)))
-
-(when (executable-find "racer")
-  (use-package racer
-    :hook (racer-mode . eldoc-mode)
-    :config (defun org-babel-edit-prep:rust (&optional _babel-info)
-              "Run racer mode for Org Babel."
-              (racer-mode 1))))
-
-(when (executable-find "cargo")
-  (use-package cargo
-    :hook (rust-mode . cargo-minor-mode)))
-
-(use-package toml-mode)
-
-(use-package racket-mode
-  :mode ("\\.rkt\\'" . racket-mode)
-  :hook (racket-repl-mode . electric-pair-local-mode)
-  :bind (:map racket-mode-map
-              ("C-c C-d" . racket-run-with-debugging))
-  :config (when (fboundp 'doom-color)
-            (progn
-              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
-              (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
-              (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
-              (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
-
-(use-package cmake-mode)
-
-(use-package help
-  :ensure nil
-  :config (setq help-window-select t))
 
 (use-package all-the-icons)
 
@@ -798,6 +646,160 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                       whitespace-trailing))
         (set-face-attribute face nil :background nil :foreground fg))))
   (setq whitespace-display-mappings '((tab-mark 9 [187 9] [92 9]))))
+
+(use-package display-line-numbers
+  :ensure nil
+  :config
+  (setq display-line-numbers-grow-only t
+        display-line-numbers-width-start t))
+
+(use-package org
+  :ensure nil
+  :defines default-justification
+  :hook ((org-mode . flyspell-mode)
+         (org-mode . auto-fill-mode)
+         (after-save . aorst/org-tangle-on-config-save)
+         (org-babel-after-execute . aorst/org-update-inline-images)
+         (org-mode . aorst/org-init-setup)
+         (ediff-prepare-buffer . outline-show-all)
+         ((org-capture-mode org-src-mode) . aorst/discard-history))
+  :bind (:map org-mode-map
+              ([backtab] . nil)
+              ([S-iso-lefttab] . nil)
+              ([C-tab] . org-shifttab)
+              ("C-c l" . org-store-link))
+  :config
+  (use-package ox-latex
+    :ensure nil)
+  (setq org-startup-with-inline-images t
+        org-startup-folded 'content
+        org-hide-emphasis-markers t
+        org-adapt-indentation nil
+        org-hide-leading-stars t
+        org-highlight-latex-and-related '(latex)
+        revert-without-query '(".*\.pdf")
+        org-preview-latex-default-process 'dvisvgm
+        org-src-fontify-natively t
+        org-preview-latex-image-directory ".ltximg/"
+        org-latex-listings 'minted
+        org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+        org-confirm-babel-evaluate nil
+        org-imenu-depth 8
+        org-agenda-files (file-truename "~/Documents/Agendas/"))
+  (defun aorst/org-tangle-on-config-save ()
+    "Tangle source code blocks when configuration file is saved."
+    (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
+      (org-babel-tangle)))
+  (defun aorst/org-update-inline-images ()
+    "Update inline images in Org-mode."
+    (when org-inline-image-overlays
+      (org-redisplay-inline-images)))
+  (defun aorst/org-init-setup ()
+    "Set buffer local values."
+    (setq default-justification 'full))
+  (defun aorst/discard-history ()
+    "Discard undo history of org src and capture blocks."
+    (setq buffer-undo-list nil)
+    (set-buffer-modified-p nil))
+  (defvar minted-cache-dir
+    (file-name-as-directory
+     (expand-file-name ".minted/\\jombname"
+                       temporary-file-directory)))
+  (add-to-list 'org-latex-packages-alist
+               `(,(concat "cachedir=" minted-cache-dir)
+                 "minted" nil))
+  (add-to-list 'org-latex-logfiles-extensions "tex")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((gnuplot . t)
+     (scheme . t)))
+  (add-to-list 'org-latex-classes
+               '("article"
+                 "\\documentclass{article}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
+(use-package doc-view
+  :ensure nil
+  :config (setq-default doc-view-resolution 192))
+
+(use-package prog-mode
+  :ensure nil
+  :hook ((prog-mode . show-paren-mode)
+         (prog-mode . display-line-numbers-mode)
+         (prog-mode . hl-line-mode)))
+
+(use-package cc-mode
+  :ensure nil
+  :config (defun aorst/cc-mode-setup ()
+            (setq c-basic-offset 4
+                  c-default-style "linux"
+                  indent-tabs-mode t
+                  tab-width 4))
+  :hook ((c-mode-common . aorst/cc-mode-setup)
+         (c-mode-common . electric-pair-local-mode)))
+
+(use-package markdown-mode
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :config
+  (use-package edit-indirect)
+  (defvar markdown-command "multimarkdown")
+  (defun aorst/markdown-setup ()
+    "Set buffer local variables."
+    (setq fill-column 80
+          default-justification 'left))
+  :hook ((markdown-mode . flyspell-mode)
+         (markdown-mode . auto-fill-mode)
+         (markdown-mode . aorst/markdown-setup)))
+
+(use-package rust-mode
+  :commands (rust-format-buffer)
+  :hook (rust-mode . electric-pair-local-mode)
+  :bind (:map rust-mode-map
+              ("C-c C-f" . rust-format-buffer)))
+
+(when (executable-find "racer")
+  (use-package racer
+    :hook (racer-mode . eldoc-mode)
+    :config (defun org-babel-edit-prep:rust (&optional _babel-info)
+              "Run racer mode for Org Babel."
+              (racer-mode 1))))
+
+(when (executable-find "cargo")
+  (use-package cargo
+    :hook (rust-mode . cargo-minor-mode)))
+
+(use-package toml-mode)
+
+(use-package racket-mode
+  :mode ("\\.rkt\\'" . racket-mode)
+  :hook (racket-repl-mode . electric-pair-local-mode)
+  :bind (:map racket-mode-map
+              ("C-c C-d" . racket-run-with-debugging))
+  :config (when (fboundp 'doom-color)
+            (progn
+              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
+              (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
+              (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
+              (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
+
+(use-package cmake-mode)
+
+(use-package help
+  :ensure nil
+  :config (setq help-window-select t))
 
 (use-package term
   :ensure nil
