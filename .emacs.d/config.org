@@ -395,7 +395,7 @@ automatically so let's just set little bit bigger initial size:
 
 #+BEGIN_SRC emacs-lisp
   (when window-system
-    (set-frame-size (selected-frame) 190 52))
+    (set-frame-size (selected-frame) 190 60))
 #+END_SRC
 
 With this size I'm  able to fire up Emacs and get  enough space to fit
@@ -1600,7 +1600,9 @@ This package also requires these extra dependencies:
   #+BEGIN_SRC emacs-lisp
     (use-package company-quickhelp
       :after company
-      :config (company-quickhelp-mode))
+      :config
+      (company-quickhelp-mode)
+      (setq company-quickhelp-use-propertized-text t))
   #+END_SRC
 
 *** Undo Tree
@@ -1924,6 +1926,16 @@ by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell
                      (doom-color 'base0)
                    "#000000")))
       (set-face-attribute 'eldoc-box-border nil :background color)))
+#+END_SRC
+
+*** Which Key
+Nice popup that  shows available commands and their  mappings when I'm
+in process of entering a chord sequence.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode t))
 #+END_SRC
 
 * Postscript

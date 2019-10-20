@@ -112,7 +112,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (setq-default frame-title-format '("%b — Emacs"))
 
 (when window-system
-  (set-frame-size (selected-frame) 190 52))
+  (set-frame-size (selected-frame) 190 60))
 
 (set-face-attribute 'default nil :font "Source Code Pro-10")
 
@@ -966,7 +966,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package company-quickhelp
   :after company
-  :config (company-quickhelp-mode))
+  :config
+  (company-quickhelp-mode)
+  (setq company-quickhelp-use-propertized-text t))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -1142,6 +1144,10 @@ _-_: reduce region _)_: around pairs
                    (doom-color 'base0)
                  "#000000")))
     (set-face-attribute 'eldoc-box-border nil :background color)))
+
+(use-package which-key
+  :config
+  (which-key-mode t))
 
 (provide 'init)
 ;;; init.el ends here
