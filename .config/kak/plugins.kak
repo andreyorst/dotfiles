@@ -258,7 +258,7 @@ if %[ -n "${PATH##*termux*}" ] %<
             map global insert '' '<esc>: parinfer-toggle<ret>' -docstring "Toggle Parinfer between paren and indent modes (<c-]>)"
             map global normal '' '<esc>: parinfer-toggle<ret>' -docstring "Toggle Parinfer between paren and indent modes (<c-]>)"
 
-            # parinfer-enable-window
+            parinfer-enable-window
 
             try %{ set-option buffer auto_pairs '"' '"' "'" "'" ` ` }
 
