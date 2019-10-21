@@ -1066,8 +1066,9 @@ _-_: reduce region _)_: around pairs
   (use-package eglot
     :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
     :config
-    (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
-    (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))
+    (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error")))
+    (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
+    (setq eglot-events-buffer-size 0)))
 
 (use-package project
   :ensure nil
