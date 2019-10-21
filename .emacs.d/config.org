@@ -1773,8 +1773,9 @@ Emacs polyglot. LSP client.
      (use-package eglot
        :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
        :config
-       (add-to-list 'eglot-server-programs '((c-mode c++-mode) "clangd"))
-       (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)))
+       (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error")))
+       (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
+       (setq eglot-events-buffer-size 0)))
 #+END_SRC
 
 There's still one  problem though. [[Eglot]] use =project.el=  to detect the
