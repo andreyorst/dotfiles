@@ -1,3 +1,4 @@
+
 #+title: Emacs configuration with Org Mode
 #+author: Andrey Orst
 #+email: andreyorst@gmail.com
@@ -385,6 +386,13 @@ also remove initial message:
 #+BEGIN_SRC emacs-lisp
   (setq initial-major-mode 'fundamental-mode
         initial-scratch-message "")
+#+END_SRC
+
+** Selection
+It is conveinient to delete selection by typing:
+
+#+BEGIN_SRC emacs-lisp
+  (delete-selection-mode t)
 #+END_SRC
 
 * User Interface
@@ -947,6 +955,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
         (setq tab-width 1
               mode-line-format nil
               line-spacing 5)
+        (setq-local scroll-step 1
+                    scroll-conservatively 10000)
         (set-window-fringes nil 0 0 nil)
         (aorst/treemacs-variable-pitch-labels))
       (defun aorst/treemacs-setup-fringes ()
@@ -1944,6 +1954,16 @@ in process of entering a chord sequence.
   (use-package which-key
     :config
     (which-key-mode t))
+#+END_SRC
+
+** Reverse Input Method
+This  package  allows  using  Emacs shortcuts  while  using  different
+layout.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package reverse-im
+    :config
+    (reverse-im-activate "russian-computer"))
 #+END_SRC
 
 * Postscript

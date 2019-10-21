@@ -9,7 +9,9 @@
         c-electric-colon
         c-electric-delete-forward
         c-electric-paren
+        c-electric-pound
         c-electric-semi&comma
+        c-electric-star
         c-end-of-defun
         c-indent-line-or-region
         counsel-M-x

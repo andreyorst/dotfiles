@@ -105,6 +105,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (setq initial-major-mode 'fundamental-mode
       initial-scratch-message "")
 
+(delete-selection-mode t)
+
 (setq inhibit-splash-screen t)
 
 (tooltip-mode -1)
@@ -523,6 +525,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       (setq tab-width 1
             mode-line-format nil
             line-spacing 5)
+      (setq-local scroll-step 1
+                  scroll-conservatively 10000)
       (set-window-fringes nil 0 0 nil)
       (aorst/treemacs-variable-pitch-labels))
     (defun aorst/treemacs-setup-fringes ()
@@ -1145,6 +1149,10 @@ _-_: reduce region _)_: around pairs
 (use-package which-key
   :config
   (which-key-mode t))
+
+(use-package reverse-im
+  :config
+  (reverse-im-activate "russian-computer"))
 
 (provide 'init)
 ;;; init.el ends here
