@@ -107,6 +107,9 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 
 (delete-selection-mode t)
 
+(global-set-key "\M-Z" 'zap-to-char)
+(global-set-key "\M-z" 'zap-up-to-char)
+
 (setq inhibit-splash-screen t)
 
 (tooltip-mode -1)

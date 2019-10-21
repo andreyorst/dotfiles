@@ -395,6 +395,16 @@ It is conveinient to delete selection by typing:
   (delete-selection-mode t)
 #+END_SRC
 
+** Zap Up To Char
+Emacs has nice function, =zap-upt-to-char=  but for some reason it's not
+bound to any key. I find it more usable than =zap-to-char= so let's swap
+those:
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\M-Z" 'zap-to-char)
+  (global-set-key "\M-z" 'zap-up-to-char)
+#+END_SRC
+
 * User Interface
 
 ** Splash
