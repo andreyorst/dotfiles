@@ -296,11 +296,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
         find-file-visit-truename t)
-  (setq internal-lisp-face-attributes
-        [nil
-         :family :foundry :swidth :height :weight :slant :underline :inverse
-         :foreground :background :stipple :overline :strike :box
-         :font :inherit :fontset :vector :extend])
   (doom-modeline-mode 1))
 
 (when window-system
