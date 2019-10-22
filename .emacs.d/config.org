@@ -5,8 +5,9 @@
 #+startup: noinlineimages
 #+property: header-args :tangle "~/.emacs.d/init.el"
 
-* About this document
 [[file:.screenshot.png]]
+
+* About this document
 
 This is my Emacs configuration file written as Org document.  I do all
 edits here,  then /compile/ it to  =init.el= file. Emacs is  complex tool,
@@ -44,7 +45,7 @@ starts with commentary:
 At  this point  configurations  will be  split  in different  sections
 grouped by something common to them all.
 
-* =early-init.el=, =package.el= and =use-package=
+* Initial Setup
 Emacs starts fast, but as amount of packages grows it gets slower. The
 init time is important  because I like to close it  when I'm not using
 it. I'm not  closing and opening it  for every file, or  like every 15
