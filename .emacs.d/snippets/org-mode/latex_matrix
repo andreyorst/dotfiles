@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: LaTeX matrix
+# key: \mx
+# --
+\begin{${1:V}matrix}$2\end{$1matrix}
