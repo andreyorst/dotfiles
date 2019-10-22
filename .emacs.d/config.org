@@ -1453,18 +1453,6 @@ since it's never used, and left fringe is occupied by diff status.
     :config (setq flymake-fringe-indicator-position 'right-fringe))
 #+END_SRC
 
-** Flyspell
-Good  spell checking  package for  Emacs. I'm  using it  with =hunspell=
-instead of =aspell=.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flyspell
-    :ensure nil
-    :config
-    (setq ispell-program-name (executable-find "hunspell")
-          ispell-dictionary "en_US"))
-#+END_SRC
-
 ** Hydra
 This is something like ability to create mappings that sit in it's own
 mode, like different user modes in Kakoune. It allows me to press some

@@ -858,12 +858,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :ensure nil
   :config (setq flymake-fringe-indicator-position 'right-fringe))
 
-(use-package flyspell
-  :ensure nil
-  :config
-  (setq ispell-program-name (executable-find "hunspell")
-        ispell-dictionary "en_US"))
-
 (use-package hydra
   :commands (hydra-default-pre
              hydra-keyboard-quit
