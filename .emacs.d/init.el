@@ -150,7 +150,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       (dolist (face '(org-block
                       org-block-begin-line
                       org-block-end-line
-                      org-level-1))
+                      org-level-1
+                      org-quote))
         (set-face-attribute face nil :extend t)))
     (with-eval-after-load 'magit
       (dolist (face '(magit-diff-hunk-heading
@@ -206,6 +207,10 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (with-eval-after-load 'faces
       (dolist (face '(region
                       secondary-selection))
+        (set-face-attribute face nil :extend t)))
+    (with-eval-after-load 'markdown-mode
+      (dolist (face '(markdown-code-face
+                      markdown-pre-face))
         (set-face-attribute face nil :extend t))))
   :init (load-theme 'doom-one t))
 
