@@ -694,7 +694,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
         org-confirm-babel-evaluate nil
         org-imenu-depth 8
-        org-agenda-files (file-truename "~/Documents/Agendas/"))
+        org-log-done t
+        org-agenda-files '("~/Documents/Agendas/Agenda.org"))
   (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
@@ -1001,8 +1002,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydra-mc/body)
-         ("C-q" . mc/mark-next-like-this-word))
+         ("C-c m" . hydra-mc/body))
   :config
   (use-package mc-extras)
   (defhydra hydra-mc (:hint nil :color pink)
@@ -1156,6 +1156,20 @@ _-_: reduce region _)_: around pairs
 (use-package reverse-im
   :config
   (reverse-im-activate "russian-computer"))
+
+(use-package iedit
+  :bind ("M-n" . aorst/iedit-current-or-expand)
+  :config
+  (setq iedit-toggle-key-default "")
+  (defun aorst/iedit-current-or-expand (&optional arg)
+    "Select only current occurrence with `iedit-mode'.  Expand to
+next occurrence if `iedit-mode' is already active."
+    (interactive "P")
+    (if (bound-and-true-p iedit-mode)
+        (if (symbolp arg)
+            (iedit-expand-down-to-occurrence)
+          (iedit-expand-up-to-occurrence))
+      (iedit-mode 1))))
 
 (provide 'init)
 ;;; init.el ends here
