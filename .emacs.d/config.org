@@ -1092,14 +1092,23 @@ customize tab appearance to match my theme.
                        (ignore-errors (delete-window window)))))))
           (force-mode-line-update)))
       (setq tab-line-new-tab-choice nil
-            tab-line-close-button-show nil)
+            tab-line-close-button-show nil
+            tab-line-separator nil
+            tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                              'keymap tab-line-right-map
+                                              'mouse-face 'tab-line-highlight
+                                              'help-echo "Click to scroll right")
+            tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                             'keymap tab-line-left-map
+                                             'mouse-face 'tab-line-highlight
+                                             'help-echo "Click to scroll left"))
       (let ((bg (if (facep 'solaire-default-face)
                     (face-attribute 'solaire-default-face :background)
                   (face-attribute 'default :background)))
             (fg (face-attribute 'default :foreground))
             (base (face-attribute 'mode-line :background))
             (box-width 7))
-        (set-face-attribute 'tab-line nil :background base :foreground nil :height 1.0 :inherit nil)
+        (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
         (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold :inherit nil)
         (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil))))
 #+END_SRC
@@ -1976,7 +1985,7 @@ don't fit on screen. Iedit seem to be more reliable in such cases.
 
 #+BEGIN_SRC emacs-lisp
   (use-package iedit
-    :bind ("M-n" . aorst/iedit-current-or-expand)
+    :bind ("C-c n" . aorst/iedit-current-or-expand)
     :config
     (setq iedit-toggle-key-default "")
     (defun aorst/iedit-current-or-expand (&optional arg)
