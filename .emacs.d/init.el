@@ -869,7 +869,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package flymake
   :ensure nil
-  :config (setq flymake-fringe-indicator-position 'right-fringe))
+  :config
+  (setq flymake-fringe-indicator-position 'right-fringe)
+  (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
 (use-package hydra
   :commands (hydra-default-pre
@@ -1182,6 +1184,8 @@ next occurrence if `iedit-mode' is already active."
             (iedit-expand-down-to-occurrence)
           (iedit-expand-up-to-occurrence))
       (iedit-mode 1))))
+
+(use-package wgrep)
 
 (provide 'init)
 ;;; init.el ends here

@@ -1464,7 +1464,9 @@ since it's never used, and left fringe is occupied by diff status.
 #+BEGIN_SRC emacs-lisp
   (use-package flymake
     :ensure nil
-    :config (setq flymake-fringe-indicator-position 'right-fringe))
+    :config
+    (setq flymake-fringe-indicator-position 'right-fringe)
+    (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 #+END_SRC
 
 ** Hydra
@@ -2001,6 +2003,15 @@ don't fit on screen. Iedit seem to be more reliable in such cases.
             (iedit-expand-up-to-occurrence))
         (iedit-mode 1))))
 #+END_SRC
+
+** Writable =grep=
+=wgrep=  allows editing  =grep=  buffer and  writing  edits to  respective
+files.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package wgrep)
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to
