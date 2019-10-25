@@ -303,6 +303,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (set-face-attribute 'doom-modeline-bar nil :background (doom-color 'bg-alt))
   (setq doom-modeline-bar-width 3
         doom-modeline-major-mode-color-icon nil
+        doom-modeline-buffer-color-icon nil
         doom-modeline-buffer-file-name-style 'file-name
         doom-modeline-minor-modes t
         find-file-visit-truename t)
@@ -568,7 +569,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                                  :background bg :foreground fg :height 1.0))))
   (setq treemacs-width 27
         treemacs-is-never-other-window t
-        treemacs-space-between-root-nodes nil)
+        treemacs-space-between-root-nodes nil
+        treemacs-indentation 1)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode nil))
@@ -588,7 +590,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
-    :hook ((ediff-mode . aorst/disable-tab-line)
+    :hook (((ediff-mode
+             which-key-init-buffer) . aorst/disable-tab-line)
            (after-init . global-tab-line-mode))
     :config
     (defun aorst/disable-tab-line ()
@@ -1074,7 +1077,7 @@ _-_: reduce region _)_: around pairs
   (use-package eglot
     :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
     :config
-    (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error")))
+    (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=false")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
     (setq eglot-events-buffer-size 0)))
 
