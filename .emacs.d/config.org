@@ -1691,7 +1691,7 @@ decided to avoid extra dependency and configure Ediff.
     (setq ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
 
-** Multiple Cursors
+** COMMENT Multiple Cursors
 This  package provides  multiple cursors  functionality to  Emacs.  It
 isn't much like Kakoune's multiple selections, but anything will do. I
 guess I'll figure out best mappings over time.
@@ -1727,7 +1727,7 @@ guess I'll figure out best mappings over time.
       ("q" mc/remove-duplicated-cursors :exit t)))
 #+END_SRC
 
-** Expand Region
+** COMMENT Expand Region
 This package allows to expand  or reduce region selection semantically
 in most languages that I work with inside Emacs.
 
@@ -1759,7 +1759,7 @@ in most languages that I work with inside Emacs.
               ("Q" er/mark-outside-quotes)))
 #+END_SRC
 
-** Phi Search
+** COMMENT Phi Search
 This search mode is compatible with multiple cursors.
 
 #+BEGIN_SRC emacs-lisp

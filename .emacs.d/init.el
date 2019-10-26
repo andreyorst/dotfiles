@@ -1012,68 +1012,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (advice-add 'ediff-window-display-p :override #'ignore)
   (setq ediff-split-window-function 'split-window-horizontally))
 
-(use-package multiple-cursors
-  :commands (mc/cycle-backward
-             mc/cycle-forward)
-  :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydra-mc/body))
-  :config
-  (use-package mc-extras)
-  (defhydra hydra-mc (:hint nil :color pink)
-    "
-^Select^                ^Discard^                    ^Move^
-^──────^────────────────^───────^────────────────────^────^────────────
-_M-s_: split lines      _M-SPC_: discard current     _&_: align
-_s_:   select regexp    _b_:     discard blank lines _(_: cycle backward
-_n_:   select next      _d_:     remove duplicated   _)_: cycle forward
-_p_:   select previous  _q_:     exit                ^ ^
-_C_:   select next line"
-    ("M-s" mc/edit-ends-of-lines)
-    ("s" mc/mark-all-in-region-regexp)
-    ("n" mc/mark-next-like-this-word)
-    ("p" mc/mark-previous-like-this-word)
-    ("&" mc/vertical-align-with-space)
-    ("(" mc/cycle-backward)
-    (")" mc/cycle-forward)
-    ("M-SPC" mc/remove-current-cursor)
-    ("b" mc/remove-cursors-on-blank-lines)
-    ("d" mc/remove-duplicated-cursors)
-    ("C" mc/mark-next-lines)
-    ("q" mc/remove-duplicated-cursors :exit t)))
-
-(use-package expand-region
-  :commands (er/expand-region
-             er/mark-paragraph
-             er/mark-inside-pairs
-             er/mark-outside-pairs
-             er/mark-inside-quotes
-             er/mark-outside-quotes
-             er/contract-region)
-  :bind (("C-c e" . hydra-er/body))
-  :config (defhydra hydra-er (:hint nil)
-            "
-^Expand^           ^Mark^
-^──────^───────────^────^─────────────────
-_e_: expand region _(_: inside pairs
-_-_: reduce region _)_: around pairs
-^ ^                _q_: inside quotes
-^ ^                _Q_: around quotes
-^ ^                _p_: paragraph"
-            ("e" er/expand-region :color pink)
-            ("-" er/contract-region :color pink)
-            ("p" er/mark-paragraph)
-            ("(" er/mark-inside-pairs)
-            (")" er/mark-outside-pairs)
-            ("q" er/mark-inside-quotes)
-            ("Q" er/mark-outside-quotes)))
-
-(use-package phi-search
-  :bind (("C-s" . phi-search)
-         ("C-r" . phi-search-backward))
-  :config
-  (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
-  (set-face-attribute 'phi-search-match-face nil :inherit 'region))
-
 (when (or (executable-find "clangd")
           (executable-find "rls"))
   (use-package eglot
