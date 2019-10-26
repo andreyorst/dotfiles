@@ -1974,16 +1974,6 @@ in process of entering a chord sequence.
     (which-key-mode t))
 #+END_SRC
 
-** Reverse Input Method
-This  package  allows  using  Emacs shortcuts  while  using  different
-layout.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package reverse-im
-    :config
-    (reverse-im-activate "russian-computer"))
-#+END_SRC
-
 ** Iedit Mode
 Multiple cursors have some bugs, when the amount of cursors is big and
 don't fit on screen. Iedit seem to be more reliable in such cases.

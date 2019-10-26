@@ -1105,10 +1105,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (which-key-mode t))
 
-(use-package reverse-im
-  :config
-  (reverse-im-activate "russian-computer"))
-
 (use-package iedit
   :bind ("C-c n" . aorst/iedit-current-or-expand)
   :config
