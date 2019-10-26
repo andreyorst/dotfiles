@@ -682,11 +682,12 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          (org-mode . aorst/org-init-setup)
          (ediff-prepare-buffer . outline-show-all)
          ((org-capture-mode org-src-mode) . aorst/discard-history))
-  :bind (:map org-mode-map
-              ([backtab] . nil)
-              ([S-iso-lefttab] . nil)
-              ([C-tab] . org-shifttab)
-              ("C-c l" . org-store-link))
+  :bind (("C-c a" . org-agenda)
+         :map org-mode-map
+         ([backtab] . nil)
+         ([S-iso-lefttab] . nil)
+         ([C-tab] . org-shifttab)
+         ("C-c l" . org-store-link))
   :config
   (use-package ox-latex
     :ensure nil)
@@ -707,7 +708,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         org-confirm-babel-evaluate nil
         org-imenu-depth 8
         org-log-done t
-        org-agenda-files '("~/Documents/Agendas/Agenda.org"))
+        org-agenda-files '("~/Documents/Agendas"))
   (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.emacs.d/config.org"))
