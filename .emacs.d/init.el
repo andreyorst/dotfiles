@@ -591,7 +591,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (use-package tab-line
     :ensure nil
     :hook (((ediff-mode
-             which-key-init-buffer) . aorst/disable-tab-line)
+             which-key-init-buffer
+             process-menu-mode) . aorst/disable-tab-line)
            (after-init . global-tab-line-mode))
     :config
     (defun aorst/disable-tab-line ()
