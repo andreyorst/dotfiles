@@ -320,55 +320,6 @@ will get rid of those automatically for me.
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-** Universal =C-g=
-One thing  that bothered  me is  that =C-g= is  universal way  to cancel
-things in Emacs, gut you have to  be in exact window to cancel action.
-This  function  intelligently tries  to  cancel  regardless of  active
-window:
-
-#+BEGIN_SRC emacs-lisp
-  ;; suppress byte-compiler warnings
-  (declare-function minibuffer-keyboard-quit "delsel" (&optional ARGS))
-
-  (defun aorst/escape ()
-    "Quit in current context.
-
-  When there is an active minibuffer and we are not inside it close
-  it.  When we are inside the minibuffer use the regular
-  `minibuffer-keyboard-quit' which quits any active region before
-  exiting.  When there is no minibuffer `keyboard-quit' unless we
-  are defining or executing a macro."
-    (interactive)
-    (cond ((active-minibuffer-window)
-           (if (minibufferp)
-               (minibuffer-keyboard-quit)
-             (abort-recursive-edit)))
-          ((bound-and-true-p iedit-mode)
-           (iedit-quit))
-          (t
-           ;; ignore top level quits for macros
-           (unless (or defining-kbd-macro executing-kbd-macro)
-             (keyboard-quit)))))
-  (global-set-key [remap keyboard-quit] #'aorst/escape)
-#+END_SRC
-
-** Command Error Function
-When using some commands that provide  prompt, like pushing to git, or
-=eval-expression=,  there's  annoying message  =text  is  read only=  when
-deleting past first symbol. Let's disable it:
-
-#+BEGIN_SRC emacs-lisp
-  (defun aorst/command-error-function (data context caller)
-    "Ignore the `text-read-only', `end-of-buffer', and `beginning-of-buffer' signals.
-  Pass the rest DATA CONTEXT CALLER to the default handler."
-    (when (not (memq (car data) '(text-read-only
-                                  end-of-buffer
-                                  beginning-of-buffer)))
-      (command-error-default-function data context caller)))
-
-  (setq command-error-function #'aorst/command-error-function)
-#+END_SRC
-
 ** UTF8
 Let's use =UTF8= if we can:
 
@@ -403,6 +354,88 @@ those:
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\M-Z" 'zap-to-char)
   (global-set-key "\M-z" 'zap-up-to-char)
+#+END_SRC
+
+* Functions
+This  section  describes  functions  I have  defined  for  use  inside
+configurations  of various  packages, that  are general  enough to  be
+placed in particular package  configuration. For example when function
+is shared  between configurations  and some  configuration may  not be
+loaded.
+
+I prefix my  functions with =aorst/= and variables with  =aorst--= to make
+those easier  to browse  with =ivy=  and to  explicitly define  that the
+function is not a part of a particular plugin.
+
+** =real-buffer-p=
+This function decides if buffer  should be considered a "real" buffer,
+e.g. a file-visiting buffer, or specific buffers that should behave as
+file-visiting while not visiting a particular file, like =*scratch*=
+
+#+BEGIN_SRC emacs-lisp
+  (defun aorst/real-buffer-p ()
+    "Determines whether buffer is real."
+    (let ((buffer-name (buffer-name)))
+      (or (and (not (minibufferp))
+               (buffer-file-name))
+          (or (string-equal "*scratch*" buffer-name)
+              (string-match-p ".~.*~" buffer-name)))))
+#+END_SRC
+
+** =autokill-when-no-processes=
+#+BEGIN_SRC emacs-lisp
+  (defun aorst/autokill-when-no-processes (&rest _)
+    "Kill buffer and its window when there's no processes left."
+    (when (null (get-buffer-process (current-buffer)))
+      (kill-buffer (current-buffer))))
+#+END_SRC
+** =escape=
+One thing  that bothered  me is  that =C-g= is  universal way  to cancel
+things in Emacs, gut you have to  be in exact window to cancel action.
+This  function  intelligently tries  to  cancel  regardless of  active
+window:
+
+#+BEGIN_SRC emacs-lisp
+  ;; suppress byte-compiler warnings
+  (declare-function minibuffer-keyboard-quit "delsel" (&optional ARGS))
+
+  (defun aorst/escape ()
+    "Quit in current context.
+
+  When there is an active minibuffer and we are not inside it close
+  it.  When we are inside the minibuffer use the regular
+  `minibuffer-keyboard-quit' which quits any active region before
+  exiting.  When there is no minibuffer `keyboard-quit' unless we
+  are defining or executing a macro."
+    (interactive)
+    (cond ((active-minibuffer-window)
+           (if (minibufferp)
+               (minibuffer-keyboard-quit)
+             (abort-recursive-edit)))
+          ((bound-and-true-p iedit-mode)
+           (iedit-quit))
+          (t
+           ;; ignore top level quits for macros
+           (unless (or defining-kbd-macro executing-kbd-macro)
+             (keyboard-quit)))))
+  (global-set-key [remap keyboard-quit] #'aorst/escape)
+#+END_SRC
+
+** =command-error-function=
+When using some commands that provide  prompt, like pushing to git, or
+=eval-expression=,  there's  annoying message  =text  is  read only=  when
+deleting past first symbol. Let's disable it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun aorst/command-error-function (data context caller)
+    "Ignore the `text-read-only', `end-of-buffer', and `beginning-of-buffer' signals.
+  Pass the rest DATA CONTEXT CALLER to the default handler."
+    (when (not (memq (car data) '(text-read-only
+                                  end-of-buffer
+                                  beginning-of-buffer)))
+      (command-error-default-function data context caller)))
+
+  (setq command-error-function #'aorst/command-error-function)
 #+END_SRC
 
 * User Interface
@@ -625,13 +658,6 @@ Emacs init.
             org-src-mode
             ediff-prepare-buffer) . aorst/real-buffer-setup)
     :config
-    (defun aorst/real-buffer-p ()
-      "Determines whether buffer is real."
-      (let ((buffer-name (buffer-name)))
-        (or (and (not (minibufferp))
-                 (buffer-file-name))
-            (or (string-equal "*scratch*" buffer-name)
-                (string-match-p ".~.*~" buffer-name)))))
     (defun aorst/real-buffer-setup (&rest _)
       "Wrapper around `set-window-fringes' function."
       (when (aorst/real-buffer-p)
@@ -1435,10 +1461,6 @@ automatically.
         (if window
             (select-window window)
           (aorst/ansi-term-toggle arg))))
-    (defun aorst/autokill-when-no-processes (&rest _)
-      "Kill buffer and its window when there's no processes left."
-      (when (null (get-buffer-process (current-buffer)))
-        (kill-buffer (current-buffer))))
     (advice-add 'term-handle-exit :after 'aorst/autokill-when-no-processes))
 #+END_SRC
 

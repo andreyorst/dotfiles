@@ -64,6 +64,31 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+
+(setq initial-major-mode 'fundamental-mode
+      initial-scratch-message "")
+
+(delete-selection-mode t)
+
+(global-set-key "\M-Z" 'zap-to-char)
+(global-set-key "\M-z" 'zap-up-to-char)
+
+(defun aorst/real-buffer-p ()
+  "Determines whether buffer is real."
+  (let ((buffer-name (buffer-name)))
+    (or (and (not (minibufferp))
+             (buffer-file-name))
+        (or (string-equal "*scratch*" buffer-name)
+            (string-match-p ".~.*~" buffer-name)))))
+
+(defun aorst/autokill-when-no-processes (&rest _)
+  "Kill buffer and its window when there's no processes left."
+  (when (null (get-buffer-process (current-buffer)))
+    (kill-buffer (current-buffer))))
+
 ;; suppress byte-compiler warnings
 (declare-function minibuffer-keyboard-quit "delsel" (&optional ARGS))
 
@@ -97,18 +122,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (command-error-default-function data context caller)))
 
 (setq command-error-function #'aorst/command-error-function)
-
-(prefer-coding-system 'utf-8)
-(when (display-graphic-p)
-  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-
-(setq initial-major-mode 'fundamental-mode
-      initial-scratch-message "")
-
-(delete-selection-mode t)
-
-(global-set-key "\M-Z" 'zap-to-char)
-(global-set-key "\M-z" 'zap-up-to-char)
 
 (setq inhibit-splash-screen t)
 
@@ -236,13 +249,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
           org-src-mode
           ediff-prepare-buffer) . aorst/real-buffer-setup)
   :config
-  (defun aorst/real-buffer-p ()
-    "Determines whether buffer is real."
-    (let ((buffer-name (buffer-name)))
-      (or (and (not (minibufferp))
-               (buffer-file-name))
-          (or (string-equal "*scratch*" buffer-name)
-              (string-match-p ".~.*~" buffer-name)))))
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
     (when (aorst/real-buffer-p)
@@ -859,10 +865,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (if window
           (select-window window)
         (aorst/ansi-term-toggle arg))))
-  (defun aorst/autokill-when-no-processes (&rest _)
-    "Kill buffer and its window when there's no processes left."
-    (when (null (get-buffer-process (current-buffer)))
-      (kill-buffer (current-buffer))))
   (advice-add 'term-handle-exit :after 'aorst/autokill-when-no-processes))
 
 (use-package editorconfig
