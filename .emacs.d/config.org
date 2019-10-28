@@ -1413,6 +1413,16 @@ with =q= after I've finished reading.
     :config (setq help-window-select t))
 #+END_SRC
 
+** Emacs Lisp Mode
+I write some  Emacs Lisp and experience is already  quite good, I just
+want to enable some helper modes here.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package elisp-mode
+    :ensure nil
+    :hook (emacs-lisp-mode . eldoc-mode))
+#+END_SRC
+
 * Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
@@ -1978,14 +1988,20 @@ by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell
 
 #+BEGIN_SRC emacs-lisp
   (use-package eldoc-box
-    :hook ((eldoc-mode . eldoc-box-hover-at-point-mode))
+    :hook (eldoc-mode . aorst/eldoc-box-enable)
     :config
     (setq eldoc-box-max-pixel-width 1920
           eldoc-box-max-pixel-height 1080)
     (let ((color (if (fboundp 'doom-color)
                      (doom-color 'base0)
                    "#000000")))
-      (set-face-attribute 'eldoc-box-border nil :background color)))
+      (set-face-attribute 'eldoc-box-border nil :background color))
+    :init
+    (defun aorst/eldoc-box-enable ()
+      "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
+      (interactive)
+      (when (aorst/real-buffer-p)
+        (eldoc-box-hover-at-point-mode))))
 #+END_SRC
 
 ** Which Key

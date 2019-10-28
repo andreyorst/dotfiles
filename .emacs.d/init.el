@@ -829,6 +829,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :ensure nil
   :config (setq help-window-select t))
 
+(use-package elisp-mode
+  :ensure nil
+  :hook (emacs-lisp-mode . eldoc-mode))
+
 (use-package term
   :ensure nil
   :bind (("C-`" . aorst/ansi-term-toggle)
@@ -1096,14 +1100,20 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     (server-start)))
 
 (use-package eldoc-box
-  :hook ((eldoc-mode . eldoc-box-hover-at-point-mode))
+  :hook (eldoc-mode . aorst/eldoc-box-enable)
   :config
   (setq eldoc-box-max-pixel-width 1920
         eldoc-box-max-pixel-height 1080)
   (let ((color (if (fboundp 'doom-color)
                    (doom-color 'base0)
                  "#000000")))
-    (set-face-attribute 'eldoc-box-border nil :background color)))
+    (set-face-attribute 'eldoc-box-border nil :background color))
+  :init
+  (defun aorst/eldoc-box-enable ()
+    "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
+    (interactive)
+    (when (aorst/real-buffer-p)
+      (eldoc-box-hover-at-point-mode))))
 
 (use-package which-key
   :config
