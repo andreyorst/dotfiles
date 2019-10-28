@@ -129,7 +129,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (when window-system
   (set-frame-size (selected-frame) 190 60))
 
-(set-face-attribute 'default nil :font "Source Code Pro-10")
+(set-face-attribute 'default nil :font "Hack 10")
 
 (setq column-number-mode nil
       line-number-mode nil

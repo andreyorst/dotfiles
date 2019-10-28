@@ -463,11 +463,11 @@ With this size I'm  able to fire up Emacs and get  enough space to fit
 two vertically aligned windows and a file explorer together.
 
 ** Font
-I like this  Adobe Source Code Pro  font. Even if I use  Hack in every
-other editor, for some reason I find this font just right for Emacs.
+I'm a  big fan  of [[https://github.com/source-foundry/Hack][Hack]]  font. It  has nice  support of  languages and
+styles like *bold*, /italics/ for not only Latin languages.
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Source Code Pro-10")
+  (set-face-attribute 'default nil :font "Hack 10")
 #+END_SRC
 
 ** Modeline
