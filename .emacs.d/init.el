@@ -796,12 +796,12 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (use-package racer
     :hook (racer-mode . eldoc-mode)
     :init (defun org-babel-edit-prep:rust (&optional _babel-info)
-              "Run racer mode for Org Babel."
-              (racer-mode 1))))
+            "Run racer mode for Org Babel."
+            (racer-mode 1))))
 
 (when (executable-find "cargo")
   (use-package cargo
-    :hook (rust-mode . cargo-minor-mode)))
+    :hook ((rust-mode toml-mode) . cargo-minor-mode)))
 
 (use-package toml-mode)
 

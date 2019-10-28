@@ -1333,8 +1333,8 @@ possible to use, like in Org Mode.
     (use-package racer
       :hook (racer-mode . eldoc-mode)
       :init (defun org-babel-edit-prep:rust (&optional _babel-info)
-                "Run racer mode for Org Babel."
-                (racer-mode 1))))
+              "Run racer mode for Org Babel."
+              (racer-mode 1))))
 #+END_SRC
 
 There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] integration:
@@ -1342,7 +1342,7 @@ There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] inte
 #+BEGIN_SRC emacs-lisp
   (when (executable-find "cargo")
     (use-package cargo
-      :hook (rust-mode . cargo-minor-mode)))
+      :hook ((rust-mode toml-mode) . cargo-minor-mode)))
 #+END_SRC
 
 ** TOML Mode
