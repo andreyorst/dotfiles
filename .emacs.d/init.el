@@ -304,7 +304,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (setq doom-modeline-bar-width 3
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-color-icon nil
-        doom-modeline-buffer-file-name-style 'file-name
+        doom-modeline-buffer-file-name-style 'relative-from-project
         doom-modeline-minor-modes t
         find-file-visit-truename t)
   (doom-modeline-mode 1))
