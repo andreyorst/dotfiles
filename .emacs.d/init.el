@@ -84,7 +84,7 @@
         (or (string-equal "*scratch*" buffer-name)
             (string-match-p ".~.*~" buffer-name)))))
 
-(defun aorst/autokill-when-no-processes (&rest _)
+(defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
   (when (null (get-buffer-process (current-buffer)))
     (kill-buffer (current-buffer))))
@@ -816,12 +816,31 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
               ("C-c C-d" . racket-run-with-debugging))
-  :config (when (fboundp 'doom-color)
-            (progn
-              (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
-              (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
-              (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
-              (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
+  :requires hydra
+  :config
+  (when (fboundp 'doom-color)
+    (progn
+      (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
+      (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
+      (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
+      (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg))))
+  (defhydra hydra-racket-debug (:hint nil :color pink)
+    "
+^Stepping^      ^Moving^                 ^Misc^
+^────────^──────^──────^─────────────────^────^─────────────
+_s_: step       _c_: continue            _?_: help
+_u_: setp-out   _n_: next breakable      _q_: quit debugging
+_o_: step-over  _p_: previous breakable  ^ ^
+^ ^             _h_: run til point"
+    ("s" racket-debug-step)
+    ("?" racket-debug-help)
+    ("q" racket-debug-disable :exit t)
+    ("c" racket-debug-continue)
+    ("u" racket-debug-step-out)
+    ("o" racket-debug-step-over)
+    ("n" racket-debug-next-breakable)
+    ("p" racket-debug-prev-breakable)
+    ("h" racket-debug-run-to-here)))
 
 (use-package cmake-mode)
 
@@ -869,7 +888,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (if window
           (select-window window)
         (aorst/ansi-term-toggle arg))))
-  (advice-add 'term-handle-exit :after 'aorst/autokill-when-no-processes))
+  (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes))
 
 (use-package editorconfig
   :commands editorconfig-mode
@@ -882,11 +901,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
 (use-package hydra
-  :commands (hydra-default-pre
-             hydra-keyboard-quit
-             hydra--call-interactively-remap-maybe
-             hydra-show-hint
-             hydra-set-transient-map)
   :bind (("<f5>" . hydra-zoom/body))
   :config (defhydra hydra-zoom (:hint nil)
             "Scale text"
@@ -1019,6 +1033,68 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
   (setq ediff-split-window-function 'split-window-horizontally))
+
+(use-package multiple-cursors
+  :commands (mc/cycle-backward
+             mc/cycle-forward)
+  :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
+         ("C-c m" . hydra-mc/body))
+  :config
+  (use-package mc-extras)
+  (defhydra hydra-mc (:hint nil :color pink)
+    "
+^Select^                ^Discard^                    ^Move^
+^──────^────────────────^───────^────────────────────^────^─────────────
+_M-s_: split lines      _M-SPC_: discard current     _&_: align
+_s_:   select regexp    _b_:     discard blank lines _(_: cycle backward
+_n_:   select next      _d_:     remove duplicated   _)_: cycle forward
+_p_:   select previous  _q_:     exit                ^ ^
+_C_:   select next line"
+    ("M-s" mc/edit-ends-of-lines)
+    ("s" mc/mark-all-in-region-regexp)
+    ("n" mc/mark-next-like-this-word)
+    ("p" mc/mark-previous-like-this-word)
+    ("&" mc/vertical-align-with-space)
+    ("(" mc/cycle-backward)
+    (")" mc/cycle-forward)
+    ("M-SPC" mc/remove-current-cursor)
+    ("b" mc/remove-cursors-on-blank-lines)
+    ("d" mc/remove-duplicated-cursors)
+    ("C" mc/mark-next-lines)
+    ("q" mc/remove-duplicated-cursors :exit t)))
+
+(use-package expand-region
+  :commands (er/expand-region
+             er/mark-paragraph
+             er/mark-inside-pairs
+             er/mark-outside-pairs
+             er/mark-inside-quotes
+             er/mark-outside-quotes
+             er/contract-region)
+  :bind (("C-c e" . hydra-er/body))
+  :config (defhydra hydra-er (:hint nil)
+            "
+^Expand^           ^Mark^
+^──────^───────────^────^────────────
+_e_: expand region _(_: inside pairs
+_-_: reduce region _)_: around pairs
+^ ^                _q_: inside quotes
+^ ^                _Q_: around quotes
+^ ^                _p_: paragraph"
+            ("e" er/expand-region :color pink)
+            ("-" er/contract-region :color pink)
+            ("p" er/mark-paragraph)
+            ("(" er/mark-inside-pairs)
+            (")" er/mark-outside-pairs)
+            ("q" er/mark-inside-quotes)
+            ("Q" er/mark-outside-quotes)))
+
+(use-package phi-search
+  ;:bind (("C-s" . phi-search)
+  ;       ("C-r" . phi-search-backward))
+  :config
+  (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
+  (set-face-attribute 'phi-search-match-face nil :inherit 'region))
 
 (when (or (executable-find "clangd")
           (executable-find "rls"))

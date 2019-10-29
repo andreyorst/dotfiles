@@ -382,13 +382,17 @@ file-visiting while not visiting a particular file, like =*scratch*=
               (string-match-p ".~.*~" buffer-name)))))
 #+END_SRC
 
-** =autokill-when-no-processes=
+** =kill-when-no-processes=
+This function  kills buffer which used  to have active process  but it
+was killed. Should be used via hook or advice.
+
 #+BEGIN_SRC emacs-lisp
-  (defun aorst/autokill-when-no-processes (&rest _)
+  (defun aorst/kill-when-no-processes (&rest _)
     "Kill buffer and its window when there's no processes left."
     (when (null (get-buffer-process (current-buffer)))
       (kill-buffer (current-buffer))))
 #+END_SRC
+
 ** =escape=
 One thing  that bothered  me is  that =C-g= is  universal way  to cancel
 things in Emacs, gut you have to  be in exact window to cancel action.
@@ -1388,12 +1392,31 @@ Racket is nice LISP/Scheme language that I might to get into.
     :hook (racket-repl-mode . electric-pair-local-mode)
     :bind (:map racket-mode-map
                 ("C-c C-d" . racket-run-with-debugging))
-    :config (when (fboundp 'doom-color)
-              (progn
-                (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
-                (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
-                (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
-                (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg)))))
+    :requires hydra
+    :config
+    (when (fboundp 'doom-color)
+      (progn
+        (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
+        (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
+        (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
+        (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg))))
+    (defhydra hydra-racket-debug (:hint nil :color pink)
+      "
+  ^Stepping^      ^Moving^                 ^Misc^
+  ^────────^──────^──────^─────────────────^────^─────────────
+  _s_: step       _c_: continue            _?_: help
+  _u_: setp-out   _n_: next breakable      _q_: quit debugging
+  _o_: step-over  _p_: previous breakable  ^ ^
+  ^ ^             _h_: run til point"
+      ("s" racket-debug-step)
+      ("?" racket-debug-help)
+      ("q" racket-debug-disable :exit t)
+      ("c" racket-debug-continue)
+      ("u" racket-debug-step-out)
+      ("o" racket-debug-step-over)
+      ("n" racket-debug-next-breakable)
+      ("p" racket-debug-prev-breakable)
+      ("h" racket-debug-run-to-here)))
 #+END_SRC
 
 ** Cmake Mode
@@ -1471,7 +1494,7 @@ automatically.
         (if window
             (select-window window)
           (aorst/ansi-term-toggle arg))))
-    (advice-add 'term-handle-exit :after 'aorst/autokill-when-no-processes))
+    (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes))
 #+END_SRC
 
 ** EditorConfig
@@ -1515,11 +1538,6 @@ provide sane keybindings.
 
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
-    :commands (hydra-default-pre
-               hydra-keyboard-quit
-               hydra--call-interactively-remap-maybe
-               hydra-show-hint
-               hydra-set-transient-map)
     :bind (("<f5>" . hydra-zoom/body))
     :config (defhydra hydra-zoom (:hint nil)
               "Scale text"
@@ -1725,7 +1743,7 @@ decided to avoid extra dependency and configure Ediff.
     (setq ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
 
-** COMMENT Multiple Cursors
+** Multiple Cursors
 This  package provides  multiple cursors  functionality to  Emacs.  It
 isn't much like Kakoune's multiple selections, but anything will do. I
 guess I'll figure out best mappings over time.
@@ -1741,7 +1759,7 @@ guess I'll figure out best mappings over time.
     (defhydra hydra-mc (:hint nil :color pink)
       "
   ^Select^                ^Discard^                    ^Move^
-  ^──────^────────────────^───────^────────────────────^────^────────────
+  ^──────^────────────────^───────^────────────────────^────^─────────────
   _M-s_: split lines      _M-SPC_: discard current     _&_: align
   _s_:   select regexp    _b_:     discard blank lines _(_: cycle backward
   _n_:   select next      _d_:     remove duplicated   _)_: cycle forward
@@ -1761,7 +1779,7 @@ guess I'll figure out best mappings over time.
       ("q" mc/remove-duplicated-cursors :exit t)))
 #+END_SRC
 
-** COMMENT Expand Region
+** Expand Region
 This package allows to expand  or reduce region selection semantically
 in most languages that I work with inside Emacs.
 
@@ -1778,7 +1796,7 @@ in most languages that I work with inside Emacs.
     :config (defhydra hydra-er (:hint nil)
               "
   ^Expand^           ^Mark^
-  ^──────^───────────^────^─────────────────
+  ^──────^───────────^────^────────────
   _e_: expand region _(_: inside pairs
   _-_: reduce region _)_: around pairs
   ^ ^                _q_: inside quotes
@@ -1793,13 +1811,13 @@ in most languages that I work with inside Emacs.
               ("Q" er/mark-outside-quotes)))
 #+END_SRC
 
-** COMMENT Phi Search
+** Phi Search
 This search mode is compatible with multiple cursors.
 
 #+BEGIN_SRC emacs-lisp
   (use-package phi-search
-    :bind (("C-s" . phi-search)
-           ("C-r" . phi-search-backward))
+    ;:bind (("C-s" . phi-search)
+    ;       ("C-r" . phi-search-backward))
     :config
     (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
     (set-face-attribute 'phi-search-match-face nil :inherit 'region))
