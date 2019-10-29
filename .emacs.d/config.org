@@ -277,7 +277,7 @@ file.
 
 I also don't like that Emacs  has disabled commands, and enabling them
 modifies  my =init.el=  that I  don't  modify myself.   Let's put  those
-commands to =custom-file= instead:
+commands to =disabled.el= instead:
 
 #+BEGIN_SRC emacs-lisp
   (defvar disabled-commands (expand-file-name ".disabled.el" user-emacs-directory)
@@ -507,19 +507,6 @@ styles like *bold*, /italics/ for not only Latin languages.
   (set-face-attribute 'default nil :font "Hack 10")
 #+END_SRC
 
-** Modeline
-I  don't  find displaying  position  in  modeline really  great  idea,
-because I need to move my eyes too much on big screen just to see what
-line number I'm currently on.
-
-#+BEGIN_SRC emacs-lisp
-  (setq column-number-mode nil
-        line-number-mode nil
-        size-indication-mode nil
-        mode-line-position nil
-        mode-line-in-non-selected-windows nil)
-#+END_SRC
-
 ** All The Icons
 This  package provides  nice icons  for Emacs  via custom  fonts. Just
 don't forget to use =M-x all-the-icons-install-fonts RET= after install.
@@ -705,6 +692,19 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
           (add-function :after after-focus-change-function #'solaire-mode-reset)
         (add-hook 'focus-in-hook  #'solaire-mode-reset)))
     :init (solaire-global-mode +1))
+#+END_SRC
+
+** Modeline
+I  don't  find displaying  position  in  modeline really  great  idea,
+because I need to move my eyes too much on big screen just to see what
+line number I'm currently on.
+
+#+BEGIN_SRC emacs-lisp
+  (setq column-number-mode nil
+        line-number-mode nil
+        size-indication-mode nil
+        mode-line-position nil
+        mode-line-in-non-selected-windows nil)
 #+END_SRC
 
 ** DOOM Modeline
@@ -1758,12 +1758,12 @@ guess I'll figure out best mappings over time.
     (use-package mc-extras)
     (defhydra hydra-mc (:hint nil :color pink)
       "
-  ^Select^                ^Discard^                    ^Move^
-  ^──────^────────────────^───────^────────────────────^────^─────────────
-  _M-s_: split lines      _M-SPC_: discard current     _&_: align
-  _s_:   select regexp    _b_:     discard blank lines _(_: cycle backward
-  _n_:   select next      _d_:     remove duplicated   _)_: cycle forward
-  _p_:   select previous  _q_:     exit                ^ ^
+  ^Select^                 ^Discard^                     ^Move^
+  ^──────^─────────────────^───────^─────────────────────^────^─────────────
+  _M-s_: split lines       _M-SPC_: discard current      _&_: align
+  _s_:   select regexp     _b_:     discard blank lines  _(_: cycle backward
+  _n_:   select next       _d_:     remove duplicated    _)_: cycle forward
+  _p_:   select previous   _q_:     exit                 ^ ^
   _C_:   select next line"
       ("M-s" mc/edit-ends-of-lines)
       ("s" mc/mark-all-in-region-regexp)
@@ -1795,13 +1795,13 @@ in most languages that I work with inside Emacs.
     :bind (("C-c e" . hydra-er/body))
     :config (defhydra hydra-er (:hint nil)
               "
-  ^Expand^           ^Mark^
-  ^──────^───────────^────^────────────
-  _e_: expand region _(_: inside pairs
-  _-_: reduce region _)_: around pairs
-  ^ ^                _q_: inside quotes
-  ^ ^                _Q_: around quotes
-  ^ ^                _p_: paragraph"
+  ^Expand^            ^Mark^
+  ^──────^────────────^────^────────────
+  _e_: expand region  _(_: inside pairs
+  _-_: reduce region  _)_: around pairs
+  ^ ^                 _q_: inside quotes
+  ^ ^                 _Q_: around quotes
+  ^ ^                 _p_: paragraph"
               ("e" er/expand-region :color pink)
               ("-" er/contract-region :color pink)
               ("p" er/mark-paragraph)
@@ -1816,8 +1816,6 @@ This search mode is compatible with multiple cursors.
 
 #+BEGIN_SRC emacs-lisp
   (use-package phi-search
-    ;:bind (("C-s" . phi-search)
-    ;       ("C-r" . phi-search-backward))
     :config
     (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
     (set-face-attribute 'phi-search-match-face nil :inherit 'region))
