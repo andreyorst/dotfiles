@@ -44,6 +44,7 @@
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
         upcase-region
+        zap-up-to-char
         ))
 
 (setq mc/cmds-to-run-once

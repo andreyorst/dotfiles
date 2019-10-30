@@ -644,14 +644,16 @@ Emacs init.
 #+BEGIN_SRC emacs-lisp
   (use-package fringe
     :ensure nil
-    :hook (buffer-list-update . aorst/real-buffer-setup)
+    :hook ((buffer-list-update
+            window-configuration-change
+            change-major-mode) . aorst/real-buffer-setup)
     :config
     (defun aorst/real-buffer-setup (&rest _)
       "Wrapper around `set-window-fringes' function."
       (let* ((window (selected-window))
              (buffer (window-buffer window)))
         (when (aorst/real-buffer-p buffer)
-          (set-window-fringes window 8 8 nil))))
+            (set-window-fringes window 8 8 t))))
     :init
     (when window-system
       (fringe-mode 0)
@@ -1001,11 +1003,11 @@ that Treemacs will look just as great as DOOM themed Emacs!
               line-spacing 5)
         (setq-local scroll-step 1
                     scroll-conservatively 10000)
-        (set-window-fringes nil 0 0 nil)
+        (set-window-fringes nil 0 0 t)
         (aorst/treemacs-variable-pitch-labels))
       (defun aorst/treemacs-setup-fringes ()
         "Set treemacs buffer fringes."
-        (set-window-fringes nil 0 0 nil)
+        (set-window-fringes nil 0 0 t)
         (aorst/treemacs-variable-pitch-labels))
       (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
       (defun aorst/treemacs-ignore (file _)
