@@ -76,13 +76,13 @@
 (global-set-key "\M-Z" 'zap-to-char)
 (global-set-key "\M-z" 'zap-up-to-char)
 
-(defun aorst/real-buffer-p ()
+(defun aorst/real-buffer-p (&optional buffer)
   "Determines whether buffer is real."
-  (let ((buffer-name (buffer-name)))
+  (let ((buffer-name (buffer-name buffer)))
     (or (and (not (minibufferp))
-             (buffer-file-name))
-        (or (string-equal "*scratch*" buffer-name)
-            (string-match-p ".~.*~" buffer-name)))))
+             (buffer-file-name buffer))
+        (string-equal "*scratch*" buffer-name)
+        (string-match-p ".~.*~" buffer-name))))
 
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
@@ -238,16 +238,14 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 
 (use-package fringe
   :ensure nil
-  :hook ((window-configuration-change
-          org-capture-mode
-          org-src-mode
-          ediff-prepare-buffer) . aorst/real-buffer-setup)
+  :hook (buffer-list-update . aorst/real-buffer-setup)
   :config
   (defun aorst/real-buffer-setup (&rest _)
     "Wrapper around `set-window-fringes' function."
-    (when (aorst/real-buffer-p)
-      (set-window-fringes nil 8 8 nil)
-      (setq-local scroll-margin 3)))
+    (let* ((window (selected-window))
+           (buffer (window-buffer window)))
+      (when (aorst/real-buffer-p buffer)
+        (set-window-fringes window 8 8 nil))))
   :init
   (when window-system
     (fringe-mode 0)
