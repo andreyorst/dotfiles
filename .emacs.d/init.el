@@ -611,11 +611,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
              (window (posn-window posnp))
              (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
         (with-selected-window window
-          (let ((tab-list (tab-line-tabs))
+          (let ((tab-list (tab-line-tabs-window-buffers))
                 (buffer-list (flatten-list
                               (seq-reduce (lambda (list window)
                                             (select-window window t)
-                                            (cons (tab-line-tabs) list))
+                                            (cons (tab-line-tabs-window-buffers) list))
                                           (window-list) nil))))
             (select-window window)
             (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
