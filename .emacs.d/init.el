@@ -1169,5 +1169,9 @@ next occurrence if `iedit-mode' is already active."
 
 (use-package wgrep)
 
+(use-package hideshow
+  :ensure nil
+  :hook (prog-mode . hs-minor-mode))
+
 (provide 'init)
 ;;; init.el ends here

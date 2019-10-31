@@ -2018,6 +2018,15 @@ files.
   (use-package wgrep)
 #+END_SRC
 
+** Hideshow
+This built in mode provides code folding.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hideshow
+    :ensure nil
+    :hook (prog-mode . hs-minor-mode))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to
