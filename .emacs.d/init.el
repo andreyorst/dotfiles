@@ -286,22 +286,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 
 (when window-system
   (use-package treemacs
-    :commands (treemacs
-               treemacs-follow-mode
-               treemacs-filewatch-mode
-               treemacs-fringe-indicator-mode
-               treemacs--expand-root-node
-               treemacs--maybe-recenter
-               treemacs-TAB-action
-               treemacs-load-theme
-               treemacs-toggle-fixed-width)
-    :functions (aorst/treemacs-expand-all-projects
-                aorst/treemacs-variable-pitch-labels
-                aorst/tremacs-init-setup
-                aorst/treemacs-setup
-                aorst/treemacs-setup-fringes
-                doom-color
-                all-the-icons-octicon)
+    :commands (treemacs-follow-mode)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window)
            :map treemacs-mode-map
@@ -313,7 +298,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     :config
     (use-package treemacs-magit)
     (set-face-attribute 'treemacs-root-face nil
-                        :foreground (doom-color 'fg)
+                        :foreground (face-attribute 'default :foreground)
                         :height 1.0
                         :weight 'normal)
     (treemacs-create-theme "Atom"
