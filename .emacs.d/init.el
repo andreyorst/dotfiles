@@ -537,7 +537,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (setq treemacs-width 27
         treemacs-is-never-other-window t
         treemacs-space-between-root-nodes nil
-        treemacs-indentation 1)
+        treemacs-indentation 2)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode nil))
