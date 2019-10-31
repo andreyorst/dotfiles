@@ -641,30 +641,32 @@ it's great!
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :config
-    (dolist (face '(doom-modeline-buffer-modified
-                    doom-modeline-buffer-minor-mode
-                    doom-modeline-project-parent-dir
-                    doom-modeline-project-dir
-                    doom-modeline-project-root-dir
-                    doom-modeline-highlight
-                    doom-modeline-debug
-                    doom-modeline-info
-                    doom-modeline-warning
-                    doom-modeline-urgent
-                    doom-modeline-unread-number
-                    doom-modeline-buffer-path
-                    doom-modeline-bar
-                    doom-modeline-panel
-                    doom-modeline-buffer-major-mode
-                    doom-modeline-buffer-file
-                    doom-modeline-lsp-success
-                    doom-modeline-lsp-warning
-                    doom-modeline-lsp-error))
-      (set-face-attribute face nil :foreground (doom-color 'fg) :weight 'normal))
-    (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
-    (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
-    (set-face-attribute 'doom-modeline-panel nil :background (doom-color 'bg-alt))
-    (set-face-attribute 'doom-modeline-bar nil :background (doom-color 'bg-alt))
+    (let ((fg (face-attribute 'default :foreground))
+          (bg (face-attribute 'mode-line :background)))
+      (dolist (face '(doom-modeline-buffer-modified
+                      doom-modeline-buffer-minor-mode
+                      doom-modeline-project-parent-dir
+                      doom-modeline-project-dir
+                      doom-modeline-project-root-dir
+                      doom-modeline-highlight
+                      doom-modeline-debug
+                      doom-modeline-info
+                      doom-modeline-warning
+                      doom-modeline-urgent
+                      doom-modeline-unread-number
+                      doom-modeline-buffer-path
+                      doom-modeline-bar
+                      doom-modeline-panel
+                      doom-modeline-buffer-major-mode
+                      doom-modeline-buffer-file
+                      doom-modeline-lsp-success
+                      doom-modeline-lsp-warning
+                      doom-modeline-lsp-error))
+        (set-face-attribute face nil :foreground fg :weight 'normal))
+      (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
+      (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
+      (set-face-attribute 'doom-modeline-panel nil :background bg)
+      (set-face-attribute 'doom-modeline-bar nil :background bg))
     (setq doom-modeline-bar-width 3
           doom-modeline-major-mode-color-icon nil
           doom-modeline-buffer-color-icon nil
