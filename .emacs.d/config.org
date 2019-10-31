@@ -443,8 +443,9 @@ deleting past first symbol. Let's disable it:
 #+END_SRC
 
 * User Interface
+Packages that affect user interface.
 
-** Splash
+** Splash Screen
 Emacs displays splash screen once started  with no files. I don't need
 it, so let's disable it.
 
@@ -476,29 +477,6 @@ in active window:
                   cursor-in-non-selected-windows nil))
 #+END_SRC
 
-** Frame Name and Size
-Emacs uses weird method of naming a window, I'd like to see a file I'm
-currently working  on in the task  bar in case my  Emacs was minimized
-for some reason.
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default frame-title-format '("%b — Emacs"))
-#+END_SRC
-
-Also,  why initial  frame size  is so  small? When  I launch  Emacs in
-terminal it occupies  whole window.  When I launch  it under graphical
-environment it defaults to really  small window, which is smaller than
-my   terminal.   My   window  manager   doesn't  adjust   window  size
-automatically so let's just set little bit bigger initial size:
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (set-frame-size (selected-frame) 190 60))
-#+END_SRC
-
-With this size I'm  able to fire up Emacs and get  enough space to fit
-two vertically aligned windows and a file explorer together.
-
 ** Font
 I'm a  big fan  of [[https://github.com/source-foundry/Hack][Hack]]  font. It  has nice  support of  languages and
 styles like *bold*, /italics/ for not only Latin languages.
@@ -507,9 +485,10 @@ styles like *bold*, /italics/ for not only Latin languages.
   (set-face-attribute 'default nil :font "Hack 10")
 #+END_SRC
 
-** All The Icons
-This  package provides  nice icons  for Emacs  via custom  fonts. Just
-don't forget to use =M-x all-the-icons-install-fonts RET= after install.
+** Icons
+*all-the-icons*  package  provides  nice  icons  for  Emacs  via  custom
+fonts. Just  don't forget  to use =M-x  all-the-icons-install-fonts RET=
+after install.
 
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons)
@@ -518,13 +497,14 @@ don't forget to use =M-x all-the-icons-install-fonts RET= after install.
 I don't use  this package directly yet, but some  other packages, like
 DOOM Modeline or Treemacs.
 
-** DOOM Themes
-This theme collection  was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and  I find these
-themes actually great  on its own. This package  contains nice variant
-of Atom-like One theme which I like,  but it is also an amazingly well
-put package, which defines colors for pretty much everything in Emacs.
-It also features Treemacs configuration, which  is nice, but I want to
-change a little bit of it.
+** Theme
+I'm  using *doom-themes*  package  to  make my  Emacs  look like  modern
+editor. This theme collection was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find
+these themes  actually great on  its own.  This package  contains nice
+variant  of Atom-like  One  theme which  I  like, but  it  is also  an
+amazingly  well put  package,  which defines  colors  for pretty  much
+everything in  Emacs.  It also features  Treemacs configuration, which
+is nice, but I want to change a little bit of it.
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
@@ -570,30 +550,6 @@ change a little bit of it.
                         markdown-pre-face))
           (set-face-attribute face nil :extend t))))
     :init (load-theme 'doom-one t))
-#+END_SRC
-
-** Frame
-Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
-want title bar  to be dark as  well. It is quite  difficult to achieve
-this in GNOME  Shell, but I found  this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]].  So if I
-use =window-system=  I want this  function to run  during initialization
-process, and when new frame is created.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (use-package frame
-      :ensure nil
-      :config
-      (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
-      (setq window-divider-default-right-width 1)
-      (window-divider-mode 1)
-      (defun aorst/set-frame-dark (&optional frame)
-        "Set FRAME titlebar colorscheme to dark variant."
-        (with-selected-frame (or frame (selected-frame))
-          (call-process-shell-command
-           (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-                   (frame-parameter frame 'name)))))
-      (aorst/set-frame-dark)))
 #+END_SRC
 
 ** Fringe
@@ -664,19 +620,6 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
 #+END_SRC
 
 ** Modeline
-I  don't  find displaying  position  in  modeline really  great  idea,
-because I need to move my eyes too much on big screen just to see what
-line number I'm currently on.
-
-#+BEGIN_SRC emacs-lisp
-  (setq column-number-mode nil
-        line-number-mode nil
-        size-indication-mode nil
-        mode-line-position nil
-        mode-line-in-non-selected-windows nil)
-#+END_SRC
-
-** DOOM Modeline
 I've tried bunch of different modelines:
 
 - [[https://github.com/TheBB/spaceline][Spaceline]]
@@ -731,9 +674,69 @@ it's great!
     (doom-modeline-mode 1))
 #+END_SRC
 
-I guess that this is all for DOOM  packages for now, but I have to say
-that I really  appreciate *[[https://github.com/hlissner][@hlissner]]* work. These  packages already make
-Emacs look outstanding.
+I  don't  find displaying  position  in  modeline really  great  idea,
+because I need to move my eyes too much on big screen just to see what
+line number  I'm currently  on. Also, let's  make modeline  little bit
+bigger.  And remove that bevel thing.
+
+#+BEGIN_SRC emacs-lisp
+  (setq column-number-mode nil
+        line-number-mode nil
+        size-indication-mode nil
+        mode-line-position nil
+        mode-line-in-non-selected-windows nil)
+  (unless (bound-and-true-p doom-modeline-mode)
+    (set-face-attribute 'mode-line nil
+                        :box (list :line-width 7
+                                   :color (face-attribute 'mode-line :background))))
+#+END_SRC
+
+** Frame
+Emacs uses  white titlebar, but  since I'm  using dark color  scheme I
+want title bar  to be dark as  well. It is quite  difficult to achieve
+this in GNOME  Shell, but I found  this code [[https://nicolas.petton.fr/blog/emacs-dark-window-decoration.html][on the internet]].  So if I
+use =window-system=  I want this  function to run  during initialization
+process, and when new frame is created.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (use-package frame
+      :ensure nil
+      :config
+      (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+      (setq window-divider-default-right-width 1)
+      (window-divider-mode 1)
+      (set-face-attribute 'window-divider nil :foreground (face-attribute 'mode-line-inactive :background))
+      (defun aorst/set-frame-dark (&optional frame)
+        "Set FRAME titlebar colorscheme to dark variant."
+        (with-selected-frame (or frame (selected-frame))
+          (call-process-shell-command
+           (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                   (frame-parameter frame 'name)))))
+      (aorst/set-frame-dark)))
+#+END_SRC
+
+Emacs uses weird method of naming a window, I'd like to see a file I'm
+currently working  on in the task  bar in case my  Emacs was minimized
+for some reason.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default frame-title-format '("%b — Emacs"))
+#+END_SRC
+
+Also,  why initial  frame size  is so  small? When  I launch  Emacs in
+terminal it occupies  whole window.  When I launch  it under graphical
+environment it defaults to really  small window, which is smaller than
+my   terminal.   My   window  manager   doesn't  adjust   window  size
+automatically so let's just set little bit bigger initial size:
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (set-frame-size (selected-frame) 190 60))
+#+END_SRC
+
+With this size I'm  able to fire up Emacs and get  enough space to fit
+two vertically aligned windows and a file explorer together.
 
 ** Treemacs
 To make Emacs look more like  a traditional modern text editor we need
@@ -1126,9 +1129,11 @@ In case I want to use =whitespace-mode= I'd like to disable these faces.
     (setq whitespace-display-mappings '((tab-mark 9 [187 9] [92 9]))))
 #+END_SRC
 
-** Display Line Numbers Mode
-This mode provides line numbers on  the left side of the window, which
-doesn't lag. I don't like that it changes width, so let's change it:
+** Line Numbers
+*display-line-numbers* mode is built in and provides line numbers on the
+left  side of  the window,  which doesn't  lag. I  don't like  that it
+changes width, so let's make it grow only, and calculate maximum width
+on file open:
 
 #+BEGIN_SRC emacs-lisp
   (use-package display-line-numbers

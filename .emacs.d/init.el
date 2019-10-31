@@ -137,11 +137,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (setq-default cursor-type 'bar
                 cursor-in-non-selected-windows nil))
 
-(setq-default frame-title-format '("%b — Emacs"))
-
-(when window-system
-  (set-frame-size (selected-frame) 190 60))
-
 (set-face-attribute 'default nil :font "Hack 10")
 
 (use-package all-the-icons)
@@ -189,21 +184,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                       markdown-pre-face))
         (set-face-attribute face nil :extend t))))
   :init (load-theme 'doom-one t))
-
-(when window-system
-  (use-package frame
-    :ensure nil
-    :config
-    (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
-    (setq window-divider-default-right-width 1)
-    (window-divider-mode 1)
-    (defun aorst/set-frame-dark (&optional frame)
-      "Set FRAME titlebar colorscheme to dark variant."
-      (with-selected-frame (or frame (selected-frame))
-        (call-process-shell-command
-         (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-                 (frame-parameter frame 'name)))))
-    (aorst/set-frame-dark)))
 
 (use-package fringe
   :ensure nil
@@ -283,6 +263,37 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
         doom-modeline-minor-modes t
         find-file-visit-truename t)
   (doom-modeline-mode 1))
+
+(setq column-number-mode nil
+      line-number-mode nil
+      size-indication-mode nil
+      mode-line-position nil
+      mode-line-in-non-selected-windows nil)
+(unless (bound-and-true-p doom-modeline-mode)
+  (set-face-attribute 'mode-line nil
+                      :box (list :line-width 7
+                                 :color (face-attribute 'mode-line :background))))
+
+(when window-system
+  (use-package frame
+    :ensure nil
+    :config
+    (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+    (setq window-divider-default-right-width 1)
+    (window-divider-mode 1)
+    (set-face-attribute 'window-divider nil :foreground (face-attribute 'mode-line-inactive :background))
+    (defun aorst/set-frame-dark (&optional frame)
+      "Set FRAME titlebar colorscheme to dark variant."
+      (with-selected-frame (or frame (selected-frame))
+        (call-process-shell-command
+         (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
+                 (frame-parameter frame 'name)))))
+    (aorst/set-frame-dark)))
+
+(setq-default frame-title-format '("%b — Emacs"))
+
+(when window-system
+  (set-frame-size (selected-frame) 190 60))
 
 (when window-system
   (use-package treemacs
