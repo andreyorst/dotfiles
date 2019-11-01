@@ -252,7 +252,9 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
     (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
     (set-face-attribute 'doom-modeline-panel nil :background bg)
-    (set-face-attribute 'doom-modeline-bar nil :background bg))
+    (set-face-attribute 'doom-modeline-bar nil :background bg)
+    (set-face-attribute 'mode-line-inactive nil :foreground (face-attribute 'font-lock-comment-face :foreground)
+                                                :background (face-attribute 'mode-line :background)))
   (setq doom-modeline-bar-width 3
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-color-icon nil
