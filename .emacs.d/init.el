@@ -1179,7 +1179,24 @@ next occurrence if `iedit-mode' is already active."
 
 (use-package hideshow
   :ensure nil
-  :hook (prog-mode . hs-minor-mode))
+  :requires transient
+  :hook (prog-mode . hs-minor-mode)
+  :bind (:map prog-mode-map
+              ("<f6>" . aorst/hideshow-menu))
+  :config
+  (define-transient-command aorst/hideshow-menu ()
+    "Hideshow commands."
+    [:description
+     "Hide"
+     ("ha" "all" hs-hide-all)
+     ("hb" "block" hs-hide-block)]
+    [:description
+     "Show"
+     ("sa" "all" hs-show-all)
+     ("sb" "block" hs-show-block)]
+    (interactive)
+    (when (bound-and-true-p hs-minor-mode)
+      (transient-setup 'aorst/hideshow-menu nil nil))))
 
 (provide 'init)
 ;;; init.el ends here
