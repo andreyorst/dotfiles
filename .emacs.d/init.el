@@ -861,8 +861,8 @@ _o_: step-over  _p_: previous breakable  ^ ^
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
 (use-package hydra
-  :bind (("<f5>" . hydra-zoom/body))
-  :config (defhydra hydra-zoom (:hint nil)
+  :bind (("<f5>" . hydrant/zoom/body))
+  :config (defhydra hydrant/zoom (:hint nil)
             "Scale text"
             ("+" text-scale-increase "in")
             ("-" text-scale-decrease "out")
@@ -1031,8 +1031,8 @@ _C_:   select next line"
              er/mark-inside-quotes
              er/mark-outside-quotes
              er/contract-region)
-  :bind (("C-c e" . hydra-er/body))
-  :config (defhydra hydra-er (:hint nil)
+  :bind (("C-c e" . hydrant/er/body))
+  :config (defhydra hydrant/er (:hint nil)
             "
 ^Expand^            ^Mark^
 ^──────^────────────^────^────────────

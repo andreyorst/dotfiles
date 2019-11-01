@@ -1498,8 +1498,8 @@ provide sane keybindings.
 
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
-    :bind (("<f5>" . hydra-zoom/body))
-    :config (defhydra hydra-zoom (:hint nil)
+    :bind (("<f5>" . hydrant/zoom/body))
+    :config (defhydra hydrant/zoom (:hint nil)
               "Scale text"
               ("+" text-scale-increase "in")
               ("-" text-scale-decrease "out")
@@ -1713,10 +1713,10 @@ guess I'll figure out best mappings over time.
     :commands (mc/cycle-backward
                mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-           ("C-c m" . hydra-mc/body))
+           ("C-c m" . hydrant/mc/body))
     :config
     (use-package mc-extras)
-    (defhydra hydra-mc (:hint nil :color pink)
+    (defhydra hydrant/mc (:hint nil :color pink)
       "
   ^Select^                 ^Discard^                     ^Move^
   ^──────^─────────────────^───────^─────────────────────^────^─────────────
@@ -1752,8 +1752,8 @@ in most languages that I work with inside Emacs.
                er/mark-inside-quotes
                er/mark-outside-quotes
                er/contract-region)
-    :bind (("C-c e" . hydra-er/body))
-    :config (defhydra hydra-er (:hint nil)
+    :bind (("C-c e" . hydrant/er/body))
+    :config (defhydra hydrant/er (:hint nil)
               "
   ^Expand^            ^Mark^
   ^──────^────────────^────^────────────

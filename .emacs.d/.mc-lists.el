@@ -21,8 +21,8 @@
         end-of-buffer
         end-of-defun
         forward-sexp
-        hydra-er/er/contract-region
-        hydra-er/er/expand-region
+        hydrant/er/er/contract-region
+        hydrant/er/er/expand-region
         indent-for-tab-command
         kill-region
         my/select-line
@@ -51,24 +51,24 @@
       '(
         counsel-describe-function
         counsel-find-file
-        hydra--digit-argument
-        hydra--negative-argument
-        hydra-er/body
-        hydra-mc/body
-        hydra-mc/lambda-M-s
-        hydra-mc/mc/cycle-backward
-        hydra-mc/mc/cycle-forward
-        hydra-mc/mc/edit-ends-of-lines
-        hydra-mc/mc/mark-all-in-region-regexp
-        hydra-mc/mc/mark-next-like-this-word
-        hydra-mc/mc/mark-next-like-this-word-and-exit
-        hydra-mc/mc/mark-next-lines
-        hydra-mc/mc/mark-previous-like-this-word
-        hydra-mc/mc/remove-current-cursor
-        hydra-mc/mc/remove-cursors-on-blank-lines
-        hydra-mc/mc/remove-duplicated-cursors
-        hydra-mc/mc/remove-duplicated-cursors-and-exit
-        hydra-mc/mc/vertical-align-with-space
+        hydrant/-digit-argument
+        hydrant/-negative-argument
+        hydrant/er/body
+        hydrant/mc/body
+        hydrant/mc/lambda-M-s
+        hydrant/mc/mc/cycle-backward
+        hydrant/mc/mc/cycle-forward
+        hydrant/mc/mc/edit-ends-of-lines
+        hydrant/mc/mc/mark-all-in-region-regexp
+        hydrant/mc/mc/mark-next-like-this-word
+        hydrant/mc/mc/mark-next-like-this-word-and-exit
+        hydrant/mc/mc/mark-next-lines
+        hydrant/mc/mc/mark-previous-like-this-word
+        hydrant/mc/mc/remove-current-cursor
+        hydrant/mc/mc/remove-cursors-on-blank-lines
+        hydrant/mc/mc/remove-duplicated-cursors
+        hydrant/mc/mc/remove-duplicated-cursors-and-exit
+        hydrant/mc/mc/vertical-align-with-space
         iedit-switch-to-mc-mode
         isearch-abort
         isearch-delete-char
