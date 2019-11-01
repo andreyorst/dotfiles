@@ -11,11 +11,11 @@
 (defvar aorst--gc-cons-percentage gc-cons-percentage)
 (defvar aorst--file-name-handler-alist file-name-handler-alist)
 
-(setq gc-cons-threshold 402653184
-      gc-cons-percentage 0.6
-      inhibit-compacting-font-caches t
-      message-log-max 16384
-      file-name-handler-alist nil)
+(setq-default gc-cons-threshold 402653184
+              gc-cons-percentage 0.6
+              inhibit-compacting-font-caches t
+              message-log-max 16384
+              file-name-handler-alist nil)
 
 (add-hook 'after-init-hook
           (lambda ()

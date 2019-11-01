@@ -87,11 +87,11 @@ for the GC, to restore them after initialization is finished:
 Now we can tweak CG. We need to raise threshold to prevent it running:
 
 #+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 402653184
-        gc-cons-percentage 0.6
-        inhibit-compacting-font-caches t
-        message-log-max 16384
-        file-name-handler-alist nil)
+  (setq-default gc-cons-threshold 402653184
+                gc-cons-percentage 0.6
+                inhibit-compacting-font-caches t
+                message-log-max 16384
+                file-name-handler-alist nil)
 #+END_SRC
 
 Then we need  a hook that restores initial  values once initialization
@@ -960,8 +960,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
         (setq tab-width 1
               mode-line-format nil
               line-spacing 5)
-        (setq-local scroll-step 1
-                    scroll-conservatively 10000)
+        (setq-local scroll-step 1)
+        (setq-local scroll-conservatively 10000)
         (set-window-fringes nil 0 0 t)
         (aorst/treemacs-variable-pitch-labels))
       (defun aorst/treemacs-setup-fringes ()

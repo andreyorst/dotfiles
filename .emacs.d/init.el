@@ -501,8 +501,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       (setq tab-width 1
             mode-line-format nil
             line-spacing 5)
-      (setq-local scroll-step 1
-                  scroll-conservatively 10000)
+      (setq-local scroll-step 1)
+      (setq-local scroll-conservatively 10000)
       (set-window-fringes nil 0 0 t)
       (aorst/treemacs-variable-pitch-labels))
     (defun aorst/treemacs-setup-fringes ()
