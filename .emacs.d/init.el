@@ -82,7 +82,8 @@
     (or (and (not (minibufferp))
              (buffer-file-name buffer))
         (string-equal "*scratch*" buffer-name)
-        (string-match-p ".~.*~" buffer-name))))
+        (string-match-p ".~.*~" buffer-name)
+        (string-match-p "FILE=/" buffer-name))))
 
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
@@ -990,18 +991,27 @@ _o_: step-over  _p_: previous breakable  ^ ^
 
 (use-package ediff
   :ensure nil
+  :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
+         (ediff-quit . aorst/restore-pre-ediff-winconfig))
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
-  (setq ediff-split-window-function 'split-window-horizontally))
+  (setq ediff-split-window-function 'split-window-horizontally)
+  :init
+  (defvar aorst--ediff-last-windows nil
+    "Stores window configuration before `ediff' was invoked.")
+  (defun aorst/store-pre-ediff-winconfig ()
+    (setq aorst--ediff-last-windows (current-window-configuration)))
+  (defun aorst/restore-pre-ediff-winconfig ()
+    (set-window-configuration aorst--ediff-last-windows)))
 
 (use-package multiple-cursors
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydra-mc/body))
+         ("C-c m" . hydrant/mc/body))
   :config
   (use-package mc-extras)
-  (defhydra hydra-mc (:hint nil :color pink)
+  (defhydra hydrant/mc (:hint nil :color pink)
     "
 ^Select^                 ^Discard^                     ^Move^
 ^──────^─────────────────^───────^─────────────────────^────^─────────────
