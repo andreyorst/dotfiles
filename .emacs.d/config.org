@@ -1355,13 +1355,11 @@ Racket is nice LISP/Scheme language that I might to get into.
                 ("C-c C-d" . racket-run-with-debugging))
     :requires hydra
     :config
-    (when (fboundp 'doom-color)
-      (progn
-        (set-face-attribute 'racket-debug-break-face nil :background (doom-color 'red) :foreground (doom-color 'base0))
-        (set-face-attribute 'racket-debug-result-face nil :foreground (doom-color 'grey) :box nil)
-        (set-face-attribute 'racket-debug-locals-face nil :foreground (doom-color 'grey) :box nil)
-        (set-face-attribute 'racket-selfeval-face nil :foreground (doom-color 'fg))))
-    (defhydra hydra-racket-debug (:hint nil :color pink)
+    (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
+    (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
+    (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
+    (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground))
+    (defhydra hydrant/racket-debug (:hint nil :color pink)
       "
   ^Stepping^      ^Moving^                 ^Misc^
   ^────────^──────^──────^─────────────────^────^─────────────
