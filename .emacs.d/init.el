@@ -612,8 +612,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (base (face-attribute 'mode-line :background))
           (box-width 6))
       (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
-      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'bold :inherit nil)
-      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil))
+      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
+      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
+      (set-face-attribute 'tab-line-tab-selected nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
     (append tab-line-exclude-modes '(ediff-mode process-menu-mode))))
 
 (use-package whitespace
@@ -984,6 +985,7 @@ _o_: step-over  _p_: previous breakable  ^ ^
           racket-mode). yas-minor-mode)
   :config
   (use-package yasnippet-snippets)
+  (add-to-list 'yas-key-syntaxes 'yas-longest-key-from-whitespace)
   (yas-reload-all))
 
 (use-package magit

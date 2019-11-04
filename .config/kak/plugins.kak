@@ -234,6 +234,7 @@ plug "occivink/kakoune-gdb"
 plug "KJ_Duncan/kakoune-racket.kak" domain "bitbucket.org" config %{
     hook global WinSetOption filetype=racket %{ require-module lisp }
 }
+
 if %[ -n "${PATH##*termux*}" ] %<
     plug "eraserhd/parinfer-rust" do %{
         cargo install --force --path . --locked
