@@ -935,6 +935,7 @@ _o_: step-over  _p_: previous breakable  ^ ^
         ivy-count-format ""
         ivy-display-style nil
         ivy-minibuffer-faces nil
+        ivy-minibuffer-faces '(default default default default)
         ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
   :init
