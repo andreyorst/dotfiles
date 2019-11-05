@@ -956,6 +956,7 @@ that Treemacs will look just as great as DOOM themed Emacs!
       (defun aorst/treemacs-init-setup ()
         "Set treemacs theme, open treemacs, and expand all projects."
         (treemacs-load-theme "Atom")
+        (setq treemacs-collapse-dirs 0)
         (treemacs)
         (aorst/treemacs-expand-all-projects))
       (defun aorst/treemacs-setup ()

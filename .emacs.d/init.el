@@ -497,6 +497,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (defun aorst/treemacs-init-setup ()
       "Set treemacs theme, open treemacs, and expand all projects."
       (treemacs-load-theme "Atom")
+      (setq treemacs-collapse-dirs 0)
       (treemacs)
       (aorst/treemacs-expand-all-projects))
     (defun aorst/treemacs-setup ()
