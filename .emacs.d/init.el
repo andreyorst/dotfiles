@@ -86,6 +86,14 @@
         (string-match-p "FILE=/" buffer-name)
         (string-match-p "\*edit-indirect .*\*" buffer-name))))
 
+(defun aorst/real-buffer-setup (&rest _)
+  "Wrapper around `set-window-fringes' function."
+  (when window-system
+    (let* ((window (selected-window))
+           (buffer (window-buffer window)))
+      (when (aorst/real-buffer-p buffer)
+        (set-window-fringes window 8 8 t)))))
+
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
   (when (null (get-buffer-process (current-buffer)))
@@ -187,20 +195,13 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
         (set-face-attribute face nil :extend t))))
   :init (load-theme 'doom-one t))
 
-(use-package fringe
-  :ensure nil
-  :hook ((buffer-list-update
-          window-configuration-change
-          change-major-mode) . aorst/real-buffer-setup)
-  :config
-  (defun aorst/real-buffer-setup (&rest _)
-    "Wrapper around `set-window-fringes' function."
-    (let* ((window (selected-window))
-           (buffer (window-buffer window)))
-      (when (aorst/real-buffer-p buffer)
-          (set-window-fringes window 8 8 t))))
-  :init
-  (when window-system
+(when window-system
+  (use-package fringe
+    :ensure nil
+    :hook ((buffer-list-update
+            window-configuration-change
+            change-major-mode) . aorst/real-buffer-setup)
+    :init
     (fringe-mode 0)
     (or standard-display-table
         (setq standard-display-table (make-display-table)))
@@ -1001,8 +1002,6 @@ _o_: step-over  _p_: previous breakable  ^ ^
   :ensure nil
   :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
          (ediff-quit . aorst/restore-pre-ediff-winconfig))
-  :bind (:map ediff-mode-map
-              ("d" . aorst/ediff-copy-both-to-C))
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
   (setq ediff-split-window-function 'split-window-horizontally)
@@ -1018,7 +1017,9 @@ _o_: step-over  _p_: previous breakable  ^ ^
     (ediff-copy-diff ediff-current-difference nil 'C nil
                      (concat
                       (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
-                      (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer)))))
+                      (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+  (add-hook 'ediff-keymap-setup-hook
+            '(lamba () (define-key ediff-mode-map "d" 'aorst/ediff-copy-both-to-C))))
 
 (use-package multiple-cursors
   :commands (mc/cycle-backward
@@ -1195,9 +1196,10 @@ _-_: reduce region  _)_: around pairs
     (when (aorst/real-buffer-p)
       (eldoc-box-hover-at-point-mode))))
 
-(use-package which-key
-  :config
-  (which-key-mode t))
+(when window-system
+  (use-package which-key
+    :config
+    (which-key-mode t)))
 
 (use-package iedit
   :bind ("C-c n" . aorst/iedit-current-or-expand)

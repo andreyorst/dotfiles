@@ -384,6 +384,23 @@ file-visiting while not visiting a particular file, like =*scratch*=
           (string-match-p "\*edit-indirect .*\*" buffer-name))))
 #+END_SRC
 
+** =real-buffer-setup=
+If only  certain buffers  could +be so  grossly incandescent+  *have damn
+fringes!* With  Solaire Mode  Emacs becomes way  more like  true editor
+with actual  graphical interface,  but these  fringes drive  me crazy.
+That's why  I wrote  a function =aorst/real-buffer-setup=,  that enables
+fringes only  in buffers that  are affected  by Solaire Mode
+
+#+BEGIN_SRC emacs-lisp
+  (defun aorst/real-buffer-setup (&rest _)
+    "Wrapper around `set-window-fringes' function."
+    (when window-system
+      (let* ((window (selected-window))
+             (buffer (window-buffer window)))
+        (when (aorst/real-buffer-p buffer)
+          (set-window-fringes window 8 8 t)))))
+#+END_SRC
+
 ** =kill-when-no-processes=
 This function  kills buffer which used  to have active process  but it
 was killed. Should be used via hook or advice.
@@ -555,34 +572,22 @@ is nice, but I want to change a little bit of it.
 #+END_SRC
 
 ** Fringe
-If only  certain buffers  could +be so  grossly incandescent+  *have damn
-fringes!* With  Solaire Mode  Emacs becomes way  more like  true editor
-with actual  graphical interface,  but these  fringes drive  me crazy.
-That's why  I wrote  a function =aorst/real-buffer-setup=,  that enables
-fringes only  in buffers that  are affected  by Solaire Mode.   I want
-fringes to appear only in certain buffers where I really need them, so
-let's disable  it entirely  on startup  and set  them with  some hooks
-later.  But this  adds another problem.  Emacs displays =$=  sign at the
-end of the window if line is  being truncated. Damn, why it is so hard
-to  make   it  work   how  I   want..   And   you  can't   simply  set
+I want fringes  to appear only in certain buffers  where I really need
+them, so let's  disable it entirely on startup and  set them with some
+hooks later.  But this adds another problem.  Emacs displays =$= sign at
+the end of the  window if line is being truncated. Damn,  why it is so
+hard  to  make  it  work  how  I want..   And  you  can't  simply  set
 =standard-display-table= slot to empty space,  because it isn't ready on
 Emacs init.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package fringe
-    :ensure nil
-    :hook ((buffer-list-update
-            window-configuration-change
-            change-major-mode) . aorst/real-buffer-setup)
-    :config
-    (defun aorst/real-buffer-setup (&rest _)
-      "Wrapper around `set-window-fringes' function."
-      (let* ((window (selected-window))
-             (buffer (window-buffer window)))
-        (when (aorst/real-buffer-p buffer)
-            (set-window-fringes window 8 8 t))))
-    :init
-    (when window-system
+  (when window-system
+    (use-package fringe
+      :ensure nil
+      :hook ((buffer-list-update
+              window-configuration-change
+              change-major-mode) . aorst/real-buffer-setup)
+      :init
       (fringe-mode 0)
       (or standard-display-table
           (setq standard-display-table (make-display-table)))
@@ -1709,8 +1714,6 @@ decided to avoid extra dependency and configure Ediff.
     :ensure nil
     :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
            (ediff-quit . aorst/restore-pre-ediff-winconfig))
-    :bind (:map ediff-mode-map
-                ("d" . aorst/ediff-copy-both-to-C))
     :config
     (advice-add 'ediff-window-display-p :override #'ignore)
     (setq ediff-split-window-function 'split-window-horizontally)
@@ -1726,7 +1729,9 @@ decided to avoid extra dependency and configure Ediff.
       (ediff-copy-diff ediff-current-difference nil 'C nil
                        (concat
                         (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
-                        (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer)))))
+                        (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+    (add-hook 'ediff-keymap-setup-hook
+              '(lamba () (define-key ediff-mode-map "d" 'aorst/ediff-copy-both-to-C))))
 #+END_SRC
 
 ** Multiple Cursors
@@ -2031,9 +2036,10 @@ Nice popup that  shows available commands and their  mappings when I'm
 in process of entering a chord sequence.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :config
-    (which-key-mode t))
+  (when window-system
+    (use-package which-key
+      :config
+      (which-key-mode t)))
 #+END_SRC
 
 ** Iedit Mode
