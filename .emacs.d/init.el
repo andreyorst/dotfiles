@@ -1084,10 +1084,33 @@ _-_: reduce region  _)_: around pairs
           (executable-find "rls"))
   (use-package eglot
     :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
+    :bind (:map eglot-mode-map
+                ("C-c C-e" . aorst/eglot-menu))
+    :requires hydra
     :config
     (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=false")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-    (setq eglot-events-buffer-size 0)))
+    (setq eglot-events-buffer-size 0)
+    (define-transient-command aorst/eglot-menu ()
+      "Hideshow commands."
+      [:description
+       "Find"
+       ("d" "declaration" eglot-find-declaration)
+       ("i" "implementation" eglot-find-implementation)
+       ("t" "type definition" eglot-find-typeDefinition)]
+      [:description
+       "Commands"
+       ("r" "rename" eglot-rename)
+       ("f" "format" eglot-format)
+       ("a" "code actions" eglot-code-actions)
+       ("h" "help" eglot-help-at-point)]
+      [:description
+       "Management"
+       ("R" "reconnect" eglot-reconnect)
+       ("S" "shutdown" eglot-shutdown)]
+      (interactive)
+      (when (bound-and-true-p eglot--managed-mode)
+        (transient-setup 'aorst/eglot-menu nil nil)))))
 
 (use-package project
   :ensure nil
