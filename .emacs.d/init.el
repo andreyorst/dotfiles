@@ -1183,14 +1183,11 @@ _-_: reduce region  _)_: around pairs
     (server-start)))
 
 (use-package eldoc-box
-  :hook (eldoc-mode . aorst/eldoc-box-enable)
+  ;:hook (eldoc-mode . aorst/eldoc-box-enable)
   :config
   (setq eldoc-box-max-pixel-width 1920
         eldoc-box-max-pixel-height 1080)
-  (let ((color (if (fboundp 'doom-color)
-                   (doom-color 'base0)
-                 "#000000")))
-    (set-face-attribute 'eldoc-box-border nil :background color))
+  (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
   :init
   (defun aorst/eldoc-box-enable ()
     "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
