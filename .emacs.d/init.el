@@ -83,7 +83,8 @@
              (buffer-file-name buffer))
         (string-equal "*scratch*" buffer-name)
         (string-match-p ".~.*~" buffer-name)
-        (string-match-p "FILE=/" buffer-name))))
+        (string-match-p "FILE=/" buffer-name)
+        (string-match-p "\*edit-indirect .*\*" buffer-name))))
 
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
@@ -747,7 +748,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :config
-  (use-package edit-indirect)
+  (use-package edit-indirect
+    :hook (edit-indirect-after-creation-hook . aorst/real-buffer-setup))
   (defvar markdown-command "multimarkdown")
   (defun aorst/markdown-setup ()
     "Set buffer local variables."
