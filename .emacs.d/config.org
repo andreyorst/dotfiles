@@ -1709,6 +1709,8 @@ decided to avoid extra dependency and configure Ediff.
     :ensure nil
     :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
            (ediff-quit . aorst/restore-pre-ediff-winconfig))
+    :bind (:map ediff-mode-map
+                ("d" . aorst/ediff-copy-both-to-C))
     :config
     (advice-add 'ediff-window-display-p :override #'ignore)
     (setq ediff-split-window-function 'split-window-horizontally)
@@ -1718,7 +1720,13 @@ decided to avoid extra dependency and configure Ediff.
     (defun aorst/store-pre-ediff-winconfig ()
       (setq aorst--ediff-last-windows (current-window-configuration)))
     (defun aorst/restore-pre-ediff-winconfig ()
-      (set-window-configuration aorst--ediff-last-windows)))
+      (set-window-configuration aorst--ediff-last-windows))
+    (defun aorst/ediff-copy-both-to-C ()
+      (interactive)
+      (ediff-copy-diff ediff-current-difference nil 'C nil
+                       (concat
+                        (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                        (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer)))))
 #+END_SRC
 
 ** Multiple Cursors
