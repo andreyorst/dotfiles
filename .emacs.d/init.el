@@ -617,7 +617,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
-      (set-face-attribute 'tab-line-tab-selected nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
+      (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
     (append tab-line-exclude-modes '(ediff-mode process-menu-mode))))
 
 (use-package whitespace
