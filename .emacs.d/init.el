@@ -563,8 +563,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
-    :hook ((which-key-init-buffer . aorst/disable-tab-line)
-           (after-init . global-tab-line-mode))
+    :hook (after-init . global-tab-line-mode)
     :config
     (defun aorst/disable-tab-line ()
       (setq tab-line-format nil))
@@ -618,7 +617,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
-    (append tab-line-exclude-modes '(ediff-mode process-menu-mode))))
+    (dolist (mode '(ediff-mode
+                    process-menu-mode
+                    term-mode))
+      (add-to-list 'tab-line-exclude-modes mode))))
 
 (use-package whitespace
   :ensure nil
