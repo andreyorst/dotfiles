@@ -76,6 +76,8 @@
 (global-set-key "\M-Z" 'zap-to-char)
 (global-set-key "\M-z" 'zap-up-to-char)
 
+(global-set-key "\C-w" 'backward-kill-word)
+
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether buffer is real."
   (let ((buffer-name (buffer-name buffer)))

@@ -356,6 +356,16 @@ those:
   (global-set-key "\M-z" 'zap-up-to-char)
 #+END_SRC
 
+** Kill Region
+By default Emacs uses =kill-region= command on =C-w= shortcut. I find this
+counterintuitive. GNU Readline uses =C-w=  to kill word backwards. Other
+software  uses  this  shortcut  to  kill  window.  I  prefer  Readline
+approach, so let's redefine shortcut:
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-w" 'backward-kill-word)
+#+END_SRC
+
 * Functions
 This  section  describes  functions  I have  defined  for  use  inside
 configurations  of various  packages, that  are general  enough to  be
