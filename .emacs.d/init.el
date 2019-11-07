@@ -76,8 +76,6 @@
 (global-set-key "\M-Z" 'zap-to-char)
 (global-set-key "\M-z" 'zap-up-to-char)
 
-(global-set-key "\C-w" 'backward-kill-word)
-
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether buffer is real."
   (let ((buffer-name (buffer-name buffer)))
@@ -134,6 +132,15 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (command-error-default-function data context caller)))
 
 (setq command-error-function #'aorst/command-error-function)
+
+(defun aorst/kill-region-or-word (arg)
+  (interactive "*p")
+  (if (and transient-mark-mode
+           mark-active)
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word arg)))
+
+(global-set-key "\C-w" 'aorst/kill-region-or-word)
 
 (setq inhibit-splash-screen t)
 
