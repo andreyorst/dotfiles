@@ -1012,7 +1012,8 @@ _o_: step-over  _p_: previous breakable  ^ ^
 (use-package ediff
   :ensure nil
   :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
-         (ediff-quit . aorst/restore-pre-ediff-winconfig))
+         (ediff-quit . aorst/restore-pre-ediff-winconfig)
+         (ediff-keymap-setup . aorst/ediff-setup-keys))
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
   (setq ediff-split-window-function 'split-window-horizontally)
@@ -1029,8 +1030,8 @@ _o_: step-over  _p_: previous breakable  ^ ^
                      (concat
                       (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
                       (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
-  (add-hook 'ediff-keymap-setup-hook
-            '(lamba () (define-key ediff-mode-map "d" 'aorst/ediff-copy-both-to-C))))
+  (defun aorst/ediff-setup-keys ()
+    (define-key ediff-mode-map "d" #'aorst/ediff-copy-both-to-C)))
 
 (use-package multiple-cursors
   :commands (mc/cycle-backward
