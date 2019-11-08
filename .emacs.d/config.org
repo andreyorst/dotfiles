@@ -338,14 +338,49 @@ It is conveinient to delete selection by typing:
   (delete-selection-mode t)
 #+END_SRC
 
-** Zap Up To Char
-Emacs has nice function, =zap-upt-to-char=  but for some reason it's not
+** Default Bindings and More
+Configurations to built in =simple.el= module.
+
+By default Emacs uses =kill-region= command on =C-w= shortcut. I find this
+counterintuitive. GNU Readline uses =C-w=  to kill word backwards. Other
+software  uses  this  shortcut  to kill  window.   I  prefer  Readline
+approach.   Also I've  missed  =o=  and =O=  commands  from Kakoune.  With
+=newline-below=  and  =newline-above= it  is  now  possible to  have  same
+shortcuts in Emacs.
+
+Emacs has nice  function, =zap-up-to-char= but for some  reason it's not
 bound to any key. I find it more usable than =zap-to-char= so let's swap
-those:
+those here.
+
+Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
+=before-save-hook= hook will get rid of those automatically for me.
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key "\M-Z" 'zap-to-char)
-  (global-set-key "\M-z" 'zap-up-to-char)
+  (use-package simple
+    :ensure nil
+    :bind (("C-w" . aorst/kill-region-or-word)
+           ("C-o" . aorst/newline-below)
+           ("C-S-o" . aorst/newline-above)
+           ("M-z" . zap-up-to-char)
+           ("M-S-z" . zap-to-char))
+    :hook (before-save . delete-trailing-whitespace)
+    :init
+    (defun aorst/kill-region-or-word (arg)
+      (interactive "*p")
+      (if (and transient-mark-mode
+               mark-active)
+          (kill-region (region-beginning) (region-end))
+        (backward-kill-word arg)))
+    (defun aorst/newline-below ()
+      (interactive)
+      (end-of-line)
+      (newline-and-indent))
+    (defun aorst/newline-above ()
+      (interactive)
+      (back-to-indentation)
+      (newline-and-indent)
+      (previous-line 1)
+      (indent-according-to-mode)))
 #+END_SRC
 
 * Functions

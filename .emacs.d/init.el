@@ -71,8 +71,31 @@
 
 (delete-selection-mode t)
 
-(global-set-key "\M-Z" 'zap-to-char)
-(global-set-key "\M-z" 'zap-up-to-char)
+(use-package simple
+  :ensure nil
+  :bind (("C-w" . aorst/kill-region-or-word)
+         ("C-o" . aorst/newline-below)
+         ("C-S-o" . aorst/newline-above)
+         ("M-z" . zap-up-to-char)
+         ("M-S-z" . zap-to-char))
+  :hook (before-save . delete-trailing-whitespace)
+  :init
+  (defun aorst/kill-region-or-word (arg)
+    (interactive "*p")
+    (if (and transient-mark-mode
+             mark-active)
+        (kill-region (region-beginning) (region-end))
+      (backward-kill-word arg)))
+  (defun aorst/newline-below ()
+    (interactive)
+    (end-of-line)
+    (newline-and-indent))
+  (defun aorst/newline-above ()
+    (interactive)
+    (back-to-indentation)
+    (newline-and-indent)
+    (previous-line 1)
+    (indent-according-to-mode)))
 
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether buffer is real."
