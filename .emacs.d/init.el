@@ -694,9 +694,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          ((org-capture-mode org-src-mode) . aorst/discard-history))
   :bind (("C-c a" . org-agenda)
          :map org-mode-map
-         ([backtab] . nil)
-         ([S-iso-lefttab] . nil)
-         ([C-tab] . org-shifttab)
          ("C-c l" . org-store-link))
   :config
   (use-package ox-latex
