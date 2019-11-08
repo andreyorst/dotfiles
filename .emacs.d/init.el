@@ -62,8 +62,6 @@
 
 (setq default-input-method 'russian-computer)
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
 (prefer-coding-system 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
@@ -132,15 +130,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (command-error-default-function data context caller)))
 
 (setq command-error-function #'aorst/command-error-function)
-
-(defun aorst/kill-region-or-word (arg)
-  (interactive "*p")
-  (if (and transient-mark-mode
-           mark-active)
-      (kill-region (region-beginning) (region-end))
-    (backward-kill-word arg)))
-
-(global-set-key "\C-w" 'aorst/kill-region-or-word)
 
 (setq inhibit-splash-screen t)
 

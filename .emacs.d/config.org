@@ -312,14 +312,6 @@ I'm  not   using  =russian-jcuken=   here  because  it   represents  the
 "typewriter" layout with number-line inverted,  so to access numbers I
 need to use Shift key. =russian-computer= doesn't have this problem.
 
-** Trailing Whitespaces
-I don't  want my files to  contain trailing whitespaces, so  this hook
-will get rid of those automatically for me.
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
-
 ** UTF8
 Let's use =UTF8= if we can:
 
@@ -459,23 +451,6 @@ deleting past first symbol. Let's disable it:
       (command-error-default-function data context caller)))
 
   (setq command-error-function #'aorst/command-error-function)
-#+END_SRC
-
-** =kill-region-or-word=
-By default Emacs uses =kill-region= command on =C-w= shortcut. I find this
-counterintuitive. GNU Readline uses =C-w=  to kill word backwards. Other
-software  uses  this  shortcut  to  kill  window.  I  prefer  Readline
-approach, so let's redefine shortcut:
-
-#+BEGIN_SRC emacs-lisp
-  (defun aorst/kill-region-or-word (arg)
-    (interactive "*p")
-    (if (and transient-mark-mode
-             mark-active)
-        (kill-region (region-beginning) (region-end))
-      (backward-kill-word arg)))
-
-  (global-set-key "\C-w" 'aorst/kill-region-or-word)
 #+END_SRC
 
 * User Interface
