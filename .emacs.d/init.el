@@ -40,6 +40,7 @@
 
 (global-unset-key (kbd "S-<down-mouse-1>"))
 (global-unset-key (kbd "<mouse-3>"))
+(global-set-key [mouse-3] menu-bar-edit-menu)
 (global-unset-key (kbd "S-<mouse-3>"))
 
 (setq-default mouse-wheel-progressive-speed nil

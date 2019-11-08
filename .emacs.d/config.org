@@ -244,6 +244,7 @@ I don't want menus on shift clicks:
 #+BEGIN_SRC emacs-lisp
   (global-unset-key (kbd "S-<down-mouse-1>"))
   (global-unset-key (kbd "<mouse-3>"))
+  (global-set-key [mouse-3] menu-bar-edit-menu)
   (global-unset-key (kbd "S-<mouse-3>"))
 #+END_SRC
 
