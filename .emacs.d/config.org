@@ -341,8 +341,8 @@ It is conveinient to delete selection by typing:
 ** Default Bindings and More
 Configurations to built in =simple.el= module.
 
-By default Emacs uses =kill-region= command on =C-w= shortcut. I find this
-counterintuitive. GNU Readline uses =C-w=  to kill word backwards. Other
+By default Emacs uses =kill-region= command on =C-w= shortcut. I find thisq
+counterintuitiveq. GNU Readline uses =C-w=  to kill word backwards. Otherq
 software  uses  this  shortcut  to kill  window.   I  prefer  Readline
 approach.   Also I've  missed  =o=  and =O=  commands  from Kakoune.  With
 =newline-below=  and  =newline-above= it  is  now  possible to  have  same
@@ -488,6 +488,17 @@ deleting past first symbol. Let's disable it:
   (setq command-error-function #'aorst/command-error-function)
 #+END_SRC
 
+** =font-installed-p=
+This function checks if font is available on the system.
+
+#+BEGIN_SRC emacs-lisp
+  (defun aorst/font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (if (find-font (font-spec :name font-name))
+        t
+      nil))
+#+END_SRC
+
 * User Interface
 Packages that affect user interface.
 
@@ -525,19 +536,25 @@ in active window:
 
 ** Font
 I'm a  big fan  of [[https://github.com/source-foundry/Hack][Hack]]  font. It  has nice  support of  languages and
-styles like *bold*, /italics/ for not only Latin languages.
+styles like *bold*, /italics/ for not only Latin languages. If =Hack= is not
+found we try =Source Code Pro= as a fallback option.
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Hack 10")
+  (cond ((aorst/font-installed-p "Hack")
+         (set-face-attribute 'default nil :font "Hack 10"))
+        ((aorst/font-installed-p "Source Code Pro")
+         (set-face-attribute 'default nil :font "Source Code Pro 10")))
 #+END_SRC
 
 ** Icons
 *all-the-icons*  package  provides  nice  icons  for  Emacs  via  custom
-fonts. Just  don't forget  to use =M-x  all-the-icons-install-fonts RET=
-after install.
+fonts.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :config
+    (when (not (aorst/font-installed-p "all-the-icons"))
+      (all-the-icons-install-fonts)))
 #+END_SRC
 
 I don't use  this package directly yet, but some  other packages, like

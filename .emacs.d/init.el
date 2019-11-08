@@ -154,6 +154,12 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 
 (setq command-error-function #'aorst/command-error-function)
 
+(defun aorst/font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (if (find-font (font-spec :name font-name))
+      t
+    nil))
+
 (setq inhibit-splash-screen t)
 
 (tooltip-mode -1)
@@ -168,9 +174,15 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (setq-default cursor-type 'bar
                 cursor-in-non-selected-windows nil))
 
-(set-face-attribute 'default nil :font "Hack 10")
+(cond ((aorst/font-installed-p "Hack")
+       (set-face-attribute 'default nil :font "Hack 10"))
+      ((aorst/font-installed-p "Source Code Pro")
+       (set-face-attribute 'default nil :font "Source Code Pro 10")))
 
-(use-package all-the-icons)
+(use-package all-the-icons
+  :config
+  (when (not (aorst/font-installed-p "all-the-icons"))
+    (all-the-icons-install-fonts)))
 
 (use-package doom-themes
   :commands (doom-themes-org-config)
