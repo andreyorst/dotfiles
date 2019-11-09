@@ -83,6 +83,7 @@
         mouse-set-region
         org-edit-src-save
         org-shifttab
+        org-store-link
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
