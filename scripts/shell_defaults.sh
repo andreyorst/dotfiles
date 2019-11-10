@@ -52,7 +52,7 @@ mkcd() { mkdir -p $1 && cd $1; }
 # convert webm to mp4
 webmp4() {
     if [ -z "$(command -v ffmpeg)" ]; then
-        echo "ffmpeg is not installed" >&2
+        printf "%s\n" "ffmpeg is not installed" >&2
         return 1
     fi
     while [ $# -ne 0 ]; do
@@ -66,7 +66,7 @@ gif() {
     if [ -n "$(command -v gifify)" ]; then
         gifify $1 -o ${1#.*}.gif --colors 256 --compress 0 --fps 30
     else
-        echo "gifify is not installed" >&2
+        printf "%s\n" "gifify is not installed" >&2
         return 1
     fi
 }
@@ -74,7 +74,7 @@ gif() {
 # Create new C project from template
 cnew() {
     if [ $# -lt 1 ]; then
-        echo "At leas 1 argument required" >&2
+        printf "%s\n" "At leas 1 argument required" >&2
         return 1
     fi
 
@@ -90,10 +90,10 @@ cnew() {
             (-readme) readme="true" ;;
             (-empty) empty="true"   ;;
             (-help)
-                echo "usage: cnew [-add-flag <compile flag>] [-git] [-readme] [-help] project_name\n" >&2
-                echo "  -add-flag <flag>:  add compile flag to project compile_flags.txt file" >&2
-                echo "  -vcs [git | none]: create git repository in project" >&2
-                echo "  -readme:           create empty readme file for a project" >&2
+                printf "%s\n" "usage: cnew [-add-flag <compile flag>] [-git] [-readme] [-help] project_name\n" >&2
+                printf "%s\n" "  -add-flag <flag>:  add compile flag to project compile_flags.txt file" >&2
+                printf "%s\n" "  -vcs [git | none]: create git repository in project" >&2
+                printf "%s\n" "  -readme:           create empty readme file for a project" >&2
                 return 0 ;;
             (*) project_name="$1" ;;
         esac
@@ -103,7 +103,7 @@ cnew() {
     mkdir "$project_name" >/dev/null 2>&1
     res=$?
     if [ $res -ne 0 ]; then
-        echo "Error creating a project '$project_name': Could not create directory($res)" >&2
+        printf "%s\n" "Error creating a project '$project_name': Could not create directory($res)" >&2
         return $res
     fi
 
@@ -112,8 +112,8 @@ cnew() {
         res=$?
         if [ $res -ne 0 ]; then
             rm -rf "$project_name"
-            echo "Error creating a project '$project_name'" >&2
-            echo "Could not initialize project with files ($res)" >&2
+            printf "%s\n" "Error creating a project '$project_name'" >&2
+            printf "%s\n" "Could not initialize project with files ($res)" >&2
             return $res
         fi
     fi
@@ -123,8 +123,8 @@ cnew() {
         res=$?
         if [ $res -ne 0 ]; then
             rm -rf "$project_name"
-            echo "Error creating a project '$project_name'" >&2
-            echo "Could not specify additional flags ($res)" >&2
+            printf "%s\n" "Error creating a project '$project_name'" >&2
+            printf "%s\n" "Could not specify additional flags ($res)" >&2
             return $res
         fi
     fi
@@ -136,16 +136,16 @@ cnew() {
         fi
         if [ $res -ne 0 ]; then
             rm -rf "$project_name"
-            echo "Error creating a project '$project_name'" >&2
-            echo "Could not initialize git repository ($res)" >&2
+            printf "%s\n" "Error creating a project '$project_name'" >&2
+            printf "%s\n" "Could not initialize git repository ($res)" >&2
             return $res
         fi
     elif [ "$vcs" = "none" ]; then
         res=0
     else
         rm -rf "$project_name"
-        echo "Error creating a project '$project_name'" >&2
-        echo "VCS '$vcs' is not supported by the script (1)" >&2
+        printf "%s\n" "Error creating a project '$project_name'" >&2
+        printf "%s\n" "VCS '$vcs' is not supported by the script (1)" >&2
         return 1
     fi
 
@@ -154,14 +154,14 @@ cnew() {
         res=$?
         if [ $res -ne 0 ]; then
             rm -rf "$project_name"
-            echo "Error creating a project '$project_name'" >&2
-            echo "Could not create README.md ($res)" >&2
+            printf "%s\n" "Error creating a project '$project_name'" >&2
+            printf "%s\n" "Could not create README.md ($res)" >&2
             return $res
         fi
     fi
 
     if [ $res -eq 0 ]; then
-        echo "Created project: $project_name"
+        printf "%s\n" "Created project: $project_name"
     fi
 }
 
