@@ -258,3 +258,46 @@ else
         esac
     }
 fi
+
+getpasswd() {
+    names=
+    copy=
+    args=
+    file="$HOME/.passwords.gpg"
+    while [ $# -gt 0 ]; do
+        case $1 in
+            (-file)    shift; file="$1" ;;
+            (-file=*)  file="${1#-file=}";;
+            (-copy|-c) copy="true" ;;
+            (-help|-h)
+                printf "%s\n" "usage: getpasswd [-file <filename>] [-copy] [-help] [keyname] ...\n" >&2
+                printf "%s\n" "  -c -copy: copy password to clipboard. If specified only one key is used." >&2
+                printf "%s\n" "     -file filename: look for passwords in specifiled file." >&2
+                printf "%s\n" "  -h -help: print this message" >&2
+                return 0 ;;
+            (*) args="'$1' $args" ;;
+        esac
+        shift
+    done
+    while [ -z "$file" ] || [ ! -e "$file" ]; do
+        [ -n "$file" ] && printf "No such file '%s'\n" "$file"
+        printf "Please specify a file: "
+        read -r file
+    done
+    eval "set -- $args"
+    if [ $# -lt 1 ]; then
+        printf "Enter service name(s) (^D to finish): " >&2
+        set -- $(</dev/stdin)
+        printf "\n"
+    fi
+    if [ "$copy" = "true" ] || [ $# -eq 1 ]; then
+        gpg --decrypt "$file" 2>/dev/null | grep -Po -- "(?<=^- $1 :: ).*" | tr -d '\n' | xsel -b -i
+        printf "%s\n" "Password for '$1' copied to clipboard" >&2
+    else
+        for name in $@; do
+            names="^- ${name} :: \|${names}"
+        done
+        names="${names%\\|}"
+        gpg --decrypt "$file" 2>/dev/null | grep -- "${names}"
+    fi
+}
