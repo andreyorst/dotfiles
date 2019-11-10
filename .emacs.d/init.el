@@ -199,6 +199,37 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                       org-level-1
                       org-quote))
         (set-face-attribute face nil :extend t)))
+    (with-eval-after-load 'magit
+      (dolist (face '(magit-diff-hunk-heading
+                      magit-diff-hunk-heading-highlight
+                      magit-diff-hunk-heading-selection
+                      magit-diff-hunk-region
+                      magit-diff-lines-heading
+                      magit-diff-lines-boundary
+                      magit-diff-conflict-heading
+                      magit-diff-added
+                      magit-diff-removed
+                      magit-diff-our
+                      magit-diff-base
+                      magit-diff-their
+                      magit-diff-context
+                      magit-diff-added-highlight
+                      magit-diff-removed-highlight
+                      magit-diff-our-highlight
+                      magit-diff-base-highlight
+                      magit-diff-their-highlight
+                      magit-diff-context-highlight
+                      magit-diff-whitespace-warning
+                      magit-diffstat-added
+                      magit-diffstat-removed
+                      magit-section-heading
+                      magit-section-heading-selection
+                      magit-section-highlight
+                      magit-section-secondary-heading
+                      magit-diff-file-heading
+                      magit-diff-file-heading-highlight
+                      magit-diff-file-heading-selection))
+        (set-face-attribute face nil :extend t)))
     (with-eval-after-load 'ediff
       (dolist (face '(ediff-current-diff-A
                       ediff-current-diff-Ancestor
