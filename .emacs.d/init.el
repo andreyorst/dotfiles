@@ -114,7 +114,9 @@
     (let* ((window (selected-window))
            (buffer (window-buffer window)))
       (when (aorst/real-buffer-p buffer)
-        (set-window-fringes window 8 8 t)))))
+        (set-window-fringes window 8 8 t)
+        (when (bound-and-true-p desktop-save-mode)
+          (setq desktop-save-buffer t))))))
 
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
@@ -1302,6 +1304,41 @@ next occurrence if `iedit-mode' is already active."
     (interactive)
     (when (bound-and-true-p hs-minor-mode)
       (transient-setup 'aorst/hideshow-menu nil nil))))
+
+(use-package desktop
+  :ensure nil
+  :hook ((after-init . aorst/desktop-restore)
+         (desktop-after-read . aorst/desktop-remove)
+         (auto-save . aorst/desktop-auto-save))
+  :init
+  (setq desktop-path '("~/.emacs.d/")
+        desktop-dirname "~/.emacs.d/"
+        desktop-base-file-name "emacs-desktop"
+        desktop-save t)
+  (defun aorst/desktop-remove ()
+    (let ((desktop desktop-dirname))
+      (desktop-remove)
+      (setq desktop-dirname desktop)))
+  (defun aorst/saved-desktop-p ()
+    (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+  (defun aorst/desktop-restore ()
+    "Restore a saved emacs session."
+    (interactive)
+    (if (aorst/saved-desktop-p)
+        (desktop-read)
+      (message "No desktop found.")))
+  (defun aorst/desktop-save ()
+    "Save an emacs session."
+    (interactive)
+    (when (aorst/saved-desktop-p)
+      (desktop-save-in-desktop-dir))
+    (message "Session not saved.")
+    (desktop-save-in-desktop-dir))
+  (defun aorst/desktop-auto-save ()
+    "Automatically save desktop."
+    (when (eq (desktop-owner) (emacs-pid))
+      (aorst/desktop-save)))
+  (desktop-save-mode t))
 
 (provide 'init)
 ;;; init.el ends here
