@@ -184,8 +184,9 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 
 (use-package all-the-icons
   :config
-  (when (not (aorst/font-installed-p "all-the-icons"))
-    (all-the-icons-install-fonts)))
+  (when (and (not (aorst/font-installed-p "all-the-icons"))
+             (window-system))
+    (all-the-icons-install-fonts t)))
 
 (use-package doom-themes
   :commands (doom-themes-org-config)

@@ -556,8 +556,9 @@ fonts.
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons
     :config
-    (when (not (aorst/font-installed-p "all-the-icons"))
-      (all-the-icons-install-fonts)))
+    (when (and (not (aorst/font-installed-p "all-the-icons"))
+               (window-system))
+      (all-the-icons-install-fonts t)))
 #+END_SRC
 
 I don't use  this package directly yet, but some  other packages, like
