@@ -169,7 +169,7 @@ cnew() {
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 for pm in yay pacman rpm-ostree dnf yum apt; do
     if [ -n "$(command -v $pm)" ]; then
-        alias pm="pm_$pm"
+        alias pm="pm_$(echo $pm | sed "s/[^a-zA-Z_]/_/g")"
         break
     fi
 done
@@ -222,7 +222,7 @@ pm_yum() {
     esac
 }
 
-pm_rpm-ostree() {
+pm_rpm_ostree() {
     cmd="$1"
     shift
     case "$cmd" in
