@@ -259,10 +259,7 @@ else
     }
 fi
 
-getpasswd() {
-    names=
-    copy=
-    args=
+getpasswd() {(
     file="$HOME/.passwords.gpg"
     while [ $# -gt 0 ]; do
         case $1 in
@@ -291,7 +288,18 @@ getpasswd() {
         printf "\n"
     fi
     if [ "$copy" = "true" ] || [ $# -eq 1 ]; then
-        gpg --decrypt "$file" 2>/dev/null | grep -Po -- "(?<=^- $1 :: ).*" | tr -d '\n' | xsel -b -i
+        name="$1"
+        result=$(gpg --decrypt "$file" 2>/dev/null | grep -Po -- "(?<=^- $name :: ).*")
+        amount=$(printf "%s\n" "$result" | wc -l)
+        if [ $amount -gt 1 ]; then
+            printf "Multiple passwords found for '%s'. Select which to copy [%s]: " "$name" "$(seq -s ', ' 1 $amount)" >&2
+            read -r choice
+            if [ $choice -lt 1 ] || [ $choice -gt $amount ]; then
+                printf "Bad choice '%s'.\n" "$choice" >&2
+                return 1
+            fi
+            echo $result | head -n $choice | tail -n +$choice | tr -d '\n' | xsel -b -i
+        fi
         printf "%s\n" "Password for '$1' copied to clipboard" >&2
     else
         for name in $@; do
@@ -300,4 +308,4 @@ getpasswd() {
         names="${names%\\|}"
         gpg --decrypt "$file" 2>/dev/null | grep -- "${names}"
     fi
-}
+)}
