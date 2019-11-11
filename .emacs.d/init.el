@@ -32,7 +32,7 @@
 (setq backup-by-copying t
       create-lockfiles nil
       backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups" t)))
+      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups/" t)))
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
