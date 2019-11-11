@@ -298,7 +298,7 @@ getpasswd() {(
                 printf "Bad choice '%s'.\n" "$choice" >&2
                 return 1
             fi
-            echo $result | head -n $choice | tail -n +$choice | tr -d '\n' | xsel -b -i
+            printf "%s\n" $result | head -n $choice | tail -n +$choice | tr -d '\n' | xsel -b -i
         fi
         printf "%s\n" "Password for '$1' copied to clipboard" >&2
     else
