@@ -1309,18 +1309,19 @@ next occurrence if `iedit-mode' is already active."
 (use-package desktop
   :ensure nil
   :hook ((after-init . aorst/desktop-restore)
-         (desktop-after-read . aorst/desktop-remove)
-         (auto-save . aorst/desktop-auto-save))
+         (desktop-after-read . aorst/desktop-remove))
   :init
   (setq desktop-path '("~/.emacs.d/")
         desktop-dirname "~/.emacs.d/"
         desktop-base-file-name "emacs-desktop"
         desktop-save t)
   (defun aorst/desktop-remove ()
+    "Remove current desktop, but save `desktop-dirname'."
     (let ((desktop desktop-dirname))
       (desktop-remove)
       (setq desktop-dirname desktop)))
   (defun aorst/saved-desktop-p ()
+    "Check if desktop exists."
     (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
   (defun aorst/desktop-restore ()
     "Restore a saved emacs session."
