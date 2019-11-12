@@ -1314,7 +1314,8 @@ next occurrence if `iedit-mode' is already active."
   (setq desktop-path '("~/.emacs.d/")
         desktop-dirname "~/.emacs.d/"
         desktop-base-file-name "emacs-desktop"
-        desktop-save t)
+        desktop-save t
+        desktop-load-locked-desktop t)
   (defun aorst/desktop-remove ()
     "Remove current desktop, but save `desktop-dirname'."
     (let ((desktop desktop-dirname))
