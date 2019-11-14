@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        aorst/kill-region-or-word
         backward-sexp
         beginning-of-buffer
         c-electric-brace
@@ -15,12 +16,14 @@
         c-end-of-defun
         c-indent-line-or-region
         counsel-M-x
+        default-indent-new-line
         delete-indentation
         downcase-region
         electric-newline-and-maybe-indent
         end-of-buffer
         end-of-defun
         forward-sexp
+        hydra--negative-argument
         hydrant/er/er/contract-region
         hydrant/er/er/expand-region
         indent-for-tab-command
@@ -28,6 +31,7 @@
         my/select-line
         my/smart-move-beginning-of-line
         org-beginning-of-line
+        org-cycle
         org-delete-char
         org-end-of-line
         org-fill-paragraph
