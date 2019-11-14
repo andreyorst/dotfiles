@@ -59,7 +59,6 @@
         hydrant/-negative-argument
         hydrant/er/body
         hydrant/mc/body
-        hydrant/mc/lambda-M-s
         hydrant/mc/mc/cycle-backward
         hydrant/mc/mc/cycle-forward
         hydrant/mc/mc/edit-ends-of-lines
