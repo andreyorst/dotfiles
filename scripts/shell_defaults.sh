@@ -314,6 +314,27 @@ getpasswd() {
 
 genpasswd () {
     (
-        cat /dev/random | tr -dc 'A-Za-z0-9!"$%&'\''()+,-./:;<=>?@[]^_{|}~`' | head -c ${1:-30} && echo
+        allowed='A-Za-z0-9!`~!@#$%^&*()-_=+\|[{]};:'\''",<.>/?'
+        while [ $# -gt 0 ]; do
+            case $1 in
+                (-copy|-c) copy="true" ;;
+                (-a) shift; allowed=$1 ;;
+                (-allowed=*) allowed=${1#-allowed=} ;;
+                (-help|-h)
+                    printf "%s\n" "usage: genpasswd [length] [-copy] [-help] [-allowed=<symbols>] ...\n" >&2
+                    printf "%s\n" "  -a -allowed: symbols that are allowed to be in password." >&2
+                    printf "%s\n" "  -c -copy:    copy password to clipboard. If specified only one key is used." >&2
+                    printf "%s\n" "  -h -help:    print this message" >&2
+                    return 0 ;;
+                (*) size=$1 ;;
+            esac
+            shift
+        done
+        if [ "$copy" = "true" ]; then
+            cat /dev/random | tr -dc $allowed | head -c ${size:-22} | xsel -b -i
+            printf "password copied to clipboard\n" >&2
+        else
+            cat /dev/random | tr -dc $allowed | head -c ${size:-22} && echo
+        fi
     )
 }
