@@ -6,8 +6,9 @@ if [ -f /etc/bashrc ]; then
 fi
 
 # Scripts and better defaults for shell
-. $HOME/.dotfiles/scripts/shell_defaults.sh
-. $HOME/.dotfiles/scripts/svn_helper.sh
+for i in $HOME/.dotfiles/scripts/*.sh; do
+    . "$i"
+done
 
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then

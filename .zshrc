@@ -7,5 +7,7 @@ ENABLE_CORRECTION="true"
 plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
-source $HOME/.dotfiles/scripts/shell_defaults.sh
-source $HOME/.dotfiles/scripts/svn_helper.sh
+
+for i in $HOME/.dotfiles/scripts/*.sh; do
+    . "$i"
+done
