@@ -298,7 +298,9 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
 (use-package doom-modeline
   :config
   (let ((fg (face-attribute 'default :foreground))
-        (bg (face-attribute 'mode-line :background)))
+        (bg (face-attribute 'mode-line :background))
+        (fg-inactive (face-attribute 'font-lock-comment-face :foreground))
+        (bg-inactive (face-attribute 'mode-line-inactive :background)))
     (dolist (face '(doom-modeline-buffer-modified
                     doom-modeline-buffer-minor-mode
                     doom-modeline-project-parent-dir
@@ -312,6 +314,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                     doom-modeline-unread-number
                     doom-modeline-buffer-path
                     doom-modeline-bar
+                    doom-modeline-bar-inactive
                     doom-modeline-panel
                     doom-modeline-buffer-major-mode
                     doom-modeline-buffer-file
@@ -323,8 +326,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
     (set-face-attribute 'doom-modeline-panel nil :background bg)
     (set-face-attribute 'doom-modeline-bar nil :background bg)
-    (set-face-attribute 'mode-line-inactive nil :foreground (face-attribute 'font-lock-comment-face :foreground)
-                                                :background (face-attribute 'mode-line :background)))
+    (set-face-attribute 'doom-modeline-bar-inactive nil :background bg)
+    (set-face-attribute 'mode-line-inactive nil :foreground fg-inactive :background bg-inactive))
   (setq doom-modeline-bar-width 3
         doom-modeline-major-mode-color-icon nil
         doom-modeline-buffer-color-icon nil
@@ -360,9 +363,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (aorst/set-frame-dark)))
 
 (setq-default frame-title-format '("%b — Emacs"))
-
-(when window-system
-  (set-frame-size (selected-frame) 190 60))
 
 (when window-system
   (use-package treemacs
