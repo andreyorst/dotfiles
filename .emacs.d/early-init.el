@@ -23,9 +23,11 @@
                   gc-cons-percentage aorst--gc-cons-percentage
                   file-name-handler-alist aorst--file-name-handler-alist)))
 
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(setq default-frame-alist '((width . 190)
+                            (height . 68)
+                            (menu-bar-lines . 0)
+                            (tool-bar-lines . 0)
+                            (vertical-scroll-bars)))
 
 (defvar package--init-file-ensured)
 (setq package-enable-at-startup nil
