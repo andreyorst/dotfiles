@@ -55,6 +55,7 @@
       '(
         counsel-describe-function
         counsel-find-file
+        hydra--digit-argument
         hydrant/-digit-argument
         hydrant/-negative-argument
         hydrant/er/body
