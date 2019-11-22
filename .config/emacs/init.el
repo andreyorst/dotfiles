@@ -374,6 +374,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     :hook ((after-init . aorst/treemacs-init-setup)
            (treemacs-mode . aorst/treemacs-setup)
            (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
+           (treemacs-switch-workspace . treemacs-set-fallback-workspace)
            (treemacs-mode . aorst/treemacs-setup-title))
     :config
     (use-package treemacs-magit)
@@ -569,7 +570,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       (treemacs-load-theme "Atom")
       (setq treemacs-collapse-dirs 0)
       (treemacs)
-      (aorst/treemacs-expand-all-projects))
+      (aorst/treemacs-expand-all-projects)
+      (windmove-right))
     (defun aorst/treemacs-setup ()
       "Set treemacs buffer common settings."
       (setq tab-width 1
