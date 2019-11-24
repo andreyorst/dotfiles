@@ -751,7 +751,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         org-confirm-babel-evaluate nil
         org-imenu-depth 8
         org-log-done t
-        org-agenda-files '("~/Documents/Agendas"))
+        org-agenda-files '("~/Tasks"))
   (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename "~/.config/emacs/config.org"))
