@@ -55,6 +55,7 @@
       '(
         counsel-describe-function
         counsel-find-file
+        count-lines-page
         hydra--digit-argument
         hydrant/-digit-argument
         hydrant/-negative-argument
@@ -84,6 +85,7 @@
         magit-refresh-all
         magit-stage
         minions-minor-modes-menu
+        mouse-drag-secondary
         mouse-set-region
         org-edit-src-save
         org-shifttab
