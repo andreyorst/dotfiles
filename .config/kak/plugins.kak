@@ -14,7 +14,7 @@ source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "andreyorst/plug.kak" domain GitLab.com noload config %{
+plug "andreyorst/plug.kak" domain gitlab.com noload config %{
     set-option global plug_always_ensure true
     set-option global plug_profile true
     hook global WinSetOption filetype=plug %{
@@ -33,7 +33,7 @@ plug "occivink/kakoune-find" config %{
     grep-apply-changes %{ find-apply-changes -force }
 }
 
-plug "andreyorst/base16-gruvbox.kak" domain GitLab.com theme %{
+plug "andreyorst/base16-gruvbox.kak" domain gitlab.com theme %{
     if %[ -n "${PATH##*termux*}" ] %{
         colorscheme base16-gruvbox-dark-soft
     } else %{
@@ -41,7 +41,7 @@ plug "andreyorst/base16-gruvbox.kak" domain GitLab.com theme %{
     }
 }
 
-plug "andreyorst/fzf.kak" domain GitLab.com config %{
+plug "andreyorst/fzf.kak" domain gitlab.com config %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
 } defer fzf %{
     set-option global fzf_preview_width '65%'
@@ -122,7 +122,7 @@ if %[ -n "${PATH##*termux*}" ] %{
     }
 }
 
-plug "andreyorst/powerline.kak" domain GitLab.com defer powerline %{
+plug "andreyorst/powerline.kak" domain gitlab.com defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
     set-option global powerline_shorten_bufname 'short'
@@ -135,7 +135,7 @@ plug "andreyorst/powerline.kak" domain GitLab.com defer powerline %{
     powerline-start
 }
 
-plug "andreyorst/smarttab.kak" domain GitLab.com defer smarttab %{
+plug "andreyorst/smarttab.kak" domain gitlab.com defer smarttab %{
     set-option global softtabstop 4
     set-option global smarttab_expandtab_mode_name '⋅t⋅'
     set-option global smarttab_noexpandtab_mode_name '→t→'
@@ -161,7 +161,7 @@ plug "alexherbo2/move-line.kak" config %{
 }
 
 if %[ -n "${PATH##*termux*}" ] %{
-    plug "andreyorst/tagbar.kak" domain GitLab.com defer tagbar %{
+    plug "andreyorst/tagbar.kak" domain gitlab.com defer tagbar %{
         set-option global tagbar_sort false
         set-option global tagbar_size 40
         set-option global tagbar_display_anon false
@@ -193,12 +193,12 @@ plug "alexherbo2/split-object.kak" config %{
     map -docstring "split object" global normal '<a-I>' ': enter-user-mode split-object<ret>'
 }
 
-plug "screwtapello/kakoune-inc-dec" domain GitLab.com config %{
+plug "screwtapello/kakoune-inc-dec" domain gitlab.com config %{
     map -docstring "decrement selection" global normal '<C-x>' ': inc-dec-modify-numbers - %val{count}<ret>'
     map -docstring "increment selection" global normal '<C-a>' ': inc-dec-modify-numbers + %val{count}<ret>'
 }
 
-plug "andreyorst/langmap.kak" domain GitLab.com defer langmap %{
+plug "andreyorst/langmap.kak" domain gitlab.com defer langmap %{
     set-option global langmap %opt{langmap_ru_jcuken}
     map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
     map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
@@ -210,7 +210,7 @@ plug "delapouite/kakoune-select-view" %{
     map global view s '<esc>: select-view<ret>' -docstring 'select view'
 }
 
-plug "andreyorst/kaktree" domain GitLab.com defer kaktree %{
+plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
     map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
     if %[ -n "${PATH##*termux*}" ] %{
         set-option global kaktree_double_click_duration '0.5'
