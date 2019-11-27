@@ -95,6 +95,7 @@
         phi-search
         term-line-mode
         term-send-raw
+        toggle-input-method
         xref-find-definitions
         yank-rectangle
         ))
