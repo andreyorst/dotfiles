@@ -1088,9 +1088,14 @@ _-_: reduce region  _)_: around pairs
           (executable-find "rls"))
   (use-package eglot
     :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
+           ;; (rust-mode . aorst/setup-rls))
     :bind (:map eglot-mode-map
                 ("C-c C-e" . aorst/eglot-menu))
     :requires transient
+    ;; :init
+    ;; (defun aorst/setup-rls ()
+    ;;   "Configure RLS via `eglot-workspace-configuration' variable."
+    ;;   (setq eglot-workspace-configuration '((:rls.clippy_preference . "on"))))
     :config
     (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=false")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
