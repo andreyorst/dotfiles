@@ -1090,7 +1090,7 @@ _-_: reduce region  _)_: around pairs
     :hook (((c-mode c++-mode rust-mode) . eglot-ensure))
     :bind (:map eglot-mode-map
                 ("C-c C-e" . aorst/eglot-menu))
-    :requires hydra
+    :requires transient
     :config
     (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=false")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
