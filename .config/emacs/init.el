@@ -106,7 +106,8 @@
         (string-equal "*scratch*" buffer-name)
         (string-match-p ".~.*~" buffer-name)
         (string-match-p "FILE=/" buffer-name)
-        (string-match-p "\*edit-indirect .*\*" buffer-name))))
+        (string-match-p "\*edit-indirect .*\*" buffer-name)
+        (string-match-p "\*Org Src .*\*" buffer-name))))
 
 (defun aorst/real-buffer-setup (&rest _)
   "Wrapper around `set-window-fringes' function."
@@ -216,7 +217,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
              solaire-mode-reset)
   :hook (((after-revert
            change-major-mode
-           org-capture-mode
            org-src-mode) . turn-on-solaire-mode)
          (snippet-mode . solaire-mode))
   :config

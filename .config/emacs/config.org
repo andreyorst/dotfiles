@@ -411,7 +411,8 @@ file-visiting while not visiting a particular file, like =*scratch*=
           (string-equal "*scratch*" buffer-name)
           (string-match-p ".~.*~" buffer-name)
           (string-match-p "FILE=/" buffer-name)
-          (string-match-p "\*edit-indirect .*\*" buffer-name))))
+          (string-match-p "\*edit-indirect .*\*" buffer-name)
+          (string-match-p "\*Org Src .*\*" buffer-name))))
 #+END_SRC
 
 ** =real-buffer-setup=
@@ -627,7 +628,6 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
                solaire-mode-reset)
     :hook (((after-revert
              change-major-mode
-             org-capture-mode
              org-src-mode) . turn-on-solaire-mode)
            (snippet-mode . solaire-mode))
     :config
