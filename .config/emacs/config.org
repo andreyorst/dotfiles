@@ -1424,7 +1424,7 @@ want to enable some helper modes here.
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
 
-** ANSI Term
+** COMMENT ANSI Term
 I'm using  it more  and more,  so I've  decided that  I should  have a
 proper  shortcut  for  it.   =aorst/ansi-term-toggle=  function  toggles
 bottom split  with =ansi-term= inside  it.  /Ctrl+`/ seems  great shortcut
@@ -1469,6 +1469,48 @@ automatically.
             (select-window window)
           (aorst/ansi-term-toggle arg))))
     (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes))
+#+END_SRC
+
+** vterm
+=vterm= package  provides a  bridge to =libvterm=  to display  terminal as
+Emacs buffer. It works much better than =ansi-term=, though may be buggy
+and requires compilation.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm
+    :bind (("C-`" . aorst/vterm-toggle)
+           ("C-t" . aorst/vterm-focus))
+    :config
+    (defun aorst/vterm-toggle (&optional arg)
+        "Toggle `vterm' window on and off with the same command."
+        (interactive "P")
+        (let* ((bufname "*vterm*")
+               (window (get-buffer-window bufname)))
+          (if window
+              (ignore-errors (delete-window window))
+            (let* ((win-side (if (symbolp arg)
+                                 (cons (split-window-below) 'bot)
+                               (cons (split-window-right) 'right)))
+                   (window (car win-side))
+                   (side (cdr win-side)))
+              (select-window window)
+              (cond ((get-buffer bufname)
+                     (switch-to-buffer bufname))
+                    (t (vterm bufname)))
+              (when (bound-and-true-p global-tab-line-mode)
+                (previous-buffer)
+                (bury-buffer))
+              (set-window-dedicated-p window t)
+              (set-window-parameter window 'no-delete-other-windows t)
+              (set-window-parameter window 'window-side side)
+              (set-window-parameter window 'no-other-window t))))
+      (defun aorst/ansi-term-focus (&optional arg)
+        "Focus `vterm' or open one if there's none."
+        (interactive "P")
+        (let ((window (get-buffer-window "*vterm*")))
+          (if window
+              (select-window window)
+            (aorst/ansi-term-toggle arg))))))
 #+END_SRC
 
 ** EditorConfig

@@ -820,43 +820,40 @@ _o_: step-over  _p_: previous breakable  ^ ^
   :ensure nil
   :hook (emacs-lisp-mode . eldoc-mode))
 
-(use-package term
-  :ensure nil
-  :bind (("C-`" . aorst/ansi-term-toggle)
-         ("C-t" . aorst/ansi-term-focus))
+(use-package vterm
+  :bind (("C-`" . aorst/vterm-toggle)
+         ("C-t" . aorst/vterm-focus))
   :config
-  (defun aorst/ansi-term-toggle (&optional arg)
-    "Toggle `ansi-term' window on and off with the same command."
-    (interactive "P")
-    (let* ((bufname "*ansi-term*")
-           (window (get-buffer-window bufname))
-           (shell (cond ((executable-find "zsh") "zsh")
-                        ((executable-find "bash") "bash")
-                        (t "sh"))))
-      (if window
-          (ignore-errors (delete-window window))
-        (let* ((win-side (if (symbolp arg)
-                             (cons (split-window-below) 'bot)
-                           (cons (split-window-right) 'right)))
-               (window (car win-side))
-               (side (cdr win-side)))
-          (select-window window)
-          (cond ((get-buffer bufname)
-                 (switch-to-buffer bufname))
-                (t (ansi-term shell)
-                   (rename-buffer bufname)))
-          (set-window-dedicated-p window t)
-          (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-parameter window 'window-side side)
-          (set-window-parameter window 'no-other-window t)))))
-  (defun aorst/ansi-term-focus (&optional arg)
-    "Focus `ansi-term` or open one if there's none."
-    (interactive "P")
-    (let ((window (get-buffer-window "*ansi-term*")))
-      (if window
-          (select-window window)
-        (aorst/ansi-term-toggle arg))))
-  (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes))
+  (defun aorst/vterm-toggle (&optional arg)
+      "Toggle `vterm' window on and off with the same command."
+      (interactive "P")
+      (let* ((bufname "*vterm*")
+             (window (get-buffer-window bufname)))
+        (if window
+            (ignore-errors (delete-window window))
+          (let* ((win-side (if (symbolp arg)
+                               (cons (split-window-below) 'bot)
+                             (cons (split-window-right) 'right)))
+                 (window (car win-side))
+                 (side (cdr win-side)))
+            (select-window window)
+            (cond ((get-buffer bufname)
+                   (switch-to-buffer bufname))
+                  (t (vterm bufname)))
+            (when (bound-and-true-p global-tab-line-mode)
+              (previous-buffer)
+              (bury-buffer))
+            (set-window-dedicated-p window t)
+            (set-window-parameter window 'no-delete-other-windows t)
+            (set-window-parameter window 'window-side side)
+            (set-window-parameter window 'no-other-window t))))
+    (defun aorst/ansi-term-focus (&optional arg)
+      "Focus `vterm' or open one if there's none."
+      (interactive "P")
+      (let ((window (get-buffer-window "*vterm*")))
+        (if window
+            (select-window window)
+          (aorst/ansi-term-toggle arg))))))
 
 (use-package editorconfig
   :commands editorconfig-mode
