@@ -17,28 +17,40 @@ fi
 export PATH
 
 # classyTouch Prompt
-if [ -n "$SSH_CONNECTION" ]; then
-    export PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$GIT_BRANCH_AND_STATUS[\[\e[m\]ssh\[\e[0;31m\]]\n\$(if [[ \$? == 0 ]]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
-else
-    export PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$GIT_BRANCH_AND_STATUS\n\$(if [[ \$? == 0 ]]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
-fi
+PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$GIT_PS1
+\$(if [ \$? -eq 0 ]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
 
 # Avoid duplicates
 HISTCONTROL=ignoredups:erasedups
 # When the shell exits, append to the history file instead of overwriting it
 shopt -s histappend
 
-git_ps1_generate() {
+git_ps1() {
     if git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
-        branch_name=$(git branch 2>/dev/null | grep '^*' | colrm 1 2)
-        [ $(git status --porcelain=v1 | wc -l) -gt 0 ] && changes="*" || chages=""
-        export GIT_BRANCH_AND_STATUS="[$branch_name$changes] "
+        if ! git diff-files --no-ext-diff --quiet || ! git diff-index --no-ext-diff --quiet --cached HEAD; then
+            GIT_PS1="[$(tput setaf 7)git$(tput setaf 1):$(tput setaf 7)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)*$(tput setaf 1)] "
+        else
+            GIT_PS1="[$(tput setaf 7)git$(tput setaf 1):$(tput setaf 7)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)$(tput setaf 1)] "
+        fi
     else
-        export GIT_BRANCH_AND_STATUS=
+        GIT_PS1=
     fi
-    branch_name=
-    changes=
+}
+
+ssh_ps1() {
+    if [ -n "$SSH_CONNECTION" ]; then
+        SSH_PS1="[$(tput setaf 7)ssh$(tput setaf 1)] "
+    else
+        SSH_PS1=
+    fi
+}
+
+screen_ps1() {
+    case "$TERM" in
+        screen*) SCREEN_PS1="[$(tput setaf 7)screen$(tput setaf 1)] " ;;
+        *) SCREEN_PS1= ;;
+    esac
 }
 
 # After each command, append to the history file and reread it
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1_generate"
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1"
