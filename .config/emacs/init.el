@@ -847,13 +847,13 @@ _o_: step-over  _p_: previous breakable  ^ ^
             (set-window-parameter window 'no-delete-other-windows t)
             (set-window-parameter window 'window-side side)
             (set-window-parameter window 'no-other-window t))))
-    (defun aorst/ansi-term-focus (&optional arg)
+    (defun aorst/vterm-focus (&optional arg)
       "Focus `vterm' or open one if there's none."
       (interactive "P")
       (let ((window (get-buffer-window "*vterm*")))
         (if window
             (select-window window)
-          (aorst/ansi-term-toggle arg))))))
+          (aorst/vterm-toggle arg))))))
 
 (use-package editorconfig
   :commands editorconfig-mode
