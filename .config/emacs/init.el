@@ -568,8 +568,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     :ensure nil
     :hook (after-init . global-tab-line-mode)
     :config
-    (defun aorst/disable-tab-line ()
-      (setq tab-line-format nil))
     (defun tab-line-close-tab (&optional e)
       "Close the selected tab.
 If tab is presented in another window, close the tab by using `bury-buffer` function.
@@ -622,7 +620,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
     (dolist (mode '(ediff-mode
                     process-menu-mode
-                    term-mode))
+                    term-mode
+                    vterm-mode))
       (add-to-list 'tab-line-exclude-modes mode))))
 
 (use-package whitespace
@@ -739,6 +738,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 (use-package cc-mode
   :ensure nil
   :config (defun aorst/cc-mode-setup ()
+            (c-set-offset 'case-label '+)
             (setq c-basic-offset 4
                   c-default-style "linux"
                   indent-tabs-mode t
@@ -820,40 +820,46 @@ _o_: step-over  _p_: previous breakable  ^ ^
   :ensure nil
   :hook (emacs-lisp-mode . eldoc-mode))
 
+(setq use-package-hook-name-suffix "-functions")
 (use-package vterm
   :bind (("C-`" . aorst/vterm-toggle)
          ("C-t" . aorst/vterm-focus))
+  :hook (vterm-exit . aorst/kill-vterm)
   :config
   (defun aorst/vterm-toggle (&optional arg)
-      "Toggle `vterm' window on and off with the same command."
-      (interactive "P")
-      (let* ((bufname "*vterm*")
-             (window (get-buffer-window bufname)))
-        (if window
-            (ignore-errors (delete-window window))
-          (let* ((win-side (if (symbolp arg)
-                               (cons (split-window-below) 'bot)
-                             (cons (split-window-right) 'right)))
-                 (window (car win-side))
-                 (side (cdr win-side)))
-            (select-window window)
-            (cond ((get-buffer bufname)
-                   (switch-to-buffer bufname))
-                  (t (vterm bufname)))
-            (when (bound-and-true-p global-tab-line-mode)
-              (previous-buffer)
-              (bury-buffer))
-            (set-window-dedicated-p window t)
-            (set-window-parameter window 'no-delete-other-windows t)
-            (set-window-parameter window 'window-side side)
-            (set-window-parameter window 'no-other-window t))))
+    "Toggle `vterm' window on and off with the same command."
+    (interactive "P")
+    (let* ((bufname "*vterm*")
+           (window (get-buffer-window bufname)))
+      (if window
+          (ignore-errors (delete-window window))
+        (let* ((win-side (if (symbolp arg)
+                             (cons (split-window-below) 'bot)
+                           (cons (split-window-right) 'right)))
+               (window (car win-side))
+               (side (cdr win-side)))
+          (select-window window)
+          (cond ((get-buffer bufname)
+                 (switch-to-buffer bufname))
+                (t (vterm bufname)))
+          (when (bound-and-true-p global-tab-line-mode)
+            (previous-buffer)
+            (bury-buffer))
+          (set-window-dedicated-p window t)
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-parameter window 'window-side side)
+          (set-window-parameter window 'no-other-window t))))
     (defun aorst/vterm-focus (&optional arg)
       "Focus `vterm' or open one if there's none."
       (interactive "P")
       (let ((window (get-buffer-window "*vterm*")))
         (if window
             (select-window window)
-          (aorst/vterm-toggle arg))))))
+          (aorst/vterm-toggle arg))))
+    (defun aorst/kill-vterm (buf)
+      "Kill the `*vterm*' buffer after shell exits."
+      (when buf (kill-buffer buf)))))
+(setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
   :commands editorconfig-mode
