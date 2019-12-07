@@ -17,7 +17,7 @@ fi
 export PATH
 
 # classyTouch Prompt
-PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$GIT_PS1
+PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$TOOLBOX_PS1\$GIT_PS1
 \$(if [ \$? -eq 0 ]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
 
 # Avoid duplicates
@@ -52,5 +52,13 @@ screen_ps1() {
     esac
 }
 
+toolbox_ps1() {
+    if [ -e /run/.toolboxenv ]; then
+        TOOLBOX_PS1="[$(tput setaf 7)toolbox$(tput setaf 1)] "
+    else
+        TOOLBOX_PS1=
+    fi
+}
+
 # After each command, append to the history file and reread it
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1"
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1; toolbox_ps1"
