@@ -23,11 +23,16 @@ pm_packman() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) sudo pacman -Sy "$@"               ;;
+        (install) sudo pacman -Sy "$@" ;;
         (update)  sudo pacman -Syyu --noconfirm "$@" ;;
-        (remove)  sudo pacman -Rsc "$@"              ;;
-        (search)  pacman -Ss "$@"                    ;;
-        (*)       pacman "$cmd" "$@"                 ;;
+        (remove)  sudo pacman -Rsc "$@" ;;
+        (search)  pacman -Ss "$@" ;;
+        (list)    case $1 in
+                      (all) pacman -Qe ;;
+                      (*)   echo "wrong argument for 'list'" >&2
+                            return 1 ;;
+                  esac ;;
+        (*)       pacman "$cmd" "$@" ;;
     esac
 }
 
@@ -37,9 +42,15 @@ pm_dnf() {
     case "$cmd" in
         (install) sudo dnf install "$@" ;;
         (update)  sudo dnf upgrade "$@" ;;
-        (remove)  sudo dnf remove "$@"  ;;
-        (search)  dnf search "$@"       ;;
-        (*)       dnf "$cmd" "$@"       ;;
+        (remove)  sudo dnf remove "$@" ;;
+        (search)  dnf search "$@" ;;
+        (list)    case $1 in
+                      (all)       dnf list all ;;
+                      (installed) dnf list installed ;;
+                      (*)         echo "wrong argument for 'list'" >&2
+                                  return 1 ;;
+                  esac ;;
+        (*)       dnf "$cmd" "$@" ;;
     esac
 }
 
