@@ -859,8 +859,8 @@ _o_: step-over  _p_: previous breakable  ^ ^
           (aorst/ansi-term-toggle arg))))
     (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes)))
 
+(setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
-  (setq use-package-hook-name-suffix "-functions")
   (use-package vterm
     :bind (("C-`" . aorst/vterm-toggle)
            ("C-t" . aorst/vterm-focus))
@@ -898,8 +898,8 @@ _o_: step-over  _p_: previous breakable  ^ ^
             (aorst/vterm-toggle arg))))
       (defun aorst/kill-vterm (buf)
         "Kill the `*vterm*' buffer after shell exits."
-        (when buf (kill-buffer buf)))))
-  (setq use-package-hook-name-suffix "-hook"))
+        (when buf (kill-buffer buf))))))
+(setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
   :commands editorconfig-mode

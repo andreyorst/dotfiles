@@ -1478,8 +1478,8 @@ Emacs buffer. It works much better than =ansi-term=, though may be buggy
 and requires compilation.
 
 #+BEGIN_SRC emacs-lisp
+  (setq use-package-hook-name-suffix "-functions")
   (when (bound-and-true-p module-file-suffix)
-    (setq use-package-hook-name-suffix "-functions")
     (use-package vterm
       :bind (("C-`" . aorst/vterm-toggle)
              ("C-t" . aorst/vterm-focus))
@@ -1517,8 +1517,8 @@ and requires compilation.
               (aorst/vterm-toggle arg))))
         (defun aorst/kill-vterm (buf)
           "Kill the `*vterm*' buffer after shell exits."
-          (when buf (kill-buffer buf)))))
-    (setq use-package-hook-name-suffix "-hook"))
+          (when buf (kill-buffer buf))))))
+  (setq use-package-hook-name-suffix "-hook")
 #+END_SRC
 
 ** EditorConfig
