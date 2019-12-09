@@ -58,8 +58,12 @@ cnew() {
 
     if [ "$vcs" = "git" ]; then
         if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-            git init "$project_name" >/dev/null 2>&1
+            cd "$project_name"
+            git init >/dev/null 2>&1
+            git add . >/dev/null 2>&1
+            git commit --allow-empty-message -m '' >/dev/null 2>&1
             res=$?
+            cd ..
         fi
         if [ $res -ne 0 ]; then
             rm -rf "$project_name"
