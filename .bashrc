@@ -28,9 +28,9 @@ shopt -s histappend
 git_ps1() {
     if git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
         if ! git diff-files --no-ext-diff --quiet || ! git diff-index --no-ext-diff --quiet --cached HEAD; then
-            GIT_PS1="[$(tput setaf 7)git$(tput setaf 1):$(tput setaf 7)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)*$(tput setaf 1)] "
+            GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)*$(tput setaf 1)] "
         else
-            GIT_PS1="[$(tput setaf 7)git$(tput setaf 1):$(tput setaf 7)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)$(tput setaf 1)] "
+            GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)$(tput setaf 1)] "
         fi
     else
         GIT_PS1=
@@ -39,7 +39,7 @@ git_ps1() {
 
 ssh_ps1() {
     if [ -n "$SSH_CONNECTION" ]; then
-        SSH_PS1="[$(tput setaf 7)ssh$(tput setaf 1)] "
+        SSH_PS1="[$(tput sgr0)ssh$(tput setaf 1)] "
     else
         SSH_PS1=
     fi
@@ -47,14 +47,14 @@ ssh_ps1() {
 
 screen_ps1() {
     case "$TERM" in
-        screen*) SCREEN_PS1="[$(tput setaf 7)screen$(tput setaf 1)] " ;;
+        screen*) SCREEN_PS1="[$(tput sgr0)screen$(tput setaf 1)] " ;;
         *) SCREEN_PS1= ;;
     esac
 }
 
 toolbox_ps1() {
     if [ -e /run/.toolboxenv ]; then
-        TOOLBOX_PS1="[$(tput setaf 7)toolbox$(tput setaf 1)] "
+        TOOLBOX_PS1="[$(tput sgr0)toolbox$(tput setaf 1)] "
     else
         TOOLBOX_PS1=
     fi
