@@ -29,7 +29,7 @@ shopt -s histappend
 
 git_ps1() {
     if git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
-        if ! git diff-files --no-ext-diff --quiet || ! git diff-index --no-ext-diff --quiet --cached HEAD; then
+        if ! git diff-files --no-ext-diff --quiet 1>/dev/null 2>&1 || ! git diff-index --no-ext-diff --quiet --cached HEAD 1>/dev/null 2>&1; then
             GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)*$(tput setaf 1)] "
         else
             GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)$(git branch 2>/dev/null | grep '^*' | colrm 1 2)$(tput setaf 1)] "
