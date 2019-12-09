@@ -1,4 +1,10 @@
+$include /etc/inputrc
 "\e[A": history-search-backward
 "\e[B": history-search-forward
-set show-all-if-ambiguous on
 set completion-ignore-case on
+set mark-symlinked-directories on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set visible-stats on
+"\e[Z":menu-complete-backward
+Tab:menu-complete
