@@ -742,6 +742,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
             (setq c-basic-offset 4
                   c-default-style "linux"
                   indent-tabs-mode t
+                  comment-start "//"
+                  comment-end ""
                   tab-width 4))
   :hook ((c-mode-common . aorst/cc-mode-setup)
          (c-mode-common . electric-pair-local-mode)))
