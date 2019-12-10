@@ -905,7 +905,7 @@ _o_: step-over  _p_: previous breakable  ^ ^
           (if window
               (select-window window)
             (aorst/vterm-toggle arg))))
-      (defun aorst/kill-vterm (buf)
+      (defun aorst/kill-vterm (buf &optional event)
         "Kill the `*vterm*' buffer after shell exits."
         (when buf (kill-buffer buf))))))
 (setq use-package-hook-name-suffix "-hook")
