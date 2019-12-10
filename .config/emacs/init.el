@@ -1330,5 +1330,8 @@ next occurrence if `iedit-mode' is already active."
       (aorst/desktop-save)))
   (desktop-save-mode t))
 
+(use-package god-mode
+  :bind ("<escape>" . god-local-mode))
+
 (provide 'init)
 ;;; init.el ends here

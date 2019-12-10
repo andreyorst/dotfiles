@@ -2207,6 +2207,16 @@ Emacs. It adds some time to the startup though.
 I wonder if  it could store unsaved buffers so  all my changes persist
 through sessions.
 
+** God Mode
+This package provides modal interface to Emacs. It is nice, because it
+keeps all shortcuts as in default  Emacs, just emits usage of =Ctrl= and
+=Meta= keys. I use it on phone primarily.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package god-mode
+    :bind ("<escape>" . god-local-mode))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to
