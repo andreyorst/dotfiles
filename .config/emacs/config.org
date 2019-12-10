@@ -2221,7 +2221,8 @@ keeps all shortcuts as in default  Emacs, just emits usage of =Ctrl= and
 
 #+BEGIN_SRC emacs-lisp
   (use-package god-mode
-    :bind ("<escape>" . god-local-mode))
+    :bind ("C-c g" . god-local-mode)
+    :init (god-mode-all))
 #+END_SRC
 
 * Postscript
