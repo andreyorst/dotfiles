@@ -56,6 +56,7 @@
         counsel-describe-function
         counsel-find-file
         count-lines-page
+        god-local-mode
         hydra--digit-argument
         hydrant/-digit-argument
         hydrant/-negative-argument
@@ -90,6 +91,7 @@
         org-edit-src-save
         org-shifttab
         org-store-link
+        org-table-blank-field
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
