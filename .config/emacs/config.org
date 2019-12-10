@@ -2217,12 +2217,24 @@ through sessions.
 ** God Mode
 This package provides modal interface to Emacs. It is nice, because it
 keeps all shortcuts as in default  Emacs, just emits usage of =Ctrl= and
-=Meta= keys. I use it on phone primarily.
+=Meta=  keys. I  use it  on phone  primarily. =god-mode-isearch=  provides
+integration  for =isearch=  to  make  it easier  to  use =god-mode=  while
+searching:
 
 #+BEGIN_SRC emacs-lisp
   (use-package god-mode
-    :bind ("C-c g" . god-local-mode)
-    :init (god-mode-all))
+    :bind (("C-c g" . god-local-mode)
+           :map isearch-mode-map
+           ("C-c g" . god-mode-isearch-activate)
+           :map god-mode-isearch-map
+           ("C-c g" . god-mode-isearch-disable))
+    :config
+    (add-to-list 'god-exempt-major-modes 'term-mode)
+    (add-to-list 'god-exempt-major-modes 'vterm-mode)
+    (add-to-list 'god-exempt-major-modes 'treemacs-mode)
+    :init
+    (require 'god-mode-isearch)
+    (god-mode-all))
 #+END_SRC
 
 * Postscript

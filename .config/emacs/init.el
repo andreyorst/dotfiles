@@ -1338,8 +1338,18 @@ next occurrence if `iedit-mode' is already active."
   (desktop-save-mode t))
 
 (use-package god-mode
-  :bind ("C-c g" . god-local-mode)
-  :init (god-mode-all))
+  :bind (("C-c g" . god-local-mode)
+         :map isearch-mode-map
+         ("C-c g" . god-mode-isearch-activate)
+         :map god-mode-isearch-map
+         ("C-c g" . god-mode-isearch-disable))
+  :config
+  (add-to-list 'god-exempt-major-modes 'term-mode)
+  (add-to-list 'god-exempt-major-modes 'vterm-mode)
+  (add-to-list 'god-exempt-major-modes 'treemacs-mode)
+  :init
+  (require 'god-mode-isearch)
+  (god-mode-all))
 
 (provide 'init)
 ;;; init.el ends here
