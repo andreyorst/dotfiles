@@ -253,7 +253,14 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
                     doom-modeline-buffer-file
                     doom-modeline-lsp-success
                     doom-modeline-lsp-warning
-                    doom-modeline-lsp-error))
+                    doom-modeline-lsp-error
+                    doom-modeline-lsp-running
+                    doom-modeline-persp-name
+                    doom-modeline-battery-full
+                    doom-modeline-battery-error
+                    doom-modeline-battery-charging
+                    doom-modeline-battery-critical
+                    doom-modeline-battery-normal))
       (set-face-attribute face nil :foreground fg :weight 'normal))
     (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
     (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
