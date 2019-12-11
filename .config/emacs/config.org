@@ -2233,8 +2233,7 @@ searching:
     (add-to-list 'god-exempt-major-modes 'vterm-mode)
     (add-to-list 'god-exempt-major-modes 'treemacs-mode)
     :init
-    (require 'god-mode-isearch)
-    (god-mode-all))
+    (require 'god-mode-isearch))
 #+END_SRC
 
 * Postscript

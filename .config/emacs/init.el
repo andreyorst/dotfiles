@@ -1348,8 +1348,7 @@ next occurrence if `iedit-mode' is already active."
   (add-to-list 'god-exempt-major-modes 'vterm-mode)
   (add-to-list 'god-exempt-major-modes 'treemacs-mode)
   :init
-  (require 'god-mode-isearch)
-  (god-mode-all))
+  (require 'god-mode-isearch))
 
 (provide 'init)
 ;;; init.el ends here
