@@ -9,12 +9,10 @@ saved_workspaces
 *~
 **#*
 .config/emacs/*
-!.config/emacs/config.org
 !.config/emacs/init.el
 !.config/emacs/early-init.el
 !.config/emacs/snippets/
 !.config/emacs/.sceenshot.png
 !.config/emacs/.mc-lists.el
 !.config/emacs/.disabled.el
-!.config/emacs/elisp/
 .recentf
