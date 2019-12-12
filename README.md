@@ -14,12 +14,11 @@ sym-linked to corresponding system directory. All hidden files at the root of
 the repository should be copied of sym-linked to home directory.
 
 ```
-.                        ~> /home/$USER
+.dotfiles                ~> /home/$USER
 ├── .bashrc              ~> ├── .bashrc
 ├── .config/files,dirs   ~> ├── .config/files,dirs
 ├── .c_project_template     │
 ├── .editorconfig        ~> ├── .editorconfig
-├── .emacs.d/            ~> ├── .emacs.d/
 ├── .git/                   │
 ├── .gitconfig           ~> ├── .gitconfig
 ├── .gitignore              │
@@ -42,6 +41,6 @@ These directories and files should be excluded from copying or sym-linking:
   configuration files will be visible to git. Only files that inside this
   directory should be copied or sym-linked.
 
-[1]: https://github.com/andreyorst/dotfiles/tree/master/.config/kak
-[2]: https://github.com/andreyorst/dotfiles/tree/master/.emacs.d
+[1]: .config/kak
+[2]: .config/emacs
 [3]: https://github.com/andreyorst/dotfiles/tree/58b56c0b7b2ff255b6cebf3ef1300bb632444155/.config/nvim
