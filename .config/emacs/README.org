@@ -1,9 +1,9 @@
 #+title: Emacs configuration with Org Mode
 #+author: Andrey Orst
 #+email: andreyorst@gmail.com
-#+setupfile: ~/.dotfiles/.config/emacs/.org-defaults.org
+#+setupfile: ./.org-defaults.org
 #+startup: noinlineimages
-#+property: header-args :tangle "~/.dotfiles/.config/emacs/init.el"
+#+property: header-args :tangle "./init.el"
 
 [[file:.screenshot.png]]
 
@@ -53,7 +53,7 @@ minutes, but still, the faster it starts - the better for me.
 
 ** =early-init.el=
 :properties:
-:header-args: :tangle "~/.dotfiles/.config/emacs/early-init.el"
+:header-args: :tangle "./early-init.el"
 :end:
 
 These settings are going into  different init file: =earli-init.el=.  We
