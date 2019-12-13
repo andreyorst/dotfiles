@@ -43,25 +43,8 @@
 (global-set-key [mouse-3] menu-bar-edit-menu)
 (global-unset-key (kbd "S-<mouse-3>"))
 
-(defun aorst/scroll-right (&optional e)
-  (interactive "e")
-  (let* ((posnp (event-start e))
-         (window (posn-window posnp))
-         (old-window (get-buffer-window (current-buffer))))
-    (select-window window)
-    (scroll-right 3)
-    (select-window old-window)))
-(defun aorst/scroll-left (&optional e)
-  (interactive "e")
-  (let* ((posnp (event-start e))
-         (window (posn-window posnp))
-         (old-window (get-buffer-window (current-buffer))))
-    (select-window window)
-    (scroll-left 3)
-    (select-window old-window)))
-
-(global-set-key [mouse-7] 'aorst/scroll-left)
-(global-set-key [mouse-6] 'aorst/scroll-right)
+(setq mouse-wheel-flip-direction t
+      mouse-wheel-tilt-scroll t)
 
 (setq-default mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)

@@ -250,33 +250,11 @@ I don't want menus on shift clicks:
   (global-unset-key (kbd "S-<mouse-3>"))
 #+END_SRC
 
-These two  functions will allow  me to scroll horizontally  with mouse
-without clicking on the window:
+These two settings will allow me to scroll horizontally with mouse:
 
 #+BEGIN_SRC emacs-lisp
-  (defun aorst/scroll-right (&optional e)
-    (interactive "e")
-    (let* ((posnp (event-start e))
-           (window (posn-window posnp))
-           (old-window (get-buffer-window (current-buffer))))
-      (select-window window)
-      (scroll-right 3)
-      (select-window old-window)))
-  (defun aorst/scroll-left (&optional e)
-    (interactive "e")
-    (let* ((posnp (event-start e))
-           (window (posn-window posnp))
-           (old-window (get-buffer-window (current-buffer))))
-      (select-window window)
-      (scroll-left 3)
-      (select-window old-window)))
-#+END_SRC
-
-Let's bind those to respective keys:
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key [mouse-7] 'aorst/scroll-left)
-  (global-set-key [mouse-6] 'aorst/scroll-right)
+  (setq mouse-wheel-flip-direction t
+        mouse-wheel-tilt-scroll t)
 #+END_SRC
 
 I also  don't like how Emacs  handles scrolling, that it  speeds it up
