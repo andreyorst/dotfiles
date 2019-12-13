@@ -71,3 +71,11 @@ gif() {
         return 1
     fi
 }
+
+sep() {
+    for i in $(seq 1 $(tput cols)); do
+        sep="${sep}="
+    done
+    echo $sep
+    unset sep
+}
