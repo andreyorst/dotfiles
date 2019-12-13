@@ -34,11 +34,7 @@ plug "occivink/kakoune-find" config %{
 }
 
 plug "andreyorst/base16-gruvbox.kak" domain gitlab.com theme %{
-    if %[ -n "${PATH##*termux*}" ] %{
-        colorscheme base16-gruvbox-dark-soft
-    } else %{
-        colorscheme base16-gruvbox-dark-hard
-    }
+    colorscheme base16-gruvbox-dark-soft
 }
 
 plug "andreyorst/fzf.kak" domain gitlab.com config %{
@@ -55,7 +51,7 @@ plug "andreyorst/fzf.kak" domain gitlab.com config %{
                 exclude="$exclude --exclude '$1'"
                 shift
             done
-            cmd="fd . --no-ignore --type f --follow --hidden $exclude"
+            cmd="command fd . --no-ignore --type f --follow --hidden $exclude"
         else
             eval "set -- $kak_quoted_opt_fzf_exclude_files"
             while [ $# -gt 0 ]; do
@@ -63,12 +59,11 @@ plug "andreyorst/fzf.kak" domain gitlab.com config %{
                 shift
             done
             eval "set -- $kak_quoted_opt_fzf_exclude_dirs"
-            while [ $# -gt 1 ]; do
+            while [ $# -gt 0 ]; do
                 exclude="$exclude -path '*/$1' -o"
                 shift
             done
-            exclude="$exclude -path '*/$1'"
-            cmd="find . \( $exclude \) -prune -o -type f -follow -print"
+            cmd="command find . \( ${exclude% -o} \) -prune -o -type f -follow -print"
         fi
         echo "$cmd"
     }
@@ -155,11 +150,6 @@ plug "alexherbo2/replace.kak" config %{
     map global user r -docstring 'Replace mode' ':<space>replace<ret>'
 }
 
-plug "alexherbo2/move-line.kak" config %{
-    map global normal '<a-up>'   ': move-line-above %val{count}<ret>'
-    map global normal '<a-down>' ': move-line-below %val{count}<ret>'
-}
-
 if %[ -n "${PATH##*termux*}" ] %{
     plug "andreyorst/tagbar.kak" domain gitlab.com defer tagbar %{
         set-option global tagbar_sort false
@@ -183,10 +173,6 @@ if %[ -n "${PATH##*termux*}" ] %{
 plug "alexherbo2/word-movement.kak" config %{
     word-movement-map next w
     word-movement-map previous b
-}
-
-plug "alexherbo2/yank-ring.kak" config %{
-    map -docstring "yank-ring" global user 'Y' ': yank-ring<ret>'
 }
 
 plug "alexherbo2/split-object.kak" config %{
