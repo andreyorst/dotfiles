@@ -2243,6 +2243,18 @@ searching:
     (require 'god-mode-isearch))
 #+END_SRC
 
+** pcre2el
+This  package provides  functions to  convert Perl  Compatible Regular
+Expressions into Emacs regular expressions. It also provides =pcre-mode=
+that  makes existing  commands  that read  regular expressions  within
+minibuffer to understand subset of PCRE syntax.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package pcre2el
+    :config
+    (pcre-mode))
+#+END_SRC
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to

@@ -1353,5 +1353,9 @@ next occurrence if `iedit-mode' is already active."
   :init
   (require 'god-mode-isearch))
 
+(use-package pcre2el
+  :config
+  (pcre-mode))
+
 (provide 'init)
 ;;; init.el ends here
