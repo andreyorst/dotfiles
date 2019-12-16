@@ -14,7 +14,7 @@ source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "andreyorst/plug.kak" domain gitlab.com noload config %{
+plug "andreyorst/plug.kak" branch "dev" domain gitlab.com noload config %{
     set-option global plug_always_ensure true
     set-option global plug_profile true
     hook global WinSetOption filetype=plug %{
