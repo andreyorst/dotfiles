@@ -676,6 +676,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (use-package ox-latex
     :ensure nil)
+  (use-package org-tempo
+    :ensure nil)
   (setq org-startup-with-inline-images t
         org-startup-folded 'content
         org-hide-emphasis-markers t

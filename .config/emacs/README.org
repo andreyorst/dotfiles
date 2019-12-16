@@ -1203,6 +1203,8 @@ my Emacs configuration with it.
     :config
     (use-package ox-latex
       :ensure nil)
+    (use-package org-tempo
+      :ensure nil)
     (setq org-startup-with-inline-images t
           org-startup-folded 'content
           org-hide-emphasis-markers t
