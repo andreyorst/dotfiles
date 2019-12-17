@@ -59,10 +59,10 @@ hook global BufNewFile  .* editorconfig-load
 
 ## Git
 ## ‾‾‾
-hook global BufOpenFile .* %{
-    hook buffer -group fly-git NormalIdle .* %{ try %{ git show-diff } }
-    hook buffer -group fly-git InsertIdle .* %{ try %{ git show-diff } }
-}
+# hook global BufOpenFile .* %{
+#     hook buffer -group fly-git NormalIdle .* %{ try %{ git show-diff } }
+#     hook buffer -group fly-git InsertIdle .* %{ try %{ git show-diff } }
+# }
 
 # Aliases
 # ‾‾‾‾‾‾‾

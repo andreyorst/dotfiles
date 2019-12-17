@@ -10,7 +10,6 @@
 
 evaluate-commands %sh{
     config_files="
-        defperl.kak
         commands.kak
         common.kak
         mappings.kak

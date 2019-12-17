@@ -51,7 +51,7 @@ plug "andreyorst/fzf.kak" domain gitlab.com config %{
                 exclude="$exclude --exclude '$1'"
                 shift
             done
-            cmd="command fd . --no-ignore --type f --follow --hidden $exclude"
+            cmd="fd . --no-ignore --type f --follow --hidden $exclude"
         else
             eval "set -- $kak_quoted_opt_fzf_exclude_files"
             while [ $# -gt 0 ]; do
@@ -63,7 +63,7 @@ plug "andreyorst/fzf.kak" domain gitlab.com config %{
                 exclude="$exclude -path '*/$1' -o"
                 shift
             done
-            cmd="command find . \( ${exclude% -o} \) -prune -o -type f -follow -print"
+            cmd="find . \( ${exclude% -o} \) -prune -o -type f -follow -print"
         fi
         echo "$cmd"
     }
@@ -157,10 +157,6 @@ if %[ -n "${PATH##*termux*}" ] %{
         set-option global tagbar_display_anon false
         set-option global tagbar_powerline_format ""
     } config %{
-        map global user 't' ": tagbar-toggle<ret>" -docstring "toggle tagbar panel"
-        hook global WinSetOption filetype=(c|cpp|rust|gas) %{
-            tagbar-enable
-        }
         hook global WinSetOption filetype=tagbar %{
             remove-highlighter buffer/numbers
             remove-highlighter buffer/matching
