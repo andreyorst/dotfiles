@@ -202,13 +202,13 @@ plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
         set-option global kaktree_file_icon      '⠀⠀🖺'
     }
 } config %{
-    map global user 'f' ": kaktree-enable<ret>" -docstring "enable filetree panel"
     hook global WinSetOption filetype=kaktree %{
         remove-highlighter buffer/numbers
         remove-highlighter buffer/matching
         remove-highlighter buffer/wrap
         remove-highlighter buffer/show-whitespaces
     }
+    kaktree-enable
 }
 
 plug "occivink/kakoune-gdb"
