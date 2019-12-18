@@ -151,26 +151,14 @@ are defining or executing a macro."
            (keyboard-quit)))))
 (global-set-key [remap keyboard-quit] #'aorst/escape)
 
-(defun aorst/command-error-function (data context caller)
-  "Ignore the `text-read-only', `end-of-buffer', and `beginning-of-buffer' signals.
-Pass the rest DATA CONTEXT CALLER to the default handler."
-  (when (not (memq (car data) '(text-read-only
-                                end-of-buffer
-                                beginning-of-buffer)))
-    (command-error-default-function data context caller)))
-
-(setq command-error-function #'aorst/command-error-function)
-
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
-  (if (find-font (font-spec :name font-name))
-      t
-    nil))
+  (find-font (font-spec :name font-name)))
 
 (setq inhibit-splash-screen t)
 
 (tooltip-mode -1)
-(menu-bar-mode -1)
+; (menu-bar-mode -1)
 (fset 'menu-bar-open nil)
 
 (when window-system
@@ -193,9 +181,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
     (all-the-icons-install-fonts t)))
 
 (use-package doom-themes
-  :commands (doom-themes-org-config)
   :config
-  (doom-themes-org-config)
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
   :init (load-theme 'doom-one t))
@@ -293,7 +279,7 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (use-package frame
     :ensure nil
     :config
-    (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
+    ;; (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
     (setq window-divider-default-right-width 1)
     (window-divider-mode 1)
     (set-face-attribute 'window-divider nil :foreground (face-attribute 'mode-line-inactive :background))
@@ -302,8 +288,8 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
       (with-selected-frame (or frame (selected-frame))
         (call-process-shell-command
          (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-                 (frame-parameter frame 'name)))))
-    (aorst/set-frame-dark)))
+                 (frame-parameter frame 'name)))))))
+    ;; (aorst/set-frame-dark)))
 
 (setq-default frame-title-format '("%b — Emacs"))
 
@@ -561,10 +547,6 @@ Pass the rest DATA CONTEXT CALLER to the default handler."
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode nil))
 
-(use-package eyebrowse
-  :commands eyebrowse-mode
-  :init (eyebrowse-mode t))
-
 (use-package minions
   :commands minions-mode
   :init (minions-mode 1))
@@ -623,7 +605,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                 (face-attribute 'default :background)))
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
-          (box-width 6))
+          (box-width 8))
       (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
@@ -633,26 +615,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                     term-mode
                     vterm-mode))
       (add-to-list 'tab-line-exclude-modes mode))))
-
-(use-package whitespace
-  :ensure nil
-  :hook (whitespace-mode . aorst/whitespace-mode-set-faces)
-  :config
-  (defun aorst/whitespace-mode-set-faces ()
-    (let ((fg (face-attribute whitespace-space :foreground)))
-      (dolist (face '(whitespace-big-indent
-                      whitespace-empty
-                      whitespace-hspace
-                      whitespace-indentation
-                      whitespace-line
-                      whitespace-newline
-                      whitespace-space
-                      whitespace-space-after-tab
-                      whitespace-space-before-tab
-                      whitespace-tab
-                      whitespace-trailing))
-        (set-face-attribute face nil :background nil :foreground fg))))
-  (setq whitespace-display-mappings '((tab-mark 9 [187 9] [92 9]))))
 
 (use-package display-line-numbers
   :ensure nil
@@ -805,24 +767,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
   (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
   (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
-  (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground))
-  (defhydra hydrant/racket-debug (:hint nil :color pink)
-    "
-^Stepping^      ^Moving^                 ^Misc^
-^────────^──────^──────^─────────────────^────^─────────────
-_s_: step       _c_: continue            _?_: help
-_u_: setp-out   _n_: next breakable      _q_: quit debugging
-_o_: step-over  _p_: previous breakable  ^ ^
-^ ^             _h_: run til point"
-    ("s" racket-debug-step)
-    ("?" racket-debug-help)
-    ("q" racket-debug-disable :exit t)
-    ("c" racket-debug-continue)
-    ("u" racket-debug-step-out)
-    ("o" racket-debug-step-over)
-    ("n" racket-debug-next-breakable)
-    ("p" racket-debug-prev-breakable)
-    ("h" racket-debug-run-to-here)))
+  (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 
 (use-package cmake-mode)
 
@@ -833,6 +778,48 @@ _o_: step-over  _p_: previous breakable  ^ ^
 (use-package elisp-mode
   :ensure nil
   :hook (emacs-lisp-mode . eldoc-mode))
+
+(setq use-package-hook-name-suffix "-functions")
+(when (bound-and-true-p module-file-suffix)
+  (use-package vterm
+    :bind (("C-`" . aorst/vterm-toggle)
+           ("C-t" . aorst/vterm-focus))
+    :hook (vterm-exit . aorst/kill-vterm)
+    :config
+    (defun aorst/vterm-toggle (&optional arg)
+      "Toggle `vterm' window on and off with the same command."
+      (interactive "P")
+      (let* ((bufname "*vterm*")
+             (window (get-buffer-window bufname)))
+        (if window
+            (ignore-errors (delete-window window))
+          (let* ((win-side (if (symbolp arg)
+                               (cons (split-window-below) 'bot)
+                             (cons (split-window-right) 'right)))
+                 (window (car win-side))
+                 (side (cdr win-side)))
+            (select-window window)
+            (cond ((get-buffer bufname)
+                   (switch-to-buffer bufname))
+                  (t (vterm bufname)))
+            (when (bound-and-true-p global-tab-line-mode)
+              (previous-buffer)
+              (bury-buffer))
+            (set-window-dedicated-p window t)
+            (set-window-parameter window 'no-delete-other-windows t)
+            ;(set-window-parameter window 'window-side side)
+            (set-window-parameter window 'no-other-window t))))
+      (defun aorst/vterm-focus (&optional arg)
+        "Focus `vterm' or open one if there's none."
+        (interactive "P")
+        (let ((window (get-buffer-window "*vterm*")))
+          (if window
+              (select-window window)
+            (aorst/vterm-toggle arg))))
+      (defun aorst/kill-vterm (buf &optional event)
+        "Kill the `*vterm*' buffer after shell exits."
+        (when buf (kill-buffer buf))))))
+(setq use-package-hook-name-suffix "-hook")
 
 (when (not (bound-and-true-p module-file-suffix))
   (use-package term
@@ -872,48 +859,6 @@ _o_: step-over  _p_: previous breakable  ^ ^
             (select-window window)
           (aorst/ansi-term-toggle arg))))
     (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes)))
-
-(setq use-package-hook-name-suffix "-functions")
-(when (bound-and-true-p module-file-suffix)
-  (use-package vterm
-    :bind (("C-`" . aorst/vterm-toggle)
-           ("C-t" . aorst/vterm-focus))
-    :hook (vterm-exit . aorst/kill-vterm)
-    :config
-    (defun aorst/vterm-toggle (&optional arg)
-      "Toggle `vterm' window on and off with the same command."
-      (interactive "P")
-      (let* ((bufname "*vterm*")
-             (window (get-buffer-window bufname)))
-        (if window
-            (ignore-errors (delete-window window))
-          (let* ((win-side (if (symbolp arg)
-                               (cons (split-window-below) 'bot)
-                             (cons (split-window-right) 'right)))
-                 (window (car win-side))
-                 (side (cdr win-side)))
-            (select-window window)
-            (cond ((get-buffer bufname)
-                   (switch-to-buffer bufname))
-                  (t (vterm bufname)))
-            (when (bound-and-true-p global-tab-line-mode)
-              (previous-buffer)
-              (bury-buffer))
-            (set-window-dedicated-p window t)
-            (set-window-parameter window 'no-delete-other-windows t)
-            (set-window-parameter window 'window-side side)
-            (set-window-parameter window 'no-other-window t))))
-      (defun aorst/vterm-focus (&optional arg)
-        "Focus `vterm' or open one if there's none."
-        (interactive "P")
-        (let ((window (get-buffer-window "*vterm*")))
-          (if window
-              (select-window window)
-            (aorst/vterm-toggle arg))))
-      (defun aorst/kill-vterm (buf &optional event)
-        "Kill the `*vterm*' buffer after shell exits."
-        (when buf (kill-buffer buf))))))
-(setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
   :commands editorconfig-mode
@@ -1110,37 +1055,6 @@ _C_:   select next line"
     ("C" mc/mark-next-lines)
     ("q" mc/remove-duplicated-cursors :exit t)))
 
-(use-package expand-region
-  :commands (er/expand-region
-             er/mark-paragraph
-             er/mark-inside-pairs
-             er/mark-outside-pairs
-             er/mark-inside-quotes
-             er/mark-outside-quotes
-             er/contract-region)
-  :bind (("C-c e" . hydrant/er/body))
-  :config (defhydra hydrant/er (:hint nil)
-            "
-^Expand^            ^Mark^
-^──────^────────────^────^────────────
-_e_: expand region  _(_: inside pairs
-_-_: reduce region  _)_: around pairs
-^ ^                 _q_: inside quotes
-^ ^                 _Q_: around quotes
-^ ^                 _p_: paragraph"
-            ("e" er/expand-region :color pink)
-            ("-" er/contract-region :color pink)
-            ("p" er/mark-paragraph)
-            ("(" er/mark-inside-pairs)
-            (")" er/mark-outside-pairs)
-            ("q" er/mark-inside-quotes)
-            ("Q" er/mark-outside-quotes)))
-
-(use-package phi-search
-  :config
-  (set-face-attribute 'phi-search-selection-face nil :inherit 'isearch)
-  (set-face-attribute 'phi-search-match-face nil :inherit 'region))
-
 (when (or (executable-find "clangd")
           (executable-find "rls"))
   (use-package eglot
@@ -1148,7 +1062,6 @@ _-_: reduce region  _)_: around pairs
            ((c-mode c++-mode) . eglot-ensure))
     :bind (:map eglot-mode-map
                 ("C-c C-e" . aorst/eglot-menu))
-    :requires transient
     :init
     (defun aorst/configure-and-start-rls ()
       "Configure RLS via `eglot-workspace-configuration' variable and start eglot."
@@ -1158,27 +1071,8 @@ _-_: reduce region  _)_: around pairs
     :config
     (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=false")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-    (setq eglot-events-buffer-size 0)
-    (define-transient-command aorst/eglot-menu ()
-      "Hideshow commands."
-      [:description
-       "Find"
-       ("d" "declaration" eglot-find-declaration)
-       ("i" "implementation" eglot-find-implementation)
-       ("t" "type definition" eglot-find-typeDefinition)]
-      [:description
-       "Commands"
-       ("r" "rename" eglot-rename)
-       ("f" "format" eglot-format)
-       ("a" "code actions" eglot-code-actions)
-       ("h" "help" eglot-help-at-point)]
-      [:description
-       "Management"
-       ("R" "reconnect" eglot-reconnect)
-       ("S" "shutdown" eglot-shutdown)]
-      (interactive)
-      (when (bound-and-true-p eglot--managed-mode)
-        (transient-setup 'aorst/eglot-menu nil nil)))))
+    (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
+    (setq eglot-events-buffer-size 0)))
 
 (use-package project
   :ensure nil
@@ -1210,14 +1104,6 @@ _-_: reduce region  _)_: around pairs
               ("C-c C-f" . clang-format-buffer)
               ("C-c C-S-f" . clang-format-region)))
 
-(use-package gcmh
-  :commands gcmh-mode
-  :init (gcmh-mode 1))
-
-(use-package vlf-setup
-  :ensure vlf
-  :config (setq vlf-application 'dont-ask))
-
 (use-package imenu-list
   :defines imenu-list-idle-update-delay-time
   :bind (("<f9>" . imenu-list-smart-toggle)
@@ -1236,53 +1122,11 @@ _-_: reduce region  _)_: around pairs
         imenu-list-size 27
         imenu-list-focus-after-activation t))
 
-(use-package dumb-jump
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go))
-  :config
-  (setq dumb-jump-selector 'ivy)
-  (when (executable-find "rg")
-    (setq dumb-jump-force-searcher 'rg)))
-
 (use-package server
   :ensure nil
   :config
   (unless (server-running-p)
     (server-start)))
-
-(use-package eldoc-box
-  ;:hook (eldoc-mode . aorst/eldoc-box-enable)
-  :config
-  (setq eldoc-box-max-pixel-width 1920
-        eldoc-box-max-pixel-height 1080)
-  (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
-  :init
-  (defun aorst/eldoc-box-enable ()
-    "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
-    (interactive)
-    (when (aorst/real-buffer-p)
-      (eldoc-box-hover-at-point-mode))))
-
-(when window-system
-  (use-package which-key
-    :config
-    (which-key-mode t)))
-
-(use-package iedit
-  :bind ("C-c n" . aorst/iedit-current-or-expand)
-  :config
-  (setq iedit-toggle-key-default "")
-  (defun aorst/iedit-current-or-expand (&optional arg)
-    "Select only current occurrence with `iedit-mode'.  Expand to
-next occurrence if `iedit-mode' is already active."
-    (interactive "P")
-    (if (bound-and-true-p iedit-mode)
-        (if (symbolp arg)
-            (iedit-expand-down-to-occurrence)
-          (iedit-expand-up-to-occurrence))
-      (iedit-mode 1))))
-
-(use-package wgrep)
 
 (use-package hideshow
   :ensure nil
@@ -1341,23 +1185,6 @@ next occurrence if `iedit-mode' is already active."
     (when (eq (desktop-owner) (emacs-pid))
       (aorst/desktop-save)))
   (desktop-save-mode t))
-
-(use-package god-mode
-  :bind (("C-c g" . god-local-mode)
-         :map isearch-mode-map
-         ("C-c g" . god-mode-isearch-activate)
-         :map god-mode-isearch-map
-         ("C-c g" . god-mode-isearch-disable))
-  :config
-  (add-to-list 'god-exempt-major-modes 'term-mode)
-  (add-to-list 'god-exempt-major-modes 'vterm-mode)
-  (add-to-list 'god-exempt-major-modes 'treemacs-mode)
-  :init
-  (require 'god-mode-isearch))
-
-(use-package pcre2el
-  :config
-  (pcre-mode))
 
 (provide 'init)
 ;;; init.el ends here
