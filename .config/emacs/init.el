@@ -1038,12 +1038,12 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (use-package mc-extras)
   (defhydra hydrant/mc (:hint nil :color pink)
     "
-^Select^                 ^Discard^                     ^Move^
-^──────^─────────────────^───────^─────────────────────^────^─────────────
-_M-s_: split lines       _M-SPC_: discard current      _&_: align
-_s_:   select regexp     _b_:     discard blank lines  _(_: cycle backward
-_n_:   select next       _d_:     remove duplicated    _)_: cycle forward
-_p_:   select previous   _q_:     exit                 ^ ^
+^Select^                 ^Discard^                     ^Edit^               ^Navigate^
+^──────^─────────────────^───────^─────────────────────^────^───────────────^────────^──────────
+_M-s_: split lines       _M-SPC_: discard current      _&_: align           _(_: cycle backward
+_s_:   select regexp     _b_:     discard blank lines  _#_: insert numbers  _)_: cycle forward
+_n_:   select next       _d_:     remove duplicated    ^ ^                  ^ ^
+_p_:   select previous   _q_:     exit                 ^ ^                  ^ ^
 _C_:   select next line"
     ("M-s" mc/edit-ends-of-lines)
     ("s" mc/mark-all-in-region-regexp)
@@ -1056,6 +1056,7 @@ _C_:   select next line"
     ("b" mc/remove-cursors-on-blank-lines)
     ("d" mc/remove-duplicated-cursors)
     ("C" mc/mark-next-lines)
+    ("#" mc/insert-numbers)
     ("q" mc/remove-duplicated-cursors :exit t)))
 
 (when (or (executable-find "clangd")
