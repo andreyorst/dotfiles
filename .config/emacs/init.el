@@ -807,7 +807,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
               (bury-buffer))
             (set-window-dedicated-p window t)
             (set-window-parameter window 'no-delete-other-windows t)
-            ;(set-window-parameter window 'window-side side)
+            (set-window-parameter window 'window-side side)
             (set-window-parameter window 'no-other-window t))))
       (defun aorst/vterm-focus (&optional arg)
         "Focus `vterm' or open one if there's none."
@@ -993,7 +993,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           c-mode-common
           racket-mode). yas-minor-mode)
   :config
-  (use-package yasnippet-snippets)
   (add-to-list 'yas-key-syntaxes 'yas-longest-key-from-whitespace)
   (yas-reload-all))
 
