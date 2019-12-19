@@ -1030,7 +1030,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydrant/mc/body))
+         ("C-c m" . hydrant/mc/body)
+         :map mc/keymap
+         ("<return>" . nil))
+  :requires hydra
   :config
   (use-package mc-extras)
   (defhydra hydrant/mc (:hint nil :color pink)
