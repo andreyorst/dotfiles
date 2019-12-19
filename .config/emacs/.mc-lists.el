@@ -36,6 +36,7 @@
         org-end-of-line
         org-fill-paragraph
         org-kill-line
+        org-return
         org-self-insert-command
         org-toggle-comment
         org-yank
@@ -65,6 +66,7 @@
         hydrant/mc/mc/cycle-backward
         hydrant/mc/mc/cycle-forward
         hydrant/mc/mc/edit-ends-of-lines
+        hydrant/mc/mc/insert-numbers
         hydrant/mc/mc/mark-all-in-region-regexp
         hydrant/mc/mc/mark-next-like-this-word
         hydrant/mc/mc/mark-next-like-this-word-and-exit
