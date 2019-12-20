@@ -65,6 +65,10 @@ map -docstring "previous buffer"                global goto 'B'     '<esc>: buff
 map -docstring "search tag in current file"     global goto '['     '<esc><c-s>: smart-select w; symbol<ret>'
 map -docstring "search tag in global tags file" global goto ']'     '<esc><c-s>: smart-select w; ctags-search<ret>'
 
+# Custom text objects
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+map global object w 'c\s,\s<ret>' -docstring "select between whitespace"
+
 # Arrows
 # ‾‾‾‾‾‾
 map global normal '<left>'    ': nop<ret>'
