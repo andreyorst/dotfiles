@@ -54,6 +54,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        clang-format-buffer
         counsel-describe-function
         counsel-find-file
         count-lines-page
