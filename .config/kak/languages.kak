@@ -86,9 +86,9 @@ hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
 # ‾‾‾‾‾‾‾‾
 hook global WinSetOption filetype=gas %{
     set-option window comment_line '#'
-    # a c-like line comment highlighter for compatibility reasons
 }
 
 hook global ModuleLoaded gas %{ try %{
+    # a c-like line comment highlighter for compatibility reasons
     add-highlighter shared/gas/c_line_comment region // (?<!\\\\)(?=\n) fill comment
 }}
