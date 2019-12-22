@@ -187,11 +187,6 @@ plug "andreyorst/langmap.kak" domain gitlab.com defer langmap %{
     map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
 }
 
-plug "delapouite/kakoune-select-view" %{
-    map global normal <a-%> ': select-view<ret>' -docstring 'select view'
-    map global view s '<esc>: select-view<ret>' -docstring 'select view'
-}
-
 plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
     map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
     set-option global kaktree_show_help false
@@ -211,54 +206,3 @@ plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
     }
     kaktree-enable
 }
-
-plug "occivink/kakoune-gdb"
-
-plug "KJ_Duncan/kakoune-racket.kak" domain bitbucket.org config %{
-    hook global WinSetOption filetype=racket %{ require-module lisp }
-}
-
-if %[ -n "${PATH##*termux*}" ] %<
-    plug "eraserhd/parinfer-rust" do %{
-        cargo install --force --path . --locked
-        cargo clean
-    } config %<
-        hook global WinSetOption filetype=(clojure|lisp|scheme|racket) %<
-            declare-user-mode parinfer
-            map global user 'P' ': enter-user-mode parinfer<ret>' -docstring "Change Parinfer mode"
-            map global parinfer 'p' ': parinfer-enable-window -paren<ret>' -docstring "Paren mode"
-            map global parinfer 'i' ': parinfer-enable-window -indent<ret>' -docstring "Indent mode"
-            map global parinfer 's' ': parinfer-enable-window -smart<ret>' -docstring "Smart mode"
-            map global parinfer 'q' ': parinfer-disable-window<ret>' -docstring "Disable Parinfer"
-
-            define-command -docstring "Toggle Parinfer between paren and indent modes." \
-            parinfer-toggle %{ evaluate-commands %sh{
-                if [ "$kak_opt_parinfer_current_mode" = "paren" ]; then
-                    printf "%s\n" "parinfer-enable-window -indent"
-                else
-                    printf "%s\n" "parinfer-enable-window -paren"
-                fi
-            }}
-            map global insert '' '<esc>: parinfer-toggle<ret>' -docstring "Toggle Parinfer between paren and indent modes (<c-]>)"
-            map global normal '' '<esc>: parinfer-toggle<ret>' -docstring "Toggle Parinfer between paren and indent modes (<c-]>)"
-
-            parinfer-enable-window
-
-            try %{ set-option buffer auto_pairs '"' '"' "'" "'" ` ` }
-
-            # prefer Default color on all parens
-            add-highlighter window/parinfer-parens regex [\[\](){}] 0:Default
-
-            # highlight parens that are inferred by Parinfer
-            hook window WinSetOption parinfer_current_mode=.+ %< evaluate-commands %sh<
-                if [ ! "$kak_opt_parinfer_current_mode" = "paren" ]; then
-                    printf "%s\n" "remove-highlighter window/parinfer-inferred
-                                   add-highlighter window/parinfer-inferred regex [\])}]+\h*$ 0:comment"
-                else
-                    printf "%s\n" "remove-highlighter window/parinfer-inferred
-                                   add-highlighter window/parinfer-inferred regex [\])}]+\h*$ 0:Default"
-                fi
-            >>
-        >
-    >
->
