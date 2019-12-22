@@ -194,6 +194,7 @@ plug "delapouite/kakoune-select-view" %{
 
 plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
     map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
+    set-option global kaktree_show_help false
     if %[ -n "${PATH##*termux*}" ] %{
         set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 1
