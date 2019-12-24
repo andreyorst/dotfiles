@@ -579,7 +579,7 @@ are defining or executing a macro."
         (face-remap-add-relative face
                                  :box (list :line-width 7 :color bg)
                                  :background bg :foreground fg :height 1.0))))
-  (setq treemacs-width 27
+  (setq treemacs-width 34
         treemacs-is-never-other-window t
         treemacs-space-between-root-nodes nil
         treemacs-indentation 2)
