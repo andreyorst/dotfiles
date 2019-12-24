@@ -250,57 +250,6 @@ I don't want menus on shift clicks:
   (global-unset-key (kbd "S-<mouse-3>"))
 #+end_src
 
-These two functions will allow me to scroll horizontally with mouse:
-
-#+BEGIN_SRC emacs-lisp
-  (defun aorst/lines-exceed-window-width-p (&optional beg end width)
-    "Search for lines in region BEG END which exceed the WIDTH.
-
-  BEG, END default to `point-min' and `point-max' and WIDTH to
-  `window-width'.
-
-  Retruns nil or the line number of the first line which execeeds
-  WIDTH."
-    (let ((beg (or beg (point-min)))
-          (end (or end (point-max)))
-          (w (or width (window-width))))
-      (save-excursion
-        (save-restriction
-          (narrow-to-region beg end)
-          (goto-char beg)
-          (cl-loop until (eobp)
-                   do (progn
-                        (goto-char (line-end-position))
-                        (if (> (current-column) w)
-                            (cl-return (line-number-at-pos))
-                          (forward-line 1))))))))
-  (defun aorst/scroll-right (&optional e)
-    (interactive "e")
-    (let* ((posnp (event-start e))
-           (window (posn-window posnp))
-           (old-window (get-buffer-window (current-buffer))))
-      (select-window window)
-      (when (aorst/lines-exceed-window-width-p)
-        (scroll-right 3))
-      (select-window old-window)))
-  (defun aorst/scroll-left (&optional e)
-    (interactive "e")
-    (let* ((posnp (event-start e))
-           (window (posn-window posnp))
-           (old-window (get-buffer-window (current-buffer))))
-      (select-window window)
-      (when (aorst/lines-exceed-window-width-p)
-        (scroll-left 3))
-      (select-window old-window)))
-#+END_SRC
-
-Let's bind those to respective keys:
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key [mouse-7] 'aorst/scroll-left)
-  (global-set-key [mouse-6] 'aorst/scroll-right)
-#+END_SRC
-
 I also  don't like how Emacs  handles scrolling, that it  speeds it up
 and automatically scrolls horizontally.
 
