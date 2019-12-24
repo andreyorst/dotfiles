@@ -43,8 +43,48 @@
 (global-set-key [mouse-3] menu-bar-edit-menu)
 (global-unset-key (kbd "S-<mouse-3>"))
 
-(setq mouse-wheel-flip-direction t
-      mouse-wheel-tilt-scroll t)
+(defun aorst/lines-exceed-window-width-p (&optional beg end width)
+  "Search for lines in region BEG END which exceed the WIDTH.
+
+BEG, END default to `point-min' and `point-max' and WIDTH to
+`window-width'.
+
+Retruns nil or the line number of the first line which execeeds
+WIDTH."
+  (let ((beg (or beg (point-min)))
+        (end (or end (point-max)))
+        (w (or width (window-width))))
+    (save-excursion
+      (save-restriction
+        (narrow-to-region beg end)
+        (goto-char beg)
+        (cl-loop until (eobp)
+                 do (progn
+                      (goto-char (line-end-position))
+                      (if (> (current-column) w)
+                          (cl-return (line-number-at-pos))
+                        (forward-line 1))))))))
+(defun aorst/scroll-right (&optional e)
+  (interactive "e")
+  (let* ((posnp (event-start e))
+         (window (posn-window posnp))
+         (old-window (get-buffer-window (current-buffer))))
+    (select-window window)
+    (when (aorst/lines-exceed-window-width-p)
+      (scroll-right 3))
+    (select-window old-window)))
+(defun aorst/scroll-left (&optional e)
+  (interactive "e")
+  (let* ((posnp (event-start e))
+         (window (posn-window posnp))
+         (old-window (get-buffer-window (current-buffer))))
+    (select-window window)
+    (when (aorst/lines-exceed-window-width-p)
+      (scroll-left 3))
+    (select-window old-window)))
+
+(global-set-key [mouse-7] 'aorst/scroll-left)
+(global-set-key [mouse-6] 'aorst/scroll-right)
 
 (setq-default mouse-wheel-progressive-speed nil
               auto-window-vscroll nil)
