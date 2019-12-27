@@ -31,7 +31,7 @@ alias g="git"
 alias zshconf="$EDITOR ~/.zshrc"
 alias tmuxconf="$EDITOR ~/.tmux.conf"
 alias kakconf="kak ~/.config/kak/kakrc"
-alias emacsconf="emacs ~/.emacs.d/config.org"
+alias emacsconf="emacs ~/.emacs.d/README.org"
 
 alias less="less --tabs 4"
 
