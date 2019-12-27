@@ -1838,36 +1838,6 @@ A package to format C code with Clang Format.
                 ("C-c C-S-f" . clang-format-region)))
 #+end_src
 
-** Imenu List
-Package  somewhat  similar  to  [[https://github.com/vim-scripts/taglist.vim][Taglist]] plugin  in  Vim  or  Kakoune's
-[[https://github.com/andreyorst/tagbar.kak][tagbar.kak]].  Uses  =imenu= to  get information,  and since  many plugins
-provide =imenu=  data it's  quite useful. I'm  using =advice-add=  here to
-disable  modeline  in  =*imenu-list*=   buffer,  also  locking  it  size
-preventing it from  changing when I close or resize  other windows. If
-we call  =aorst/imenu-list-setup= with =:after= advice,  the modeline will
-disappear in  another window. With =:after-while=  lambda evaluated only
-when =imenu-list= was toggled to be shown.
-
-#+begin_src emacs-lisp
-  (use-package imenu-list
-    :defines imenu-list-idle-update-delay-time
-    :bind (("<f9>" . imenu-list-smart-toggle)
-           ("<f10>". imenu-list-show))
-    :config
-    (defun aorst/imenu-list-setup ()
-      "Setings for imenu-list"
-      (setq window-size-fixed 'width
-            mode-line-format nil)
-      (when (and (not (version<= emacs-version "27"))
-                 (boundp 'tab-line-format))
-        (setq tab-line-format nil))
-      (set-window-parameter (get-buffer-window (current-buffer)) 'no-other-window t))
-    (advice-add 'imenu-list-smart-toggle :after-while #'aorst/imenu-list-setup)
-    (setq imenu-list-idle-update-delay-time 0.1
-          imenu-list-size 27
-          imenu-list-focus-after-activation t))
-#+end_src
-
 ** Server
 I'm using  =server-start= command not because  I do not want  to load my
 Emacs every time, but because I  want to have single instance of Emacs

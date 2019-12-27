@@ -1104,24 +1104,6 @@ _C_:   select next line"
               ("C-c C-f" . clang-format-buffer)
               ("C-c C-S-f" . clang-format-region)))
 
-(use-package imenu-list
-  :defines imenu-list-idle-update-delay-time
-  :bind (("<f9>" . imenu-list-smart-toggle)
-         ("<f10>". imenu-list-show))
-  :config
-  (defun aorst/imenu-list-setup ()
-    "Setings for imenu-list"
-    (setq window-size-fixed 'width
-          mode-line-format nil)
-    (when (and (not (version<= emacs-version "27"))
-               (boundp 'tab-line-format))
-      (setq tab-line-format nil))
-    (set-window-parameter (get-buffer-window (current-buffer)) 'no-other-window t))
-  (advice-add 'imenu-list-smart-toggle :after-while #'aorst/imenu-list-setup)
-  (setq imenu-list-idle-update-delay-time 0.1
-        imenu-list-size 27
-        imenu-list-focus-after-activation t))
-
 (use-package server
   :ensure nil
   :config
