@@ -99,6 +99,7 @@
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
+        tab-line-select-tab
         term-line-mode
         term-send-raw
         toggle-input-method
