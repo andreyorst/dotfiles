@@ -99,6 +99,7 @@
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
+        rust-format-buffer
         tab-line-select-tab
         term-line-mode
         term-send-raw
