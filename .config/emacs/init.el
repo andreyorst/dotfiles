@@ -1132,42 +1132,43 @@ _C_:   select next line"
     (when (bound-and-true-p hs-minor-mode)
       (transient-setup 'aorst/hideshow-menu nil nil))))
 
-(use-package desktop
-  :ensure nil
-  :hook ((after-init . aorst/desktop-restore)
-         (desktop-after-read . aorst/desktop-remove))
-  :init
-  (setq desktop-path '("~/.dotfiles/.config/emacs/")
-        desktop-dirname "~/.dotfiles/.config/emacs/"
-        desktop-base-file-name "emacs-desktop"
-        desktop-save t
-        desktop-load-locked-desktop t)
-  (defun aorst/desktop-remove ()
-    "Remove current desktop, but save `desktop-dirname'."
-    (let ((desktop desktop-dirname))
-      (desktop-remove)
-      (setq desktop-dirname desktop)))
-  (defun aorst/saved-desktop-p ()
-    "Check if desktop exists."
-    (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
-  (defun aorst/desktop-restore ()
-    "Restore a saved emacs session."
-    (interactive)
-    (if (aorst/saved-desktop-p)
-        (desktop-read)
-      (message "No desktop found.")))
-  (defun aorst/desktop-save ()
-    "Save an emacs session."
-    (interactive)
-    (when (aorst/saved-desktop-p)
+(when window-system
+  (use-package desktop
+    :ensure nil
+    :hook ((after-init . aorst/desktop-restore)
+           (desktop-after-read . aorst/desktop-remove))
+    :init
+    (setq desktop-path '("~/.dotfiles/.config/emacs/")
+          desktop-dirname "~/.dotfiles/.config/emacs/"
+          desktop-base-file-name "emacs-desktop"
+          desktop-save t
+          desktop-load-locked-desktop t)
+    (defun aorst/desktop-remove ()
+      "Remove current desktop, but save `desktop-dirname'."
+      (let ((desktop desktop-dirname))
+        (desktop-remove)
+        (setq desktop-dirname desktop)))
+    (defun aorst/saved-desktop-p ()
+      "Check if desktop exists."
+      (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+    (defun aorst/desktop-restore ()
+      "Restore a saved emacs session."
+      (interactive)
+      (if (aorst/saved-desktop-p)
+          (desktop-read)
+        (message "No desktop found.")))
+    (defun aorst/desktop-save ()
+      "Save an emacs session."
+      (interactive)
+      (when (aorst/saved-desktop-p)
+        (desktop-save-in-desktop-dir))
+      (message "Session not saved.")
       (desktop-save-in-desktop-dir))
-    (message "Session not saved.")
-    (desktop-save-in-desktop-dir))
-  (defun aorst/desktop-auto-save ()
-    "Automatically save desktop."
-    (when (eq (desktop-owner) (emacs-pid))
-      (aorst/desktop-save)))
-  (desktop-save-mode t))
+    (defun aorst/desktop-auto-save ()
+      "Automatically save desktop."
+      (when (eq (desktop-owner) (emacs-pid))
+        (aorst/desktop-save)))
+    (desktop-save-mode t)))
 
 (provide 'init)
 ;;; init.el ends here

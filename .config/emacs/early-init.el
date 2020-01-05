@@ -25,7 +25,6 @@
 
 (setq default-frame-alist '((width . 190)
                             (height . 68)
-                            ;(menu-bar-lines . 0)
                             (tool-bar-lines . 0)
                             (vertical-scroll-bars)))
 
