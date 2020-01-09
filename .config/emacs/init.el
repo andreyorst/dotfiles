@@ -1034,7 +1034,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          ("<return>" . nil))
   :requires hydra
   :config
-  (use-package mc-extras)
   (defhydra hydrant/mc (:hint nil :color pink)
     "
 ^Select^                 ^Discard^                     ^Edit^               ^Navigate^
@@ -1057,6 +1056,7 @@ _C_:   select next line"
     ("C" mc/mark-next-lines)
     ("#" mc/insert-numbers)
     ("q" mc/remove-duplicated-cursors :exit t)))
+(use-package mc-extras)
 
 (when (or (executable-find "clangd")
           (executable-find "rls"))
