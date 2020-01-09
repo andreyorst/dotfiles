@@ -808,17 +808,17 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
             (set-window-dedicated-p window t)
             (set-window-parameter window 'no-delete-other-windows t)
             (set-window-parameter window 'window-side side)
-            (set-window-parameter window 'no-other-window t))))
-      (defun aorst/vterm-focus (&optional arg)
-        "Focus `vterm' or open one if there's none."
-        (interactive "P")
-        (let ((window (get-buffer-window "*vterm*")))
-          (if window
-              (select-window window)
-            (aorst/vterm-toggle arg))))
-      (defun aorst/kill-vterm (buf &optional event)
-        "Kill the `*vterm*' buffer after shell exits."
-        (when buf (kill-buffer buf))))))
+            (set-window-parameter window 'no-other-window t)))))
+    (defun aorst/vterm-focus (&optional arg)
+      "Focus `vterm' or open one if there's none."
+      (interactive "P")
+      (let ((window (get-buffer-window "*vterm*")))
+        (if window
+            (select-window window)
+          (aorst/vterm-toggle arg))))
+    (defun aorst/kill-vterm (buf &optional event)
+      "Kill the `*vterm*' buffer after shell exits."
+      (when buf (kill-buffer buf)))))
 (setq use-package-hook-name-suffix "-hook")
 
 (when (not (bound-and-true-p module-file-suffix))
