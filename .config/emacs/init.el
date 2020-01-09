@@ -777,7 +777,15 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package elisp-mode
   :ensure nil
-  :hook (emacs-lisp-mode . eldoc-mode))
+  :hook (emacs-lisp-mode . eldoc-mode)
+  :bind (:map emacs-lisp-mode-map
+              ("C-c C-f" . aorst/elisp-format-buffer))
+  :config (defun aorst/elisp-format-buffer ()
+            (interactive)
+            (save-excursion
+              (save-restriction
+                (mark-whole-buffer)
+                (indent-region (region-beginning) (region-end))))))
 
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)

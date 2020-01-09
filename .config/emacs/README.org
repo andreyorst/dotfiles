@@ -1355,7 +1355,15 @@ want to enable some helper modes here.
 #+begin_src emacs-lisp
   (use-package elisp-mode
     :ensure nil
-    :hook (emacs-lisp-mode . eldoc-mode))
+    :hook (emacs-lisp-mode . eldoc-mode)
+    :bind (:map emacs-lisp-mode-map
+                ("C-c C-f" . aorst/elisp-format-buffer))
+    :config (defun aorst/elisp-format-buffer ()
+              (interactive)
+              (save-excursion
+                (save-restriction
+                  (mark-whole-buffer)
+                  (indent-region (region-beginning) (region-end))))))
 #+end_src
 
 * Tools
