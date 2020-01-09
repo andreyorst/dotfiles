@@ -635,6 +635,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (use-package ox-latex
     :ensure nil)
+  (use-package ox-hugo
+    :after ox)
   (when (not (version<= org-version "9.1.9"))
     (use-package org-tempo
       :ensure nil))
