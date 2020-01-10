@@ -961,6 +961,24 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
      1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
   (ivy-mode 1))
 
+(use-package ivy-posframe
+  :after ivy
+  :config
+  (defun aorst/posframe-position (str)
+    (ivy-posframe--display str #'aorst/posframe-unser-tabs-center))
+  (defun aorst/posframe-unser-tabs-center (info)
+    "vaiv."
+    (cons (/ (- (plist-get info :parent-frame-width)
+                (plist-get info :posframe-width))
+             2)
+          (window-tab-line-height)))
+  (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
+        ivy-posframe-height-alist '((t . 15))
+        ivy-posframe-parameters '((internal-border-width . 3))
+        ivy-posframe-width 100)
+  (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
+  (ivy-posframe-mode +1))
+
 (use-package company
   :commands global-company-mode
   :bind (:map company-active-map
@@ -1080,7 +1098,7 @@ _C_:   select next line"
       (setq eglot-workspace-configuration '((:rust . (:clippy_preference "on"))))
       (eglot-ensure))
     :config
-    (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=false")))
+    (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=true")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
     (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
     (setq eglot-events-buffer-size 0)))
