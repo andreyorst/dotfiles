@@ -4,6 +4,7 @@
 (setq mc/cmds-to-run-for-all
       '(
         aorst/kill-region-or-word
+        aorst/newline-below
         backward-sexp
         beginning-of-buffer
         c-electric-brace
@@ -90,6 +91,7 @@
         magit-refresh-all
         magit-stage
         minions-minor-modes-menu
+        mouse-drag-mode-line
         mouse-drag-secondary
         mouse-set-region
         org-edit-src-save
