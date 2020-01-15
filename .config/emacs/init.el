@@ -1019,7 +1019,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           c-mode-common
           racket-mode). yas-minor-mode)
   :config
-  (add-to-list 'yas-key-syntaxes 'yas-longest-key-from-whitespace)
+  (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace)
   (yas-reload-all))
 
 (use-package magit
@@ -1091,13 +1091,12 @@ _C_:   select next line"
            ((c-mode c++-mode) . eglot-ensure))
     :bind (:map eglot-mode-map
                 ("C-c C-e" . aorst/eglot-menu))
-    :init
+    :config
     (defun aorst/configure-and-start-rls ()
       "Configure RLS via `eglot-workspace-configuration' variable and start eglot."
       (interactive)
       (setq eglot-workspace-configuration '((:rust . (:clippy_preference "on"))))
       (eglot-ensure))
-    :config
     (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=true")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
     (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
@@ -1111,7 +1110,7 @@ _C_:   select next line"
   (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
     "Files or directories that indicate the root of a project.")
   (defun aorst/project-find-root (path)
-    "Tail-recursive search in PATH for root markers."
+    "Recursive search in PATH for root markers."
     (let* ((this-dir (file-name-as-directory (file-truename path)))
            (parent-dir (expand-file-name (concat this-dir "../")))
            (system-root-dir (expand-file-name "/")))
