@@ -3,6 +3,7 @@
 # or copy those via `xsel' asking for choice if multiple results found.
 getpasswd() {
     (
+        copy="true"
         file="$HOME/.passwords.gpg"
         while [ $# -gt 0 ]; do
             case $1 in
@@ -32,7 +33,7 @@ getpasswd() {
             set -- $(</dev/stdin)
             printf "\n"
         fi
-        if [ -n "$(command -v xsel)" ] && { [ "$copy" = "true" ] || [ $# -eq 1 ]; }; then
+        if [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
             result=$(gpg --decrypt "$file" 2>/dev/null | grep -Po -- "(?<=^- $name :: ).*")
             amount=$(printf "%s\n" "$result" | wc -l)
