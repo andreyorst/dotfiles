@@ -35,7 +35,7 @@ cnew() {
     fi
 
     if [ -z "$empty" ]; then
-        cp -r ~/.dotfiles/.c_project_template/. "$project_name/" >/dev/null 2>&1
+        cp -r ~/.dotfiles/c_project_template/. "$project_name/" >/dev/null 2>&1
         res=$?
         if [ $res -ne 0 ]; then
             rm -rf "$project_name"

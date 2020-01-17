@@ -14,26 +14,25 @@ sym-linked to corresponding system directory. All hidden files at the root of
 the repository should be copied of sym-linked to home directory.
 
 ```
-.dotfiles                ~> /home/$USER
-├── .bashrc              ~> ├── .bashrc
-├── .config/files,dirs   ~> ├── .config/files,dirs
-├── .c_project_template     │
-├── .editorconfig        ~> ├── .editorconfig
-├── .git/                   │
-├── .gitconfig           ~> ├── .gitconfig
-├── .gitignore              │
-├── .inputrc             ~> ├── .inputrc
-├── README.md               │
-├── scripts                 │
-├── .tmux.conf           ~> ├── .tmux.conf
-└── .zshrc               ~> └── .zshrc
+.dotfiles               ~> /home/$USER
+├── .bashrc             ~> ├── .bashrc
+├── .config/*           ~> ├── .config/
+├── c_project_template     │
+├── .editorconfig       ~> ├── .editorconfig
+├── .git/                  │
+├── .gitconfig          ~> ├── .gitconfig
+├── .gitignore             │
+├── .inputrc            ~> ├── .inputrc
+├── README.md              │
+├── scripts                │
+└── .tmux.conf          ~> └── .tmux.conf
 ```
 
 These directories and files should be excluded from copying or sym-linking:
 
 - `.git`, `.gitignore`, `README.md` - obviously, there's no need to copy these
   files to your home directory, as those are git related files.
-- `.c_project_template` - is a template for creating a C project, that is used
+- `c_project_template` - is a template for creating a C project, that is used
   by a script, that is placed in `scripts` directory.
 - `scripts` - directory stores scripts that I use directly from there, either by
   sourcing or by invoking from `$PATH`.
