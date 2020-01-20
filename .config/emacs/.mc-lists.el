@@ -30,6 +30,9 @@
         hydrant/er/er/expand-region
         indent-for-tab-command
         kill-region
+        markdown-electric-backquote
+        markdown-enter-key
+        markdown-outdent-or-delete
         my/select-line
         my/smart-move-beginning-of-line
         org-beginning-of-line
