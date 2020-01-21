@@ -174,9 +174,11 @@ if %[ -n "${PATH##*termux*}" ] %{
     }
 }
 
-plug "alexherbo2/word-movement.kak" config %{
-    word-movement-map next w
-    word-movement-map previous b
+plug "alexherbo2/word-select.kak" config %{
+    map global normal w ': word-select-next-word<ret>'
+    map global normal <a-w> ': word-select-next-big-word<ret>'
+    map global normal b ': word-select-previous-word<ret>'
+    map global normal <a-b> ': word-select-previous-big-word<ret>'
 }
 
 plug "alexherbo2/split-object.kak" config %{
