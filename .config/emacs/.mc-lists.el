@@ -110,6 +110,7 @@
         term-line-mode
         term-send-raw
         toggle-input-method
+        undo-tree-visualize
         xref-find-definitions
         yank-rectangle
         ))
