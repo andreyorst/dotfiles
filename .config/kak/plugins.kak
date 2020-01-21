@@ -9,8 +9,16 @@
 # │ GitHub.com/andreyorst/dotfiles │
 # ╰────────────────────────────────╯
 
-# source the plugin manager itself
-source "%val{config}/plugins/plug.kak/rc/plug.kak"
+# bootstrap the plugin manager
+evaluate-commands %sh{
+    plugins="$HOME/.config/kak/plugins"
+    mkdir -p $plugins
+    if [ ! -e "$plugins/plug.kak" ]; then
+        git clone -q https://gitlab.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+    fi
+    printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
+
+}
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
