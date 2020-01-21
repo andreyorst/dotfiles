@@ -181,7 +181,12 @@ are defining or executing a macro."
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  :init (load-theme 'doom-one t))
+  :init
+  (load-theme 'doom-one t)
+  (set-face-attribute 'highlight nil
+                      :foreground 'unspecified
+                      :distant-foreground 'unspecified
+                      :background (face-attribute 'region :background)))
 
 (when window-system
   (use-package fringe

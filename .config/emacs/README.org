@@ -561,7 +561,12 @@ is nice, but I want to change a little bit of it.
     :config
     (setq doom-themes-enable-bold t
           doom-themes-enable-italic t)
-    :init (load-theme 'doom-one t))
+    :init
+    (load-theme 'doom-one t)
+    (set-face-attribute 'highlight nil
+                        :foreground 'unspecified
+                        :distant-foreground 'unspecified
+                        :background (face-attribute 'region :background)))
 #+end_src
 
 ** Fringe
