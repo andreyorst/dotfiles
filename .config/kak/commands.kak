@@ -308,6 +308,7 @@ define-command -hidden clang-find-and-parse-compile-flags %{
     ) }
 }
 
+add-highlighter shared/kakrc/code/map-sequence regex \bmap-sequence\b 0:keyword
 define-command -docstring "map-sequence <sequence> <command>: map <sequence> of keys to <command> in insert mode." \
 map-sequence -params 2 %{ evaluate-commands %sh{
     keys=$(printf "%s" "$1" | sed "s/\([&|]\)/\1\1/g")
