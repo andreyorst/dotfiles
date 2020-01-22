@@ -94,6 +94,7 @@
         magit-next-line
         magit-refresh-all
         magit-stage
+        mark-whole-buffer
         minions-minor-modes-menu
         mouse-drag-mode-line
         mouse-drag-secondary
