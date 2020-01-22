@@ -1,10 +1,11 @@
-# getpasswd function relyes on `gpg' and password file located
-# at $HOME/.passwords.gpg by default .It can eiher print passwods,
-# or copy those via `xsel' asking for choice if multiple results found.
+# getpasswd function relies on `gpg' and password file located at
+# $HOME/.passwords.gpg by default .It can either print passwords, or
+# copy those via `xsel' asking for choice if multiple results found.
 getpasswd() {
     (
         copy="true"
         file="$HOME/.passwords.gpg"
+        # argument handling
         while [ $# -gt 0 ]; do
             case $1 in
                 (-file)    shift; file="$1" ;;
@@ -18,10 +19,15 @@ getpasswd() {
                     printf "%s\n" "     -file=filename: look for passwords in specifiled file." >&2
                     printf "%s\n" "  -h -help: print this message" >&2
                     return 0 ;;
+                # if we did not match to anything treat current item
+                # as args for later usage. This way we can keep args
+                # in original order
                 (*) args="'$1' $args" ;;
             esac
             shift
         done
+        # if file was not specified or not found continuously ask for
+        # vile via user input.
         while [ -z "$file" ] || [ ! -e "$file" ]; do
             [ -n "$file" ] && printf "No such file '%s'\n" "$file"
             printf "Please specify a file: "
@@ -33,10 +39,15 @@ getpasswd() {
             set -- $(</dev/stdin)
             printf "\n"
         fi
+        # in case when there's only one password queue was provided,
+        # and if no `-print' option was specified we're going to copy
+        # the password via `xsel'.
         if [ $# -eq 1 ] && [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
             result=$(gpg --decrypt "$file" 2>/dev/null | perl ~/.dotfiles/scripts/search_password.pl $name)
             amount=$(printf "%s\n" "$result" | wc -l)
+            # if multiple passwords found in the search results we
+            # have to select 1 to copy
             if [ $amount -gt 1 ]; then
                 printf "Multiple passwords found for '%s':\n" "$name" >&2
                 for i in $(seq 1 $amount); do
@@ -55,6 +66,7 @@ getpasswd() {
             fi
             printf "%s\n" "Password for '$name' copied to clipboard" >&2
         else
+            # multiple passwords were specified
             for name in $@; do
                 names="${names} $name"
             done
