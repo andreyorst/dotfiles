@@ -33,28 +33,32 @@ getpasswd() {
             set -- $(</dev/stdin)
             printf "\n"
         fi
-        if [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
+        if [ $# -eq 1 ] && [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
-            result=$(gpg --decrypt "$file" 2>/dev/null | grep -Po -- "(?<=^- $name :: ).*")
+            result=$(gpg --decrypt "$file" 2>/dev/null | perl ~/.dotfiles/scripts/search_password.pl $name)
             amount=$(printf "%s\n" "$result" | wc -l)
             if [ $amount -gt 1 ]; then
-                printf "Multiple passwords found for '%s'. Select which to copy [%s]: " "$name" "$(seq -s ', ' 1 $amount)" >&2
+                printf "Multiple passwords found for '%s':\n" "$name" >&2
+                for i in $(seq 1 $amount); do
+                    item=$(printf "%s\n" "$result" | head -n $i | tail -n +$i | tr -d '\n' | sed "s|/\w\+: .*$||")
+                    printf "%s) %s\n" "$i" "$item"
+                done
+                printf "Select which to copy [%s]: " "$(seq -s ', ' 1 $amount)"
                 read -r choice
                 if [ $choice -lt 1 ] || [ $choice -gt $amount ]; then
                     printf "Bad choice '%s'.\n" "$choice" >&2
                     return 1
                 fi
-                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | xsel -b -i
+                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | sed "s/.*: //" | xsel -b -i
             else
-                printf "%s" "$result" | xsel -b -i
+                printf "%s" "$result" | sed "s/.*: //" | xsel -b -i
             fi
-            printf "%s\n" "Password for '$1' copied to clipboard" >&2
+            printf "%s\n" "Password for '$name' copied to clipboard" >&2
         else
             for name in $@; do
-                names="^- ${name} :: \|${names}"
+                names="${names} $name"
             done
-            names="${names%\\|}"
-            gpg --decrypt "$file" 2>/dev/null | grep -- "${names}"
+            gpg --decrypt "$file" 2>/dev/null | perl ~/.dotfiles/scripts/search_password.pl $names
         fi
     )
 }
