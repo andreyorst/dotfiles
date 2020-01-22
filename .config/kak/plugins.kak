@@ -150,8 +150,11 @@ plug "andreyorst/smarttab.kak" domain gitlab.com defer smarttab %{
 }
 
 plug "alexherbo2/auto-pairs.kak" %{
-    map global user 's' ': auto-pairs-surround<ret>' -docstring "surround selection"
     hook global WinCreate .* auto-pairs-enable
+}
+
+plug "alexherbo2/surround.kak" %{
+    map global user 's' ': surround<ret>' -docstring "surround selection"
 }
 
 plug "alexherbo2/replace.kak" config %{
