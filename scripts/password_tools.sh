@@ -52,10 +52,10 @@ getpasswd() {
                 (-copy|-c) copy="true" ;;
                 (-print|-p) copy="false" ;;
                 (-help|-h)
-                    printf "%s\n" "usage: getpasswd [-file <filename>] [-copy] [-help] [keyname] ...\n" >&2
+                    printf "%s\n" "usage: getpasswd [-file=<filename>] [-copy, -c|-print, -p] [-help, -h] [keyname] ...\n" >&2
                     printf "%s\n" "  -c -copy: copy password to clipboard. If specified only one key is used." >&2
                     printf "%s\n" "  -p -print: print password even if there's only one found" >&2
-                    printf "%s\n" "     -file=filename: look for passwords in specifiled file." >&2
+                    printf "%s\n" "     -file=filename: look for passwords in specified file." >&2
                     printf "%s\n" "  -h -help: print this message" >&2
                     return 0 ;;
                 # if we did not match to anything treat current item
@@ -115,7 +115,7 @@ getpasswd() {
 }
 
 # `genpasswd' function generates passwords by reading `/dev/random' and stripping
-# avay everything that are not presented in `allowed' list of symbols.
+# away everything that are not presented in `allowed' list of symbols.
 genpasswd () {
     (
         allowed='A-Za-z0-9!`~!@#$%^&*()-_=+\|[{]};:'\''",<.>/?'
