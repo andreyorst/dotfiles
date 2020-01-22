@@ -3,6 +3,45 @@
 # copy those via `xsel' asking for choice if multiple results found.
 getpasswd() {
     (
+        # declare inline function here, that will be destroyed when
+        # `getpasswd' exits.  This function reads `stdin' line by line,
+        # building categories for the password_tools.sh based on Org
+        # Mode format. Each nested heading is being pushed into the
+        # stack, if heading has the same level we pop previous stack
+        # item. When the line matches the queue we print the stack and
+        # the result to `stdout'.
+        filter() {
+            perl -e 'use strict;
+                     use warnings;
+
+                     my @results;
+
+                     my $old_depth = 0;
+                     my $cur_depth = 0;
+                     my @path;
+
+                     foreach (<STDIN>) {
+                         foreach my $name (@ARGV) {
+                             if ($_ =~ /^(\*+)\s(.*)$/) {
+                                 $cur_depth = length $1;
+                                 if ($cur_depth > $old_depth) {
+                                     push @path, $2;
+                                 } elsif ($cur_depth == $old_depth) {
+                                     pop @path;
+                                     push @path, $2;
+                                 } else {
+                                     pop @path;
+                                 }
+                                 $old_depth = $cur_depth;
+                             } elsif ($_ =~ /^-\s($name)\s::\s(.*)$/) {
+                                 my $password = $2;
+                                 my $p = join "/", @path;
+                                 # @path = ();
+                                 print "$p/$name: $2\n";
+                             }
+                         }
+                     }' $@
+        }
         copy="true"
         file="$HOME/.passwords.gpg"
         # argument handling
