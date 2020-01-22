@@ -97,7 +97,7 @@ getpasswd() {
                 printf "Multiple passwords found for '%s':\n" "$name" >&2
                 for i in $(seq 1 $amount); do
                     item=$(printf "%s\n" "$result" | head -n $i | tail -n +$i | tr -d '\n' | sed "s|/\w\+: .*$||")
-                    printf "%s) %s\n" "$i" "$item"
+                    printf "%s) %s\n" "$i" "$item" >&2
                 done
                 printf "Select which to copy [%s]: " "$(seq -s ', ' 1 $amount)" >&2
                 read -r choice
@@ -112,10 +112,11 @@ getpasswd() {
                        fi ;;
                 esac
                 # filter the input by specific line
-                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n'
+                name="$(printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | sed "s|/\w\+: .*$||")"
+                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | sed "s/.*: //" | xsel -b -i
             else
-                printf "%s" "$result"
-            fi | sed "s/.*: //" | xsel -b -i
+                printf "%s" "$result" | sed "s/.*: //" | xsel -b -i
+            fi
             printf "%s\n" "Password for '$name' copied to clipboard" >&2
         else
             # multiple passwords were specified
