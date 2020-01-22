@@ -11,36 +11,41 @@ getpasswd() {
         # item. When the line matches the queue we print the stack and
         # the result to `stdout'.
         filter() {
-            perl -e 'use strict;
-                     use warnings;
+            perl -e '
+                use strict;
+                use warnings;
 
-                     my @results;
+                my @results;
 
-                     my $old_depth = 0;
-                     my $cur_depth = 0;
-                     my @path;
+                my $old_depth = 0;
+                my $cur_depth = 0;
+                my @path;
 
-                     foreach (<STDIN>) {
-                         foreach my $name (@ARGV) {
-                             if ($_ =~ /^(\*+)\s(.*)$/) {
-                                 $cur_depth = length $1;
-                                 if ($cur_depth > $old_depth) {
-                                     push @path, $2;
-                                 } elsif ($cur_depth == $old_depth) {
-                                     pop @path;
-                                     push @path, $2;
-                                 } else {
-                                     pop @path;
-                                 }
-                                 $old_depth = $cur_depth;
-                             } elsif ($_ =~ /^-\s($name)\s::\s(.*)$/) {
-                                 my $password = $2;
-                                 my $p = join "/", @path;
-                                 # @path = ();
-                                 print "$p/$name: $2\n";
-                             }
-                         }
-                     }' $@
+                foreach (<STDIN>) {
+                    foreach my $name (@ARGV) {
+                        if ($_ =~ /^(\*+)\s(.*)$/) {
+                            $cur_depth = length $1;
+                            if ($cur_depth == 1) {
+                                @path = ();
+                                push @path, $2;
+                            } elsif ($cur_depth > $old_depth) {
+                                push @path, $2;
+                            } elsif ($cur_depth == $old_depth) {
+                                pop @path;
+                                push @path, $2;
+                            } else {
+                                pop @path;
+                            }
+                            $old_depth = $cur_depth;
+                        } elsif ($_ =~ /^-\s($name)\s::\s(.*)$/) {
+                            my $password = $2;
+                            my $p = join "/", @path;
+                            # @path = ();
+                            print "$p/$name: $2\n";
+                        }
+                    }
+                }
+            ' $@
         }
         copy="true"
         file="$HOME/.passwords.gpg"
