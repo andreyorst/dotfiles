@@ -68,22 +68,23 @@ getpasswd() {
         # if file was not specified or not found continuously ask for
         # vile via user input.
         while [ -z "$file" ] || [ ! -e "$file" ]; do
-            [ -n "$file" ] && printf "No such file '%s'\n" "$file"
-            printf "Please specify a file: "
+            [ -n "$file" ] && printf "No such file '%s'\n" "$file" >&2
+            printf "Please specify a file: " >&2
             read -r file
         done
+
         eval "set -- $args"
         if [ $# -lt 1 ]; then
-            printf "Enter service name(s) (^D to finish): " >&2
-            set -- $(</dev/stdin)
-            printf "\n"
+            printf "Enter service name(s) (separated by space): " >&2
+            read -r inputs
+            set -- $inputs
         fi
         # in case when there's only one password queue was provided,
         # and if no `-print' option was specified we're going to copy
         # the password via `xsel'.
         if [ $# -eq 1 ] && [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
-            result=$(gpg --decrypt "$file" 2>/dev/null | perl ~/.dotfiles/scripts/search_password.pl $name)
+            result=$(gpg --decrypt "$file" 2>/dev/null | filter $name)
             amount=$(printf "%s\n" "$result" | wc -l)
             # if multiple passwords found in the search results we
             # have to select 1 to copy
@@ -93,23 +94,30 @@ getpasswd() {
                     item=$(printf "%s\n" "$result" | head -n $i | tail -n +$i | tr -d '\n' | sed "s|/\w\+: .*$||")
                     printf "%s) %s\n" "$i" "$item"
                 done
-                printf "Select which to copy [%s]: " "$(seq -s ', ' 1 $amount)"
+                printf "Select which to copy [%s]: " "$(seq -s ', ' 1 $amount)" >&2
                 read -r choice
-                if [ $choice -lt 1 ] || [ $choice -gt $amount ]; then
-                    printf "Bad choice '%s'.\n" "$choice" >&2
-                    return 1
-                fi
-                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | sed "s/.*: //" | xsel -b -i
+                # this `case' checks if user input is a number and
+                # that it is in range of available passwords
+                case $choice in
+                    ''|*[!0-9]*) printf "Bad choice '%s', expected one of these: %s.\n" "$choice" "$(seq -s ', ' 1 $amount)" >&2
+                                 return 1 ;;
+                    *) if [ $choice -lt 1 ] || [ $choice -gt $amount ]; then
+                           printf "Bad choice '%s', expected one of these: %s.\n" "$choice" "$(seq -s ', ' 1 $amount)" >&2
+                           return 1
+                       fi ;;
+                esac
+                # filter the input by specific line
+                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n'
             else
-                printf "%s" "$result" | sed "s/.*: //" | xsel -b -i
-            fi
+                printf "%s" "$result"
+            fi | sed "s/.*: //" | xsel -b -i
             printf "%s\n" "Password for '$name' copied to clipboard" >&2
         else
             # multiple passwords were specified
             for name in $@; do
                 names="${names} $name"
             done
-            gpg --decrypt "$file" 2>/dev/null | perl ~/.dotfiles/scripts/search_password.pl $names
+            gpg --decrypt "$file" 2>/dev/null | filter $names
         fi
     )
 }
