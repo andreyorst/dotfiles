@@ -219,3 +219,5 @@ plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
     }
     kaktree-enable
 }
+
+plug "listentolist/kakoune-table" domain "gitlab.com"
