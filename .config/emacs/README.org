@@ -250,11 +250,14 @@ I don't want menus on shift clicks:
 #+end_src
 
 I also  don't like how Emacs  handles scrolling, that it  speeds it up
-and automatically scrolls horizontally.
+and automatically scrolls horizontally. Also, changing =mouse-highlight=
+to integer value disables highlighting  of hovered item when the point
+moves which is kinda convenient when working with =flymake=.
 
 #+begin_src emacs-lisp
   (setq-default mouse-wheel-progressive-speed nil
-                auto-window-vscroll nil)
+                auto-window-vscroll nil
+                mouse-highlight 0)
 #+end_src
 
 ** Tab character
@@ -566,7 +569,7 @@ is nice, but I want to change a little bit of it.
     (set-face-attribute 'highlight nil
                         :foreground 'unspecified
                         :distant-foreground 'unspecified
-                        :background (face-attribute 'region :background)))
+                        :background 'unspecified))
 #+end_src
 
 ** Fringe

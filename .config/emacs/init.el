@@ -44,7 +44,8 @@
 (global-unset-key (kbd "S-<mouse-3>"))
 
 (setq-default mouse-wheel-progressive-speed nil
-              auto-window-vscroll nil)
+              auto-window-vscroll nil
+              mouse-highlight 0)
 
 (setq-default indent-tabs-mode nil)
 
@@ -186,7 +187,7 @@ are defining or executing a macro."
   (set-face-attribute 'highlight nil
                       :foreground 'unspecified
                       :distant-foreground 'unspecified
-                      :background (face-attribute 'region :background)))
+                      :background 'unspecified))
 
 (when window-system
   (use-package fringe
