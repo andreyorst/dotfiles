@@ -251,13 +251,13 @@ I don't want menus on shift clicks:
 
 I also  don't like how Emacs  handles scrolling, that it  speeds it up
 and automatically scrolls horizontally. Also, changing =mouse-highlight=
-to integer value disables highlighting  of hovered item when the point
+to  =nil= value  disables highlighting  of hovered  item when  the point
 moves which is kinda convenient when working with =flymake=.
 
 #+begin_src emacs-lisp
   (setq-default mouse-wheel-progressive-speed nil
                 auto-window-vscroll nil
-                mouse-highlight 0)
+                mouse-highlight nil)
 #+end_src
 
 ** Tab character
@@ -1372,6 +1372,13 @@ want to enable some helper modes here.
                 (save-restriction
                   (mark-whole-buffer)
                   (indent-region (region-beginning) (region-end))))))
+#+end_src
+
+** Yaml
+Support for =.yaml= files.
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode)
 #+end_src
 
 * Tools

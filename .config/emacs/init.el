@@ -45,7 +45,7 @@
 
 (setq-default mouse-wheel-progressive-speed nil
               auto-window-vscroll nil
-              mouse-highlight 0)
+              mouse-highlight nil)
 
 (setq-default indent-tabs-mode nil)
 
@@ -792,6 +792,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
               (save-restriction
                 (mark-whole-buffer)
                 (indent-region (region-beginning) (region-end))))))
+
+(use-package yaml-mode)
 
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
