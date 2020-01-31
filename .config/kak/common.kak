@@ -9,12 +9,10 @@
 # ╰────────────────────────────────╯
 
 # Common options
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 set-option global scrolloff 4,4
 set-option global ui_options ncurses_set_title=false
 
-## Grep
-## ‾‾‾‾
+# Grep
 if %[ -n "$(command -v rg)" ] %{
     set-option global grepcmd 'rg -L --hidden --with-filename --column'
 }
@@ -23,23 +21,19 @@ hook global BufSetOption filetype=grep %{
     remove-highlighter buffer/wrap
 }
 
-## Tabstop and indentwidth
-## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+# Tabstop and indentwidth
 set-option global tabstop 4
 set-option global indentwidth 4
 
-## Align with spaces
-## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+# Align with spaces
 hook global WinCreate .* %{
     set-option window aligntab false
 }
 
-## Use main client as jumpclient
-## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+# Use main client as jumpclient
 set-option global jumpclient client0
 
 # Highlighters
-# ‾‾‾‾‾‾‾‾‾‾‾‾
 set-face global delimiter rgb:af3a03,default
 
 hook global WinCreate .* %{ try %{
@@ -49,30 +43,14 @@ hook global WinCreate .* %{ try %{
     add-highlighter buffer/show-whitespaces show-whitespaces -lf ' ' -spc ' ' -nbsp '⋅'
 }}
 
-# Hooks
-# ‾‾‾‾‾
-
-## Editorconfig
-## ‾‾‾‾‾‾‾‾‾‾‾‾
+# Editorconfig
 hook global BufOpenFile .* editorconfig-load
 hook global BufNewFile  .* editorconfig-load
 
-## Git
-## ‾‾‾
-# hook global BufOpenFile .* %{
-#     hook buffer -group fly-git NormalIdle .* %{ try %{ git show-diff } }
-#     hook buffer -group fly-git InsertIdle .* %{ try %{ git show-diff } }
-# }
-
 # Aliases
-# ‾‾‾‾‾‾‾
 alias global h doc
 
-# Scratch buffer
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-
-## Delete the `*scratch*' buffer as soon as another is created, but only if it's empty
-## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+# Delete the `*scratch*' buffer as soon as another is created, but only if it's empty
 hook global BufCreate '^\*scratch\*$' %{
     execute-keys -buffer *scratch* '%d'
     hook -once -always global BufCreate '^(?!\*scratch\*).*$' %{ try %{

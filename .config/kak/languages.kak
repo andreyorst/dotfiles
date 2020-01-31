@@ -11,7 +11,6 @@
 # ╰────────────────────────────────╯
 
 # C/Cpp
-# ‾‾‾‾‾
 hook global WinSetOption filetype=(c|cpp) %{
     set-option buffer formatcmd 'clang-format'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
@@ -55,20 +54,17 @@ hook global ModuleLoaded c-family %{ try %{ evaluate-commands %sh{
 }}}
 
 # Rust
-# ‾‾‾‾
 hook global WinSetOption filetype=rust %{
     set-option buffer formatcmd 'rustfmt'
     set-option buffer matching_pairs '{' '}' '[' ']' '(' ')'
 }
 
 # Makefile
-# ‾‾‾‾‾‾‾‾
 hook global BufCreate .*\.mk$ %{
     set-option buffer filetype makefile
 }
 
 # Kakscript
-# ‾‾‾‾‾‾‾‾‾
 hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
     evaluate-commands -save-regs 'a' %{ try %{
         execute-keys -draft <a-i>w"ay
@@ -83,7 +79,6 @@ hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
 }}
 
 # Assemply
-# ‾‾‾‾‾‾‾‾
 hook global WinSetOption filetype=gas %{
     set-option window comment_line '#'
 }

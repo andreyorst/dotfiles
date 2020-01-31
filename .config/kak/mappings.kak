@@ -9,25 +9,21 @@
 # ╰────────────────────────────────╯
 
 # Normal mode mappings
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "comment/uncomment selection (<c-/>)"                              global normal ''     ': comment-line<ret>'
 map -docstring "add currsor/jump on current word"                                 global normal '<c-d>' ': select-or-add-cursor<ret>'
 map -docstring "behave as <a-x> if line not selected, select line down otherwise" global normal '<a-x>' ': alt-x J<ret>'
 map -docstring "behave as <a-x> if line not selected, select line up otherwise"   global normal '<a-X>' ': alt-x K<ret>'
 
 # Avoid escape key
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "avoid escape key" global normal '<c-g>' ';<space>'
 map -docstring "avoid escape key" global prompt '<c-g>' '<esc>'
 map -docstring "avoid escape key" global insert '<c-g>' '<esc>'
 
 # User Mode Mappings
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "convert leading spaces to tabs" global user '<a-t>' ': leading-spaces-to-tabs<ret>'
 map -docstring "convert leading tabs to spaces" global user '<a-T>' ': leading-tabs-to-spaces<ret>'
 
-## System clipboard mappings
-## ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+# System clipboard mappings
 if %[ -n "$(command -v xsel)" ] %{
     map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
     map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
@@ -39,10 +35,7 @@ if %[ -n "$(command -v xsel)" ] %{
     echo -debug "'xsel' is not installed"
 }
 
-# Insert Mode Mappings
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-## Completion
-## ‾‾‾‾‾‾‾‾‾‾
+# Completion
 hook global InsertCompletionShow .* %{ try %{
     execute-keys -draft 'h<a-K>\h<ret>'
     map window insert <tab> <c-n>
@@ -57,7 +50,6 @@ hook global InsertCompletionHide .* %{
 }
 
 # Goto mode mappings
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map -docstring "file (non-recursive)"           global goto '<a-f>' '<esc>gf'
 map -docstring "file (recursive)"               global goto 'f'     '<esc>: smart-select-file; search-file %val{selection}<ret>'
 map -docstring "next buffer"                    global goto 'b'     '<esc>: buffer-next<ret>'
@@ -66,11 +58,9 @@ map -docstring "search tag in current file"     global goto '['     '<esc><c-s>:
 map -docstring "search tag in global tags file" global goto ']'     '<esc><c-s>: smart-select w; ctags-search<ret>'
 
 # Custom text objects
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 map global object w 'c\s,\s<ret>' -docstring "select between whitespace"
 
 # Arrows
-# ‾‾‾‾‾‾
 map global normal '<left>'    ': nop<ret>'
 map global normal '<right>'   ': nop<ret>'
 map global normal '<up>'      ': nop<ret>'

@@ -93,6 +93,7 @@
         isearch-printing-char
         magit-commit
         magit-next-line
+        magit-pull
         magit-refresh-all
         magit-stage
         mark-whole-buffer

@@ -13,9 +13,8 @@
 evaluate-commands %sh{
     plugins="$HOME/.config/kak/plugins"
     mkdir -p $plugins
-    if [ ! -e "$plugins/plug.kak" ]; then
+    [ ! -e "$plugins/plug.kak" ] && \
         git clone -q https://gitlab.com/andreyorst/plug.kak.git "$plugins/plug.kak"
-    fi
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
 
 }
@@ -42,7 +41,11 @@ plug "occivink/kakoune-find" config %{
 }
 
 plug "andreyorst/base16-gruvbox.kak" domain gitlab.com theme %{
-    colorscheme base16-gruvbox-dark-soft
+    if %[ -n "${PATH##*termux*}" ] %{
+        colorscheme base16-gruvbox-dark-soft
+    } else %{
+        colorscheme base16-gruvbox-dark-hard
+    }
 }
 
 plug "andreyorst/fzf.kak" domain gitlab.com config %{
@@ -140,9 +143,9 @@ plug "andreyorst/powerline.kak" domain gitlab.com defer powerline %{
 
 plug "andreyorst/smarttab.kak" domain gitlab.com defer smarttab %{
     set-option global softtabstop 4
-    set-option global smarttab_expandtab_mode_name '⋅t⋅'
+    set-option global smarttab_expandtab_mode_name   '⋅t⋅'
     set-option global smarttab_noexpandtab_mode_name '→t→'
-    set-option global smarttab_smarttab_mode_name '→t⋅'
+    set-option global smarttab_smarttab_mode_name    '→t⋅'
 } config %{
     hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme|sh|perl) expandtab
     hook global WinSetOption filetype=(makefile|gas) noexpandtab
@@ -178,9 +181,9 @@ if %[ -n "${PATH##*termux*}" ] %{
 }
 
 plug "alexherbo2/word-select.kak" config %{
-    map global normal w ': word-select-next-word<ret>'
+    map global normal w     ': word-select-next-word<ret>'
     map global normal <a-w> ': word-select-next-big-word<ret>'
-    map global normal b ': word-select-previous-word<ret>'
+    map global normal b     ': word-select-previous-word<ret>'
     map global normal <a-b> ': word-select-previous-big-word<ret>'
 }
 
