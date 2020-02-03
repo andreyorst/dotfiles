@@ -153,6 +153,13 @@ are defining or executing a macro."
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 
+(defun aorst/indent-buffer ()
+  (interactive)
+  (save-excursion
+    (save-restriction
+      (mark-whole-buffer)
+      (indent-region (region-beginning) (region-end)))))
+
 (setq inhibit-splash-screen t)
 
 (tooltip-mode -1)
@@ -679,7 +686,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         org-agenda-files '("~/Tasks"))
   (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
-    (when (string= buffer-file-name (file-truename "~/.config/emacs/README.org"))
+    (when (string= buffer-file-name (file-truename (concat user-emacs-directory "README.org")))
       (org-babel-tangle)))
   (defun aorst/org-update-inline-images ()
     "Update inline images in Org-mode."
@@ -789,8 +796,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :mode ("\\.rkt\\'" . racket-mode)
   :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
-              ("C-c C-d" . racket-run-with-debugging))
-  :requires hydra
+              ("C-c C-d" . racket-run-with-debugging)
+              ("C-c C-f" . aorst/indent-buffer))
   :config
   (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
   (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
@@ -807,13 +814,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :ensure nil
   :hook (emacs-lisp-mode . eldoc-mode)
   :bind (:map emacs-lisp-mode-map
-              ("C-c C-f" . aorst/elisp-format-buffer))
-  :config (defun aorst/elisp-format-buffer ()
-            (interactive)
-            (save-excursion
-              (save-restriction
-                (mark-whole-buffer)
-                (indent-region (region-beginning) (region-end))))))
+              ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package yaml-mode)
 

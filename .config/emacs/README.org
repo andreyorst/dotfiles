@@ -488,6 +488,17 @@ This function checks if font is available on the system.
     (find-font (font-spec :name font-name)))
 #+end_src
 
+** =indent-buffer=
+
+#+begin_src emacs-lisp
+  (defun aorst/indent-buffer ()
+    (interactive)
+    (save-excursion
+      (save-restriction
+        (mark-whole-buffer)
+        (indent-region (region-beginning) (region-end)))))
+#+end_src
+
 * User Interface
 Packages that affect user interface.
 
@@ -1183,7 +1194,7 @@ my Emacs configuration with it.
           org-agenda-files '("~/Tasks"))
     (defun aorst/org-tangle-on-config-save ()
       "Tangle source code blocks when configuration file is saved."
-      (when (string= buffer-file-name (file-truename "~/.config/emacs/README.org"))
+      (when (string= buffer-file-name (file-truename (concat user-emacs-directory "README.org")))
         (org-babel-tangle)))
     (defun aorst/org-update-inline-images ()
       "Update inline images in Org-mode."
@@ -1352,8 +1363,8 @@ Racket is nice LISP/Scheme language that I might to get into.
     :mode ("\\.rkt\\'" . racket-mode)
     :hook (racket-repl-mode . electric-pair-local-mode)
     :bind (:map racket-mode-map
-                ("C-c C-d" . racket-run-with-debugging))
-    :requires hydra
+                ("C-c C-d" . racket-run-with-debugging)
+                ("C-c C-f" . aorst/indent-buffer))
     :config
     (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
     (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
@@ -1387,13 +1398,7 @@ want to enable some helper modes here.
     :ensure nil
     :hook (emacs-lisp-mode . eldoc-mode)
     :bind (:map emacs-lisp-mode-map
-                ("C-c C-f" . aorst/elisp-format-buffer))
-    :config (defun aorst/elisp-format-buffer ()
-              (interactive)
-              (save-excursion
-                (save-restriction
-                  (mark-whole-buffer)
-                  (indent-region (region-beginning) (region-end))))))
+                ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Yaml
