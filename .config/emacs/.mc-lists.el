@@ -18,6 +18,7 @@
         c-electric-star
         c-end-of-defun
         c-indent-line-or-region
+        comment-line
         counsel-M-x
         default-indent-new-line
         delete-indentation
