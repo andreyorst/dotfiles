@@ -218,6 +218,19 @@ are defining or executing a macro."
     (if (boundp 'after-focus-change-function)
         (add-function :after after-focus-change-function #'solaire-mode-reset)
       (add-hook 'focus-in-hook  #'solaire-mode-reset)))
+  (defun aorst/create-image-with-background-color (args)
+    "Specify background color of Org-mode inline image through modify `ARGS'."
+    (let* ((file (car args))
+           (type (cadr args))
+           (data-p (caddr args))
+           (props (cdddr args)))
+      ;; get this return result style from `create-image'
+      (append (list file type data-p)
+              (list :background (face-attribute (or (cadr (assq 'default face-remapping-alist))
+                                                    'default)
+                                                :background nil t))
+              props)))
+  (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
   :init (solaire-global-mode +1))
 
 (use-package doom-modeline
@@ -646,7 +659,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (when (not (version<= org-version "9.1.9"))
     (use-package org-tempo
       :ensure nil))
-  (setq org-startup-with-inline-images t
+  (setq org-startup-with-inline-images nil
         org-startup-folded 'content
         org-hide-emphasis-markers t
         org-adapt-indentation nil
@@ -703,7 +716,16 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (defun aorst/org-update-latex-preview-background-color (&rest _)
+    (setq-default
+     org-format-latex-options
+     (plist-put org-format-latex-options
+                :background
+                (face-attribute (or (cadr (assq 'default face-remapping-alist))
+                                    'default)
+                                :background nil t))))
+  (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color))
 
 (use-package doc-view
   :ensure nil
