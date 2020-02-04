@@ -797,7 +797,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
               ("C-c C-d" . racket-run-with-debugging)
-              ("C-c C-f" . aorst/indent-buffer))
+              ("C-c C-f" . aorst/indent-buffer)
+              (")" . self-insert-command)
+              ("]" . self-insert-command)
+              ("}" . self-insert-command))
   :config
   (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
   (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
