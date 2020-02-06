@@ -115,6 +115,8 @@
         term-send-raw
         toggle-input-method
         undo-tree-visualize
+        vterm--self-insert
+        vterm-send-C-a
         xref-find-definitions
         yank-rectangle
         ))
