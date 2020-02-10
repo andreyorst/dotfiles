@@ -89,7 +89,12 @@ getpasswd() {
         # the password via `xsel'.
         if [ $# -eq 1 ] && [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
-            result=$(gpg --decrypt "$file" 2>/dev/null | filter $name)
+            result=$(gpg --decrypt "$file")
+            if [ $? -gt 1 ]; then
+                printf "gpg error occured. Exiting\n" >&2
+                return 1;
+            fi
+            result=$(echo $result | filter $name)
             amount=$(printf "%s\n" "$result" | wc -l)
             # if multiple passwords found in the search results we
             # have to select 1 to copy
@@ -123,7 +128,14 @@ getpasswd() {
             for name in $@; do
                 names="${names} $name"
             done
-            gpg --decrypt "$file" 2>/dev/null | filter $names
+
+            result=$(gpg --decrypt "$file")
+            if [ $? -gt 1 ]; then
+                printf "gpg error occured. Exiting\n" >&2
+                return 1;
+            fi
+            result=$(echo $result | filter $names)
+            amount=$(printf "%s\n" "$result" | wc -l)
         fi
     )
 }
