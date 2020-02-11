@@ -158,7 +158,8 @@ are defining or executing a macro."
   (save-excursion
     (save-restriction
       (mark-whole-buffer)
-      (indent-region (region-beginning) (region-end)))))
+      (indent-region (region-beginning) (region-end))
+      (deactivate-mark))))
 
 (setq inhibit-splash-screen t)
 
@@ -790,7 +791,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (use-package cargo
     :hook ((rust-mode toml-mode) . cargo-minor-mode)))
 
-(use-package toml-mode)
+(use-package toml-mode
+  :bind (:map toml-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
@@ -807,7 +810,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
   (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 
-(use-package cmake-mode)
+(use-package cmake-mode
+  :bind (:map cmake-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package help
   :ensure nil
@@ -820,6 +825,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
               ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package yaml-mode)
+
+(use-package sh-script
+  :ensure nil
+  :bind (:map sh-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
 
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)

@@ -496,7 +496,8 @@ This function checks if font is available on the system.
     (save-excursion
       (save-restriction
         (mark-whole-buffer)
-        (indent-region (region-beginning) (region-end)))))
+        (indent-region (region-beginning) (region-end))
+        (deactivate-mark))))
 #+end_src
 
 * User Interface
@@ -1352,7 +1353,9 @@ There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] inte
 configure project.
 
 #+begin_src emacs-lisp
-  (use-package toml-mode)
+  (use-package toml-mode
+    :bind (:map toml-mode-map
+                ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Racket
@@ -1379,7 +1382,9 @@ Racket is nice LISP/Scheme language that I might to get into.
 A mode for editing cmake files.
 
 #+begin_src emacs-lisp
-  (use-package cmake-mode)
+  (use-package cmake-mode
+    :bind (:map cmake-mode-map
+                ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Help
@@ -1409,6 +1414,16 @@ Support for =.yaml= files.
 
 #+begin_src emacs-lisp
   (use-package yaml-mode)
+#+end_src
+
+** Shell Script
+Some configurations for shell script modes.
+
+#+begin_src emacs-lisp
+  (use-package sh-script
+    :ensure nil
+    :bind (:map sh-mode-map
+                ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 * Tools
