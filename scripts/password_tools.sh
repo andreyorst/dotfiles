@@ -126,7 +126,7 @@ getpasswd() {
             else
                 printf "%s" "$result" | sed "s/.*: //" | xsel -b -i
             fi
-            printf "%s\n" "Password for '$name' copied to clipboard" >&2
+            printf "Password for '%s' copied to clipboard\n" "$name" >&2
         else
             # multiple passwords were specified or copy was false
             for name in $@; do
