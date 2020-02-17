@@ -158,6 +158,8 @@ plug "alexherbo2/auto-pairs.kak" %{
 
 plug "alexherbo2/surround.kak" %{
     map global user 's' ': surround<ret>' -docstring "surround selection"
+    set-option global surround_begin auto-pairs-disable
+    set-option global surround_end auto-pairs-enable
 }
 
 plug "alexherbo2/replace.kak" config %{
