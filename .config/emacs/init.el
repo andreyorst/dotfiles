@@ -7,6 +7,9 @@
 ;;;
 ;;; Code:
 
+(unless (featurep 'early-init)
+  (load (expand-file-name "early-init.el" user-emacs-directory)))
+
 (defvar package-archives)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")

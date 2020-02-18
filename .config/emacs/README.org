@@ -136,6 +136,19 @@ This concludes the =early-init.el= file.
   ;;; early-init.el ends here
 #+end_src
 
+*** Loading =early-init.el= in Emacs 26 and earlier
+:properties:
+:header-args: :tangle "./init.el"
+:end:
+Before Emacs  27 there were  no such thing  as =eraly-init.el=, so  if I
+will use  older Emacs  with this configuration  it will  miss settings
+that are done there. This code manually loads this file in such case:
+
+#+begin_src emacs-lisp
+  (unless (featurep 'early-init)
+    (load (expand-file-name "early-init.el" user-emacs-directory)))
+#+end_src
+
 ** =package.el=
 To obtain plugins we need =package.el= package. Although this is builtin
 and convenient,  it's also slow  and messy.  Instead of  using =package=
