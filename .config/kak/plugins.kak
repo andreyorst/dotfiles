@@ -214,6 +214,9 @@ plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
         set-option global kaktree_dir_icon_open  '▾ 🗁 '
         set-option global kaktree_dir_icon_close '▸ 🗀 '
         set-option global kaktree_file_icon      '⠀⠀🖺'
+    } else %{
+        set-option global kaktree_split vertical
+        set-option global kaktree_size 30%
     }
 } config %{
     hook global WinSetOption filetype=kaktree %{
