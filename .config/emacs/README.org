@@ -1439,6 +1439,18 @@ Some configurations for shell script modes.
                 ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
+** Perl
+Perl related configurations.
+
+#+begin_src emacs-lisp
+  (use-package perl-mode
+    :ensure nil
+    :hook ((perl-mode . electric-pair-local-mode)
+           (perl-mode . flymake-mode))
+    :bind (:map perl-mode-map
+                ("C-c C-f" . aorst/indent-buffer)))
+#+end_src
+
 * Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.

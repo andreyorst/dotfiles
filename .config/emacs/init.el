@@ -834,6 +834,13 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :bind (:map sh-mode-map
               ("C-c C-f" . aorst/indent-buffer)))
 
+(use-package perl-mode
+  :ensure nil
+  :hook ((perl-mode . electric-pair-local-mode)
+         (perl-mode . flymake-mode))
+  :bind (:map perl-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
+
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
   (use-package vterm
