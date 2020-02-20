@@ -95,6 +95,8 @@
         magit-commit
         magit-next-line
         magit-pull
+        magit-push
+        magit-push-current-to-upstream
         magit-refresh-all
         magit-stage
         mark-whole-buffer
