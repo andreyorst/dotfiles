@@ -62,6 +62,18 @@ webmp4() {
     done
 }
 
+scour() {
+    if [ -z "$(command -v scour)"  ]; then
+        printf "%s\n" "scour is not installed" >&2
+        return 1
+    fi
+    while [ $# -ne 0 ]; do
+        command scour -i "$1" -o tmp.svg
+        mv tmp.svg "$1"
+        shift
+    done
+}
+
 # gifify wrapper for fast gif creating
 gif() {
     if [ -n "$(command -v gifify)" ]; then
