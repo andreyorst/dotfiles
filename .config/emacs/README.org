@@ -1451,6 +1451,16 @@ Perl related configurations.
                 ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
+** Clojure
+Clojure is a Lisp dialect for JVM - Java Virtual Machine. It is one of
+the few  modern and refreshing  languages, that bring  both innovation
+and reliability. Emacs has a nice  package called Cider, which is sort
+of an IDE for Clojure and ClojureScript.
+
+#+begin_src emacs-lisp
+  (use-package cider)
+#+end_src
+
 * Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.

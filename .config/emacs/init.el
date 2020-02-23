@@ -841,6 +841,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :bind (:map perl-mode-map
               ("C-c C-f" . aorst/indent-buffer)))
 
+(use-package cider)
+
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
   (use-package vterm
