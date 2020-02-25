@@ -775,6 +775,18 @@ process, and when new frame is created.
       ;; (aorst/set-frame-dark)))
 #+end_src
 
+There's one  more thing that  bothers me.  At some point  Emacs starts
+creating  new  frames   when  there's  no  place  left   to  create  a
+window.  This should  not ever  happen,  because it  messes my  window
+manager.
+
+#+begin_src emacs-lisp
+  (define-advice make-frame (:around (fn &rest args) suppress)
+    "Suppress making new frame; return existing frame."
+    (message "make-frame suppressed.")
+    (selected-frame))
+#+end_src
+
 ** Title
 Emacs uses weird method of naming a window, I'd like to see a file I'm
 currently working  on in the task  bar in case my  Emacs was minimized

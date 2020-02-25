@@ -318,6 +318,11 @@ are defining or executing a macro."
                  (frame-parameter frame 'name)))))))
     ;; (aorst/set-frame-dark)))
 
+(define-advice make-frame (:around (fn &rest args) suppress)
+  "Suppress making new frame; return existing frame."
+  (message "make-frame suppressed.")
+  (selected-frame))
+
 (setq-default frame-title-format '("%b — Emacs"))
 
 (when window-system
