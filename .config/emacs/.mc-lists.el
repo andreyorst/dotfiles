@@ -62,6 +62,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        aorst/treemacs-expand-all-projects
         clang-format-buffer
         counsel-describe-function
         counsel-find-file
@@ -116,6 +117,8 @@
         term-line-mode
         term-send-raw
         toggle-input-method
+        treemacs-collapse-all-projects
+        treemacs-rename
         undo-tree-visualize
         vterm--self-insert
         vterm-send-C-a
