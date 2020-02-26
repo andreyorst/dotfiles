@@ -306,22 +306,12 @@ are defining or executing a macro."
   (use-package frame
     :ensure nil
     :config
-    ;; (add-to-list 'after-make-frame-functions #'aorst/set-frame-dark)
     (setq window-divider-default-right-width 1)
     (window-divider-mode 1)
-    (set-face-attribute 'window-divider nil :foreground (face-attribute 'mode-line-inactive :background))
-    (defun aorst/set-frame-dark (&optional frame)
-      "Set FRAME titlebar colorscheme to dark variant."
-      (with-selected-frame (or frame (selected-frame))
-        (call-process-shell-command
-         (format "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \"%s\""
-                 (frame-parameter frame 'name)))))))
-    ;; (aorst/set-frame-dark)))
-
-(define-advice make-frame (:around (fn &rest args) suppress)
-  "Suppress making new frame; return existing frame."
-  (message "make-frame suppressed.")
-  (selected-frame))
+    (set-face-attribute
+     'window-divider nil
+     :foreground (face-attribute
+                  'mode-line-inactive :background))))
 
 (setq-default frame-title-format '("%b — Emacs"))
 
@@ -693,12 +683,16 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
         org-imenu-depth 8
         org-log-done t
         org-agenda-files '("~/Tasks"))
+  (font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-+]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
   (defun aorst/org-tangle-on-config-save ()
     "Tangle source code blocks when configuration file is saved."
     (when (string= buffer-file-name (file-truename (concat user-emacs-directory "README.org")))
       (org-babel-tangle)))
   (defun aorst/org-update-inline-images ()
     "Update inline images in Org-mode."
+    (interactive)
     (when org-inline-image-overlays
       (org-redisplay-inline-images)))
   (defun aorst/org-init-setup ()
