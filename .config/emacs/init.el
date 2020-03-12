@@ -163,6 +163,7 @@ are defining or executing a macro."
       (mark-whole-buffer)
       (indent-region (region-beginning) (region-end))
       (deactivate-mark))))
+(global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
 
 (setq inhibit-splash-screen t)
 
@@ -1144,8 +1145,6 @@ _C_:   select next line"
   (use-package eglot
     :hook ((rust-mode . aorst/configure-and-start-rls)
            ((c-mode c++-mode) . eglot-ensure))
-    :bind (:map eglot-mode-map
-                ("C-c C-e" . aorst/eglot-menu))
     :config
     (defun aorst/configure-and-start-rls ()
       "Configure RLS via `eglot-workspace-configuration' variable and start eglot."
