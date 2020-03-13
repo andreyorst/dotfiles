@@ -1906,7 +1906,7 @@ Emacs polyglot. LSP client.
          (eglot-ensure))
        (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=true")))
        (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-       (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
+       ;; (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
        (setq eglot-events-buffer-size 0)))
 #+end_src
 
@@ -2004,7 +2004,7 @@ This code above automatically creates user local =emacs.desktop= file in
   which will create server, and opening new files will be done in this
   instance of =emacs=.
 
-** COMMENT Eldoc Box
+** Eldoc Box
 This nice  package displays eldoc in  child frame that can  hover near
 the cursor. It is really good for modes that support eldoc and removes
 distraction  that happen  every  time when  your  buffer size  changes

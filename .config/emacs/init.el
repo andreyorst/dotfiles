@@ -1153,7 +1153,7 @@ _C_:   select next line"
       (eglot-ensure))
     (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=true")))
     (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-    (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
+    ;; (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
     (setq eglot-events-buffer-size 0)))
 
 (use-package project
@@ -1191,6 +1191,19 @@ _C_:   select next line"
   :config
   (unless (server-running-p)
     (server-start)))
+
+(use-package eldoc-box
+  :hook (eldoc-mode . aorst/eldoc-box-enable)
+  :config
+  (setq eldoc-box-max-pixel-width 1920
+        eldoc-box-max-pixel-height 1080)
+  (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
+  :init
+  (defun aorst/eldoc-box-enable ()
+    "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
+    (interactive)
+    (when (aorst/real-buffer-p)
+      (eldoc-box-hover-at-point-mode))))
 
 (use-package hideshow
   :ensure nil
