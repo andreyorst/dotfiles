@@ -1195,6 +1195,7 @@ _C_:   select next line"
 (use-package eldoc-box
   :hook (eldoc-mode . aorst/eldoc-box-enable)
   :config
+  (setq x-wait-for-event-timeout 0)
   (setq eldoc-box-max-pixel-width 1920
         eldoc-box-max-pixel-height 1080)
   (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
