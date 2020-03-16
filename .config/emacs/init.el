@@ -937,6 +937,7 @@ are defining or executing a macro."
            ("C-h l" . counsel-find-library)))
   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format ""
+        ivy-ignore-buffers '("\\` " "\\`\\*")
         ivy-display-style nil
         ivy-minibuffer-faces nil
         ivy-minibuffer-faces '(default default default default)
