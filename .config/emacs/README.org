@@ -1584,16 +1584,6 @@ since it's never used, and left fringe is occupied by diff status.
     (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 #+end_src
 
-** Flycheck
-I use  =flycheck= as a  dependency to  [[*LSP Mode][LSP Mode]],  but maybe will  use it
-instead of =flymake= completely.
-
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :config
-    (setq flycheck-indication-mode 'right-fringe))
-#+end_src
-
 ** Hydra
 This is something like ability to create mappings that sit in it's own
 mode, like different user modes in Kakoune. It allows me to press some

@@ -128,9 +128,6 @@
   (when (null (get-buffer-process (current-buffer)))
     (kill-buffer (current-buffer))))
 
-;; suppress byte-compiler warnings
-(declare-function minibuffer-keyboard-quit "delsel" (&optional ARGS))
-
 (defun aorst/escape ()
   "Quit in current context.
 
@@ -144,12 +141,11 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
-        ((bound-and-true-p iedit-mode)
-         (iedit-quit))
         (t
-         ;; ignore top level quits for macros
-         (unless (or defining-kbd-macro executing-kbd-macro)
-           (keyboard-quit)))))
+         (unless (or defining-kbd-macro
+                     executing-kbd-macro)
+           (keyboard-quit))))
+  (message this-command))
 (global-set-key [remap keyboard-quit] #'aorst/escape)
 
 (defun aorst/font-installed-p (font-name)
@@ -934,10 +930,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (setq flymake-fringe-indicator-position 'right-fringe)
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
-(use-package flycheck
-  :config
-  (setq flycheck-indication-mode 'right-fringe))
-
 (use-package hydra
   :bind (("<f5>" . hydrant/zoom/body))
   :config (defhydra hydrant/zoom (:hint nil)
@@ -1150,19 +1142,29 @@ _C_:   select next line"
           (executable-find "rls"))
   (use-package lsp-mode
     :hook ((rust-mode c-mode c++-mode) . lsp)
+    :init (setq lsp-keymap-prefix "C-c l")
     :config
-    (defun aorst/disable-eldoc-box ()
-      (when eldoc-box-hover-mode
-        (eldoc-box-hover-mode 0))
-      (when eldoc-box-hover-at-point-mode
-        (eldoc-box-hover-at-point-mode 0)))
     (setq lsp-rust-clippy-preference "on"
-          lsp-prefer-capf t)
-    (when (package-installed-p 'flycheck)
-      (use-package lsp-ui
-        :hook (lsp-ui-mode . aorst/disable-eldoc-box)
-        :commands lsp-ui-mode
-        :config (lsp-ui-mode)))))
+          lsp-prefer-capf t
+          lsp-enable-symbol-highlighting nil)
+    (use-package lsp-ui
+      :commands lsp-ui-mode
+      :hook (lsp-ui-mode . aorst/disable-eldoc-box)
+      :bind (:map lsp-ui-mode-map
+                  ("M-." . lsp-ui-peek-find-definitions)
+                  ("M-/" . lsp-ui-peek-find-references))
+      :config
+      (defun aorst/disable-eldoc-box ()
+        (eldoc-box-hover-mode 0)
+        (eldoc-box-hover-at-point-mode 0))
+      (setq lsp-ui-doc-border (face-attribute 'mode-line-inactive :background)
+            lsp-ui-sideline-enable nil
+            lsp-ui-imenu-enable nil)
+      (when (fboundp 'aorst/escape)
+        (define-advice lsp-ui-doc--make-request (:around (foo))
+          (unless (eq this-command 'aorst/escape)
+            (funcall foo))))
+      (lsp-ui-mode))))
 
 (use-package project
   :ensure nil
