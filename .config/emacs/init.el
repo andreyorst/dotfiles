@@ -953,6 +953,24 @@ are defining or executing a macro."
      1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
   (ivy-mode 1))
 
+(use-package ivy-posframe
+  :after ivy
+  :config
+  (defun aorst/posframe-position (str)
+    (ivy-posframe--display str #'aorst/posframe-unser-tabs-center))
+  (defun aorst/posframe-unser-tabs-center (info)
+    "vaiv."
+    (cons (/ (- (plist-get info :parent-frame-width)
+                (plist-get info :posframe-width))
+             2)
+          (+ (if global-tab-line-mode (window-tab-line-height) 0))))
+  (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
+        ivy-posframe-height-alist '((t . 15))
+        ivy-posframe-parameters '((internal-border-width . 3))
+        ivy-posframe-width 100)
+  (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
+  (ivy-posframe-mode +1))
+
 (use-package company
   :commands global-company-mode
   :bind (:map company-active-map

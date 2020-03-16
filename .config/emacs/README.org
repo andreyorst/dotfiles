@@ -1709,7 +1709,7 @@ anyways.   Counsel  has  nice   =counsel-file-fump=  command  that  uses
     (ivy-mode 1))
 #+end_src
 
-** COMMENT Ivy Posframe
+** Ivy Posframe
 This package displays =ivy= in separate frame on top of Emacs.
 
 #+begin_src emacs-lisp
