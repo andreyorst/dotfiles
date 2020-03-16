@@ -934,6 +934,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (setq flymake-fringe-indicator-position 'right-fringe)
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
+(use-package flycheck
+  :config
+  (setq flycheck-indication-mode 'right-fringe))
+
 (use-package hydra
   :bind (("<f5>" . hydrant/zoom/body))
   :config (defhydra hydrant/zoom (:hint nil)
@@ -1059,11 +1063,13 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (company-flx-mode +1))
 
-(use-package company-quickhelp
+(use-package company-posframe
   :after company
   :config
-  (company-quickhelp-mode)
-  (setq company-quickhelp-use-propertized-text t))
+  (setq company-posframe-quickhelp-show-header nil
+        company-posframe-show-indicator nil
+        company-posframe-show-metadata nil)
+  (company-posframe-mode))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -1142,19 +1148,21 @@ _C_:   select next line"
 
 (when (or (executable-find "clangd")
           (executable-find "rls"))
-  (use-package eglot
-    :hook ((rust-mode . aorst/configure-and-start-rls)
-           ((c-mode c++-mode) . eglot-ensure))
+  (use-package lsp-mode
+    :hook ((rust-mode c-mode c++-mode) . lsp)
     :config
-    (defun aorst/configure-and-start-rls ()
-      "Configure RLS via `eglot-workspace-configuration' variable and start eglot."
-      (interactive)
-      (setq eglot-workspace-configuration '((:rust . (:clippy_preference "on"))))
-      (eglot-ensure))
-    (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=true")))
-    (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-    ;; (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
-    (setq eglot-events-buffer-size 0)))
+    (defun aorst/disable-eldoc-box ()
+      (when eldoc-box-hover-mode
+        (eldoc-box-hover-mode 0))
+      (when eldoc-box-hover-at-point-mode
+        (eldoc-box-hover-at-point-mode 0)))
+    (setq lsp-rust-clippy-preference "on"
+          lsp-prefer-capf t)
+    (when (package-installed-p 'flycheck)
+      (use-package lsp-ui
+        :hook (lsp-ui-mode . aorst/disable-eldoc-box)
+        :commands lsp-ui-mode
+        :config (lsp-ui-mode)))))
 
 (use-package project
   :ensure nil
