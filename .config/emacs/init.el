@@ -574,67 +574,6 @@ are defining or executing a macro."
   :ensure nil
   :config (setq uniquify-buffer-name-style 'forward))
 
-(unless (version< emacs-version "27")
-  (use-package tab-line
-    :ensure nil
-    :hook (after-init . global-tab-line-mode)
-    :config
-    (defun tab-line-close-tab (&optional e)
-      "Close the selected tab.
-If tab is presented in another window, close the tab by using `bury-buffer` function.
-If tab is uniq to all existing windows, kill the buffer with `kill-buffer` function.
-Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
-      (interactive "e")
-      (let* ((posnp (event-start e))
-             (window (posn-window posnp))
-             (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-        (with-selected-window window
-          (let ((tab-list (tab-line-tabs-window-buffers))
-                (buffer-list (flatten-list
-                              (seq-reduce (lambda (list window)
-                                            (select-window window t)
-                                            (cons (tab-line-tabs-window-buffers) list))
-                                          (window-list) nil))))
-            (select-window window)
-            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-                (progn
-                  (if (eq buffer (current-buffer))
-                      (bury-buffer)
-                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
-                  (unless (cdr tab-list)
-                    (ignore-errors (delete-window window))))
-              (and (kill-buffer buffer)
-                   (unless (cdr tab-list)
-                     (ignore-errors (delete-window window)))))))
-        (force-mode-line-update)))
-    (setq tab-line-new-tab-choice nil
-          tab-line-close-button-show nil
-          tab-line-separator nil
-          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                            'keymap tab-line-right-map
-                                            'mouse-face 'tab-line-highlight
-                                            'help-echo "Click to scroll right")
-          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                           'keymap tab-line-left-map
-                                           'mouse-face 'tab-line-highlight
-                                           'help-echo "Click to scroll left"))
-    (let ((bg (if (facep 'solaire-default-face)
-                  (face-attribute 'solaire-default-face :background)
-                (face-attribute 'default :background)))
-          (fg (face-attribute 'default :foreground))
-          (base (face-attribute 'mode-line :background))
-          (box-width 8))
-      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
-      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
-      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
-      (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
-    (dolist (mode '(ediff-mode
-                    process-menu-mode
-                    term-mode
-                    vterm-mode))
-      (add-to-list 'tab-line-exclude-modes mode))))
-
 (use-package display-line-numbers
   :ensure nil
   :config

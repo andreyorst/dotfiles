@@ -1067,7 +1067,7 @@ adding directory name in the buffer name.
     :config (setq uniquify-buffer-name-style 'forward))
 #+end_src
 
-** Tabline
+** COMMENT Tabline
 Starting  with Emacs  27  native tab  support is  present.  I want  to
 customize tab appearance to match my theme.
 
