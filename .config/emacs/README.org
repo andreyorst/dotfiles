@@ -1709,7 +1709,7 @@ anyways.   Counsel  has  nice   =counsel-file-fump=  command  that  uses
     (ivy-mode 1))
 #+end_src
 
-** Ivy Posframe
+** COMMENT Ivy Posframe
 This package displays =ivy= in separate frame on top of Emacs.
 
 #+begin_src emacs-lisp
@@ -1723,13 +1723,14 @@ This package displays =ivy= in separate frame on top of Emacs.
       (cons (/ (- (plist-get info :parent-frame-width)
                   (plist-get info :posframe-width))
                2)
-            (window-tab-line-height)))
+            (+ (if global-tab-line-mode (window-tab-line-height) 0))))
     (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
           ivy-posframe-height-alist '((t . 15))
           ivy-posframe-parameters '((internal-border-width . 3))
           ivy-posframe-width 100)
     (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
     (ivy-posframe-mode +1))
+
 #+end_src
 
 ** Company
@@ -1776,6 +1777,14 @@ This package also requires these extra dependencies:
     (setq company-posframe-quickhelp-show-header nil
           company-posframe-show-indicator nil
           company-posframe-show-metadata nil)
+    (defvar company-posframe-quickhelp-show-params
+      (list :poshandler #'company-posframe-quickhelp-right-poshandler
+            :internal-border-width 1
+            :timeout 60
+            :internal-border-color (face-attribute 'mode-line-inactive :background)
+            :no-properties nil
+            :poshandler nil)
+      "List of parameters passed to `posframe-show'.")
     (company-posframe-mode))
 #+end_src
 

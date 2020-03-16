@@ -953,24 +953,6 @@ are defining or executing a macro."
      1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
   (ivy-mode 1))
 
-(use-package ivy-posframe
-  :after ivy
-  :config
-  (defun aorst/posframe-position (str)
-    (ivy-posframe--display str #'aorst/posframe-unser-tabs-center))
-  (defun aorst/posframe-unser-tabs-center (info)
-    "vaiv."
-    (cons (/ (- (plist-get info :parent-frame-width)
-                (plist-get info :posframe-width))
-             2)
-          (window-tab-line-height)))
-  (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
-        ivy-posframe-height-alist '((t . 15))
-        ivy-posframe-parameters '((internal-border-width . 3))
-        ivy-posframe-width 100)
-  (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
-  (ivy-posframe-mode +1))
-
 (use-package company
   :commands global-company-mode
   :bind (:map company-active-map
@@ -1001,6 +983,14 @@ are defining or executing a macro."
   (setq company-posframe-quickhelp-show-header nil
         company-posframe-show-indicator nil
         company-posframe-show-metadata nil)
+  (defvar company-posframe-quickhelp-show-params
+    (list :poshandler #'company-posframe-quickhelp-right-poshandler
+          :internal-border-width 1
+          :timeout 60
+          :internal-border-color (face-attribute 'mode-line-inactive :background)
+          :no-properties nil
+          :poshandler nil)
+    "List of parameters passed to `posframe-show'.")
   (company-posframe-mode))
 
 (use-package undo-tree
@@ -1153,7 +1143,8 @@ _C_:   select next line"
   (defun aorst/eldoc-box-enable ()
     "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
     (interactive)
-    (when (aorst/real-buffer-p)
+    (when (and (aorst/real-buffer-p)
+               (not lsp-ui-mode))
       (eldoc-box-hover-at-point-mode))))
 
 (use-package hideshow
