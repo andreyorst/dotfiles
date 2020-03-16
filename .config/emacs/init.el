@@ -1162,7 +1162,7 @@ _C_:   select next line"
     "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
     (interactive)
     (when (and (aorst/real-buffer-p)
-               (not lsp-ui-mode))
+               (not (bound-and-true-p lsp-ui-mode)))
       (eldoc-box-hover-at-point-mode))))
 
 (use-package hideshow
