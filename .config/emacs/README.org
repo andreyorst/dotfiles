@@ -1656,10 +1656,9 @@ anyways.   Counsel  has  nice   =counsel-file-fump=  command  that  uses
 #+begin_src emacs-lisp
   (use-package ivy
     :commands ivy-mode
-    :bind (("C-x C-b" . ivy-switch-buffer)
-           ("C-x b" . ivy-switch-buffer))
     :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
            (minibuffer-exit-hook . aorst/minibuffer-restore-garbage-collection))
+    :bind (("C-x b" . ivy-switch-buffer))
     :config
     (use-package counsel
       :commands (counsel-M-x
@@ -1689,7 +1688,8 @@ anyways.   Counsel  has  nice   =counsel-file-fump=  command  that  uses
              ("C-h f" . counsel-describe-function)
              ("C-h C-f" . counsel-describe-face)
              ("C-h v" . counsel-describe-variable)
-             ("C-h l" . counsel-find-library)))
+             ("C-h l" . counsel-find-library)
+             ("C-x C-b" . counsel-switch-buffer)))
     (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
           ivy-count-format ""
           ivy-ignore-buffers '("\\` " "\\`\\*")

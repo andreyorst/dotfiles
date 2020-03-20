@@ -901,10 +901,9 @@ are defining or executing a macro."
 
 (use-package ivy
   :commands ivy-mode
-  :bind (("C-x C-b" . ivy-switch-buffer)
-         ("C-x b" . ivy-switch-buffer))
   :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
          (minibuffer-exit-hook . aorst/minibuffer-restore-garbage-collection))
+  :bind (("C-x b" . ivy-switch-buffer))
   :config
   (use-package counsel
     :commands (counsel-M-x
@@ -934,7 +933,8 @@ are defining or executing a macro."
            ("C-h f" . counsel-describe-function)
            ("C-h C-f" . counsel-describe-face)
            ("C-h v" . counsel-describe-variable)
-           ("C-h l" . counsel-find-library)))
+           ("C-h l" . counsel-find-library)
+           ("C-x C-b" . counsel-switch-buffer)))
   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format ""
         ivy-ignore-buffers '("\\` " "\\`\\*")
