@@ -1096,17 +1096,14 @@ _C_:   select next line"
           lsp-enable-symbol-highlighting nil)
     (use-package lsp-ui
       :commands lsp-ui-mode
-      :hook (lsp-ui-mode . aorst/disable-eldoc-box)
       :bind (:map lsp-ui-mode-map
                   ("M-." . lsp-ui-peek-find-definitions)
                   ("M-/" . lsp-ui-peek-find-references))
       :config
-      (defun aorst/disable-eldoc-box ()
-        (eldoc-box-hover-mode 0)
-        (eldoc-box-hover-at-point-mode 0))
       (setq lsp-ui-doc-border (face-attribute 'mode-line-inactive :background)
             lsp-ui-sideline-enable nil
-            lsp-ui-imenu-enable nil)
+            lsp-ui-imenu-enable nil
+            lsp-ui-doc-delay 0.7) ;; higher than eldoc delay
       (when (fboundp 'aorst/escape)
         (define-advice lsp-ui-doc--make-request (:around (foo))
           (unless (eq this-command 'aorst/escape)
@@ -1152,16 +1149,16 @@ _C_:   select next line"
 (use-package eldoc-box
   :hook (eldoc-mode . aorst/eldoc-box-enable)
   :config
-  (setq x-wait-for-event-timeout 0)
-  (setq eldoc-box-max-pixel-width 1920
+  (setq x-wait-for-event-timeout 0
+        eldoc-idle-delay 0.5
+        eldoc-box-max-pixel-width 1920
         eldoc-box-max-pixel-height 1080)
   (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
   :init
   (defun aorst/eldoc-box-enable ()
     "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
     (interactive)
-    (when (and (aorst/real-buffer-p)
-               (not (bound-and-true-p lsp-ui-mode)))
+    (when (aorst/real-buffer-p)
       (eldoc-box-hover-at-point-mode))))
 
 (use-package hideshow
