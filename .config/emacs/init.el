@@ -1001,14 +1001,13 @@ are defining or executing a macro."
   (setq company-posframe-quickhelp-show-header nil
         company-posframe-show-indicator nil
         company-posframe-show-metadata nil)
-  (defvar company-posframe-quickhelp-show-params
-    (list :poshandler #'company-posframe-quickhelp-right-poshandler
-          :internal-border-width 1
-          :timeout 60
-          :internal-border-color (face-attribute 'mode-line-inactive :background)
-          :no-properties nil
-          :poshandler nil)
-    "List of parameters passed to `posframe-show'.")
+  (setq-default company-posframe-quickhelp-show-params
+                (list :poshandler #'company-posframe-quickhelp-right-poshandler
+                      :internal-border-width 1
+                      :timeout 60
+                      :internal-border-color (face-attribute 'mode-line-inactive :background)
+                      :no-properties nil
+                      :poshandler nil))
   (company-posframe-mode))
 
 (use-package undo-tree
