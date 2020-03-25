@@ -210,8 +210,12 @@ Let's set full name and e-mail address in case I would send e-mail from
 Emacs, or some modes can use those automatically, like Org Mode:
 
 #+begin_src emacs-lisp
-  (setq user-mail-address "andreyorst@gmail.com"
-        user-full-name "Andrey Orst")
+  (use-package startup
+    :no-require t
+    :ensure nil
+    :custom
+    (user-mail-address "andreyorst@gmail.com")
+    (user-full-name "Andrey Orst"))
 #+end_src
 
 ** Bell
@@ -229,10 +233,13 @@ I don't  know who decided  that having backups  all over the  place is
 good idea, but I don't think alike.
 
 #+begin_src emacs-lisp
-  (setq backup-by-copying t
-        create-lockfiles nil
-        backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-        auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups/" t)))
+  (use-package files
+    :ensure nil
+    :custom
+    (backup-by-copying t)
+    (create-lockfiles nil)
+    (backup-directory-alist '(("." . "~/.cache/emacs-backups")))
+    (auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups/" t))))
 #+end_src
 
 ** Yes or No
@@ -240,7 +247,11 @@ For some  reason in some  situations Emacs asks  for typing =yes=  or =no=
 explicitly, instead of accepting =y= or =n=. This can be fixed with this.
 
 #+begin_src emacs-lisp
-  (fset 'yes-or-no-p 'y-or-n-p)
+  (use-package subr
+    :no-require t
+    :ensure nil
+    :init
+    (fset 'yes-or-no-p 'y-or-n-p))
 #+end_src
 
 ** Echo Keystrokes
@@ -289,8 +300,12 @@ interfering to  my configuration  files, so lets  move it  to separate
 file.
 
 #+begin_src emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file :noerror)
+  (use-package cus-edit
+    :ensure nil
+    :custom
+    (custom-file (expand-file-name "custom.el" user-emacs-directory))
+    :init
+    (load custom-file :noerror))
 #+end_src
 
 I also don't like that Emacs  has disabled commands, and enabling them
@@ -323,7 +338,11 @@ OS. Luckily for  me, Emacs provides a method to  switch layouts within
 Emacs with =C-\=, so all common shortcuts will still work fine.
 
 #+begin_src emacs-lisp
-  (setq default-input-method 'russian-computer)
+  (use-package mule-cmds
+    :no-require t
+    :ensure nil
+    :custom
+    (default-input-method 'russian-computer))
 #+end_src
 
 I'm  not   using  =russian-jcuken=   here  because  it   represents  the
@@ -345,15 +364,22 @@ faster.  Since  it's no  longer Emacs  Lisp interaction  buffer, let's
 also remove initial message:
 
 #+begin_src emacs-lisp
-  (setq initial-major-mode 'fundamental-mode
-        initial-scratch-message "")
+  (use-package startup
+    :no-require t
+    :ensure nil
+    :custom
+    (initial-major-mode 'fundamental-mode)
+    (initial-scratch-message ""))
 #+end_src
 
 ** Selection
 It is conveinient to delete selection by typing:
 
 #+begin_src emacs-lisp
-  (delete-selection-mode t)
+  (use-package delsel
+    :ensure nil
+    :init
+    (delete-selection-mode t))
 #+end_src
 
 ** Default Bindings and More
@@ -410,7 +436,7 @@ loaded.
 
 I prefix my  functions with =aorst/= and variables with  =aorst--= to make
 those easier  to browse  with =ivy=  and to  explicitly define  that the
-function is not a part of a particular plugin.
+function is not a part of a particular package.
 
 ** =real-buffer-p=
 This function decides if buffer  should be considered a "real" buffer,
@@ -432,10 +458,11 @@ file-visiting while not visiting a particular file, like =*scratch*=
 
 ** =real-buffer-setup=
 If only  certain buffers  could +be so  grossly incandescent+  *have damn
-fringes!* With  Solaire Mode  Emacs becomes way  more like  true editor
-with actual  graphical interface,  but these  fringes drive  me crazy.
-That's why  I wrote  a function =aorst/real-buffer-setup=,  that enables
-fringes only  in buffers that  are affected  by Solaire Mode
+fringes!* With Solaire Mode Emacs becomes way more like true GUI editor
+with actual elements of user interface represented by different color,
+but  these fringes  drive me  crazy.  That's  why I  wrote a  function
+=aorst/real-buffer-setup=, that enables fringes only in buffers that are
+affected by Solaire Mode:
 
 #+begin_src emacs-lisp
   (defun aorst/real-buffer-setup (&rest _)
@@ -498,6 +525,9 @@ This function checks if font is available on the system.
 #+end_src
 
 ** =indent-buffer=
+This function  is kinda  a way  to indent a  buffer by  using language
+indentation rules provided by current mode. If there's a tool that can
+properly format buffer it should be used instead of this function.
 
 #+begin_src emacs-lisp
   (defun aorst/indent-buffer ()
@@ -518,7 +548,11 @@ Emacs displays splash screen once started  with no files. I don't need
 it, so let's disable it.
 
 #+begin_src emacs-lisp
-  (setq inhibit-splash-screen t)
+  (use-package startup
+    :no-require t
+    :ensure nil
+    :custom
+    (inhibit-splash-screen t))
 #+end_src
 
 ** Menus and Tooltips
@@ -558,8 +592,7 @@ found we try =Source Code Pro= as a fallback option.
 #+end_src
 
 ** Icons
-*all-the-icons*  package  provides  nice  icons  for  Emacs  via  custom
-fonts.
+=all-the-icons= package provides nice icons for Emacs via custom fonts.
 
 #+begin_src emacs-lisp
   (use-package all-the-icons
@@ -569,23 +602,21 @@ fonts.
       (all-the-icons-install-fonts t)))
 #+end_src
 
-I don't use  this package directly yet, but some  other packages, like
-DOOM Modeline or Treemacs.
+I don't  use this package  directly yet,  but some other  packages do,
+like DOOM Modeline or Treemacs.
 
 ** Theme
-I'm  using *doom-themes*  package  to  make my  Emacs  look like  modern
-editor. This theme collection was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find
-these themes  actually great on  its own.  This package  contains nice
-variant  of Atom-like  One  theme which  I  like, but  it  is also  an
-amazingly  well put  package,  which defines  colors  for pretty  much
-everything in  Emacs.  It also features  Treemacs configuration, which
-is nice, but I want to change a little bit of it.
+I'm using *doom-themes* package to make my Emacs look modern. This theme
+collection  was developed  for [[https://github.com/hlissner/doom-emacs][DOOM  Emacs]],  and I  find these  themes
+actually  great on  its own.   This package  contains nice  variant of
+Atom-like One theme which I like, but it is also an amazingly well put
+package, which defines colors for pretty much everything in Emacs.
 
 #+begin_src emacs-lisp
   (use-package doom-themes
-    :config
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
+    :custom
+    (doom-themes-enable-bold t)
+    (doom-themes-enable-italic t)
     :init
     (load-theme 'doom-one t)
     (set-face-attribute 'highlight nil
@@ -637,6 +668,7 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
     :hook (((after-revert
              change-major-mode
              org-src-mode) . turn-on-solaire-mode)
+           (focus-in . solaire-mode-reset)
            (snippet-mode . solaire-mode))
     :config
     (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -788,22 +820,38 @@ that Treemacs will look just as great as DOOM themed Emacs!
 #+begin_src emacs-lisp
   (when window-system
     (use-package treemacs
-      :commands (treemacs-follow-mode)
+      :commands (treemacs-follow-mode
+                 treemacs-filewatch-mode
+                 treemacs-fringe-indicator-mode
+                 treemacs-load-theme)
       :bind (("<f7>" . treemacs)
              ("<f8>" . treemacs-select-window)
              :map treemacs-mode-map
              ([C-tab] . aorst/treemacs-expand-all-projects))
-      :hook ((after-init . aorst/treemacs-init-setup)
-             (treemacs-mode . aorst/treemacs-setup)
+      :hook ((after-init . aorst/treemacs-after-init-setup)
+             (treemacs-mode . aorst/after-treemacs-setup)
              (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
              (treemacs-switch-workspace . treemacs-set-fallback-workspace)
              (treemacs-mode . aorst/treemacs-setup-title))
       :config
       (use-package treemacs-magit)
+      (setq treemacs-width 34
+            treemacs-is-never-other-window t
+            treemacs-space-between-root-nodes nil
+            treemacs-indentation 2)
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode nil)
       (set-face-attribute 'treemacs-root-face nil
                           :foreground (face-attribute 'default :foreground)
                           :height 1.0
                           :weight 'normal)
+      (defun aorst/treemacs-ignore (file _)
+        (or (s-ends-with? ".elc" file)
+            (s-ends-with? ".o" file)
+            (s-ends-with? ".a" file)
+            (string= file ".svn")))
+      (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
       (treemacs-create-theme "Atom"
         :config
         (progn
@@ -959,6 +1007,7 @@ that Treemacs will look just as great as DOOM themed Emacs!
                                    :v-adjust 0
                                    :face '(:inherit font-lock-doc-face :slant normal)))
            :extensions (fallback))))
+      :init
       (defun aorst/treemacs-expand-all-projects (&optional _)
         "Expand all projects."
         (interactive)
@@ -971,30 +1020,40 @@ that Treemacs will look just as great as DOOM themed Emacs!
                 (treemacs--expand-root-node pos)))))
         (treemacs--maybe-recenter 'on-distance))
       (defun aorst/treemacs-variable-pitch-labels (&rest _)
-        (dolist (face '(treemacs-root-face
-                        treemacs-git-unmodified-face
-                        treemacs-git-modified-face
-                        treemacs-git-renamed-face
-                        treemacs-git-ignored-face
-                        treemacs-git-untracked-face
-                        treemacs-git-added-face
-                        treemacs-git-conflict-face
+        (dolist (face '(treemacs-file-face
+                        treemacs-root-face
+                        treemacs-tags-face
                         treemacs-directory-face
                         treemacs-directory-collapsed-face
-                        treemacs-file-face
-                        treemacs-tags-face))
+                        treemacs-term-node-face
+                        treemacs-help-title-face
+                        treemacs-help-column-face
+                        treemacs-git-added-face
+                        treemacs-git-ignored-face
+                        treemacs-git-renamed-face
+                        treemacs-git-conflict-face
+                        treemacs-git-modified-face
+                        treemacs-git-unmodified-face
+                        treemacs-git-untracked-face
+                        treemacs-root-unreadable-face
+                        treemacs-root-remote-face
+                        treemacs-root-remote-unreadable-face
+                        treemacs-root-remote-disconnected-face
+                        treemacs-fringe-indicator-face
+                        treemacs-on-failure-pulse-face
+                        treemacs-on-success-pulse-face))
           (let ((faces (face-attribute face :inherit nil)))
             (set-face-attribute
              face nil :inherit
              `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
-      (defun aorst/treemacs-init-setup ()
+      (defun aorst/treemacs-after-init-setup ()
         "Set treemacs theme, open treemacs, and expand all projects."
         (treemacs-load-theme "Atom")
         (setq treemacs-collapse-dirs 0)
         (treemacs)
         (aorst/treemacs-expand-all-projects)
         (windmove-right))
-      (defun aorst/treemacs-setup ()
+      (defun aorst/after-treemacs-setup ()
         "Set treemacs buffer common settings."
         (setq tab-width 1
               mode-line-format nil
@@ -1008,18 +1067,12 @@ that Treemacs will look just as great as DOOM themed Emacs!
         (set-window-fringes nil 0 0 t)
         (aorst/treemacs-variable-pitch-labels))
       (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
-      (defun aorst/treemacs-ignore (file _)
-        (or (s-ends-with? ".elc" file)
-            (s-ends-with? ".o" file)
-            (s-ends-with? ".a" file)
-            (string= file ".svn")))
-      (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
       (defun aorst/treemacs-setup-title ()
         (let ((format '((:eval (concat
                                 (make-string
                                  (let ((width (window-width)))
                                    (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
-                                 ?\ )
+                                 ?\s)
                                 "Treemacs")))))
           (if (version<= emacs-version "27")
               (setq header-line-format format)
@@ -1031,20 +1084,10 @@ that Treemacs will look just as great as DOOM themed Emacs!
                       'tab-line)))
           (face-remap-add-relative face
                                    :box (list :line-width 7 :color bg)
-                                   :background bg :foreground fg :height 1.0))))
-    (setq treemacs-width 34
-          treemacs-is-never-other-window t
-          treemacs-space-between-root-nodes nil
-          treemacs-indentation 2)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode nil))
+                                   :background bg :foreground fg :height 1.0)))))
 #+end_src
 
-Before using Treemacs I was a  happy user of another filetree package:
-[[https://github.com/jaypei/emacs-neotree][Neotree]]. Unfortunately, last  commit to this package dates  to Nov 21,
-2018, and since then there were no maintenance, and I was experiencing
-a bug which made me move to Treemacs.
+This is my Treemacs theme that mimics Atom editor file tree:
 
 ** Minions
 This  package  implements   a  menu  that  lists   all  enabled  minor
@@ -1454,7 +1497,19 @@ and reliability. Emacs has a nice  package called Cider, which is sort
 of an IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
-  (use-package cider)
+  (use-package cider
+    :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
+           ((cider-repl-mode cider-mode) . eldoc-mode))
+    :custom-face
+    (cider-error-highlight-face ((t (:inherit flymake-error))))
+    (cider-fringe-face ((t (:inherit flymake-warning))))
+    (cider-fragile-button-face ((t (:box (:line-width -1 :color nil :style nil)
+                                         :inherit (font-lock-warning-face)))))
+    (cider-deprecated-face ((t (:inherit smerge-upper))))
+    (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
+    :config
+    (setq cider-repl-display-help-banner nil
+          cider-repl-tab-command nil))
 #+end_src
 
 * Tools
@@ -1621,23 +1676,31 @@ here, since it also provides completion for it.
 Now that's a quality package. It makes writing LISP so easy, that I've
 never thought it could be.
 
+I'm using a  fork of this package,  located at [[https://github.com/jvshahid/parinfer-mode/tree/master][jvshahid/parinfer-mode]],
+and it explicitly requires these two dependencies:
+
 #+begin_src emacs-lisp
-  (use-package parinfer
-    :commands (parinfer-mode
-               parinfer-toggle-mode)
+  (use-package paredit)
+  (use-package selected)
+#+end_src
+
+The package itself is located under my local =Git= directory, that I use
+to host various projects that I've cloned with =git=.
+
+#+begin_src emacs-lisp
+  (use-package parinfer-smart
+    :load-path "~/Git/parinfer-mode"
     :hook ((clojure-mode
             emacs-lisp-mode
             common-lisp-mode
             scheme-mode
             lisp-mode
             racket-mode) . parinfer-mode)
-    :bind (:map parinfer-mode-map
-                ("C-," . parinfer-toggle-mode))
-    :config (setq parinfer-extensions
-                  '(defaults
-                     pretty-parens
-                     smart-tab
-                     smart-yank)))
+    :config
+    (setq parinfer-extensions '(defaults
+                                 pretty-parens
+                                 smart-tab
+                                 smart-yank)))
 #+end_src
 
 Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
@@ -1895,32 +1958,6 @@ guess I'll figure out best mappings over time.
   (use-package mc-extras)
 #+end_src
 
-** COMMENT Eglot
-Emacs polyglot. LSP client.
-
- #+begin_src emacs-lisp
-   (when (or (executable-find "clangd")
-             (executable-find "rls"))
-     (use-package eglot
-       :hook ((rust-mode . aorst/configure-and-start-rls)
-              ((c-mode c++-mode) . eglot-ensure))
-       :config
-       (defun aorst/configure-and-start-rls ()
-         "Configure RLS via `eglot-workspace-configuration' variable and start eglot."
-         (interactive)
-         (setq eglot-workspace-configuration '((:rust . (:clippy_preference "on"))))
-         (eglot-ensure))
-       (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--log=error" "--background-index=true")))
-       (add-to-list 'eglot-ignored-server-capabilites :documentHighlightProvider)
-       ;; (add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
-       (setq eglot-events-buffer-size 0)))
-#+end_src
-
-There's still one  problem though. [[Eglot]] use =project.el=  to detect the
-root of current  project to run server in. Which  results in the roots
-of the  project is found not  exactly where the project  root actually
-is, e.g. when multiple projects are stored in single repository.
-
 ** LSP Mode
 Another LSP client for Emacs.
 
@@ -2049,19 +2086,22 @@ by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell
 
 #+begin_src emacs-lisp
   (use-package eldoc-box
-    :hook (eldoc-mode . aorst/eldoc-box-enable)
+    :hook ((eldoc-mode . aorst/eldoc-box-enable)
+           (eldoc-box-buffer . aorst/eldoc-box-buffer-setup))
     :config
     (setq x-wait-for-event-timeout 0
           eldoc-idle-delay 0.5
-          eldoc-box-max-pixel-width 1920
-          eldoc-box-max-pixel-height 1080)
+          eldoc-box-max-pixel-width 640
+          eldoc-box-max-pixel-height 480)
     (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
     :init
     (defun aorst/eldoc-box-enable ()
       "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
       (interactive)
       (when (aorst/real-buffer-p)
-        (eldoc-box-hover-at-point-mode))))
+        (eldoc-box-hover-at-point-mode)))
+    (defun aorst/eldoc-box-buffer-setup ()
+      (unless word-wrap (toggle-word-wrap))))
 #+end_src
 
 ** Hideshow
@@ -2090,7 +2130,7 @@ This built in mode provides code folding.
         (transient-setup 'aorst/hideshow-menu nil nil))))
 #+end_src
 
-** Desktop
+** COMMENT Desktop
 This is  really nice feature  that allows me  to save my  workspace on
 disk and  do not restore  all buffers and  windows every time  I start
 Emacs. It adds some time to the startup though.
@@ -2118,21 +2158,21 @@ Emacs. It adds some time to the startup though.
       (defun aorst/desktop-restore ()
         "Restore a saved emacs session."
         (interactive)
+        (desktop-save-mode t)
         (if (aorst/saved-desktop-p)
             (desktop-read)
           (message "No desktop found.")))
       (defun aorst/desktop-save ()
         "Save an emacs session."
         (interactive)
-        (when (aorst/saved-desktop-p)
-          (desktop-save-in-desktop-dir))
-        (message "Session not saved.")
-        (desktop-save-in-desktop-dir))
+        (if (aorst/saved-desktop-p)
+            (desktop-save-in-desktop-dir)
+          (message "Session not saved.")
+          (desktop-save-in-desktop-dir)))
       (defun aorst/desktop-auto-save ()
         "Automatically save desktop."
         (when (eq (desktop-owner) (emacs-pid))
-          (aorst/desktop-save)))
-      (desktop-save-mode t)))
+          (aorst/desktop-save)))))
 #+end_src
 
 I wonder if  it could store unsaved buffers so  all my changes persist

@@ -27,17 +27,28 @@
   (require 'use-package)
   (setq use-package-always-ensure t))
 
-(setq user-mail-address "andreyorst@gmail.com"
-      user-full-name "Andrey Orst")
+(use-package startup
+  :no-require t
+  :ensure nil
+  :custom
+  (user-mail-address "andreyorst@gmail.com")
+  (user-full-name "Andrey Orst"))
 
 (setq ring-bell-function 'ignore)
 
-(setq backup-by-copying t
-      create-lockfiles nil
-      backup-directory-alist '(("." . "~/.cache/emacs-backups"))
-      auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups/" t)))
+(use-package files
+  :ensure nil
+  :custom
+  (backup-by-copying t)
+  (create-lockfiles nil)
+  (backup-directory-alist '(("." . "~/.cache/emacs-backups")))
+  (auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups/" t))))
 
-(fset 'yes-or-no-p 'y-or-n-p)
+(use-package subr
+  :no-require t
+  :ensure nil
+  :init
+  (fset 'yes-or-no-p 'y-or-n-p))
 
 (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 5)))
 
@@ -52,8 +63,12 @@
 
 (setq-default indent-tabs-mode nil)
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file :noerror)
+(use-package cus-edit
+  :ensure nil
+  :custom
+  (custom-file (expand-file-name "custom.el" user-emacs-directory))
+  :init
+  (load custom-file :noerror))
 
 (defvar disabled-commands (expand-file-name ".disabled.el" user-emacs-directory)
   "File to store disabled commands, that were enabled permamently.")
@@ -65,16 +80,27 @@
 
 (savehist-mode 1)
 
-(setq default-input-method 'russian-computer)
+(use-package mule-cmds
+  :no-require t
+  :ensure nil
+  :custom
+  (default-input-method 'russian-computer))
 
 (prefer-coding-system 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
-(setq initial-major-mode 'fundamental-mode
-      initial-scratch-message "")
+(use-package startup
+  :no-require t
+  :ensure nil
+  :custom
+  (initial-major-mode 'fundamental-mode)
+  (initial-scratch-message ""))
 
-(delete-selection-mode t)
+(use-package delsel
+  :ensure nil
+  :init
+  (delete-selection-mode t))
 
 (use-package simple
   :ensure nil
@@ -161,7 +187,11 @@ are defining or executing a macro."
       (deactivate-mark))))
 (global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
 
-(setq inhibit-splash-screen t)
+(use-package startup
+  :no-require t
+  :ensure nil
+  :custom
+  (inhibit-splash-screen t))
 
 (tooltip-mode -1)
 ; (menu-bar-mode -1)
@@ -187,9 +217,9 @@ are defining or executing a macro."
     (all-the-icons-install-fonts t)))
 
 (use-package doom-themes
-  :config
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
   :init
   (load-theme 'doom-one t)
   (set-face-attribute 'highlight nil
@@ -218,6 +248,7 @@ are defining or executing a macro."
   :hook (((after-revert
            change-major-mode
            org-src-mode) . turn-on-solaire-mode)
+         (focus-in . solaire-mode-reset)
          (snippet-mode . solaire-mode))
   :config
   (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -314,22 +345,38 @@ are defining or executing a macro."
 
 (when window-system
   (use-package treemacs
-    :commands (treemacs-follow-mode)
+    :commands (treemacs-follow-mode
+               treemacs-filewatch-mode
+               treemacs-fringe-indicator-mode
+               treemacs-load-theme)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window)
            :map treemacs-mode-map
            ([C-tab] . aorst/treemacs-expand-all-projects))
-    :hook ((after-init . aorst/treemacs-init-setup)
-           (treemacs-mode . aorst/treemacs-setup)
+    :hook ((after-init . aorst/treemacs-after-init-setup)
+           (treemacs-mode . aorst/after-treemacs-setup)
            (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
            (treemacs-switch-workspace . treemacs-set-fallback-workspace)
            (treemacs-mode . aorst/treemacs-setup-title))
     :config
     (use-package treemacs-magit)
+    (setq treemacs-width 34
+          treemacs-is-never-other-window t
+          treemacs-space-between-root-nodes nil
+          treemacs-indentation 2)
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode nil)
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (face-attribute 'default :foreground)
                         :height 1.0
                         :weight 'normal)
+    (defun aorst/treemacs-ignore (file _)
+      (or (s-ends-with? ".elc" file)
+          (s-ends-with? ".o" file)
+          (s-ends-with? ".a" file)
+          (string= file ".svn")))
+    (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
     (treemacs-create-theme "Atom"
       :config
       (progn
@@ -485,6 +532,7 @@ are defining or executing a macro."
                                  :v-adjust 0
                                  :face '(:inherit font-lock-doc-face :slant normal)))
          :extensions (fallback))))
+    :init
     (defun aorst/treemacs-expand-all-projects (&optional _)
       "Expand all projects."
       (interactive)
@@ -497,30 +545,40 @@ are defining or executing a macro."
               (treemacs--expand-root-node pos)))))
       (treemacs--maybe-recenter 'on-distance))
     (defun aorst/treemacs-variable-pitch-labels (&rest _)
-      (dolist (face '(treemacs-root-face
-                      treemacs-git-unmodified-face
-                      treemacs-git-modified-face
-                      treemacs-git-renamed-face
-                      treemacs-git-ignored-face
-                      treemacs-git-untracked-face
-                      treemacs-git-added-face
-                      treemacs-git-conflict-face
+      (dolist (face '(treemacs-file-face
+                      treemacs-root-face
+                      treemacs-tags-face
                       treemacs-directory-face
                       treemacs-directory-collapsed-face
-                      treemacs-file-face
-                      treemacs-tags-face))
+                      treemacs-term-node-face
+                      treemacs-help-title-face
+                      treemacs-help-column-face
+                      treemacs-git-added-face
+                      treemacs-git-ignored-face
+                      treemacs-git-renamed-face
+                      treemacs-git-conflict-face
+                      treemacs-git-modified-face
+                      treemacs-git-unmodified-face
+                      treemacs-git-untracked-face
+                      treemacs-root-unreadable-face
+                      treemacs-root-remote-face
+                      treemacs-root-remote-unreadable-face
+                      treemacs-root-remote-disconnected-face
+                      treemacs-fringe-indicator-face
+                      treemacs-on-failure-pulse-face
+                      treemacs-on-success-pulse-face))
         (let ((faces (face-attribute face :inherit nil)))
           (set-face-attribute
            face nil :inherit
            `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
-    (defun aorst/treemacs-init-setup ()
+    (defun aorst/treemacs-after-init-setup ()
       "Set treemacs theme, open treemacs, and expand all projects."
       (treemacs-load-theme "Atom")
       (setq treemacs-collapse-dirs 0)
       (treemacs)
       (aorst/treemacs-expand-all-projects)
       (windmove-right))
-    (defun aorst/treemacs-setup ()
+    (defun aorst/after-treemacs-setup ()
       "Set treemacs buffer common settings."
       (setq tab-width 1
             mode-line-format nil
@@ -534,18 +592,12 @@ are defining or executing a macro."
       (set-window-fringes nil 0 0 t)
       (aorst/treemacs-variable-pitch-labels))
     (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
-    (defun aorst/treemacs-ignore (file _)
-      (or (s-ends-with? ".elc" file)
-          (s-ends-with? ".o" file)
-          (s-ends-with? ".a" file)
-          (string= file ".svn")))
-    (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
     (defun aorst/treemacs-setup-title ()
       (let ((format '((:eval (concat
                               (make-string
                                (let ((width (window-width)))
                                  (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
-                               ?\ )
+                               ?\s)
                               "Treemacs")))))
         (if (version<= emacs-version "27")
             (setq header-line-format format)
@@ -557,14 +609,7 @@ are defining or executing a macro."
                     'tab-line)))
         (face-remap-add-relative face
                                  :box (list :line-width 7 :color bg)
-                                 :background bg :foreground fg :height 1.0))))
-  (setq treemacs-width 34
-        treemacs-is-never-other-window t
-        treemacs-space-between-root-nodes nil
-        treemacs-indentation 2)
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode nil))
+                                 :background bg :foreground fg :height 1.0)))))
 
 (use-package minions
   :commands minions-mode
@@ -776,7 +821,19 @@ are defining or executing a macro."
   :bind (:map perl-mode-map
               ("C-c C-f" . aorst/indent-buffer)))
 
-(use-package cider)
+(use-package cider
+  :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
+         ((cider-repl-mode cider-mode) . eldoc-mode))
+  :custom-face
+  (cider-error-highlight-face ((t (:inherit flymake-error))))
+  (cider-fringe-face ((t (:inherit flymake-warning))))
+  (cider-fragile-button-face ((t (:box (:line-width -1 :color nil :style nil)
+                                       :inherit (font-lock-warning-face)))))
+  (cider-deprecated-face ((t (:inherit smerge-upper))))
+  (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
+  :config
+  (setq cider-repl-display-help-banner nil
+        cider-repl-tab-command nil))
 
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
@@ -882,22 +939,22 @@ are defining or executing a macro."
   :config (setq geiser-active-implementations '(guile)
                 geiser-default-implementation 'guile))
 
-(use-package parinfer
-  :commands (parinfer-mode
-             parinfer-toggle-mode)
+(use-package paredit)
+(use-package selected)
+
+(use-package parinfer-smart
+  :load-path "~/Git/parinfer-mode"
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode
           scheme-mode
           lisp-mode
           racket-mode) . parinfer-mode)
-  :bind (:map parinfer-mode-map
-              ("C-," . parinfer-toggle-mode))
-  :config (setq parinfer-extensions
-                '(defaults
-                   pretty-parens
-                   smart-tab
-                   smart-yank)))
+  :config
+  (setq parinfer-extensions '(defaults
+                               pretty-parens
+                               smart-tab
+                               smart-yank)))
 
 (use-package ivy
   :commands ivy-mode
@@ -1147,19 +1204,22 @@ _C_:   select next line"
     (server-start)))
 
 (use-package eldoc-box
-  :hook (eldoc-mode . aorst/eldoc-box-enable)
+  :hook ((eldoc-mode . aorst/eldoc-box-enable)
+         (eldoc-box-buffer . aorst/eldoc-box-buffer-setup))
   :config
   (setq x-wait-for-event-timeout 0
         eldoc-idle-delay 0.5
-        eldoc-box-max-pixel-width 1920
-        eldoc-box-max-pixel-height 1080)
+        eldoc-box-max-pixel-width 640
+        eldoc-box-max-pixel-height 480)
   (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
   :init
   (defun aorst/eldoc-box-enable ()
     "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
     (interactive)
     (when (aorst/real-buffer-p)
-      (eldoc-box-hover-at-point-mode))))
+      (eldoc-box-hover-at-point-mode)))
+  (defun aorst/eldoc-box-buffer-setup ()
+    (unless word-wrap (toggle-word-wrap))))
 
 (use-package hideshow
   :ensure nil
@@ -1181,44 +1241,6 @@ _C_:   select next line"
     (interactive)
     (when (bound-and-true-p hs-minor-mode)
       (transient-setup 'aorst/hideshow-menu nil nil))))
-
-(when window-system
-  (use-package desktop
-    :ensure nil
-    :hook ((after-init . aorst/desktop-restore)
-           (desktop-after-read . aorst/desktop-remove))
-    :init
-    (setq desktop-path '("~/.dotfiles/.config/emacs/")
-          desktop-dirname "~/.dotfiles/.config/emacs/"
-          desktop-base-file-name "emacs-desktop"
-          desktop-save t
-          desktop-load-locked-desktop t)
-    (defun aorst/desktop-remove ()
-      "Remove current desktop, but save `desktop-dirname'."
-      (let ((desktop desktop-dirname))
-        (desktop-remove)
-        (setq desktop-dirname desktop)))
-    (defun aorst/saved-desktop-p ()
-      "Check if desktop exists."
-      (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
-    (defun aorst/desktop-restore ()
-      "Restore a saved emacs session."
-      (interactive)
-      (if (aorst/saved-desktop-p)
-          (desktop-read)
-        (message "No desktop found.")))
-    (defun aorst/desktop-save ()
-      "Save an emacs session."
-      (interactive)
-      (when (aorst/saved-desktop-p)
-        (desktop-save-in-desktop-dir))
-      (message "Session not saved.")
-      (desktop-save-in-desktop-dir))
-    (defun aorst/desktop-auto-save ()
-      "Automatically save desktop."
-      (when (eq (desktop-owner) (emacs-pid))
-        (aorst/desktop-save)))
-    (desktop-save-mode t)))
 
 (provide 'init)
 ;;; init.el ends here
