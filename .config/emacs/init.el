@@ -821,6 +821,8 @@ are defining or executing a macro."
   :bind (:map perl-mode-map
               ("C-c C-f" . aorst/indent-buffer)))
 
+(use-package clojure-mode)
+
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
          ((cider-repl-mode cider-mode) . eldoc-mode))
@@ -950,6 +952,7 @@ are defining or executing a macro."
           scheme-mode
           lisp-mode
           racket-mode) . parinfer-mode)
+  :custom-face (parinfer-error-face ((t (:inherit (flymake-error)))))
   :config
   (setq parinfer-extensions '(defaults
                                pretty-parens

@@ -1493,8 +1493,14 @@ Perl related configurations.
 ** Clojure
 Clojure is a Lisp dialect for JVM - Java Virtual Machine. It is one of
 the few  modern and refreshing  languages, that bring  both innovation
-and reliability. Emacs has a nice  package called Cider, which is sort
-of an IDE for Clojure and ClojureScript.
+and reliability.
+
+#+begin_src emacs-lisp
+  (use-package clojure-mode)
+#+end_src
+
+Emacs  also has  a great  package called  Cider, which  is an  IDE for
+Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package cider
@@ -1696,6 +1702,7 @@ to host various projects that I've cloned with =git=.
             scheme-mode
             lisp-mode
             racket-mode) . parinfer-mode)
+    :custom-face (parinfer-error-face ((t (:inherit (flymake-error)))))
     :config
     (setq parinfer-extensions '(defaults
                                  pretty-parens
