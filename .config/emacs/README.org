@@ -3,7 +3,7 @@
 #+email: andreyorst@gmail.com
 #+setupfile: ./.org-defaults.org
 #+startup: noinlineimages
-#+property: header-args :tangle "./init.el"
+#+property: header-args :tangle "./init.el" :results silent
 
 [[file:.screenshot.png]]
 
@@ -53,7 +53,7 @@ minutes, but still, the faster it starts - the better for me.
 
 ** =early-init.el=
 :properties:
-:header-args: :tangle "./early-init.el"
+:header-args: :tangle "./early-init.el" :results silent
 :end:
 
 These settings are going into  different init file: =earli-init.el=.  We
@@ -138,7 +138,7 @@ This concludes the =early-init.el= file.
 
 *** Loading =early-init.el= in Emacs 26 and earlier
 :properties:
-:header-args: :tangle "./init.el"
+:header-args: :tangle "./init.el" :results silent
 :end:
 Before Emacs  27 there were  no such thing  as =eraly-init.el=, so  if I
 will use  older Emacs  with this configuration  it will  miss settings
