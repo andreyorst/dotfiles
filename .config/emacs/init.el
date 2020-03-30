@@ -718,10 +718,6 @@ are defining or executing a macro."
                                 :background nil t))))
   (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color))
 
-(use-package doc-view
-  :ensure nil
-  :config (setq-default doc-view-resolution 192))
-
 (use-package prog-mode
   :ensure nil
   :hook ((prog-mode . show-paren-mode)
@@ -797,10 +793,6 @@ are defining or executing a macro."
   :bind (:map cmake-mode-map
               ("C-c C-f" . aorst/indent-buffer)))
 
-(use-package help
-  :ensure nil
-  :config (setq help-window-select t))
-
 (use-package elisp-mode
   :ensure nil
   :hook (emacs-lisp-mode . eldoc-mode)
@@ -821,7 +813,9 @@ are defining or executing a macro."
   :bind (:map perl-mode-map
               ("C-c C-f" . aorst/indent-buffer)))
 
-(use-package clojure-mode)
+(use-package clojure-mode
+  :bind (:map clojure-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
@@ -836,6 +830,22 @@ are defining or executing a macro."
   :config
   (setq cider-repl-display-help-banner nil
         cider-repl-tab-command nil))
+
+(use-package fennel-mode
+  :bind (:map fennel-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
+
+(use-package lua-mode
+  :bind (:map lua-mode-map
+              ("C-c C-f" . aorst/indent-buffer)))
+
+(use-package help
+  :ensure nil
+  :config (setq help-window-select t))
+
+(use-package doc-view
+  :ensure nil
+  :config (setq-default doc-view-resolution 192))
 
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
@@ -879,45 +889,6 @@ are defining or executing a macro."
       (when buf (kill-buffer buf)))))
 (setq use-package-hook-name-suffix "-hook")
 
-(when (not (bound-and-true-p module-file-suffix))
-  (use-package term
-    :ensure nil
-    :bind (("C-`" . aorst/ansi-term-toggle)
-           ("C-t" . aorst/ansi-term-focus))
-    :config
-    (defun aorst/ansi-term-toggle (&optional arg)
-      "Toggle `ansi-term' window on and off with the same command."
-      (interactive "P")
-      (let* ((bufname "*ansi-term*")
-             (window (get-buffer-window bufname))
-             (shell (cond ((executable-find "zsh") "zsh")
-                          ((executable-find "bash") "bash")
-                          (t "sh"))))
-        (if window
-            (ignore-errors (delete-window window))
-          (let* ((win-side (if (symbolp arg)
-                               (cons (split-window-below) 'bot)
-                             (cons (split-window-right) 'right)))
-                 (window (car win-side))
-                 (side (cdr win-side)))
-            (select-window window)
-            (cond ((get-buffer bufname)
-                   (switch-to-buffer bufname))
-                  (t (ansi-term shell)
-                     (rename-buffer bufname)))
-            (set-window-dedicated-p window t)
-            (set-window-parameter window 'no-delete-other-windows t)
-            (set-window-parameter window 'window-side side)
-            (set-window-parameter window 'no-other-window t)))))
-    (defun aorst/ansi-term-focus (&optional arg)
-      "Focus `ansi-term` or open one if there's none."
-      (interactive "P")
-      (let ((window (get-buffer-window "*ansi-term*")))
-        (if window
-            (select-window window)
-          (aorst/ansi-term-toggle arg))))
-    (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes)))
-
 (use-package editorconfig
   :commands editorconfig-mode
   :config (editorconfig-mode 1))
@@ -928,13 +899,7 @@ are defining or executing a macro."
   (setq flymake-fringe-indicator-position 'right-fringe)
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
-(use-package hydra
-  :bind (("<f5>" . hydrant/zoom/body))
-  :config (defhydra hydrant/zoom (:hint nil)
-            "Scale text"
-            ("+" text-scale-increase "in")
-            ("-" text-scale-decrease "out")
-            ("0" (text-scale-set 0) "reset")))
+(use-package hydra)
 
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
@@ -951,8 +916,9 @@ are defining or executing a macro."
           common-lisp-mode
           scheme-mode
           lisp-mode
-          racket-mode) . parinfer-mode)
-  :custom-face (parinfer-error-face ((t (:inherit (flymake-error)))))
+          racket-mode
+          fennel-mode) . parinfer-mode)
+  :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
   :config
   (setq parinfer-extensions '(defaults
                                pretty-parens
@@ -1244,6 +1210,44 @@ _C_:   select next line"
     (interactive)
     (when (bound-and-true-p hs-minor-mode)
       (transient-setup 'aorst/hideshow-menu nil nil))))
+
+(when window-system
+  (use-package desktop
+    :ensure nil
+    :hook ((after-init . aorst/desktop-restore)
+           (desktop-after-read . aorst/desktop-remove))
+    :init
+    (setq desktop-path '("~/.dotfiles/.config/emacs/")
+          desktop-dirname "~/.dotfiles/.config/emacs/"
+          desktop-base-file-name "emacs-desktop"
+          desktop-save t
+          desktop-load-locked-desktop t)
+    (defun aorst/desktop-remove ()
+      "Remove current desktop, but save `desktop-dirname'."
+      (let ((desktop desktop-dirname))
+        (desktop-remove)
+        (setq desktop-dirname desktop)))
+    (defun aorst/saved-desktop-p ()
+      "Check if desktop exists."
+      (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
+    (defun aorst/desktop-restore ()
+      "Restore a saved emacs session."
+      (interactive)
+      (desktop-save-mode t)
+      (if (aorst/saved-desktop-p)
+          (desktop-read)
+        (message "No desktop found.")))
+    (defun aorst/desktop-save ()
+      "Save an emacs session."
+      (interactive)
+      (if (aorst/saved-desktop-p)
+          (desktop-save-in-desktop-dir)
+        (message "Session not saved.")
+        (desktop-save-in-desktop-dir)))
+    (defun aorst/desktop-auto-save ()
+      "Automatically save desktop."
+      (when (eq (desktop-owner) (emacs-pid))
+        (aorst/desktop-save)))))
 
 (provide 'init)
 ;;; init.el ends here
