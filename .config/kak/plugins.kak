@@ -232,3 +232,27 @@ plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
 }
 
 plug "listentolist/kakoune-table" domain "gitlab.com"
+
+plug "eraserhd/parinfer-rust" do %{
+    cargo install --force --path . --locked
+    cargo clean
+} config %<
+    hook global WinSetOption filetype=(clojure|lisp|scheme|racket) %<
+        parinfer-enable-window
+        try %{ set-option buffer auto_pairs '"' '"' "'" "'" ` ` }
+
+        # prefer Default color on all parens
+        add-highlighter window/parinfer-parens regex [\[\](){}] 0:Default
+
+        # highlight parens that are inferred by Parinfer
+        hook window WinSetOption parinfer_current_mode=.+ %< evaluate-commands %sh<
+            if [ ! "$kak_opt_parinfer_current_mode" = "paren" ]; then
+                printf "%s\n" "remove-highlighter window/parinfer-inferred
+                               add-highlighter window/parinfer-inferred regex [\])}]+\h*$ 0:comment"
+            else
+                printf "%s\n" "remove-highlighter window/parinfer-inferred
+                               add-highlighter window/parinfer-inferred regex [\])}]+\h*$ 0:Default"
+            fi
+        >>
+    >
+>
