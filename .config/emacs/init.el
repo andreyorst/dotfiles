@@ -869,11 +869,19 @@ are defining or executing a macro."
     (defun aorst/vterm-toggle (&optional arg)
       "Toggle `vterm' window on and off with the same command."
       (interactive "P")
-      (let* ((bufname "*vterm*")
+      (let* ((directory (if default-directory
+                            default-directory
+                          (expand-file-name "~/")))
+             (bufname "*vterm*")
              (window (get-buffer-window bufname)))
         (if window
             (ignore-errors (delete-window window))
-          (let* ((win-side (if (symbolp arg)
+          (if (window-dedicated-p)
+              (let ((windows (seq-drop-while #'window-dedicated-p (window-list))))
+                (when (not (null windows))
+                  (select-window (car windows)))))
+          (let* ((window)
+                 (win-side (if (symbolp arg)
                                (cons (split-window-below) 'bot)
                              (cons (split-window-right) 'right)))
                  (window (car win-side))
@@ -881,7 +889,8 @@ are defining or executing a macro."
             (select-window window)
             (cond ((get-buffer bufname)
                    (switch-to-buffer bufname))
-                  (t (vterm bufname)))
+                  (t (let ((default-directory directory))
+                       (vterm bufname))))
             (when (bound-and-true-p global-tab-line-mode)
               (previous-buffer)
               (bury-buffer))
