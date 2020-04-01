@@ -838,7 +838,8 @@ are defining or executing a macro."
   (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
   :config
   (setq cider-repl-display-help-banner nil
-        cider-repl-tab-command nil))
+        cider-repl-tab-command nil
+        nrepl-hide-special-buffers t))
 
 (use-package fennel-mode
   :bind (:map

@@ -1298,15 +1298,6 @@ my Emacs configuration with it.
     (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color))
 #+end_src
 
-** Doc View
-Default resolution is too low:
-
-#+begin_src emacs-lisp
-  (use-package doc-view
-    :ensure nil
-    :config (setq-default doc-view-resolution 192))
-#+end_src
-
 ** Prog Mode
 This isn't really a configuration of  Prog Mode itself, but some hooks
 that change how  programming related modes behave. One  feature that I
@@ -1506,8 +1497,7 @@ Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package cider
-    :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-           ((cider-repl-mode cider-mode) . eldoc-mode))
+    :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion))
     :custom-face
     (cider-error-highlight-face ((t (:inherit flymake-error))))
     (cider-fringe-face ((t (:inherit flymake-warning))))
@@ -1517,12 +1507,56 @@ Clojure and ClojureScript.
     (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
     :config
     (setq cider-repl-display-help-banner nil
-          cider-repl-tab-command nil))
+          cider-repl-tab-command nil
+          nrepl-hide-special-buffers t))
+#+end_src
+
+** Fennel
+Fennel  is  a programming  language  a  lisp  dialect, that  is  being
+compiled  to Lua,  which means  that it  can run  anywhere, where  Lua
+can.   It   supports  compile-time   macro   system,   and  full   Lua
+compatibility.
+
+#+begin_src emacs-lisp
+  (use-package fennel-mode
+    :bind (:map
+           fennel-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
+#+end_src
+
+** Lua
+I'm not  into Lua language  myself, but in  order to view  what [[*Fennel][Fennel]]
+produces I need support for Lua.
+
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :bind (:map
+           lua-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 * Tools
 Additional  packages  that  change  how Emacs  works,  providing  more
 comfortable user experience.
+
+** Help
+I want help  window to be selected automatically, so  I could close it
+with =q= after I've finished reading.
+
+#+begin_src emacs-lisp
+  (use-package help
+    :ensure nil
+    :config (setq help-window-select t))
+#+end_src
+
+** Doc View
+Default resolution is too low:
+
+#+begin_src emacs-lisp
+  (use-package doc-view
+    :ensure nil
+    :config (setq-default doc-view-resolution 192))
+#+end_src
 
 ** vterm
 This  package provides  a bridge  to =libvterm=  to display  terminal as
@@ -1573,51 +1607,6 @@ and requires compilation.
   (setq use-package-hook-name-suffix "-hook")
 #+end_src
 
-** ANSI Term
-Builtin terminal solution in Emacs. Not  as good as =vterm= but works on
-Emacs builds where module support wasn't enabled.
-
-#+begin_src emacs-lisp
-  (when (not (bound-and-true-p module-file-suffix))
-    (use-package term
-      :ensure nil
-      :bind (("C-`" . aorst/ansi-term-toggle)
-             ("C-t" . aorst/ansi-term-focus))
-      :config
-      (defun aorst/ansi-term-toggle (&optional arg)
-        "Toggle `ansi-term' window on and off with the same command."
-        (interactive "P")
-        (let* ((bufname "*ansi-term*")
-               (window (get-buffer-window bufname))
-               (shell (cond ((executable-find "zsh") "zsh")
-                            ((executable-find "bash") "bash")
-                            (t "sh"))))
-          (if window
-              (ignore-errors (delete-window window))
-            (let* ((win-side (if (symbolp arg)
-                                 (cons (split-window-below) 'bot)
-                               (cons (split-window-right) 'right)))
-                   (window (car win-side))
-                   (side (cdr win-side)))
-              (select-window window)
-              (cond ((get-buffer bufname)
-                     (switch-to-buffer bufname))
-                    (t (ansi-term shell)
-                       (rename-buffer bufname)))
-              (set-window-dedicated-p window t)
-              (set-window-parameter window 'no-delete-other-windows t)
-              (set-window-parameter window 'window-side side)
-              (set-window-parameter window 'no-other-window t)))))
-      (defun aorst/ansi-term-focus (&optional arg)
-        "Focus `ansi-term` or open one if there's none."
-        (interactive "P")
-        (let ((window (get-buffer-window "*ansi-term*")))
-          (if window
-              (select-window window)
-            (aorst/ansi-term-toggle arg))))
-      (advice-add 'term-handle-exit :after 'aorst/kill-when-no-processes)))
-#+end_src
-
 ** EditorConfig
 =.editorconfig=  file  provides a  nice  way  to synchronize  my  editor
 configurations between projects and different editors.
@@ -1658,13 +1647,7 @@ This  package will  be used  in many  other package  configurations to
 provide sane keybindings.
 
 #+begin_src emacs-lisp
-  (use-package hydra
-    :bind (("<f5>" . hydrant/zoom/body))
-    :config (defhydra hydrant/zoom (:hint nil)
-              "Scale text"
-              ("+" text-scale-increase "in")
-              ("-" text-scale-decrease "out")
-              ("0" (text-scale-set 0) "reset")))
+  (use-package hydra)
 #+end_src
 
 ** Geiser
@@ -1703,8 +1686,9 @@ to host various projects that I've cloned with =git=.
             common-lisp-mode
             scheme-mode
             lisp-mode
-            racket-mode) . parinfer-mode)
-    :custom-face (parinfer-error-face ((t (:inherit (flymake-error)))))
+            racket-mode
+            fennel-mode) . parinfer-mode)
+    :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
     :config
     (setq parinfer-extensions '(defaults
                                  pretty-parens
@@ -2066,7 +2050,7 @@ and open a file.
 To fully achieve this behavior one needs a =.desktop= file to exist that
 will decide which kind of Emacs to call: =emacs= or =emacsclient=:
 
-#+begin_src conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes
+#+begin_src conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes :results silent
   [Desktop Entry]
   Name=Emacs
   GenericName=Text Editor
@@ -2142,7 +2126,7 @@ This built in mode provides code folding.
         (transient-setup 'aorst/hideshow-menu nil nil))))
 #+end_src
 
-** COMMENT Desktop
+** Desktop
 This is  really nice feature  that allows me  to save my  workspace on
 disk and  do not restore  all buffers and  windows every time  I start
 Emacs. It adds some time to the startup though.
@@ -2189,6 +2173,53 @@ Emacs. It adds some time to the startup though.
 
 I wonder if  it could store unsaved buffers so  all my changes persist
 through sessions.
+
+** COMMENT God Mode
+God mode is more  like a mode in a sense of a  mode from modal editor,
+such as Vim, or Kakoune. It  makes all shortcuts you press be prefixed
+by =Ctrl= key by default. Not sure if I'm going to use it much, though.
+
+#+begin_src emacs-lisp
+  (use-package god-mode
+    :hook ((god-mode-enabled
+            god-mode-disabled) . aorst/god-mode-change-cursor-shape)
+    :bind (("<escape>" . god-local-mode)
+           :map
+           god-local-mode-map
+           ("i" . god-local-mode)
+           ("<backspace>" . ignore)
+           ("<escape>" . ignore)
+           ("<return>" . ignore)
+           ("j" . ignore)
+           ("m" . ignore))
+    :config
+    (advice-add 'aorst/newline-below :after #'(lambda () (god-local-mode -1)))
+    (advice-add 'aorst/newline-above :after #'(lambda () (god-local-mode -1)))
+    (dolist (mode '(treemacs-mode
+                    vterm-mode
+                    cider-repl-mode
+                    racket-repl-mode
+                    geiser-repl-mode))
+      (add-to-list 'god-exempt-major-modes mode))
+    :init
+    (defun aorst/god-mode-change-cursor-shape ()
+      (when window-system
+        (setq cursor-type (if god-local-mode 'box 'bar))))
+    (god-mode))
+#+end_src
+
+This package provides more comfortable usage for =isearch= in God mode:
+
+#+begin_src emacs-lisp
+  (use-package god-mode-isearch
+    :ensure nil
+    :bind (:map
+           isearch-mode-map
+           ("<escape>" . god-mode-isearch-activate)
+           :map
+           god-mode-isearch-map
+           ("<escape>" . god-mode-isearch-disable)))
+#+end_src
 
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
