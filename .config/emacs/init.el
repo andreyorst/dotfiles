@@ -351,7 +351,8 @@ are defining or executing a macro."
                treemacs-load-theme)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window)
-           :map treemacs-mode-map
+           :map
+           treemacs-mode-map
            ([C-tab] . aorst/treemacs-expand-all-projects))
     :hook ((after-init . aorst/treemacs-after-init-setup)
            (treemacs-mode . aorst/after-treemacs-setup)
@@ -636,7 +637,8 @@ are defining or executing a macro."
          (ediff-prepare-buffer . outline-show-all)
          ((org-capture-mode org-src-mode) . aorst/discard-history))
   :bind (("C-c a" . org-agenda)
-         :map org-mode-map
+         :map
+         org-mode-map
          ("C-c l" . org-store-link))
   :config
   (use-package ox-latex
@@ -756,8 +758,9 @@ are defining or executing a macro."
 (use-package rust-mode
   :commands (rust-format-buffer)
   :hook (rust-mode . electric-pair-local-mode)
-  :bind (:map rust-mode-map
-              ("C-c C-f" . rust-format-buffer)))
+  :bind (:map
+         rust-mode-map
+         ("C-c C-f" . rust-format-buffer)))
 
 (when (executable-find "racer")
   (use-package racer
@@ -771,18 +774,20 @@ are defining or executing a macro."
     :hook ((rust-mode toml-mode) . cargo-minor-mode)))
 
 (use-package toml-mode
-  :bind (:map toml-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         toml-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
   :hook (racket-repl-mode . electric-pair-local-mode)
-  :bind (:map racket-mode-map
-              ("C-c C-d" . racket-run-with-debugging)
-              ("C-c C-f" . aorst/indent-buffer)
-              (")" . self-insert-command)
-              ("]" . self-insert-command)
-              ("}" . self-insert-command))
+  :bind (:map
+         racket-mode-map
+         ("C-c C-d" . racket-run-with-debugging)
+         ("C-c C-f" . aorst/indent-buffer)
+         (")" . self-insert-command)
+         ("]" . self-insert-command)
+         ("}" . self-insert-command))
   :config
   (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
   (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
@@ -790,36 +795,40 @@ are defining or executing a macro."
   (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 
 (use-package cmake-mode
-  :bind (:map cmake-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         cmake-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package elisp-mode
   :ensure nil
   :hook (emacs-lisp-mode . eldoc-mode)
-  :bind (:map emacs-lisp-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         emacs-lisp-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package yaml-mode)
 
 (use-package sh-script
   :ensure nil
-  :bind (:map sh-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         sh-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package perl-mode
   :ensure nil
   :hook ((perl-mode . electric-pair-local-mode)
          (perl-mode . flymake-mode))
-  :bind (:map perl-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         perl-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
-  :bind (:map clojure-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         clojure-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package cider
-  :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-         ((cider-repl-mode cider-mode) . eldoc-mode))
+  :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion))
   :custom-face
   (cider-error-highlight-face ((t (:inherit flymake-error))))
   (cider-fringe-face ((t (:inherit flymake-warning))))
@@ -832,12 +841,14 @@ are defining or executing a macro."
         cider-repl-tab-command nil))
 
 (use-package fennel-mode
-  :bind (:map fennel-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         fennel-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package lua-mode
-  :bind (:map lua-mode-map
-              ("C-c C-f" . aorst/indent-buffer)))
+  :bind (:map
+         lua-mode-map
+         ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package help
   :ensure nil
@@ -999,13 +1010,14 @@ are defining or executing a macro."
 
 (use-package company
   :commands global-company-mode
-  :bind (:map company-active-map
-              ("TAB" . company-complete-common-or-cycle)
-              ("<tab>" . company-complete-common-or-cycle)
-              ("<S-Tab>" . company-select-previous)
-              ("<backtab>" . company-select-previous)
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous))
+  :bind (:map
+         company-active-map
+         ("TAB" . company-complete-common-or-cycle)
+         ("<tab>" . company-complete-common-or-cycle)
+         ("<S-Tab>" . company-select-previous)
+         ("<backtab>" . company-select-previous)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))
   :hook (after-init . global-company-mode)
   :config
   (setq company-require-match 'never
@@ -1083,7 +1095,8 @@ are defining or executing a macro."
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydrant/mc/body)
-         :map mc/keymap
+         :map
+         mc/keymap
          ("<return>" . nil))
   :requires hydra
   :config
@@ -1122,9 +1135,10 @@ _C_:   select next line"
           lsp-enable-symbol-highlighting nil)
     (use-package lsp-ui
       :commands lsp-ui-mode
-      :bind (:map lsp-ui-mode-map
-                  ("M-." . lsp-ui-peek-find-definitions)
-                  ("M-/" . lsp-ui-peek-find-references))
+      :bind (:map
+             lsp-ui-mode-map
+             ("M-." . lsp-ui-peek-find-definitions)
+             ("M-/" . lsp-ui-peek-find-references))
       :config
       (setq lsp-ui-doc-border (face-attribute 'mode-line-inactive :background)
             lsp-ui-sideline-enable nil

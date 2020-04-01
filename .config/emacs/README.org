@@ -826,7 +826,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
                  treemacs-load-theme)
       :bind (("<f7>" . treemacs)
              ("<f8>" . treemacs-select-window)
-             :map treemacs-mode-map
+             :map
+             treemacs-mode-map
              ([C-tab] . aorst/treemacs-expand-all-projects))
       :hook ((after-init . aorst/treemacs-after-init-setup)
              (treemacs-mode . aorst/after-treemacs-setup)
@@ -1213,7 +1214,8 @@ my Emacs configuration with it.
            (ediff-prepare-buffer . outline-show-all)
            ((org-capture-mode org-src-mode) . aorst/discard-history))
     :bind (("C-c a" . org-agenda)
-           :map org-mode-map
+           :map
+           org-mode-map
            ("C-c l" . org-store-link))
     :config
     (use-package ox-latex
@@ -1374,8 +1376,9 @@ settings for Rust mode.
   (use-package rust-mode
     :commands (rust-format-buffer)
     :hook (rust-mode . electric-pair-local-mode)
-    :bind (:map rust-mode-map
-                ("C-c C-f" . rust-format-buffer)))
+    :bind (:map
+           rust-mode-map
+           ("C-c C-f" . rust-format-buffer)))
 #+end_src
 
 This also means  that I could use something  to automatically complete
@@ -1406,8 +1409,9 @@ configure project.
 
 #+begin_src emacs-lisp
   (use-package toml-mode
-    :bind (:map toml-mode-map
-                ("C-c C-f" . aorst/indent-buffer)))
+    :bind (:map
+           toml-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Racket
@@ -1417,12 +1421,13 @@ Racket is nice LISP/Scheme language that I might to get into.
   (use-package racket-mode
     :mode ("\\.rkt\\'" . racket-mode)
     :hook (racket-repl-mode . electric-pair-local-mode)
-    :bind (:map racket-mode-map
-                ("C-c C-d" . racket-run-with-debugging)
-                ("C-c C-f" . aorst/indent-buffer)
-                (")" . self-insert-command)
-                ("]" . self-insert-command)
-                ("}" . self-insert-command))
+    :bind (:map
+           racket-mode-map
+           ("C-c C-d" . racket-run-with-debugging)
+           ("C-c C-f" . aorst/indent-buffer)
+           (")" . self-insert-command)
+           ("]" . self-insert-command)
+           ("}" . self-insert-command))
     :config
     (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
     (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
@@ -1435,18 +1440,9 @@ A mode for editing cmake files.
 
 #+begin_src emacs-lisp
   (use-package cmake-mode
-    :bind (:map cmake-mode-map
-                ("C-c C-f" . aorst/indent-buffer)))
-#+end_src
-
-** Help
-I want help  window to be selected automatically, so  I could close it
-with =q= after I've finished reading.
-
-#+begin_src emacs-lisp
-  (use-package help
-    :ensure nil
-    :config (setq help-window-select t))
+    :bind (:map
+           cmake-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Emacs Lisp
@@ -1457,8 +1453,9 @@ want to enable some helper modes here.
   (use-package elisp-mode
     :ensure nil
     :hook (emacs-lisp-mode . eldoc-mode)
-    :bind (:map emacs-lisp-mode-map
-                ("C-c C-f" . aorst/indent-buffer)))
+    :bind (:map
+           emacs-lisp-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Yaml
@@ -1474,8 +1471,9 @@ Some configurations for shell script modes.
 #+begin_src emacs-lisp
   (use-package sh-script
     :ensure nil
-    :bind (:map sh-mode-map
-                ("C-c C-f" . aorst/indent-buffer)))
+    :bind (:map
+           sh-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Perl
@@ -1486,8 +1484,9 @@ Perl related configurations.
     :ensure nil
     :hook ((perl-mode . electric-pair-local-mode)
            (perl-mode . flymake-mode))
-    :bind (:map perl-mode-map
-                ("C-c C-f" . aorst/indent-buffer)))
+    :bind (:map
+           perl-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Clojure
@@ -1496,7 +1495,10 @@ the few  modern and refreshing  languages, that bring  both innovation
 and reliability.
 
 #+begin_src emacs-lisp
-  (use-package clojure-mode)
+  (use-package clojure-mode
+    :bind (:map
+           clojure-mode-map
+           ("C-c C-f" . aorst/indent-buffer)))
 #+end_src
 
 Emacs  also has  a great  package called  Cider, which  is an  IDE for
@@ -1809,13 +1811,14 @@ Complete anything framework. Nothing much to say. Does it's job.
 #+begin_src emacs-lisp
   (use-package company
     :commands global-company-mode
-    :bind (:map company-active-map
-                ("TAB" . company-complete-common-or-cycle)
-                ("<tab>" . company-complete-common-or-cycle)
-                ("<S-Tab>" . company-select-previous)
-                ("<backtab>" . company-select-previous)
-                ("C-n" . company-select-next)
-                ("C-p" . company-select-previous))
+    :bind (:map
+           company-active-map
+           ("TAB" . company-complete-common-or-cycle)
+           ("<tab>" . company-complete-common-or-cycle)
+           ("<S-Tab>" . company-select-previous)
+           ("<backtab>" . company-select-previous)
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous))
     :hook (after-init . global-company-mode)
     :config
     (setq company-require-match 'never
@@ -1936,7 +1939,8 @@ guess I'll figure out best mappings over time.
                mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
            ("C-c m" . hydrant/mc/body)
-           :map mc/keymap
+           :map
+           mc/keymap
            ("<return>" . nil))
     :requires hydra
     :config
@@ -1980,9 +1984,10 @@ Another LSP client for Emacs.
             lsp-enable-symbol-highlighting nil)
       (use-package lsp-ui
         :commands lsp-ui-mode
-        :bind (:map lsp-ui-mode-map
-                    ("M-." . lsp-ui-peek-find-definitions)
-                    ("M-/" . lsp-ui-peek-find-references))
+        :bind (:map
+               lsp-ui-mode-map
+               ("M-." . lsp-ui-peek-find-definitions)
+               ("M-/" . lsp-ui-peek-find-references))
         :config
         (setq lsp-ui-doc-border (face-attribute 'mode-line-inactive :background)
               lsp-ui-sideline-enable nil
