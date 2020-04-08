@@ -1074,8 +1074,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     (cons (/ (- (plist-get info :parent-frame-width)
                 (plist-get info :posframe-width))
              2)
-          (+ (if (fboundp 'window-tab-line-height) (window-tab-line-height) 0)
-             aorst--ivy-posframe-top-padding)))
+          0))
   (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
         ivy-posframe-height-alist '((t . 16))
         ivy-posframe-parameters '((internal-border-width . 6))
@@ -1198,7 +1197,7 @@ _C_:   select next line"
   :bind (("M-n" . aorst/iedit-current-or-expand)
          ("C-c i" . aorst/iedit-hydrant))
   :init
-  (setq iedit-toggle-key-default "")
+  (setq iedit-toggle-key-default nil)
   (defun aorst/iedit-to-mc-hydrant ()
     "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
     (interactive)
@@ -1345,18 +1344,7 @@ _p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: n
       (desktop-save-mode t)
       (if (aorst/saved-desktop-p)
           (desktop-read)
-        (message "No desktop found.")))
-    (defun aorst/desktop-save ()
-      "Save an emacs session."
-      (interactive)
-      (if (aorst/saved-desktop-p)
-          (desktop-save-in-desktop-dir)
-        (message "Session not saved.")
-        (desktop-save-in-desktop-dir)))
-    (defun aorst/desktop-auto-save ()
-      "Automatically save desktop."
-      (when (eq (desktop-owner) (emacs-pid))
-        (aorst/desktop-save)))))
+        (message "No desktop found.")))))
 
 (provide 'init)
 ;;; init.el ends here
