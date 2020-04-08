@@ -72,6 +72,7 @@
         hydrant/-digit-argument
         hydrant/-negative-argument
         hydrant/er/body
+        hydrant/iedit/aorst/iedit-to-mc-hydrant-and-exit
         hydrant/mc/body
         hydrant/mc/mc/cycle-backward
         hydrant/mc/mc/cycle-forward
@@ -106,6 +107,7 @@
         mouse-drag-secondary
         mouse-set-region
         org-edit-src-save
+        org-insert-link
         org-shifttab
         org-store-link
         org-table-blank-field

@@ -53,7 +53,7 @@ minutes, but still, the faster it starts - the better for me.
 
 ** =early-init.el=
 :properties:
-:header-args: :tangle "./early-init.el" :results silent
+:header-args+: :tangle "./early-init.el"
 :end:
 
 These settings are going into  different init file: =earli-init.el=.  We
@@ -71,6 +71,7 @@ before that, let's add top comment:
   ;;; Code:
 #+end_src
 
+*** Garbage Collection
 The main problem  with Emacs startup is garbage  collection system. It
 is invoked so many times on startup that it causes quite big impact on
 startup time.   We're talking  /seconds/.  One can  raise limit  when to
@@ -105,6 +106,23 @@ done:
                     file-name-handler-alist aorst--file-name-handler-alist)))
 #+end_src
 
+*** Native Compiled Emacs Lisp
+There's a  very interesting project  that I'm currently  using, called
+[[https://akrl.sdf.org/gccemacs.html][gccemacs]]. It  provides a way to  compile Emacs Lisp into  native code,
+thus making  Emacs much more  robust and  snappy. In order  to compile
+everything that Emacs loads asynchronously we can set this variable to
+=true=.
+
+#+begin_src emacs-lisp
+  (defvar comp-deferred-compilation)
+  (setq comp-deferred-compilation t)
+#+end_src
+
+This way  I can compile  Emacs from source as  I usually do,  and then
+continue using it as normal, and Emacs will do it's native compilation
+in background for every loaded package. That's amazing!
+
+*** User Interface
 Prevent the glimpse of un-styled  Emacs by disabling these UI elements
 early.
 
@@ -115,6 +133,17 @@ early.
                               (vertical-scroll-bars)))
 #+end_src
 
+Resizing frame is also expensive so we inhibit it, and latest patch to
+Emacs  introduced =x-gtk-resize-child-frames=  variable  that fixes  the
+issue  with  child frames  not  being  resized correctly  under  GNOME
+Shell, so let's set it to =resize-mode=.
+
+#+begin_src emacs-lisp
+  (setq frame-inhibit-implied-resize t
+        x-gtk-resize-child-frames 'resize-mode)
+#+end_src
+
+*** =package.el=
 =package.el= initialization is expensive so we disable it at startup:
 
 #+begin_src emacs-lisp
@@ -123,12 +152,7 @@ early.
         package--init-file-ensured t)
 #+end_src
 
-Resizing frame is also expensive:
-
-#+begin_src emacs-lisp
-  (setq frame-inhibit-implied-resize t)
-#+end_src
-
+*** =(provide 'early-init)=
 This concludes the =early-init.el= file.
 
 #+begin_src emacs-lisp
@@ -138,7 +162,7 @@ This concludes the =early-init.el= file.
 
 *** Loading =early-init.el= in Emacs 26 and earlier
 :properties:
-:header-args: :tangle "./init.el" :results silent
+:header-args+: :tangle "./init.el"
 :end:
 Before Emacs  27 there were  no such thing  as =eraly-init.el=, so  if I
 will use  older Emacs  with this configuration  it will  miss settings
@@ -146,7 +170,7 @@ that are done there. This code manually loads this file in such case:
 
 #+begin_src emacs-lisp
   (unless (featurep 'early-init)
-    (load (expand-file-name "early-init.el" user-emacs-directory)))
+    (load (expand-file-name "early-init" user-emacs-directory)))
 #+end_src
 
 ** =package.el=
@@ -169,6 +193,7 @@ There's recent bug with downloading from elpa. This line fixes it:
 
 #+begin_src emacs-lisp
   (when (version= emacs-version "26.2")
+    (defvar gnutls-algorithm-priority)
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
   (package-initialize)
 #+end_src
@@ -190,9 +215,8 @@ system.
 And =require= the package itself:
 
 #+begin_src emacs-lisp
-  (eval-when-compile
-    (require 'use-package)
-    (setq use-package-always-ensure t))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 #+end_src
 
 This  way I  can  use =use-package=  automatically  install packages  at
@@ -423,7 +447,7 @@ Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
       (interactive)
       (back-to-indentation)
       (newline-and-indent)
-      (previous-line 1)
+      (forward-line -1)
       (indent-according-to-mode)))
 #+end_src
 
@@ -507,6 +531,8 @@ window:
            (if (minibufferp)
                (minibuffer-keyboard-quit)
              (abort-recursive-edit)))
+          ((bound-and-true-p iedit-mode)
+           (iedit-quit))
           (t
            (unless (or defining-kbd-macro
                        executing-kbd-macro)
@@ -534,9 +560,7 @@ properly format buffer it should be used instead of this function.
     (interactive)
     (save-excursion
       (save-restriction
-        (mark-whole-buffer)
-        (indent-region (region-beginning) (region-end))
-        (deactivate-mark))))
+        (indent-region (point-min) (point-max)))))
   (global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
 #+end_src
 
@@ -668,7 +692,6 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
     :hook (((after-revert
              change-major-mode
              org-src-mode) . turn-on-solaire-mode)
-           (focus-in . solaire-mode-reset)
            (snippet-mode . solaire-mode))
     :config
     (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -1111,7 +1134,7 @@ adding directory name in the buffer name.
     :config (setq uniquify-buffer-name-style 'forward))
 #+end_src
 
-** COMMENT Tabline
+** Tabline
 Starting  with Emacs  27  native tab  support is  present.  I want  to
 customize tab appearance to match my theme.
 
@@ -1152,6 +1175,7 @@ customize tab appearance to match my theme.
           (force-mode-line-update)))
       (setq tab-line-new-tab-choice nil
             tab-line-close-button-show nil
+            tab-line-new-button-show nil
             tab-line-separator nil
             tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
                                               'keymap tab-line-right-map
@@ -1226,6 +1250,7 @@ my Emacs configuration with it.
       (use-package org-tempo
         :ensure nil))
     (setq org-startup-with-inline-images nil
+          org-tags-column -100
           org-startup-folded 'content
           org-hide-emphasis-markers t
           org-adapt-indentation nil
@@ -1705,6 +1730,13 @@ to host various projects that I've cloned with =git=.
 
 Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
 
+** Flx
+Flex matching for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package flx)
+#+end_src
+
 ** Ivy and Counsel
 Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
 experience.  It  integrates with  Counsel that handles  minibuffer, so
@@ -1779,18 +1811,21 @@ This package displays =ivy= in separate frame on top of Emacs.
   (use-package ivy-posframe
     :after ivy
     :config
+    (defvar aorst--ivy-posframe-top-padding 42
+      "additional padding between top of the frame and posframe.")
     (defun aorst/posframe-position (str)
-      (ivy-posframe--display str #'aorst/posframe-unser-tabs-center))
-    (defun aorst/posframe-unser-tabs-center (info)
-      "vaiv."
+      (ivy-posframe--display str #'aorst/posframe-under-tabs-center))
+    (defun aorst/posframe-under-tabs-center (info)
+      "Function that sets center position for ivy posframe."
       (cons (/ (- (plist-get info :parent-frame-width)
                   (plist-get info :posframe-width))
                2)
-            (+ (if global-tab-line-mode (window-tab-line-height) 0))))
+            (+ (if (fboundp 'window-tab-line-height) (window-tab-line-height) 0)
+               aorst--ivy-posframe-top-padding)))
     (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
-          ivy-posframe-height-alist '((t . 15))
-          ivy-posframe-parameters '((internal-border-width . 3))
-          ivy-posframe-width 100)
+          ivy-posframe-height-alist '((t . 16))
+          ivy-posframe-parameters '((internal-border-width . 6))
+          ivy-posframe-width 78)
     (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
     (ivy-posframe-mode +1))
 
@@ -1822,15 +1857,6 @@ Complete anything framework. Nothing much to say. Does it's job.
 #+end_src
 
 This package also optionally requires these extra dependencies:
-
-- =company-flx= - provides fuzzy matching algorithms for company.
-
-  #+begin_src emacs-lisp
-    (use-package company-flx
-      :after company
-      :config
-      (company-flx-mode +1))
-  #+end_src
 
 - =company-posframe= - provides posframe frontend for company.
 
@@ -1960,6 +1986,57 @@ guess I'll figure out best mappings over time.
   (use-package mc-extras)
 #+end_src
 
+** Iedit Mode
+Another package  for multiple editing  purposes, that is  kinda faster
+than multiple cursors,  but can edit only fixed width  regions of text
+and  has less  abilities regarding  to commands.  Still pretty  usable
+though, as multiple cursor some times looses cursors for some reason.
+
+#+begin_src emacs-lisp
+  (use-package iedit
+    :bind (("M-n" . aorst/iedit-current-or-expand)
+           ("C-c i" . aorst/iedit-hydrant))
+    :init
+    (setq iedit-toggle-key-default "")
+    (defun aorst/iedit-to-mc-hydrant ()
+      "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
+      (interactive)
+      (iedit-switch-to-mc-mode)
+      (hydrant/mc/body))
+    (defun aorst/iedit-current-or-expand (&optional arg)
+      "Select only currnent occurrence with `iedit-mode'.  Expand to
+    next occurrence if `iedit-mode' is already active."
+      (interactive "P")
+      (if (bound-and-true-p iedit-mode)
+          (if (symbolp arg)
+              (iedit-expand-down-to-occurrence)
+            (iedit-expand-up-to-occurrence))
+        (iedit-mode 1)))
+    (defun aorst/iedit-hydrant ()
+      "toggle iedit mode for item under point, and open `hydrant/iedit'."
+      (interactive)
+      (ignore-errors
+        (iedit-mode 1)
+        (hydrant/iedit/body)))
+    (defhydra hydrant/iedit (:hint nil :color pink)
+      "
+  ^Select^                  ^Discard^                  ^Edit^               ^Navigate^
+  ^──────^──────────────────^───────^──────────────────^────^───────────────^────────^─────────────
+  _n_: next occurrence      _M-SPC_: toggle selection  _u_: uppercase       _(_: previous selection
+  _p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: next selection
+  ^ ^                       _m_:     convert to mc     _#_: insert numbers"
+      ("n" iedit-expand-down-to-occurrence)
+      ("m" aorst/iedit-to-mc-hydrant :exit t)
+      ("p" iedit-expand-up-to-occurrence)
+      ("u" iedit-upcase-occurrences)
+      ("d" iedit-downcase-occurrences)
+      ("#" iedit-number-occurrences)
+      ("(" iedit-prev-occurrence)
+      (")" iedit-next-occurrence)
+      ("M-SPC" iedit-toggle-selection)
+      ("q" ignore :exit t)))
+#+end_src
+
 ** LSP Mode
 Another LSP client for Emacs.
 
@@ -2080,7 +2157,7 @@ This code above automatically creates user local =emacs.desktop= file in
   which will create server, and opening new files will be done in this
   instance of =emacs=.
 
-** Eldoc Box
+** COMMENT Eldoc Box
 This nice  package displays eldoc in  child frame that can  hover near
 the cursor. It is really good for modes that support eldoc and removes
 distraction  that happen  every  time when  your  buffer size  changes

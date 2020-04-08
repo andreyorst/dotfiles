@@ -8,7 +8,7 @@
 ;;; Code:
 
 (unless (featurep 'early-init)
-  (load (expand-file-name "early-init.el" user-emacs-directory)))
+  (load (expand-file-name "early-init" user-emacs-directory)))
 
 (defvar package-archives)
 (setq package-archives
@@ -16,6 +16,7 @@
         ("melpa" . "https://melpa.org/packages/")))
 
 (when (version= emacs-version "26.2")
+  (defvar gnutls-algorithm-priority)
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 (package-initialize)
 
@@ -23,9 +24,8 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(eval-when-compile
-  (require 'use-package)
-  (setq use-package-always-ensure t))
+(require 'use-package)
+(setq use-package-always-ensure t)
 
 (use-package startup
   :no-require t
@@ -125,7 +125,7 @@
     (interactive)
     (back-to-indentation)
     (newline-and-indent)
-    (previous-line 1)
+    (forward-line -1)
     (indent-according-to-mode)))
 
 (defun aorst/real-buffer-p (&optional buffer)
@@ -167,6 +167,8 @@ are defining or executing a macro."
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
+        ((bound-and-true-p iedit-mode)
+         (iedit-quit))
         (t
          (unless (or defining-kbd-macro
                      executing-kbd-macro)
@@ -182,9 +184,7 @@ are defining or executing a macro."
   (interactive)
   (save-excursion
     (save-restriction
-      (mark-whole-buffer)
-      (indent-region (region-beginning) (region-end))
-      (deactivate-mark))))
+      (indent-region (point-min) (point-max)))))
 (global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
 
 (use-package startup
@@ -248,7 +248,6 @@ are defining or executing a macro."
   :hook (((after-revert
            change-major-mode
            org-src-mode) . turn-on-solaire-mode)
-         (focus-in . solaire-mode-reset)
          (snippet-mode . solaire-mode))
   :config
   (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -620,6 +619,68 @@ are defining or executing a macro."
   :ensure nil
   :config (setq uniquify-buffer-name-style 'forward))
 
+(unless (version< emacs-version "27")
+  (use-package tab-line
+    :ensure nil
+    :hook (after-init . global-tab-line-mode)
+    :config
+    (defun tab-line-close-tab (&optional e)
+      "Close the selected tab.
+If tab is presented in another window, close the tab by using `bury-buffer` function.
+If tab is uniq to all existing windows, kill the buffer with `kill-buffer` function.
+Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
+      (interactive "e")
+      (let* ((posnp (event-start e))
+             (window (posn-window posnp))
+             (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+        (with-selected-window window
+          (let ((tab-list (tab-line-tabs-window-buffers))
+                (buffer-list (flatten-list
+                              (seq-reduce (lambda (list window)
+                                            (select-window window t)
+                                            (cons (tab-line-tabs-window-buffers) list))
+                                          (window-list) nil))))
+            (select-window window)
+            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+                (progn
+                  (if (eq buffer (current-buffer))
+                      (bury-buffer)
+                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                  (unless (cdr tab-list)
+                    (ignore-errors (delete-window window))))
+              (and (kill-buffer buffer)
+                   (unless (cdr tab-list)
+                     (ignore-errors (delete-window window)))))))
+        (force-mode-line-update)))
+    (setq tab-line-new-tab-choice nil
+          tab-line-close-button-show nil
+          tab-line-new-button-show nil
+          tab-line-separator nil
+          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                            'keymap tab-line-right-map
+                                            'mouse-face 'tab-line-highlight
+                                            'help-echo "Click to scroll right")
+          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                           'keymap tab-line-left-map
+                                           'mouse-face 'tab-line-highlight
+                                           'help-echo "Click to scroll left"))
+    (let ((bg (if (facep 'solaire-default-face)
+                  (face-attribute 'solaire-default-face :background)
+                (face-attribute 'default :background)))
+          (fg (face-attribute 'default :foreground))
+          (base (face-attribute 'mode-line :background))
+          (box-width 8))
+      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
+      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
+      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
+      (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
+    (dolist (mode '(ediff-mode
+                    process-menu-mode
+                    term-mode
+                    vterm-mode))
+      (add-to-list 'tab-line-exclude-modes mode))))
+
 (use-package display-line-numbers
   :ensure nil
   :config
@@ -649,6 +710,7 @@ are defining or executing a macro."
     (use-package org-tempo
       :ensure nil))
   (setq org-startup-with-inline-images nil
+        org-tags-column -100
         org-startup-folded 'content
         org-hide-emphasis-markers t
         org-adapt-indentation nil
@@ -944,6 +1006,8 @@ are defining or executing a macro."
                                smart-tab
                                smart-yank)))
 
+(use-package flx)
+
 (use-package ivy
   :commands ivy-mode
   :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
@@ -1001,18 +1065,21 @@ are defining or executing a macro."
 (use-package ivy-posframe
   :after ivy
   :config
+  (defvar aorst--ivy-posframe-top-padding 42
+    "additional padding between top of the frame and posframe.")
   (defun aorst/posframe-position (str)
-    (ivy-posframe--display str #'aorst/posframe-unser-tabs-center))
-  (defun aorst/posframe-unser-tabs-center (info)
-    "vaiv."
+    (ivy-posframe--display str #'aorst/posframe-under-tabs-center))
+  (defun aorst/posframe-under-tabs-center (info)
+    "Function that sets center position for ivy posframe."
     (cons (/ (- (plist-get info :parent-frame-width)
                 (plist-get info :posframe-width))
              2)
-          (+ (if global-tab-line-mode (window-tab-line-height) 0))))
+          (+ (if (fboundp 'window-tab-line-height) (window-tab-line-height) 0)
+             aorst--ivy-posframe-top-padding)))
   (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
-        ivy-posframe-height-alist '((t . 15))
-        ivy-posframe-parameters '((internal-border-width . 3))
-        ivy-posframe-width 100)
+        ivy-posframe-height-alist '((t . 16))
+        ivy-posframe-parameters '((internal-border-width . 6))
+        ivy-posframe-width 78)
   (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
   (ivy-posframe-mode +1))
 
@@ -1035,11 +1102,6 @@ are defining or executing a macro."
                             company-preview-frontend
                             company-echo-metadata-frontend)
         company-backends '(company-capf company-files)))
-
-(use-package company-flx
-  :after company
-  :config
-  (company-flx-mode +1))
 
 (use-package company-posframe
   :after company
@@ -1132,6 +1194,49 @@ _C_:   select next line"
     ("q" mc/remove-duplicated-cursors :exit t)))
 (use-package mc-extras)
 
+(use-package iedit
+  :bind (("M-n" . aorst/iedit-current-or-expand)
+         ("C-c i" . aorst/iedit-hydrant))
+  :init
+  (setq iedit-toggle-key-default "")
+  (defun aorst/iedit-to-mc-hydrant ()
+    "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
+    (interactive)
+    (iedit-switch-to-mc-mode)
+    (hydrant/mc/body))
+  (defun aorst/iedit-current-or-expand (&optional arg)
+    "Select only currnent occurrence with `iedit-mode'.  Expand to
+  next occurrence if `iedit-mode' is already active."
+    (interactive "P")
+    (if (bound-and-true-p iedit-mode)
+        (if (symbolp arg)
+            (iedit-expand-down-to-occurrence)
+          (iedit-expand-up-to-occurrence))
+      (iedit-mode 1)))
+  (defun aorst/iedit-hydrant ()
+    "toggle iedit mode for item under point, and open `hydrant/iedit'."
+    (interactive)
+    (ignore-errors
+      (iedit-mode 1)
+      (hydrant/iedit/body)))
+  (defhydra hydrant/iedit (:hint nil :color pink)
+    "
+^Select^                  ^Discard^                  ^Edit^               ^Navigate^
+^──────^──────────────────^───────^──────────────────^────^───────────────^────────^─────────────
+_n_: next occurrence      _M-SPC_: toggle selection  _u_: uppercase       _(_: previous selection
+_p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: next selection
+^ ^                       _m_:     convert to mc     _#_: insert numbers"
+    ("n" iedit-expand-down-to-occurrence)
+    ("m" aorst/iedit-to-mc-hydrant :exit t)
+    ("p" iedit-expand-up-to-occurrence)
+    ("u" iedit-upcase-occurrences)
+    ("d" iedit-downcase-occurrences)
+    ("#" iedit-number-occurrences)
+    ("(" iedit-prev-occurrence)
+    (")" iedit-next-occurrence)
+    ("M-SPC" iedit-toggle-selection)
+    ("q" ignore :exit t)))
+
 (when (or (executable-find "clangd")
           (executable-find "rls"))
   (use-package lsp-mode
@@ -1193,24 +1298,6 @@ _C_:   select next line"
   :config
   (unless (server-running-p)
     (server-start)))
-
-(use-package eldoc-box
-  :hook ((eldoc-mode . aorst/eldoc-box-enable)
-         (eldoc-box-buffer . aorst/eldoc-box-buffer-setup))
-  :config
-  (setq x-wait-for-event-timeout 0
-        eldoc-idle-delay 0.5
-        eldoc-box-max-pixel-width 640
-        eldoc-box-max-pixel-height 480)
-  (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
-  :init
-  (defun aorst/eldoc-box-enable ()
-    "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
-    (interactive)
-    (when (aorst/real-buffer-p)
-      (eldoc-box-hover-at-point-mode)))
-  (defun aorst/eldoc-box-buffer-setup ()
-    (unless word-wrap (toggle-word-wrap))))
 
 (use-package hideshow
   :ensure nil

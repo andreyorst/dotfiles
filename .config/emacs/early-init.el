@@ -23,16 +23,20 @@
                   gc-cons-percentage aorst--gc-cons-percentage
                   file-name-handler-alist aorst--file-name-handler-alist)))
 
+(defvar comp-deferred-compilation)
+(setq comp-deferred-compilation t)
+
 (setq default-frame-alist '((width . 190)
                             (height . 68)
                             (tool-bar-lines . 0)
                             (vertical-scroll-bars)))
 
+(setq frame-inhibit-implied-resize t
+      x-gtk-resize-child-frames 'resize-mode)
+
 (defvar package--init-file-ensured)
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
-
-(setq frame-inhibit-implied-resize t)
 
 (provide 'early-init)
 ;;; early-init.el ends here
