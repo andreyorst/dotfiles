@@ -593,23 +593,17 @@ are defining or executing a macro."
       (aorst/treemacs-variable-pitch-labels))
     (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
     (defun aorst/treemacs-setup-title ()
-      (let ((format '((:eval (concat
-                              (make-string
-                               (let ((width (window-width)))
-                                 (- (/ (if (= (% width 2) 0) width (1+ width)) 2) 5))
-                               ?\s)
-                              "Treemacs")))))
-        (if (version<= emacs-version "27")
-            (setq header-line-format format)
-          (setq tab-line-format format)))
       (let ((bg (face-attribute 'default :background))
-            (fg (face-attribute 'default :foreground))
-            (face (if (version<= emacs-version "27")
-                      'header-line
-                    'tab-line)))
-        (face-remap-add-relative face
-                                 :box (list :line-width 7 :color bg)
-                                 :background bg :foreground fg :height 1.0)))))
+            (fg (face-attribute 'default :foreground)))
+        (face-remap-add-relative 'header-line
+                                 :background bg :foreground fg
+                                 :box `(:line-width 8 :color ,bg))
+        (setq header-line-format
+              '((:eval
+                 (let* ((text "Treemacs")
+                        (extra-align (/ (length text) 2))
+                        (width (- (/ (window-width) 2) extra-align)))
+                   (concat (make-string width ?\s) text)))))))))
 
 (use-package minions
   :commands minions-mode
