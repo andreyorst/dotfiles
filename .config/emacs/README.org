@@ -2293,6 +2293,19 @@ This package provides more comfortable usage for =isearch= in God mode:
            ("<escape>" . god-mode-isearch-disable)))
 #+end_src
 
+** Separedit
+This package  provides a way to  edit comments in sources  as separate
+buffers with another major mode, like Markdown.
+
+#+begin_src emacs-lisp
+  (use-package separedit
+    :bind (:map
+           prog-mode-map
+           ("C-c '" . separedit))
+    :init
+    (setq separedit-default-mode 'markdown-mode))
+#+end_src
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to

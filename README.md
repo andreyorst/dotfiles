@@ -17,6 +17,7 @@ the repository should be copied of sym-linked to home directory.
 .dotfiles               ~> /home/$USER
 ├── .bashrc             ~> ├── .bashrc
 ├── .config/*           ~> ├── .config/
+├── .config/emacs       ~> ├── .emacs.d (for pre Emacs 27 users)
 ├── c_project_template     │
 ├── .editorconfig       ~> ├── .editorconfig
 ├── .git/                  │

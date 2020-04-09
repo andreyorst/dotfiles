@@ -1346,5 +1346,12 @@ _p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: n
           (desktop-read)
         (message "No desktop found.")))))
 
+(use-package separedit
+  :bind (:map
+         prog-mode-map
+         ("C-c '" . separedit))
+  :init
+  (setq separedit-default-mode 'markdown-mode))
+
 (provide 'init)
 ;;; init.el ends here
