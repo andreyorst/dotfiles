@@ -1370,8 +1370,6 @@ window  with  appropriate  major  mode.  This  can  be  achieved  with
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
     :config
-    (use-package edit-indirect
-      :hook (edit-indirect-after-creation-hook . aorst/real-buffer-setup))
     (defvar markdown-command "multimarkdown")
     (defun aorst/markdown-setup ()
       "Set buffer local variables."
@@ -2293,17 +2291,46 @@ This package provides more comfortable usage for =isearch= in God mode:
            ("<escape>" . god-mode-isearch-disable)))
 #+end_src
 
+** Edit Indirect
+This  package  makes it  possible  to  edit  Markdown code  blocks  in
+separate buffers.
+
+#+begin_src emacs-lisp
+  (use-package edit-indirect
+    :hook ((edit-indirect-after-creation . aorst/real-buffer-setup)
+           (edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
+    :bind (:map
+           edit-indirect-mode-map
+           ("C-c C-c" . edit-indirect-commit)
+           ("C-c C-k" . edit-indirect-abort)
+           ("C-c '" . nil))
+    :init
+    (defun aorst/edit-indirect-header-line-setup ()
+      (setq-local
+       header-line-format
+       (substitute-command-keys
+        "\\<edit-indirect-mode-map>Edit, then exit with `\\[edit-indirect-commit]' or abort with `\\[edit-indirect-abort]'"))))
+#+end_src
+
 ** Separedit
 This package  provides a way to  edit comments in sources  as separate
 buffers with another major mode, like Markdown.
 
 #+begin_src emacs-lisp
   (use-package separedit
+    :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
     :bind (:map
            prog-mode-map
+           ("C-c '" . separedit)
+           :map edit-indirect-mode-map
            ("C-c '" . separedit))
     :init
-    (setq separedit-default-mode 'markdown-mode))
+    (setq separedit-default-mode 'markdown-mode)
+    (defun aorst/separedit-header-line-setup ()
+      (setq-local
+       header-line-format
+       (substitute-command-keys
+        "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 #+end_src
 
 * Postscript

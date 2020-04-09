@@ -806,8 +806,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :config
-  (use-package edit-indirect
-    :hook (edit-indirect-after-creation-hook . aorst/real-buffer-setup))
   (defvar markdown-command "multimarkdown")
   (defun aorst/markdown-setup ()
     "Set buffer local variables."
@@ -1346,12 +1344,35 @@ _p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: n
           (desktop-read)
         (message "No desktop found.")))))
 
+(use-package edit-indirect
+  :hook ((edit-indirect-after-creation . aorst/real-buffer-setup)
+         (edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
+  :bind (:map
+         edit-indirect-mode-map
+         ("C-c C-c" . edit-indirect-commit)
+         ("C-c C-k" . edit-indirect-abort)
+         ("C-c '" . nil))
+  :init
+  (defun aorst/edit-indirect-header-line-setup ()
+    (setq-local
+     header-line-format
+     (substitute-command-keys
+      "\\<edit-indirect-mode-map>Edit, then exit with `\\[edit-indirect-commit]' or abort with `\\[edit-indirect-abort]'"))))
+
 (use-package separedit
+  :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
   :bind (:map
          prog-mode-map
+         ("C-c '" . separedit)
+         :map edit-indirect-mode-map
          ("C-c '" . separedit))
   :init
-  (setq separedit-default-mode 'markdown-mode))
+  (setq separedit-default-mode 'markdown-mode)
+  (defun aorst/separedit-header-line-setup ()
+    (setq-local
+     header-line-format
+     (substitute-command-keys
+      "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
 (provide 'init)
 ;;; init.el ends here
