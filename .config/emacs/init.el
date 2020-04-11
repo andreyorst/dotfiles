@@ -1368,5 +1368,10 @@ _p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: n
      (substitute-command-keys
       "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
+(use-package recentf
+  :ensure nil
+  :config
+  (add-to-list 'recentf-exclude "\\.gpg\\"))
+
 (provide 'init)
 ;;; init.el ends here

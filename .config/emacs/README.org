@@ -2325,6 +2325,16 @@ buffers with another major mode, like Markdown.
         "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 #+end_src
 
+** Recent files
+Settings to =recentf= mode.
+
+#+begin_src emacs-lisp
+  (use-package recentf
+    :ensure nil
+    :config
+    (add-to-list 'recentf-exclude "\\.gpg\\"))
+#+end_src
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to
