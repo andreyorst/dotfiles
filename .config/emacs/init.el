@@ -647,6 +647,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                    (unless (cdr tab-list)
                      (ignore-errors (delete-window window)))))))
         (force-mode-line-update)))
+
     (setq tab-line-new-tab-choice nil
           tab-line-close-button-show nil
           tab-line-new-button-show nil
@@ -659,6 +660,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                                            'keymap tab-line-left-map
                                            'mouse-face 'tab-line-highlight
                                            'help-echo "Click to scroll left"))
+
     (let ((bg (if (facep 'solaire-default-face)
                   (face-attribute 'solaire-default-face :background)
                 (face-attribute 'default :background)))
@@ -669,6 +671,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
+
     (dolist (mode '(ediff-mode
                     process-menu-mode
                     term-mode
@@ -1163,13 +1166,13 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (defhydra hydrant/mc (:hint nil :color pink)
     "
-^Select^                 ^Discard^                     ^Edit^               ^Navigate^
-^──────^─────────────────^───────^─────────────────────^────^───────────────^────────^──────────
-_M-s_: split lines       _M-SPC_: discard current      _&_: align           _(_: cycle backward
-_s_:   select regexp     _b_:     discard blank lines  _#_: insert numbers  _)_: cycle forward
-_n_:   select next       _d_:     remove duplicated    ^ ^                  ^ ^
-_p_:   select previous   _q_:     exit                 ^ ^                  ^ ^
-_C_:   select next line"
+ ^Select^                 ^Discard^                     ^Edit^               ^Navigate^
+─^──────^─────────────────^───────^─────────────────────^────^───────────────^────────^─────────
+ _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
+ _s_:   select regexp     _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
+ _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
+ _p_:   select previous   _q_ or _g_: exit               ^ ^                  ^ ^
+ _C_:   select next line"
     ("M-s" mc/edit-ends-of-lines)
     ("s" mc/mark-all-in-region-regexp)
     ("n" mc/mark-next-like-this-word)
@@ -1182,8 +1185,40 @@ _C_:   select next line"
     ("d" mc/remove-duplicated-cursors)
     ("C" mc/mark-next-lines)
     ("#" mc/insert-numbers)
-    ("q" mc/remove-duplicated-cursors :exit t)))
+    ("q" mc/remove-duplicated-cursors :exit t)
+    ("g" mc/remove-duplicated-cursors :exit t)))
 (use-package mc-extras)
+
+(use-package expand-region
+  :bind (("C-c e" . hydrant/er/body))
+  :requires hydra
+  :config
+  (defun aorst/er-deactivate-region ()
+    "Wrapper around `deactivate-mark'."
+    (interactive)
+    (deactivate-mark))
+  (defhydra hydrant/er (:color pink :hint nil)
+    "
+ ^Expand/Discard^                ^Mark^
+─^──────────────^────────────────^────^─────────────────
+ _e_ or _+_: expand region         _(_:      inside pairs
+ _r_ or _-_: reduce region         _)_:      around pairs
+ _g_:      exit                  _q_ or _'_: inside quotes
+ _G_:      discard region, exit  _Q_ or _\"_: around quotes
+ ^ ^    ^ ^                        _p_:      paragraph"
+    ("e" er/expand-region)
+    ("+" er/expand-region)
+    ("r" er/contract-region)
+    ("-" er/contract-region)
+    ("p" er/mark-paragraph)
+    ("(" er/mark-inside-pairs)
+    (")" er/mark-outside-pairs)
+    ("q" er/mark-inside-quotes)
+    ("'" er/mark-inside-quotes)
+    ("Q" er/mark-outside-quotes)
+    ("\"" er/mark-outside-quotes)
+    ("g" ignore :exit t)
+    ("G" aorst/er-deactivate-region :exit t)))
 
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
@@ -1212,11 +1247,12 @@ _C_:   select next line"
       (hydrant/iedit/body)))
   (defhydra hydrant/iedit (:hint nil :color pink)
     "
-^Select^                  ^Discard^                  ^Edit^               ^Navigate^
-^──────^──────────────────^───────^──────────────────^────^───────────────^────────^─────────────
-_n_: next occurrence      _M-SPC_: toggle selection  _u_: uppercase       _(_: previous selection
-_p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: next selection
-^ ^                       _m_:     convert to mc     _#_: insert numbers"
+ ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
+─^──────^──────────────────^───────^───────────────────^────^───────────────^────────^─────────────
+ _n_: next occurrence      _M-SPC_:  toggle selection  _u_: uppercase       _(_: previous selection
+ _p_: previous occurrence  _q_ or _g_: exit              _d_: downcase        _)_: next selection
+ ^ ^                       _G_:      exit iedit-mode   _#_: insert numbers
+ ^ ^                       _m_:      switch to mc"
     ("n" iedit-expand-down-to-occurrence)
     ("m" aorst/iedit-to-mc-hydrant :exit t)
     ("p" iedit-expand-up-to-occurrence)
@@ -1226,7 +1262,9 @@ _p_: previous occurrence  _q_:     exit              _d_: downcase        _)_: n
     ("(" iedit-prev-occurrence)
     (")" iedit-next-occurrence)
     ("M-SPC" iedit-toggle-selection)
-    ("q" ignore :exit t)))
+    ("q" ignore :exit t)
+    ("g" ignore :exit t)
+    ("G" #'(lambda () (interactive) (iedit-mode -1)) :exit t)))
 
 (when (or (executable-find "clangd")
           (executable-find "rls"))
