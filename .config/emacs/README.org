@@ -55,10 +55,9 @@ minutes, but still, the faster it starts - the better for me.
 :properties:
 :header-args+: :tangle "./early-init.el"
 :end:
-
 These settings are going into  different init file: =earli-init.el=.  We
-are  going to  use some  speedup  technics from  [[https://github.com/hlissner/doom-emacs][doom-emacs]] here.  But
-before that, let's add top comment:
+are going to use some speedup tricks from [[https://github.com/hlissner/doom-emacs][doom-emacs]] here.  But before
+that, let's add top comment:
 
 #+begin_src emacs-lisp
   ;;; early-init.el --- early configurations -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
@@ -127,10 +126,14 @@ Prevent the glimpse of un-styled  Emacs by disabling these UI elements
 early.
 
 #+begin_src emacs-lisp
-  (setq default-frame-alist '((width . 190)
-                              (height . 68)
+  (setq initial-frame-alist '((width . 170)
+                              (height . 56)
                               (tool-bar-lines . 0)
-                              (vertical-scroll-bars)))
+                              (left-fringe . 0)
+                              (right-fringe . 0)
+                              (bottom-divider-width . 0)
+                              (right-divider-width . 1))
+        default-frame-alist initial-frame-alist)
 #+end_src
 
 Resizing frame is also expensive so we inhibit it, and latest patch to
