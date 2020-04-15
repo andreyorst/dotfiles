@@ -26,10 +26,14 @@
 (defvar comp-deferred-compilation)
 (setq comp-deferred-compilation t)
 
-(setq default-frame-alist '((width . 190)
-                            (height . 68)
+(setq initial-frame-alist '((width . 170)
+                            (height . 56)
                             (tool-bar-lines . 0)
-                            (vertical-scroll-bars)))
+                            (left-fringe . 0)
+                            (right-fringe . 0)
+                            (bottom-divider-width . 0)
+                            (right-divider-width . 1))
+      default-frame-alist initial-frame-alist)
 
 (setq frame-inhibit-implied-resize t
       x-gtk-resize-child-frames 'resize-mode)

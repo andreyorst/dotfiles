@@ -220,7 +220,7 @@ are defining or executing a macro."
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
-  :init
+  :config
   (load-theme 'doom-one t)
   (set-face-attribute 'highlight nil
                       :foreground 'unspecified
@@ -1078,7 +1078,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (ivy-posframe-mode +1))
 
 (use-package company
-  :commands global-company-mode
   :bind (:map
          company-active-map
          ("TAB" . company-complete-common-or-cycle)
@@ -1090,7 +1089,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :hook (after-init . global-company-mode)
   :config
   (setq company-require-match 'never
-        company-minimum-prefix-length 3
+        company-minimum-prefix-length 2
         company-tooltip-align-annotations t
         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                             company-preview-frontend
@@ -1171,8 +1170,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
  _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
  _s_:   select regexp     _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
  _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
- _p_:   select previous   _q_ or _g_: exit               ^ ^                  ^ ^
- _C_:   select next line"
+ _p_:   select previous   _q_ or _g_: exit hydrant       ^ ^                  ^ ^
+ _C_:   select next line  _G_:      exit mc mode"
     ("M-s" mc/edit-ends-of-lines)
     ("s" mc/mark-all-in-region-regexp)
     ("n" mc/mark-next-like-this-word)
@@ -1186,24 +1185,21 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     ("C" mc/mark-next-lines)
     ("#" mc/insert-numbers)
     ("q" mc/remove-duplicated-cursors :exit t)
-    ("g" mc/remove-duplicated-cursors :exit t)))
+    ("g" mc/remove-duplicated-cursors :exit t)
+    ("G" mc/keyboard-quit :exit t)))
 (use-package mc-extras)
 
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
   :requires hydra
   :config
-  (defun aorst/er-deactivate-region ()
-    "Wrapper around `deactivate-mark'."
-    (interactive)
-    (deactivate-mark))
   (defhydra hydrant/er (:color pink :hint nil)
     "
  ^Expand/Discard^                ^Mark^
 ─^──────────────^────────────────^────^─────────────────
  _e_ or _+_: expand region         _(_:      inside pairs
  _r_ or _-_: reduce region         _)_:      around pairs
- _g_:      exit                  _q_ or _'_: inside quotes
+ _g_:      exit hydrant          _q_ or _'_: inside quotes
  _G_:      discard region, exit  _Q_ or _\"_: around quotes
  ^ ^    ^ ^                        _p_:      paragraph"
     ("e" er/expand-region)
@@ -1218,7 +1214,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     ("Q" er/mark-outside-quotes)
     ("\"" er/mark-outside-quotes)
     ("g" ignore :exit t)
-    ("G" aorst/er-deactivate-region :exit t)))
+    ("G" #'(lambda () (interactive) (deactivate-mark)) :exit t)))
 
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
@@ -1250,7 +1246,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
  ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
 ─^──────^──────────────────^───────^───────────────────^────^───────────────^────────^─────────────
  _n_: next occurrence      _M-SPC_:  toggle selection  _u_: uppercase       _(_: previous selection
- _p_: previous occurrence  _q_ or _g_: exit              _d_: downcase        _)_: next selection
+ _p_: previous occurrence  _q_ or _g_: exit hydrant      _d_: downcase        _)_: next selection
  ^ ^                       _G_:      exit iedit-mode   _#_: insert numbers
  ^ ^                       _m_:      switch to mc"
     ("n" iedit-expand-down-to-occurrence)
