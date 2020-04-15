@@ -886,7 +886,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-         ((cider-repl-mode cider-mode) . eldoc-mode))
+         ((cider-repl-mode cider-mode) . eldoc-mode)
+         (cider-disconnected . (lambda () (ignore-errors (delete-window)))))
   :custom-face
   (cider-error-highlight-face ((t (:inherit flymake-error))))
   (cider-fringe-face ((t (:inherit flymake-warning))))
