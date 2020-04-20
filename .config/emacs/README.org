@@ -2281,6 +2281,16 @@ Emacs. It adds some time to the startup though.
 I wonder if  it could store unsaved buffers so  all my changes persist
 through sessions.
 
+** Saveplace
+Save position in files you've visited.
+
+#+begin_src emacs-lisp
+  (use-package saveplace
+    :ensure nil
+    :init
+    (save-place-mode))
+#+end_src
+
 ** COMMENT God Mode
 God mode is more  like a mode in a sense of a  mode from modal editor,
 such as Vim, or Kakoune. It  makes all shortcuts you press be prefixed

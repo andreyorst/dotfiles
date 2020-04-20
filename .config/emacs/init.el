@@ -1374,6 +1374,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (desktop-read)
         (message "No desktop found.")))))
 
+(use-package saveplace
+  :ensure nil
+  :init
+  (save-place-mode))
+
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/real-buffer-setup)
          (edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
