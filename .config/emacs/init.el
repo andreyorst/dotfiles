@@ -129,7 +129,7 @@
     (indent-according-to-mode)))
 
 (defun aorst/real-buffer-p (&optional buffer)
-  "Determines whether buffer is real."
+  "Determines whether BUFFER is real."
   (let ((buffer-name (buffer-name buffer)))
     (or (and (not (minibufferp))
              (buffer-file-name buffer))
@@ -181,10 +181,12 @@ are defining or executing a macro."
   (find-font (font-spec :name font-name)))
 
 (defun aorst/indent-buffer ()
+  "Indent whole buffer."
   (interactive)
   (save-excursion
     (save-restriction
       (indent-region (point-min) (point-max)))))
+
 (global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
 
 (use-package startup
@@ -249,8 +251,9 @@ are defining or executing a macro."
            change-major-mode
            org-src-mode) . turn-on-solaire-mode)
          (snippet-mode . solaire-mode))
+  :custom
+  (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   :config
-  (setq solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   (solaire-mode-swap-bg)
   (with-no-warnings
     (if (boundp 'after-focus-change-function)
@@ -272,6 +275,13 @@ are defining or executing a macro."
   :init (solaire-global-mode +1))
 
 (use-package doom-modeline
+  :custom
+  (doom-modeline-bar-width 3)
+  (doom-modeline-major-mode-color-icon nil)
+  (doom-modeline-buffer-color-icon nil)
+  (doom-modeline-buffer-file-name-style 'relative-from-project)
+  (doom-modeline-minor-modes t)
+  (find-file-visit-truename t)
   :config
   (let ((fg (face-attribute 'default :foreground))
         (bg (face-attribute 'mode-line :background))
@@ -311,34 +321,29 @@ are defining or executing a macro."
     (set-face-attribute 'doom-modeline-bar nil :background bg)
     (set-face-attribute 'doom-modeline-bar-inactive nil :background bg)
     (set-face-attribute 'mode-line-inactive nil :foreground fg-inactive :background bg-inactive))
-  (setq doom-modeline-bar-width 3
-        doom-modeline-major-mode-color-icon nil
-        doom-modeline-buffer-color-icon nil
-        doom-modeline-buffer-file-name-style 'relative-from-project
-        doom-modeline-minor-modes t
-        find-file-visit-truename t)
   (doom-modeline-mode 1))
 
-(setq column-number-mode nil
-      line-number-mode nil
-      size-indication-mode nil
-      mode-line-position nil
-      mode-line-in-non-selected-windows nil)
+(setq-default column-number-mode t
+              line-number-mode t
+              size-indication-mode nil
+              mode-line-position nil
+              mode-line-percent-position nil
+              mode-line-in-non-selected-windows nil)
 (unless (bound-and-true-p doom-modeline-mode)
   (set-face-attribute 'mode-line nil
-                      :box (list :line-width 7
+                      :box (list :line-width 8
                                  :color (face-attribute 'mode-line :background))))
 
 (when window-system
   (use-package frame
     :ensure nil
+    :custom
+    (window-divider-default-right-width 1)
     :config
-    (setq window-divider-default-right-width 1)
     (window-divider-mode 1)
-    (set-face-attribute
-     'window-divider nil
-     :foreground (face-attribute
-                  'mode-line-inactive :background))))
+    (set-face-attribute 'window-divider nil
+                        :foreground (face-attribute
+                                     'mode-line-inactive :background))))
 
 (setq-default frame-title-format '("%b — Emacs"))
 
@@ -358,12 +363,13 @@ are defining or executing a macro."
            (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
            (treemacs-switch-workspace . treemacs-set-fallback-workspace)
            (treemacs-mode . aorst/treemacs-setup-title))
+    :custom
+    (treemacs-width 34)
+    (treemacs-is-never-other-window t)
+    (treemacs-space-between-root-nodes nil)
+    (treemacs-indentation 2)
     :config
     (use-package treemacs-magit)
-    (setq treemacs-width 34
-          treemacs-is-never-other-window t
-          treemacs-space-between-root-nodes nil
-          treemacs-indentation 2)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode nil)
@@ -611,7 +617,7 @@ are defining or executing a macro."
 
 (use-package uniquify
   :ensure nil
-  :config (setq uniquify-buffer-name-style 'forward))
+  :custom (uniquify-buffer-name-style 'forward))
 
 (unless (version< emacs-version "27")
   (use-package tab-line
@@ -680,9 +686,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package display-line-numbers
   :ensure nil
-  :config
-  (setq display-line-numbers-grow-only t
-        display-line-numbers-width-start t))
+  :custom
+  (display-line-numbers-grow-only t)
+  (display-line-numbers-width-start t))
 
 (use-package org
   :ensure nil
@@ -698,6 +704,26 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          :map
          org-mode-map
          ("C-c l" . org-store-link))
+  :custom
+  (org-startup-with-inline-images nil)
+  (org-tags-column -100)
+  (org-startup-folded 'content)
+  (org-hide-emphasis-markers t)
+  (org-adapt-indentation nil)
+  (org-hide-leading-stars t)
+  (org-highlight-latex-and-related '(latex))
+  (revert-without-query '(".*\.pdf"))
+  (org-preview-latex-default-process 'dvisvgm)
+  (org-src-fontify-natively t)
+  (org-preview-latex-image-directory ".ltximg/")
+  (org-latex-listings 'minted)
+  (org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+                          ("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+                          ("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (org-confirm-babel-evaluate nil)
+  (org-imenu-depth 8)
+  (org-log-done t)
+  (org-agenda-files '("~/Tasks"))
   :config
   (use-package ox-latex
     :ensure nil)
@@ -706,25 +732,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (when (not (version<= org-version "9.1.9"))
     (use-package org-tempo
       :ensure nil))
-  (setq org-startup-with-inline-images nil
-        org-tags-column -100
-        org-startup-folded 'content
-        org-hide-emphasis-markers t
-        org-adapt-indentation nil
-        org-hide-leading-stars t
-        org-highlight-latex-and-related '(latex)
-        revert-without-query '(".*\.pdf")
-        org-preview-latex-default-process 'dvisvgm
-        org-src-fontify-natively t
-        org-preview-latex-image-directory ".ltximg/"
-        org-latex-listings 'minted
-        org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                                "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
-        org-confirm-babel-evaluate nil
-        org-imenu-depth 8
-        org-log-done t
-        org-agenda-files '("~/Tasks"))
   (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-+]\\) "
                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
@@ -746,7 +753,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     (set-buffer-modified-p nil))
   (defvar minted-cache-dir
     (file-name-as-directory
-     (expand-file-name ".minted/\\jombname"
+     (expand-file-name ".minted/\\jobname"
                        temporary-file-directory)))
   (add-to-list 'org-latex-packages-alist
                `(,(concat "cachedir=" minted-cache-dir)
@@ -895,10 +902,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                                        :inherit (font-lock-warning-face)))))
   (cider-deprecated-face ((t (:inherit smerge-upper))))
   (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
-  :config
-  (setq cider-repl-display-help-banner nil
-        cider-repl-tab-command nil
-        nrepl-hide-special-buffers t))
+  :custom
+  (cider-repl-display-help-banner nil)
+  (cider-repl-tab-command nil)
+  (nrepl-hide-special-buffers t))
 
 (use-package fennel-mode
   :bind (:map
@@ -912,11 +919,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package help
   :ensure nil
-  :config (setq help-window-select t))
+  :custom (help-window-select t))
 
 (use-package doc-view
   :ensure nil
-  :config (setq-default doc-view-resolution 192))
+  :custom (doc-view-resolution 192))
 
 (setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
@@ -973,16 +980,18 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package flymake
   :ensure nil
+  :custom
+  (flymake-fringe-indicator-position 'right-fringe)
   :config
-  (setq flymake-fringe-indicator-position 'right-fringe)
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
 (use-package hydra)
 
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
-  :config (setq geiser-active-implementations '(guile)
-                geiser-default-implementation 'guile))
+  :custom
+  (geiser-active-implementations '(guile))
+  (geiser-default-implementation 'guile))
 
 (use-package paredit)
 (use-package selected)
@@ -997,11 +1006,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           racket-mode
           fennel-mode) . parinfer-mode)
   :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
-  :config
-  (setq parinfer-extensions '(defaults
-                               pretty-parens
-                               smart-tab
-                               smart-yank)))
+  :custom
+  (parinfer-extensions '(defaults
+                          pretty-parens
+                          smart-tab
+                          smart-yank)))
 
 (use-package flx)
 
@@ -1010,45 +1019,15 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
          (minibuffer-exit-hook . aorst/minibuffer-restore-garbage-collection))
   :bind (("C-x b" . ivy-switch-buffer))
-  :config
-  (use-package counsel
-    :commands (counsel-M-x
-               counsel-find-file
-               counsel-file-jump
-               counsel-recentf
-               counsel-rg
-               counsel-describe-function
-               counsel-describe-variable
-               counsel-find-library)
-    :config
-    (when (executable-find "fd")
-      (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory))
-        (let ((find-program "fd")
-              (counsel-file-jump-args (split-string "-L --type f --hidden")))
-          (funcall foo))))
-    (when (executable-find "rg")
-      (setq counsel-rg-base-command
-            "rg -S --no-heading --hidden --line-number --color never %s .")
-      (setenv "FZF_DEFAULT_COMMAND"
-              "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'"))
-    :bind (("M-x" . counsel-M-x)
-           ("C-x C-f" . counsel-find-file)
-           ("C-x f" . counsel-file-jump)
-           ("C-x C-r" . counsel-recentf)
-           ("C-x d" . counsel-dired)
-           ("C-h f" . counsel-describe-function)
-           ("C-h C-f" . counsel-describe-face)
-           ("C-h v" . counsel-describe-variable)
-           ("C-h l" . counsel-find-library)
-           ("C-x C-b" . counsel-switch-buffer)))
-  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
-        ivy-count-format ""
-        ivy-ignore-buffers '("\\` " "\\`\\*")
-        ivy-display-style nil
-        ivy-minibuffer-faces nil
-        ivy-minibuffer-faces '(default default default default)
-        ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t)
+  :custom
+  (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
+  (ivy-count-format "")
+  (ivy-ignore-buffers '("\\` " "\\`\\*"))
+  (ivy-display-style nil)
+  (ivy-minibuffer-faces nil)
+  (ivy-minibuffer-faces '(default default default default))
+  (ivy-use-virtual-buffers t)
+  (enable-recursive-minibuffers t)
   :init
   (defun aorst/minibuffer-defer-garbage-collection ()
     "Defer garbage collection for minibuffer"
@@ -1059,8 +1038,44 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
      1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
   (ivy-mode 1))
 
+(use-package counsel
+  :commands (counsel-M-x
+             counsel-find-file
+             counsel-file-jump
+             counsel-recentf
+             counsel-rg
+             counsel-describe-function
+             counsel-describe-variable
+             counsel-find-library)
+  :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-x f" . counsel-file-jump)
+         ("C-x C-r" . counsel-recentf)
+         ("C-x d" . counsel-dired)
+         ("C-h f" . counsel-describe-function)
+         ("C-h C-f" . counsel-describe-face)
+         ("C-h v" . counsel-describe-variable)
+         ("C-h l" . counsel-find-library)
+         ("C-x C-b" . counsel-switch-buffer))
+  :config
+  (when (executable-find "fd")
+    (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory))
+      (let ((find-program "fd")
+            (counsel-file-jump-args (split-string "-L --type f --hidden")))
+        (funcall foo))))
+  (when (executable-find "rg")
+    (setq counsel-rg-base-command
+          "rg -S --no-heading --hidden --line-number --color never %s .")
+    (setenv "FZF_DEFAULT_COMMAND"
+            "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'")))
+
 (use-package ivy-posframe
   :after ivy
+  :custom
+  (ivy-posframe-display-functions-alist '((t . aorst/posframe-position)))
+  (ivy-posframe-height-alist '((t . 16)))
+  (ivy-posframe-parameters '((internal-border-width . 6)))
+  (ivy-posframe-width 78)
   :config
   (defvar aorst--ivy-posframe-top-padding 42
     "additional padding between top of the frame and posframe.")
@@ -1072,10 +1087,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                 (plist-get info :posframe-width))
              2)
           0))
-  (setq ivy-posframe-display-functions-alist '((t . aorst/posframe-position))
-        ivy-posframe-height-alist '((t . 16))
-        ivy-posframe-parameters '((internal-border-width . 6))
-        ivy-posframe-width 78)
   (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
   (ivy-posframe-mode +1))
 
@@ -1089,28 +1100,29 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          ("C-n" . company-select-next)
          ("C-p" . company-select-previous))
   :hook (after-init . global-company-mode)
-  :config
-  (setq company-require-match 'never
-        company-minimum-prefix-length 2
-        company-tooltip-align-annotations t
-        company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-                            company-preview-frontend
-                            company-echo-metadata-frontend)
-        company-backends '(company-capf company-files)))
+  :custom
+  (company-require-match 'never)
+  (company-minimum-prefix-length 2)
+  (company-tooltip-align-annotations t)
+  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                       company-preview-frontend
+                       company-echo-metadata-frontend))
+  (company-backends '(company-capf company-files)))
 
 (use-package company-posframe
   :after company
+  :custom
+  (company-posframe-quickhelp-show-header nil)
+  (company-posframe-show-indicator nil)
+  (company-posframe-show-metadata nil)
+  (company-posframe-quickhelp-show-params
+   (list :poshandler #'company-posframe-quickhelp-right-poshandler
+         :internal-border-width 1
+         :timeout 60
+         :internal-border-color (face-attribute 'mode-line-inactive :background)
+         :no-properties nil
+         :poshandler nil))
   :config
-  (setq company-posframe-quickhelp-show-header nil
-        company-posframe-show-indicator nil
-        company-posframe-show-metadata nil)
-  (setq-default company-posframe-quickhelp-show-params
-                (list :poshandler #'company-posframe-quickhelp-right-poshandler
-                      :internal-border-width 1
-                      :timeout 60
-                      :internal-border-color (face-attribute 'mode-line-inactive :background)
-                      :no-properties nil
-                      :poshandler nil))
   (company-posframe-mode))
 
 (use-package undo-tree
@@ -1129,7 +1141,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode))
   :bind (("<f12>" . magit-status))
-  :config (setq magit-ediff-dwim-show-on-hunks t))
+  :custom (magit-ediff-dwim-show-on-hunks t))
 
 (use-package ediff
   :ensure nil
@@ -1138,7 +1150,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          (ediff-keymap-setup . aorst/ediff-setup-keys))
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
-  (setq ediff-split-window-function 'split-window-horizontally)
+  :custom
+  (ediff-split-window-function 'split-window-horizontally)
   :init
   (defvar aorst--ediff-last-windows nil
     "Stores window configuration before `ediff' was invoked.")
@@ -1221,8 +1234,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
          ("C-c i" . aorst/iedit-hydrant))
+  :custom
+  (iedit-toggle-key-default nil)
   :init
-  (setq iedit-toggle-key-default nil)
   (defun aorst/iedit-to-mc-hydrant ()
     "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
     (interactive)
@@ -1268,27 +1282,30 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (executable-find "rls"))
   (use-package lsp-mode
     :hook ((rust-mode c-mode c++-mode) . lsp)
-    :init (setq lsp-keymap-prefix "C-c l")
-    :config
-    (setq lsp-rust-clippy-preference "on"
-          lsp-prefer-capf t
-          lsp-enable-symbol-highlighting nil)
-    (use-package lsp-ui
-      :commands lsp-ui-mode
-      :bind (:map
-             lsp-ui-mode-map
-             ("M-." . lsp-ui-peek-find-definitions)
-             ("M-/" . lsp-ui-peek-find-references))
-      :config
-      (setq lsp-ui-doc-border (face-attribute 'mode-line-inactive :background)
-            lsp-ui-sideline-enable nil
-            lsp-ui-imenu-enable nil
-            lsp-ui-doc-delay 0.7) ;; higher than eldoc delay
-      (when (fboundp 'aorst/escape)
-        (define-advice lsp-ui-doc--make-request (:around (foo))
-          (unless (eq this-command 'aorst/escape)
-            (funcall foo))))
-      (lsp-ui-mode))))
+    :custom
+    (lsp-keymap-prefix "C-c l")
+    (lsp-rust-clippy-preference "on")
+    (lsp-prefer-capf t)
+    (lsp-enable-symbol-highlighting nil)))
+
+(use-package lsp-ui
+  :after lsp-mode
+  :commands lsp-ui-mode
+  :bind (:map
+         lsp-ui-mode-map
+         ("M-." . lsp-ui-peek-find-definitions)
+         ("M-/" . lsp-ui-peek-find-references))
+  :custom
+  (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-imenu-enable nil)
+  (lsp-ui-doc-delay 0.7 "higher than eldoc delay")
+  :config
+  (when (fboundp 'aorst/escape)
+    (define-advice lsp-ui-doc--make-request (:around (foo))
+      (unless (eq this-command 'aorst/escape)
+        (funcall foo))))
+  (lsp-ui-mode))
 
 (use-package project
   :ensure nil
@@ -1352,12 +1369,13 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     :ensure nil
     :hook ((after-init . aorst/desktop-restore)
            (desktop-after-read . aorst/desktop-remove))
+    :custom
+    (desktop-path '("~/.dotfiles/.config/emacs/"))
+    (desktop-dirname "~/.dotfiles/.config/emacs/")
+    (desktop-base-file-name "emacs-desktop")
+    (desktop-save t)
+    (desktop-load-locked-desktop t)
     :init
-    (setq desktop-path '("~/.dotfiles/.config/emacs/")
-          desktop-dirname "~/.dotfiles/.config/emacs/"
-          desktop-base-file-name "emacs-desktop"
-          desktop-save t
-          desktop-load-locked-desktop t)
     (defun aorst/desktop-remove ()
       "Remove current desktop, but save `desktop-dirname'."
       (let ((desktop desktop-dirname))
@@ -1401,8 +1419,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
          ("C-c '" . separedit)
          :map edit-indirect-mode-map
          ("C-c '" . separedit))
+  :custom
+  (separedit-default-mode 'markdown-mode)
   :init
-  (setq separedit-default-mode 'markdown-mode)
   (defun aorst/separedit-header-line-setup ()
     (setq-local
      header-line-format
