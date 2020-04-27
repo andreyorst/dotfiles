@@ -1336,11 +1336,11 @@ ability  to see  matching bracket  when cursor  stands near  the other
 bracket. So I enable it for every programming language.
 
 #+begin_src emacs-lisp
-    (use-package prog-mode
-      :ensure nil
-      :hook ((prog-mode . show-paren-mode)
-             (prog-mode . display-line-numbers-mode)
-             (prog-mode . hl-line-mode)))
+  (use-package prog-mode
+    :ensure nil
+    :hook ((prog-mode . show-paren-mode)
+           (prog-mode . display-line-numbers-mode)))
+           ;; (prog-mode . hl-line-mode)))
 #+end_src
 
 ** CC
@@ -1563,6 +1563,15 @@ produces I need support for Lua.
     :bind (:map
            lua-mode-map
            ("C-c C-f" . aorst/indent-buffer)))
+#+end_src
+
+** CSS
+
+#+begin_src emacs-lisp
+  (use-package css-mode
+    :ensure nil
+    :custom
+    (css-indent-offset 2))
 #+end_src
 
 * Tools
@@ -1862,7 +1871,9 @@ Complete anything framework. Nothing much to say. Does it's job.
     (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                          company-preview-frontend
                          company-echo-metadata-frontend))
-    (company-backends '(company-capf company-files)))
+    (company-backends '(company-capf company-files))
+    (company-tooltip-minimum-width 30)
+    (company-tooltip-maximum-width 60))
 #+end_src
 
 This package also optionally requires these extra dependencies:

@@ -789,8 +789,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 (use-package prog-mode
   :ensure nil
   :hook ((prog-mode . show-paren-mode)
-         (prog-mode . display-line-numbers-mode)
-         (prog-mode . hl-line-mode)))
+         (prog-mode . display-line-numbers-mode)))
+         ;; (prog-mode . hl-line-mode)))
 
 (use-package cc-mode
   :ensure nil
@@ -916,6 +916,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :bind (:map
          lua-mode-map
          ("C-c C-f" . aorst/indent-buffer)))
+
+(use-package css-mode
+  :ensure nil
+  :custom
+  (css-indent-offset 2))
 
 (use-package help
   :ensure nil
@@ -1107,7 +1112,9 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                        company-preview-frontend
                        company-echo-metadata-frontend))
-  (company-backends '(company-capf company-files)))
+  (company-backends '(company-capf company-files))
+  (company-tooltip-minimum-width 30)
+  (company-tooltip-maximum-width 60))
 
 (use-package company-posframe
   :after company
