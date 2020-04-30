@@ -1287,15 +1287,14 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     ("g" ignore :exit t)
     ("G" #'(lambda () (interactive) (iedit-mode -1)) :exit t)))
 
-(when (or (executable-find "clangd")
-          (executable-find "rls"))
-  (use-package lsp-mode
-    :hook ((rust-mode c-mode c++-mode) . lsp)
-    :custom
-    (lsp-keymap-prefix "C-c l")
-    (lsp-rust-clippy-preference "on")
-    (lsp-prefer-capf t)
-    (lsp-enable-symbol-highlighting nil)))
+(use-package lsp-mode
+  :hook ((rust-mode c-mode c++-mode) . lsp)
+  :custom
+  (lsp-keymap-prefix "C-c l")
+  (lsp-rust-clippy-preference "on")
+  (lsp-prefer-capf t)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-rust-server 'rust-analyzer))
 
 (use-package lsp-ui
   :after lsp-mode

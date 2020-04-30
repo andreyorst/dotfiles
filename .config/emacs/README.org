@@ -2103,15 +2103,14 @@ though, as multiple cursor some times looses cursors for some reason.
 Another LSP client for Emacs.
 
 #+begin_src emacs-lisp
-  (when (or (executable-find "clangd")
-            (executable-find "rls"))
-    (use-package lsp-mode
-      :hook ((rust-mode c-mode c++-mode) . lsp)
-      :custom
-      (lsp-keymap-prefix "C-c l")
-      (lsp-rust-clippy-preference "on")
-      (lsp-prefer-capf t)
-      (lsp-enable-symbol-highlighting nil)))
+  (use-package lsp-mode
+    :hook ((rust-mode c-mode c++-mode) . lsp)
+    :custom
+    (lsp-keymap-prefix "C-c l")
+    (lsp-rust-clippy-preference "on")
+    (lsp-prefer-capf t)
+    (lsp-enable-symbol-highlighting nil)
+    (lsp-rust-server 'rust-analyzer))
 #+end_src
 
 #+begin_src emacs-lisp
