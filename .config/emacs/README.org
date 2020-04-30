@@ -480,7 +480,8 @@ file-visiting while not visiting a particular file, like =*scratch*=
           (string-match-p ".~.*~" buffer-name)
           (string-match-p "FILE=/" buffer-name)
           (string-match-p "\*edit-indirect .*\*" buffer-name)
-          (string-match-p "\*Org Src .*\*" buffer-name))))
+          (string-match-p "\*Org Src .*\*" buffer-name)
+          (string-match-p "*eww*" buffer-name))))
 #+end_src
 
 ** =real-buffer-setup=
