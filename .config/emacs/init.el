@@ -614,6 +614,7 @@ are defining or executing a macro."
       (set-window-fringes nil 0 0 t)
       (aorst/treemacs-variable-pitch-labels))
     (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
+    (advice-add #'treemacs-switch-workspace :after #'aorst/treemacs-setup-title)
     (defun aorst/treemacs-setup-title ()
       (let ((bg (face-attribute 'default :background))
             (fg (face-attribute 'default :foreground)))
@@ -622,8 +623,8 @@ are defining or executing a macro."
                                  :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg))
         (setq header-line-format
               '((:eval
-                 (let* ((text "Treemacs")
-                        (extra-align (/ (length text) 2))
+                 (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                        (extra-align (+ (/ (length text) 2) 1))
                         (width (- (/ (window-width) 2) extra-align)))
                    (concat (make-string width ?\s) text)))))))))
 
