@@ -145,7 +145,7 @@ Shell, so let's set it to =resize-mode=.
         x-gtk-resize-child-frames 'resize-mode)
 #+end_src
 
-*** =package.el=
+*** early =package.el= settings
 =package.el= initialization is expensive so we disable it at startup:
 
 #+begin_src emacs-lisp
@@ -200,6 +200,44 @@ There's recent bug with downloading from elpa. This line fixes it:
   (package-initialize)
 #+end_src
 
+Found this trick  [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], but instead of using Boolean,  I've decided to
+track time since last package refresh.  This variable is going to hold
+either  =nil= or  date-time  string. Since  I'm using  =desktop-save-mode=
+ideally this variable should be stored and then updated correctly.
+
+#+begin_src emacs-lisp
+  (defvar aorst--package-refresh-time nil
+    "Date and time when package lists have been refreshed.")
+#+end_src
+
+This  advice first  checks if  our date-time  string exists,  and then
+checks if there's more than 24 hours passed since last check.
+
+#+begin_src emacs-lisp
+  (define-advice package-install (:before (&rest _))
+    (when (or (null aorst--package-refresh-time)
+              (> (/ (float-time
+                     (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
+                                    (date-to-time aorst--package-refresh-time)))
+                    3600)
+                 24))
+      (package-refresh-contents)))
+#+end_src
+
+Now all packages that  use =package-install= should periodically refresh
+package  contents. In  order to  update time  we also  have to  advice
+=package-refresh-contents=:
+
+#+begin_src emacs-lisp
+  (define-advice package-refresh-contents (:after (&rest _))
+    (setq aorst--package-refresh-time (format-time-string "%Y-%m-%dT%H:%M")))
+#+end_src
+
+Saving  of  this  variable  is   configured  under  =:config=  block  in
+[[*Desktop][desktop.el section]].   If =desktop-save-mode= is not  enabled, refreshing
+will  always occur  on first  call to  =package-install= after  Emacs is
+loaded.
+
 ** =use-package=
 I use =use-package= to install, load  and configure my packages.  I find
 this way very consistent and easy  to understand and maintain.  What I
@@ -210,7 +248,6 @@ system.
 
 #+begin_src emacs-lisp
   (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
     (package-install 'use-package))
 #+end_src
 
@@ -674,7 +711,7 @@ Emacs init.
       (fringe-mode 0)
       (or standard-display-table
           (setq standard-display-table (make-display-table)))
-      (set-display-table-slot standard-display-table 0 ?\ )))
+      (set-display-table-slot standard-display-table 0 ?\s)))
 #+end_src
 
 ** Solaire Mode
@@ -2293,6 +2330,8 @@ Emacs. It adds some time to the startup though.
       (desktop-base-file-name "emacs-desktop")
       (desktop-save t)
       (desktop-load-locked-desktop t)
+      :config
+      (add-to-list 'desktop-globals-to-save 'aorst--package-refresh-time)
       :init
       (defun aorst/desktop-remove ()
         "Remove current desktop, but save `desktop-dirname'."

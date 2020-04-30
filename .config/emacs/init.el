@@ -20,8 +20,22 @@
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 (package-initialize)
 
+(defvar aorst--package-refresh-time nil
+  "Date and time when package lists have been refreshed.")
+
+(define-advice package-install (:before (&rest _))
+  (when (or (null aorst--package-refresh-time)
+            (> (/ (float-time
+                   (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
+                                  (date-to-time aorst--package-refresh-time)))
+                  3600)
+               24))
+    (package-refresh-contents)))
+
+(define-advice package-refresh-contents (:after (&rest _))
+  (setq aorst--package-refresh-time (format-time-string "%Y-%m-%dT%H:%M")))
+
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
   (package-install 'use-package))
 
 (require 'use-package)
@@ -240,7 +254,7 @@ are defining or executing a macro."
     (fringe-mode 0)
     (or standard-display-table
         (setq standard-display-table (make-display-table)))
-    (set-display-table-slot standard-display-table 0 ?\ )))
+    (set-display-table-slot standard-display-table 0 ?\s)))
 
 (use-package solaire-mode
   :commands (solaire-global-mode
@@ -1383,6 +1397,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     (desktop-base-file-name "emacs-desktop")
     (desktop-save t)
     (desktop-load-locked-desktop t)
+    :config
+    (add-to-list 'desktop-globals-to-save 'aorst--package-refresh-time)
     :init
     (defun aorst/desktop-remove ()
       "Remove current desktop, but save `desktop-dirname'."
