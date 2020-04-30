@@ -8,25 +8,24 @@
 [[file:.screenshot.png]]
 
 * About this document
-
 This is my Emacs configuration file written as Org document.  I do all
 edits here,  then /compile/ it to  =init.el= file. Emacs is  complex tool,
-and  by  having my  configuration  in  Org  Mode,  I can  separate  my
-configuration  in sections,  comment  each  configuration, and  toggle
-configuration parts on and off with ease.
+and  by having  my configuration  in Org  Mode, I  can separate  it to
+different sections,  elaborate each  change, and  toggle configuration
+parts on and off with ease.
 
 I  try to  maintain my  Emacs  configuration simple,  fast, and  small
 keeping as much  of vanilla Emacs behaviors  as I can, but  I'm a sane
-person so  some aspects which  are actually  insane in my  opinion are
+person so some  aspects, which are actually insane in  my opinion, are
 changed.
 
 Org Mode has a function  called =org-babel-tangle= that exports all code
 blocks accordingly to =header-args= property. Calling this function with
 this file as an argument will result in creation of =init.el= located at
-=.config/emacs= in  your home directory. This  means that you only  need this
-file  in order  to  get my  Emacs configuration  and  compile it  with
+=user-emacs-directory=.   This means  that you  only need  this file  in
+order   to  get   my   Emacs  configuration   and   compile  it   with
 =org-babel-tangle= function for the first  time.  After that, every time
-this file is saved it gets re-tangled automatically.
+this file is saved it gets re-tangled automatically on save.
 
 Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
 starts with commentary:
