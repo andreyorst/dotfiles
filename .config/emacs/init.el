@@ -282,6 +282,7 @@ are defining or executing a macro."
   (doom-modeline-buffer-color-icon nil)
   (doom-modeline-buffer-file-name-style 'relative-from-project)
   (doom-modeline-minor-modes t)
+  (doom-modeline-height (floor (* (line-pixel-height) 1.8)))
   (find-file-visit-truename t)
   :config
   (let ((fg (face-attribute 'default :foreground))
@@ -604,7 +605,7 @@ are defining or executing a macro."
             (fg (face-attribute 'default :foreground)))
         (face-remap-add-relative 'header-line
                                  :background bg :foreground fg
-                                 :box `(:line-width 8 :color ,bg))
+                                 :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg))
         (setq header-line-format
               '((:eval
                  (let* ((text "Treemacs")
@@ -673,7 +674,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                 (face-attribute 'default :background)))
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
-          (box-width 8))
+          (box-width (/ (line-pixel-height) 2)))
       (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
