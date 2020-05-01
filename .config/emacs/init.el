@@ -636,13 +636,13 @@ are defining or executing a macro."
             (fg (face-attribute 'default :foreground)))
         (face-remap-add-relative 'header-line
                                  :background bg :foreground fg
-                                 :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg))
-        (setq header-line-format
-              '((:eval
-                 (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
-                        (extra-align (+ (/ (length text) 2) 1))
-                        (width (- (/ (window-width) 2) extra-align)))
-                   (concat (make-string width ?\s) text)))))))))
+                                 :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+      (setq header-line-format
+            '((:eval
+               (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                      (extra-align (+ (/ (length text) 2) 1))
+                      (width (- (/ (window-width) 2) extra-align)))
+                 (concat (make-string width ?\s) text))))))))
 
 (use-package minions
   :commands minions-mode
