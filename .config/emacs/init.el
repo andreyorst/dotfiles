@@ -631,7 +631,6 @@ are defining or executing a macro."
       (set-window-fringes nil 0 0 t)
       (aorst/treemacs-variable-pitch-labels))
     (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
-    (advice-add #'treemacs-switch-workspace :after #'aorst/treemacs-setup-title)
     (defun aorst/treemacs-setup-title ()
       (let ((bg (face-attribute 'default :background))
             (fg (face-attribute 'default :foreground)))
