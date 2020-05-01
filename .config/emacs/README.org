@@ -201,13 +201,33 @@ There's recent bug with downloading from elpa. This line fixes it:
 #+end_src
 
 Found this trick  [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], but instead of using Boolean,  I've decided to
-track time since last package refresh.  This variable is going to hold
-either  =nil= or  date-time  string. Since  I'm using  =desktop-save-mode=
-ideally this variable should be stored and then updated correctly.
+track time since last package refresh,  and use customize to store it.
+This variable is  going to hold either =nil= or  date-time string.
 
 #+begin_src emacs-lisp
-  (defvar aorst--package-refresh-time nil
-    "Date and time when package lists have been refreshed.")
+  (defcustom package-last-refresh-date nil
+    "Date and time when package lists have been refreshed.
+
+  This variable is then used to check whether
+  `package-refresh-contents' call is needed before calling
+  `package-install'. Value of this varialbe is updated when
+  `package-refresh-contents' is called.
+
+  See `package-refresh-hour-threshold' for amount of time needed to
+  trigger refresh."
+    :type 'string
+    :group 'package)
+#+end_src
+
+And we  need a variable that  holds amount of hours  that will trigger
+the refresh:
+
+#+begin_src emacs-lisp
+  (defcustom package-automatic-refresh-threshold 24
+    "Amount of hours since last `package-refresh-contents' call
+  needed to trigger automatic refresh before calling `package-install'."
+    :type 'number
+    :group 'package)
 #+end_src
 
 This  advice first  checks if  our date-time  string exists,  and then
@@ -215,13 +235,14 @@ checks if there's more than 24 hours passed since last check.
 
 #+begin_src emacs-lisp
   (define-advice package-install (:before (&rest _))
-    (when (or (null aorst--package-refresh-time)
-              (> (/ (float-time
-                     (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
-                                    (date-to-time aorst--package-refresh-time)))
-                    3600)
-                 24))
-      (package-refresh-contents)))
+    (let ((seconds-per-hour 3600))
+      (when (or (null package-last-refresh-date)
+                (> (/ (float-time
+                       (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
+                                      (date-to-time package-last-refresh-date)))
+                      seconds-per-hour)
+                   package-automatic-refresh-threshold))
+        (package-refresh-contents))))
 #+end_src
 
 Now all packages that  use =package-install= should periodically refresh
@@ -230,13 +251,11 @@ package  contents. In  order to  update time  we also  have to  advice
 
 #+begin_src emacs-lisp
   (define-advice package-refresh-contents (:after (&rest _))
-    (setq aorst--package-refresh-time (format-time-string "%Y-%m-%dT%H:%M")))
+    (customize-save-variable 'package-last-refresh-date (format-time-string "%Y-%m-%dT%H:%M")))
 #+end_src
 
-Saving  of  this  variable  is   configured  under  =:config=  block  in
-[[*Desktop][desktop.el section]].   If =desktop-save-mode= is not  enabled, refreshing
-will  always occur  on first  call to  =package-install= after  Emacs is
-loaded.
+This  variable gets  saved  in  your =custom=  file,  and is  persistent
+through Emacs sessions.
 
 ** =use-package=
 I use =use-package= to install, load  and configure my packages.  I find
@@ -2331,8 +2350,6 @@ Emacs. It adds some time to the startup though.
       (desktop-base-file-name "emacs-desktop")
       (desktop-save t)
       (desktop-load-locked-desktop t)
-      :config
-      (add-to-list 'desktop-globals-to-save 'aorst--package-refresh-time)
       :init
       (defun aorst/desktop-remove ()
         "Remove current desktop, but save `desktop-dirname'."

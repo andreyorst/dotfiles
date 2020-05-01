@@ -20,20 +20,37 @@
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 (package-initialize)
 
-(defvar aorst--package-refresh-time nil
-  "Date and time when package lists have been refreshed.")
+(defcustom package-last-refresh-date nil
+  "Date and time when package lists have been refreshed.
+
+This variable is then used to check whether
+`package-refresh-contents' call is needed before calling
+`package-install'. Value of this varialbe is updated when
+`package-refresh-contents' is called.
+
+See `package-refresh-hour-threshold' for amount of time needed to
+trigger refresh."
+  :type 'string
+  :group 'package)
+
+(defcustom package-automatic-refresh-threshold 24
+  "Amount of hours since last `package-refresh-contents' call
+needed to trigger automatic refresh before calling `package-install'."
+  :type 'number
+  :group 'package)
 
 (define-advice package-install (:before (&rest _))
-  (when (or (null aorst--package-refresh-time)
-            (> (/ (float-time
-                   (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
-                                  (date-to-time aorst--package-refresh-time)))
-                  3600)
-               24))
-    (package-refresh-contents)))
+  (let ((seconds-per-hour 3600))
+    (when (or (null package-last-refresh-date)
+              (> (/ (float-time
+                     (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
+                                    (date-to-time package-last-refresh-date)))
+                    seconds-per-hour)
+                 package-automatic-refresh-threshold))
+      (package-refresh-contents))))
 
 (define-advice package-refresh-contents (:after (&rest _))
-  (setq aorst--package-refresh-time (format-time-string "%Y-%m-%dT%H:%M")))
+  (customize-save-variable 'package-last-refresh-date (format-time-string "%Y-%m-%dT%H:%M")))
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -1398,8 +1415,6 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
     (desktop-base-file-name "emacs-desktop")
     (desktop-save t)
     (desktop-load-locked-desktop t)
-    :config
-    (add-to-list 'desktop-globals-to-save 'aorst--package-refresh-time)
     :init
     (defun aorst/desktop-remove ()
       "Remove current desktop, but save `desktop-dirname'."
