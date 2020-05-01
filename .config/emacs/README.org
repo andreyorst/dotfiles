@@ -106,7 +106,7 @@ done:
 
 *** Native Compiled Emacs Lisp
 There's a  very interesting project  that I'm currently  using, called
-[[https://akrl.sdf.org/gccemacs.html][gccemacs]]. It  provides a way to  compile Emacs Lisp into  native code,
+[[http://akrl.sdf.org/gccemacs.html][gccemacs]]. It  provides a way to  compile Emacs Lisp into  native code,
 thus making  Emacs much more  robust and  snappy. In order  to compile
 everything that Emacs loads asynchronously we can set this variable to
 =true=.
