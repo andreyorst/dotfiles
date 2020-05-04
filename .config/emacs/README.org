@@ -254,8 +254,9 @@ package  contents. In  order to  update time  we also  have to  advice
     (customize-save-variable 'package-last-refresh-date (format-time-string "%Y-%m-%dT%H:%M")))
 #+end_src
 
-This  variable gets  saved  in  your =custom=  file,  and is  persistent
-through Emacs sessions.
+This way if  I refresh packages from package menu,  or manually or via
+that =package-install= advice  =package-last-refresh-date= will be updated
+and persistently saved via =custom=.
 
 ** =use-package=
 I use =use-package= to install, load  and configure my packages.  I find
