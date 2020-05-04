@@ -14,9 +14,8 @@ evaluate-commands %sh{
     plugins="$HOME/.config/kak/plugins"
     mkdir -p $plugins
     [ ! -e "$plugins/plug.kak" ] && \
-        git clone -q https://gitlab.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+        git clone -q -b dev https://gitlab.com/andreyorst/plug.kak.git "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
-
 }
 
 # Plugin configurations
