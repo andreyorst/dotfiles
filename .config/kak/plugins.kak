@@ -131,6 +131,8 @@ plug "andreyorst/powerline.kak" domain gitlab.com defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
     set-option global powerline_shorten_bufname 'short'
+    set-option global powerline_separator '║'
+    set-option global powerline_separator_thin ''
     if %[ ! -n "${PATH##*termux*}" ] %{
         set-option global powerline_separator ''
         set-option global powerline_separator_thin ''
@@ -210,12 +212,12 @@ plug "andreyorst/kaktree" domain gitlab.com defer kaktree %{
     if %[ -n "${PATH##*termux*}" ] %{
         set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 1
-        # set-option global kaktree_dir_icon_open  '▾ 🗁 '
-        # set-option global kaktree_dir_icon_close '▸ 🗀 '
-        # set-option global kaktree_file_icon      '⠀⠀🖺'
-        set-option global kaktree_dir_icon_open  ''
-        set-option global kaktree_dir_icon_close ''
-        set-option global kaktree_file_icon      ''
+        set-option global kaktree_dir_icon_open  '▾ 🗁 '
+        set-option global kaktree_dir_icon_close '▸ 🗀 '
+        set-option global kaktree_file_icon      '⠀⠀🖺'
+        # set-option global kaktree_dir_icon_open  ''
+        # set-option global kaktree_dir_icon_close ''
+        # set-option global kaktree_file_icon      ''
     } else %{
         set-option global kaktree_split vertical
         set-option global kaktree_size 30%
