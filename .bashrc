@@ -29,11 +29,15 @@ shopt -s histappend
 
 git_ps1() {
     if git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
-        if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-            GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)$(git symbolic-ref --short HEAD)*$(tput setaf 1)] "
-        else
-            GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)$(git symbolic-ref --short HEAD)$(tput setaf 1)] "
+        branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+        if [ $? -ne 0 ]; then
+            branch=$(git rev-parse --short HEAD)
         fi
+        if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+            GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)${branch:-unknown}*$(tput setaf 1)] "
+        else
+            GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)${branch:-unknown}$(tput setaf 1)] "
+    fi
     else
         GIT_PS1=
     fi
