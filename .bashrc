@@ -19,7 +19,7 @@ export PATH
 unset LS_COLORS
 
 # classyTouch Prompt
-PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$TOOLBOX_PS1\$GIT_PS1
+PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$CONTAINER_PS1\$GIT_PS1
 \$(if [ \$? -eq 0 ]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
 
 # Avoid duplicates
@@ -30,14 +30,12 @@ shopt -s histappend
 git_ps1() {
     if git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
         branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-        if [ $? -ne 0 ]; then
-            branch=$(git rev-parse --short HEAD)
-        fi
+        [ $? -ne 0 ] && branch=$(git rev-parse --short HEAD)
         if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
             GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)${branch:-unknown}*$(tput setaf 1)] "
         else
             GIT_PS1="[$(tput sgr0)git$(tput setaf 1):$(tput sgr0)${branch:-unknown}$(tput setaf 1)] "
-    fi
+        fi
     else
         GIT_PS1=
     fi
@@ -58,13 +56,17 @@ screen_ps1() {
     esac
 }
 
-toolbox_ps1() {
+container_ps1() {
     if [ -e /run/.toolboxenv ]; then
-        TOOLBOX_PS1="[$(tput sgr0)toolbox$(tput setaf 1)] "
+        CONTAINER_PS1="[$(tput sgr0)toolbox$(tput setaf 1)] "
+    elif [ -e /run/.containerenv  ]; then
+        CONTAINER_PS1="[$(tput sgr0)podman$(tput setaf 1)] "
+    elif [ -e /.dockerenv ]; then
+        CONTAINER_PS1="[$(tput sgr0)docker$(tput setaf 1)] "
     else
-        TOOLBOX_PS1=
+        CONTAINER_PS1=
     fi
 }
 
 # After each command, append to the history file and reread it
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1; toolbox_ps1"
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1; container_ps1"
