@@ -2371,7 +2371,7 @@ Emacs. It adds some time to the startup though.
 I wonder if  it could store unsaved buffers so  all my changes persist
 through sessions.
 
-** Saveplace
+** COMMENT Saveplace
 Save position in files you've visited.
 
 #+begin_src emacs-lisp
