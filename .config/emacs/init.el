@@ -1220,8 +1220,8 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
   :config
   (defhydra hydrant/mc (:hint nil :color pink)
     "
- ^Select^                 ^Discard^                     ^Edit^               ^Navigate^
-─^──────^─────────────────^───────^─────────────────────^────^───────────────^────────^─────────
+ ^Select^                 ^Discard^                      ^Edit^               ^Navigate^
+─^──────^─────────────────^───────^──────────────────────^────^───────────────^────────^─────────
  _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
  _s_:   select regexp     _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
  _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
