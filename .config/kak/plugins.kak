@@ -14,13 +14,13 @@ evaluate-commands %sh{
     plugins="$HOME/.config/kak/plugins"
     mkdir -p $plugins
     [ ! -e "$plugins/plug.kak" ] && \
-        git clone -q -b dev https://gitlab.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+        git clone -q https://gitlab.com/andreyorst/plug.kak.git "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
 }
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "andreyorst/plug.kak" branch "dev" domain gitlab.com noload config %{
+plug "andreyorst/plug.kak" domain gitlab.com noload config %{
     set-option global plug_always_ensure true
     set-option global plug_profile true
     hook global WinSetOption filetype=plug %{
