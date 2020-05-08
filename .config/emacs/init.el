@@ -687,10 +687,28 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                      (ignore-errors (delete-window window)))))))
         (force-mode-line-update)))
 
+    (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
+      "Create name for tab with padding and truncation."
+      (with-current-buffer buffer
+        (let* ((window (get-buffer-window))
+               (window-width (window-width window))
+               (tab-amount (length (tab-line-tabs-window-buffers)))
+               (tab-width 26)
+               (buffer-name (if (stringp buffer)
+                                buffer
+                              (buffer-name)))
+               (name-width (length buffer-name)))
+          (if (> name-width tab-width)
+              (concat (string-trim-right (truncate-string-to-width buffer-name tab-width)) "…")
+            (let* ((length (/ (- tab-width name-width) 2))
+                   (padding (make-string length ?\s)))
+              (concat padding " " buffer-name padding))))))
+
     (setq tab-line-new-tab-choice nil
-          tab-line-close-button-show nil
+          tab-line-close-button-show t
           tab-line-new-button-show nil
           tab-line-separator nil
+          tab-line-tab-name-function #'aorst/tab-line-name-buffer
           tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
                                             'keymap tab-line-right-map
                                             'mouse-face 'tab-line-highlight
@@ -698,7 +716,11 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
                                            'keymap tab-line-left-map
                                            'mouse-face 'tab-line-highlight
-                                           'help-echo "Click to scroll left"))
+                                           'help-echo "Click to scroll left")
+          tab-line-close-button (propertize (if (char-displayable-p ?×) " ×" " x")
+                                            'keymap tab-line-tab-close-map
+                                            'mouse-face 'tab-line-close-highlight
+                                            'help-echo "Click to close tab"))
 
     (let ((bg (if (facep 'solaire-default-face)
                   (face-attribute 'solaire-default-face :background)
@@ -706,10 +728,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
           (box-width (/ (line-pixel-height) 2)))
-      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil)
-      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil)
-      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :box (list :line-width box-width :color base) :weight 'normal :inherit nil)
-      (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :box (list :line-width box-width :color bg) :weight 'normal :inherit nil))
+      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil :box nil)
+      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg))
+      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :weight 'normal :inherit nil :box (list :line-width box-width :color base))
+      (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg)))
 
     (dolist (mode '(ediff-mode
                     process-menu-mode
