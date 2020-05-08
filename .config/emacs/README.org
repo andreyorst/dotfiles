@@ -2330,16 +2330,16 @@ by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell
 #+end_src
 
 ** Hideshow
-This built in mode provides code folding.
+This built  in mode provides code  folding. I use =transient=  to create
+little interactive menu for easy interaction.
 
 #+begin_src emacs-lisp
   (use-package hideshow
     :ensure nil
-    :requires transient
     :hook (prog-mode . hs-minor-mode)
     :bind (:map prog-mode-map
                 ("<f6>" . aorst/hideshow-menu))
-    :init
+    :config
     (define-transient-command aorst/hideshow-menu ()
       "Hideshow commands."
       [:description

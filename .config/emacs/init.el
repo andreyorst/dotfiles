@@ -1406,11 +1406,10 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package hideshow
   :ensure nil
-  :requires transient
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
               ("<f6>" . aorst/hideshow-menu))
-  :init
+  :config
   (define-transient-command aorst/hideshow-menu ()
     "Hideshow commands."
     [:description
