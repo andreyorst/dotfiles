@@ -659,9 +659,12 @@ are defining or executing a macro."
     :config
     (defun tab-line-close-tab (&optional e)
       "Close the selected tab.
-If tab is presented in another window, close the tab by using `bury-buffer` function.
-If tab is uniq to all existing windows, kill the buffer with `kill-buffer` function.
-Lastly, if no tabs left in the window, it is deleted with `delete-window` function."
+
+If tab is presented in another window, close the tab by using
+`bury-buffer` function.  If tab is unique to all existing
+windows, kill the buffer with `kill-buffer` function.  Lastly, if
+no tabs left in the window, it is deleted with `delete-window`
+function."
       (interactive "e")
       (let* ((posnp (event-start e))
              (window (posn-window posnp))
@@ -684,30 +687,55 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                     (ignore-errors (delete-window window))))
               (and (kill-buffer buffer)
                    (unless (cdr tab-list)
-                     (ignore-errors (delete-window window)))))))
-        (force-mode-line-update)))
+                     (ignore-errors (delete-window window)))))))))
+
+    (defcustom tab-line-tab-min-width 10
+      "Minimum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
+
+    (defcustom tab-line-tab-max-width 30
+      "Maximum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
 
     (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
-      "Create name for tab with padding and truncation."
-      (with-current-buffer buffer
-        (let* ((window (get-buffer-window))
-               (window-width (window-width window))
-               (tab-amount (length (tab-line-tabs-window-buffers)))
-               (tab-width 26)
-               (buffer-name (if (stringp buffer)
-                                buffer
-                              (buffer-name)))
-               (name-width (length buffer-name)))
-          (if (> name-width tab-width)
-              (concat (string-trim-right (truncate-string-to-width buffer-name tab-width)) "…")
-            (let* ((length (/ (- tab-width name-width) 2))
-                   (padding (make-string length ?\s)))
-              (concat padding " " buffer-name padding))))))
+      "Create name for tab with padding and truncation.
 
-    (setq tab-line-new-tab-choice nil
-          tab-line-close-button-show t
+If buffer name is shorter than `tab-line-tab-max-width' it gets
+centered with spaces, otherwise it is truncated, to preserve
+equal width for all tabs.  This function also tries to fit as
+many tabs in window as possible, so if there are no room for tabs
+with maximum width, it calculates new width for each tab and
+truncates text if needed.  Minimal width can be set with
+`tab-line-tab-min-width' variable."
+      (with-current-buffer buffer
+        (let* ((window-width (window-width (get-buffer-window)))
+               (tab-amount (length (tab-line-tabs-window-buffers)))
+               (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                         (/ window-width tab-amount)
+                                       tab-line-tab-max-width))
+               (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                    tab-line-tab-max-width)
+                                   ((< window-max-tab-width tab-line-tab-min-width)
+                                    tab-line-tab-min-width)
+                                   (t window-max-tab-width))
+                             3)) ;; compensation for ' x ' button
+               (buffer-name (string-trim (if (stringp buffer)
+                                             buffer
+                                           (buffer-name))))
+               (name-width (length buffer-name))
+               (buffer-name (if (>= name-width tab-width)
+                                (concat " " buffer-name)
+                              (concat (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s) buffer-name)))
+               (name-width (length buffer-name)))
+          (cond ((>= name-width tab-width)
+                 (concat (truncate-string-to-width buffer-name (- tab-width 1)) "…"))
+                (t (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
+
+    (setq tab-line-close-button-show t
           tab-line-new-button-show nil
-          tab-line-separator nil
+          tab-line-separator ""
           tab-line-tab-name-function #'aorst/tab-line-name-buffer
           tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
                                             'keymap tab-line-right-map
@@ -717,7 +745,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
                                            'keymap tab-line-left-map
                                            'mouse-face 'tab-line-highlight
                                            'help-echo "Click to scroll left")
-          tab-line-close-button (propertize (if (char-displayable-p ?×) " ×" " x")
+          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
                                             'keymap tab-line-tab-close-map
                                             'mouse-face 'tab-line-close-highlight
                                             'help-echo "Click to close tab"))
@@ -728,7 +756,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
           (box-width (/ (line-pixel-height) 2)))
-      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil :box nil)
+      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil :box (list :line-width -1 :color base))
       (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg))
       (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :weight 'normal :inherit nil :box (list :line-width box-width :color base))
       (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg)))
@@ -1406,6 +1434,7 @@ Lastly, if no tabs left in the window, it is deleted with `delete-window` functi
 
 (use-package hideshow
   :ensure nil
+  :after transient
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
               ("<f6>" . aorst/hideshow-menu))
