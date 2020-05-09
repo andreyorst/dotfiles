@@ -721,17 +721,13 @@ truncates text if needed.  Minimal width can be set with
                                     tab-line-tab-min-width)
                                    (t window-max-tab-width))
                              3)) ;; compensation for ' x ' button
-               (buffer-name (string-trim (if (stringp buffer)
-                                             buffer
-                                           (buffer-name))))
-               (name-width (length buffer-name))
-               (buffer-name (if (>= name-width tab-width)
-                                (concat " " buffer-name)
-                              (concat (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s) buffer-name)))
+               (buffer-name (string-trim (buffer-name)))
                (name-width (length buffer-name)))
-          (cond ((>= name-width tab-width)
-                 (concat (truncate-string-to-width buffer-name (- tab-width 1)) "…"))
-                (t (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
+          (if (>= name-width tab-width)
+              (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+            (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+                   (buffer-name (concat padding buffer-name)))
+              (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
 
     (setq tab-line-close-button-show t
           tab-line-new-button-show nil
