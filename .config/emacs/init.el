@@ -101,7 +101,7 @@ needed to trigger automatic refresh before calling `package-install'."
   :init
   (load custom-file :noerror))
 
-(defvar disabled-commands (expand-file-name ".disabled.el" user-emacs-directory)
+(defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
   "File to store disabled commands, that were enabled permamently.")
 (defadvice en/disable-command (around put-in-custom-file activate)
   "Put declarations in disabled.el."
@@ -652,7 +652,8 @@ are defining or executing a macro."
   :ensure nil
   :custom (uniquify-buffer-name-style 'forward))
 
-(unless (version< emacs-version "27")
+(unless (or (version< emacs-version "27")
+            (not (window-system)))
   (use-package tab-line
     :ensure nil
     :hook (after-init . global-tab-line-mode)
@@ -711,23 +712,25 @@ truncates text if needed.  Minimal width can be set with
 `tab-line-tab-min-width' variable."
       (with-current-buffer buffer
         (let* ((window-width (window-width (get-buffer-window)))
+               (close-button-size (if tab-line-close-button-show
+                                      (length (substring-no-properties tab-line-close-button))
+                                    0))
                (tab-amount (length (tab-line-tabs-window-buffers)))
-               (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
-                                         (/ window-width tab-amount)
-                                       tab-line-tab-max-width))
-               (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+               (window-max-tab-width (/ window-width tab-amount))
+               (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
                                     tab-line-tab-max-width)
                                    ((< window-max-tab-width tab-line-tab-min-width)
                                     tab-line-tab-min-width)
                                    (t window-max-tab-width))
-                             3)) ;; compensation for ' x ' button
+                             close-button-size))
                (buffer-name (string-trim (buffer-name)))
                (name-width (length buffer-name)))
-          (if (>= name-width tab-width)
-              (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
-            (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
-                   (buffer-name (concat padding buffer-name)))
-              (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+          (if (>= name-width (- tab-width 3))
+              (concat  " " (truncate-string-to-width buffer-name (- tab-width 3)) "… ")
+            (let* ((padding (make-string (/ (- tab-width name-width) 2) ?\s))
+                   (buffer-name (concat padding buffer-name))
+                   (name-width (length buffer-name)))
+              (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
 
     (setq tab-line-close-button-show t
           tab-line-new-button-show nil
@@ -741,7 +744,7 @@ truncates text if needed.  Minimal width can be set with
                                            'keymap tab-line-left-map
                                            'mouse-face 'tab-line-highlight
                                            'help-echo "Click to scroll left")
-          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+          tab-line-close-button (propertize (if (char-displayable-p ?×) "× " "x ")
                                             'keymap tab-line-tab-close-map
                                             'mouse-face 'tab-line-close-highlight
                                             'help-echo "Click to close tab"))
@@ -752,16 +755,47 @@ truncates text if needed.  Minimal width can be set with
           (fg (face-attribute 'default :foreground))
           (base (face-attribute 'mode-line :background))
           (box-width (/ (line-pixel-height) 2)))
-      (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil :box (list :line-width -1 :color base))
-      (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg))
-      (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :weight 'normal :inherit nil :box (list :line-width box-width :color base))
-      (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg)))
+      (when (and (color-defined-p bg)
+                 (color-defined-p fg)
+                 (color-defined-p base)
+                 (numberp box-width))
+        (set-face-attribute 'tab-line nil
+                            :background base
+                            :foreground fg
+                            :height 1.0
+                            :inherit nil
+                            :box (list :line-width -1 :color base))
+        (set-face-attribute 'tab-line-tab nil
+                            :foreground fg
+                            :background bg
+                            :weight 'normal
+                            :inherit nil
+                            :box (list :line-width box-width :color bg))
+        (set-face-attribute 'tab-line-tab-inactive nil
+                            :foreground fg
+                            :background base
+                            :weight 'normal
+                            :inherit nil
+                            :box (list :line-width box-width :color base))
+        (set-face-attribute 'tab-line-tab-current nil
+                            :foreground fg
+                            :background bg
+                            :weight 'normal
+                            :inherit nil
+                            :box (list :line-width box-width :color bg))))
 
     (dolist (mode '(ediff-mode
                     process-menu-mode
                     term-mode
                     vterm-mode))
-      (add-to-list 'tab-line-exclude-modes mode))))
+      (add-to-list 'tab-line-exclude-modes mode))
+
+    (defun aorst/tab-line-drop-caches ()
+      "Drops `tab-line' cache in every window."
+      (dolist (window (window-list))
+        (set-window-parameter window 'tab-line-cache nil)))
+
+    (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)))
 
 (use-package display-line-numbers
   :ensure nil
@@ -983,7 +1017,7 @@ truncates text if needed.  Minimal width can be set with
   (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
   :custom
   (cider-repl-display-help-banner nil)
-  (cider-repl-tab-command nil)
+  (cider-repl-tab-command #'company-complete-common-or-cycle)
   (nrepl-hide-special-buffers t))
 
 (use-package fennel-mode
@@ -1371,7 +1405,8 @@ truncates text if needed.  Minimal width can be set with
   (lsp-rust-clippy-preference "on")
   (lsp-prefer-capf t)
   (lsp-enable-symbol-highlighting nil)
-  (lsp-rust-server 'rust-analyzer))
+  (lsp-rust-server 'rust-analyzer)
+  (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
 
 (use-package lsp-ui
   :after lsp-mode
@@ -1384,7 +1419,7 @@ truncates text if needed.  Minimal width can be set with
   (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
   (lsp-ui-sideline-enable nil)
   (lsp-ui-imenu-enable nil)
-  (lsp-ui-doc-delay 0.7 "higher than eldoc delay")
+  (lsp-ui-doc-delay 1 "higher than eldoc delay")
   :config
   (when (fboundp 'aorst/escape)
     (define-advice lsp-ui-doc--make-request (:around (foo))
@@ -1455,9 +1490,10 @@ truncates text if needed.  Minimal width can be set with
     :hook ((after-init . aorst/desktop-restore)
            (desktop-after-read . aorst/desktop-remove))
     :custom
-    (desktop-path '("~/.dotfiles/.config/emacs/"))
-    (desktop-dirname "~/.dotfiles/.config/emacs/")
-    (desktop-base-file-name "emacs-desktop")
+    (desktop-path `(,user-emacs-directory))
+    (desktop-dirname user-emacs-directory)
+    (desktop-base-file-name "desktop")
+    (desktop-base-lock-name "desktop.lock")
     (desktop-save t)
     (desktop-load-locked-desktop t)
     :init

@@ -393,10 +393,10 @@ file.
 
 I also don't like that Emacs  has disabled commands, and enabling them
 modifies  my =init.el=  that I  don't  modify myself.   Let's put  those
-commands to =disabled.el= instead:
+commands to =disabled.el= file instead:
 
 #+begin_src emacs-lisp
-  (defvar disabled-commands (expand-file-name ".disabled.el" user-emacs-directory)
+  (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
     "File to store disabled commands, that were enabled permamently.")
   (defadvice en/disable-command (around put-in-custom-file activate)
     "Put declarations in disabled.el."
@@ -1198,7 +1198,8 @@ Starting  with Emacs  27  native tab  support is  present.  I want  to
 customize tab appearance to match my theme.
 
 #+begin_src emacs-lisp
-  (unless (version< emacs-version "27")
+  (unless (or (version< emacs-version "27")
+              (not (window-system)))
     (use-package tab-line
       :ensure nil
       :hook (after-init . global-tab-line-mode)
@@ -1257,23 +1258,25 @@ customize tab appearance to match my theme.
   `tab-line-tab-min-width' variable."
         (with-current-buffer buffer
           (let* ((window-width (window-width (get-buffer-window)))
+                 (close-button-size (if tab-line-close-button-show
+                                        (length (substring-no-properties tab-line-close-button))
+                                      0))
                  (tab-amount (length (tab-line-tabs-window-buffers)))
-                 (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
-                                           (/ window-width tab-amount)
-                                         tab-line-tab-max-width))
-                 (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                 (window-max-tab-width (/ window-width tab-amount))
+                 (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
                                       tab-line-tab-max-width)
                                      ((< window-max-tab-width tab-line-tab-min-width)
                                       tab-line-tab-min-width)
                                      (t window-max-tab-width))
-                               3)) ;; compensation for ' x ' button
+                               close-button-size))
                  (buffer-name (string-trim (buffer-name)))
                  (name-width (length buffer-name)))
-            (if (>= name-width tab-width)
-                (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
-              (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
-                     (buffer-name (concat padding buffer-name)))
-                (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+            (if (>= name-width (- tab-width 3))
+                (concat  " " (truncate-string-to-width buffer-name (- tab-width 3)) "… ")
+              (let* ((padding (make-string (/ (- tab-width name-width) 2) ?\s))
+                     (buffer-name (concat padding buffer-name))
+                     (name-width (length buffer-name)))
+                (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
 
       (setq tab-line-close-button-show t
             tab-line-new-button-show nil
@@ -1287,7 +1290,7 @@ customize tab appearance to match my theme.
                                              'keymap tab-line-left-map
                                              'mouse-face 'tab-line-highlight
                                              'help-echo "Click to scroll left")
-            tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+            tab-line-close-button (propertize (if (char-displayable-p ?×) "× " "x ")
                                               'keymap tab-line-tab-close-map
                                               'mouse-face 'tab-line-close-highlight
                                               'help-echo "Click to close tab"))
@@ -1298,16 +1301,47 @@ customize tab appearance to match my theme.
             (fg (face-attribute 'default :foreground))
             (base (face-attribute 'mode-line :background))
             (box-width (/ (line-pixel-height) 2)))
-        (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil :box (list :line-width -1 :color base))
-        (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg))
-        (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :weight 'normal :inherit nil :box (list :line-width box-width :color base))
-        (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg)))
+        (when (and (color-defined-p bg)
+                   (color-defined-p fg)
+                   (color-defined-p base)
+                   (numberp box-width))
+          (set-face-attribute 'tab-line nil
+                              :background base
+                              :foreground fg
+                              :height 1.0
+                              :inherit nil
+                              :box (list :line-width -1 :color base))
+          (set-face-attribute 'tab-line-tab nil
+                              :foreground fg
+                              :background bg
+                              :weight 'normal
+                              :inherit nil
+                              :box (list :line-width box-width :color bg))
+          (set-face-attribute 'tab-line-tab-inactive nil
+                              :foreground fg
+                              :background base
+                              :weight 'normal
+                              :inherit nil
+                              :box (list :line-width box-width :color base))
+          (set-face-attribute 'tab-line-tab-current nil
+                              :foreground fg
+                              :background bg
+                              :weight 'normal
+                              :inherit nil
+                              :box (list :line-width box-width :color bg))))
 
       (dolist (mode '(ediff-mode
                       process-menu-mode
                       term-mode
                       vterm-mode))
-        (add-to-list 'tab-line-exclude-modes mode))))
+        (add-to-list 'tab-line-exclude-modes mode))
+
+      (defun aorst/tab-line-drop-caches ()
+        "Drops `tab-line' cache in every window."
+        (dolist (window (window-list))
+          (set-window-parameter window 'tab-line-cache nil)))
+
+      (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)))
 #+end_src
 
 ** Line Numbers
@@ -1640,7 +1674,7 @@ Clojure and ClojureScript.
     (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
     :custom
     (cider-repl-display-help-banner nil)
-    (cider-repl-tab-command nil)
+    (cider-repl-tab-command #'company-complete-common-or-cycle)
     (nrepl-hide-special-buffers t))
 #+end_src
 
@@ -2212,7 +2246,8 @@ Another LSP client for Emacs.
     (lsp-rust-clippy-preference "on")
     (lsp-prefer-capf t)
     (lsp-enable-symbol-highlighting nil)
-    (lsp-rust-server 'rust-analyzer))
+    (lsp-rust-server 'rust-analyzer)
+    (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2227,7 +2262,7 @@ Another LSP client for Emacs.
     (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
     (lsp-ui-sideline-enable nil)
     (lsp-ui-imenu-enable nil)
-    (lsp-ui-doc-delay 0.7 "higher than eldoc delay")
+    (lsp-ui-doc-delay 1 "higher than eldoc delay")
     :config
     (when (fboundp 'aorst/escape)
       (define-advice lsp-ui-doc--make-request (:around (foo))
@@ -2391,9 +2426,10 @@ Emacs. It adds some time to the startup though.
       :hook ((after-init . aorst/desktop-restore)
              (desktop-after-read . aorst/desktop-remove))
       :custom
-      (desktop-path '("~/.dotfiles/.config/emacs/"))
-      (desktop-dirname "~/.dotfiles/.config/emacs/")
-      (desktop-base-file-name "emacs-desktop")
+      (desktop-path `(,user-emacs-directory))
+      (desktop-dirname user-emacs-directory)
+      (desktop-base-file-name "desktop")
+      (desktop-base-lock-name "desktop.lock")
       (desktop-save t)
       (desktop-load-locked-desktop t)
       :init
@@ -2416,16 +2452,6 @@ Emacs. It adds some time to the startup though.
 
 I wonder if  it could store unsaved buffers so  all my changes persist
 through sessions.
-
-** COMMENT Saveplace
-Save position in files you've visited.
-
-#+begin_src emacs-lisp
-  (use-package saveplace
-    :ensure nil
-    :init
-    (save-place-mode))
-#+end_src
 
 ** COMMENT God Mode
 God mode is more  like a mode in a sense of a  mode from modal editor,
