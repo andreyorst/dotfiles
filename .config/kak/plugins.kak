@@ -251,8 +251,7 @@ plug "eraserhd/parinfer-rust" do %{
                 printf "%s\n" "remove-highlighter window/parinfer-inferred
                                add-highlighter window/parinfer-inferred regex [\])}]+\h*$ 0:comment"
             else
-                printf "%s\n" "remove-highlighter window/parinfer-inferred
-                               add-highlighter window/parinfer-inferred regex [\])}]+\h*$ 0:Default"
+                printf "%s\n" "remove-highlighter window/parinfer-inferred"
             fi
         >>
     >
