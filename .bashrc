@@ -10,9 +10,15 @@ for i in $HOME/.dotfiles/scripts/*.sh; do
     . "$i"
 done
 
+# place to install npm packages
+NPM_PACKAGES="${HOME}/.npm-packages"
+# Preserve MANPATH if you already defined it somewhere in your config.
+# Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
+export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
+
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
-    PATH="$HOME/.dotfiles/scripts:$HOME/.local/bin:$HOME/bin:$PATH"
+    PATH="$HOME/.dotfiles/scripts:$HOME/.local/bin:$HOME/bin:$NPM_PACKAGES/bin:$PATH"
 fi
 export PATH
 
@@ -70,3 +76,7 @@ container_ps1() {
 
 # After each command, append to the history file and reread it
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1; container_ps1"
+
+if [ -z "$TMUX" ]; then
+    tmux
+fi
