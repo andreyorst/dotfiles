@@ -77,6 +77,6 @@ container_ps1() {
 # After each command, append to the history file and reread it
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r; git_ps1; ssh_ps1; screen_ps1; container_ps1"
 
-if [ -z "$TMUX" ]; then
+if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ]; then
     tmux
 fi

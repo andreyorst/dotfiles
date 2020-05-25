@@ -36,7 +36,9 @@ alias emacsconf="emacs ~/.emacs.d/README.org"
 alias less="less --tabs 4"
 
 # ultimate alias to create and attach to tmux sessions
-alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
+if [ -n "$(command -v tmux)" ]; then
+    alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
+fi
 
 # to use sudo with aliases
 alias sudo="sudo "
