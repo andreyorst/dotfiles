@@ -10,57 +10,11 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
-(defvar package-archives)
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")))
-
-(when (version= emacs-version "26.2")
-  (defvar gnutls-algorithm-priority)
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-(package-initialize)
-
-(defcustom package-last-refresh-date nil
-  "Date and time when package lists have been refreshed.
-
-This variable is then used to check whether
-`package-refresh-contents' call is needed before calling
-`package-install'. Value of this varialbe is updated when
-`package-refresh-contents' is called.
-
-See `package-refresh-hour-threshold' for amount of time needed to
-trigger refresh."
-  :type 'string
-  :group 'package)
-
-(defcustom package-automatic-refresh-threshold 24
-  "Amount of hours since last `package-refresh-contents' call
-needed to trigger automatic refresh before calling `package-install'."
-  :type 'number
-  :group 'package)
-
-(define-advice package-install (:before (&rest _))
-  (let ((seconds-per-hour 3600))
-    (when (or (null package-last-refresh-date)
-              (> (/ (float-time
-                     (time-subtract (date-to-time (format-time-string "%Y-%m-%dT%H:%M"))
-                                    (date-to-time package-last-refresh-date)))
-                    seconds-per-hour)
-                 package-automatic-refresh-threshold))
-      (package-refresh-contents))))
-
-(define-advice package-refresh-contents (:after (&rest _))
-  (customize-save-variable 'package-last-refresh-date (format-time-string "%Y-%m-%dT%H:%M")))
-
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
 (require 'use-package)
-(setq use-package-always-ensure t)
 
 (use-package startup
   :no-require t
-  :ensure nil
+  :straight nil
   :custom
   (user-mail-address "andreyorst@gmail.com")
   (user-full-name "Andrey Orst"))
@@ -68,7 +22,7 @@ needed to trigger automatic refresh before calling `package-install'."
 (setq ring-bell-function 'ignore)
 
 (use-package files
-  :ensure nil
+  :straight nil
   :custom
   (backup-by-copying t)
   (create-lockfiles nil)
@@ -77,7 +31,7 @@ needed to trigger automatic refresh before calling `package-install'."
 
 (use-package subr
   :no-require t
-  :ensure nil
+  :straight nil
   :init
   (fset 'yes-or-no-p 'y-or-n-p))
 
@@ -95,7 +49,7 @@ needed to trigger automatic refresh before calling `package-install'."
 (setq-default indent-tabs-mode nil)
 
 (use-package cus-edit
-  :ensure nil
+  :straight nil
   :custom
   (custom-file (expand-file-name "custom.el" user-emacs-directory))
   :init
@@ -113,7 +67,7 @@ needed to trigger automatic refresh before calling `package-install'."
 
 (use-package mule-cmds
   :no-require t
-  :ensure nil
+  :straight nil
   :custom
   (default-input-method 'russian-computer))
 
@@ -123,18 +77,18 @@ needed to trigger automatic refresh before calling `package-install'."
 
 (use-package startup
   :no-require t
-  :ensure nil
+  :straight nil
   :custom
   (initial-major-mode 'fundamental-mode)
   (initial-scratch-message ""))
 
 (use-package delsel
-  :ensure nil
+  :straight nil
   :init
   (delete-selection-mode t))
 
 (use-package simple
-  :ensure nil
+  :straight nil
   :bind (("C-w" . aorst/kill-region-or-word)
          ("C-o" . aorst/newline-below)
          ("C-S-o" . aorst/newline-above)
@@ -223,7 +177,7 @@ are defining or executing a macro."
 
 (use-package startup
   :no-require t
-  :ensure nil
+  :straight nil
   :custom
   (inhibit-splash-screen t))
 
@@ -263,7 +217,7 @@ are defining or executing a macro."
 
 (when window-system
   (use-package fringe
-    :ensure nil
+    :straight nil
     :hook ((buffer-list-update
             window-configuration-change
             change-major-mode) . aorst/real-buffer-setup)
@@ -346,7 +300,9 @@ are defining or executing a macro."
                     doom-modeline-battery-error
                     doom-modeline-battery-charging
                     doom-modeline-battery-critical
-                    doom-modeline-battery-normal))
+                    doom-modeline-battery-normal
+                    doom-modeline-input-method
+                    doom-modeline-input-method-alt))
       (set-face-attribute face nil :foreground fg :weight 'normal))
     (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
     (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
@@ -369,7 +325,7 @@ are defining or executing a macro."
 
 (when window-system
   (use-package frame
-    :ensure nil
+    :straight nil
     :custom
     (window-divider-default-right-width 1)
     :config
@@ -649,13 +605,13 @@ are defining or executing a macro."
   :init (minions-mode 1))
 
 (use-package uniquify
-  :ensure nil
+  :straight nil
   :custom (uniquify-buffer-name-style 'forward))
 
 (unless (or (version< emacs-version "27")
             (not (window-system)))
   (use-package tab-line
-    :ensure nil
+    :straight nil
     :hook (after-init . global-tab-line-mode)
     :config
     (defun tab-line-close-tab (&optional e)
@@ -798,13 +754,13 @@ truncates text if needed.  Minimal width can be set with
     (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)))
 
 (use-package display-line-numbers
-  :ensure nil
+  :straight nil
   :custom
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
 
 (use-package org
-  :ensure nil
+  :straight nil
   :defines default-justification
   :hook ((org-mode . flyspell-mode)
          (org-mode . auto-fill-mode)
@@ -839,12 +795,12 @@ truncates text if needed.  Minimal width can be set with
   (org-agenda-files '("~/Tasks"))
   :config
   (use-package ox-latex
-    :ensure nil)
+    :straight nil)
   (use-package ox-hugo
     :after ox)
   (when (not (version<= org-version "9.1.9"))
     (use-package org-tempo
-      :ensure nil))
+      :straight nil))
   (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-+]\\) "
                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
@@ -900,13 +856,13 @@ truncates text if needed.  Minimal width can be set with
   (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color))
 
 (use-package prog-mode
-  :ensure nil
+  :straight nil
   :hook ((prog-mode . show-paren-mode)
          (prog-mode . display-line-numbers-mode)))
          ;; (prog-mode . hl-line-mode)))
 
 (use-package cc-mode
-  :ensure nil
+  :straight nil
   :config (defun aorst/cc-mode-setup ()
             (c-set-offset 'case-label '+)
             (setq c-basic-offset 4
@@ -977,7 +933,7 @@ truncates text if needed.  Minimal width can be set with
          ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package elisp-mode
-  :ensure nil
+  :straight nil
   :hook (emacs-lisp-mode . eldoc-mode)
   :bind (:map
          emacs-lisp-mode-map
@@ -986,13 +942,13 @@ truncates text if needed.  Minimal width can be set with
 (use-package yaml-mode)
 
 (use-package sh-script
-  :ensure nil
+  :straight nil
   :bind (:map
          sh-mode-map
          ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package perl-mode
-  :ensure nil
+  :straight nil
   :hook ((perl-mode . electric-pair-local-mode)
          (perl-mode . flymake-mode))
   :bind (:map
@@ -1031,16 +987,16 @@ truncates text if needed.  Minimal width can be set with
          ("C-c C-f" . aorst/indent-buffer)))
 
 (use-package css-mode
-  :ensure nil
+  :straight nil
   :custom
   (css-indent-offset 2))
 
 (use-package help
-  :ensure nil
+  :straight nil
   :custom (help-window-select t))
 
 (use-package doc-view
-  :ensure nil
+  :straight nil
   :custom (doc-view-resolution 192))
 
 (setq use-package-hook-name-suffix "-functions")
@@ -1097,7 +1053,7 @@ truncates text if needed.  Minimal width can be set with
   :config (editorconfig-mode 1))
 
 (use-package flymake
-  :ensure nil
+  :straight nil
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   :config
@@ -1113,9 +1069,8 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package paredit)
 (use-package selected)
-
 (use-package parinfer-smart
-  :load-path "~/Git/parinfer-mode"
+  :straight (:host github :repo "andreyorst/parinfer-mode" :branch "smart")
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode
@@ -1124,11 +1079,7 @@ truncates text if needed.  Minimal width can be set with
           racket-mode
           fennel-mode) . parinfer-mode)
   :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
-  :custom
-  (parinfer-extensions '(defaults
-                          pretty-parens
-                          smart-tab
-                          smart-yank)))
+  :custom (parinfer-extensions '(defaults pretty-parens smart-tab smart-yank)))
 
 (use-package flx)
 
@@ -1264,7 +1215,7 @@ truncates text if needed.  Minimal width can be set with
   :custom (magit-ediff-dwim-show-on-hunks t))
 
 (use-package ediff
-  :ensure nil
+  :straight nil
   :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
          (ediff-quit . aorst/restore-pre-ediff-winconfig)
          (ediff-keymap-setup . aorst/ediff-setup-keys))
@@ -1428,7 +1379,7 @@ truncates text if needed.  Minimal width can be set with
   (lsp-ui-mode))
 
 (use-package project
-  :ensure nil
+  :straight nil
   :bind (("C-c p f" . project-find-file)
          ("C-c p r" . project-find-regexp))
   :config
@@ -1458,13 +1409,13 @@ truncates text if needed.  Minimal width can be set with
               ("C-c C-S-f" . clang-format-region)))
 
 (use-package server
-  :ensure nil
+  :straight nil
   :config
   (unless (server-running-p)
     (server-start)))
 
 (use-package hideshow
-  :ensure nil
+  :straight nil
   :after transient
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
@@ -1486,7 +1437,7 @@ truncates text if needed.  Minimal width can be set with
 
 (when window-system
   (use-package desktop
-    :ensure nil
+    :straight nil
     :hook ((after-init . aorst/desktop-restore)
            (desktop-after-read . aorst/desktop-remove))
     :custom
@@ -1545,7 +1496,7 @@ truncates text if needed.  Minimal width can be set with
       "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
 (use-package recentf
-  :ensure nil
+  :straight nil
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\"))
 

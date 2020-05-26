@@ -145,13 +145,40 @@ Shell, so let's set it to =resize-mode=.
         x-gtk-resize-child-frames 'resize-mode)
 #+end_src
 
+*** =straight.el=
+Straight is an alternative way  to manage package installations. It is
+a purely  functional package  manager. It  installs packages  from Git
+repositories listed on ELPA and MELPA, or from Git URL. First, we have
+to bootstrap it:
+
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+end_src
+
+Now we can install =use-package= with it:
+
+#+begin_src emacs-lisp
+  (straight-use-package 'use-package)
+  (defvar straight-use-package-by-default)
+  (setq straight-use-package-by-default t)
+#+end_src
+
 *** early =package.el= settings
 =package.el= initialization is expensive so we disable it at startup:
 
 #+begin_src emacs-lisp
-  (defvar package--init-file-ensured)
-  (setq package-enable-at-startup nil
-        package--init-file-ensured t)
+  (setq package-enable-at-startup nil)
 #+end_src
 
 *** =(provide 'early-init)=
@@ -175,7 +202,7 @@ that are done there. This code manually loads this file in such case:
     (load (expand-file-name "early-init" user-emacs-directory)))
 #+end_src
 
-** =package.el=
+** COMMENT =package.el=
 To obtain plugins we need =package.el= package. Although this is builtin
 and convenient,  it's also slow  and messy.  Instead of  using =package=
 directly we will use =use-package= to manage package configurations.
@@ -197,7 +224,7 @@ There's recent bug with downloading from elpa. This line fixes it:
   (when (version= emacs-version "26.2")
     (defvar gnutls-algorithm-priority)
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-  (package-initialize)
+  ;; (package-initialize)
 #+end_src
 
 Found this trick  [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], but instead of using Boolean,  I've decided to
@@ -258,30 +285,26 @@ This way if  I refresh packages from package menu,  or manually or via
 that =package-install= advice  =package-last-refresh-date= will be updated
 and persistently saved via =custom=.
 
-** =use-package=
-I use =use-package= to install, load  and configure my packages.  I find
-this way very consistent and easy  to understand and maintain.  What I
-like  about it  is that  it automatically  installs packages  on Emacs
-startup. But unfortunately it can't be installed by itself, so we need
-a way  to install  Use Package  in case  I load  this config  on fresh
-system.
+Last thing we need to do is to install =use-package=:
 
 #+begin_src emacs-lisp
   (unless (package-installed-p 'use-package)
     (package-install 'use-package))
-#+end_src
 
-And =require= the package itself:
-
-#+begin_src emacs-lisp
-  (require 'use-package)
+  (defvar use-package-always-ensure)
   (setq use-package-always-ensure t)
 #+end_src
 
-This  way I  can  use =use-package=  automatically  install packages  at
-startup, and  to configure  both built in  and external  packages, and
-have  all   benefits  provided   by  =use-package=  such   as  deferring
-configuration, encapsulating configuration, and so on.
+** =use-package=
+I use =use-package= to install, load  and configure my packages.  I find
+this way very consistent and easy to understand, and maintain. At this
+point =use-package= should be already  installed by either =package.el= or
+=straight.el=, depending on what is enabled above. Only thing left to do
+is to require =use-package= itself:
+
+#+begin_src emacs-lisp
+  (require 'use-package)
+#+end_src
 
 * Defaults
 Emacs is  old. I  understand that  back then  it could  be appropriate
@@ -295,7 +318,7 @@ Emacs, or some modes can use those automatically, like Org Mode:
 #+begin_src emacs-lisp
   (use-package startup
     :no-require t
-    :ensure nil
+    :straight nil
     :custom
     (user-mail-address "andreyorst@gmail.com")
     (user-full-name "Andrey Orst"))
@@ -317,7 +340,7 @@ good idea, but I don't think alike.
 
 #+begin_src emacs-lisp
   (use-package files
-    :ensure nil
+    :straight nil
     :custom
     (backup-by-copying t)
     (create-lockfiles nil)
@@ -332,7 +355,7 @@ explicitly, instead of accepting =y= or =n=. This can be fixed with this.
 #+begin_src emacs-lisp
   (use-package subr
     :no-require t
-    :ensure nil
+    :straight nil
     :init
     (fset 'yes-or-no-p 'y-or-n-p))
 #+end_src
@@ -384,7 +407,7 @@ file.
 
 #+begin_src emacs-lisp
   (use-package cus-edit
-    :ensure nil
+    :straight nil
     :custom
     (custom-file (expand-file-name "custom.el" user-emacs-directory))
     :init
@@ -423,7 +446,7 @@ Emacs with =C-\=, so all common shortcuts will still work fine.
 #+begin_src emacs-lisp
   (use-package mule-cmds
     :no-require t
-    :ensure nil
+    :straight nil
     :custom
     (default-input-method 'russian-computer))
 #+end_src
@@ -449,7 +472,7 @@ also remove initial message:
 #+begin_src emacs-lisp
   (use-package startup
     :no-require t
-    :ensure nil
+    :straight nil
     :custom
     (initial-major-mode 'fundamental-mode)
     (initial-scratch-message ""))
@@ -460,7 +483,7 @@ It is conveinient to delete selection by typing:
 
 #+begin_src emacs-lisp
   (use-package delsel
-    :ensure nil
+    :straight nil
     :init
     (delete-selection-mode t))
 #+end_src
@@ -484,7 +507,7 @@ Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
 
 #+begin_src emacs-lisp
   (use-package simple
-    :ensure nil
+    :straight nil
     :bind (("C-w" . aorst/kill-region-or-word)
            ("C-o" . aorst/newline-below)
            ("C-S-o" . aorst/newline-above)
@@ -636,7 +659,7 @@ it, so let's disable it.
 #+begin_src emacs-lisp
   (use-package startup
     :no-require t
-    :ensure nil
+    :straight nil
     :custom
     (inhibit-splash-screen t))
 #+end_src
@@ -723,7 +746,7 @@ Emacs init.
 #+begin_src emacs-lisp
   (when window-system
     (use-package fringe
-      :ensure nil
+      :straight nil
       :hook ((buffer-list-update
               window-configuration-change
               change-major-mode) . aorst/real-buffer-setup)
@@ -839,7 +862,9 @@ it's great!
                       doom-modeline-battery-error
                       doom-modeline-battery-charging
                       doom-modeline-battery-critical
-                      doom-modeline-battery-normal))
+                      doom-modeline-battery-normal
+                      doom-modeline-input-method
+                      doom-modeline-input-method-alt))
         (set-face-attribute face nil :foreground fg :weight 'normal))
       (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
       (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
@@ -878,7 +903,7 @@ process, and when new frame is created.
 #+begin_src emacs-lisp
   (when window-system
     (use-package frame
-      :ensure nil
+      :straight nil
       :custom
       (window-divider-default-right-width 1)
       :config
@@ -1189,7 +1214,7 @@ adding directory name in the buffer name.
 
 #+begin_src emacs-lisp
   (use-package uniquify
-    :ensure nil
+    :straight nil
     :custom (uniquify-buffer-name-style 'forward))
 #+end_src
 
@@ -1201,7 +1226,7 @@ customize tab appearance to match my theme.
   (unless (or (version< emacs-version "27")
               (not (window-system)))
     (use-package tab-line
-      :ensure nil
+      :straight nil
       :hook (after-init . global-tab-line-mode)
       :config
       (defun tab-line-close-tab (&optional e)
@@ -1351,7 +1376,7 @@ let's make it grow only, and calculate maximum width on file open:
 
 #+begin_src emacs-lisp
   (use-package display-line-numbers
-    :ensure nil
+    :straight nil
     :custom
     (display-line-numbers-grow-only t)
     (display-line-numbers-width-start t))
@@ -1369,7 +1394,7 @@ my Emacs configuration with it.
 
 #+begin_src emacs-lisp
   (use-package org
-    :ensure nil
+    :straight nil
     :defines default-justification
     :hook ((org-mode . flyspell-mode)
            (org-mode . auto-fill-mode)
@@ -1404,12 +1429,12 @@ my Emacs configuration with it.
     (org-agenda-files '("~/Tasks"))
     :config
     (use-package ox-latex
-      :ensure nil)
+      :straight nil)
     (use-package ox-hugo
       :after ox)
     (when (not (version<= org-version "9.1.9"))
       (use-package org-tempo
-        :ensure nil))
+        :straight nil))
     (font-lock-add-keywords 'org-mode
                           '(("^ *\\([-+]\\) "
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
@@ -1474,7 +1499,7 @@ bracket. So I enable it for every programming language.
 
 #+begin_src emacs-lisp
   (use-package prog-mode
-    :ensure nil
+    :straight nil
     :hook ((prog-mode . show-paren-mode)
            (prog-mode . display-line-numbers-mode)))
            ;; (prog-mode . hl-line-mode)))
@@ -1485,7 +1510,7 @@ These settings are for editing C source files.
 
 #+begin_src emacs-lisp
   (use-package cc-mode
-    :ensure nil
+    :straight nil
     :config (defun aorst/cc-mode-setup ()
               (c-set-offset 'case-label '+)
               (setq c-basic-offset 4
@@ -1607,7 +1632,7 @@ want to enable some helper modes here.
 
 #+begin_src emacs-lisp
   (use-package elisp-mode
-    :ensure nil
+    :straight nil
     :hook (emacs-lisp-mode . eldoc-mode)
     :bind (:map
            emacs-lisp-mode-map
@@ -1626,7 +1651,7 @@ Some configurations for shell script modes.
 
 #+begin_src emacs-lisp
   (use-package sh-script
-    :ensure nil
+    :straight nil
     :bind (:map
            sh-mode-map
            ("C-c C-f" . aorst/indent-buffer)))
@@ -1637,7 +1662,7 @@ Perl related configurations.
 
 #+begin_src emacs-lisp
   (use-package perl-mode
-    :ensure nil
+    :straight nil
     :hook ((perl-mode . electric-pair-local-mode)
            (perl-mode . flymake-mode))
     :bind (:map
@@ -1706,7 +1731,7 @@ produces I need support for Lua.
 
 #+begin_src emacs-lisp
   (use-package css-mode
-    :ensure nil
+    :straight nil
     :custom
     (css-indent-offset 2))
 #+end_src
@@ -1721,7 +1746,7 @@ with =q= after I've finished reading.
 
 #+begin_src emacs-lisp
   (use-package help
-    :ensure nil
+    :straight nil
     :custom (help-window-select t))
 #+end_src
 
@@ -1730,7 +1755,7 @@ Default resolution is too low:
 
 #+begin_src emacs-lisp
   (use-package doc-view
-    :ensure nil
+    :straight nil
     :custom (doc-view-resolution 192))
 #+end_src
 
@@ -1813,7 +1838,7 @@ since it's never used, and left fringe is occupied by diff status.
 
 #+begin_src emacs-lisp
   (use-package flymake
-    :ensure nil
+    :straight nil
     :custom
     (flymake-fringe-indicator-position 'right-fringe)
     :config
@@ -1852,20 +1877,11 @@ here, since it also provides completion for it.
 Now that's a quality package. It makes writing LISP so easy, that I've
 never thought it could be.
 
-I'm using a  fork of this package,  located at [[https://github.com/jvshahid/parinfer-mode/tree/master][jvshahid/parinfer-mode]],
-and it explicitly requires these two dependencies:
-
 #+begin_src emacs-lisp
   (use-package paredit)
   (use-package selected)
-#+end_src
-
-The package itself is located under my local =Git= directory, that I use
-to host various projects that I've cloned with =git=.
-
-#+begin_src emacs-lisp
   (use-package parinfer-smart
-    :load-path "~/Git/parinfer-mode"
+    :straight (:host github :repo "andreyorst/parinfer-mode" :branch "smart")
     :hook ((clojure-mode
             emacs-lisp-mode
             common-lisp-mode
@@ -1874,11 +1890,7 @@ to host various projects that I've cloned with =git=.
             racket-mode
             fennel-mode) . parinfer-mode)
     :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
-    :custom
-    (parinfer-extensions '(defaults
-                            pretty-parens
-                            smart-tab
-                            smart-yank)))
+    :custom (parinfer-extensions '(defaults pretty-parens smart-tab smart-yank)))
 #+end_src
 
 Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
@@ -2079,7 +2091,7 @@ decided to avoid extra dependency and configure Ediff.
 
 #+begin_src emacs-lisp
   (use-package ediff
-    :ensure nil
+    :straight nil
     :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
            (ediff-quit . aorst/restore-pre-ediff-winconfig)
            (ediff-keymap-setup . aorst/ediff-setup-keys))
@@ -2283,7 +2295,7 @@ one directory and repeat.
 
 #+begin_src emacs-lisp
   (use-package project
-    :ensure nil
+    :straight nil
     :bind (("C-c p f" . project-find-file)
            ("C-c p r" . project-find-regexp))
     :config
@@ -2327,7 +2339,7 @@ and open a file.
 
 #+begin_src emacs-lisp
   (use-package server
-    :ensure nil
+    :straight nil
     :config
     (unless (server-running-p)
       (server-start)))
@@ -2393,7 +2405,7 @@ little interactive menu for easy interaction.
 
 #+begin_src emacs-lisp
   (use-package hideshow
-    :ensure nil
+    :straight nil
     :after transient
     :hook (prog-mode . hs-minor-mode)
     :bind (:map prog-mode-map
@@ -2422,7 +2434,7 @@ Emacs. It adds some time to the startup though.
 #+begin_src emacs-lisp
   (when window-system
     (use-package desktop
-      :ensure nil
+      :straight nil
       :hook ((after-init . aorst/desktop-restore)
              (desktop-after-read . aorst/desktop-remove))
       :custom
@@ -2491,7 +2503,7 @@ This package provides more comfortable usage for =isearch= in God mode:
 
 #+begin_src emacs-lisp
   (use-package god-mode-isearch
-    :ensure nil
+    :straight nil
     :bind (:map
            isearch-mode-map
            ("<escape>" . god-mode-isearch-activate)
@@ -2548,7 +2560,7 @@ Settings to =recentf= mode.
 
 #+begin_src emacs-lisp
   (use-package recentf
-    :ensure nil
+    :straight nil
     :config
     (add-to-list 'recentf-exclude "\\.gpg\\"))
 #+end_src

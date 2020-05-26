@@ -38,9 +38,24 @@
 (setq frame-inhibit-implied-resize t
       x-gtk-resize-child-frames 'resize-mode)
 
-(defvar package--init-file-ensured)
-(setq package-enable-at-startup nil
-      package--init-file-ensured t)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+(defvar straight-use-package-by-default)
+(setq straight-use-package-by-default t)
+
+(setq package-enable-at-startup nil)
 
 (provide 'early-init)
 ;;; early-init.el ends here
