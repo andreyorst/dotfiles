@@ -1,6 +1,11 @@
 #+options: toc:nil
 #+options: H:8
 #+options: num:2
+#+latex_header: %\setlength{\emergencystretch}{200pt}
+#+latex_header: \usepackage[margin=1.7cm]{geometry}
+#+latex_header: \usepackage[T2A]{fontenc}
+#+latex_header: \usepackage[utf8]{inputenc}
+#+latex_class_options: [a4paper,9pt]
 #+latex_header_extra: \hypersetup{
 #+latex_header_extra:   colorlinks,
 #+latex_header_extra:   linkcolor={red!50!black},
