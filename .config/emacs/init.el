@@ -344,8 +344,7 @@ are defining or executing a macro."
              treemacs-load-theme)
   :bind (("<f7>" . treemacs)
          ("<f8>" . treemacs-select-window)
-         :map
-         treemacs-mode-map
+         :map treemacs-mode-map
          ([C-tab] . aorst/treemacs-expand-all-projects))
   :hook ((after-init . aorst/treemacs-after-init-setup)
          (treemacs-mode . aorst/after-treemacs-setup)
@@ -770,8 +769,7 @@ truncates text if needed.  Minimal width can be set with
          (ediff-prepare-buffer . outline-show-all)
          ((org-capture-mode org-src-mode) . aorst/discard-history))
   :bind (("C-c a" . org-agenda)
-         :map
-         org-mode-map
+         :map org-mode-map
          ("C-c l" . org-store-link))
   :custom
   (org-startup-with-inline-images nil)
@@ -891,8 +889,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package rust-mode
   :commands (rust-format-buffer)
   :hook (rust-mode . electric-pair-local-mode)
-  :bind (:map
-         rust-mode-map
+  :bind (:map rust-mode-map
          ("C-c C-M-f" . rust-format-buffer)))
 
 (when (executable-find "racer")
@@ -907,15 +904,13 @@ truncates text if needed.  Minimal width can be set with
     :hook ((rust-mode toml-mode) . cargo-minor-mode)))
 
 (use-package toml-mode
-  :bind (:map
-         toml-mode-map
+  :bind (:map toml-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
   :hook (racket-repl-mode . electric-pair-local-mode)
-  :bind (:map
-         racket-mode-map
+  :bind (:map racket-mode-map
          ("C-c C-d" . racket-run-with-debugging)
          ("C-c C-M-f" . aorst/indent-buffer)
          (")" . self-insert-command)
@@ -928,36 +923,77 @@ truncates text if needed.  Minimal width can be set with
   (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 
 (use-package cmake-mode
-  :bind (:map
-         cmake-mode-map
+  :bind (:map cmake-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package elisp-mode
   :straight nil
-  :hook (emacs-lisp-mode . eldoc-mode)
-  :bind (:map
-         emacs-lisp-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+  :commands (aorst/emacs-lisp-indent-function)
+  :hook ((emacs-lisp-mode . eldoc-mode)
+         (emacs-lisp-mode . (lambda ()
+                              (setq-local lisp-indent-function
+                                          #'aorst/emacs-lisp-indent-function))))
+  :bind (:map emacs-lisp-mode-map
+         ("C-c C-M-f" . aorst/indent-buffer))
+  :config
+  (defun aorst/emacs-lisp-indent-function (indent-point state)
+    "A replacement for `lisp-indent-function'.
+Indents plists more sensibly. Adapted from DOOM Emacs:
+https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b637998"
+    (let ((normal-indent (current-column))
+          (orig-point (point)))
+      (goto-char (1+ (elt state 1)))
+      (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
+      (cond ((and (elt state 2)
+                  (or (not (looking-at-p "\\sw\\|\\s_"))
+                      (eq (char-after) ?:)))
+             (unless (> (save-excursion (forward-line 1) (point))
+                        calculate-lisp-indent-last-sexp)
+               (goto-char calculate-lisp-indent-last-sexp)
+               (beginning-of-line)
+               (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t))
+             (backward-prefix-chars)
+             (current-column))
+            ((and (save-excursion
+                    (goto-char indent-point)
+                    (skip-syntax-forward " ")
+                    (not (eq (char-after) ?:)))
+                  (save-excursion
+                    (goto-char orig-point)
+                    (eq (char-after) ?:)))
+             (save-excursion
+               (goto-char (+ 2 (elt state 1)))
+               (current-column)))
+            ((let* ((function (buffer-substring (point) (progn (forward-sexp 1) (point))))
+                    (method (or (function-get (intern-soft function) 'lisp-indent-function)
+                                (get (intern-soft function) 'lisp-indent-hook))))
+               (cond ((or (eq method 'defun)
+                          (and (null method)
+                               (> (length function) 3)
+                               (string-match-p "\\`def" function)))
+                      (lisp-indent-defform state indent-point))
+                     ((integerp method)
+                      (lisp-indent-specform method state
+                                            indent-point normal-indent))
+                     (method
+                      (funcall method indent-point state)))))))))
 
 (use-package yaml-mode)
 
 (use-package sh-script
   :straight nil
-  :bind (:map
-         sh-mode-map
+  :bind (:map sh-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package perl-mode
   :straight nil
   :hook ((perl-mode . electric-pair-local-mode)
          (perl-mode . flymake-mode))
-  :bind (:map
-         perl-mode-map
+  :bind (:map perl-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
-  :bind (:map
-         clojure-mode-map
+  :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package cider
@@ -968,7 +1004,7 @@ truncates text if needed.  Minimal width can be set with
   (cider-error-highlight-face ((t (:inherit flymake-error))))
   (cider-fringe-face ((t (:inherit flymake-warning))))
   (cider-fragile-button-face ((t (:box (:line-width -1 :color nil :style nil)
-                                       :inherit (font-lock-warning-face)))))
+                                  :inherit (font-lock-warning-face)))))
   (cider-deprecated-face ((t (:inherit smerge-upper))))
   (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
   :custom
@@ -977,13 +1013,11 @@ truncates text if needed.  Minimal width can be set with
   (nrepl-hide-special-buffers t))
 
 (use-package fennel-mode
-  :bind (:map
-         fennel-mode-map
+  :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package lua-mode
-  :bind (:map
-         lua-mode-map
+  :bind (:map lua-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package css-mode
@@ -1070,7 +1104,9 @@ truncates text if needed.  Minimal width can be set with
 (use-package paredit)
 (use-package selected)
 (use-package parinfer-smart
-  :straight (:host github :repo "andreyorst/parinfer-mode" :branch "smart")
+  :straight (:host github
+             :repo "andreyorst/parinfer-mode"
+             :branch "smart")
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode
@@ -1160,8 +1196,7 @@ truncates text if needed.  Minimal width can be set with
   (ivy-posframe-mode +1))
 
 (use-package company
-  :bind (:map
-         company-active-map
+  :bind (:map company-active-map
          ("TAB" . company-complete-common-or-cycle)
          ("<tab>" . company-complete-common-or-cycle)
          ("<S-Tab>" . company-select-previous)
@@ -1244,8 +1279,7 @@ truncates text if needed.  Minimal width can be set with
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydrant/mc/body)
-         :map
-         mc/keymap
+         :map mc/keymap
          ("<return>" . nil))
   :requires hydra
   :config
@@ -1363,8 +1397,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package lsp-ui
   :after lsp-mode
   :commands lsp-ui-mode
-  :bind (:map
-         lsp-ui-mode-map
+  :bind (:map lsp-ui-mode-map
          ("M-." . lsp-ui-peek-find-definitions)
          ("M-/" . lsp-ui-peek-find-references))
   :custom
@@ -1406,7 +1439,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package clang-format
   :after cc-mode
   :bind (:map c-mode-base-map
-              ("C-c C-M-f" . clang-format-buffer)))
+         ("C-c C-M-f" . clang-format-buffer)))
 
 (use-package server
   :straight nil
@@ -1419,7 +1452,7 @@ truncates text if needed.  Minimal width can be set with
   :after transient
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
-              ("<f6>" . aorst/hideshow-menu))
+         ("<f6>" . aorst/hideshow-menu))
   :config
   (define-transient-command aorst/hideshow-menu ()
     "Hideshow commands."
@@ -1467,8 +1500,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/real-buffer-setup)
          (edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
-  :bind (:map
-         edit-indirect-mode-map
+  :bind (:map edit-indirect-mode-map
          ("C-c C-c" . edit-indirect-commit)
          ("C-c C-k" . edit-indirect-abort)
          ("C-c '" . nil))
@@ -1481,8 +1513,7 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package separedit
   :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
-  :bind (:map
-         prog-mode-map
+  :bind (:map prog-mode-map
          ("C-c '" . separedit)
          :map edit-indirect-mode-map
          ("C-c '" . separedit))
