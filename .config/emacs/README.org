@@ -646,7 +646,7 @@ properly format buffer it should be used instead of this function.
       (save-restriction
         (indent-region (point-min) (point-max)))))
 
-  (global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
+  (global-set-key (kbd "C-c C-M-f") #'aorst/indent-buffer)
 #+end_src
 
 * User Interface
@@ -714,7 +714,7 @@ found we try =Source Code Pro= as a fallback option.
 I don't  use this package  directly yet,  but some other  packages do,
 like DOOM Modeline or Treemacs.
 
-** Theme
+ ** Theme
 I'm using *doom-themes* package to make my Emacs look modern. This theme
 collection  was developed  for [[https://github.com/hlissner/doom-emacs][DOOM  Emacs]],  and I  find these  themes
 actually  great on  its own.   This package  contains nice  variant of
@@ -1394,7 +1394,7 @@ my Emacs configuration with it.
 
 #+begin_src emacs-lisp
   (use-package org
-    :straight nil
+    :straight (:type built-in)
     :defines default-justification
     :hook ((org-mode . flyspell-mode)
            (org-mode . auto-fill-mode)
@@ -1559,7 +1559,7 @@ settings for Rust mode.
     :hook (rust-mode . electric-pair-local-mode)
     :bind (:map
            rust-mode-map
-           ("C-c C-f" . rust-format-buffer)))
+           ("C-c C-M-f" . rust-format-buffer)))
 #+end_src
 
 This also means  that I could use something  to automatically complete
@@ -1592,7 +1592,7 @@ configure project.
   (use-package toml-mode
     :bind (:map
            toml-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Racket
@@ -1605,7 +1605,7 @@ Racket is nice LISP/Scheme language that I might to get into.
     :bind (:map
            racket-mode-map
            ("C-c C-d" . racket-run-with-debugging)
-           ("C-c C-f" . aorst/indent-buffer)
+           ("C-c C-M-f" . aorst/indent-buffer)
            (")" . self-insert-command)
            ("]" . self-insert-command)
            ("}" . self-insert-command))
@@ -1623,7 +1623,7 @@ A mode for editing cmake files.
   (use-package cmake-mode
     :bind (:map
            cmake-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Emacs Lisp
@@ -1636,7 +1636,7 @@ want to enable some helper modes here.
     :hook (emacs-lisp-mode . eldoc-mode)
     :bind (:map
            emacs-lisp-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Yaml
@@ -1654,7 +1654,7 @@ Some configurations for shell script modes.
     :straight nil
     :bind (:map
            sh-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Perl
@@ -1667,7 +1667,7 @@ Perl related configurations.
            (perl-mode . flymake-mode))
     :bind (:map
            perl-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Clojure
@@ -1679,7 +1679,7 @@ and reliability.
   (use-package clojure-mode
     :bind (:map
            clojure-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 Emacs  also has  a great  package called  Cider, which  is an  IDE for
@@ -1713,7 +1713,7 @@ compatibility.
   (use-package fennel-mode
     :bind (:map
            fennel-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** Lua
@@ -1724,7 +1724,7 @@ produces I need support for Lua.
   (use-package lua-mode
     :bind (:map
            lua-mode-map
-           ("C-c C-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 ** CSS
@@ -1895,6 +1895,19 @@ never thought it could be.
 
 Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
 
+** COMMENT Parinfer Rust
+#+begin_src emacs-lisp
+  (use-package parinfer-rust-mode
+    :straight (:host github :repo "justinbarclay/parinfer-rust-mode" :branch "master")
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode
+            fennel-mode) . parinfer-rust-mode)
+    :init (setq parinfer-rust--auto-download-p 't))
+#+end_src
 ** Flx
 Flex matching for Emacs.
 
@@ -1996,7 +2009,6 @@ This package displays =ivy= in separate frame on top of Emacs.
             0))
     (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
     (ivy-posframe-mode +1))
-
 #+end_src
 
 ** Company
@@ -2327,8 +2339,7 @@ A package to format C code with Clang Format.
   (use-package clang-format
     :after cc-mode
     :bind (:map c-mode-base-map
-                ("C-c C-f" . clang-format-buffer)
-                ("C-c C-S-f" . clang-format-region)))
+                ("C-c C-M-f" . clang-format-buffer)))
 #+end_src
 
 ** Server

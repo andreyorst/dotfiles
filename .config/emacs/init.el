@@ -173,7 +173,7 @@ are defining or executing a macro."
     (save-restriction
       (indent-region (point-min) (point-max)))))
 
-(global-set-key (kbd "C-c C-f") #'aorst/indent-buffer)
+(global-set-key (kbd "C-c C-M-f") #'aorst/indent-buffer)
 
 (use-package startup
   :no-require t
@@ -760,7 +760,7 @@ truncates text if needed.  Minimal width can be set with
   (display-line-numbers-width-start t))
 
 (use-package org
-  :straight nil
+  :straight (:type built-in)
   :defines default-justification
   :hook ((org-mode . flyspell-mode)
          (org-mode . auto-fill-mode)
@@ -893,7 +893,7 @@ truncates text if needed.  Minimal width can be set with
   :hook (rust-mode . electric-pair-local-mode)
   :bind (:map
          rust-mode-map
-         ("C-c C-f" . rust-format-buffer)))
+         ("C-c C-M-f" . rust-format-buffer)))
 
 (when (executable-find "racer")
   (use-package racer
@@ -909,7 +909,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package toml-mode
   :bind (:map
          toml-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
@@ -917,7 +917,7 @@ truncates text if needed.  Minimal width can be set with
   :bind (:map
          racket-mode-map
          ("C-c C-d" . racket-run-with-debugging)
-         ("C-c C-f" . aorst/indent-buffer)
+         ("C-c C-M-f" . aorst/indent-buffer)
          (")" . self-insert-command)
          ("]" . self-insert-command)
          ("}" . self-insert-command))
@@ -930,14 +930,14 @@ truncates text if needed.  Minimal width can be set with
 (use-package cmake-mode
   :bind (:map
          cmake-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package elisp-mode
   :straight nil
   :hook (emacs-lisp-mode . eldoc-mode)
   :bind (:map
          emacs-lisp-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package yaml-mode)
 
@@ -945,7 +945,7 @@ truncates text if needed.  Minimal width can be set with
   :straight nil
   :bind (:map
          sh-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package perl-mode
   :straight nil
@@ -953,12 +953,12 @@ truncates text if needed.  Minimal width can be set with
          (perl-mode . flymake-mode))
   :bind (:map
          perl-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
   :bind (:map
          clojure-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
@@ -979,12 +979,12 @@ truncates text if needed.  Minimal width can be set with
 (use-package fennel-mode
   :bind (:map
          fennel-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package lua-mode
   :bind (:map
          lua-mode-map
-         ("C-c C-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package css-mode
   :straight nil
@@ -1406,8 +1406,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package clang-format
   :after cc-mode
   :bind (:map c-mode-base-map
-              ("C-c C-f" . clang-format-buffer)
-              ("C-c C-S-f" . clang-format-region)))
+              ("C-c C-M-f" . clang-format-buffer)))
 
 (use-package server
   :straight nil
