@@ -256,3 +256,5 @@ plug "eraserhd/parinfer-rust" do %{
         >>
     >
 >
+
+plug "andreyorst/pmanage.kak"
