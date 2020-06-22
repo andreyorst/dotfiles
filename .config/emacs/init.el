@@ -228,6 +228,8 @@ are defining or executing a macro."
   (set-display-table-slot standard-display-table 0 ?\s))
 
 (use-package solaire-mode
+  :straight (:host github
+             :repo "hlissner/emacs-solaire-mode")
   :commands (solaire-global-mode
              solaire-mode-swap-bg
              turn-on-solaire-mode

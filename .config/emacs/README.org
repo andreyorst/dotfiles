@@ -769,6 +769,8 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
 
 #+begin_src emacs-lisp
   (use-package solaire-mode
+    :straight (:host github
+               :repo "hlissner/emacs-solaire-mode")
     :commands (solaire-global-mode
                solaire-mode-swap-bg
                turn-on-solaire-mode
