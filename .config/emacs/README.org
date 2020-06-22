@@ -714,7 +714,7 @@ found we try =Source Code Pro= as a fallback option.
 I don't  use this package  directly yet,  but some other  packages do,
 like DOOM Modeline or Treemacs.
 
- ** Theme
+** Theme
 I'm using *doom-themes* package to make my Emacs look modern. This theme
 collection  was developed  for [[https://github.com/hlissner/doom-emacs][DOOM  Emacs]],  and I  find these  themes
 actually  great on  its own.   This package  contains nice  variant of
@@ -864,7 +864,9 @@ it's great!
                       doom-modeline-battery-critical
                       doom-modeline-battery-normal
                       doom-modeline-input-method
-                      doom-modeline-input-method-alt))
+                      doom-modeline-input-method-alt
+                      doom-modeline-repl-warning
+                      doom-modeline-repl-success))
         (set-face-attribute face nil :foreground fg :weight 'normal))
       (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
       (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)

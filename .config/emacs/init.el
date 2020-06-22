@@ -302,7 +302,9 @@ are defining or executing a macro."
                     doom-modeline-battery-critical
                     doom-modeline-battery-normal
                     doom-modeline-input-method
-                    doom-modeline-input-method-alt))
+                    doom-modeline-input-method-alt
+                    doom-modeline-repl-warning
+                    doom-modeline-repl-success))
       (set-face-attribute face nil :foreground fg :weight 'normal))
     (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
     (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
