@@ -1504,7 +1504,6 @@ bracket. So I enable it for every programming language.
     :straight nil
     :hook ((prog-mode . show-paren-mode)
            (prog-mode . display-line-numbers-mode)))
-           ;; (prog-mode . hl-line-mode)))
 #+end_src
 
 ** CC
@@ -1712,7 +1711,7 @@ Perl related configurations.
 #+end_src
 
 ** Clojure
-Clojure is a Lisp dialect for JVM - Java Virtual Machine. It is one of
+Clojure is a Lisp dialect for Java Virtual Machine. It is one of
 the few  modern and refreshing  languages, that bring  both innovation
 and reliability.
 
@@ -1722,6 +1721,7 @@ and reliability.
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
+*** CIDER
 Emacs  also has  a great  package called  Cider, which  is an  IDE for
 Clojure and ClojureScript.
 
@@ -1733,14 +1733,32 @@ Clojure and ClojureScript.
     :custom-face
     (cider-error-highlight-face ((t (:inherit flymake-error))))
     (cider-fringe-face ((t (:inherit flymake-warning))))
-    (cider-fragile-button-face ((t (:box (:line-width -1 :color nil :style nil)
+    (cider-fragile-button-face ((t (:box (:line-width -1
+                                          :color nil
+                                          :style nil)
                                     :inherit (font-lock-warning-face)))))
     (cider-deprecated-face ((t (:inherit smerge-upper))))
-    (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
+    (cider-instrumented-face ((t (:box (:line-width -1
+                                        :color "#ff6c6b"
+                                        :style nil)))))
     :custom
     (cider-repl-display-help-banner nil)
     (cider-repl-tab-command #'company-complete-common-or-cycle)
     (nrepl-hide-special-buffers t))
+#+end_src
+
+*** flymake-kondor
+[[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flymake-kondor=
+is a backend for =flymake=, that  makes these two things understand each
+other.
+
+#+begin_src emacs-lisp
+  (use-package flymake-kondor
+    :if (executable-find "clj-kondo")
+    :straight (:host github
+               :repo "turbo-cafe/flymake-kondor")
+    :hook ((clojure-mode . flymake-mode)
+           (clojure-mode . flymake-kondor-setup)))
 #+end_src
 
 ** Fennel
@@ -1883,6 +1901,10 @@ since it's never used, and left fringe is occupied by diff status.
     (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 #+end_src
 
+#+begin_src emacs-lisp
+  (use-package flymake-quickdef)
+#+end_src
+
 ** Hydra
 This is something like ability to create mappings that sit in it's own
 mode, like different user modes in Kakoune. It allows me to press some
@@ -1911,7 +1933,7 @@ here, since it also provides completion for it.
     (geiser-default-implementation 'guile))
 #+end_src
 
-** Parinfer
+** COMMENT Parinfer
 Now that's a quality package. It makes writing LISP so easy, that I've
 never thought it could be.
 

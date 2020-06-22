@@ -861,7 +861,6 @@ truncates text if needed.  Minimal width can be set with
   :straight nil
   :hook ((prog-mode . show-paren-mode)
          (prog-mode . display-line-numbers-mode)))
-         ;; (prog-mode . hl-line-mode)))
 
 (use-package cc-mode
   :straight nil
@@ -1007,14 +1006,25 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom-face
   (cider-error-highlight-face ((t (:inherit flymake-error))))
   (cider-fringe-face ((t (:inherit flymake-warning))))
-  (cider-fragile-button-face ((t (:box (:line-width -1 :color nil :style nil)
+  (cider-fragile-button-face ((t (:box (:line-width -1
+                                        :color nil
+                                        :style nil)
                                   :inherit (font-lock-warning-face)))))
   (cider-deprecated-face ((t (:inherit smerge-upper))))
-  (cider-instrumented-face ((t (:box (:line-width -1 :color "#ff6c6b" :style nil)))))
+  (cider-instrumented-face ((t (:box (:line-width -1
+                                      :color "#ff6c6b"
+                                      :style nil)))))
   :custom
   (cider-repl-display-help-banner nil)
   (cider-repl-tab-command #'company-complete-common-or-cycle)
   (nrepl-hide-special-buffers t))
+
+(use-package flymake-kondor
+  :if (executable-find "clj-kondo")
+  :straight (:host github
+             :repo "turbo-cafe/flymake-kondor")
+  :hook ((clojure-mode . flymake-mode)
+         (clojure-mode . flymake-kondor-setup)))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
@@ -1097,6 +1107,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
+(use-package flymake-quickdef)
+
 (use-package hydra)
 
 (use-package geiser
@@ -1104,22 +1116,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
-
-(use-package paredit)
-(use-package selected)
-(use-package parinfer-smart
-  :straight (:host github
-             :repo "andreyorst/parinfer-mode"
-             :branch "smart")
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode
-          fennel-mode) . parinfer-mode)
-  :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
-  :custom (parinfer-extensions '(defaults pretty-parens smart-tab smart-yank)))
 
 (use-package flx)
 
