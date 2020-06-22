@@ -1957,7 +1957,7 @@ never thought it could be.
 
 Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
 
-** COMMENT Parinfer Rust
+** Parinfer Rust
 Parinfer implementation in Rust language.  Much faster than Emacs Lisp
 implementation, but in very early stages of development.
 
