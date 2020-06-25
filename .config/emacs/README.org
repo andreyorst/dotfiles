@@ -1718,7 +1718,26 @@ and reliability.
 #+begin_src emacs-lisp
   (use-package clojure-mode
     :bind (:map clojure-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer)
+           ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
+    :config
+    (defun aorst/clojure-toggle-ignore-form ()
+      "Add or remove #_ literal before the current form."
+      (interactive)
+      (save-excursion
+        (condition-case nil
+            (progn
+              (backward-up-list)
+              (if (looking-back "#_")
+                  (delete-char -2)
+                (insert "#_")))
+          (scan-error
+           (progn
+             (forward-sexp)
+             (if (looking-back "#_")
+                 (delete-char -2)
+               (backward-sexp)
+               (insert "#_"))))))))
 #+end_src
 
 *** CIDER

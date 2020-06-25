@@ -997,7 +997,26 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package clojure-mode
   :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer)
+         ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
+  :config
+  (defun aorst/clojure-toggle-ignore-form ()
+    "Add or remove #_ literal before the current form."
+    (interactive)
+    (save-excursion
+      (condition-case nil
+          (progn
+            (backward-up-list)
+            (if (looking-back "#_")
+                (delete-char -2)
+              (insert "#_")))
+        (scan-error
+         (progn
+           (forward-sexp)
+           (if (looking-back "#_")
+               (delete-char -2)
+             (backward-sexp)
+             (insert "#_"))))))))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
