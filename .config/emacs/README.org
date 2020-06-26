@@ -19,13 +19,21 @@ keeping as much  of vanilla Emacs behaviors  as I can, but  I'm a sane
 person so some  aspects, which are actually insane in  my opinion, are
 changed.
 
-Org Mode has a function  called =org-babel-tangle= that exports all code
-blocks accordingly to =header-args= property. Calling this function with
-this file as an argument will result in creation of =init.el= located at
-=user-emacs-directory=.   This means  that you  only need  this file  in
-order   to  get   my   Emacs  configuration   and   compile  it   with
-=org-babel-tangle= function for the first  time.  After that, every time
-this file is saved it gets re-tangled automatically on save.
+This file is self contained configuration  for Emacs 26 and higher, so
+it is the only file you need to bootstrap Emacs, and it will configure
+itself, although you  need [[https://orgmode.org/][Org Mode]] for this to  work.  Org mode comes
+with  all current  versions  of Emacs,  and =org-babel-tangle=  function
+should be available. If you've downloaded this file, run this function
+on it, and  Emacs will be configured.  This function  exports all code
+blocks  accordingly  to  =header-args=  property  at  the  top  of  this
+document, and  under some  headings. Calling  this function  with this
+file  as  an   argument  will  result  in  creation   of  =init.el=  and
+=early-init.el= located  at =user-emacs-directory=. This is  why I'm using
+tangle approach, instead of =org-babel-load-file=,  as there's no way to
+provide =early-init= this way. After  first tangle, every time this file
+is saved  it gets re-tangled automatically,  so there's not much  of a
+difference from  loading with babel,  and only  this file needs  to be
+edited.
 
 Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
 starts with commentary:
