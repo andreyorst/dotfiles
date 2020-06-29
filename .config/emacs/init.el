@@ -1147,8 +1147,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           lisp-mode
           racket-mode
           fennel-mode) . parinfer-rust-mode)
-  :config
-  (add-to-list 'parinfer-rust-treat-command-as '(delete-indentation . "paren"))
   :init
   (setq parinfer-rust--auto-download-p t))
 
@@ -1268,13 +1266,15 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package undo-tree
   :commands global-undo-tree-mode
+  :bind (("C-z" . undo-tree-undo)
+         ("C-S-z" . undo-tree-redo))
   :init (global-undo-tree-mode 1))
 
 (use-package yasnippet
   :commands yas-reload-all
   :hook ((rust-mode
           c-mode-common
-          racket-mode). yas-minor-mode)
+          racket-mode) . yas-minor-mode)
   :config
   (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace)
   (yas-reload-all))

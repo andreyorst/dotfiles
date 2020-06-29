@@ -2002,8 +2002,6 @@ development.
             lisp-mode
             racket-mode
             fennel-mode) . parinfer-rust-mode)
-    :config
-    (add-to-list 'parinfer-rust-treat-command-as '(delete-indentation . "paren"))
     :init
     (setq parinfer-rust--auto-download-p t))
 #+end_src
@@ -2160,11 +2158,16 @@ This package also optionally requires these extra dependencies:
 
 ** Undo Tree
 This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
-mapping to redo.
+mapping to  redo. I also  map convenient  =C-z= and =C-S-z=  maps, because
+sometimes when  someone else sits at  my PC (for pair  programming for
+example), and forgets that this is Emacs, and hits =C-z= thus minimizing
+the frame, and being frustrated.
 
 #+begin_src emacs-lisp
   (use-package undo-tree
     :commands global-undo-tree-mode
+    :bind (("C-z" . undo-tree-undo)
+           ("C-S-z" . undo-tree-redo))
     :init (global-undo-tree-mode 1))
 #+end_src
 
@@ -2178,7 +2181,7 @@ a separate package
     :commands yas-reload-all
     :hook ((rust-mode
             c-mode-common
-            racket-mode). yas-minor-mode)
+            racket-mode) . yas-minor-mode)
     :config
     (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace)
     (yas-reload-all))
