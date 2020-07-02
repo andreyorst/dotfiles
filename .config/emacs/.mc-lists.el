@@ -65,6 +65,7 @@
 (setq mc/cmds-to-run-once
       '(
         aorst/treemacs-expand-all-projects
+        cider-repl-return
         clang-format-buffer
         counsel-describe-function
         counsel-find-file
