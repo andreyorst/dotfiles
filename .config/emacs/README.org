@@ -1712,7 +1712,7 @@ Perl related configurations.
   (use-package perl-mode
     :straight nil
     :hook ((perl-mode . electric-pair-local-mode)
-           (perl-mode . flymake-mode))
+           (perl-mode . flycheck-mode))
     :bind (:map perl-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
@@ -1774,18 +1774,18 @@ Clojure and ClojureScript.
     (nrepl-hide-special-buffers t))
 #+end_src
 
-*** flymake-kondor
-[[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flymake-kondor=
-is a backend for =flymake=, that  makes these two things understand each
-other.
+*** flycheck-clj-kondo
+[[https://github.com/borkdude/clj-kondo][clj-kondo]]   is   a   static    analyzer   for   Clojure(Script),   and
+=flycheck-clj-kondo= is  a backend  for =flycheck=,  that makes  these two
+things understand each other.
 
 #+begin_src emacs-lisp
-  (use-package flymake-kondor
+  (use-package flycheck-clj-kondo
     :if (executable-find "clj-kondo")
     :straight (:host github
-               :repo "turbo-cafe/flymake-kondor")
-    :hook ((clojure-mode . flymake-mode)
-           (clojure-mode . flymake-kondor-setup)))
+               :repo "borkdude/flycheck-clj-kondo")
+    :hook ((clojure-mode . flycheck-mode)
+           (clojure-mode . flycheck-clj-kondo-define-checkers)))
 #+end_src
 
 ** Fennel
@@ -1930,6 +1930,13 @@ since it's never used, and left fringe is occupied by diff status.
 
 #+begin_src emacs-lisp
   (use-package flymake-quickdef)
+#+end_src
+
+** Flycheck
+Some languages have better support with =flycheck=.
+
+#+begin_src emacs-lisp
+  (use-package flycheck)
 #+end_src
 
 ** Hydra

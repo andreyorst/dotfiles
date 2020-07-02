@@ -990,7 +990,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package perl-mode
   :straight nil
   :hook ((perl-mode . electric-pair-local-mode)
-         (perl-mode . flymake-mode))
+         (perl-mode . flycheck-mode))
   :bind (:map perl-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
@@ -1038,12 +1038,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (cider-repl-tab-command #'company-complete-common-or-cycle)
   (nrepl-hide-special-buffers t))
 
-(use-package flymake-kondor
+(use-package flycheck-clj-kondo
   :if (executable-find "clj-kondo")
   :straight (:host github
-             :repo "turbo-cafe/flymake-kondor")
-  :hook ((clojure-mode . flymake-mode)
-         (clojure-mode . flymake-kondor-setup)))
+             :repo "borkdude/flycheck-clj-kondo")
+  :hook ((clojure-mode . flycheck-mode)
+         (clojure-mode . flycheck-clj-kondo-define-checkers)))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
@@ -1127,6 +1127,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
 
 (use-package flymake-quickdef)
+
+(use-package flycheck)
 
 (use-package hydra)
 

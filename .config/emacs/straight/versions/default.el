@@ -44,7 +44,6 @@
  ("minions" . "36d39bd25ae58d1359d17f99142520339bea5974")
  ("multiple-cursors.el" . "b880554d04b8f61165afba7d4de19ac9e39bb7ab")
  ("ox-hugo" . "77050d256fc2cb58483284bc56617e25596e445b")
- ("parinfer-rust-mode" . "95bf9baa6f000eb577f81ebc74d2236d8e06442b")
  ("parseclj" . "b34d3e13a249d4b92f1a008cdc1df20a92f866c5")
  ("parseedn" . "92bf875962e62f8c6370b56991d546f122536c6b")
  ("pfuture" . "d7926de3ba0105a36cfd00811fd6278aea903eef")
