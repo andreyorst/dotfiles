@@ -1977,8 +1977,10 @@ development.
             lisp-mode
             racket-mode
             fennel-mode) . parinfer-rust-mode)
+    :config
+    (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
     :init
-    (setq parinfer-rust--auto-download-p t))
+    (setq parinfer-rust-auto-download-p t))
 #+end_src
 
 ** Flx

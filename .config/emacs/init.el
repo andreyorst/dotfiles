@@ -1146,8 +1146,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           lisp-mode
           racket-mode
           fennel-mode) . parinfer-rust-mode)
+  :config
+  (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
   :init
-  (setq parinfer-rust--auto-download-p t))
+  (setq parinfer-rust-auto-download-p t))
 
 (use-package flx)
 
