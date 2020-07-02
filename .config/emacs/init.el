@@ -911,7 +911,6 @@ truncates text if needed.  Minimal width can be set with
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package racket-mode
-  :mode ("\\.rkt\\'" . racket-mode)
   :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
          ("C-c C-d" . racket-run-with-debugging)
