@@ -1960,30 +1960,6 @@ here, since it also provides completion for it.
     (geiser-default-implementation 'guile))
 #+end_src
 
-** COMMENT Parinfer
-Now that's a quality package. It makes writing LISP so easy, that I've
-never thought it could be.
-
-#+begin_src emacs-lisp
-  (use-package paredit)
-  (use-package selected)
-  (use-package parinfer-smart
-    :straight (:host github
-               :repo "andreyorst/parinfer-mode"
-               :branch "smart")
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode) . parinfer-mode)
-    :custom-face (parinfer--error-face ((t (:inherit (flymake-error)))))
-    :custom (parinfer-extensions '(defaults pretty-parens smart-tab smart-yank)))
-#+end_src
-
-Big thanks to [[https://github.com/shaunlebron][@shaunlebron]] for creating original [[https://github.com/shaunlebron/parinfer][Parinfer]].
-
 ** Parinfer Rust
 Parinfer implementation  written in Rust  language.  Not as  strict as
 Emacs Lisp  implementation, because it  does not force  any formatting
