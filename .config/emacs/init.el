@@ -1177,7 +1177,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
               #b00000000
               #b00000000
               #b00111100
-              #b01100110
+              #b01111110
               #b01100110
               #b01100110
               #b00000110
@@ -1232,6 +1232,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       ("m" flycheck-mode)
       ("s" flycheck-select-checker))))
 
+(use-package flycheck-cask
+  :hook (flycheck-mode . flycheck-cask-setup))
+
 (use-package hydra)
 
 (use-package parinfer-rust-mode
@@ -1247,7 +1250,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config
   (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
   :init
-  (setq parinfer-rust-auto-download-p t))
+  (setq parinfer-rust-auto-download t))
 
 (use-package flx)
 
