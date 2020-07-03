@@ -910,6 +910,12 @@ truncates text if needed.  Minimal width can be set with
   :bind (:map toml-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
+(use-package geiser
+  :hook (scheme-mode . geiser-mode)
+  :custom
+  (geiser-active-implementations '(guile))
+  (geiser-default-implementation 'guile))
+
 (use-package racket-mode
   :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
@@ -1131,12 +1137,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package flycheck)
 
 (use-package hydra)
-
-(use-package geiser
-  :hook (scheme-mode . geiser-mode)
-  :custom
-  (geiser-active-implementations '(guile))
-  (geiser-default-implementation 'guile))
 
 (use-package parinfer-rust-mode
   :straight (:host github

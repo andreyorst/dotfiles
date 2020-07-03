@@ -1602,6 +1602,20 @@ configure project.
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
+** Geiser
+Since I mostly use Emacs for studying LISP, and I'm reading SICP which
+uses Scheme as main LISP flavor for explanations and exercises, I need
+a tool  to run Scheme,  and Geiser seems  like the most  viable option
+here, since it also provides completion for it.
+
+#+begin_src emacs-lisp
+  (use-package geiser
+    :hook (scheme-mode . geiser-mode)
+    :custom
+    (geiser-active-implementations '(guile))
+    (geiser-default-implementation 'guile))
+#+end_src
+
 ** Racket
 Racket is nice LISP/Scheme language that I might to get into.
 
@@ -1951,20 +1965,6 @@ provide sane keybindings.
 
 #+begin_src emacs-lisp
   (use-package hydra)
-#+end_src
-
-** Geiser
-Since I mostly use Emacs for studying LISP, and I'm reading SICP which
-uses Scheme as main LISP flavor for explanations and exercises, I need
-a tool  to run Scheme,  and Geiser seems  like the most  viable option
-here, since it also provides completion for it.
-
-#+begin_src emacs-lisp
-  (use-package geiser
-    :hook (scheme-mode . geiser-mode)
-    :custom
-    (geiser-active-implementations '(guile))
-    (geiser-default-implementation 'guile))
 #+end_src
 
 ** Parinfer Rust
