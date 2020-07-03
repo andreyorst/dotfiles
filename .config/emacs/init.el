@@ -1417,8 +1417,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("<return>" . nil))
   :requires hydra
   :config
-  (defhydra hydrant/mc (:hint nil :color pink)
-    "
+  (when (fboundp 'defhydra)
+    (defhydra hydrant/mc (:hint nil :color pink)
+      "
  ^Select^                 ^Discard^                      ^Edit^               ^Navigate^
 ─^──────^─────────────────^───────^──────────────────────^────^───────────────^────────^─────────
  _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
@@ -1426,29 +1427,31 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
  _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
  _p_:   select previous   _q_ or _g_: exit hydrant       ^ ^                  ^ ^
  _C_:   select next line  _G_:      exit mc mode"
-    ("M-s" mc/edit-ends-of-lines)
-    ("s" mc/mark-all-in-region-regexp)
-    ("n" mc/mark-next-like-this-word)
-    ("p" mc/mark-previous-like-this-word)
-    ("&" mc/vertical-align-with-space)
-    ("(" mc/cycle-backward)
-    (")" mc/cycle-forward)
-    ("M-SPC" mc/remove-current-cursor)
-    ("b" mc/remove-cursors-on-blank-lines)
-    ("d" mc/remove-duplicated-cursors)
-    ("C" mc/mark-next-lines)
-    ("#" mc/insert-numbers)
-    ("q" mc/remove-duplicated-cursors :exit t)
-    ("g" mc/remove-duplicated-cursors :exit t)
-    ("G" mc/keyboard-quit :exit t)))
+      ("M-s" mc/edit-ends-of-lines)
+      ("s" mc/mark-all-in-region-regexp)
+      ("n" mc/mark-next-like-this-word)
+      ("p" mc/mark-previous-like-this-word)
+      ("&" mc/vertical-align-with-space)
+      ("(" mc/cycle-backward)
+      (")" mc/cycle-forward)
+      ("M-SPC" mc/remove-current-cursor)
+      ("b" mc/remove-cursors-on-blank-lines)
+      ("d" mc/remove-duplicated-cursors)
+      ("C" mc/mark-next-lines)
+      ("#" mc/insert-numbers)
+      ("q" mc/remove-duplicated-cursors :exit t)
+      ("g" mc/remove-duplicated-cursors :exit t)
+      ("G" mc/keyboard-quit :exit t))))
+
 (use-package mc-extras)
 
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
   :requires hydra
   :config
-  (defhydra hydrant/er (:color pink :hint nil)
-    "
+  (when (fboundp 'defhydra)
+    (defhydra hydrant/er (:color pink :hint nil)
+      "
  ^Expand/Discard^                ^Mark^
 ─^──────────────^────────────────^────^─────────────────
  _e_ or _+_: expand region         _(_:      inside pairs
@@ -1456,19 +1459,19 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
  _g_:      exit hydrant          _q_ or _'_: inside quotes
  _G_:      discard region, exit  _Q_ or _\"_: around quotes
  ^ ^    ^ ^                        _p_:      paragraph"
-    ("e" er/expand-region)
-    ("+" er/expand-region)
-    ("r" er/contract-region)
-    ("-" er/contract-region)
-    ("p" er/mark-paragraph)
-    ("(" er/mark-inside-pairs)
-    (")" er/mark-outside-pairs)
-    ("q" er/mark-inside-quotes)
-    ("'" er/mark-inside-quotes)
-    ("Q" er/mark-outside-quotes)
-    ("\"" er/mark-outside-quotes)
-    ("g" ignore :exit t)
-    ("G" #'(lambda () (interactive) (deactivate-mark)) :exit t)))
+      ("e" er/expand-region)
+      ("+" er/expand-region)
+      ("r" er/contract-region)
+      ("-" er/contract-region)
+      ("p" er/mark-paragraph)
+      ("(" er/mark-inside-pairs)
+      (")" er/mark-outside-pairs)
+      ("q" er/mark-inside-quotes)
+      ("'" er/mark-inside-quotes)
+      ("Q" er/mark-outside-quotes)
+      ("\"" er/mark-outside-quotes)
+      ("g" ignore :exit t)
+      ("G" #'(lambda () (interactive) (deactivate-mark)) :exit t))))
 
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
@@ -1490,32 +1493,33 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
             (iedit-expand-down-to-occurrence)
           (iedit-expand-up-to-occurrence))
       (iedit-mode 1)))
-  (defun aorst/iedit-hydrant ()
-    "toggle iedit mode for item under point, and open `hydrant/iedit'."
-    (interactive)
-    (ignore-errors
-      (iedit-mode 1)
-      (hydrant/iedit/body)))
-  (defhydra hydrant/iedit (:hint nil :color pink)
-    "
+  (when (fboundp 'defhydra)
+    (defhydra hydrant/iedit (:hint nil :color pink)
+      "
  ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
 ─^──────^──────────────────^───────^───────────────────^────^───────────────^────────^─────────────
  _n_: next occurrence      _M-SPC_:  toggle selection  _u_: uppercase       _(_: previous selection
  _p_: previous occurrence  _q_ or _g_: exit hydrant      _d_: downcase        _)_: next selection
  ^ ^                       _G_:      exit iedit-mode   _#_: insert numbers
  ^ ^                       _m_:      switch to mc"
-    ("n" iedit-expand-down-to-occurrence)
-    ("m" aorst/iedit-to-mc-hydrant :exit t)
-    ("p" iedit-expand-up-to-occurrence)
-    ("u" iedit-upcase-occurrences)
-    ("d" iedit-downcase-occurrences)
-    ("#" iedit-number-occurrences)
-    ("(" iedit-prev-occurrence)
-    (")" iedit-next-occurrence)
-    ("M-SPC" iedit-toggle-selection)
-    ("q" ignore :exit t)
-    ("g" ignore :exit t)
-    ("G" #'(lambda () (interactive) (iedit-mode -1)) :exit t)))
+      ("n" iedit-expand-down-to-occurrence)
+      ("m" aorst/iedit-to-mc-hydrant :exit t)
+      ("p" iedit-expand-up-to-occurrence)
+      ("u" iedit-upcase-occurrences)
+      ("d" iedit-downcase-occurrences)
+      ("#" iedit-number-occurrences)
+      ("(" iedit-prev-occurrence)
+      (")" iedit-next-occurrence)
+      ("M-SPC" iedit-toggle-selection)
+      ("q" ignore :exit t)
+      ("g" ignore :exit t)
+      ("G" #'(lambda () (interactive) (iedit-mode -1)) :exit t))
+    (defun aorst/iedit-hydrant ()
+      "toggle iedit mode for item under point, and open `hydrant/iedit'."
+      (interactive)
+      (ignore-errors
+        (iedit-mode 1)
+        (hydrant/iedit/body)))))
 
 (use-package lsp-mode
   :hook ((rust-mode c-mode c++-mode) . lsp)
