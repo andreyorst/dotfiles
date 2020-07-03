@@ -1001,6 +1001,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
+  :hook (((clojure-mode clojurescript-mode) . flycheck-mode))
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
          ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
@@ -1047,9 +1048,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package flycheck-clj-kondo
   :if (executable-find "clj-kondo")
   :straight (:host github
-             :repo "borkdude/flycheck-clj-kondo")
-  :hook ((clojure-mode . flycheck-mode)
-         (clojure-mode . flycheck-clj-kondo-define-checkers)))
+             :repo "borkdude/flycheck-clj-kondo"))
+
+(use-package clj-refactor
+  :hook ((clojure-mode . clj-refactor-mode)
+         (clojure-mode . yas-minor-mode))
+  :config (cljr-add-keybindings-with-prefix "C-c C-r"))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
