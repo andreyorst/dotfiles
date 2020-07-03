@@ -1932,35 +1932,112 @@ configurations between projects and different editors.
     :config (editorconfig-mode 1))
 #+end_src
 
-** Flymake Mode
-This mode allows checking syntax in  the buffer.  I was using [[https://www.flycheck.org/en/latest/][Flycheck]]
-package  before,  but  I  don't   see  major  advantages  of  Flycheck
-supporting 50  languages versus  4 in Flymake  [[https://www.flycheck.org/en/latest/user/flycheck-versus-flymake.html#supported-languages][(1)]], because  I'm using
-language server protocol that integrates with Flymake, so as long as I
-have  server for  a  language, I  have support  for  this language  in
-Flymake.
-
-Also let's  use right  fringe for indication  of errors  and warnings,
-since it's never used, and left fringe is occupied by diff status.
-
-#+begin_src emacs-lisp
-  (use-package flymake
-    :straight nil
-    :custom
-    (flymake-fringe-indicator-position 'right-fringe)
-    :config
-    (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package flymake-quickdef)
-#+end_src
-
 ** Flycheck
 Some languages have better support with =flycheck=.
 
 #+begin_src emacs-lisp
-  (use-package flycheck)
+  (use-package flycheck
+    :bind (:map flycheck-mode-map
+           ("C-c ! C-h" . hydrant/flycheck/body))
+    :custom
+    (flycheck-indication-mode 'right-fringe)
+    :config
+    (when (fboundp 'define-fringe-bitmap)
+      (define-fringe-bitmap 'flycheck-double-exclamation-mark
+        (vector #b00000000
+                #b00000000
+                #b00000000
+                #b01100110
+                #b01100110
+                #b01100110
+                #b01100110
+                #b01100110
+                #b01100110
+                #b01100110
+                #b01100110
+                #b00000000
+                #b01100110
+                #b01100110
+                #b00000000
+                #b00000000
+                #b00000000))
+      (define-fringe-bitmap 'flycheck-exclamation-mark
+        (vector #b00000000
+                #b00000000
+                #b00000000
+                #b00011000
+                #b00011000
+                #b00011000
+                #b00011000
+                #b00011000
+                #b00011000
+                #b00011000
+                #b00011000
+                #b00000000
+                #b00011000
+                #b00011000
+                #b00000000
+                #b00000000
+                #b00000000))
+      (define-fringe-bitmap 'flycheck-question-mark
+        (vector #b00000000
+                #b00000000
+                #b00000000
+                #b00111100
+                #b01100110
+                #b01100110
+                #b01100110
+                #b00000110
+                #b00001100
+                #b00011000
+                #b00011000
+                #b00000000
+                #b00011000
+                #b00011000
+                #b00000000
+                #b00000000
+                #b00000000))
+      (flycheck-define-error-level 'error
+        :severity 100
+        :compilation-level 2
+        :overlay-category 'flycheck-error-overlay
+        :fringe-bitmap 'flycheck-double-exclamation-mark
+        :fringe-face 'flycheck-fringe-error
+        :error-list-face 'flycheck-error-list-error)
+      (flycheck-define-error-level 'warning
+        :severity 100
+        :compilation-level 1
+        :overlay-category 'flycheck-warning-overlay
+        :fringe-bitmap 'flycheck-exclamation-mark
+        :fringe-face 'flycheck-fringe-warning
+        :error-list-face 'flycheck-error-list-warning)
+      (flycheck-define-error-level 'info
+        :severity 100
+        :compilation-level 0
+        :overlay-category 'flycheck-info-overlay
+        :fringe-bitmap 'flycheck-question-mark
+        :fringe-face 'flycheck-fringe-info
+        :error-list-face 'flycheck-error-list-info))
+    (when (fboundp 'defhydra)
+      (defhydra hydrant/flycheck (:color blue :hint nil)
+        "
+   ^Flycheck^          ^Errors^            ^Checker^
+  ─^────────^──────────^──────^────────────^───────^─────
+   _q_: quit           _<_: previous       _?_: describe
+   _M_: manual         _>_: next           _d_: disable
+   _v_: verify setup   _f_: check          _m_: mode
+   ^ ^                 _l_: list           _s_: select"
+        ("q" ignore :exit t)
+        ("M" flycheck-manual)
+        ("v" flycheck-verify-setup)
+        ("<" flycheck-previous-error :color pink)
+        (">" flycheck-next-error :color pink)
+        ("f" flycheck-buffer)
+        ("l" flycheck-list-errors)
+        ("?" flycheck-describe-checker)
+        ("d" flycheck-disable-checker)
+        ("m" flycheck-mode)
+        ("s" flycheck-select-checker))))
 #+end_src
 
 ** Hydra
