@@ -12,7 +12,13 @@ pm_yay() {
     shift
     case "$cmd" in
         (install) yay -Sy "$@"                                                                              ;;
-        (update)  yay -Syyu --noconfirm --devel --nodiffmenu --noeditmenu --noupgrademenu --removemake "$@" ;;
+        (update)  yay -Syyu \
+                      --noconfirm \
+                      --devel \
+                      --nodiffmenu \
+                      --noeditmenu \
+                      --noupgrademenu \
+                      --removemake "$@" ;;
         (remove)  yay -Rsc "$@"                                                                             ;;
         (search)  yay -Ss "$@"                                                                              ;;
         (*)       yay "$cmd" "$@"                                                                           ;;
@@ -77,28 +83,15 @@ pm_rpm_ostree() {
     esac
 }
 
-if [ -n "${PATH##*termux*}" ]; then
-    pm_apt() {
-        cmd="$1"
-        shift
-        case "$cmd" in
-            (install) sudo apt install "$@" ;;
-            (update)  sudo apt update "$@"  ;;
-            (remove)  sudo apt remove "$@"  ;;
-            (search)  apt search "$@"       ;;
-            (*)       apt "$cmd" "$@"       ;;
-        esac
-    }
-else
-    pm_apt() {
-        cmd="$1"
-        shift
-        case "$cmd" in
-            (install) apt install "$@" ;;
-            (update)  apt update && apt upgrade "$@"  ;;
-            (remove)  apt remove "$@" ;;
-            (search)  apt search "$@" ;;
-            (*)       apt "$cmd" "$@" ;;
-        esac
-    }
-fi
+pm_apt() {
+    cmd="$1"
+    shift
+    case "$cmd" in
+        (install)     sudo apt install "$@"    ;;
+        (update)      sudo apt update "$@"     ;;
+        (remove)      sudo apt remove "$@"     ;;
+        (autoremove)  sudo apt autoremove "$@" ;;
+        (search)      apt search "$@"          ;;
+        (*)           sudo apt "$cmd" "$@"     ;;
+    esac
+}

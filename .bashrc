@@ -10,6 +10,15 @@ for i in $HOME/.dotfiles/scripts/*.sh; do
     . "$i"
 done
 
+
+if [ -z "${PATH##*termux*}" ]; then
+    # Termux doesn't require sudo
+    alias sudo=""
+else
+    # Hack to make sudo work with aliases
+    alias sudo="sudo "
+fi
+
 # place to install npm packages
 NPM_PACKAGES="${HOME}/.npm-packages"
 # Preserve MANPATH if you already defined it somewhere in your config.
