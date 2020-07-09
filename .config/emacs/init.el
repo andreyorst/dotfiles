@@ -1076,8 +1076,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight nil
   :custom (doc-view-resolution 192))
 
+(setq use-package-hook-name-suffix "-functions")
 (when (bound-and-true-p module-file-suffix)
-  (setq use-package-hook-name-suffix "-functions")
   (use-package vterm
     :bind (("C-`" . aorst/vterm-toggle)
            ("C-t" . aorst/vterm-focus))
@@ -1122,8 +1122,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           (aorst/vterm-toggle arg))))
     (defun aorst/kill-vterm (buf &optional event)
       "Kill the `*vterm*' buffer after shell exits."
-      (when buf (kill-buffer buf))))
-  (setq use-package-hook-name-suffix "-hook"))
+      (when buf (kill-buffer buf)))))
+(setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
   :commands editorconfig-mode
@@ -1240,7 +1240,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (when (bound-and-true-p module-file-suffix)
   (use-package parinfer-rust-mode
     :straight (:host github
-               :repo "justinbarclay/parinfer-rust-mode")
+               :repo "justinbarclay/parinfer-rust-mode"
+               :branch "amalgamate-undo")
     :hook ((clojure-mode
             emacs-lisp-mode
             common-lisp-mode

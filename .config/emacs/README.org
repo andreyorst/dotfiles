@@ -1872,8 +1872,8 @@ Emacs buffer. It works much better than =ansi-term=, though may be buggy
 and requires compilation.
 
 #+begin_src emacs-lisp
+  (setq use-package-hook-name-suffix "-functions")
   (when (bound-and-true-p module-file-suffix)
-    (setq use-package-hook-name-suffix "-functions")
     (use-package vterm
       :bind (("C-`" . aorst/vterm-toggle)
              ("C-t" . aorst/vterm-focus))
@@ -1918,8 +1918,8 @@ and requires compilation.
             (aorst/vterm-toggle arg))))
       (defun aorst/kill-vterm (buf &optional event)
         "Kill the `*vterm*' buffer after shell exits."
-        (when buf (kill-buffer buf))))
-    (setq use-package-hook-name-suffix "-hook"))
+        (when buf (kill-buffer buf)))))
+  (setq use-package-hook-name-suffix "-hook")
 #+end_src
 
 ** EditorConfig
@@ -2071,7 +2071,8 @@ development.
   (when (bound-and-true-p module-file-suffix)
     (use-package parinfer-rust-mode
       :straight (:host github
-                 :repo "justinbarclay/parinfer-rust-mode")
+                 :repo "justinbarclay/parinfer-rust-mode"
+                 :branch "amalgamate-undo")
       :hook ((clojure-mode
               emacs-lisp-mode
               common-lisp-mode
