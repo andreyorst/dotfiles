@@ -39,6 +39,8 @@
       x-gtk-resize-child-frames 'resize-mode)
 
 (defvar bootstrap-version)
+(defvar straight-repository-branch)
+(setq straight-repository-branch "develop")
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
