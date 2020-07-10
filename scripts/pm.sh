@@ -11,7 +11,6 @@ pm_yay() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) yay -Sy "$@"                                                                              ;;
         (update)  yay -Syyu \
                       --noconfirm \
                       --devel \
@@ -19,9 +18,10 @@ pm_yay() {
                       --noeditmenu \
                       --noupgrademenu \
                       --removemake "$@" ;;
-        (remove)  yay -Rsc "$@"                                                                             ;;
-        (search)  yay -Ss "$@"                                                                              ;;
-        (*)       yay "$cmd" "$@"                                                                           ;;
+        (install) yay -Sy "$@" ;;
+        (remove)  yay -Rsc "$@" ;;
+        (search)  yay -Ss "$@" ;;
+        (*)       yay "$cmd" "$@" ;;
     esac
 }
 
@@ -65,10 +65,10 @@ pm_yum() {
     shift
     case "$cmd" in
         (install) sudo yum install "$@" ;;
-        (update)  sudo yum update "$@"  ;;
-        (remove)  sudo yum remove "$@"  ;;
-        (search)  yum search "$@"       ;;
-        (*)       yum "$cmd" "$@"       ;;
+        (update)  sudo yum update "$@" ;;
+        (remove)  sudo yum remove "$@" ;;
+        (search)  yum search "$@" ;;
+        (*)       yum "$cmd" "$@" ;;
     esac
 }
 
@@ -78,8 +78,8 @@ pm_rpm_ostree() {
     case "$cmd" in
         (install) rpm-ostree install "$@" ;;
         (update)  rpm-ostree upgrade "$@" ;;
-        (remove)  rpm-ostree remove "$@"  ;;
-        (*)       rpm-ostree "$cmd" "$@"  ;;
+        (remove)  rpm-ostree remove "$@" ;;
+        (*)       rpm-ostree "$cmd" "$@" ;;
     esac
 }
 
@@ -87,11 +87,11 @@ pm_apt() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install)     sudo apt install "$@"    ;;
-        (update)      sudo apt update "$@"     ;;
-        (remove)      sudo apt remove "$@"     ;;
+        (install)     sudo apt install "$@" ;;
+        (update)      sudo apt update "$@" ;;
+        (remove)      sudo apt remove "$@" ;;
         (autoremove)  sudo apt autoremove "$@" ;;
-        (search)      apt search "$@"          ;;
-        (*)           sudo apt "$cmd" "$@"     ;;
+        (search)      apt search "$@" ;;
+        (*)           sudo apt "$cmd" "$@" ;;
     esac
 }
