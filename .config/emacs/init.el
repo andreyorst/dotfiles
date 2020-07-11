@@ -895,16 +895,16 @@ truncates text if needed.  Minimal width can be set with
   :bind (:map rust-mode-map
          ("C-c C-M-f" . rust-format-buffer)))
 
-(when (executable-find "racer")
-  (use-package racer
-    :hook (racer-mode . eldoc-mode)
-    :init (defun org-babel-edit-prep:rust (&optional _babel-info)
-            "Run racer mode for Org Babel."
-            (racer-mode 1))))
+(use-package racer
+  :if (executable-find "racer")
+  :hook (racer-mode . eldoc-mode)
+  :init (defun org-babel-edit-prep:rust (&optional _babel-info)
+          "Run racer mode for Org Babel."
+          (racer-mode 1)))
 
-(when (executable-find "cargo")
-  (use-package cargo
-    :hook ((rust-mode toml-mode) . cargo-minor-mode)))
+(use-package cargo
+  :if (executable-find "cargo")
+  :hook ((rust-mode toml-mode) . cargo-minor-mode))
 
 (use-package toml-mode
   :bind (:map toml-mode-map
@@ -1045,10 +1045,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (cider-repl-tab-command #'company-complete-common-or-cycle)
   (nrepl-hide-special-buffers t))
 
-(when (executable-find "clj-kondo")
-  (use-package flycheck-clj-kondo
-    :straight (:host github
-               :repo "borkdude/flycheck-clj-kondo")))
+(use-package flycheck-clj-kondo
+  :if (executable-find "clj-kondo")
+  :straight (:host github
+             :repo "borkdude/flycheck-clj-kondo"))
 
 (use-package clj-refactor
   :hook ((clojure-mode . clj-refactor-mode)
@@ -1275,7 +1275,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :commands ivy-mode
   :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
          (minibuffer-exit-hook . aorst/minibuffer-restore-garbage-collection))
-  :bind (("C-x b" . ivy-switch-buffer))
+  :bind (("C-x b" . ivy-switch-buffer)
+         ("C-x C-b" . ivy-switch-buffer))
   :custom
   (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-count-format "")
@@ -1312,8 +1313,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-h f" . counsel-describe-function)
          ("C-h C-f" . counsel-describe-face)
          ("C-h v" . counsel-describe-variable)
-         ("C-h l" . counsel-find-library)
-         ("C-x C-b" . counsel-switch-buffer))
+         ("C-h l" . counsel-find-library))
   :config
   (when (executable-find "fd")
     (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory))
@@ -1322,9 +1322,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
         (funcall foo))))
   (when (executable-find "rg")
     (setq counsel-rg-base-command
-          "rg -S --no-heading --hidden --line-number --color never %s .")
-    (setenv "FZF_DEFAULT_COMMAND"
-            "rg --files --hidden --follow --no-ignore --no-messages --glob '!.git/*' --glob '!.svn/*'")))
+          "rg -S --no-heading --hidden --line-number --color never %s .")))
 
 (use-package ivy-posframe
   :after ivy
