@@ -742,7 +742,7 @@ truncates text if needed.  Minimal width can be set with
                             :weight 'normal
                             :inherit nil
                             :box (list :line-width box-width :color bg))))
-
+    (setq tab-line-exclude-modes '())
     (dolist (mode '(ediff-mode
                     process-menu-mode
                     term-mode
