@@ -796,6 +796,11 @@ truncates text if needed.  Minimal width can be set with
   (org-log-done t)
   (org-agenda-files '("~/Tasks"))
   :config
+  (when (executable-find "gsettings")
+    (let ((font-scaling (string-to-number
+                         (shell-command-to-string "gsettings get org.gnome.desktop.interface text-scaling-factor"))))
+      (setq org-format-latex-options
+            (plist-put org-format-latex-options :scale font-scaling))))
   (use-package ox-latex
     :straight nil)
   (use-package ox-hugo
