@@ -90,6 +90,7 @@
 (use-package simple
   :straight nil
   :bind (("C-w" . aorst/kill-region-or-word)
+         ("C-x C-x" . aorst/exchange-point-and-mark)
          ("C-o" . aorst/newline-below)
          ("C-S-o" . aorst/newline-above)
          ("M-z" . zap-up-to-char)
@@ -102,6 +103,11 @@
              mark-active)
         (kill-region (region-beginning) (region-end))
       (backward-kill-word arg)))
+  (defun aorst/exchange-point-and-mark (arg)
+   (interactive "*p")
+   (when (and transient-mark-mode
+              mark-active)
+     (exchange-point-and-mark)))
   (defun aorst/newline-below ()
     (interactive)
     (end-of-line)
