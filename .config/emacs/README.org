@@ -1820,9 +1820,77 @@ complements the refactoring functionality from =clojure-mode= and CIDER.
 
 #+begin_src emacs-lisp
   (use-package clj-refactor
-    :hook ((clojure-mode . clj-refactor-mode)
-           (clojure-mode . yas-minor-mode))
-    :config (cljr-add-keybindings-with-prefix "C-c C-r"))
+    :hook ((cider-mode . clj-refactor-mode)
+           (cider-mode . yas-minor-mode))
+    :bind (:map cider-mode-map
+           ("C-c C-r" . hydrant/clj-refactor-menu/body))
+    :config
+    (when (fboundp 'defhydra)
+      (defhydra hydrant/clj-refactor-menu (:color blue :hint nil)
+        "
+   ^Add^                     ^Extract^       ^Clean^          ^Rename^      ^Unwind^
+   _ad_: declaration         _ec_: constant  _cp_: project    _rs_: symbol  _ua_: unwind all
+   _ai_: import to ns        _ed_: def       _cn_: namespace  _rf_: file    _uw_: unwind
+   _am_: missing-libspec     _ef_: function  ^  ^             ^  ^          ^  ^
+   _ap_: project-dependency  ^  ^            ^  ^             ^  ^          ^  ^
+   _au_: use-to-ns           ^Expand^        ^Cycle^          ^Remove^      ^Update^
+   _ar_: require-to-n        _el_: let       _ci_: if         _rl_: let     _ud_: dependencies
+   _as_: stubs               ^  ^            _cp_: privacy
+   ^  ^                      ^  ^            ^  ^             ^Require^     ^Hotload^
+   ^  ^                      ^  ^            ^  ^             _rm_: macro   _hd_: dependency
+
+   ^Uncategorized^            ^Misc^                      ^Thread^
+   _pf_: promote fn           _q_:  exit                  _tf_: thread first all
+   _mf_: move form            _?_:  describe refactoring  _th_: thread
+   _ml_: move to let          _sc_: show changelog        _tl_: thread last all
+   _il_: introduce let        _sp_: sort project deps     _ct_: cycle thread
+   _is_: inline symbol        _sr_: stop referring        ^  ^
+   _fe_: fn from example
+   _fu_: find usages
+   _dk_: destructure keys
+   _cs_: change fn signature
+  "
+        ("pf" cljr-promote-function)
+        ("mf" cljr-move-form)
+        ("ml" cljr-move-to-let)
+        ("il" cljr-introduce-let)
+        ("is" cljr-inline-symbol)
+        ("fe" cljr-create-fn-from-example)
+        ("fu" cljr-find-usages)
+        ("dk" cljr-destructure-keys)
+        ("cs" cljr-change-function-signature)
+        ("?"  cljr-describe-refactoring)
+        ("q"  ignore :exit t)
+        ("cp" cljr-project-clean)
+        ("cn" cljr-clean-ns)
+        ("ad" cljr-add-declaration)
+        ("ai" cljr-add-import-to-ns)
+        ("am" cljr-add-missing-libspec)
+        ("ap" cljr-add-project-dependency)
+        ("ar" cljr-add-require-to-ns)
+        ("as" cljr-add-stubs)
+        ("au" cljr-add-use-to-ns)
+        ("ec" cljr-extract-constant)
+        ("ed" cljr-extract-def)
+        ("ef" cljr-extract-function)
+        ("el" cljr-expand-let)
+        ("hd" cljr-hotload-dependency)
+        ("ua" clojure-unwind-all)
+        ("ud" cljr-update-project-dependencies)
+        ("uw" clojure-unwind)
+        ("tf" clojure-thread-first-all)
+        ("th" clojure-thread)
+        ("tl" clojure-thread-last-all)
+        ("sc" cljr-show-changelog)
+        ("sp" cljr-sort-project-dependencies)
+        ("sr" cljr-stop-referring)
+        ("ci" clojure-cycle-if)
+        ("cp" clojure-cycle-privacy)
+        ("ct" cljr-cycle-thread)
+        ("rf" cljr-rename-file-or-dir)
+        ("rl" cljr-remove-let)
+        ("rm" cljr-require-macro)
+        ("rs" cljr-rename-symbol))))
 #+end_src
 
 ** Fennel
@@ -2356,7 +2424,6 @@ guess I'll figure out best mappings over time.
            ("C-c m" . hydrant/mc/body)
            :map mc/keymap
            ("<return>" . nil))
-    :requires hydra
     :config
     (when (fboundp 'defhydra)
       (defhydra hydrant/mc (:hint nil :color pink)
@@ -2394,7 +2461,6 @@ languages that I work with inside Emacs.
 #+begin_src emacs-lisp
   (use-package expand-region
     :bind (("C-c e" . hydrant/er/body))
-    :requires hydra
     :config
     (when (fboundp 'defhydra)
       (defhydra hydrant/er (:color pink :hint nil)
