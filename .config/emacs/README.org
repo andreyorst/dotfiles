@@ -2153,7 +2153,7 @@ development.
     (use-package parinfer-rust-mode
       :straight (:host github
                  :repo "justinbarclay/parinfer-rust-mode"
-                 :branch "amalgamate-undo")
+                 :branch "master")
       :hook ((clojure-mode
               emacs-lisp-mode
               common-lisp-mode

@@ -1320,7 +1320,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (use-package parinfer-rust-mode
     :straight (:host github
                :repo "justinbarclay/parinfer-rust-mode"
-               :branch "amalgamate-undo")
+               :branch "master")
     :hook ((clojure-mode
             emacs-lisp-mode
             common-lisp-mode
