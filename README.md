@@ -1,11 +1,6 @@
 # .dotfiles
-I really love to configure text editors.  [Kakoune][1] and [Emacs][2]
-configurations are stored in this repository. There also was NeoVim config, but
-since I'm no longer using and maintaining its configuration, it was removed. If
-you're interested in it, you can browse the repository at [this commit][3].
-
-Also includes settings for Termite, Tmux, and other misc stuff, that is usual
-for Linux.
+This repository is mostly for maintaining my [Emacs][1] configuration, although
+it includes some useful scripts and settings for different Linux related tools.
 
 ## Structure
 The structure of this repository is pretty simple. Each directory that is named
@@ -41,6 +36,4 @@ These directories and files should be excluded from copying or sym-linking:
   configuration files will be visible to git. Only files that inside this
   directory should be copied or sym-linked.
 
-[1]: .config/kak
-[2]: .config/emacs
-[3]: https://github.com/andreyorst/dotfiles/tree/58b56c0b7b2ff255b6cebf3ef1300bb632444155/.config/nvim
+[1]: .config/emacs

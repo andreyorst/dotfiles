@@ -1,3 +1,0 @@
-// clang-format off
-tos("$1"); ton($2); tos(${3:endl});$0
-// clang-format on
