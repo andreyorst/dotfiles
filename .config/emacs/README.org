@@ -1797,6 +1797,8 @@ Clojure and ClojureScript.
                                         :style nil)))))
     (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
     :custom
+    (cider-prompt-for-symbol nil)
+    (nrepl-log-messages nil)
     (cider-repl-display-help-banner nil)
     (cider-repl-tab-command #'company-complete-common-or-cycle)
     (nrepl-hide-special-buffers t))

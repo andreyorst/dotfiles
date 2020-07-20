@@ -1052,6 +1052,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                       :style nil)))))
   (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
   :custom
+  (cider-prompt-for-symbol nil)
+  (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)
   (cider-repl-tab-command #'company-complete-common-or-cycle)
   (nrepl-hide-special-buffers t))
