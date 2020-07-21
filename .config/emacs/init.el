@@ -1302,8 +1302,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
             lisp-mode
             racket-mode
             fennel-mode) . parinfer-rust-mode)
-    :custom (parinfer-rust-check-before-enable 'immediate)
     :config
+    (setq-local parinfer-rust-check-before-enable (if buffer-read-only 'defer 'immediate))
     (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
     :init
     (setq parinfer-rust-auto-download t)))
