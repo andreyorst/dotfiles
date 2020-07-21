@@ -29,8 +29,6 @@
 (setq initial-frame-alist '((width . 170)
                             (height . 56)
                             (tool-bar-lines . 0)
-                            (left-fringe . 0)
-                            (right-fringe . 0)
                             (bottom-divider-width . 0)
                             (right-divider-width . 1))
       default-frame-alist initial-frame-alist)

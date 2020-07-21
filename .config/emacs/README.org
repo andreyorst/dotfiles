@@ -136,8 +136,6 @@ early.
   (setq initial-frame-alist '((width . 170)
                               (height . 56)
                               (tool-bar-lines . 0)
-                              (left-fringe . 0)
-                              (right-fringe . 0)
                               (bottom-divider-width . 0)
                               (right-divider-width . 1))
         default-frame-alist initial-frame-alist)
@@ -579,26 +577,6 @@ file-visiting while not visiting a particular file, like =*scratch*=
           (string-match-p "*eww*" buffer-name))))
 #+end_src
 
-** =real-buffer-setup=
-If only  certain buffers  could +be so  grossly incandescent+  *have damn
-fringes!* With Solaire Mode Emacs becomes way more like true GUI editor
-with actual elements of user interface represented by different color,
-but  these fringes  drive me  crazy.  That's  why I  wrote a  function
-=aorst/real-buffer-setup=, that enables fringes only in buffers that are
-affected by Solaire Mode:
-
-#+begin_src emacs-lisp
-  (defun aorst/real-buffer-setup (&rest _)
-    "Wrapper around `set-window-fringes' function."
-    (when window-system
-      (let* ((window (selected-window))
-             (buffer (window-buffer window)))
-        (when (aorst/real-buffer-p buffer)
-          (set-window-fringes window 8 8 t)
-          (when (bound-and-true-p desktop-save-mode)
-            (setq desktop-save-buffer t))))))
-#+end_src
-
 ** =kill-when-no-processes=
 This function  kills buffer which used  to have active process  but it
 was killed. Should be used via hook or advice.
@@ -748,29 +726,6 @@ package, which defines colors for pretty much everything in Emacs.
                         :foreground 'unspecified
                         :distant-foreground 'unspecified
                         :background 'unspecified))
-#+end_src
-
-** Fringe
-I want fringes  to appear only in certain buffers  where I really need
-them, so let's  disable it entirely on startup and  set them with some
-hooks later.  But this adds another problem.  Emacs displays =$= sign at
-the end of the  window if line is being truncated. Damn,  why it is so
-hard  to  make  it  work  how  I want..   And  you  can't  simply  set
-=standard-display-table= slot to empty space,  because it isn't ready on
-Emacs init.
-
-#+begin_src emacs-lisp
-  (when window-system
-    (use-package fringe
-      :straight nil
-      :hook ((buffer-list-update
-              window-configuration-change
-              change-major-mode) . aorst/real-buffer-setup)
-      :init
-      (fringe-mode 0)
-      (or standard-display-table
-          (setq standard-display-table (make-display-table)))
-      (set-display-table-slot standard-display-table 0 ?\s)))
 #+end_src
 
 ** Solaire Mode
@@ -968,7 +923,7 @@ that Treemacs will look just as great as DOOM themed Emacs!
              (treemacs-switch-workspace . treemacs-set-fallback-workspace)
              (treemacs-mode . aorst/treemacs-setup-title))
       :custom
-      (treemacs-width 34)
+      (treemacs-width 32)
       (treemacs-is-never-other-window t)
       (treemacs-space-between-root-nodes nil)
       (treemacs-indentation 2)
@@ -976,7 +931,7 @@ that Treemacs will look just as great as DOOM themed Emacs!
       (use-package treemacs-magit)
       (treemacs-follow-mode t)
       (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode nil)
+      (treemacs-fringe-indicator-mode t)
       (set-face-attribute 'treemacs-root-face nil
                           :foreground (face-attribute 'default :foreground)
                           :height 1.0
@@ -1195,13 +1150,7 @@ that Treemacs will look just as great as DOOM themed Emacs!
               line-spacing 5)
         (setq-local scroll-step 1)
         (setq-local scroll-conservatively 10000)
-        (set-window-fringes nil 0 0 t)
         (aorst/treemacs-variable-pitch-labels))
-      (defun aorst/treemacs-setup-fringes ()
-        "Set treemacs buffer fringes."
-        (set-window-fringes nil 0 0 t)
-        (aorst/treemacs-variable-pitch-labels))
-      (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
       (defun aorst/treemacs-setup-title ()
         (let ((bg (face-attribute 'default :background))
               (fg (face-attribute 'default :foreground)))
@@ -2813,8 +2762,7 @@ separate buffers.
 
 #+begin_src emacs-lisp
   (use-package edit-indirect
-    :hook ((edit-indirect-after-creation . aorst/real-buffer-setup)
-           (edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
+    :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
     :bind (:map edit-indirect-mode-map
            ("C-c C-c" . edit-indirect-commit)
            ("C-c C-k" . edit-indirect-abort)

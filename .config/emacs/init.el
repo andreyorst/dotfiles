@@ -131,16 +131,6 @@
         (string-match-p "\*Org Src .*\*" buffer-name)
         (string-match-p "*eww*" buffer-name))))
 
-(defun aorst/real-buffer-setup (&rest _)
-  "Wrapper around `set-window-fringes' function."
-  (when window-system
-    (let* ((window (selected-window))
-           (buffer (window-buffer window)))
-      (when (aorst/real-buffer-p buffer)
-        (set-window-fringes window 8 8 t)
-        (when (bound-and-true-p desktop-save-mode)
-          (setq desktop-save-buffer t))))))
-
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
   (when (null (get-buffer-process (current-buffer)))
@@ -220,18 +210,6 @@ are defining or executing a macro."
                       :foreground 'unspecified
                       :distant-foreground 'unspecified
                       :background 'unspecified))
-
-(when window-system
-  (use-package fringe
-    :straight nil
-    :hook ((buffer-list-update
-            window-configuration-change
-            change-major-mode) . aorst/real-buffer-setup)
-    :init
-    (fringe-mode 0)
-    (or standard-display-table
-        (setq standard-display-table (make-display-table)))
-    (set-display-table-slot standard-display-table 0 ?\s)))
 
 (use-package solaire-mode
   :straight (:host github
@@ -362,7 +340,7 @@ are defining or executing a macro."
            (treemacs-switch-workspace . treemacs-set-fallback-workspace)
            (treemacs-mode . aorst/treemacs-setup-title))
     :custom
-    (treemacs-width 34)
+    (treemacs-width 32)
     (treemacs-is-never-other-window t)
     (treemacs-space-between-root-nodes nil)
     (treemacs-indentation 2)
@@ -370,7 +348,7 @@ are defining or executing a macro."
     (use-package treemacs-magit)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode nil)
+    (treemacs-fringe-indicator-mode t)
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (face-attribute 'default :foreground)
                         :height 1.0
@@ -589,13 +567,7 @@ are defining or executing a macro."
             line-spacing 5)
       (setq-local scroll-step 1)
       (setq-local scroll-conservatively 10000)
-      (set-window-fringes nil 0 0 t)
       (aorst/treemacs-variable-pitch-labels))
-    (defun aorst/treemacs-setup-fringes ()
-      "Set treemacs buffer fringes."
-      (set-window-fringes nil 0 0 t)
-      (aorst/treemacs-variable-pitch-labels))
-    (advice-add #'treemacs-select-window :after #'aorst/treemacs-setup-fringes)
     (defun aorst/treemacs-setup-title ()
       (let ((bg (face-attribute 'default :background))
             (fg (face-attribute 'default :foreground)))
@@ -1734,8 +1706,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
         (message "No desktop found.")))))
 
 (use-package edit-indirect
-  :hook ((edit-indirect-after-creation . aorst/real-buffer-setup)
-         (edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
+  :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
   :bind (:map edit-indirect-mode-map
          ("C-c C-c" . edit-indirect-commit)
          ("C-c C-k" . edit-indirect-abort)
