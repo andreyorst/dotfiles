@@ -2163,7 +2163,6 @@ development.
               racket-mode
               fennel-mode) . parinfer-rust-mode)
       :config
-      (setq-local parinfer-rust-check-before-enable (if buffer-read-only 'defer 'immediate))
       (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
       :init
       (setq parinfer-rust-auto-download t)))
