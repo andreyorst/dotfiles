@@ -189,10 +189,47 @@ are defining or executing a macro."
   (setq-default cursor-type 'bar
                 cursor-in-non-selected-windows nil))
 
-(cond ((aorst/font-installed-p "Hack")
+(cond ((aorst/font-installed-p "JetBrainsMono")
+       (set-face-attribute 'default nil :font "JetBrainsMono 10"))
+      ((aorst/font-installed-p "Hack")
        (set-face-attribute 'default nil :font "Hack 10"))
       ((aorst/font-installed-p "Source Code Pro")
        (set-face-attribute 'default nil :font "Source Code Pro 10")))
+
+(when (aorst/font-installed-p "JetBrainsMono")
+  (let ((ligatures `((?-  . ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
+                     (?/  . ,(regexp-opt '("/**" "/*" "///" "/=" "/==" "/>" "//")))
+                     (?*  . ,(regexp-opt '("*>" "***" "*/")))
+                     (?<  . ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||::=" "<|>" "<:" "<>" "<-<"
+                                           "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
+                                           "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
+                     (?:  . ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=")))
+                     (?=  . ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
+                     (?!  . ,(regexp-opt '("!==" "!!" "!=")))
+                     (?>  . ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
+                     (?&  . ,(regexp-opt '("&&&" "&&")))
+                     (?|  . ,(regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")))
+                     (?.  . ,(regexp-opt '(".." ".?" ".=" ".-" "..<" "...")))
+                     (?+  . ,(regexp-opt '("+++" "+>" "++")))
+                     (?\[ . ,(regexp-opt '("[||]" "[<" "[|")))
+                     (?\{ . ,(regexp-opt '("{|")))
+                     (?\? . ,(regexp-opt '("??" "?." "?=" "?:")))
+                     (?#  . ,(regexp-opt '("####" "###" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" "##")))
+                     (?\; . ,(regexp-opt '(";;")))
+                     (?_  . ,(regexp-opt '("_|_" "__")))
+                     (?\\ . ,(regexp-opt '("\\" "\\/")))
+                     (?~  . ,(regexp-opt '("~~" "~~>" "~>" "~=" "~-" "~@")))
+                     (?$  . ,(regexp-opt '("$>")))
+                     (?^  . ,(regexp-opt '("^=")))
+                     (?\] . ,(regexp-opt '("]#"))))))
+    (dolist (char-regexp ligatures)
+      (set-char-table-range composition-function-table (car char-regexp)
+                            `([,(cdr char-regexp) 0 font-shape-gstring])))))
+
+(use-package composite
+  :straight nil
+  :hook (prog-mode . auto-composition-mode)
+  :init (global-auto-composition-mode -1))
 
 (use-package all-the-icons
   :config

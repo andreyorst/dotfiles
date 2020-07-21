@@ -688,10 +688,60 @@ styles like *bold*, /italics/ for not only Latin languages. If =Hack= is not
 found we try =Source Code Pro= as a fallback option.
 
 #+begin_src emacs-lisp
-  (cond ((aorst/font-installed-p "Hack")
+  (cond ((aorst/font-installed-p "JetBrainsMono")
+         (set-face-attribute 'default nil :font "JetBrainsMono 10"))
+        ((aorst/font-installed-p "Hack")
          (set-face-attribute 'default nil :font "Hack 10"))
         ((aorst/font-installed-p "Source Code Pro")
          (set-face-attribute 'default nil :font "Source Code Pro 10")))
+#+end_src
+
+*** Ligatures
+I'd like to try out programming ligatures, but unfortunately Emacs has
+quite poor support for ligatures  OOTB. However, with the inclusion of
+[[https://github.com/harfbuzz/harfbuzz][HarfBuzz]],  it is  possible  to use  =auto-composition-mode=, with  these
+settings:
+
+#+begin_src emacs-lisp
+  (when (aorst/font-installed-p "JetBrainsMono")
+    (let ((ligatures `((?-  . ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
+                       (?/  . ,(regexp-opt '("/**" "/*" "///" "/=" "/==" "/>" "//")))
+                       (?*  . ,(regexp-opt '("*>" "***" "*/")))
+                       (?<  . ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||::=" "<|>" "<:" "<>" "<-<"
+                                             "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
+                                             "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
+                       (?:  . ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=")))
+                       (?=  . ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
+                       (?!  . ,(regexp-opt '("!==" "!!" "!=")))
+                       (?>  . ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
+                       (?&  . ,(regexp-opt '("&&&" "&&")))
+                       (?|  . ,(regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")))
+                       (?.  . ,(regexp-opt '(".." ".?" ".=" ".-" "..<" "...")))
+                       (?+  . ,(regexp-opt '("+++" "+>" "++")))
+                       (?\[ . ,(regexp-opt '("[||]" "[<" "[|")))
+                       (?\{ . ,(regexp-opt '("{|")))
+                       (?\? . ,(regexp-opt '("??" "?." "?=" "?:")))
+                       (?#  . ,(regexp-opt '("####" "###" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" "##")))
+                       (?\; . ,(regexp-opt '(";;")))
+                       (?_  . ,(regexp-opt '("_|_" "__")))
+                       (?\\ . ,(regexp-opt '("\\" "\\/")))
+                       (?~  . ,(regexp-opt '("~~" "~~>" "~>" "~=" "~-" "~@")))
+                       (?$  . ,(regexp-opt '("$>")))
+                       (?^  . ,(regexp-opt '("^=")))
+                       (?\] . ,(regexp-opt '("]#"))))))
+      (dolist (char-regexp ligatures)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
+#+end_src
+
+Although I  don't need  =auto-composition-mode= on  for all  buffers, so
+let's disable it, and enable manually later:
+
+#+begin_src emacs-lisp
+  (use-package composite
+    :straight nil
+    :hook (prog-mode . auto-composition-mode)
+    :init (global-auto-composition-mode -1))
 #+end_src
 
 ** Icons
