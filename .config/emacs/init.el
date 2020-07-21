@@ -1738,5 +1738,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\"))
 
+(use-package smooth-scroll
+  :config
+  (smooth-scroll-mode)
+  (setq smooth-scroll/vscroll-step-size 10)
+  (setq smooth-scroll/hscroll-step-size 4))
+
 (provide 'init)
 ;;; init.el ends here

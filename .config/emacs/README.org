@@ -2806,6 +2806,18 @@ Settings to =recentf= mode.
     (add-to-list 'recentf-exclude "\\.gpg\\"))
 #+end_src
 
+** Smooth Scroll
+This minor  mode provides a nice  way of having fake  smooth scrolling
+that helps seeing where
+
+#+begin_src emacs-lisp
+(use-package smooth-scroll
+  :config
+  (smooth-scroll-mode)
+  (setq smooth-scroll/vscroll-step-size 10)
+  (setq smooth-scroll/hscroll-step-size 4))
+#+end_src
+
 * Postscript
 This Emacs Configuration features  various cool E-Lisp hacks somewhere
 that I've  found over the  Internet, and I  try to keep  references to
