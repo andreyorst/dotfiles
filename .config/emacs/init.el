@@ -1320,7 +1320,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (defhydra hydrant/flycheck (:color blue :hint nil)
       "
  ^Flycheck^          ^Errors^            ^Checker^
-─^────────^──────────^──────^────────────^───────^─────
  _q_: quit           _<_: previous       _?_: describe
  _M_: manual         _>_: next           _d_: disable
  _v_: verify setup   _f_: check          _m_: mode
@@ -1543,7 +1542,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (defhydra hydrant/mc (:hint nil :color pink)
       "
  ^Select^                 ^Discard^                      ^Edit^               ^Navigate^
-─^──────^─────────────────^───────^──────────────────────^────^───────────────^────────^─────────
  _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
  _s_:   select regexp     _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
  _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
@@ -1574,7 +1572,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (defhydra hydrant/er (:color pink :hint nil)
       "
  ^Expand/Discard^                ^Mark^
-─^──────────────^────────────────^────^─────────────────
  _e_ or _+_: expand region         _(_:      inside pairs
  _r_ or _-_: reduce region         _)_:      around pairs
  _g_:      exit hydrant          _q_ or _'_: inside quotes
@@ -1618,7 +1615,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (defhydra hydrant/iedit (:hint nil :color pink)
       "
  ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
-─^──────^──────────────────^───────^───────────────────^────^───────────────^────────^─────────────
  _n_: next occurrence      _M-SPC_:  toggle selection  _u_: uppercase       _(_: previous selection
  _p_: previous occurrence  _q_ or _g_: exit hydrant      _d_: downcase        _)_: next selection
  ^ ^                       _G_:      exit iedit-mode   _#_: insert numbers
