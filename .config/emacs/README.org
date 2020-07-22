@@ -2443,13 +2443,17 @@ isn't much like Kakoune's multiple selections, but anything will do. I
 guess I'll figure out best mappings over time.
 
 #+begin_src emacs-lisp
+  (use-package phi-search)
+  (use-package mc-extras)
   (use-package multiple-cursors
     :commands (mc/cycle-backward
                mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
            ("C-c m" . hydrant/mc/body)
            :map mc/keymap
-           ("<return>" . nil))
+           ("<return>" . nil)
+           ("C-s" . phi-search)
+           ("C-r" . phi-search-backward))
     :config
     (when (fboundp 'defhydra)
       (defhydra hydrant/mc (:hint nil :color pink)
@@ -2475,8 +2479,6 @@ guess I'll figure out best mappings over time.
         ("q" mc/remove-duplicated-cursors :exit t)
         ("g" mc/remove-duplicated-cursors :exit t)
         ("G" mc/keyboard-quit :exit t))))
-
-  (use-package mc-extras)
 #+end_src
 
 ** Expand Region

@@ -1530,13 +1530,17 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (defun aorst/ediff-setup-keys ()
     (define-key ediff-mode-map "d" #'aorst/ediff-copy-both-to-C)))
 
+(use-package phi-search)
+(use-package mc-extras)
 (use-package multiple-cursors
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c m" . hydrant/mc/body)
          :map mc/keymap
-         ("<return>" . nil))
+         ("<return>" . nil)
+         ("C-s" . phi-search)
+         ("C-r" . phi-search-backward))
   :config
   (when (fboundp 'defhydra)
     (defhydra hydrant/mc (:hint nil :color pink)
@@ -1562,8 +1566,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       ("q" mc/remove-duplicated-cursors :exit t)
       ("g" mc/remove-duplicated-cursors :exit t)
       ("G" mc/keyboard-quit :exit t))))
-
-(use-package mc-extras)
 
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
