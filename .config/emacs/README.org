@@ -547,6 +547,13 @@ Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
       (indent-according-to-mode)))
 #+end_src
 
+** Line truncation
+Let's disable line wrapping by default, unless I need it:
+
+#+begin_src emacs-lisp
+  (setq-default truncate-lines t)
+#+end_src
+
 * Functions
 This  section  describes  functions  I have  defined  for  use  inside
 configurations  of various  packages, that  are general  enough to  be

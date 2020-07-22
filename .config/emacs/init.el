@@ -119,6 +119,8 @@
     (forward-line -1)
     (indent-according-to-mode)))
 
+(setq-default truncate-lines t)
+
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
   (let ((buffer-name (buffer-name buffer)))
