@@ -1807,6 +1807,11 @@ Clojure and ClojureScript.
                                         :style nil)))))
     (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
     :custom
+    (cider-jdk-src-paths (cond ((file-exists-p "/etc/alternatives/java_sdk_openjdk/src.zip")
+                                '("/etc/alternatives/java_sdk_openjdk/src.zip"))
+                               ((file-exists-p "/etc/alternatives/java_sdk_openjdk/lib/src.zip")
+                                '("/etc/alternatives/java_sdk_openjdk/lib/src.zip"))
+                               (t nil)))
     (cider-prompt-for-symbol nil)
     (nrepl-log-messages nil)
     (cider-repl-display-help-banner nil)
@@ -1934,6 +1939,16 @@ produces I need support for Lua.
     :straight nil
     :custom
     (css-indent-offset 2))
+#+end_src
+
+** Java
+Support for Java  is inbuilt, but to use Java  Language Server we need
+this package:
+
+#+begin_src emacs-lisp
+  (use-package lsp-java
+    :requires lsp-mode
+    :hook (java-mode . lsp))
 #+end_src
 
 * Tools
@@ -2556,7 +2571,7 @@ though, as multiple cursor some times looses cursors for some reason.
 #+end_src
 
 ** LSP Mode
-Another LSP client for Emacs.
+LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
@@ -2589,6 +2604,13 @@ Another LSP client for Emacs.
         (unless (eq this-command 'aorst/escape)
           (funcall foo))))
     (lsp-ui-mode))
+#+end_src
+
+** DAP Mode
+Debug Adapter Protocol support for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package dap-mode)
 #+end_src
 
 ** Project

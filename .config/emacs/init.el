@@ -1067,6 +1067,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                       :style nil)))))
   (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
   :custom
+  (cider-jdk-src-paths (cond ((file-exists-p "/etc/alternatives/java_sdk_openjdk/src.zip")
+                              '("/etc/alternatives/java_sdk_openjdk/src.zip"))
+                             ((file-exists-p "/etc/alternatives/java_sdk_openjdk/lib/src.zip")
+                              '("/etc/alternatives/java_sdk_openjdk/lib/src.zip"))
+                             (t nil)))
   (cider-prompt-for-symbol nil)
   (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)
@@ -1163,6 +1168,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight nil
   :custom
   (css-indent-offset 2))
+
+(use-package lsp-java
+  :requires lsp-mode
+  :hook (java-mode . lsp))
 
 (use-package help
   :straight nil
@@ -1661,6 +1670,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
   (lsp-ui-mode))
+
+(use-package dap-mode)
 
 (use-package project
   :straight nil
