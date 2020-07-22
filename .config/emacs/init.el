@@ -380,6 +380,8 @@ are defining or executing a macro."
            (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
            (treemacs-switch-workspace . treemacs-set-fallback-workspace)
            (treemacs-mode . aorst/treemacs-setup-title))
+    :custom-face
+    (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
     :custom
     (treemacs-width 32)
     (treemacs-is-never-other-window t)
