@@ -200,12 +200,12 @@ are defining or executing a macro."
 
 (when (aorst/font-installed-p "JetBrainsMono")
   (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
-                     (?/  ,(regexp-opt '("/**" "/*" "///" "/=" "/==" "/>" "//")))
+                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/**" "/*"
                      (?*  ,(regexp-opt '("*>"))) ;; "***" "*/"
-                     (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||::=" "<|>" "<:" "<>" "<-<"
+                     (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
                                            "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
                                            "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
-                     (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=")))
+                     (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
                      (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
                      (?!  ,(regexp-opt '("!==" "!!" "!=")))
                      (?>  ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
@@ -219,7 +219,7 @@ are defining or executing a macro."
                      (?#  ,(regexp-opt '("####" "###" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" "##")))
                      (?\; ,(regexp-opt '(";;")))
                      (?_  ,(regexp-opt '("_|_" "__")))
-                     (?\\ ,(regexp-opt '("\\" "\\/")))
+                     ;; (?\\ ,(regexp-opt '("\\" "\\/")))
                      (?~  ,(regexp-opt '("~~" "~~>" "~>" "~=" "~-" "~@")))
                      (?$  ,(regexp-opt '("$>")))
                      (?^  ,(regexp-opt '("^=")))
@@ -1353,7 +1353,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
             lisp-mode
             racket-mode
             fennel-mode) . parinfer-rust-mode)
-    :custom (parinfer-rust-check-before-enable 'immediate)
+    :custom (parinfer-rust-check-before-enable 'defer)
     :config
     (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
     :init
