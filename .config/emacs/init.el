@@ -200,7 +200,7 @@ are defining or executing a macro."
 
 (when (aorst/font-installed-p "JetBrainsMono")
   (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
-                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/**" "/*"
+                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
                      (?*  ,(regexp-opt '("*>"))) ;; "***" "*/"
                      (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
                                            "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
@@ -219,15 +219,15 @@ are defining or executing a macro."
                      (?#  ,(regexp-opt '("####" "###" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" "##")))
                      (?\; ,(regexp-opt '(";;")))
                      (?_  ,(regexp-opt '("_|_" "__")))
-                     ;; (?\\ ,(regexp-opt '("\\" "\\/")))
-                     (?~  ,(regexp-opt '("~~" "~~>" "~>" "~=" "~-" "~@")))
+                     (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
                      (?$  ,(regexp-opt '("$>")))
                      (?^  ,(regexp-opt '("^=")))
                      (?\] ,(regexp-opt '("]#"))))))
     (dolist (char-regexp ligatures)
-      (apply (lambda (char regexp) (set-char-table-range
-                                    composition-function-table
-                                    char `([,regexp 0 font-shape-gstring])))
+      (apply (lambda (char regexp)
+               (set-char-table-range
+                composition-function-table
+                char `([,regexp 0 font-shape-gstring])))
              char-regexp))))
 
 (use-package composite
