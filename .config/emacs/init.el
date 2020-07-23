@@ -245,12 +245,12 @@ are defining or executing a macro."
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
+  :custom-face
+  (highlight ((t (:foreground unspecified
+                  :distant-foreground unspecified
+                  :background unspecified))))
   :config
-  (load-theme 'doom-one t)
-  (set-face-attribute 'highlight nil
-                      :foreground 'unspecified
-                      :distant-foreground 'unspecified
-                      :background 'unspecified))
+  (load-theme 'doom-one t))
 
 (use-package solaire-mode
   :straight (:host github
@@ -292,8 +292,8 @@ are defining or executing a macro."
   (doom-modeline-bar-width 3)
   (doom-modeline-major-mode-color-icon nil)
   (doom-modeline-buffer-color-icon nil)
-  (doom-modeline-buffer-file-name-style 'relative-from-project)
-  (doom-modeline-minor-modes t)
+  (doom-modeline-buffer-file-name-style 'name)
+  (doom-modeline-minor-modes nil)
   (doom-modeline-height (floor (* (line-pixel-height) 1.8)))
   (find-file-visit-truename t)
   :config
