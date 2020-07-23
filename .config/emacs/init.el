@@ -1067,16 +1067,16 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                       :style nil)))))
   (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
   :custom
-  (cider-jdk-src-paths (cond ((file-exists-p "/etc/alternatives/java_sdk_openjdk/src.zip")
-                              '("/etc/alternatives/java_sdk_openjdk/src.zip"))
-                             ((file-exists-p "/etc/alternatives/java_sdk_openjdk/lib/src.zip")
-                              '("/etc/alternatives/java_sdk_openjdk/lib/src.zip"))
-                             (t nil)))
-  (cider-prompt-for-symbol nil)
   (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)
   (cider-repl-tab-command #'company-complete-common-or-cycle)
-  (nrepl-hide-special-buffers t))
+  (nrepl-hide-special-buffers t)
+  :config
+  (setq cider-jdk-src-paths nil)
+  (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
+    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip"))
+  (when (file-exists-p "/usr/lib/jvm/java-11-openjdk/lib/src.zip")
+    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip")))
 
 (use-package flycheck-clj-kondo
   :if (executable-find "clj-kondo")
@@ -1169,9 +1169,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom
   (css-indent-offset 2))
 
-(use-package lsp-java
-  :requires lsp-mode
-  :hook (java-mode . lsp))
+(use-package lsp-java)
 
 (use-package help
   :straight nil
@@ -1642,7 +1640,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
         (hydrant/iedit/body)))))
 
 (use-package lsp-mode
-  :hook ((rust-mode c-mode c++-mode) . lsp)
+  :hook ((rust-mode c-mode c++-mode java-mode) . lsp)
+  :custom-face
+  (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
   :custom
   (lsp-enable-links nil)
   (lsp-keymap-prefix "C-c l")
