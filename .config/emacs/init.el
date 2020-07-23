@@ -267,25 +267,24 @@ are defining or executing a macro."
   :custom
   (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   :config
-  (solaire-mode-swap-bg)
+  (solaire-global-mode 1)
+
   (with-no-warnings
     (if (boundp 'after-focus-change-function)
         (add-function :after after-focus-change-function #'solaire-mode-reset)
       (add-hook 'focus-in-hook  #'solaire-mode-reset)))
   (defun aorst/create-image-with-background-color (args)
     "Specify background color of Org-mode inline image through modify `ARGS'."
-    (let* ((file (car args))
-           (type (cadr args))
-           (data-p (caddr args))
-           (props (cdddr args)))
-      ;; get this return result style from `create-image'
-      (append (list file type data-p)
-              (list :background (face-attribute (or (cadr (assq 'default face-remapping-alist))
-                                                    'default)
-                                                :background nil t))
-              props)))
+    (apply (lambda (file type data-p &rest props)
+             (append (list file type data-p)
+                     (list :background (face-attribute
+                                        (or (cadr (assq 'default face-remapping-alist))
+                                            'default)
+                                        :background nil t))
+                     props))
+           args))
   (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
-  :init (solaire-global-mode +1))
+  (solaire-mode-swap-bg))
 
 (use-package doom-modeline
   :custom
@@ -1590,7 +1589,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       ("Q" er/mark-outside-quotes)
       ("\"" er/mark-outside-quotes)
       ("g" ignore :exit t)
-      ("G" #'(lambda () (interactive) (deactivate-mark)) :exit t))))
+      ("G" (lambda () (interactive) (deactivate-mark)) :exit t))))
 
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
@@ -1631,7 +1630,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       ("M-SPC" iedit-toggle-selection)
       ("q" ignore :exit t)
       ("g" ignore :exit t)
-      ("G" #'(lambda () (interactive) (iedit-mode -1)) :exit t))
+      ("G" (lambda () (interactive) (iedit-mode -1)) :exit t))
     (defun aorst/iedit-hydrant ()
       "toggle iedit mode for item under point, and open `hydrant/iedit'."
       (interactive)
@@ -1740,6 +1739,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (desktop-base-lock-name "desktop.lock")
     (desktop-save t)
     (desktop-load-locked-desktop t)
+    :config
+    (add-to-list 'desktop-minor-mode-table '(parinfer-rust-mode nil))
     :init
     (defun aorst/desktop-remove ()
       "Remove current desktop, but save `desktop-dirname'."
