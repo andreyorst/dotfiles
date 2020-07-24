@@ -834,23 +834,8 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
 #+end_src
 
 ** Modeline
-I've tried bunch of different modelines:
-
-- [[https://github.com/TheBB/spaceline][Spaceline]]
-  Great modeline, but  I was experiencing slowdowns  in Emacs startup,
-  and I like my Emacs to start fast.
-- [[https://github.com/dbordak/telephone-line][Telephone Line]]
-  Another good modeline, but I was lazy to configure it.
-- [[https://github.com/milkypostman/powerline][Powerline]]
-  This was first what I tried because I was using something similar in
-  Vim. I don't remember why I dropped it.
-- [[https://github.com/tarsius/moody][Moody]]
-  Really lightweight  configuration for  default modeline,  which I've
-  used for quite a some time.
-
-They're all  great, but  I experienced some  troubles with  DOOM Theme
-that I use, so  I've decided to try out DOOM  Modeline.  And turns out
-it's great!
+A very  nice modeline for  Emacs, that  has both good  performance and
+look. Although I don't like it's colorful style.
 
 #+begin_src emacs-lisp
   (use-package doom-modeline
@@ -858,7 +843,7 @@ it's great!
     (doom-modeline-bar-width 3)
     (doom-modeline-major-mode-color-icon nil)
     (doom-modeline-buffer-color-icon nil)
-    (doom-modeline-buffer-file-name-style 'name)
+    (doom-modeline-buffer-file-name-style 'truncate-with-project)
     (doom-modeline-minor-modes nil)
     (doom-modeline-height (floor (* (line-pixel-height) 1.8)))
     (find-file-visit-truename t)
@@ -921,9 +906,10 @@ bigger.  And remove that bevel thing.
                 mode-line-percent-position nil
                 mode-line-in-non-selected-windows nil)
   (unless (bound-and-true-p doom-modeline-mode)
-    (set-face-attribute 'mode-line nil
-                        :box (list :line-width 8
-                                   :color (face-attribute 'mode-line :background))))
+    (dolist (face '(mode-line mode-line-inactive))
+      (set-face-attribute face nil
+                          :box (list :line-width (/ (line-pixel-height) 2)
+                                     :color (face-attribute face :background)))))
 #+end_src
 
 ** Frame

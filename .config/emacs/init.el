@@ -291,7 +291,7 @@ are defining or executing a macro."
   (doom-modeline-bar-width 3)
   (doom-modeline-major-mode-color-icon nil)
   (doom-modeline-buffer-color-icon nil)
-  (doom-modeline-buffer-file-name-style 'name)
+  (doom-modeline-buffer-file-name-style 'truncate-with-project)
   (doom-modeline-minor-modes nil)
   (doom-modeline-height (floor (* (line-pixel-height) 1.8)))
   (find-file-visit-truename t)
@@ -345,11 +345,12 @@ are defining or executing a macro."
               size-indication-mode nil
               mode-line-position nil
               mode-line-percent-position nil
-              mode-line-in-non-selected-windows nil)
+              mode-line-in-non-selected-windows t)
 (unless (bound-and-true-p doom-modeline-mode)
-  (set-face-attribute 'mode-line nil
-                      :box (list :line-width 8
-                                 :color (face-attribute 'mode-line :background))))
+  (dolist (face '(mode-line mode-line-inactive))
+    (set-face-attribute face nil
+                        :box (list :line-width (/ (line-pixel-height) 2)
+                                   :color (face-attribute face :background)))))
 
 (when window-system
   (use-package frame
