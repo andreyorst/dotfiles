@@ -1275,15 +1275,57 @@ customize tab appearance to match my theme.
                      (unless (cdr tab-list)
                        (ignore-errors (delete-window window)))))))))
 
+
       (defcustom tab-line-tab-min-width 10
         "Minimum width of a tab in characters."
         :type 'integer
         :group 'tab-line)
 
+
       (defcustom tab-line-tab-max-width 30
         "Maximum width of a tab in characters."
         :type 'integer
         :group 'tab-line)
+
+      (defcustom tab-line-ellipsis-string "…"
+        "String for indicating truncated names"
+        :type 'string
+        :group 'tab-line)
+
+      (defun aorst/tab-line--tab-width (window-width tab-amount)
+        "Calculate width of single tab dividing WINDOW-WIDTH by TAB-AMOUNT."
+        (let* ((close-button-size
+                (if tab-line-close-button-show
+                    (length (substring-no-properties tab-line-close-button)) 0))
+               (tab-width (/ window-width tab-amount)))
+          (- (cond ((< window-width 0)
+                    tab-line-tab-min-width)
+                   ((>= tab-width tab-line-tab-max-width)
+                    tab-line-tab-max-width)
+                   ((< tab-width tab-line-tab-min-width)
+                    tab-line-tab-min-width)
+                   (t tab-width))
+             close-button-size)))
+
+      (defun aorst/tab-line--max-width (window)
+        "Calculate free width of the WINDOW.
+
+  Free width means amount of space we can use to display tabs
+  without truncation."
+        (- (window-width window)
+           (length (substring-no-properties tab-line-left-button))
+           (length (substring-no-properties tab-line-right-button))
+           (if tab-line-new-button-show
+               (length (substring-no-properties tab-line-new-button))
+             0)))
+
+
+      (defun aorst/tab-line--make-pad (tab-width name-width)
+        "Generate padding string based on TAB-WIDTH and NAME-WIDTH."
+        (let* ((width (- tab-width name-width))
+               (padding (/ (if (oddp width) (+ width 1) width) 2)))
+          (make-string padding ?\s)))
+
 
       (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
         "Create name for tab with padding and truncation.
@@ -1296,26 +1338,23 @@ customize tab appearance to match my theme.
   truncates text if needed.  Minimal width can be set with
   `tab-line-tab-min-width' variable."
         (with-current-buffer buffer
-          (let* ((window-width (window-width (get-buffer-window)))
-                 (close-button-size (if tab-line-close-button-show
-                                        (length (substring-no-properties tab-line-close-button))
-                                      0))
-                 (tab-amount (length (tab-line-tabs-window-buffers)))
-                 (window-max-tab-width (/ window-width tab-amount))
-                 (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
-                                      tab-line-tab-max-width)
-                                     ((< window-max-tab-width tab-line-tab-min-width)
-                                      tab-line-tab-min-width)
-                                     (t window-max-tab-width))
-                               close-button-size))
-                 (buffer-name (string-trim (buffer-name)))
-                 (name-width (length buffer-name)))
-            (if (>= name-width (- tab-width 3))
-                (concat  " " (truncate-string-to-width buffer-name (- tab-width 3)) "… ")
-              (let* ((padding (make-string (/ (- tab-width name-width) 2) ?\s))
-                     (buffer-name (concat padding buffer-name))
-                     (name-width (length buffer-name)))
-                (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
+          (let* ((amount (length (tab-line-tabs-window-buffers)))
+                 (width (aorst/tab-line--tab-width
+                         (aorst/tab-line--max-width (get-buffer-window buffer))
+                         amount))
+                 (buffer (string-trim (buffer-name)))
+                 (name-width (length buffer))
+                 (right-pad (if tab-line-close-button-show "" " "))
+                 (truncate-width (- width
+                                    (length tab-line-ellipsis-string)
+                                    (length right-pad))))
+            (if (>= name-width truncate-width)
+                (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
+              (let* ((padding (aorst/tab-line--make-pad width name-width))
+                     (tab-text (concat padding buffer))
+                     (text-width (length tab-text)))
+                (concat tab-text (make-string (- width text-width) ?\s)))))))
+
 
       (setq tab-line-close-button-show t
             tab-line-new-button-show nil
@@ -1329,10 +1368,11 @@ customize tab appearance to match my theme.
                                              'keymap tab-line-left-map
                                              'mouse-face 'tab-line-highlight
                                              'help-echo "Click to scroll left")
-            tab-line-close-button (propertize (if (char-displayable-p ?×) "× " "x ")
+            tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
                                               'keymap tab-line-tab-close-map
                                               'mouse-face 'tab-line-close-highlight
                                               'help-echo "Click to close tab"))
+
 
       (let ((bg (if (facep 'solaire-default-face)
                     (face-attribute 'solaire-default-face :background)
