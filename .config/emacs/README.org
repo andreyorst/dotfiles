@@ -2412,13 +2412,8 @@ a separate package
 
 #+begin_src emacs-lisp
   (use-package yasnippet
-    :commands yas-reload-all
-    :hook ((rust-mode
-            c-mode-common
-            racket-mode) . yas-minor-mode)
     :config
-    (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace)
-    (yas-reload-all))
+    (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
 #+end_src
 
 ** Magit
@@ -2600,7 +2595,8 @@ LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :hook ((rust-mode c-mode c++-mode java-mode) . lsp)
+    :hook (((rust-mode c-mode c++-mode java-mode) . lsp)
+           (lsp-mode . yas-minor-mode))
     :custom-face
     (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
     :custom
@@ -2608,6 +2604,7 @@ LSP client for Emacs.
     (lsp-keymap-prefix "C-c l")
     (lsp-rust-clippy-preference "on")
     (lsp-prefer-capf t)
+    (lsp-enable-indentation nil)
     (lsp-enable-symbol-highlighting nil)
     (lsp-rust-server 'rust-analyzer)
     (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
@@ -2927,6 +2924,16 @@ that helps seeing where
   (smooth-scroll-mode)
   (setq smooth-scroll/vscroll-step-size 10)
   (setq smooth-scroll/hscroll-step-size 4))
+#+end_src
+
+** Dumb Jump
+Dumbest definition jumping that just work.
+
+#+begin_src emacs-lisp
+  (use-package dumb-jump
+    :custom (dumb-jump-prefer-searcher 'rg)
+    :config
+    (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 #+end_src
 
 * Postscript

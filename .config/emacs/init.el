@@ -345,7 +345,7 @@ are defining or executing a macro."
               size-indication-mode nil
               mode-line-position nil
               mode-line-percent-position nil
-              mode-line-in-non-selected-windows t)
+              mode-line-in-non-selected-windows nil)
 (unless (bound-and-true-p doom-modeline-mode)
   (dolist (face '(mode-line mode-line-inactive))
     (set-face-attribute face nil
@@ -1533,13 +1533,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :init (global-undo-tree-mode 1))
 
 (use-package yasnippet
-  :commands yas-reload-all
-  :hook ((rust-mode
-          c-mode-common
-          racket-mode) . yas-minor-mode)
   :config
-  (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace)
-  (yas-reload-all))
+  (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
 
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode))
@@ -1682,7 +1677,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
         (hydrant/iedit/body)))))
 
 (use-package lsp-mode
-  :hook ((rust-mode c-mode c++-mode java-mode) . lsp)
+  :hook (((rust-mode c-mode c++-mode java-mode) . lsp)
+         (lsp-mode . yas-minor-mode))
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
   :custom
@@ -1690,6 +1686,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-keymap-prefix "C-c l")
   (lsp-rust-clippy-preference "on")
   (lsp-prefer-capf t)
+  (lsp-enable-indentation nil)
   (lsp-enable-symbol-highlighting nil)
   (lsp-rust-server 'rust-analyzer)
   (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
@@ -1839,6 +1836,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (smooth-scroll-mode)
   (setq smooth-scroll/vscroll-step-size 10)
   (setq smooth-scroll/hscroll-step-size 4))
+
+(use-package dumb-jump
+  :custom (dumb-jump-prefer-searcher 'rg)
+  :config
+  (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (provide 'init)
 ;;; init.el ends here
