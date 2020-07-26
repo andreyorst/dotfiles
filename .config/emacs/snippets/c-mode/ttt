@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: ttt
-# key: ttt
-# --
-tos(\"$1\"); ton($2); tos(\"${3:\n\r}\"); 
