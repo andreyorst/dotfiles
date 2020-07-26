@@ -828,8 +828,7 @@ truncates text if needed.  Minimal width can be set with
 (use-package org
   :straight (:type built-in)
   :defines default-justification
-  :hook ((org-mode . flyspell-mode)
-         (org-mode . auto-fill-mode)
+  :hook ((org-mode . auto-fill-mode)
          (after-save . aorst/org-tangle-on-config-save)
          (org-babel-after-execute . aorst/org-update-inline-images)
          (org-mode . aorst/org-init-setup)

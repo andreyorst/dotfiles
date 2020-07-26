@@ -129,7 +129,7 @@ continue using it as normal, and Emacs will do it's native compilation
 in background for every loaded package. That's amazing!
 
 *** User Interface
-Prevent the glimpse of un-styled  Emacs by disabling these UI elements
+Prevent the glimpse  of unstyled Emacs by disabling  these UI elements
 early.
 
 #+begin_src emacs-lisp
@@ -487,7 +487,7 @@ also remove initial message:
 #+end_src
 
 ** Selection
-It is conveinient to delete selection by typing:
+It is convenient to delete selection by typing:
 
 #+begin_src emacs-lisp
   (use-package delsel
@@ -499,10 +499,10 @@ It is conveinient to delete selection by typing:
 ** Default Bindings and More
 Configurations to built in =simple.el= module.
 
-By default Emacs uses =kill-region= command on =C-w= shortcut. I find thisq
-counterintuitiveq. GNU Readline uses =C-w=  to kill word backwards. Otherq
+By default Emacs uses =kill-region= command on =C-w= shortcut. I find this
+counter intuitive. GNU Readline uses =C-w= to kill word backwards. Other
 software  uses  this  shortcut  to kill  window.   I  prefer  Readline
-approach.   Also I've  missed  =o=  and =O=  commands  from Kakoune.  With
+approach.   Also I've  missed =o=  and  =O= commands  from Kakoune.   With
 =newline-below=  and  =newline-above= it  is  now  possible to  have  same
 shortcuts in Emacs.
 
@@ -690,9 +690,11 @@ in active window:
 #+end_src
 
 ** Font
-I'm a  big fan  of [[https://github.com/source-foundry/Hack][Hack]]  font. It  has nice  support of  languages and
-styles like *bold*, /italics/ for not only Latin languages. If =Hack= is not
-found we try =Source Code Pro= as a fallback option.
+Currently I'm  using [[https://www.jetbrains.com/lp/mono/][JetBrains  Mono]] font, that  has nice  support for
+ligatures, and overall  looks great. I'm also a big  fan of [[https://github.com/source-foundry/Hack][Hack]] font.
+It has nice support of languages and styles like *bold*, /italics/ for not
+only  Latin languages.  If  neither =JetBrainsMono=,  nor  =Hack= are  not
+found, we try =Source Code Pro= as a fallback option.
 
 #+begin_src emacs-lisp
   (cond ((aorst/font-installed-p "JetBrainsMono")
@@ -704,10 +706,10 @@ found we try =Source Code Pro= as a fallback option.
 #+end_src
 
 *** Ligatures
-I'd like to try out programming ligatures, but unfortunately Emacs has
-quite poor support for ligatures  OOTB. However, with the inclusion of
-[[https://github.com/harfbuzz/harfbuzz][HarfBuzz]],  it is  possible  to use  =auto-composition-mode=, with  these
-settings:
+With  the inclusion  of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]]  support into  Emacs 27+,  it is  now
+possible  to  use  =auto-composition-mode=   to  add  ligatures.  What's
+especially cool,  is that we can  specify which ligatures we  want, by
+defining regular expressions:
 
 #+begin_src emacs-lisp
   (when (aorst/font-installed-p "JetBrainsMono")
@@ -743,8 +745,8 @@ settings:
                char-regexp))))
 #+end_src
 
-Although I  don't need  =auto-composition-mode= on  for all  buffers, so
-let's disable it, and enable manually later:
+Although I don't need =auto-composition-mode=  for all buffers, so let's
+disable it, and enable manually later:
 
 #+begin_src emacs-lisp
   (use-package composite
@@ -1452,8 +1454,7 @@ my Emacs configuration with it.
   (use-package org
     :straight (:type built-in)
     :defines default-justification
-    :hook ((org-mode . flyspell-mode)
-           (org-mode . auto-fill-mode)
+    :hook ((org-mode . auto-fill-mode)
            (after-save . aorst/org-tangle-on-config-save)
            (org-babel-after-execute . aorst/org-update-inline-images)
            (org-mode . aorst/org-init-setup)
@@ -1653,10 +1654,7 @@ configure project.
 #+end_src
 
 ** Geiser
-Since I mostly use Emacs for studying LISP, and I'm reading SICP which
-uses Scheme as main LISP flavor for explanations and exercises, I need
-a tool  to run Scheme,  and Geiser seems  like the most  viable option
-here, since it also provides completion for it.
+Great REPL support for various Schemes.
 
 #+begin_src emacs-lisp
   (use-package geiser
