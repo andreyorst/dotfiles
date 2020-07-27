@@ -123,15 +123,15 @@
 
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
-  (let ((buffer-name (buffer-name buffer)))
-    (or (and (not (minibufferp))
-             (buffer-file-name buffer))
-        (string-equal "*scratch*" buffer-name)
-        (string-match-p ".~.*~" buffer-name)
-        (string-match-p "FILE=/" buffer-name)
-        (string-match-p "\*edit-indirect .*\*" buffer-name)
-        (string-match-p "\*Org Src .*\*" buffer-name)
-        (string-match-p "*eww*" buffer-name))))
+  (not (or (string-match-p
+            (regexp-opt '("Treemacs"
+                          "*vterm*"
+                          " *Minibuf"
+                          " *Echo Area"
+                          "*Process List*"
+                          " *LV*"))
+            (buffer-name buffer))
+           (minibufferp))))
 
 (defun aorst/kill-when-no-processes (&rest _)
   "Kill buffer and its window when there's no processes left."
