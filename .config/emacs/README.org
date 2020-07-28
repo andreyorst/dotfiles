@@ -2786,8 +2786,7 @@ Emacs. It adds some time to the startup though.
   (when window-system
     (use-package desktop
       :straight nil
-      :hook ((after-init . aorst/desktop-restore)
-             (desktop-after-read . aorst/desktop-remove))
+      :hook ((after-init . aorst/desktop-restore))
       :custom
       (desktop-path `(,user-emacs-directory))
       (desktop-dirname user-emacs-directory)
@@ -2795,24 +2794,21 @@ Emacs. It adds some time to the startup though.
       (desktop-base-lock-name "desktop.lock")
       (desktop-save t)
       (desktop-load-locked-desktop t)
+      (desktop-locals-to-save nil)
+      (desktop-globals-to-save nil)
+      (desktop-restore-frames nil)
       :config
-      (add-to-list 'desktop-minor-mode-table '(parinfer-rust-mode nil))
+      (dolist (mode '(solaire-mode
+                      parinfer-rust-mode))
+        (add-to-list 'desktop-minor-mode-table `(,mode nil)))
       :init
-      (defun aorst/desktop-remove ()
-        "Remove current desktop, but save `desktop-dirname'."
-        (let ((desktop desktop-dirname))
-          (desktop-remove)
-          (setq desktop-dirname desktop)))
-      (defun aorst/saved-desktop-p ()
-        "Check if desktop exists."
-        (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
       (defun aorst/desktop-restore ()
         "Restore a saved emacs session."
         (interactive)
         (desktop-save-mode t)
-        (if (aorst/saved-desktop-p)
-            (desktop-read)
-          (message "No desktop found.")))))
+        (when (file-exists-p
+               (concat desktop-dirname desktop-base-file-name))
+          (desktop-read)))))
 #+end_src
 
 I wonder if  it could store unsaved buffers so  all my changes persist

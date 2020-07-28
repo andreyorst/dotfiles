@@ -1769,8 +1769,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (when window-system
   (use-package desktop
     :straight nil
-    :hook ((after-init . aorst/desktop-restore)
-           (desktop-after-read . aorst/desktop-remove))
+    :hook ((after-init . aorst/desktop-restore))
     :custom
     (desktop-path `(,user-emacs-directory))
     (desktop-dirname user-emacs-directory)
@@ -1778,24 +1777,21 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (desktop-base-lock-name "desktop.lock")
     (desktop-save t)
     (desktop-load-locked-desktop t)
+    (desktop-locals-to-save nil)
+    (desktop-globals-to-save nil)
+    (desktop-restore-frames nil)
     :config
-    (add-to-list 'desktop-minor-mode-table '(parinfer-rust-mode nil))
+    (dolist (mode '(solaire-mode
+                    parinfer-rust-mode))
+      (add-to-list 'desktop-minor-mode-table `(,mode nil)))
     :init
-    (defun aorst/desktop-remove ()
-      "Remove current desktop, but save `desktop-dirname'."
-      (let ((desktop desktop-dirname))
-        (desktop-remove)
-        (setq desktop-dirname desktop)))
-    (defun aorst/saved-desktop-p ()
-      "Check if desktop exists."
-      (file-exists-p (concat desktop-dirname "/" desktop-base-file-name)))
     (defun aorst/desktop-restore ()
       "Restore a saved emacs session."
       (interactive)
       (desktop-save-mode t)
-      (if (aorst/saved-desktop-p)
-          (desktop-read)
-        (message "No desktop found.")))))
+      (when (file-exists-p
+             (concat desktop-dirname desktop-base-file-name))
+        (desktop-read)))))
 
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
