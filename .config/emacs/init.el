@@ -1123,7 +1123,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :bind (:map cider-mode-map
          ("C-c C-r" . hydrant/clj-refactor-menu/body))
   :config
-  (when (fboundp 'defhydra)
+  (when (fboundp #'defhydra)
     (defhydra hydrant/clj-refactor-menu (:color blue :hint nil)
       "
  ^Add^                     ^Extract^       ^Clean^          ^Rename^      ^Unwind^
@@ -1272,7 +1272,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom
   (flycheck-indication-mode 'right-fringe)
   :config
-  (when (fboundp 'define-fringe-bitmap)
+  (when (fboundp #'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-double-exclamation-mark
       (vector #b00000000
               #b00000000
@@ -1348,14 +1348,14 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       :fringe-bitmap 'flycheck-question-mark
       :fringe-face 'flycheck-fringe-info
       :error-list-face 'flycheck-error-list-info))
-  (when (fboundp 'defhydra)
+  (when (fboundp #'defhydra)
     (defhydra hydrant/flycheck (:color blue :hint nil)
       "
- ^Flycheck^          ^Errors^            ^Checker^
- _q_: quit           _<_: previous       _?_: describe
- _M_: manual         _>_: next           _d_: disable
- _v_: verify setup   _f_: check          _m_: mode
- ^ ^                 _l_: list           _s_: select"
+ ^Flycheck^         ^Errors^       ^Checker^
+ _q_: quit          _<_: previous  _?_: describe
+ _M_: manual        _>_: next      _d_: disable
+ _v_: verify setup  _f_: check     _m_: mode
+ ^ ^                _l_: list      _s_: select"
       ("q" ignore :exit t)
       ("M" flycheck-manual)
       ("v" flycheck-verify-setup)
@@ -1570,7 +1570,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-s" . phi-search)
          ("C-r" . phi-search-backward))
   :config
-  (when (fboundp 'defhydra)
+  (when (fboundp #'defhydra)
     (defhydra hydrant/mc (:hint nil :color pink)
       "
  ^Select^                 ^Discard^                      ^Edit^               ^Navigate^
@@ -1598,7 +1598,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
   :config
-  (when (fboundp 'defhydra)
+  (when (fboundp #'defhydra)
     (defhydra hydrant/er (:color pink :hint nil)
       "
  ^Expand/Discard^                ^Mark^
@@ -1641,7 +1641,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
             (iedit-expand-down-to-occurrence)
           (iedit-expand-up-to-occurrence))
       (iedit-mode 1)))
-  (when (fboundp 'defhydra)
+  (when (fboundp #'defhydra)
     (defhydra hydrant/iedit (:hint nil :color pink)
       "
  ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
@@ -1695,7 +1695,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-ui-imenu-enable nil)
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
   :config
-  (when (fboundp 'aorst/escape)
+  (when (fboundp #'aorst/escape)
     (define-advice lsp-ui-doc--make-request (:around (foo))
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
