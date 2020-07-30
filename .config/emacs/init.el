@@ -364,264 +364,264 @@ are defining or executing a macro."
 
 (setq-default frame-title-format '("%b — Emacs"))
 
-(when window-system
-  (use-package treemacs
-    :commands (treemacs-follow-mode
-               treemacs-filewatch-mode
-               treemacs-fringe-indicator-mode
-               treemacs-load-theme)
-    :bind (("<f7>" . treemacs)
-           ("<f8>" . treemacs-select-window)
-           :map treemacs-mode-map
-           ([C-tab] . aorst/treemacs-expand-all-projects))
-    :hook ((after-init . aorst/treemacs-after-init-setup)
-           (treemacs-mode . aorst/after-treemacs-setup)
-           (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
-           (treemacs-switch-workspace . treemacs-set-fallback-workspace)
-           (treemacs-mode . aorst/treemacs-setup-title))
-    :custom-face
-    (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
-    :custom
-    (treemacs-width 32)
-    (treemacs-is-never-other-window t)
-    (treemacs-space-between-root-nodes nil)
-    (treemacs-indentation 2)
+(use-package treemacs
+  :if window-system
+  :commands (treemacs-follow-mode
+             treemacs-filewatch-mode
+             treemacs-fringe-indicator-mode
+             treemacs-load-theme)
+  :bind (("<f7>" . treemacs)
+         ("<f8>" . treemacs-select-window)
+         :map treemacs-mode-map
+         ([C-tab] . aorst/treemacs-expand-all-projects))
+  :hook ((after-init . aorst/treemacs-after-init-setup)
+         (treemacs-mode . aorst/after-treemacs-setup)
+         (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
+         (treemacs-switch-workspace . treemacs-set-fallback-workspace)
+         (treemacs-mode . aorst/treemacs-setup-title))
+  :custom-face
+  (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
+  :custom
+  (treemacs-width 32)
+  (treemacs-is-never-other-window t)
+  (treemacs-space-between-root-nodes nil)
+  (treemacs-indentation 2)
+  :config
+  (use-package treemacs-magit)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode t)
+  (set-face-attribute 'treemacs-root-face nil
+                      :foreground (face-attribute 'default :foreground)
+                      :height 1.0
+                      :weight 'normal)
+  (defun aorst/treemacs-ignore (file _)
+    (or (s-ends-with? ".elc" file)
+        (s-ends-with? ".o" file)
+        (s-ends-with? ".a" file)
+        (string= file ".svn")))
+  (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
+  (treemacs-create-theme "Atom"
     :config
-    (use-package treemacs-magit)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode t)
-    (set-face-attribute 'treemacs-root-face nil
-                        :foreground (face-attribute 'default :foreground)
-                        :height 1.0
-                        :weight 'normal)
-    (defun aorst/treemacs-ignore (file _)
-      (or (s-ends-with? ".elc" file)
-          (s-ends-with? ".o" file)
-          (s-ends-with? ".a" file)
-          (string= file ".svn")))
-    (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
-    (treemacs-create-theme "Atom"
-      :config
-      (progn
-        (treemacs-create-icon
-         :icon (format " %s\t"
-                       (all-the-icons-octicon
-                        "repo"
-                        :v-adjust -0.1
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (root))
-        (treemacs-create-icon
-         :icon (format "%s\t%s\t"
-                       (all-the-icons-octicon
-                        "chevron-down"
-                        :height 0.75
-                        :v-adjust 0.1
-                        :face '(:inherit font-lock-doc-face :slant normal))
-                       (all-the-icons-octicon
-                        "file-directory"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (dir-open))
-        (treemacs-create-icon
-         :icon (format "%s\t%s\t"
-                       (all-the-icons-octicon
-                        "chevron-right"
-                        :height 0.75
-                        :v-adjust 0.1
-                        :face '(:inherit font-lock-doc-face :slant normal))
-                       (all-the-icons-octicon
-                        "file-directory"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (dir-closed))
-        (treemacs-create-icon
-         :icon (format "%s\t%s\t"
-                       (all-the-icons-octicon
-                        "chevron-down"
-                        :height 0.75
-                        :v-adjust 0.1
-                        :face '(:inherit font-lock-doc-face :slant normal))
-                       (all-the-icons-octicon
-                        "package"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (tag-open))
-        (treemacs-create-icon
-         :icon (format "%s\t%s\t"
-                       (all-the-icons-octicon
-                        "chevron-right"
-                        :height 0.75
-                        :v-adjust 0.1
-                        :face '(:inherit font-lock-doc-face :slant normal))
-                       (all-the-icons-octicon
-                        "package"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (tag-closed))
-        (treemacs-create-icon
-         :icon (format "%s\t"
-                       (all-the-icons-octicon
-                        "tag"
-                        :height 0.9
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (tag-leaf))
-        (treemacs-create-icon
-         :icon (format "%s\t"
-                       (all-the-icons-octicon
-                        "flame"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (error))
-        (treemacs-create-icon
-         :icon (format "%s\t"
-                       (all-the-icons-octicon
-                        "stop"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (warning))
-        (treemacs-create-icon
-         :icon (format "%s\t"
-                       (all-the-icons-octicon
-                        "info"
-                        :height 0.75
-                        :v-adjust 0.1
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (info))
-        (treemacs-create-icon
-         :icon (format "  %s\t"
-                       (all-the-icons-octicon
-                        "file-media"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                      "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                      "wav" "mp3" "ogg" "midi"))
-        (treemacs-create-icon
-         :icon (format "  %s\t"
-                       (all-the-icons-octicon
-                        "file-code"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
-                      "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
-                      "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
-                      "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
-                      "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
-                      "vagrantfile" "j2" "jinja2" "tex" "racket" "rkt" "rktl" "rktd"
-                      "scrbl" "scribble" "plt" "makefile" "elm" "xml" "xsl" "rb"
-                      "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
-                      "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
-                      "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                      "gitconfig"))
-        (treemacs-create-icon
-         :icon (format "  %s\t"
-                       (all-the-icons-octicon
-                        "book"
-                        :v-adjust 0
-                        :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
-                      "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
-                      "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
-                      "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
-        (treemacs-create-icon
-         :icon (format "  %s\t" (all-the-icons-octicon
-                                 "file-text"
-                                 :v-adjust 0
-                                 :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("md" "markdown" "rst" "log" "org" "txt"
-                      "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
-        (treemacs-create-icon
-         :icon (format "  %s\t" (all-the-icons-octicon
-                                 "file-binary"
-                                 :v-adjust 0
-                                 :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("exe" "dll" "obj" "so" "o" "out"))
-        (treemacs-create-icon
-         :icon (format "  %s\t" (all-the-icons-octicon
-                                 "file-pdf"
-                                 :v-adjust 0
-                                 :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("pdf"))
-        (treemacs-create-icon
-         :icon (format "  %s\t" (all-the-icons-octicon
-                                 "file-zip"
-                                 :v-adjust 0
-                                 :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
-        (treemacs-create-icon
-         :icon (format "  %s\t" (all-the-icons-octicon
-                                 "file-text"
-                                 :v-adjust 0
-                                 :face '(:inherit font-lock-doc-face :slant normal)))
-         :extensions (fallback))))
-    :init
-    (defun aorst/treemacs-expand-all-projects (&optional _)
-      "Expand all projects."
-      (interactive)
-      (save-excursion
-        (treemacs--forget-last-highlight)
-        (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
-          (-when-let (pos (treemacs-project->position project))
-            (when (eq 'root-node-closed (treemacs-button-get pos :state))
-              (goto-char pos)
-              (treemacs--expand-root-node pos)))))
-      (treemacs--maybe-recenter 'on-distance))
-    (defun aorst/treemacs-variable-pitch-labels (&rest _)
-      (dolist (face '(treemacs-file-face
-                      treemacs-root-face
-                      treemacs-tags-face
-                      treemacs-directory-face
-                      treemacs-directory-collapsed-face
-                      treemacs-term-node-face
-                      treemacs-help-title-face
-                      treemacs-help-column-face
-                      treemacs-git-added-face
-                      treemacs-git-ignored-face
-                      treemacs-git-renamed-face
-                      treemacs-git-conflict-face
-                      treemacs-git-modified-face
-                      treemacs-git-unmodified-face
-                      treemacs-git-untracked-face
-                      treemacs-root-unreadable-face
-                      treemacs-root-remote-face
-                      treemacs-root-remote-unreadable-face
-                      treemacs-root-remote-disconnected-face
-                      treemacs-fringe-indicator-face
-                      treemacs-on-failure-pulse-face
-                      treemacs-on-success-pulse-face))
-        (let ((faces (face-attribute face :inherit nil)))
-          (set-face-attribute
-           face nil :inherit
-           `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
-    (defun aorst/treemacs-after-init-setup ()
-      "Set treemacs theme, open treemacs, and expand all projects."
-      (treemacs-load-theme "Atom")
-      (setq treemacs-collapse-dirs 0)
-      (treemacs)
-      (aorst/treemacs-expand-all-projects)
-      (windmove-right))
-    (defun aorst/after-treemacs-setup ()
-      "Set treemacs buffer common settings."
-      (setq tab-width 1
-            mode-line-format nil
-            line-spacing 5)
-      (setq-local scroll-step 1)
-      (setq-local scroll-conservatively 10000)
-      (aorst/treemacs-variable-pitch-labels))
-    (defun aorst/treemacs-setup-title ()
-      (let ((bg (face-attribute 'default :background))
-            (fg (face-attribute 'default :foreground)))
-        (face-remap-add-relative 'header-line
-                                 :background bg :foreground fg
-                                 :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
-      (setq header-line-format
-            '((:eval
-               (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
-                      (extra-align (+ (/ (length text) 2) 1))
-                      (width (- (/ (window-width) 2) extra-align)))
-                 (concat (make-string width ?\s) text))))))))
+    (progn
+      (treemacs-create-icon
+       :icon (format " %s\t"
+                     (all-the-icons-octicon
+                      "repo"
+                      :v-adjust -0.1
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (root))
+      (treemacs-create-icon
+       :icon (format "%s\t%s\t"
+                     (all-the-icons-octicon
+                      "chevron-down"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     (all-the-icons-octicon
+                      "file-directory"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (dir-open))
+      (treemacs-create-icon
+       :icon (format "%s\t%s\t"
+                     (all-the-icons-octicon
+                      "chevron-right"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     (all-the-icons-octicon
+                      "file-directory"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (dir-closed))
+      (treemacs-create-icon
+       :icon (format "%s\t%s\t"
+                     (all-the-icons-octicon
+                      "chevron-down"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     (all-the-icons-octicon
+                      "package"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (tag-open))
+      (treemacs-create-icon
+       :icon (format "%s\t%s\t"
+                     (all-the-icons-octicon
+                      "chevron-right"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal))
+                     (all-the-icons-octicon
+                      "package"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (tag-closed))
+      (treemacs-create-icon
+       :icon (format "%s\t"
+                     (all-the-icons-octicon
+                      "tag"
+                      :height 0.9
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (tag-leaf))
+      (treemacs-create-icon
+       :icon (format "%s\t"
+                     (all-the-icons-octicon
+                      "flame"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (error))
+      (treemacs-create-icon
+       :icon (format "%s\t"
+                     (all-the-icons-octicon
+                      "stop"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (warning))
+      (treemacs-create-icon
+       :icon (format "%s\t"
+                     (all-the-icons-octicon
+                      "info"
+                      :height 0.75
+                      :v-adjust 0.1
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (info))
+      (treemacs-create-icon
+       :icon (format "  %s\t"
+                     (all-the-icons-octicon
+                      "file-media"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                    "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                    "wav" "mp3" "ogg" "midi"))
+      (treemacs-create-icon
+       :icon (format "  %s\t"
+                     (all-the-icons-octicon
+                      "file-code"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
+                    "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
+                    "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
+                    "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
+                    "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
+                    "vagrantfile" "j2" "jinja2" "tex" "racket" "rkt" "rktl" "rktd"
+                    "scrbl" "scribble" "plt" "makefile" "elm" "xml" "xsl" "rb"
+                    "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
+                    "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
+                    "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
+                    "gitconfig"))
+      (treemacs-create-icon
+       :icon (format "  %s\t"
+                     (all-the-icons-octicon
+                      "book"
+                      :v-adjust 0
+                      :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
+                    "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
+                    "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
+                    "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
+      (treemacs-create-icon
+       :icon (format "  %s\t" (all-the-icons-octicon
+                               "file-text"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("md" "markdown" "rst" "log" "org" "txt"
+                    "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
+      (treemacs-create-icon
+       :icon (format "  %s\t" (all-the-icons-octicon
+                               "file-binary"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("exe" "dll" "obj" "so" "o" "out"))
+      (treemacs-create-icon
+       :icon (format "  %s\t" (all-the-icons-octicon
+                               "file-pdf"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("pdf"))
+      (treemacs-create-icon
+       :icon (format "  %s\t" (all-the-icons-octicon
+                               "file-zip"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
+      (treemacs-create-icon
+       :icon (format "  %s\t" (all-the-icons-octicon
+                               "file-text"
+                               :v-adjust 0
+                               :face '(:inherit font-lock-doc-face :slant normal)))
+       :extensions (fallback))))
+  :init
+  (defun aorst/treemacs-expand-all-projects (&optional _)
+    "Expand all projects."
+    (interactive)
+    (save-excursion
+      (treemacs--forget-last-highlight)
+      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+        (-when-let (pos (treemacs-project->position project))
+          (when (eq 'root-node-closed (treemacs-button-get pos :state))
+            (goto-char pos)
+            (treemacs--expand-root-node pos)))))
+    (treemacs--maybe-recenter 'on-distance))
+  (defun aorst/treemacs-variable-pitch-labels (&rest _)
+    (dolist (face '(treemacs-file-face
+                    treemacs-root-face
+                    treemacs-tags-face
+                    treemacs-directory-face
+                    treemacs-directory-collapsed-face
+                    treemacs-term-node-face
+                    treemacs-help-title-face
+                    treemacs-help-column-face
+                    treemacs-git-added-face
+                    treemacs-git-ignored-face
+                    treemacs-git-renamed-face
+                    treemacs-git-conflict-face
+                    treemacs-git-modified-face
+                    treemacs-git-unmodified-face
+                    treemacs-git-untracked-face
+                    treemacs-root-unreadable-face
+                    treemacs-root-remote-face
+                    treemacs-root-remote-unreadable-face
+                    treemacs-root-remote-disconnected-face
+                    treemacs-fringe-indicator-face
+                    treemacs-on-failure-pulse-face
+                    treemacs-on-success-pulse-face))
+      (let ((faces (face-attribute face :inherit nil)))
+        (set-face-attribute
+         face nil :inherit
+         `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
+  (defun aorst/treemacs-after-init-setup ()
+    "Set treemacs theme, open treemacs, and expand all projects."
+    (treemacs-load-theme "Atom")
+    (setq treemacs-collapse-dirs 0)
+    (treemacs)
+    (aorst/treemacs-expand-all-projects)
+    (windmove-right))
+  (defun aorst/after-treemacs-setup ()
+    "Set treemacs buffer common settings."
+    (setq tab-width 1
+          mode-line-format nil
+          line-spacing 5)
+    (setq-local scroll-step 1)
+    (setq-local scroll-conservatively 10000)
+    (aorst/treemacs-variable-pitch-labels))
+  (defun aorst/treemacs-setup-title ()
+    (let ((bg (face-attribute 'default :background))
+          (fg (face-attribute 'default :foreground)))
+      (face-remap-add-relative 'header-line
+                               :background bg :foreground fg
+                               :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+    (setq header-line-format
+          '((:eval
+             (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                    (extra-align (+ (/ (length text) 2) 1))
+                    (width (- (/ (window-width) 2) extra-align)))
+               (concat (make-string width ?\s) text)))))))
 
 (use-package minions
   :commands minions-mode
@@ -631,98 +631,97 @@ are defining or executing a macro."
   :straight nil
   :custom (uniquify-buffer-name-style 'forward))
 
-(when (and window-system
-           (not (version< emacs-version "27")))
-  (use-package tab-line
-    :straight nil
-    :hook (after-init . global-tab-line-mode)
-    :config
-    (defun tab-line-close-tab (&optional e)
-      "Close the selected tab.
+(use-package tab-line
+  :straight nil
+  :if (and window-system (not (version< emacs-version "27")))
+  :hook (after-init . global-tab-line-mode)
+  :config
+  (defun tab-line-close-tab (&optional e)
+    "Close the selected tab.
 
 If tab is presented in another window, close the tab by using
 `bury-buffer` function.  If tab is unique to all existing
 windows, kill the buffer with `kill-buffer` function.  Lastly, if
 no tabs left in the window, it is deleted with `delete-window`
 function."
-      (interactive "e")
-      (let* ((posnp (event-start e))
-             (window (posn-window posnp))
-             (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-        (with-selected-window window
-          (let ((tab-list (tab-line-tabs-window-buffers))
-                (buffer-list (flatten-list
-                              (seq-reduce (lambda (list window)
-                                            (select-window window t)
-                                            (cons (tab-line-tabs-window-buffers) list))
-                                          (window-list) nil))))
-            (select-window window)
-            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-                (progn
-                  (if (eq buffer (current-buffer))
-                      (bury-buffer)
-                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
-                  (unless (cdr tab-list)
-                    (ignore-errors (delete-window window))))
-              (and (kill-buffer buffer)
-                   (unless (cdr tab-list)
-                     (ignore-errors (delete-window window)))))))))
+    (interactive "e")
+    (let* ((posnp (event-start e))
+           (window (posn-window posnp))
+           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+      (with-selected-window window
+        (let ((tab-list (tab-line-tabs-window-buffers))
+              (buffer-list (flatten-list
+                            (seq-reduce (lambda (list window)
+                                          (select-window window t)
+                                          (cons (tab-line-tabs-window-buffers) list))
+                                        (window-list) nil))))
+          (select-window window)
+          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+              (progn
+                (if (eq buffer (current-buffer))
+                    (bury-buffer)
+                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                (unless (cdr tab-list)
+                  (ignore-errors (delete-window window))))
+            (and (kill-buffer buffer)
+                 (unless (cdr tab-list)
+                   (ignore-errors (delete-window window)))))))))
 
 
-    (defcustom tab-line-tab-min-width 10
-      "Minimum width of a tab in characters."
-      :type 'integer
-      :group 'tab-line)
+  (defcustom tab-line-tab-min-width 10
+    "Minimum width of a tab in characters."
+    :type 'integer
+    :group 'tab-line)
 
 
-    (defcustom tab-line-tab-max-width 30
-      "Maximum width of a tab in characters."
-      :type 'integer
-      :group 'tab-line)
+  (defcustom tab-line-tab-max-width 30
+    "Maximum width of a tab in characters."
+    :type 'integer
+    :group 'tab-line)
 
-    (defcustom tab-line-ellipsis-string "…"
-      "String for indicating truncated names"
-      :type 'string
-      :group 'tab-line)
+  (defcustom tab-line-ellipsis-string "…"
+    "String for indicating truncated names"
+    :type 'string
+    :group 'tab-line)
 
-    (defun aorst/tab-line--tab-width (window-width tab-amount)
-      "Calculate width of single tab dividing WINDOW-WIDTH by TAB-AMOUNT."
-      (let* ((close-button-size
-              (if tab-line-close-button-show
-                  (length (substring-no-properties tab-line-close-button)) 0))
-             (tab-width (/ window-width tab-amount)))
-        (- (cond ((< window-width 0)
-                  tab-line-tab-min-width)
-                 ((>= tab-width tab-line-tab-max-width)
-                  tab-line-tab-max-width)
-                 ((< tab-width tab-line-tab-min-width)
-                  tab-line-tab-min-width)
-                 (t tab-width))
-           close-button-size)))
+  (defun aorst/tab-line--tab-width (window-width tab-amount)
+    "Calculate width of single tab dividing WINDOW-WIDTH by TAB-AMOUNT."
+    (let* ((close-button-size
+            (if tab-line-close-button-show
+                (length (substring-no-properties tab-line-close-button)) 0))
+           (tab-width (/ window-width tab-amount)))
+      (- (cond ((< window-width 0)
+                tab-line-tab-min-width)
+               ((>= tab-width tab-line-tab-max-width)
+                tab-line-tab-max-width)
+               ((< tab-width tab-line-tab-min-width)
+                tab-line-tab-min-width)
+               (t tab-width))
+         close-button-size)))
 
-    (defun aorst/tab-line--max-width (window)
-      "Calculate free width of the WINDOW.
+  (defun aorst/tab-line--max-width (window)
+    "Calculate free width of the WINDOW.
 
 Free width means amount of space we can use to display tabs
 without truncation."
-      (- (window-width window)
-         (length (substring-no-properties tab-line-left-button))
-         (length (substring-no-properties tab-line-right-button))
-         (if tab-line-new-button-show
-             (length (substring-no-properties tab-line-new-button))
-           0)))
+    (- (window-width window)
+       (length (substring-no-properties tab-line-left-button))
+       (length (substring-no-properties tab-line-right-button))
+       (if tab-line-new-button-show
+           (length (substring-no-properties tab-line-new-button))
+         0)))
 
 
-    (defun aorst/tab-line--make-pad (tab-width name-width)
-      "Generate padding string based on TAB-WIDTH and NAME-WIDTH."
-      (let* ((width (- tab-width name-width))
-             (padding (/ (if (oddp width) (+ width 1) width) 2)))
-        (make-string padding ?\s)))
+  (defun aorst/tab-line--make-pad (tab-width name-width)
+    "Generate padding string based on TAB-WIDTH and NAME-WIDTH."
+    (let* ((width (- tab-width name-width))
+           (padding (/ (if (oddp width) (+ width 1) width) 2)))
+      (make-string padding ?\s)))
 
 
-    (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
-      "Create name for tab with padding and truncation.
+  (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
+    "Create name for tab with padding and truncation.
 
 If buffer name is shorter than `tab-line-tab-max-width' it gets
 centered with spaces, otherwise it is truncated, to preserve
@@ -731,92 +730,92 @@ many tabs in window as possible, so if there are no room for tabs
 with maximum width, it calculates new width for each tab and
 truncates text if needed.  Minimal width can be set with
 `tab-line-tab-min-width' variable."
-      (with-current-buffer buffer
-        (let* ((amount (length (tab-line-tabs-window-buffers)))
-               (width (aorst/tab-line--tab-width
-                       (aorst/tab-line--max-width (get-buffer-window buffer))
-                       amount))
-               (buffer (string-trim (buffer-name)))
-               (name-width (length buffer))
-               (right-pad (if tab-line-close-button-show "" " "))
-               (truncate-width (- width
-                                  (length tab-line-ellipsis-string)
-                                  (length right-pad))))
-          (if (>= name-width truncate-width)
-              (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
-            (let* ((padding (aorst/tab-line--make-pad width name-width))
-                   (tab-text (concat padding buffer))
-                   (text-width (length tab-text)))
-              (concat tab-text (make-string (- width text-width) ?\s)))))))
+    (with-current-buffer buffer
+      (let* ((amount (length (tab-line-tabs-window-buffers)))
+             (width (aorst/tab-line--tab-width
+                     (aorst/tab-line--max-width (get-buffer-window buffer))
+                     amount))
+             (buffer (string-trim (buffer-name)))
+             (name-width (length buffer))
+             (right-pad (if tab-line-close-button-show "" " "))
+             (truncate-width (- width
+                                (length tab-line-ellipsis-string)
+                                (length right-pad))))
+        (if (>= name-width truncate-width)
+            (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
+          (let* ((padding (aorst/tab-line--make-pad width name-width))
+                 (tab-text (concat padding buffer))
+                 (text-width (length tab-text)))
+            (concat tab-text (make-string (- width text-width) ?\s)))))))
 
 
-    (setq tab-line-close-button-show t
-          tab-line-new-button-show nil
-          tab-line-separator ""
-          tab-line-tab-name-function #'aorst/tab-line-name-buffer
-          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                            'keymap tab-line-right-map
-                                            'mouse-face 'tab-line-highlight
-                                            'help-echo "Click to scroll right")
-          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                           'keymap tab-line-left-map
-                                           'mouse-face 'tab-line-highlight
-                                           'help-echo "Click to scroll left")
-          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
-                                            'keymap tab-line-tab-close-map
-                                            'mouse-face 'tab-line-close-highlight
-                                            'help-echo "Click to close tab"))
+  (setq tab-line-close-button-show t
+        tab-line-new-button-show nil
+        tab-line-separator ""
+        tab-line-tab-name-function #'aorst/tab-line-name-buffer
+        tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                          'keymap tab-line-right-map
+                                          'mouse-face 'tab-line-highlight
+                                          'help-echo "Click to scroll right")
+        tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                         'keymap tab-line-left-map
+                                         'mouse-face 'tab-line-highlight
+                                         'help-echo "Click to scroll left")
+        tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+                                          'keymap tab-line-tab-close-map
+                                          'mouse-face 'tab-line-close-highlight
+                                          'help-echo "Click to close tab"))
 
 
-    (let ((bg (if (facep 'solaire-default-face)
-                  (face-attribute 'solaire-default-face :background)
-                (face-attribute 'default :background)))
-          (fg (face-attribute 'default :foreground))
-          (base (if (facep 'solaire-default-face)
-                    (face-attribute 'default :background)
-                  (face-attribute 'mode-line :background)))
-          (box-width (/ (line-pixel-height) 2)))
-      (when (and (color-defined-p bg)
-                 (color-defined-p fg)
-                 (color-defined-p base)
-                 (numberp box-width))
-        (set-face-attribute 'tab-line nil
-                            :background base
-                            :foreground fg
-                            :height 1.0
-                            :inherit nil
-                            :box (list :line-width -1 :color base))
-        (set-face-attribute 'tab-line-tab nil
-                            :foreground fg
-                            :background bg
-                            :weight 'normal
-                            :inherit nil
-                            :box (list :line-width box-width :color bg))
-        (set-face-attribute 'tab-line-tab-inactive nil
-                            :foreground fg
-                            :background base
-                            :weight 'normal
-                            :inherit nil
-                            :box (list :line-width box-width :color base))
-        (set-face-attribute 'tab-line-tab-current nil
-                            :foreground fg
-                            :background bg
-                            :weight 'normal
-                            :inherit nil
-                            :box (list :line-width box-width :color bg))))
-    (setq tab-line-exclude-modes '())
-    (dolist (mode '(ediff-mode
-                    process-menu-mode
-                    term-mode
-                    vterm-mode))
-      (add-to-list 'tab-line-exclude-modes mode))
+  (let ((bg (if (facep 'solaire-default-face)
+                (face-attribute 'solaire-default-face :background)
+              (face-attribute 'default :background)))
+        (fg (face-attribute 'default :foreground))
+        (base (if (facep 'solaire-default-face)
+                  (face-attribute 'default :background)
+                (face-attribute 'mode-line :background)))
+        (box-width (/ (line-pixel-height) 2)))
+    (when (and (color-defined-p bg)
+               (color-defined-p fg)
+               (color-defined-p base)
+               (numberp box-width))
+      (set-face-attribute 'tab-line nil
+                          :background base
+                          :foreground fg
+                          :height 1.0
+                          :inherit nil
+                          :box (list :line-width -1 :color base))
+      (set-face-attribute 'tab-line-tab nil
+                          :foreground fg
+                          :background bg
+                          :weight 'normal
+                          :inherit nil
+                          :box (list :line-width box-width :color bg))
+      (set-face-attribute 'tab-line-tab-inactive nil
+                          :foreground fg
+                          :background base
+                          :weight 'normal
+                          :inherit nil
+                          :box (list :line-width box-width :color base))
+      (set-face-attribute 'tab-line-tab-current nil
+                          :foreground fg
+                          :background bg
+                          :weight 'normal
+                          :inherit nil
+                          :box (list :line-width box-width :color bg))))
+  (setq tab-line-exclude-modes '())
+  (dolist (mode '(ediff-mode
+                  process-menu-mode
+                  term-mode
+                  vterm-mode))
+    (add-to-list 'tab-line-exclude-modes mode))
 
-    (defun aorst/tab-line-drop-caches ()
-      "Drops `tab-line' cache in every window."
-      (dolist (window (window-list))
-        (set-window-parameter window 'tab-line-cache nil)))
+  (defun aorst/tab-line-drop-caches ()
+    "Drops `tab-line' cache in every window."
+    (dolist (window (window-list))
+      (set-window-parameter window 'tab-line-cache nil)))
 
-    (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)))
+  (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches))
 
 (use-package display-line-numbers
   :straight nil
@@ -1215,52 +1214,52 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom (doc-view-resolution 192))
 
 (setq use-package-hook-name-suffix "-functions")
-(when (bound-and-true-p module-file-suffix)
-  (use-package vterm
-    :bind (("C-`" . aorst/vterm-toggle)
-           ("C-t" . aorst/vterm-focus))
-    :hook (vterm-exit . aorst/kill-vterm)
-    :config
-    (defun aorst/vterm-toggle (&optional arg)
-      "Toggle `vterm' window on and off with the same command."
-      (interactive "P")
-      (let* ((directory (if default-directory
-                            default-directory
-                          (expand-file-name "~/")))
-             (bufname "*vterm*")
-             (window (get-buffer-window bufname)))
-        (if window
-            (ignore-errors (delete-window window))
-          (if (window-dedicated-p)
-              (let ((windows (seq-drop-while #'window-dedicated-p (window-list))))
-                (when (not (null windows))
-                  (select-window (car windows)))))
-          (let* ((win-side (if (symbolp arg)
-                               (cons (split-window-below) 'bot)
-                             (cons (split-window-right) 'right)))
-                 (window (car win-side))
-                 (side (cdr win-side)))
-            (select-window window)
-            (cond ((get-buffer bufname)
-                   (switch-to-buffer bufname))
-                  (t (let ((default-directory directory))
-                       (vterm bufname))))
-            (when (bound-and-true-p global-tab-line-mode)
-              (setq tab-line-format nil))
-            (set-window-dedicated-p window t)
-            (set-window-parameter window 'no-delete-other-windows t)
-            (set-window-parameter window 'window-side side)
-            (set-window-parameter window 'no-other-window t)))))
-    (defun aorst/vterm-focus (&optional arg)
-      "Focus `vterm' or open one if there's none."
-      (interactive "P")
-      (let ((window (get-buffer-window "*vterm*")))
-        (if window
-            (select-window window)
-          (aorst/vterm-toggle arg))))
-    (defun aorst/kill-vterm (buf &optional event)
-      "Kill the `*vterm*' buffer after shell exits."
-      (when buf (kill-buffer buf)))))
+(use-package vterm
+  :if (bound-and-true-p module-file-suffix)
+  :bind (("C-`" . aorst/vterm-toggle)
+         ("C-t" . aorst/vterm-focus))
+  :hook (vterm-exit . aorst/kill-vterm)
+  :config
+  (defun aorst/vterm-toggle (&optional arg)
+    "Toggle `vterm' window on and off with the same command."
+    (interactive "P")
+    (let* ((directory (if default-directory
+                          default-directory
+                        (expand-file-name "~/")))
+           (bufname "*vterm*")
+           (window (get-buffer-window bufname)))
+      (if window
+          (ignore-errors (delete-window window))
+        (if (window-dedicated-p)
+            (let ((windows (seq-drop-while #'window-dedicated-p (window-list))))
+              (when (not (null windows))
+                (select-window (car windows)))))
+        (let* ((win-side (if (symbolp arg)
+                             (cons (split-window-below) 'bot)
+                           (cons (split-window-right) 'right)))
+               (window (car win-side))
+               (side (cdr win-side)))
+          (select-window window)
+          (cond ((get-buffer bufname)
+                 (switch-to-buffer bufname))
+                (t (let ((default-directory directory))
+                     (vterm bufname))))
+          (when (bound-and-true-p global-tab-line-mode)
+            (setq tab-line-format nil))
+          (set-window-dedicated-p window t)
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-parameter window 'window-side side)
+          (set-window-parameter window 'no-other-window t)))))
+  (defun aorst/vterm-focus (&optional arg)
+    "Focus `vterm' or open one if there's none."
+    (interactive "P")
+    (let ((window (get-buffer-window "*vterm*")))
+      (if window
+          (select-window window)
+        (aorst/vterm-toggle arg))))
+  (defun aorst/kill-vterm (buf &optional event)
+    "Kill the `*vterm*' buffer after shell exits."
+    (when buf (kill-buffer buf))))
 (setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
@@ -1745,47 +1744,32 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
          ("<f6>" . aorst/hideshow-menu))
+(use-package desktop
+  :straight nil
+  :if window-system
+  :hook ((after-init . aorst/desktop-restore))
+  :custom
+  (desktop-path `(,user-emacs-directory))
+  (desktop-dirname user-emacs-directory)
+  (desktop-base-file-name "desktop")
+  (desktop-base-lock-name "desktop.lock")
+  (desktop-save t)
+  (desktop-load-locked-desktop t)
+  (desktop-locals-to-save nil)
+  (desktop-globals-to-save nil)
+  (desktop-restore-frames nil)
   :config
-  (define-transient-command aorst/hideshow-menu ()
-    "Hideshow commands."
-    [:description
-     "Hide"
-     ("ha" "all" hs-hide-all)
-     ("hb" "block" hs-hide-block)]
-    [:description
-     "Show"
-     ("sa" "all" hs-show-all)
-     ("sb" "block" hs-show-block)]
+  (dolist (mode '(solaire-mode
+                  parinfer-rust-mode))
+    (add-to-list 'desktop-minor-mode-table `(,mode ,nil)))
+  :init
+  (defun aorst/desktop-restore ()
+    "Restore a saved emacs session."
     (interactive)
-    (when (bound-and-true-p hs-minor-mode)
-      (transient-setup 'aorst/hideshow-menu nil nil))))
-
-(when window-system
-  (use-package desktop
-    :straight nil
-    :hook ((after-init . aorst/desktop-restore))
-    :custom
-    (desktop-path `(,user-emacs-directory))
-    (desktop-dirname user-emacs-directory)
-    (desktop-base-file-name "desktop")
-    (desktop-base-lock-name "desktop.lock")
-    (desktop-save t)
-    (desktop-load-locked-desktop t)
-    (desktop-locals-to-save nil)
-    (desktop-globals-to-save nil)
-    (desktop-restore-frames nil)
-    :config
-    (dolist (mode '(solaire-mode
-                    parinfer-rust-mode))
-      (add-to-list 'desktop-minor-mode-table `(,mode nil)))
-    :init
-    (defun aorst/desktop-restore ()
-      "Restore a saved emacs session."
-      (interactive)
-      (desktop-save-mode t)
-      (when (file-exists-p
-             (concat desktop-dirname desktop-base-file-name))
-        (desktop-read)))))
+    (desktop-save-mode t)
+    (when (file-exists-p
+           (concat desktop-dirname desktop-base-file-name))
+      (desktop-read))))
 
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
