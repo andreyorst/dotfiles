@@ -1729,7 +1729,23 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :after transient
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
-         ("<f6>" . aorst/hideshow-menu))
+         ("<f6>" . hydrant/hideshow-menu/body))
+  :config
+  (when (fboundp #'defhydra)
+    (defhydra hydrant/hideshow-menu (:color pink :hint nil)
+      "
+ ^Hide^       ^Show^       ^Exit^
+ _ha_: all    _sa_: all    _qs_: quit show all
+ _hb_: block  _sb_: block  _qh_: quit hide all
+ ^  ^         ^  ^         _qq_: quit"
+      ("ha" hs-hide-all)
+      ("hb" hs-hide-block)
+      ("sa" hs-show-all)
+      ("sb" hs-show-block)
+      ("qq"  ignore :exit t)
+      ("qs"  hs-show-all :exit t)
+      ("qh"  hs-hide-all :exit t))))
+
 (use-package desktop
   :straight nil
   :if window-system

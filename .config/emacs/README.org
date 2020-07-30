@@ -2733,21 +2733,22 @@ little interactive menu for easy interaction.
     :after transient
     :hook (prog-mode . hs-minor-mode)
     :bind (:map prog-mode-map
-           ("<f6>" . aorst/hideshow-menu))
+           ("<f6>" . hydrant/hideshow-menu/body))
     :config
-    (define-transient-command aorst/hideshow-menu ()
-      "Hideshow commands."
-      [:description
-       "Hide"
-       ("ha" "all" hs-hide-all)
-       ("hb" "block" hs-hide-block)]
-      [:description
-       "Show"
-       ("sa" "all" hs-show-all)
-       ("sb" "block" hs-show-block)]
-      (interactive)
-      (when (bound-and-true-p hs-minor-mode)
-        (transient-setup 'aorst/hideshow-menu nil nil))))
+    (when (fboundp #'defhydra)
+      (defhydra hydrant/hideshow-menu (:color pink :hint nil)
+        "
+   ^Hide^       ^Show^       ^Exit^
+   _ha_: all    _sa_: all    _qs_: quit show all
+   _hb_: block  _sb_: block  _qh_: quit hide all
+   ^  ^         ^  ^         _qq_: quit"
+        ("ha" hs-hide-all)
+        ("hb" hs-hide-block)
+        ("sa" hs-show-all)
+        ("sb" hs-show-block)
+        ("qq"  ignore :exit t)
+        ("qs"  hs-show-all :exit t)
+        ("qh"  hs-hide-all :exit t))))
 #+end_src
 
 ** Desktop
