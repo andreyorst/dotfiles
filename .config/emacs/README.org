@@ -2193,45 +2193,24 @@ rules, and theoretically should be faster, but in very early stages of
 development.
 
 #+begin_src emacs-lisp
-  (when (bound-and-true-p module-file-suffix)
-    (use-package parinfer-rust-mode
-      :straight (:host github
-                 :repo "justinbarclay/parinfer-rust-mode"
-                 :branch "master")
-      :hook ((clojure-mode
-              emacs-lisp-mode
-              common-lisp-mode
-              scheme-mode
-              lisp-mode
-              racket-mode
-              fennel-mode) . parinfer-rust-mode)
-      :custom (parinfer-rust-check-before-enable 'defer)
-      :config
-      (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
-      :init
-      (setq parinfer-rust-auto-download t)))
-#+end_src
-
-However, there's a problem. Parinfer Rust requires module support, and
-not every Emacs  was compiled with =--with-modules=  flag. To workaround
-this I'll be using Emacs Lisp  version of Parinfer when module support
-is not available:
-
-#+begin_src emacs-lisp
-  (unless (bound-and-true-p module-file-suffix)
-    (use-package paredit)
-    (use-package selected)
-    (use-package parinfer-smart
-      :straight (:host github
-                 :repo "DogLooksGood/parinfer-mode"
-                 :branch "smart")
-      :hook ((clojure-mode
-              emacs-lisp-mode
-              common-lisp-mode
-              scheme-mode
-              lisp-mode
-              racket-mode
-              fennel-mode) . parinfer-mode)))
+  (use-package parinfer-rust-mode
+    :if (and (bound-and-true-p module-file-suffix)
+             (not (string-match-p "aarch" system-configuration)))
+    :straight (:host github
+               :repo "justinbarclay/parinfer-rust-mode"
+               :branch "master")
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode
+            fennel-mode) . parinfer-rust-mode)
+    :custom (parinfer-rust-check-before-enable 'defer)
+    :config
+    (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
+    :init
+    (setq parinfer-rust-auto-download t))
 #+end_src
 
 ** Flx

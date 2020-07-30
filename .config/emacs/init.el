@@ -1373,38 +1373,24 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package hydra)
 
-(when (bound-and-true-p module-file-suffix)
-  (use-package parinfer-rust-mode
-    :straight (:host github
-               :repo "justinbarclay/parinfer-rust-mode"
-               :branch "master")
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode) . parinfer-rust-mode)
-    :custom (parinfer-rust-check-before-enable 'defer)
-    :config
-    (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
-    :init
-    (setq parinfer-rust-auto-download t)))
-
-(unless (bound-and-true-p module-file-suffix)
-  (use-package paredit)
-  (use-package selected)
-  (use-package parinfer-smart
-    :straight (:host github
-               :repo "DogLooksGood/parinfer-mode"
-               :branch "smart")
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode) . parinfer-mode)))
+(use-package parinfer-rust-mode
+  :if (and (bound-and-true-p module-file-suffix)
+           (not (string-match-p "aarch" system-configuration)))
+  :straight (:host github
+             :repo "justinbarclay/parinfer-rust-mode"
+             :branch "master")
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode
+          fennel-mode) . parinfer-rust-mode)
+  :custom (parinfer-rust-check-before-enable 'defer)
+  :config
+  (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
+  :init
+  (setq parinfer-rust-auto-download t))
 
 (use-package flx)
 
