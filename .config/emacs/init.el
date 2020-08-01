@@ -100,7 +100,8 @@
          ("C-S-o" . aorst/newline-above)
          ("M-z" . zap-up-to-char)
          ("M-S-z" . zap-to-char))
-  :hook (before-save . delete-trailing-whitespace)
+  :hook ((before-save . delete-trailing-whitespace)
+         (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :init
   (defun aorst/kill-region-or-word (arg)
     (interactive "*p")
@@ -122,7 +123,10 @@
     (back-to-indentation)
     (newline-and-indent)
     (forward-line -1)
-    (indent-according-to-mode)))
+    (indent-according-to-mode))
+  (defun aorst/overwrite-set-cursor-shape ()
+    (when (display-graphic-p)
+      (setq cursor-type (if overwrite-mode 'box 'bar)))))
 
 (setq-default truncate-lines t)
 
@@ -342,13 +346,13 @@ are defining or executing a macro."
 (defun aorst/mode-line-readonly ()
   (if buffer-read-only
       (propertize
-       (if (char-displayable-p ?🔒) "🔒" "RO")
+       (if (char-displayable-p ?🔒) "🔒  " "RO  ")
        'help-echo "Make file writable"
        'local-map (let ((map (make-sparse-keymap)))
                     (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
                     map))
     (propertize
-     (if (char-displayable-p ?🔓) "🔓" "RW")
+     (if (char-displayable-p ?🔓) "🔓  " "RW  ")
      'help-echo "Make file read only"
      'local-map (let ((map (make-sparse-keymap)))
                   (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
@@ -371,17 +375,18 @@ are defining or executing a macro."
              :branch "gui-line-setting")
   :custom
   (mini-modeline-display-gui-line nil)
-  (mini-modeline-right-padding 1)
   (mini-modeline-r-format
-   '(:eval (concat "%b"
-                   (aorst/mode-line-buffer-modified)
-                   "%C:%l  "
-                   (aorst/mode-line-line-encoding)
-                   (aorst/mode-line-buffer-encoding)
-                   (aorst/mode-line-indent-mode)
-                   (format-mode-line mode-name) "  "
-                   (aorst/mode-line-git-branch)
-                   (aorst/mode-line-readonly))))
+   '(:eval (string-trim-right
+            (concat
+             "%b"
+             (aorst/mode-line-buffer-modified)
+             "%C:%l  "
+             (aorst/mode-line-line-encoding)
+             (aorst/mode-line-buffer-encoding)
+             (aorst/mode-line-indent-mode)
+             (format-mode-line mode-name) "  "
+             (aorst/mode-line-git-branch)
+             (aorst/mode-line-readonly)))))
   :config
   (mini-modeline-mode t))
 

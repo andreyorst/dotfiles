@@ -533,7 +533,8 @@ Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
            ("C-S-o" . aorst/newline-above)
            ("M-z" . zap-up-to-char)
            ("M-S-z" . zap-to-char))
-    :hook (before-save . delete-trailing-whitespace)
+    :hook ((before-save . delete-trailing-whitespace)
+           (overwrite-mode . aorst/overwrite-set-cursor-shape))
     :init
     (defun aorst/kill-region-or-word (arg)
       (interactive "*p")
@@ -555,7 +556,10 @@ Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
       (back-to-indentation)
       (newline-and-indent)
       (forward-line -1)
-      (indent-according-to-mode)))
+      (indent-according-to-mode))
+    (defun aorst/overwrite-set-cursor-shape ()
+      (when (display-graphic-p)
+        (setq cursor-type (if overwrite-mode 'box 'bar)))))
 #+end_src
 
 ** Line truncation
@@ -941,13 +945,13 @@ Read only state module for mode-line.
   (defun aorst/mode-line-readonly ()
     (if buffer-read-only
         (propertize
-         (if (char-displayable-p ?🔒) "🔒" "RO")
+         (if (char-displayable-p ?🔒) "🔒  " "RO  ")
          'help-echo "Make file writable"
          'local-map (let ((map (make-sparse-keymap)))
                       (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
                       map))
       (propertize
-       (if (char-displayable-p ?🔓) "🔓" "RW")
+       (if (char-displayable-p ?🔓) "🔓  " "RW  ")
        'help-echo "Make file read only"
        'local-map (let ((map (make-sparse-keymap)))
                     (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
@@ -982,17 +986,18 @@ forward to integrate DOOM modeline with it.
                :branch "gui-line-setting")
     :custom
     (mini-modeline-display-gui-line nil)
-    (mini-modeline-right-padding 1)
     (mini-modeline-r-format
-     '(:eval (concat "%b"
-                     (aorst/mode-line-buffer-modified)
-                     "%C:%l  "
-                     (aorst/mode-line-line-encoding)
-                     (aorst/mode-line-buffer-encoding)
-                     (aorst/mode-line-indent-mode)
-                     (format-mode-line mode-name) "  "
-                     (aorst/mode-line-git-branch)
-                     (aorst/mode-line-readonly))))
+     '(:eval (string-trim-right
+              (concat
+               "%b"
+               (aorst/mode-line-buffer-modified)
+               "%C:%l  "
+               (aorst/mode-line-line-encoding)
+               (aorst/mode-line-buffer-encoding)
+               (aorst/mode-line-indent-mode)
+               (format-mode-line mode-name) "  "
+               (aorst/mode-line-git-branch)
+               (aorst/mode-line-readonly)))))
     :config
     (mini-modeline-mode t))
 #+end_src
@@ -2368,32 +2373,6 @@ it's own variable for it, so we do no need to runtime-patch it.
             "rg -S --no-heading --hidden --line-number --color never %s .")))
 #+end_src
 
-** COMMENT Ivy Posframe
-This package displays =ivy= in separate frame on top of Emacs.
-
-#+begin_src emacs-lisp
-  (use-package ivy-posframe
-    :after ivy
-    :custom
-    (ivy-posframe-display-functions-alist '((t . aorst/posframe-position)))
-    (ivy-posframe-height-alist '((t . 16)))
-    (ivy-posframe-parameters '((internal-border-width . 6)))
-    (ivy-posframe-width 78)
-    :config
-    (defvar aorst--ivy-posframe-top-padding 42
-      "additional padding between top of the frame and posframe.")
-    (defun aorst/posframe-position (str)
-      (ivy-posframe--display str #'aorst/posframe-under-tabs-center))
-    (defun aorst/posframe-under-tabs-center (info)
-      "Function that sets center position for ivy posframe."
-      (cons (/ (- (plist-get info :parent-frame-width)
-                  (plist-get info :posframe-width))
-               2)
-            0))
-    (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
-    (ivy-posframe-mode +1))
-#+end_src
-
 ** Company
 Complete anything framework. Nothing much to say. Does it's job.
 
@@ -2775,34 +2754,6 @@ This code above automatically creates user local =emacs.desktop= file in
   which will create server, and opening new files will be done in this
   instance of =emacs=.
 
-** COMMENT Eldoc Box
-This nice  package displays eldoc in  child frame that can  hover near
-the cursor. It is really good for modes that support eldoc and removes
-distraction  that happen  every  time when  your  buffer size  changes
-because eldoc message appeared at the bottom. This package is affected
-by [[https://gitlab.gnome.org/GNOME/mutter/issues/840][this bug]] in Gnome Shell.
-
-#+begin_src emacs-lisp
-  (use-package eldoc-box
-    :hook ((eldoc-mode . aorst/eldoc-box-enable)
-           (eldoc-box-buffer . aorst/eldoc-box-buffer-setup))
-    :custom
-    (x-wait-for-event-timeout 0)
-    (eldoc-idle-delay 0.5)
-    (eldoc-box-max-pixel-width 640)
-    (eldoc-box-max-pixel-height 480)
-    :config
-    (set-face-attribute 'eldoc-box-border nil :background (face-attribute 'mode-line-inactive :background))
-    :init
-    (defun aorst/eldoc-box-enable ()
-      "Helper function that enables `eldoc-box-hover-at-point-mode' for real buffers only."
-      (interactive)
-      (when (aorst/real-buffer-p)
-        (eldoc-box-hover-at-point-mode)))
-    (defun aorst/eldoc-box-buffer-setup ()
-      (unless word-wrap (toggle-word-wrap))))
-#+end_src
-
 ** Hideshow
 This built  in mode provides code  folding. I use =transient=  to create
 little interactive menu for easy interaction.
@@ -2867,50 +2818,6 @@ Emacs. It adds some time to the startup though.
 
 I wonder if  it could store unsaved buffers so  all my changes persist
 through sessions.
-
-** COMMENT God Mode
-God mode is more  like a mode in a sense of a  mode from modal editor,
-such as Vim, or Kakoune. It  makes all shortcuts you press be prefixed
-by =Ctrl= key by default. Not sure if I'm going to use it much, though.
-
-#+begin_src emacs-lisp
-  (use-package god-mode
-    :hook ((god-mode-enabled
-            god-mode-disabled) . aorst/god-mode-change-cursor-shape)
-    :bind (("<escape>" . god-local-mode)
-           :map god-local-mode-map
-           ("i" . god-local-mode)
-           ("<backspace>" . ignore)
-           ("<escape>" . ignore)
-           ("<return>" . ignore)
-           ("j" . ignore)
-           ("m" . ignore))
-    :config
-    (advice-add #'aorst/newline-below :after (lambda () (god-local-mode -1)))
-    (advice-add #'aorst/newline-above :after (lambda () (god-local-mode -1)))
-    (dolist (mode '(treemacs-mode
-                    vterm-mode
-                    cider-repl-mode
-                    racket-repl-mode
-                    geiser-repl-mode))
-      (add-to-list 'god-exempt-major-modes mode))
-    :init
-    (defun aorst/god-mode-change-cursor-shape ()
-      (when window-system
-        (setq cursor-type (if god-local-mode 'box 'bar))))
-    (god-mode))
-#+end_src
-
-This package provides more comfortable usage for =isearch= in God mode:
-
-#+begin_src emacs-lisp
-  (use-package god-mode-isearch
-    :straight nil
-    :bind (:map isearch-mode-map
-           ("<escape>" . god-mode-isearch-activate)
-           :map god-mode-isearch-map
-           ("<escape>" . god-mode-isearch-disable)))
-#+end_src
 
 ** Edit Indirect
 This  package  makes it  possible  to  edit  Markdown code  blocks  in
