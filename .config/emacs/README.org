@@ -906,6 +906,17 @@ Line encoding module for mode-line.
                     map))))
 #+end_src
 
+**** =mode-line-buffer-name=
+Buffer name module for mode-line. Returns buffer name or empty string
+if buffer is special and starts from space.
+
+#+begin_src emacs-lisp
+  (defun aorst/mode-line-buffer-name ()
+    (let* ((name (buffer-name))
+           (match (string-match " " name)))
+      (if (and match (= match 0)) "" name)))
+#+end_src
+
 **** =mode-line-buffer-encoding=
 Buffer encoding module for mode-line.
 
@@ -982,6 +993,29 @@ Indentation info module for mode-line.
      'help-echo "Indentation method"))
 #+end_src
 
+**** =mode-line-line-column=
+Line-column module for mode-line.
+
+#+begin_src emacs-lisp
+  (defun aorst/mode-line-line-column ()
+    (propertize
+     "%C:%l  "
+     'help-echo "goto line"
+     'local-map (let ((map (make-sparse-keymap)))
+                  (define-key map [mode-line mouse-1] #'goto-line)
+                  map)))
+#+end_src
+
+**** =mode-line-mode-name=
+Major mode module for mode-line
+
+#+begin_src emacs-lisp
+  (defun aorst/mode-line-mode-name ()
+    (propertize
+     (concat (format-mode-line mode-name) "  ")
+     'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
+#+end_src
+
 *** Mini Modeline
 A very interesting package that displays modeline in the echo area
 (minibuffer). Currently it uses default format, and I'm looking
@@ -997,13 +1031,13 @@ forward to integrate DOOM modeline with it.
     (mini-modeline-r-format
      '(:eval (string-trim-right
               (concat
-               "%b"
+               (aorst/mode-line-buffer-name)
                (aorst/mode-line-buffer-modified)
-               "%C:%l  "
+               (aorst/mode-line-line-column)
                (aorst/mode-line-line-encoding)
                (aorst/mode-line-buffer-encoding)
                (aorst/mode-line-indent-mode)
-               (format-mode-line mode-name) "  "
+               (aorst/mode-line-mode-name)
                (aorst/mode-line-git-branch)
                (aorst/mode-line-readonly)))))
     :config

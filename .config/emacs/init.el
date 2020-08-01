@@ -321,6 +321,11 @@ are defining or executing a macro."
                   (define-key map [mode-line mouse-1] 'mode-line-change-eol)
                   map))))
 
+(defun aorst/mode-line-buffer-name ()
+  (let* ((name (buffer-name))
+         (match (string-match " " name)))
+    (if (and match (= match 0)) "" name)))
+
 (defun aorst/mode-line-buffer-encoding ()
   (propertize
    (let ((sys (coding-system-plist buffer-file-coding-system)))
@@ -372,6 +377,19 @@ are defining or executing a macro."
        "Spaces  "))
    'help-echo "Indentation method"))
 
+(defun aorst/mode-line-line-column ()
+  (propertize
+   "%C:%l  "
+   'help-echo "goto line"
+   'local-map (let ((map (make-sparse-keymap)))
+                (define-key map [mode-line mouse-1] #'goto-line)
+                map)))
+
+(defun aorst/mode-line-mode-name ()
+  (propertize
+   (concat (format-mode-line mode-name) "  ")
+   'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
+
 (use-package mini-modeline
   :straight (:host github
              :repo "andreyorst/emacs-mini-modeline"
@@ -381,13 +399,13 @@ are defining or executing a macro."
   (mini-modeline-r-format
    '(:eval (string-trim-right
             (concat
-             "%b"
+             (aorst/mode-line-buffer-name)
              (aorst/mode-line-buffer-modified)
-             "%C:%l  "
+             (aorst/mode-line-line-column)
              (aorst/mode-line-line-encoding)
              (aorst/mode-line-buffer-encoding)
              (aorst/mode-line-indent-mode)
-             (format-mode-line mode-name) "  "
+             (aorst/mode-line-mode-name)
              (aorst/mode-line-git-branch)
              (aorst/mode-line-readonly)))))
   :config
