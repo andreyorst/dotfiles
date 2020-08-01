@@ -1870,5 +1870,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config
   (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
+(use-package which-key
+  :config (which-key-mode t))
+
 (provide 'init)
 ;;; init.el ends here
