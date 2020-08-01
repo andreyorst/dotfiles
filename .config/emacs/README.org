@@ -405,6 +405,14 @@ moves which is kinda convenient when working with =flymake=.
                 scroll-step 10)
 #+end_src
 
+If by chance I would need to use Emacs in terminal, I'd like to keep
+mouse workng:
+
+#+begin_src emacs-lisp
+  (unless (display-graphic-p)
+    (xterm-mouse-mode t))
+#+end_src
+
 ** Tab character
 Another default  setting that I kinda  dislike. Not that I'm  a fan of
 spaces over tabs  - tabs have their  use and spaces do to,  but I find
@@ -1040,7 +1048,6 @@ that Treemacs will look just as great as DOOM themed Emacs!
 
 #+begin_src emacs-lisp
   (use-package treemacs
-    :if window-system
     :commands (treemacs-follow-mode
                treemacs-filewatch-mode
                treemacs-fringe-indicator-mode
@@ -1272,7 +1279,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
            `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
     (defun aorst/treemacs-after-init-setup ()
       "Set treemacs theme, open treemacs, and expand all projects."
-      (treemacs-load-theme "Atom")
+      (when (display-graphic-p)
+        (treemacs-load-theme "Atom"))
       (setq treemacs-collapse-dirs 0)
       (treemacs)
       (aorst/treemacs-expand-all-projects)
@@ -1327,7 +1335,7 @@ customize tab appearance to match my theme.
 #+begin_src emacs-lisp
   (use-package tab-line
     :straight nil
-    :if (and window-system (not (version< emacs-version "27")))
+    :unless (version< emacs-version "27")
     :hook (after-init . global-tab-line-mode)
     :config
     (defun tab-line-close-tab (&optional e)
@@ -1469,40 +1477,35 @@ customize tab appearance to match my theme.
                     (face-attribute 'default :background)
                   (face-attribute 'mode-line :background)))
           (box-width (/ (line-pixel-height) 2)))
-      (when (and (color-defined-p bg)
-                 (color-defined-p fg)
-                 (color-defined-p base)
-                 (numberp box-width))
-        (set-face-attribute 'tab-line nil
-                            :background base
-                            :foreground fg
-                            :height 1.0
-                            :inherit nil
-                            :box (list :line-width -1 :color base))
-        (set-face-attribute 'tab-line-tab nil
-                            :foreground fg
-                            :background bg
-                            :weight 'normal
-                            :inherit nil
-                            :box (list :line-width box-width :color bg))
-        (set-face-attribute 'tab-line-tab-inactive nil
-                            :foreground fg
-                            :background base
-                            :weight 'normal
-                            :inherit nil
-                            :box (list :line-width box-width :color base))
-        (set-face-attribute 'tab-line-tab-current nil
-                            :foreground fg
-                            :background bg
-                            :weight 'normal
-                            :inherit nil
-                            :box (list :line-width box-width :color bg))))
-    (setq tab-line-exclude-modes '())
-    (dolist (mode '(ediff-mode
-                    process-menu-mode
-                    term-mode
-                    vterm-mode))
-      (add-to-list 'tab-line-exclude-modes mode))
+      (set-face-attribute 'tab-line nil
+                          :background base
+                          :foreground fg
+                          :height 1.0
+                          :inherit nil
+                          :box (if (> box-width 0) (list :line-width -1 :color base) nil))
+      (set-face-attribute 'tab-line-tab nil
+                          :foreground fg
+                          :background bg
+                          :weight 'normal
+                          :inherit nil
+                          :box (if (> box-width 0) (list :line-width box-width :color bg) nil))
+      (set-face-attribute 'tab-line-tab-inactive nil
+                          :foreground fg
+                          :background base
+                          :weight 'normal
+                          :inherit nil
+                          :box (if (> box-width 0) (list :line-width box-width :color base) nil))
+      (set-face-attribute 'tab-line-tab-current nil
+                          :foreground fg
+                          :background bg
+                          :weight 'normal
+                          :inherit nil
+                          :box (if (> box-width 0) (list :line-width box-width :color bg) nil)))
+
+    (setq tab-line-exclude-modes '(ediff-mode
+                                   process-menu-mode
+                                   term-mode
+                                   vterm-mode))
 
     (defun aorst/tab-line-drop-caches ()
       "Drops `tab-line' cache in every window."
