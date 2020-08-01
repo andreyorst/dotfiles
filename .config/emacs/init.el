@@ -392,8 +392,7 @@ are defining or executing a macro."
 
 (use-package mini-modeline
   :straight (:host github
-             :repo "andreyorst/emacs-mini-modeline"
-             :branch "gui-line-setting")
+             :repo "kiennq/emacs-mini-modeline")
   :custom
   (mini-modeline-display-gui-line nil)
   (mini-modeline-r-format
@@ -781,10 +780,6 @@ without truncation."
            (padding (/ (if (oddp width) (+ width 1) width) 2)))
       (make-string padding ?\s)))
 
-  (defun aorst/buffer-active (buffer)
-    (cond ((eq buffer (window-buffer (selected-window))) 'focused)
-          ((get-buffer-window buffer) 'visible)
-          (t 'background)))
 
   (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
     "Create name for tab with padding and truncation.
@@ -797,8 +792,7 @@ with maximum width, it calculates new width for each tab and
 truncates text if needed.  Minimal width can be set with
 `tab-line-tab-min-width' variable."
     (with-current-buffer buffer
-      (let* ((status (aorst/buffer-active buffer))
-             (amount (length (tab-line-tabs-window-buffers)))
+      (let* ((amount (length (tab-line-tabs-window-buffers)))
              (width (aorst/tab-line--tab-width
                      (aorst/tab-line--max-width (get-buffer-window buffer))
                      amount))

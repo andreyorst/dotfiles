@@ -1024,8 +1024,7 @@ forward to integrate DOOM modeline with it.
 #+begin_src emacs-lisp
   (use-package mini-modeline
     :straight (:host github
-               :repo "andreyorst/emacs-mini-modeline"
-               :branch "gui-line-setting")
+               :repo "kiennq/emacs-mini-modeline")
     :custom
     (mini-modeline-display-gui-line nil)
     (mini-modeline-r-format
