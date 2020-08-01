@@ -136,7 +136,7 @@
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
   (not (or (string-match-p
-            (regexp-opt '("Treemacs"
+            (regexp-opt '("*Treemacs"
                           "*vterm*"
                           " *Minibuf"
                           " *Echo Area"
@@ -781,6 +781,10 @@ without truncation."
            (padding (/ (if (oddp width) (+ width 1) width) 2)))
       (make-string padding ?\s)))
 
+  (defun aorst/buffer-active (buffer)
+    (cond ((eq buffer (window-buffer (selected-window))) 'focused)
+          ((get-buffer-window buffer) 'visible)
+          (t 'background)))
 
   (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
     "Create name for tab with padding and truncation.
@@ -793,7 +797,8 @@ with maximum width, it calculates new width for each tab and
 truncates text if needed.  Minimal width can be set with
 `tab-line-tab-min-width' variable."
     (with-current-buffer buffer
-      (let* ((amount (length (tab-line-tabs-window-buffers)))
+      (let* ((status (aorst/buffer-active buffer))
+             (amount (length (tab-line-tabs-window-buffers)))
              (width (aorst/tab-line--tab-width
                      (aorst/tab-line--max-width (get-buffer-window buffer))
                      amount))
@@ -826,46 +831,46 @@ truncates text if needed.  Minimal width can be set with
         tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
                                           'keymap tab-line-tab-close-map
                                           'mouse-face 'tab-line-close-highlight
-                                          'help-echo "Click to close tab"))
+                                          'help-echo "Click to close tab")
+        tab-line-exclude-modes '(ediff-mode
+                                 process-menu-mode
+                                 term-mode
+                                 vterm-mode))
 
 
   (let ((bg (if (facep 'solaire-default-face)
                 (face-attribute 'solaire-default-face :background)
               (face-attribute 'default :background)))
         (fg (face-attribute 'default :foreground))
+        (dark-fg (face-attribute 'shadow :foreground))
         (base (if (facep 'solaire-default-face)
                   (face-attribute 'default :background)
                 (face-attribute 'mode-line :background)))
         (box-width (/ (line-pixel-height) 2)))
     (set-face-attribute 'tab-line nil
                         :background base
-                        :foreground fg
+                        :foreground dark-fg
                         :height 1.0
                         :inherit nil
-                        :box (if (> box-width 0) (list :line-width -1 :color base) nil))
+                        :box (when (> box-width 0) (list :line-width -1 :color base)))
     (set-face-attribute 'tab-line-tab nil
-                        :foreground fg
+                        :foreground dark-fg
                         :background bg
                         :weight 'normal
                         :inherit nil
-                        :box (if (> box-width 0) (list :line-width box-width :color bg) nil))
+                        :box (when (> box-width 0) (list :line-width box-width :color bg)))
     (set-face-attribute 'tab-line-tab-inactive nil
-                        :foreground fg
+                        :foreground dark-fg
                         :background base
                         :weight 'normal
                         :inherit nil
-                        :box (if (> box-width 0) (list :line-width box-width :color base) nil))
+                        :box (when (> box-width 0) (list :line-width box-width :color base)))
     (set-face-attribute 'tab-line-tab-current nil
                         :foreground fg
                         :background bg
-                        :weight 'normal
+                        :weight 'bold
                         :inherit nil
-                        :box (if (> box-width 0) (list :line-width box-width :color bg) nil)))
-
-  (setq tab-line-exclude-modes '(ediff-mode
-                                 process-menu-mode
-                                 term-mode
-                                 vterm-mode))
+                        :box (when (> box-width 0) (list :line-width box-width :color bg))))
 
   (defun aorst/tab-line-drop-caches ()
     "Drops `tab-line' cache in every window."
