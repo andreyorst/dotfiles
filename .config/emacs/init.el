@@ -389,9 +389,11 @@ are defining or executing a macro."
   (use-package frame
     :straight nil
     :custom
+    (window-divider-default-bottom-width 1)
     (window-divider-default-right-width 1)
+    (window-divider-default-places t)
     :config
-    (window-divider-mode 1)
+    (window-divider-mode t)
     (set-face-attribute 'window-divider nil
                         :foreground (face-attribute
                                      'mode-line-inactive :background))))
