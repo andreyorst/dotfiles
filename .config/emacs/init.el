@@ -303,38 +303,66 @@ are defining or executing a macro."
   (set-face-attribute face nil
                       :box nil))
 
+(defun aorst/mode-line-buffer-name ()
+  (let* ((name (buffer-name))
+         (match (string-match " " name)))
+    (if (and match (= match 0)) "" (concat "  " name))))
+
+(defun aorst/mode-line-buffer-modified ()
+  (when (and buffer-file-name (buffer-modified-p))
+      (if (char-displayable-p ?💾) " 💾" "*")))
+
+(defun aorst/mode-line-line-column ()
+  (propertize
+   "  %C:%l"
+   'help-echo "goto line"
+   'local-map (let ((map (make-sparse-keymap)))
+                (define-key map [mode-line mouse-1] #'goto-line)
+                map)))
+
 (defun aorst/mode-line-line-encoding ()
   (let ((eol (coding-system-eol-type buffer-file-coding-system)))
     (propertize
      (pcase eol
-       (0 "LF  ")
-       (1 "CRLF  ")
-       (2 "CR  ")
+       (0 "  LF")
+       (1 "  CRLF")
+       (2 "  CR")
        (_ ""))
      'help-echo (format "End-of-line style: %s"
                         (pcase eol
-                          (0 "Unix-style LF (\\n)")
-                          (1 "DOS-style CRLF (\\r\\n)")
-                          (2 "Mac-style CR (\\r)")
+                          (0 "Unix-style LF")
+                          (1 "DOS-style CRLF")
+                          (2 "Mac-style CR")
                           (_ "Undecided")))
      'local-map (let ((map (make-sparse-keymap)))
                   (define-key map [mode-line mouse-1] 'mode-line-change-eol)
                   map))))
-
-(defun aorst/mode-line-buffer-name ()
-  (let* ((name (buffer-name))
-         (match (string-match " " name)))
-    (if (and match (= match 0)) "" name)))
 
 (defun aorst/mode-line-buffer-encoding ()
   (propertize
    (let ((sys (coding-system-plist buffer-file-coding-system)))
      (if (memq (plist-get sys :category)
                '(coding-category-undecided coding-category-utf-8))
-         "UTF-8  "
-       (concat (upcase (symbol-name (plist-get sys :name))) "  ")))
+         "  UTF-8"
+       (concat "  " (upcase (symbol-name (plist-get sys :name))))))
    'help-echo 'mode-line-mule-info-help-echo
    'local-map mode-line-coding-system-map))
+
+(defun aorst/mode-line-indent-mode ()
+  (propertize
+   (if indent-tabs-mode
+       "  Tabs"
+     (if (boundp 'editorconfig-indentation-alist)
+         (if-let ((indent-level (symbol-value (cadr (assoc major-mode editorconfig-indentation-alist)))))
+             (format "  %d Spaces" indent-level)
+           "  Spaces")
+       "  Spaces"))
+   'help-echo "Indentation method"))
+
+(defun aorst/mode-line-mode-name ()
+  (propertize
+   (concat "  " (format-mode-line mode-name))
+   'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
 
 (defun aorst/mode-line-git-branch ()
   (when (and vc-mode buffer-file-name)
@@ -344,51 +372,42 @@ are defining or executing a macro."
                    (+ (if (eq (vc-backend buffer-file-name) 'Hg) 2 3)
                       2)))))
       (when str
-        (concat (if (char-displayable-p ?) "" "@") " " str "  ")))))
-
-(defun aorst/mode-line-buffer-modified ()
-  (if (and buffer-file-name (buffer-modified-p))
-      (if (char-displayable-p ?💾) " 💾  " "*  ")
-    "  "))
+        (concat (if (char-displayable-p ?) "   " "  @ ") str)))))
 
 (defun aorst/mode-line-readonly ()
   (if buffer-read-only
       (propertize
-       (if (char-displayable-p ?🔒) "🔒  " "RO  ")
+       (if (char-displayable-p ?🔒) "  🔒" "  RO")
        'help-echo "Make file writable"
        'local-map (let ((map (make-sparse-keymap)))
                     (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
                     map))
     (propertize
-     (if (char-displayable-p ?🔓) "🔓  " "RW  ")
+     (if (char-displayable-p ?🔓) "  🔓" "  RW")
      'help-echo "Make file read only"
      'local-map (let ((map (make-sparse-keymap)))
                   (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
                   map))))
 
-(defun aorst/mode-line-indent-mode ()
-  (propertize
-   (if indent-tabs-mode
-       "Tabs  "
-     (if (boundp 'editorconfig-indentation-alist)
-         (if-let ((indent-level (symbol-value (cadr (assoc major-mode editorconfig-indentation-alist)))))
-             (format "%d Spaces  " indent-level)
-           "Spaces  ")
-       "Spaces  "))
-   'help-echo "Indentation method"))
-
-(defun aorst/mode-line-line-column ()
-  (propertize
-   "%C:%l  "
-   'help-echo "goto line"
-   'local-map (let ((map (make-sparse-keymap)))
-                (define-key map [mode-line mouse-1] #'goto-line)
-                map)))
-
-(defun aorst/mode-line-mode-name ()
-  (propertize
-   (concat (format-mode-line mode-name) "  ")
-   'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
+(defun aorst/mode-line-flycheck ()
+  (when (bound-and-true-p flycheck-mode)
+    (propertize
+     (concat
+      "  "
+      (pcase flycheck-last-status-change
+        (`not-checked "-")
+        (`no-checker "-")
+        (`running (if (char-displayable-p ?🔄) "🔄" "*"))
+        (`errored (if (char-displayable-p ?⚠) "⚠" "!"))
+        (`finished
+         (let-alist (flycheck-count-errors flycheck-current-errors)
+           (if (or .error .warning)
+               (format "⚠ %s/%s" (or .error 0) (or .warning 0))
+             "✔")))
+        (`interrupted ".")
+        (`suspicious "?")))
+     'help-echo "Flycheck list errors"
+     'local-map 'flycheck-error-list-mode-line-map)))
 
 (use-package mini-modeline
   :straight (:host github
@@ -396,17 +415,17 @@ are defining or executing a macro."
   :custom
   (mini-modeline-display-gui-line nil)
   (mini-modeline-r-format
-   '(:eval (string-trim-right
-            (concat
-             (aorst/mode-line-buffer-name)
-             (aorst/mode-line-buffer-modified)
-             (aorst/mode-line-line-column)
-             (aorst/mode-line-line-encoding)
-             (aorst/mode-line-buffer-encoding)
-             (aorst/mode-line-indent-mode)
-             (aorst/mode-line-mode-name)
-             (aorst/mode-line-git-branch)
-             (aorst/mode-line-readonly)))))
+   '(:eval (concat
+            (aorst/mode-line-buffer-name)
+            (aorst/mode-line-buffer-modified)
+            (aorst/mode-line-line-column)
+            (aorst/mode-line-line-encoding)
+            (aorst/mode-line-buffer-encoding)
+            (aorst/mode-line-indent-mode)
+            (aorst/mode-line-mode-name)
+            (aorst/mode-line-git-branch)
+            (aorst/mode-line-readonly)
+            (aorst/mode-line-flycheck))))
   :config
   (mini-modeline-mode t))
 
