@@ -285,71 +285,105 @@ are defining or executing a macro."
   (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
   (solaire-mode-swap-bg))
 
-(use-package doom-modeline
-  :custom
-  (doom-modeline-bar-width 3)
-  (doom-modeline-major-mode-color-icon nil)
-  (doom-modeline-buffer-color-icon nil)
-  (doom-modeline-buffer-file-name-style 'truncate-with-project)
-  (doom-modeline-minor-modes nil)
-  (doom-modeline-height (floor (* (line-pixel-height) 1.8)))
-  (find-file-visit-truename t)
-  :config
-  (let ((fg (face-attribute 'default :foreground))
-        (bg (face-attribute 'mode-line :background))
-        (fg-inactive (face-attribute 'font-lock-comment-face :foreground))
-        (bg-inactive (face-attribute 'mode-line-inactive :background)))
-    (dolist (face '(doom-modeline-buffer-modified
-                    doom-modeline-buffer-minor-mode
-                    doom-modeline-project-parent-dir
-                    doom-modeline-project-dir
-                    doom-modeline-project-root-dir
-                    doom-modeline-highlight
-                    doom-modeline-debug
-                    doom-modeline-info
-                    doom-modeline-warning
-                    doom-modeline-urgent
-                    doom-modeline-unread-number
-                    doom-modeline-buffer-path
-                    doom-modeline-bar
-                    doom-modeline-bar-inactive
-                    doom-modeline-panel
-                    doom-modeline-buffer-major-mode
-                    doom-modeline-buffer-file
-                    doom-modeline-lsp-success
-                    doom-modeline-lsp-warning
-                    doom-modeline-lsp-error
-                    doom-modeline-lsp-running
-                    doom-modeline-persp-name
-                    doom-modeline-battery-full
-                    doom-modeline-battery-error
-                    doom-modeline-battery-charging
-                    doom-modeline-battery-critical
-                    doom-modeline-battery-normal
-                    doom-modeline-input-method
-                    doom-modeline-input-method-alt
-                    doom-modeline-repl-warning
-                    doom-modeline-repl-success))
-      (set-face-attribute face nil :foreground fg :weight 'normal))
-    (set-face-attribute 'doom-modeline-buffer-file nil :weight 'semi-bold)
-    (set-face-attribute 'doom-modeline-buffer-major-mode nil :weight 'semi-bold)
-    (set-face-attribute 'doom-modeline-panel nil :background bg)
-    (set-face-attribute 'doom-modeline-bar nil :background bg)
-    (set-face-attribute 'doom-modeline-bar-inactive nil :background bg)
-    (set-face-attribute 'mode-line-inactive nil :foreground fg-inactive :background bg-inactive))
-  (doom-modeline-mode 1))
-
 (setq-default column-number-mode t
               line-number-mode t
               size-indication-mode nil
               mode-line-position nil
               mode-line-percent-position nil
               mode-line-in-non-selected-windows nil)
-(unless (bound-and-true-p doom-modeline-mode)
-  (dolist (face '(mode-line mode-line-inactive))
-    (set-face-attribute face nil
-                        :box (list :line-width (/ (line-pixel-height) 2)
-                                   :color (face-attribute face :background)))))
+
+(dolist (face '(mode-line mode-line-inactive))
+  (set-face-attribute face nil
+                      :box nil))
+
+(defun aorst/mode-line-line-encoding ()
+  (let ((eol (coding-system-eol-type buffer-file-coding-system)))
+    (propertize
+     (pcase eol
+       (0 "LF  ")
+       (1 "CRLF  ")
+       (2 "CR  ")
+       (_ ""))
+     'help-echo (format "End-of-line style: %s"
+                        (pcase eol
+                          (0 "Unix-style LF (\\n)")
+                          (1 "DOS-style CRLF (\\r\\n)")
+                          (2 "Mac-style CR (\\r)")
+                          (_ "Undecided")))
+     'local-map (let ((map (make-sparse-keymap)))
+                  (define-key map [mode-line mouse-1] 'mode-line-change-eol)
+                  map))))
+
+(defun aorst/mode-line-buffer-encoding ()
+  (propertize
+   (let ((sys (coding-system-plist buffer-file-coding-system)))
+     (if (memq (plist-get sys :category)
+               '(coding-category-undecided coding-category-utf-8))
+         "UTF-8  "
+       (concat (upcase (symbol-name (plist-get sys :name))) "  ")))
+   'help-echo 'mode-line-mule-info-help-echo
+   'local-map mode-line-coding-system-map))
+
+(defun aorst/mode-line-git-branch ()
+  (when (and vc-mode buffer-file-name)
+    (let* ((str (when vc-display-status
+                  (substring
+                   vc-mode
+                   (+ (if (eq (vc-backend buffer-file-name) 'Hg) 2 3)
+                      2)))))
+      (when str
+        (concat (if (char-displayable-p ?) "" "@") " " str "  ")))))
+
+(defun aorst/mode-line-buffer-modified ()
+  (if (and buffer-file-name (buffer-modified-p))
+      (if (char-displayable-p ?💾) " 💾  " "*  ")
+    "  "))
+
+(defun aorst/mode-line-readonly ()
+  (if buffer-read-only
+      (propertize
+       (if (char-displayable-p ?🔒) "🔒" "RO")
+       'help-echo "Make file writable"
+       'local-map (let ((map (make-sparse-keymap)))
+                    (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
+                    map))
+    (propertize
+     (if (char-displayable-p ?🔓) "🔓" "RW")
+     'help-echo "Make file read only"
+     'local-map (let ((map (make-sparse-keymap)))
+                  (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
+                  map))))
+
+(defun aorst/mode-line-indent-mode ()
+  (propertize
+   (if indent-tabs-mode
+       "Tabs  "
+     (if (boundp 'editorconfig-indentation-alist)
+         (if-let ((indent-level (symbol-value (cadr (assoc major-mode editorconfig-indentation-alist)))))
+             (format "%d Spaces  " indent-level)
+           "Spaces  ")
+       "Spaces  "))
+   'help-echo "Indentation method"))
+
+(use-package mini-modeline
+  :straight (:host github
+             :repo "andreyorst/emacs-mini-modeline"
+             :branch "gui-line-setting")
+  :custom
+  (mini-modeline-display-gui-line nil)
+  (mini-modeline-right-padding 1)
+  (mini-modeline-r-format
+   '(:eval (concat "%b"
+                   (aorst/mode-line-buffer-modified)
+                   "%C:%l  "
+                   (aorst/mode-line-line-encoding)
+                   (aorst/mode-line-buffer-encoding)
+                   (aorst/mode-line-indent-mode)
+                   (format-mode-line mode-name) "  "
+                   (aorst/mode-line-git-branch)
+                   (aorst/mode-line-readonly))))
+  :config
+  (mini-modeline-mode t))
 
 (when window-system
   (use-package frame
@@ -1263,7 +1297,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
-  :commands editorconfig-mode
   :config (editorconfig-mode 1))
 
 (use-package flycheck
@@ -1396,8 +1429,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package ivy
   :commands ivy-mode
-  :hook ((minibuffer-setup-hook . aorst/minibuffer-defer-garbage-collection)
-         (minibuffer-exit-hook . aorst/minibuffer-restore-garbage-collection))
+  :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
+         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-x C-b" . ivy-switch-buffer))
   :custom
@@ -1446,27 +1479,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (when (executable-find "rg")
     (setq counsel-rg-base-command
           "rg -S --no-heading --hidden --line-number --color never %s .")))
-
-(use-package ivy-posframe
-  :after ivy
-  :custom
-  (ivy-posframe-display-functions-alist '((t . aorst/posframe-position)))
-  (ivy-posframe-height-alist '((t . 16)))
-  (ivy-posframe-parameters '((internal-border-width . 6)))
-  (ivy-posframe-width 78)
-  :config
-  (defvar aorst--ivy-posframe-top-padding 42
-    "additional padding between top of the frame and posframe.")
-  (defun aorst/posframe-position (str)
-    (ivy-posframe--display str #'aorst/posframe-under-tabs-center))
-  (defun aorst/posframe-under-tabs-center (info)
-    "Function that sets center position for ivy posframe."
-    (cons (/ (- (plist-get info :parent-frame-width)
-                (plist-get info :posframe-width))
-             2)
-          0))
-  (set-face-attribute 'ivy-posframe nil :background (face-attribute 'mode-line :background))
-  (ivy-posframe-mode +1))
 
 (use-package company
   :bind (:map company-active-map

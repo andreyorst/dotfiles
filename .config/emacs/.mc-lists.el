@@ -46,6 +46,7 @@
         org-fill-paragraph
         org-force-self-insert
         org-kill-line
+        org-meta-return
         org-return
         org-self-insert-command
         org-toggle-comment
