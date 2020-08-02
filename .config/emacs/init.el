@@ -890,7 +890,10 @@ truncates text if needed.  Minimal width can be set with
     (dolist (window (window-list))
       (set-window-parameter window 'tab-line-cache nil)))
 
-  (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches))
+  (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)
+
+  (define-advice tab-line-select-tab (:after (&optional e))
+    (select-window (posn-window (event-start e)))))
 
 (use-package display-line-numbers
   :straight nil
