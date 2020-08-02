@@ -10,17 +10,22 @@
 * About this document
 This is my Emacs configuration file written as Org document.
 I do all edits here, then /compile/ it to initialization files.
-Emacs is complex tool, and by having my configuration in Org Mode, I can separate it to different sections, elaborate each change, and toggle configuration parts on and off with ease.
+Emacs is complex tool, and by having my configuration in Org Mode, I can separate it to different sections.
+I also can add short description for packages, and toggle configuration parts on and off with ease.
 
-I try to maintain my Emacs configuration simple, fast, and small, keeping as much of vanilla Emacs as I can, but I'm a sane person so some aspects, which are actually insane in my opinion, are changed.
+I try to maintain my Emacs configuration simple, fast, and small, keeping as much of vanilla Emacs as I can.
+But I'm a sane person so some aspects, which in my opinion are actually insane, are changed.
 
-This file is self contained configuration, thus it is the only file you need to bootstrap Emacs 26 and higher, and it will configure itself, although you need [[https://orgmode.org/][Org Mode]] for this to work.
-Org mode comes with all current versions of Emacs, and =org-babel-tangle= function should be available.
-If you've downloaded this file, run this function on it, and restart Emacs.
+This file is self contained Emacs configuration, thus it is the only file you need to bootstrap Emacs 26 and higher.
+It will configure itself, although you need [[https://orgmode.org/][Org Mode]] for this to work.
+Org mode comes inbuilt with all current versions of Emacs.
+
+If you've downloaded this file, put it to =~/.config/emacs= or =~/.emacs.d/=, and run =org-babel-tangle=, then restart Emacs.
 This function exports all code blocks accordingly to =header-args= property at the top of this document, and under some headings.
-Calling this function with this file as an argument will result in creation of =init.el= and =early-init.el= located at =user-emacs-directory=.
+As a result =init.el= and =early-init.el= files are created, located in the same directory as this file, which should be in =user-emacs-directory=.
 This is why I'm using tangle approach, instead of =org-babel-load-file=, as there's no way to provide =early-init= this way.
-After first tangle, every time this file is saved it gets re-tangled automatically, so there's not much of a difference from loading with babel, and only this file needs to be edited.
+After first tangle, every time this file is saved it gets re-tangled automatically.
+And, because both =init.el= and =early-init.el= are in read only mode, only this file needs to be edited.
 
 Since I'm trying to follow Emacs conventions, good Emacs Lisp file starts with commentary:
 
@@ -40,7 +45,8 @@ At this point configurations will be split in different sections grouped by some
 * Initial Setup
 Emacs starts fast, but as amount of packages grows it gets slower.
 The init time is important because I like to close Emacs when I'm not using it.
-I'm not closing and opening it for every file, or like every 15 minutes, but still, the faster it starts - the better for me.
+I'm not closing and opening it for every file, or like every 15 minutes, but still.
+The faster it starts - the better for me.
 
 ** =early-init.el=
 :properties:
@@ -106,7 +112,8 @@ In order to compile everything that Emacs loads asynchronously we can set this v
   (setq comp-deferred-compilation t)
 #+end_src
 
-This way I can compile Emacs from source as I usually do, and then continue using it as normal, and Emacs will do it's native compilation in background for every loaded package.
+This way I can compile Emacs from source as I usually do, and then continue using it as normal.
+And Emacs will do it's native compilation in background for every loaded package.
 That's amazing!
 
 *** User Interface
@@ -121,7 +128,8 @@ Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
         default-frame-alist initial-frame-alist)
 #+end_src
 
-Resizing frame is also expensive so we inhibit it, and latest patch to Emacs introduced =x-gtk-resize-child-frames= variable that fixes the issue with child frames not being resized correctly under GNOME Shell, so let's set it to =resize-mode=.
+Resizing frame is also expensive so we inhibit it.
+Setting =x-gtk-resize-child-frames= variable to =resize-mode= fixes the [[https://gitlab.gnome.org/GNOME/mutter/-/issues/840][issue]] with child frames not being resized correctly under GNOME Shell.
 
 #+begin_src emacs-lisp
   (setq frame-inhibit-implied-resize t
@@ -178,7 +186,8 @@ This concludes the =early-init.el= file.
 :properties:
 :header-args+: :tangle "./init.el"
 :end:
-Before Emacs 27 there were no such thing as =eraly-init.el=, so if I will use older Emacs with this configuration it will miss settings that are done there.
+Before Emacs 27 there were no such thing as =eraly-init.el=.
+So if I will use older Emacs with this configuration it will miss settings that are done there.
 This code manually loads this file in such case:
 
 #+begin_src emacs-lisp
@@ -186,9 +195,16 @@ This code manually loads this file in such case:
     (load (expand-file-name "early-init" user-emacs-directory)))
 #+end_src
 
-We do it as early as possible to as it is important to load these settings before all settings specified in =init.el=.
+We do it as early as possible, as it is important to load these settings before all settings specified in =init.el=.
 
 ** COMMENT =package.el=
+#+begin_comment
+This section is commented because I'm no longer using =package.el= as my package manager.
+Instead I'm using =straight.el=, which provides more facilites, and does not have most of =package.el= problems.
+However, I still keep this configuration, since I might switch back, and I would not want to configure everything again.
+If you want to use =package.el= instead, make sure to uncomment this heading, and comment =straight.el= heading.
+#+end_comment
+
 To obtain plugins we need =package.el= package.
 Although this is builtin and convenient, it's also slow and messy.
 Instead of using =package= directly we will use =use-package= to manage package configurations.
@@ -203,7 +219,9 @@ Since all packages that I need can be obtained from there, I did not bothered wi
           ("melpa" . "https://melpa.org/packages/")))
 #+end_src
 
-Emacs 26.2 had a bug with downloading from Elpa, here's a workaround, although it is dangerous to use this, as it is pretty insecure, so please upgrade to more recent Emacs, in case you're still using Emacs 26.2.
+Emacs 26.2 had a bug with downloading from Elpa.
+Here's a workaround, although it is dangerous to use this, as it is pretty insecure.
+So please upgrade to more recent Emacs, in case you're still using Emacs 26.2.
 
 #+begin_src emacs-lisp
   (when (version= emacs-version "26.2")
@@ -211,7 +229,8 @@ Emacs 26.2 had a bug with downloading from Elpa, here's a workaround, although i
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 #+end_src
 
-Found this trick [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], but instead of using Boolean, I've decided to track time since last package refresh, and use customize to store it.
+Found this trick [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], and adopted the idea.
+But instead of using Boolean, I've decided to track time since last package refresh, and use customize to store it.
 This variable is going to hold either =nil= or date-time string.
 
 #+begin_src emacs-lisp
@@ -416,7 +435,8 @@ Another feature I want is history between sessions. I'm not sure why it isn't de
 #+end_src
 
 ** Keyboard Layout
-I use two keyboard layouts: =qwerty= and =йцукен=, therefore I need a way to switch between those without loosing ability to use such chords as =C-x= which will become a =C-ч= if I select Cyrillic layout in the OS.
+I use two keyboard layouts: =qwerty= and =йцукен=, therefore I need a way to switch between those.
+But there's a problem - such chords as =C-x= which will become a =C-ч= if I select Cyrillic layout in the OS.
 Luckily for me, Emacs provides a method to switch layouts within Emacs with =C-\=, so all common shortcuts will still work fine.
 
 #+begin_src emacs-lisp
@@ -427,7 +447,7 @@ Luckily for me, Emacs provides a method to switch layouts within Emacs with =C-\
     (default-input-method 'russian-computer))
 #+end_src
 
-I'm not using =russian-jcuken= here because it represents the "typewriter" layout with number-line inverted, so to access numbers I need to use Shift key.
+I'm not using =russian-jcuken= here because this layout has inverted number-line, so to access numbers I need to use Shift key.
 =russian-computer= doesn't have this problem.
 
 ** UTF8
@@ -716,7 +736,8 @@ I don't use this package directly yet, but some other packages do, like DOOM Mod
 ** Theme
 I'm using *doom-themes* package to make my Emacs look modern.
 This theme collection was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find these themes actually great on its own.
-This package contains nice variant of Atom-like One theme which I like, but it is also an amazingly well put package, which defines colors for pretty much everything in Emacs.
+This package contains nice variant of Atom-like One theme which I like.
+But it is also an amazingly well put set of themes, which define colors for pretty much every popular Emacs package.
 
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -780,8 +801,6 @@ Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode
 Mode-line is displayed at the bottom of each buffer, and shows necessary information about buffer state.
 There are several packages that can make your mode-line appear differently, but most will reuse mode-line settings.
 
-I don't find displaying position in mode-line really great idea, because I need to move my eyes too much on big screen just to see what line number I'm currently on.
-
 #+begin_src emacs-lisp
   (setq-default column-number-mode t
                 line-number-mode t
@@ -800,7 +819,8 @@ Also, let's remove that bevel thing.
 #+end_src
 
 *** Mode-line functions
-Most of these functions are based on what [[https://github.com/seagle0128/doom-modeline][DOOM Modeline]] does, although I want to use more compact mode-line, without many additional settings that DOOM Mode-line provides.
+Most of these functions are based on what [[https://github.com/seagle0128/doom-modeline][DOOM Modeline]] does.
+Although I want to use more compact mode-line, without many additional settings that DOOM Mode-line provides.
 
 **** =mode-line-buffer-name=
 Buffer name module for mode-line.
