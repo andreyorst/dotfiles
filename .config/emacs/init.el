@@ -457,7 +457,9 @@ are defining or executing a macro."
                         :foreground (face-attribute
                                      'mode-line-inactive :background))))
 
-(setq-default frame-title-format '("%b — Emacs"))
+(setq-default frame-title-format
+              '(:eval (let ((match (string-match "[ *]" (buffer-name))))
+                        (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
 
 (use-package treemacs
   :commands (treemacs-follow-mode

@@ -1044,10 +1044,15 @@ Some tweaks to window divider colors.
 #+end_src
 
 ** Title
-Emacs uses weird method of naming a window, I'd like to see a file I'm currently working on in the task bar in case my Emacs was minimized for some reason.
+Emacs uses weird method of naming a frame.
+I'd like to see a file I'm currently working on in the task bar in case my Emacs was minimized for some reason.
+But I don't really need all these special buffers in the frame title.
+We can avoid this with this little check for space and asterisk at the beginning of buffer name.
 
 #+begin_src emacs-lisp
-  (setq-default frame-title-format '("%b — Emacs"))
+  (setq-default frame-title-format
+                '(:eval (let ((match (string-match "[ *]" (buffer-name))))
+                          (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
 #+end_src
 
 ** Treemacs
