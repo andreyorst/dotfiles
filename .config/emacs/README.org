@@ -8,33 +8,21 @@
 [[file:.screenshot.png]]
 
 * About this document
-This is my Emacs configuration file written as Org document.  I do all
-edits here, then /compile/ it  to initialization files. Emacs is complex
-tool, and by having my configuration in Org Mode, I can separate it to
-different sections,  elaborate each  change, and  toggle configuration
-parts on and off with ease.
+This is my Emacs configuration file written as Org document.
+I do all edits here, then /compile/ it to initialization files.
+Emacs is complex tool, and by having my configuration in Org Mode, I can separate it to different sections, elaborate each change, and toggle configuration parts on and off with ease.
 
-I  try to  maintain my  Emacs configuration  simple, fast,  and small,
-keeping as much  of vanilla Emacs as  I can, but I'm a  sane person so
-some aspects, which are actually insane in my opinion, are changed.
+I try to maintain my Emacs configuration simple, fast, and small, keeping as much of vanilla Emacs as I can, but I'm a sane person so some aspects, which are actually insane in my opinion, are changed.
 
-This file  is self contained configuration,  thus it is the  only file
-you  need to  bootstrap Emacs  26 and  higher, and  it will  configure
-itself, although you  need [[https://orgmode.org/][Org Mode]] for this to  work.  Org mode comes
-with  all current  versions  of Emacs,  and =org-babel-tangle=  function
-should be available. If you've downloaded this file, run this function
-on  it, and  restart Emacs.   This  function exports  all code  blocks
-accordingly to =header-args=  property at the top of  this document, and
-under  some headings.   Calling this  function  with this  file as  an
-argument will result in creation  of =init.el= and =early-init.el= located
-at  =user-emacs-directory=.   This is  why  I'm  using tangle  approach,
-instead  of   =org-babel-load-file=,  as  there's  no   way  to  provide
-=early-init= this way. After first tangle, every time this file is saved
-it gets re-tangled automatically, so  there's not much of a difference
-from loading with babel, and only this file needs to be edited.
+This file is self contained configuration, thus it is the only file you need to bootstrap Emacs 26 and higher, and it will configure itself, although you need [[https://orgmode.org/][Org Mode]] for this to work.
+Org mode comes with all current versions of Emacs, and =org-babel-tangle= function should be available.
+If you've downloaded this file, run this function on it, and restart Emacs.
+This function exports all code blocks accordingly to =header-args= property at the top of this document, and under some headings.
+Calling this function with this file as an argument will result in creation of =init.el= and =early-init.el= located at =user-emacs-directory=.
+This is why I'm using tangle approach, instead of =org-babel-load-file=, as there's no way to provide =early-init= this way.
+After first tangle, every time this file is saved it gets re-tangled automatically, so there's not much of a difference from loading with babel, and only this file needs to be edited.
 
-Since I'm  trying to  follow Emacs conventions,  good Emacs  Lisp file
-starts with commentary:
+Since I'm trying to follow Emacs conventions, good Emacs Lisp file starts with commentary:
 
 #+begin_src emacs-lisp
   ;;; init.el --- Emacs main configuration file -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
@@ -47,22 +35,20 @@ starts with commentary:
   ;;; Code:
 #+end_src
 
-At  this point  configurations  will be  split  in different  sections
-grouped by something common to them all.
+At this point configurations will be split in different sections grouped by something common to them all.
 
 * Initial Setup
-Emacs starts fast, but as amount of packages grows it gets slower. The
-init time  is important  because I  like to close  Emacs when  I'm not
-using it. I'm not closing and opening it for every file, or like every
-15 minutes, but still, the faster it starts - the better for me.
+Emacs starts fast, but as amount of packages grows it gets slower.
+The init time is important because I like to close Emacs when I'm not using it.
+I'm not closing and opening it for every file, or like every 15 minutes, but still, the faster it starts - the better for me.
 
 ** =early-init.el=
 :properties:
 :header-args+: :tangle "./early-init.el"
 :end:
-These settings are going into  different init file: =earli-init.el=.  We
-are going to use some speedup tricks from [[https://github.com/hlissner/doom-emacs][doom-emacs]] here.  But before
-that, let's add top comment as we did for =init.el=:
+These settings are going into  different init file: =earli-init.el=.
+We are going to use some speedup tricks from [[https://github.com/hlissner/doom-emacs][doom-emacs]] here.
+But before that, let's add top comment as we did for =init.el=:
 
 #+begin_src emacs-lisp
   ;;; early-init.el --- early configurations -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
@@ -76,12 +62,11 @@ that, let's add top comment as we did for =init.el=:
 #+end_src
 
 *** Garbage Collection
-The main problem  with Emacs startup is garbage  collection system. It
-is invoked so many times on startup that it causes quite big impact on
-startup time.   We're talking  /seconds/.  One can  raise limit  when to
-trigger garbage collection, but this will end up in unpleasant editing
-experience. So I'm  declaring these variables to  store default values
-for the GC, to restore them after initialization is finished:
+The main problem with Emacs startup is garbage collection system.
+It is invoked so many times on startup that it causes quite big impact on startup time.
+We're talking /seconds/.
+One can raise limit when to trigger garbage collection, but this will end up in unpleasant editing experience.
+So I'm declaring these variables to store default values for the GC, to restore them after initialization is finished:
 
 #+begin_src emacs-lisp
   (defvar aorst--gc-cons-threshold gc-cons-threshold)
@@ -89,8 +74,9 @@ for the GC, to restore them after initialization is finished:
   (defvar aorst--file-name-handler-alist file-name-handler-alist)
 #+end_src
 
-Now  we can  tweak  CG.  We  need  to raise  threshold  to prevent  it
-running. And as well we tweak some other slow bits:
+Now we can tweak CG.
+We need to raise threshold to prevent it running.
+And as well we tweak some other slow bits:
 
 #+begin_src emacs-lisp
   (setq-default gc-cons-threshold 402653184
@@ -100,8 +86,7 @@ running. And as well we tweak some other slow bits:
                 file-name-handler-alist nil)
 #+end_src
 
-Then we need  a hook that restores initial  values once initialization
-done:
+Then we need a hook that restores initial values once initialization done:
 
 #+begin_src emacs-lisp
   (add-hook 'after-init-hook
@@ -112,24 +97,20 @@ done:
 #+end_src
 
 *** Native Compiled Emacs Lisp
-There's a  very interesting project  that I'm currently  using, called
-[[http://akrl.sdf.org/gccemacs.html][gccemacs]]. It  provides a way to  compile Emacs Lisp into  native code,
-thus making  Emacs much more  robust and  snappy. In order  to compile
-everything that Emacs loads asynchronously we can set this variable to
-=true=.
+There's a very interesting project that I'm currently using, called [[http://akrl.sdf.org/gccemacs.html][gccemacs]].
+It provides a way to compile Emacs Lisp into native code, thus making Emacs much more robust and snappy.
+In order to compile everything that Emacs loads asynchronously we can set this variable to =true=.
 
 #+begin_src emacs-lisp
   (defvar comp-deferred-compilation)
   (setq comp-deferred-compilation t)
 #+end_src
 
-This way  I can compile  Emacs from source as  I usually do,  and then
-continue using it as normal, and Emacs will do it's native compilation
-in background for every loaded package. That's amazing!
+This way I can compile Emacs from source as I usually do, and then continue using it as normal, and Emacs will do it's native compilation in background for every loaded package.
+That's amazing!
 
 *** User Interface
-Prevent the glimpse of un-styled Emacs by disabling these UI elements
-early.
+Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
 
 #+begin_src emacs-lisp
   (setq initial-frame-alist '((width . 170)
@@ -140,10 +121,7 @@ early.
         default-frame-alist initial-frame-alist)
 #+end_src
 
-Resizing frame is also expensive so we inhibit it, and latest patch to
-Emacs  introduced =x-gtk-resize-child-frames=  variable  that fixes  the
-issue  with  child frames  not  being  resized correctly  under  GNOME
-Shell, so let's set it to =resize-mode=.
+Resizing frame is also expensive so we inhibit it, and latest patch to Emacs introduced =x-gtk-resize-child-frames= variable that fixes the issue with child frames not being resized correctly under GNOME Shell, so let's set it to =resize-mode=.
 
 #+begin_src emacs-lisp
   (setq frame-inhibit-implied-resize t
@@ -151,10 +129,10 @@ Shell, so let's set it to =resize-mode=.
 #+end_src
 
 *** =straight.el=
-Straight is an alternative way  to manage package installations. It is
-a purely  functional package  manager. It  installs packages  from Git
-repositories listed on ELPA and MELPA, or from Git URL. First, we have
-to bootstrap it:
+Straight is an alternative way to manage package installations.
+It is a purely functional package manager.
+It installs packages from Git repositories listed on ELPA and MELPA, or from Git URL.
+First, we have to bootstrap it:
 
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
@@ -200,26 +178,23 @@ This concludes the =early-init.el= file.
 :properties:
 :header-args+: :tangle "./init.el"
 :end:
-Before Emacs  27 there were  no such thing  as =eraly-init.el=, so  if I
-will use  older Emacs  with this configuration  it will  miss settings
-that are done there. This code manually loads this file in such case:
+Before Emacs 27 there were no such thing as =eraly-init.el=, so if I will use older Emacs with this configuration it will miss settings that are done there.
+This code manually loads this file in such case:
 
 #+begin_src emacs-lisp
   (unless (featurep 'early-init)
     (load (expand-file-name "early-init" user-emacs-directory)))
 #+end_src
 
-We do  it as early  as possible  to as it  is important to  load these
-settings before all settings specified in =init.el=.
+We do it as early as possible to as it is important to load these settings before all settings specified in =init.el=.
 
 ** COMMENT =package.el=
-To obtain plugins we need =package.el= package. Although this is builtin
-and convenient,  it's also slow  and messy.  Instead of  using =package=
-directly we will use =use-package= to manage package configurations.
+To obtain plugins we need =package.el= package.
+Although this is builtin and convenient, it's also slow and messy.
+Instead of using =package= directly we will use =use-package= to manage package configurations.
 
-Melpa is a  package repository, that I use to  get packages. Since all
-packages that  I need can be  obtained from there, I  did not bothered
-with different methods of installation.
+Melpa is a package repository, that I use to get packages.
+Since all packages that I need can be obtained from there, I did not bothered with different methods of installation.
 
 #+begin_src emacs-lisp
   (defvar package-archives)
@@ -228,9 +203,7 @@ with different methods of installation.
           ("melpa" . "https://melpa.org/packages/")))
 #+end_src
 
-Emacs 26.2 had a bug with  downloading from Elpa, here's a workaround,
-although it  is dangerous to  use this, as  it is pretty  insecure, so
-please upgrade to more recent Emacs, in case you're still using Emacs 26.2.
+Emacs 26.2 had a bug with downloading from Elpa, here's a workaround, although it is dangerous to use this, as it is pretty insecure, so please upgrade to more recent Emacs, in case you're still using Emacs 26.2.
 
 #+begin_src emacs-lisp
   (when (version= emacs-version "26.2")
@@ -238,9 +211,8 @@ please upgrade to more recent Emacs, in case you're still using Emacs 26.2.
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 #+end_src
 
-Found this trick  [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], but instead of using Boolean,  I've decided to
-track time since last package refresh,  and use customize to store it.
-This variable is  going to hold either =nil= or  date-time string.
+Found this trick [[https://genehack.blog/2020/04/a-bit-of-emacs-advice/][here]], but instead of using Boolean, I've decided to track time since last package refresh, and use customize to store it.
+This variable is going to hold either =nil= or date-time string.
 
 #+begin_src emacs-lisp
   (defcustom package-last-refresh-date nil
@@ -257,8 +229,7 @@ This variable is  going to hold either =nil= or  date-time string.
     :group 'package)
 #+end_src
 
-And we  need a variable that  holds amount of hours  that will trigger
-the refresh:
+And we need a variable that holds amount of hours that will trigger the refresh:
 
 #+begin_src emacs-lisp
   (defcustom package-automatic-refresh-threshold 24
@@ -268,8 +239,7 @@ the refresh:
     :group 'package)
 #+end_src
 
-This  advice first  checks if  our date-time  string exists,  and then
-checks if there's more than 24 hours passed since last check.
+This advice first checks if our date-time string exists, and then checks if there's more than 24 hours passed since last check.
 
 #+begin_src emacs-lisp
   (define-advice package-install (:before (&rest _))
@@ -283,18 +253,15 @@ checks if there's more than 24 hours passed since last check.
         (package-refresh-contents))))
 #+end_src
 
-Now all packages that  use =package-install= should periodically refresh
-package  contents. In  order to  update time  we also  have to  advice
-=package-refresh-contents=:
+Now all packages that use =package-install= should periodically refresh package contents.
+In order to update time we also have to advice =package-refresh-contents=:
 
 #+begin_src emacs-lisp
   (define-advice package-refresh-contents (:after (&rest _))
     (customize-save-variable 'package-last-refresh-date (format-time-string "%Y-%m-%dT%H:%M")))
 #+end_src
 
-This way if  I refresh packages from package menu,  or manually or via
-that =package-install= advice  =package-last-refresh-date= will be updated
-and persistently saved via =custom=.
+This way if I refresh packages from package menu, or manually or via that =package-install= advice =package-last-refresh-date= will be updated and persistently saved via =custom=.
 
 Last thing we need to do is to install =use-package=:
 
@@ -307,24 +274,21 @@ Last thing we need to do is to install =use-package=:
 #+end_src
 
 ** =use-package=
-I use =use-package= to install, load  and configure my packages.  I find
-this way very consistent and easy to understand, and maintain. At this
-point =use-package= should be already  installed by either =package.el= or
-=straight.el=, depending on what is enabled above. Only thing left to do
-is to require =use-package= itself:
+I use =use-package= to install, load and configure my packages.
+I find this way very consistent and easy to understand, and maintain.
+At this point =use-package= should be already installed by either =package.el= or =straight.el=, depending on what is enabled above.
+Only thing left to do is to require =use-package= itself:
 
 #+begin_src emacs-lisp
   (require 'use-package)
 #+end_src
 
 * Defaults
-Emacs is  old. I  understand that  back then  it could  be appropriate
-decisions,  but as  of today  they are  completely obliterated  by the
-passage of time.
+Emacs is old.
+I understand that back then it could be appropriate decisions, but as of today they are completely obliterated by the passage of time.
 
 ** User Credentials
-Let's set full name and e-mail address in case I would send e-mail from
-Emacs, or some modes can use those settings, like Org Mode:
+Let's set full name and e-mail address in case I would send e-mail from Emacs, or some modes can use those settings, like Org Mode:
 
 #+begin_src emacs-lisp
   (use-package startup
@@ -336,19 +300,18 @@ Emacs, or some modes can use those settings, like Org Mode:
 #+end_src
 
 ** Bell
-I'm not  trying to  insult on anyone,  but usage of  the bell  is just
-insane. It's  not 1980's, computers  have their own speakers  and rich
-displays, why would anyone want  to use builtin speaker?  Why everyone
-should know when I'm mistaken? Disable bell.
+I'm not trying to insult on anyone, but usage of the bell is just insane.
+It's not 1980's, computers have their own speakers and rich displays, why would anyone want to use builtin speaker?
+Why everyone should know when I'm mistaken?
+Disable bell.
 
 #+begin_src emacs-lisp
   (setq ring-bell-function 'ignore)
 #+end_src
 
 ** Backups
-I don't  know who decided  that having backups  all over the  place is
-good idea, but I don't think  alike. Instead let's put backup files in
-default cache directory:
+I don't know who decided that having backups all over the place is good idea, but I don't think alike.
+Instead let's put backup files in default cache directory:
 
 #+begin_src emacs-lisp
   (use-package files
@@ -361,8 +324,8 @@ default cache directory:
 #+end_src
 
 ** Yes or No
-For some  reason in some  situations Emacs asks  for typing =yes=  or =no=
-explicitly, instead of accepting =y= or =n=. This can be fixed with this.
+For some reason in some situations Emacs asks for typing =yes= or =no= explicitly, instead of accepting =y= or =n=.
+This can be fixed with this.
 
 #+begin_src emacs-lisp
   (use-package subr
@@ -373,9 +336,7 @@ explicitly, instead of accepting =y= or =n=. This can be fixed with this.
 #+end_src
 
 ** Echo Keystrokes
-Emacs displays pressed  key after some time but it's  too fast for me,
-because I use Emacs on the phone  too, and the keyboard is a bit small
-for lightning fast typing.
+Emacs displays pressed key after some time but it's too fast for me, because I use Emacs on the phone too, and the keyboard is a bit small for lightning fast typing.
 
 #+begin_src emacs-lisp
   (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 5)))
@@ -391,10 +352,9 @@ I don't want menus on shift clicks:
   (global-unset-key (kbd "S-<mouse-3>"))
 #+end_src
 
-I also  don't like how Emacs  handles scrolling, that it  speeds it up
-and automatically scrolls horizontally. Also, changing =mouse-highlight=
-to  =nil= value  disables highlighting  of hovered  item when  the point
-moves which is kinda convenient when working with =flycheck=.
+I also don't like how Emacs handles scrolling, that it speeds it up and automatically scrolls horizontally.
+
+Also, changing =mouse-highlight= to =nil= value disables highlighting of hovered item when the point moves which is kinda convenient when working with =flycheck=.
 
 #+begin_src emacs-lisp
   (setq-default mouse-wheel-progressive-speed nil
@@ -405,8 +365,7 @@ moves which is kinda convenient when working with =flycheck=.
                 scroll-step 10)
 #+end_src
 
-If by chance I would need to use Emacs in terminal, I'd like to keep
-mouse working:
+If by chance I would need to use Emacs in terminal, I'd like to keep mouse working:
 
 #+begin_src emacs-lisp
   (unless (display-graphic-p)
@@ -414,21 +373,16 @@ mouse working:
 #+end_src
 
 ** Tab character
-Another default  setting that I kinda  dislike. Not that I'm  a fan of
-spaces over tabs  - tabs have their  use and spaces do to,  but I find
-that there are  much more modes or even languages  that expect spaces,
-and not tabs.  For the record, I  need tab characters only when I work
-with C/C++  code and Makefile  rules, and pretty much  everything else
-uses spaces.
+Another default setting that I kinda dislike.
+Not that I'm a fan of spaces over tabs - tabs have their use and spaces do to, but I find that there are much more modes or even languages that expect spaces, and not tabs.
+For the record, I need tab characters only when I work with C/C++ code and Makefile rules, and pretty much everything else uses spaces.
 
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+end_src
 
 ** Custom File and Disabled Commands
-I  don't like  custom,  and  especially would  like  to  stop it  from
-interfering to  my configuration  files, so lets  move it  to separate
-file.
+I don't like custom, and especially would like to stop it from interfering to my configuration files, so lets move it to separate file.
 
 #+begin_src emacs-lisp
   (use-package cus-edit
@@ -439,9 +393,8 @@ file.
     (load custom-file :noerror))
 #+end_src
 
-I also don't like that Emacs  has disabled commands, and enabling them
-modifies  my =init.el=  that I  don't  modify myself.   Let's put  those
-commands to =disabled.el= file instead:
+I also don't like that Emacs has disabled commands, and enabling them modifies my =init.el= that I don't modify myself.
+Let's put those commands to =disabled.el= file instead:
 
 #+begin_src emacs-lisp
   (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
@@ -454,8 +407,7 @@ commands to =disabled.el= file instead:
 #+end_src
 
 ** History
-Another feature I  want is history between sessions. I'm  not sure why
-it isn't default.
+Another feature I want is history between sessions. I'm not sure why it isn't default.
 
 #+begin_src emacs-lisp
   (use-package savehist
@@ -464,11 +416,8 @@ it isn't default.
 #+end_src
 
 ** Keyboard Layout
-I use two keyboard layouts: =qwerty=  and =йцукен=, therefore I need a way
-to switch between those without loosing  ability to use such chords as
-=C-x=  which will  become  a =C-ч=  if  I select  Cyrillic  layout in  the
-OS. Luckily for  me, Emacs provides a method to  switch layouts within
-Emacs with =C-\=, so all common shortcuts will still work fine.
+I use two keyboard layouts: =qwerty= and =йцукен=, therefore I need a way to switch between those without loosing ability to use such chords as =C-x= which will become a =C-ч= if I select Cyrillic layout in the OS.
+Luckily for me, Emacs provides a method to switch layouts within Emacs with =C-\=, so all common shortcuts will still work fine.
 
 #+begin_src emacs-lisp
   (use-package mule-cmds
@@ -478,9 +427,8 @@ Emacs with =C-\=, so all common shortcuts will still work fine.
     (default-input-method 'russian-computer))
 #+end_src
 
-I'm  not   using  =russian-jcuken=   here  because  it   represents  the
-"typewriter" layout with number-line inverted,  so to access numbers I
-need to use Shift key. =russian-computer= doesn't have this problem.
+I'm not using =russian-jcuken= here because it represents the "typewriter" layout with number-line inverted, so to access numbers I need to use Shift key.
+=russian-computer= doesn't have this problem.
 
 ** UTF8
 Let's use =UTF8= if we can:
@@ -492,9 +440,8 @@ Let's use =UTF8= if we can:
 #+end_src
 
 ** Default Major Mode
-I would like =*scratch*= buffer to  use =fundamental= mode, so fully empty
-Emacs  session  loads  faster.   Since   it's  no  longer  Emacs  Lisp
-interaction buffer, let's also remove initial message:
+I would like =*scratch*= buffer to use =fundamental= mode, so fully empty Emacs session loads faster.
+Since it's no longer Emacs Lisp interaction buffer, let's also remove initial message:
 
 #+begin_src emacs-lisp
   (use-package startup
@@ -517,20 +464,18 @@ It is convenient to delete selection by typing:
 
 ** Default Bindings and More
 Configurations for inbuilt =simple.el= module.
+By default Emacs uses =kill-region= command on =C-w= shortcut.
+I find this counter intuitive.
+GNU Readline uses =C-w= to kill word backwards.
+Other software uses this shortcut to kill window.
+I prefer Readline approach.
+Also I've missed =o= and =O= commands from Kakoune.
+With =newline-below= and =newline-above= it is now possible to have same shortcuts in Emacs.
 
-By default Emacs uses =kill-region= command on =C-w= shortcut. I find this
-counter intuitive. GNU Readline uses =C-w= to kill word backwards. Other
-software  uses  this  shortcut  to kill  window.   I  prefer  Readline
-approach.   Also I've  missed =o=  and  =O= commands  from Kakoune.   With
-=newline-below=  and  =newline-above= it  is  now  possible to  have  same
-shortcuts in Emacs.
+Emacs has nice function, =zap-up-to-char= but for some reason it's not bound to any key.
+I find it more usable than =zap-to-char= so let's swap those here.
 
-Emacs has nice  function, =zap-up-to-char= but for some  reason it's not
-bound to any key. I find it more usable than =zap-to-char= so let's swap
-those here.
-
-Also,  I don't  want  my  files to  contain  trailing whitespaces,  so
-=before-save-hook= hook will get rid of those automatically for me.
+Also, I don't want my files to contain trailing whitespaces, so =before-save-hook= hook will get rid of those automatically for me.
 
 #+begin_src emacs-lisp
   (use-package simple
@@ -578,25 +523,16 @@ Let's disable line wrapping by default, unless I need it:
 #+end_src
 
 * Functions
-This  section  describes  functions  I have  defined  for  use  inside
-configurations  of various  packages, that  are general  enough to  be
-placed in particular package  configuration. For example when function
-is shared  between configurations  and some  configuration may  not be
-loaded.
+This section describes functions I have defined for use inside configurations of various packages, that are general enough to be placed in particular package configuration.
+For example when function is shared between configurations and some configuration may not be loaded.
 
-I prefix my  functions with =aorst/= and variables with  =aorst--= to make
-those easier  to browse  with =ivy=  and to  explicitly define  that the
-function is not a part of a particular package.
+I prefix my functions with =aorst/= and variables with =aorst--= to make those easier to browse with =ivy= and to explicitly define that the function is not a part of a particular package.
 
 ** =real-buffer-p=
-This  function  decides  if  buffer  should  be  considered  a  "real"
-buffer. Real buffer concept is introduced [[*Solaire Mode][Solaire Mode]] but is actually
-useful in several  other places. However, wheres  Solaire Mode decided
-if buffer  is real by  checking if this is  a file visiting  buffer, I
-instead decide which buffers are not real, and everything else as real
-buffers. This is due to the fact of how I stylize [[*Tabline][Tabline]] package from
-Emacs  27, and  it looks  nice when  buffers that  have tabs  are real
-buffers.
+This function decides if buffer should be considered a "real" buffer.
+Real buffer concept is introduced [[*Solaire Mode][Solaire Mode]] but is actually useful in several other places.
+However, wheres Solaire Mode decided if buffer is real by checking if this is a file visiting buffer, I instead decide which buffers are not real, and everything else as real buffers.
+This is due to the fact of how I stylize [[*Tabline][Tabline]] package from Emacs 27, and it looks nice when buffers that have tabs are real buffers.
 
 #+begin_src emacs-lisp
   (defun aorst/real-buffer-p (&optional buffer)
@@ -613,10 +549,8 @@ buffers.
 #+end_src
 
 ** =escape=
-One thing  that bothered  me is  that =C-g= is  universal way  to cancel
-things in Emacs, but you have to  be in exact window to cancel action.
-This  function  intelligently tries  to  cancel  regardless of  active
-window:
+One thing that bothered me is that =C-g= is universal way to cancel things in Emacs, but you have to be in exact window to cancel action.
+This function intelligently tries to cancel regardless of active window:
 
 #+begin_src emacs-lisp
   (defun aorst/escape ()
@@ -652,9 +586,8 @@ This function checks if font is available on the system.
 #+end_src
 
 ** =indent-buffer=
-This function  is kinda  a way  to indent a  buffer by  using language
-indentation rules provided by current mode. If there's a tool that can
-properly format buffer it should be used instead of this function.
+This function is kinda a way to indent a buffer by using language indentation rules provided by current mode.
+If there's a tool that can properly format buffer it should be used instead of this function.
 
 #+begin_src emacs-lisp
   (defun aorst/indent-buffer ()
@@ -671,8 +604,8 @@ properly format buffer it should be used instead of this function.
 Packages that affect user interface.
 
 ** Splash Screen
-Emacs displays splash screen once started  with no files. I don't need
-it, so let's disable it.
+Emacs displays splash screen once started with no files.
+I don't need it, so let's disable it.
 
 #+begin_src emacs-lisp
   (use-package startup
@@ -683,8 +616,8 @@ it, so let's disable it.
 #+end_src
 
 ** Menus and Tooltips
-I don't need all these tooltips, menus and scroll bars. Emacs enables
-all of those by default, so let's disable them as early as possible:
+I don't need all these tooltips, menus and scroll bars.
+Emacs enables all of those by default, so let's disable them as early as possible:
 
 #+begin_src emacs-lisp
   (tooltip-mode -1)
@@ -706,11 +639,10 @@ in active window:
 #+end_src
 
 ** Font
-Currently I'm  using [[https://www.jetbrains.com/lp/mono/][JetBrains  Mono]] font, that  has nice  support for
-ligatures, and overall  looks great. I'm also a big  fan of [[https://github.com/source-foundry/Hack][Hack]] font.
-It has nice support of languages and styles like *bold*, /italics/ for not
-only  Latin languages.  If  neither =JetBrainsMono=,  nor  =Hack= are  not
-found, we try =Source Code Pro= as a fallback option.
+Currently I'm using [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] font, that has nice support for ligatures, and overall looks great.
+I'm also a big fan of [[https://github.com/source-foundry/Hack][Hack]] font.
+It has nice support of languages and styles like *bold*, /italics/ for not only Latin languages.
+If neither =JetBrainsMono=, nor =Hack= are not found, we try =Source Code Pro= as a fallback option.
 
 #+begin_src emacs-lisp
   (cond ((aorst/font-installed-p "JetBrainsMono")
@@ -722,10 +654,8 @@ found, we try =Source Code Pro= as a fallback option.
 #+end_src
 
 *** Ligatures
-With  the inclusion  of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]]  support into  Emacs 27+,  it is  now
-possible  to  use  =auto-composition-mode=   to  add  ligatures.  What's
-especially cool,  is that we can  specify which ligatures we  want, by
-defining regular expressions:
+With the inclusion of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]] support into Emacs 27+, it is now possible to use =auto-composition-mode= to add ligatures.
+What's especially cool, is that we can specify which ligatures we want, by defining regular expressions:
 
 #+begin_src emacs-lisp
   (when (aorst/font-installed-p "JetBrainsMono")
@@ -761,8 +691,7 @@ defining regular expressions:
                char-regexp))))
 #+end_src
 
-Although I don't need =auto-composition-mode=  for all buffers, so let's
-disable it, and enable manually later:
+Although I don't need =auto-composition-mode= for all buffers, so let's disable it, and enable manually later:
 
 #+begin_src emacs-lisp
   (use-package composite
@@ -782,15 +711,12 @@ disable it, and enable manually later:
       (all-the-icons-install-fonts t)))
 #+end_src
 
-I don't  use this package  directly yet,  but some other  packages do,
-like DOOM Modeline or Treemacs.
+I don't use this package directly yet, but some other packages do, like DOOM Modeline or Treemacs.
 
 ** Theme
-I'm using *doom-themes* package to make my Emacs look modern. This theme
-collection  was developed  for [[https://github.com/hlissner/doom-emacs][DOOM  Emacs]],  and I  find these  themes
-actually  great on  its own.   This package  contains nice  variant of
-Atom-like One theme which I like, but it is also an amazingly well put
-package, which defines colors for pretty much everything in Emacs.
+I'm using *doom-themes* package to make my Emacs look modern.
+This theme collection was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find these themes actually great on its own.
+This package contains nice variant of Atom-like One theme which I like, but it is also an amazingly well put package, which defines colors for pretty much everything in Emacs.
 
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -806,14 +732,13 @@ package, which defines colors for pretty much everything in Emacs.
 #+end_src
 
 ** Solaire Mode
-This  package helps  distinguish  buffers that  have  file opened  and
-buffers that  are for utilities  like file  browser. Also it  has cool
-name! =\[T]/=
+This package helps distinguish buffers that have file opened and buffers that are for utilities like file browser.
+Also it has cool name!
+=\[T]/=
 
-I really want  Solaire to treat =*scratch*= buffer as  real.  For that I
-need to define my  own function that will decide if  buffer is real or
-not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
-=solaire-mode-real-buffer-fn=.
+I really want Solaire to treat =*scratch*= buffer as real.
+For that I need to define my own function that will decide if buffer is real or not.
+Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode-real-buffer-fn=.
 
 #+begin_src emacs-lisp
   (use-package solaire-mode
@@ -852,14 +777,10 @@ not. Now we can set up  Solaire Mode and assign =aorst/real-buffer-p= to
 #+end_src
 
 ** Mode-line
-Mode-line is displayed at the bottom of each buffer, and shows
-necessary information about buffer state. There are several packages
-that can make your mode-line appear differently, but most will reuse
-mode-line settings.
+Mode-line is displayed at the bottom of each buffer, and shows necessary information about buffer state.
+There are several packages that can make your mode-line appear differently, but most will reuse mode-line settings.
 
-I don't find displaying position in mode-line really great idea,
-because I need to move my eyes too much on big screen just to see what
-line number I'm currently on.
+I don't find displaying position in mode-line really great idea, because I need to move my eyes too much on big screen just to see what line number I'm currently on.
 
 #+begin_src emacs-lisp
   (setq-default column-number-mode t
@@ -879,13 +800,11 @@ Also, let's remove that bevel thing.
 #+end_src
 
 *** Mode-line functions
-Most of these functions are based on what [[https://github.com/seagle0128/doom-modeline][DOOM Modeline]] does, although
-I want to use more compact mode-line, without many additional settings
-that DOOM Mode-line provides.
+Most of these functions are based on what [[https://github.com/seagle0128/doom-modeline][DOOM Modeline]] does, although I want to use more compact mode-line, without many additional settings that DOOM Mode-line provides.
 
 **** =mode-line-buffer-name=
-Buffer name module for mode-line. Returns buffer name or empty string
-if buffer is special and starts from space.
+Buffer name module for mode-line.
+Returns buffer name or empty string if buffer is special and starts from space.
 
 #+begin_src emacs-lisp
   (defun aorst/mode-line-buffer-name ()
@@ -1061,9 +980,8 @@ Support for various structural editing modes in mode-line.
 #+end_src
 
 *** Mini Modeline
-A very interesting package that displays mode-line in the echo area
-(minibuffer). Currently it uses default format, and I'm looking
-forward to integrate DOOM mode-line with it.
+A very interesting package that displays mode-line in the echo area (minibuffer).
+Currently it uses default format, and I'm looking forward to integrate DOOM mode-line with it.
 
 #+begin_src emacs-lisp
   (use-package mini-modeline
@@ -1106,22 +1024,18 @@ Some tweaks to window divider colors.
 #+end_src
 
 ** Title
-Emacs uses weird method of naming a window, I'd like to see a file I'm
-currently working  on in the task  bar in case my  Emacs was minimized
-for some reason.
+Emacs uses weird method of naming a window, I'd like to see a file I'm currently working on in the task bar in case my Emacs was minimized for some reason.
 
 #+begin_src emacs-lisp
   (setq-default frame-title-format '("%b — Emacs"))
 #+end_src
 
 ** Treemacs
-To make  Emacs look  more like  a modern  text editor  we need  a file
-explorer.  Emacs has builtin package  for this, named =speedbar=, but It
-uses external frame  and has so many  features that I don't  know if I
-really need. With this package, and its supplement packages I can have
-a  consistent filetree  inside  my  Emacs frame.  Which  is good.  But
-there's more:  DOOM Themes support  this package as well,  which means
-that Treemacs will look just as great as DOOM themed Emacs!
+To make Emacs look more like a modern text editor we need a file explorer.
+Emacs has builtin package for this, named =speedbar=, but It uses external frame and has so many features that I don't know if I really need.
+With this package, and its supplement packages I can have a consistent filetree inside my Emacs frame.
+Which is good.
+But there's more: DOOM Themes support this package as well, which means that Treemacs will look just as great as DOOM themed Emacs!
 
 #+begin_src emacs-lisp
   (use-package treemacs
@@ -1384,20 +1298,8 @@ that Treemacs will look just as great as DOOM themed Emacs!
                  (concat (make-string width ?\s) text)))))))
 #+end_src
 
-** Minions
-This  package  implements   a  menu  that  lists   all  enabled  minor
-modes. Emacs mode  line can become pretty long, so  this can be handy,
-and perhaps I don't need to use =:diminish= everywhere anymore.
-
-#+begin_src emacs-lisp
-  (use-package minions
-    :commands minions-mode
-    :init (minions-mode 1))
-#+end_src
-
 ** Uniquify
-This package makes files with  identical names more distinguishable by
-adding directory name in the buffer name.
+This package makes files with identical names more distinguishable by adding directory name in the buffer name.
 
 #+begin_src emacs-lisp
   (use-package uniquify
@@ -1406,8 +1308,8 @@ adding directory name in the buffer name.
 #+end_src
 
 ** Tabline
-Starting  with Emacs  27  native tab  support is  present.  I want  to
-customize tab appearance to match my theme.
+Starting with Emacs 27 native tab support is present.
+I want to customize tab appearance to match my theme.
 
 #+begin_src emacs-lisp
   (use-package tab-line
@@ -1596,9 +1498,8 @@ customize tab appearance to match my theme.
 #+end_src
 
 ** Line Numbers
-=display-line-numbers= provides  line numbers  on the  left side  of the
-window, which  doesn't lag.  I don't  like that  it changes  width, so
-let's make it grow only, and calculate maximum width on file open:
+=display-line-numbers= provides line numbers on the left side of the window, which doesn't lag.
+I don't like that it changes width, so let's make it grow only, and calculate maximum width on file open:
 
 #+begin_src emacs-lisp
   (use-package display-line-numbers
@@ -1609,20 +1510,16 @@ let's make it grow only, and calculate maximum width on file open:
 #+end_src
 
 * Languages
-This section contains various  language specific settings and external
-packages that provide language support.
+This section contains various language specific settings and external packages that provide language support.
 
 ** Org
-Org  Mode is  a great  mode for  taking notes,  managing to-do  lists,
-writing books, literate programming, and  many other things. I primary
-use it for taking notes on different programming languages, and manage
-my Emacs configuration with it.
+Org Mode is a great mode for taking notes, managing to-do lists, writing books, literate programming, and many other things.
+I primary use it for taking notes on different programming languages, and manage my Emacs configuration with it.
 
 #+begin_src emacs-lisp
   (use-package org
     :straight (:type built-in)
-    :hook ((org-mode . auto-fill-mode)
-           (after-save . aorst/org-tangle-on-config-save)
+    :hook ((after-save . aorst/org-tangle-on-config-save)
            (org-babel-after-execute . aorst/org-update-inline-images)
            (ediff-prepare-buffer . outline-show-all)
            ((org-capture-mode org-src-mode) . aorst/discard-history))
@@ -1715,11 +1612,9 @@ my Emacs configuration with it.
 #+end_src
 
 ** Prog Mode
-This isn't really a configuration of  Prog Mode itself, but some hooks
-that change how  programming related modes behave. One  feature that I
-think is really important, especially  when working with lisp code, is
-ability  to see  matching bracket  when cursor  stands near  the other
-bracket. So I enable it for every programming language.
+This isn't really a configuration of Prog Mode itself, but some hooks that change how programming related modes behave.
+One feature that I think is really important, especially when working with lisp code, is ability to see matching bracket when cursor stands near the other bracket.
+So I enable it for every programming language.
 
 #+begin_src emacs-lisp
   (use-package prog-mode
@@ -1748,11 +1643,10 @@ These settings are for editing C source files.
 
 ** Markdown
 Sometimes I need to edit Markdown documents, so this package is handy.
-For markdown  mode I would like  to have automatic spell  checking and
-filling. Basically  the same setup  as for Org  Mode.  And one  of the
-features of Org mode is ability to edit source code blocks in separate
-window  with  appropriate  major  mode.  This  can  be  achieved  with
-=edit-indirect= package.
+For markdown mode I would like to have automatic spell checking and filling.
+Basically the same setup as for Org Mode.
+And one of the features of Org mode is ability to edit source code blocks in separate window with appropriate major mode.
+This can be achieved with =edit-indirect= package.
 
 #+begin_src emacs-lisp
   (use-package markdown-mode
@@ -1766,15 +1660,12 @@ window  with  appropriate  major  mode.  This  can  be  achieved  with
       (setq fill-column 80
             default-justification 'left))
     :hook ((markdown-mode . flyspell-mode)
-           (markdown-mode . auto-fill-mode)
            (markdown-mode . aorst/markdown-setup)))
 #+end_src
 
 ** Rust
-I'd like to  have Rust syntax highlighting and  some basic facilities,
-since I'm  planning to write my  exercises in org mode.   Since I make
-notes in Org-mode, and  I started to use it for Rust  too, I need some
-settings for Rust mode.
+I'd like to have Rust syntax highlighting and some basic facilities, since I'm planning to write my exercises in org mode.
+Since I make notes in Org-mode, and I started to use it for Rust too, I need some settings for Rust mode.
 
 #+begin_src emacs-lisp
   (use-package rust-mode
@@ -1784,10 +1675,9 @@ settings for Rust mode.
            ("C-c C-M-f" . rust-format-buffer)))
 #+end_src
 
-This also means  that I could use something  to automatically complete
-Rust  language facilities.   Rust ecosystem  provides two  options for
-that:  [[https://github.com/racer-rust/emacs-racer][Racer]], and  [[https://github.com/rust-lang/rls][RLS]].   I'm planning  to use  Racer  when RLS  isn't
-possible to use, like in Org Mode.
+This also means that I could use something to automatically complete Rust language facilities.
+Rust ecosystem provides two options for that: [[https://github.com/racer-rust/emacs-racer][Racer]], and [[https://github.com/rust-lang/rls][RLS]].
+I'm planning to use Racer when RLS isn't possible to use, like in Org Mode.
 
 #+begin_src emacs-lisp
   (use-package racer
@@ -1807,8 +1697,7 @@ There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] inte
 #+end_src
 
 ** TOML
-=toml-mode= helps  with highlighting of  TOML files, which Rust  uses to
-configure project.
+=toml-mode= helps with highlighting of TOML files, which Rust uses to configure project.
 
 #+begin_src emacs-lisp
   (use-package toml-mode
@@ -1856,8 +1745,7 @@ A mode for editing cmake files.
 #+end_src
 
 ** Emacs Lisp
-I write some  Emacs Lisp and experience is already  quite good, I just
-want to enable some helper modes here.
+I write some Emacs Lisp and experience is already quite good, I just want to enable some helper modes here.
 
 #+begin_src emacs-lisp
   (use-package elisp-mode
@@ -1943,9 +1831,8 @@ Perl related configurations.
 #+end_src
 
 ** Clojure
-Clojure is a Lisp dialect for Java Virtual Machine. It is one of
-the few  modern and refreshing  languages, that bring  both innovation
-and reliability.
+Clojure is a Lisp dialect for Java Virtual Machine.
+It is one of the few modern and refreshing languages, that bring both innovation and reliability.
 
 #+begin_src emacs-lisp
   (use-package clojure-mode
@@ -1974,8 +1861,7 @@ and reliability.
 #+end_src
 
 *** CIDER
-Emacs  also has  a great  package called  Cider, which  is an  IDE for
-Clojure and ClojureScript.
+Emacs also has a great package called Cider, which is an IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package cider
@@ -2009,9 +1895,7 @@ Clojure and ClojureScript.
 #+end_src
 
 *** flycheck-clj-kondo
-[[https://github.com/borkdude/clj-kondo][clj-kondo]]   is   a   static    analyzer   for   Clojure(Script),   and
-=flycheck-clj-kondo= is  a backend  for =flycheck=,  that makes  these two
-things understand each other.
+[[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flycheck-clj-kondo= is a backend for =flycheck=, that makes these two things understand each other.
 
 #+begin_src emacs-lisp
   (use-package flycheck-clj-kondo
@@ -2021,8 +1905,8 @@ things understand each other.
 #+end_src
 
 *** clj-refactor
-=clj-refactor= provides  refactoring support  for Clojure  projects.  It
-complements the refactoring functionality from =clojure-mode= and CIDER.
+=clj-refactor= provides refactoring support for Clojure projects.
+It complements the refactoring functionality from =clojure-mode= and CIDER.
 
 #+begin_src emacs-lisp
   (use-package clj-refactor
@@ -2100,10 +1984,8 @@ complements the refactoring functionality from =clojure-mode= and CIDER.
 #+end_src
 
 ** Fennel
-Fennel  is  a programming  language  a  lisp  dialect, that  is  being
-compiled  to Lua,  which means  that it  can run  anywhere, where  Lua
-can.   It   supports  compile-time   macro   system,   and  full   Lua
-compatibility.
+Fennel is a programming language a lisp dialect, that is being compiled to Lua, which means that it can run anywhere, where Lua can.
+It supports compile-time macro system, and full Lua compatibility.
 
 #+begin_src emacs-lisp
   (use-package fennel-mode
@@ -2112,8 +1994,7 @@ compatibility.
 #+end_src
 
 ** Lua
-I'm not  into Lua language  myself, but in  order to view  what [[*Fennel][Fennel]]
-produces I need support for Lua.
+I'm not into Lua language myself, but in order to view what [[*Fennel][Fennel]] produces I need support for Lua.
 
 #+begin_src emacs-lisp
   (use-package lua-mode
@@ -2122,6 +2003,7 @@ produces I need support for Lua.
 #+end_src
 
 ** CSS
+CSS indentation tweaks.
 
 #+begin_src emacs-lisp
   (use-package css-mode
@@ -2131,20 +2013,17 @@ produces I need support for Lua.
 #+end_src
 
 ** Java
-Support for Java  is inbuilt, but to use Java  Language Server we need
-this package:
+Support for Java is inbuilt, but to use Java Language Server we need this package:
 
 #+begin_src emacs-lisp
   (use-package lsp-java)
 #+end_src
 
 * Tools
-Additional  packages  that  change  how Emacs  works,  providing  more
-comfortable user experience.
+Additional packages that change how Emacs works, providing more comfortable user experience.
 
 ** Help
-I want help  window to be selected automatically, so  I could close it
-with =q= after I've finished reading.
+I want help window to be selected automatically, so I could close it with =q= after I've finished reading.
 
 #+begin_src emacs-lisp
   (use-package help
@@ -2162,9 +2041,8 @@ Default resolution is too low:
 #+end_src
 
 ** vterm
-This  package provides  a bridge  to =libvterm=  to display  terminal as
-Emacs buffer. It works much better than =ansi-term=, though may be buggy
-and requires compilation.
+This package provides a bridge to =libvterm= to display terminal as Emacs buffer.
+It works much better than =ansi-term=, though may be buggy and requires compilation.
 
 #+begin_src emacs-lisp
   (setq use-package-hook-name-suffix "-functions")
@@ -2218,8 +2096,7 @@ and requires compilation.
 #+end_src
 
 ** EditorConfig
-=.editorconfig=  file  provides a  nice  way  to synchronize  my  editor
-configurations between projects and different editors.
+=.editorconfig= file provides a nice way to synchronize my editor configurations between projects and different editors.
 
 #+begin_src emacs-lisp
   (use-package editorconfig
@@ -2341,24 +2218,17 @@ Some languages have better support with =flycheck=.
 #+end_src
 
 ** Hydra
-This is something like ability to create mappings that sit in it's own
-mode, like different user modes in Kakoune. It allows me to press some
-shortcut  and be  locked  in a  mode-like state  where  keys that  are
-related  to  this  prefix  shortcut  are behaving  in  terms  of  this
-shortcut.
-
-This  package will  be used  in many  other package  configurations to
-provide sane keybindings.
+This is something like ability to create mappings that sit in it's own mode, like different user modes in Kakoune.
+It allows me to press some shortcut and be locked in a mode-like state where keys that are related to this prefix shortcut are behaving in terms of this shortcut.
+This package will be used in many other package configurations to provide sane keybindings.
 
 #+begin_src emacs-lisp
   (use-package hydra)
 #+end_src
 
 ** Parinfer
-Parinfer implementation  written in Rust  language.  Not as  strict as
-Emacs Lisp  implementation, because it  does not force  any formatting
-rules, and theoretically should be faster, but in very early stages of
-development.
+Parinfer implementation written in Rust language.
+Not as strict as Emacs Lisp implementation, because it does not force any formatting rules, and theoretically should be faster, but in very early stages of development.
 
 #+begin_src emacs-lisp
   (use-package parinfer-rust-mode
@@ -2389,9 +2259,8 @@ Flex matching for Emacs.
 #+end_src
 
 ** Ivy and Counsel
-Ivy  is a  narrowing  framework  like Helm,  but  much  lighter in  my
-experience.  It  integrates with  Counsel that handles  minibuffer, so
-let's install it too.
+Ivy is a narrowing framework like Helm, but much lighter in my experience.
+It integrates with Counsel that handles minibuffer, so let's install it too.
 
 #+begin_src emacs-lisp
   (use-package ivy
@@ -2420,11 +2289,10 @@ let's install it too.
     (ivy-mode 1))
 #+end_src
 
-I'm using  [[https://github.com/sharkdp/fd][fd]] as a  great replacement for GNU  Find. It's fast  and it
-takes  =.gitignore= into  account.  Counsel  has nice  =counsel-file-fump=
-command that uses =find-program= variable, so  we can advice it in order
-for it to use  =fd=. The same thing is for =rg=,  but counsel actually has
-it's own variable for it, so we do no need to runtime-patch it.
+I'm using [[https://github.com/sharkdp/fd][fd]] as a great replacement for GNU Find.
+It's fast and it takes =.gitignore= into account.
+Counsel has nice =counsel-file-fump= command that uses =find-program= variable, so we can advice it in order for it to use =fd=.
+The same thing is for =rg=, but counsel actually has it's own variable for it, so we do no need to runtime-patch it.
 
 #+begin_src emacs-lisp
   (use-package counsel
@@ -2504,11 +2372,9 @@ This package also optionally requires these extra dependencies:
 #+end_src
 
 ** Undo Tree
-This is more familiar  undo mode. It adds =C-/= mapping  to undo and =C-?=
-mapping to  redo. I also  map convenient  =C-z= and =C-S-z=  maps, because
-sometimes when  someone else sits at  my PC (for pair  programming for
-example), and forgets that this is Emacs, and hits =C-z= thus minimizing
-the frame, and being frustrated.
+This is more familiar undo mode.
+It adds =C-/= mapping to undo and =C-?= mapping to redo.
+I also map convenient =C-z= and =C-S-z= maps, because sometimes when someone else sits at my PC (for pair programming for example), and forgets that this is Emacs, and hits =C-z= thus minimizing the frame, and being frustrated.
 
 #+begin_src emacs-lisp
   (use-package undo-tree
@@ -2519,9 +2385,9 @@ the frame, and being frustrated.
 #+end_src
 
 ** Yasnippet
-Another very handy package, that helps insert templates of code. Now I
-really need to write some snippets to use. Also has nice collection as
-a separate package
+Another very handy package, that helps insert templates of code.
+Now I really need to write some snippets to use.
+Also has nice collection as a separate package
 
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -2530,8 +2396,8 @@ a separate package
 #+end_src
 
 ** Magit
-Emacs interface to Git.  I've heard that it has many nice features, so
-I want to try it out.
+Emacs interface to Git.
+I've heard that it has many nice features, so I want to try it out.
 
 #+begin_src emacs-lisp
   (use-package magit
@@ -2541,9 +2407,8 @@ I want to try it out.
 #+end_src
 
 ** Ediff
-This is a built  in mode for diffing files in  Emacs. Previously I was
-using  [[https://github.com/justbur/emacs-vdiff][Vdiff]] but  I have  to say  that I've  used it  so rarely,  so I
-decided to avoid extra dependency and configure Ediff.
+This is a built in mode for diffing files in Emacs.
+Previously I was using [[https://github.com/justbur/emacs-vdiff][Vdiff]] but I have to say that I've used it so rarely, so I decided to avoid extra dependency and configure Ediff.
 
 #+begin_src emacs-lisp
   (use-package ediff
@@ -2573,9 +2438,9 @@ decided to avoid extra dependency and configure Ediff.
 #+end_src
 
 ** Multiple Cursors
-This  package provides  multiple cursors  functionality to  Emacs.  It
-isn't much like Kakoune's multiple selections, but anything will do. I
-guess I'll figure out best mappings over time.
+This package provides multiple cursors functionality to Emacs.
+It isn't much like Kakoune's multiple selections, but anything will do.
+I guess I'll figure out best mappings over time.
 
 #+begin_src emacs-lisp
   (use-package phi-search)
@@ -2617,8 +2482,8 @@ guess I'll figure out best mappings over time.
 #+end_src
 
 ** Expand Region
-Expand  or   reduce  region  selection  semantically.   Supports  most
-languages that I work with inside Emacs.
+Expand or reduce region selection semantically.
+Supports most languages that I work with inside Emacs.
 
 #+begin_src emacs-lisp
   (use-package expand-region
@@ -2649,10 +2514,8 @@ languages that I work with inside Emacs.
 #+end_src
 
 ** Iedit Mode
-Another package  for multiple editing  purposes, that is  kinda faster
-than multiple cursors,  but can edit only fixed width  regions of text
-and  has less  abilities regarding  to commands.  Still pretty  usable
-though, as multiple cursor some times looses cursors for some reason.
+Another package for multiple editing purposes, that is kinda faster than multiple cursors, but can edit only fixed width regions of text and has less abilities regarding to commands.
+Still pretty usable though, as multiple cursor some times looses cursors for some reason.
 
 #+begin_src emacs-lisp
   (use-package iedit
@@ -2751,14 +2614,10 @@ Debug Adapter Protocol support for Emacs.
 #+end_src
 
 ** Project
-I  do  not  want  to  use projectile,  since  Emacs  already  features
-=project.el= and many  packages use it.  Although I've  needed to create
-my own  function that searches for  correct project root. So  first we
-need a list  of project root markers, that will  hold file names which
-we will look up recursively. we need a function that will test current
-directory for  several conditions,  like does it  have any  of project
-markers, is it root directory, and  if everything fails, it will go up
-one directory and repeat.
+I do not want to use projectile, since Emacs already features =project.el= and many packages use it.
+Although I've needed to create my own function that searches for correct project root.
+So first we need a list of project root markers, that will hold file names which we will look up recursively.
+We need a function that will test current directory for several conditions, like does it have any of project markers, is it root directory, and if everything fails, it will go up one directory and repeat.
 
 #+begin_src emacs-lisp
   (use-package project
@@ -2797,11 +2656,8 @@ A package to format C code with Clang Format.
 #+end_src
 
 ** Server
-I'm using  =server-start= command not because  I do not want  to load my
-Emacs every time, but because I  want to have single instance of Emacs
-running at a time, so all files that I open from GUI will be opened in
-existing Emacs. If no Emacs exist, it should start one, start a server
-and open a file.
+I'm using =server-start= command not because I do not want to load my Emacs every time, but because I want to have single instance of Emacs running at a time, so all files that I open from GUI will be opened in existing Emacs.
+If no Emacs exist, it should start one, start a server and open a file.
 
 #+begin_src emacs-lisp
   (use-package server
@@ -2811,8 +2667,7 @@ and open a file.
       (server-start)))
 #+end_src
 
-To fully achieve this behavior one needs a =.desktop= file to exist that
-will decide which kind of Emacs to call: =emacs= or =emacsclient=:
+To fully achieve this behavior one needs a =.desktop= file to exist that will decide which kind of Emacs to call: =emacs= or =emacsclient=:
 
 #+begin_src conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes :results silent
   [Desktop Entry]
@@ -2828,18 +2683,15 @@ will decide which kind of Emacs to call: =emacs= or =emacsclient=:
   StartupWMClass=Emacs
 #+end_src
 
-This code above automatically creates user local =emacs.desktop= file in
-=~/.local/share/applications= that will:
+This code above automatically creates user local =emacs.desktop= file in =~/.local/share/applications= that will:
 
 - call =emacs= if no arguments provided, or
-- call =emacsclient  -a emacs= with  arguments. =emacsclient= will  try to
-  connect to  a server,  and if  there's none, it  will fire  up =emacs=
-  which will create server, and opening new files will be done in this
-  instance of =emacs=.
+- call =emacsclient -a emacs= with arguments.
+  =emacsclient= will try to connect to a server, and if there's none, it will fire up =emacs= which will create server, and opening new files will be done in this instance of =emacs=.
 
 ** Hideshow
-This built  in mode provides code  folding. I use =transient=  to create
-little interactive menu for easy interaction.
+This built in mode provides code folding.
+I use =transient= to create little interactive menu for easy interaction.
 
 #+begin_src emacs-lisp
   (use-package hideshow
@@ -2866,9 +2718,8 @@ little interactive menu for easy interaction.
 #+end_src
 
 ** Desktop
-This is  really nice feature  that allows me  to save my  workspace on
-disk and  do not restore  all buffers and  windows every time  I start
-Emacs. It adds some time to the startup though.
+This is really nice feature that allows me to save my workspace on disk and do not restore all buffers and windows every time I start Emacs.
+It adds some time to the startup though.
 
 #+begin_src emacs-lisp
   (use-package desktop
@@ -2899,12 +2750,10 @@ Emacs. It adds some time to the startup though.
         (desktop-read))))
 #+end_src
 
-I wonder if  it could store unsaved buffers so  all my changes persist
-through sessions.
+I wonder if it could store unsaved buffers so all my changes persist through sessions.
 
 ** Edit Indirect
-This  package  makes it  possible  to  edit  Markdown code  blocks  in
-separate buffers.
+This package makes it possible to edit Markdown code blocks in separate buffers.
 
 #+begin_src emacs-lisp
   (use-package edit-indirect
@@ -2922,8 +2771,7 @@ separate buffers.
 #+end_src
 
 ** Separedit
-This package  provides a way to  edit comments in sources  as separate
-buffers with another major mode, like Markdown.
+This package provides a way to edit comments in sources as separate buffers with another major mode, like Markdown.
 
 #+begin_src emacs-lisp
   (use-package separedit
@@ -2953,8 +2801,7 @@ Settings to =recentf= mode.
 #+end_src
 
 ** Smooth Scroll
-This minor  mode provides a nice  way of having fake  smooth scrolling
-that helps seeing where
+This minor mode provides a nice way of having fake smooth scrolling that helps seeing where.
 
 #+begin_src emacs-lisp
 (use-package smooth-scroll
@@ -2975,8 +2822,7 @@ Dumbest definition jumping that just work.
 #+end_src
 
 ** Which Key
-A useful package that displays all keybindings available for the chord
-you're entering after a certain delay.
+A useful package that displays all keybindings available for the chord you're entering after a certain delay.
 
 #+begin_src emacs-lisp
   (use-package which-key
@@ -2984,15 +2830,9 @@ you're entering after a certain delay.
 #+end_src
 
 * Postscript
-This Emacs Configuration features  various cool E-Lisp hacks somewhere
-that I've  found over the  Internet, and I  try to keep  references to
-original places, so reader could refer to those, because I alter these
-pieces of code for my personal needs and thus it may not be compatible
-with  other people  tastes,  and  because I  want  to credit  original
-author.
+This Emacs Configuration features various cool E-Lisp hacks somewhere that I've found over the Internet, and I try to keep references to original places, so reader could refer to those, because I alter these pieces of code for my personal needs and thus it may not be compatible with other people tastes, and because I want to credit original author.
 
-If you  find any issue with  my config feel  free to [[https://github.com/andreyorst/dotfiles/issues/new][file an  issue]] or
-contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].
+If you find any issue with my config feel free to [[https://github.com/andreyorst/dotfiles/issues/new][file an issue]] or contact me via email: [[mailto:andreyorst@gmail.com][andreyorst@gmail.com]].
 
 And as a final step of a proper init file:
 

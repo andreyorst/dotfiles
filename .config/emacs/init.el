@@ -718,10 +718,6 @@ are defining or executing a macro."
                     (width (- (/ (window-width) 2) extra-align)))
                (concat (make-string width ?\s) text)))))))
 
-(use-package minions
-  :commands minions-mode
-  :init (minions-mode 1))
-
 (use-package uniquify
   :straight nil
   :custom (uniquify-buffer-name-style 'forward))
@@ -918,8 +914,7 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package org
   :straight (:type built-in)
-  :hook ((org-mode . auto-fill-mode)
-         (after-save . aorst/org-tangle-on-config-save)
+  :hook ((after-save . aorst/org-tangle-on-config-save)
          (org-babel-after-execute . aorst/org-update-inline-images)
          (ediff-prepare-buffer . outline-show-all)
          ((org-capture-mode org-src-mode) . aorst/discard-history))
@@ -1039,7 +1034,6 @@ truncates text if needed.  Minimal width can be set with
     (setq fill-column 80
           default-justification 'left))
   :hook ((markdown-mode . flyspell-mode)
-         (markdown-mode . auto-fill-mode)
          (markdown-mode . aorst/markdown-setup)))
 
 (use-package rust-mode
