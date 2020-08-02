@@ -409,6 +409,21 @@ are defining or executing a macro."
      'help-echo "Flycheck list errors"
      'local-map 'flycheck-error-list-mode-line-map)))
 
+(defun aorst/mode-line-structural ()
+  (cond ((bound-and-true-p parinfer-rust-mode)
+         (propertize (concat "  Parinfer: " parinfer-rust--mode)
+                     'help-echo (concat "Parinfer " parinfer-rust--mode
+                                        " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
+                     'local-map (let ((map (make-sparse-keymap)))
+                                  (define-key map [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode)
+                                  map)))
+        ((bound-and-true-p paredit-mode)
+         (propertize "  Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+        ((bound-and-true-p lispy-mode)
+         (propertize "  Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
+        ((bound-and-true-p electric-pair-mode)
+         (propertize "  EPM" 'help-echo "Electric Pair mode is enabled for current buffer"))))
+
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
@@ -416,7 +431,6 @@ are defining or executing a macro."
   (mini-modeline-display-gui-line nil)
   (mini-modeline-r-format
    '(:eval (concat
-            (aorst/mode-line-buffer-name)
             (aorst/mode-line-buffer-modified)
             (aorst/mode-line-line-column)
             (aorst/mode-line-line-encoding)
@@ -425,7 +439,8 @@ are defining or executing a macro."
             (aorst/mode-line-mode-name)
             (aorst/mode-line-git-branch)
             (aorst/mode-line-readonly)
-            (aorst/mode-line-flycheck))))
+            (aorst/mode-line-flycheck)
+            (aorst/mode-line-structural))))
   :config
   (mini-modeline-mode t))
 
@@ -1454,8 +1469,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :if (and (bound-and-true-p module-file-suffix)
            (not (string-match-p "aarch" system-configuration)))
   :straight (:host github
-             :repo "justinbarclay/parinfer-rust-mode"
-             :branch "master")
+             :repo "andreyorst/parinfer-rust-mode")
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode

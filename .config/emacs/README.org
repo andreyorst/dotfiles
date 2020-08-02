@@ -1040,6 +1040,26 @@ Flycheck module for mode-line.
        'local-map 'flycheck-error-list-mode-line-map)))
 #+end_src
 
+**** =mode-line-structural=
+Support for various structural editing modes in mode-line.
+
+#+begin_src emacs-lisp
+  (defun aorst/mode-line-structural ()
+    (cond ((bound-and-true-p parinfer-rust-mode)
+           (propertize (concat "  Parinfer: " parinfer-rust--mode)
+                       'help-echo (concat "Parinfer " parinfer-rust--mode
+                                          " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
+                       'local-map (let ((map (make-sparse-keymap)))
+                                    (define-key map [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode)
+                                    map)))
+          ((bound-and-true-p paredit-mode)
+           (propertize "  Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+          ((bound-and-true-p lispy-mode)
+           (propertize "  Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
+          ((bound-and-true-p electric-pair-mode)
+           (propertize "  EPM" 'help-echo "Electric Pair mode is enabled for current buffer"))))
+#+end_src
+
 *** Mini Modeline
 A very interesting package that displays mode-line in the echo area
 (minibuffer). Currently it uses default format, and I'm looking
@@ -1053,7 +1073,6 @@ forward to integrate DOOM mode-line with it.
     (mini-modeline-display-gui-line nil)
     (mini-modeline-r-format
      '(:eval (concat
-              (aorst/mode-line-buffer-name)
               (aorst/mode-line-buffer-modified)
               (aorst/mode-line-line-column)
               (aorst/mode-line-line-encoding)
@@ -1062,7 +1081,8 @@ forward to integrate DOOM mode-line with it.
               (aorst/mode-line-mode-name)
               (aorst/mode-line-git-branch)
               (aorst/mode-line-readonly)
-              (aorst/mode-line-flycheck))))
+              (aorst/mode-line-flycheck)
+              (aorst/mode-line-structural))))
     :config
     (mini-modeline-mode t))
 #+end_src
@@ -2345,8 +2365,7 @@ development.
     :if (and (bound-and-true-p module-file-suffix)
              (not (string-match-p "aarch" system-configuration)))
     :straight (:host github
-               :repo "justinbarclay/parinfer-rust-mode"
-               :branch "master")
+               :repo "andreyorst/parinfer-rust-mode")
     :hook ((clojure-mode
             emacs-lisp-mode
             common-lisp-mode
