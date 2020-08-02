@@ -2355,6 +2355,7 @@ development.
             racket-mode
             fennel-mode) . parinfer-rust-mode)
     :custom (parinfer-rust-check-before-enable 'defer)
+    :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
     :config
     (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
     :init
