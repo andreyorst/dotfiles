@@ -505,6 +505,7 @@ Also, I don't want my files to contain trailing whitespaces, so =before-save-hoo
            ("C-o" . aorst/newline-below)
            ("C-S-o" . aorst/newline-above)
            ("M-z" . zap-up-to-char)
+           ("C-x k" . kill-this-buffer)
            ("M-S-z" . zap-to-char))
     :hook ((before-save . delete-trailing-whitespace)
            (overwrite-mode . aorst/overwrite-set-cursor-shape))
@@ -830,7 +831,7 @@ Returns buffer name or empty string if buffer is special and starts from space.
   (defun aorst/mode-line-buffer-name ()
     (let* ((name (buffer-name))
            (match (string-match " " name)))
-      (if (and match (= match 0)) "" (concat "  " name))))
+      (if (and match (= match 0)) nil (concat "  " name))))
 #+end_src
 
 **** =mode-line-buffer-modified=
@@ -906,7 +907,14 @@ Indentation info module for mode-line.
                (format "  %d Spaces" indent-level)
              "  Spaces")
          "  Spaces"))
-     'help-echo "Indentation method"))
+     'help-echo "Indentation method\nmouse-1: toggle indent method"
+     'local-map (let ((map (make-sparse-keymap)))
+                  (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
+                  map)))
+
+  (defun aorst/toggle-indent-mode ()
+    (interactive)
+    (setq-local indent-tabs-mode (not indent-tabs-mode)))
 #+end_src
 
 **** =mode-line-mode-name=
@@ -939,19 +947,19 @@ Read only state module for mode-line.
 
 #+begin_src emacs-lisp
   (defun aorst/mode-line-readonly ()
-    (if buffer-read-only
-        (propertize
-         (if (char-displayable-p ?🔒) "  🔒" "  RO")
-         'help-echo "Make file writable"
-         'local-map (let ((map (make-sparse-keymap)))
-                      (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
-                      map))
+    (when buffer-read-only
       (propertize
-       (if (char-displayable-p ?🔓) "  🔓" "  RW")
-       'help-echo "Make file read only"
+       (if (char-displayable-p ?🔒) "  🔒" "  RO")
+       'help-echo "Make file writable"
        'local-map (let ((map (make-sparse-keymap)))
                     (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
                     map))))
+      ;; (propertize
+      ;;  (if (char-displayable-p ?🔓) "  🔓" "  RW")
+      ;;  'help-echo "Make file read only"
+      ;;  'local-map (let ((map (make-sparse-keymap)))
+      ;;               (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
+      ;;               map))))
 #+end_src
 
 **** =mode-line-flycheck=
@@ -965,17 +973,17 @@ Flycheck module for mode-line.
         "  "
         (pcase flycheck-last-status-change
           (`not-checked "-")
-          (`no-checker "-")
+          (`no-checker (if (char-displayable-p ?🚫) "🚫" "-"))
           (`running (if (char-displayable-p ?🔄) "🔄" "*"))
           (`errored (if (char-displayable-p ?⚠) "⚠" "!"))
           (`finished
            (let-alist (flycheck-count-errors flycheck-current-errors)
              (if (or .error .warning)
-                 (format "⚠ %s/%s" (or .error 0) (or .warning 0))
-               "✔")))
-          (`interrupted ".")
+                 (format "%s %s/%s" (if (char-displayable-p ?⚠) "⚠" "!") (or .error 0) (or .warning 0))
+               (if (char-displayable-p ?✔) "✔" "+"))))
+          (`interrupted (if (char-displayable-p ?❌) "❌" "x"))
           (`suspicious "?")))
-       'help-echo "Flycheck list errors"
+       'help-echo "mouse-1: list Flycheck errors"
        'local-map 'flycheck-error-list-mode-line-map)))
 #+end_src
 
@@ -999,6 +1007,30 @@ Support for various structural editing modes in mode-line.
            (propertize "  EPM" 'help-echo "Electric Pair mode is enabled for current buffer"))))
 #+end_src
 
+*** Mode-line format
+#+begin_src emacs-lisp
+  (setq-default
+   mode-line-format
+   '(:eval
+     (let ((format
+            (concat
+             (aorst/mode-line-buffer-modified)
+             (aorst/mode-line-readonly)
+             (aorst/mode-line-line-column)
+             (aorst/mode-line-line-encoding)
+             (aorst/mode-line-buffer-encoding)
+             (aorst/mode-line-indent-mode)
+             (aorst/mode-line-mode-name)
+             (aorst/mode-line-git-branch)
+             (aorst/mode-line-flycheck)
+             (aorst/mode-line-structural))))
+       (concat (make-string (- (window-width)
+                               (string-width (format-mode-line format))
+                               1)
+                            ?\s)
+               format))))
+#+end_src
+
 *** Mini Modeline
 A very interesting package that displays mode-line in the echo area (minibuffer).
 Currently it uses default format, and I'm looking forward to integrate DOOM mode-line with it.
@@ -1012,13 +1044,13 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
     (mini-modeline-r-format
      '(:eval (concat
               (aorst/mode-line-buffer-modified)
+              (aorst/mode-line-readonly)
               (aorst/mode-line-line-column)
               (aorst/mode-line-line-encoding)
               (aorst/mode-line-buffer-encoding)
               (aorst/mode-line-indent-mode)
               (aorst/mode-line-mode-name)
               (aorst/mode-line-git-branch)
-              (aorst/mode-line-readonly)
               (aorst/mode-line-flycheck)
               (aorst/mode-line-structural))))
     :config

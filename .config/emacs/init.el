@@ -102,6 +102,7 @@
          ("C-o" . aorst/newline-below)
          ("C-S-o" . aorst/newline-above)
          ("M-z" . zap-up-to-char)
+         ("C-x k" . kill-this-buffer)
          ("M-S-z" . zap-to-char))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
@@ -306,7 +307,7 @@ are defining or executing a macro."
 (defun aorst/mode-line-buffer-name ()
   (let* ((name (buffer-name))
          (match (string-match " " name)))
-    (if (and match (= match 0)) "" (concat "  " name))))
+    (if (and match (= match 0)) nil (concat "  " name))))
 
 (defun aorst/mode-line-buffer-modified ()
   (when (and buffer-file-name (buffer-modified-p))
@@ -357,7 +358,14 @@ are defining or executing a macro."
              (format "  %d Spaces" indent-level)
            "  Spaces")
        "  Spaces"))
-   'help-echo "Indentation method"))
+   'help-echo "Indentation method\nmouse-1: toggle indent method"
+   'local-map (let ((map (make-sparse-keymap)))
+                (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
+                map)))
+
+(defun aorst/toggle-indent-mode ()
+  (interactive)
+  (setq-local indent-tabs-mode (not indent-tabs-mode)))
 
 (defun aorst/mode-line-mode-name ()
   (propertize
@@ -375,19 +383,19 @@ are defining or executing a macro."
         (concat (if (char-displayable-p ?) "   " "  @ ") str)))))
 
 (defun aorst/mode-line-readonly ()
-  (if buffer-read-only
-      (propertize
-       (if (char-displayable-p ?🔒) "  🔒" "  RO")
-       'help-echo "Make file writable"
-       'local-map (let ((map (make-sparse-keymap)))
-                    (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
-                    map))
+  (when buffer-read-only
     (propertize
-     (if (char-displayable-p ?🔓) "  🔓" "  RW")
-     'help-echo "Make file read only"
+     (if (char-displayable-p ?🔒) "  🔒" "  RO")
+     'help-echo "Make file writable"
      'local-map (let ((map (make-sparse-keymap)))
                   (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
                   map))))
+    ;; (propertize
+    ;;  (if (char-displayable-p ?🔓) "  🔓" "  RW")
+    ;;  'help-echo "Make file read only"
+    ;;  'local-map (let ((map (make-sparse-keymap)))
+    ;;               (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
+    ;;               map))))
 
 (defun aorst/mode-line-flycheck ()
   (when (bound-and-true-p flycheck-mode)
@@ -396,17 +404,17 @@ are defining or executing a macro."
       "  "
       (pcase flycheck-last-status-change
         (`not-checked "-")
-        (`no-checker "-")
+        (`no-checker (if (char-displayable-p ?🚫) "🚫" "-"))
         (`running (if (char-displayable-p ?🔄) "🔄" "*"))
         (`errored (if (char-displayable-p ?⚠) "⚠" "!"))
         (`finished
          (let-alist (flycheck-count-errors flycheck-current-errors)
            (if (or .error .warning)
-               (format "⚠ %s/%s" (or .error 0) (or .warning 0))
-             "✔")))
-        (`interrupted ".")
+               (format "%s %s/%s" (if (char-displayable-p ?⚠) "⚠" "!") (or .error 0) (or .warning 0))
+             (if (char-displayable-p ?✔) "✔" "+"))))
+        (`interrupted (if (char-displayable-p ?❌) "❌" "x"))
         (`suspicious "?")))
-     'help-echo "Flycheck list errors"
+     'help-echo "mouse-1: list Flycheck errors"
      'local-map 'flycheck-error-list-mode-line-map)))
 
 (defun aorst/mode-line-structural ()
@@ -424,6 +432,27 @@ are defining or executing a macro."
         ((bound-and-true-p electric-pair-mode)
          (propertize "  EPM" 'help-echo "Electric Pair mode is enabled for current buffer"))))
 
+(setq-default
+ mode-line-format
+ '(:eval
+   (let ((format
+          (concat
+           (aorst/mode-line-buffer-modified)
+           (aorst/mode-line-readonly)
+           (aorst/mode-line-line-column)
+           (aorst/mode-line-line-encoding)
+           (aorst/mode-line-buffer-encoding)
+           (aorst/mode-line-indent-mode)
+           (aorst/mode-line-mode-name)
+           (aorst/mode-line-git-branch)
+           (aorst/mode-line-flycheck)
+           (aorst/mode-line-structural))))
+     (concat (make-string (- (window-width)
+                             (string-width (format-mode-line format))
+                             1)
+                          ?\s)
+             format))))
+
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
@@ -432,13 +461,13 @@ are defining or executing a macro."
   (mini-modeline-r-format
    '(:eval (concat
             (aorst/mode-line-buffer-modified)
+            (aorst/mode-line-readonly)
             (aorst/mode-line-line-column)
             (aorst/mode-line-line-encoding)
             (aorst/mode-line-buffer-encoding)
             (aorst/mode-line-indent-mode)
             (aorst/mode-line-mode-name)
             (aorst/mode-line-git-branch)
-            (aorst/mode-line-readonly)
             (aorst/mode-line-flycheck)
             (aorst/mode-line-structural))))
   :config
