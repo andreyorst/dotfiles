@@ -181,6 +181,23 @@ are defining or executing a macro."
 
 (global-set-key (kbd "C-c C-M-f") #'aorst/indent-buffer)
 
+(defun aorst/split-pararagraph-into-lines ()
+  "Split current paragraph into lines with one sentence each."
+  (interactive)
+  (save-excursion
+    (let ((fill-column (point-max)))
+      (fill-paragraph))
+    (let ((end (progn (end-of-line) (backward-sentence) (point))))
+      (back-to-indentation)
+      (unless (= (point) end)
+        (while (< (point) end)
+          (forward-sentence)
+          (delete-horizontal-space)
+          (newline-and-indent))
+        (deactivate-mark)
+        (when (looking-at "^$")
+          (backward-delete-char 1))))))
+
 (use-package startup
   :no-require t
   :straight nil
@@ -951,6 +968,7 @@ truncates text if needed.  Minimal width can be set with
          ((org-capture-mode org-src-mode) . aorst/discard-history))
   :bind (("C-c a" . org-agenda)
          :map org-mode-map
+         ("M-Q" . aorst/split-pararagraph-into-lines)
          ("C-c l" . org-store-link))
   :custom
   (org-startup-with-inline-images nil)
@@ -1058,6 +1076,8 @@ truncates text if needed.  Minimal width can be set with
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
+  :bind (:map markdown-mode-map
+         ("M-Q" . aorst/split-pararagraph-into-lines))
   :config
   (defvar markdown-command "multimarkdown")
   (defun aorst/markdown-setup ()
