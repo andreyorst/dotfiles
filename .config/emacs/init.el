@@ -187,14 +187,18 @@ are defining or executing a macro."
   (save-excursion
     (let ((fill-column (point-max)))
       (fill-paragraph))
-    (let ((end (progn (end-of-line) (backward-sentence) (point))))
+    (let ((auto-fill-p auto-fill-function)
+          (end (progn (end-of-line) (backward-sentence) (point))))
       (back-to-indentation)
       (unless (= (point) end)
+        (auto-fill-mode -1)
         (while (< (point) end)
           (forward-sentence)
           (delete-horizontal-space)
           (newline-and-indent))
         (deactivate-mark)
+        (when auto-fill-p
+          (auto-fill-mode t))
         (when (looking-at "^$")
           (backward-delete-char 1))))))
 
