@@ -311,18 +311,13 @@ are defining or executing a macro."
   (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
   :config
   (solaire-global-mode 1)
-
-  (with-no-warnings
-    (if (boundp 'after-focus-change-function)
-        (add-function :after after-focus-change-function #'solaire-mode-reset)
-      (add-hook 'focus-in-hook  #'solaire-mode-reset)))
   (defun aorst/create-image-with-background-color (args)
     "Specify background color of Org-mode inline image through modify `ARGS'."
     (apply (lambda (file type data-p &rest props)
              (append (list file type data-p)
                      (list :background (face-attribute
-                                        (or (cadr (assq 'default face-remapping-alist))
-                                            'default)
+                                        (let ((face (cadr (assq 'default face-remapping-alist))))
+                                          (if (facep face) face 'default))
                                         :background nil t))
                      props))
            args))
