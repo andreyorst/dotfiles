@@ -1011,7 +1011,7 @@ truncates text if needed.  Minimal width can be set with
     (set-face-attribute 'tab-line-tab-current nil
                         :foreground fg
                         :background bg
-                        :weight 'bold
+                        :weight 'normal
                         :inherit nil
                         :box (when (> box-width 0) (list :line-width box-width :color bg))))
 
@@ -1309,6 +1309,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                       :color "#ff6c6b"
                                       :style nil)))))
   (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
+  (cider-result-overlay-face ((t (:inherit cider-debug-code-overlay-face))))
   :custom
   (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)

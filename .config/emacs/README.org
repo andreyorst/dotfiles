@@ -1640,7 +1640,7 @@ I want to customize tab appearance to match my theme.
       (set-face-attribute 'tab-line-tab-current nil
                           :foreground fg
                           :background bg
-                          :weight 'bold
+                          :weight 'normal
                           :inherit nil
                           :box (when (> box-width 0) (list :line-width box-width :color bg))))
 
@@ -2041,6 +2041,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
                                         :color "#ff6c6b"
                                         :style nil)))))
     (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
+    (cider-result-overlay-face ((t (:inherit cider-debug-code-overlay-face))))
     :custom
     (nrepl-log-messages nil)
     (cider-repl-display-help-banner nil)
