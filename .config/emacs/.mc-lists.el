@@ -19,6 +19,7 @@
         c-electric-star
         c-end-of-defun
         c-indent-line-or-region
+        cider-eval-defun-at-point
         comment-line
         counsel-M-x
         default-indent-new-line
