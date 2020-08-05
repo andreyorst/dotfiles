@@ -950,25 +950,72 @@ Buffer encoding module for mode-line.
 Indentation info module for mode-line.
 
 #+begin_src emacs-lisp
+  (defvar-local mode-line--current-major-mode nil
+    "Holds current major mode.
+  Used for quicker check if `aorst/mode-line-indent-mode' need to
+  do any meaningful stuff.")
+
+  (defvar-local mode-line--indent-var nil
+    "Holds variable that is used for setting indent offset in current major mode.
+  Used for both checking if we need to do meaningful work in
+  `aorst/mode-line-indent-mode', and for getting updated value.")
+
+  (defvar-local mode-line--indent-var-value nil
+    "Holds indent offset value, that was gathered before.
+  Used to check if we need to preform meaningful work in
+  `aorst/mode-line-indent-mode'.")
+
   (defun aorst/mode-line-indent-mode ()
-    (propertize
-     (if indent-tabs-mode
-         "  Tabs"
-       (if-let ((indent-level (and (boundp 'editorconfig-indentation-alist)
-                                   (symbol-value
-                                    (car (assoc-default
-                                          major-mode
-                                          editorconfig-indentation-alist
-                                          (lambda (car key)
-                                            (provided-mode-derived-p key car))))))))
-           (format "  %S Spaces" indent-level)
-         "  Spaces"))
-     'help-echo "Indentation method\nmouse-1: toggle indent method"
-     'local-map (let ((map (make-sparse-keymap)))
-                  (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
-                  map)))
+    "Compute mode-line string with current indent mode.
+  Does heavy work only if major-mode has changed since last call,
+  or if current indent offset has changed since last call, or if
+  there's no previous result of this function stored."
+    (if (and (eq major-mode mode-line--current-major-mode)
+             (eq mode-line--indent-var-value
+                 (symbol-value mode-line--indent-var))
+             mode-line--indent-mode-string)
+        mode-line--indent-mode-string
+      (setq-local mode-line--current-major-mode major-mode)
+      (aorst/mode-line--update-indent-var)
+      (aorst/mode-line--update-indent-var-value)
+      (setq-local mode-line--indent-mode-string
+                  (propertize
+                   (concat "  "
+                           (when (and (not indent-tabs-mode)
+                                      mode-line--indent-var-value)
+                             (format "%d " mode-line--indent-var-value))
+                           (if indent-tabs-mode "Tabs" "Spaces"))
+                   'help-echo (concat "Indent mode"
+                                      (when mode-line--indent-var-value
+                                        (format ": %S" mode-line--indent-var))
+                                      "\nmouse-1: toggle indent "
+                                      (if indent-tabs-mode "Spaces" "Tabs")
+                                      " mode")
+                   'local-map (let ((map (make-sparse-keymap)))
+                                (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
+                                map)))
+      mode-line--indent-mode-string))
+
+  (defun aorst/mode-line--update-indent-var ()
+    "Get variable that holds indent offset for current major mode.
+  Uses `editorconfig-indentation-alist' variable as a source for
+  all relationshipts between major modes and their respective
+  offset variables."
+    (setq-local mode-line--indent-var
+                (and (boundp 'editorconfig-indentation-alist)
+                     (car (assoc-default
+                           major-mode
+                           editorconfig-indentation-alist
+                           (lambda (car key)
+                             (provided-mode-derived-p key car)))))))
+
+  (defun aorst/mode-line--update-indent-var-value ()
+    "Set buffer local indent offset value."
+    (setq-local mode-line--indent-var-value (symbol-value mode-line--indent-var)))
+
 
   (defun aorst/toggle-indent-mode ()
+    "Toggle `indent-tabs-mode' on and off."
     (interactive)
     (setq-local indent-tabs-mode (not indent-tabs-mode)))
 #+end_src
