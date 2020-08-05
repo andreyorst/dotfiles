@@ -434,21 +434,22 @@ are defining or executing a macro."
 
 (defun aorst/mode-line-flycheck ()
   (when (bound-and-true-p flycheck-mode)
-    (propertize
-     (concat
-      "  "
-      (pcase flycheck-last-status-change
-        (`not-checked "-")
-        (`no-checker "-")
-        (`running "*")
-        (`errored "!")
-        (`finished
-         (let-alist (flycheck-count-errors flycheck-current-errors)
-           (format "%s/%s" (or .error 0) (or .warning 0))))
-        (`interrupted "x")
-        (`suspicious "?")))
-     'help-echo "mouse-1: list Flycheck errors"
-     'local-map 'flycheck-error-list-mode-line-map)))
+    (concat
+     "  "
+     (pcase flycheck-last-status-change
+       (`not-checked (propertize "-" 'help-echo "Flycheck: not checked"))
+       (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
+       (`running (propertize "*" 'help-echo "Flycheck: checking"))
+       (`errored (propertize "!" 'help-echo "Flycheck: error"))
+       (`finished
+        (let-alist (flycheck-count-errors flycheck-current-errors)
+          (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                      'help-echo (if (or .error .warning)
+                                     "Flycheck: errors\nmouse-1: list errors"
+                                   "Flycheck: no errors or warnings")
+                      'local-map 'flycheck-error-list-mode-line-map)))
+       (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
+       (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))))
 
 (defun aorst/mode-line-structural ()
   (cond ((bound-and-true-p parinfer-rust-mode)
@@ -1504,25 +1505,51 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       :fringe-bitmap 'flycheck-question-mark
       :fringe-face 'flycheck-fringe-info
       :error-list-face 'flycheck-error-list-info))
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/flycheck (:color blue :hint nil)
-      "
+
+  (when (executable-find "textlint")
+    (flycheck-define-checker textlint
+      "A linter for textlint."
+      :command ("textlint"
+                "--format" "unix"
+                "--rule" "write-good"
+                "--rule" "no-start-duplicated-conjunction"
+                "--rule" "max-comma"
+                "--rule" "terminology"
+                "--rule" "period-in-list-item"
+                "--rule" "abbr-within-parentheses"
+                "--rule" "alex"
+                "--rule" "common-misspellings"
+                "--rule" "en-max-word-count"
+                "--rule" "diacritics"
+                "--rule" "stop-words"
+                source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+                (message (one-or-more not-newline)
+                         (zero-or-more "\n" (any " ") (one-or-more not-newline)))
+                line-end))
+      :modes (text-mode latex-mode org-mode markdown-mode))
+    (add-to-list 'flycheck-checkers 'textlint))
+
+ (when (fboundp #'defhydra)
+   (defhydra hydrant/flycheck (:color blue :hint nil)
+     "
  ^Flycheck^         ^Errors^       ^Checker^
  _q_: quit          _<_: previous  _?_: describe
  _M_: manual        _>_: next      _d_: disable
  _v_: verify setup  _f_: check     _m_: mode
  ^ ^                _l_: list      _s_: select"
-      ("q" ignore :exit t)
-      ("M" flycheck-manual)
-      ("v" flycheck-verify-setup)
-      ("<" flycheck-previous-error :color pink)
-      (">" flycheck-next-error :color pink)
-      ("f" flycheck-buffer)
-      ("l" flycheck-list-errors)
-      ("?" flycheck-describe-checker)
-      ("d" flycheck-disable-checker)
-      ("m" flycheck-mode)
-      ("s" flycheck-select-checker))))
+     ("q" ignore :exit t)
+     ("M" flycheck-manual)
+     ("v" flycheck-verify-setup)
+     ("<" flycheck-previous-error :color pink)
+     (">" flycheck-next-error :color pink)
+     ("f" flycheck-buffer)
+     ("l" flycheck-list-errors)
+     ("?" flycheck-describe-checker)
+     ("d" flycheck-disable-checker)
+     ("m" flycheck-mode)
+     ("s" flycheck-select-checker))))
 
 (use-package flycheck-cask
   :hook (flycheck-mode . flycheck-cask-setup))

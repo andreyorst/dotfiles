@@ -11,7 +11,7 @@ for i in $HOME/.dotfiles/scripts/*.sh; do
 done
 
 # User specific environment
-export PATH="$HOME/.dotfiles/scripts:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.dotfiles/scripts:$HOME/.local/bin:$HOME/.npm/bin:$HOME/.luarocks/bin:$PATH"
 
 # Prompt
 PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$CONTAINER_PS1\$GIT_PS1
