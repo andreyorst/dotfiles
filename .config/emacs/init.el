@@ -1415,6 +1415,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package lsp-java)
 
+(use-package sql-indent
+  :hook (sql-mode . sqlind-minor-mode))
+
 (use-package help
   :straight nil
   :custom (help-window-select t))

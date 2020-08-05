@@ -2181,6 +2181,14 @@ Support for Java is inbuilt, but to use Java Language Server we need this packag
   (use-package lsp-java)
 #+end_src
 
+** SQL
+Syntax based indentation for SQL:
+
+#+begin_src emacs-lisp
+  (use-package sql-indent
+    :hook (sql-mode . sqlind-minor-mode))
+#+end_src
+
 * Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 
