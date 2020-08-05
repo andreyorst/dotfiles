@@ -614,12 +614,6 @@ offset variables."
                       :foreground (face-attribute 'default :foreground)
                       :height 1.0
                       :weight 'normal)
-  (defun aorst/treemacs-ignore (file _)
-    (or (s-ends-with? ".elc" file)
-        (s-ends-with? ".o" file)
-        (s-ends-with? ".a" file)
-        (string= file ".svn")))
-  (add-to-list 'treemacs-ignored-file-predicates #'aorst/treemacs-ignore)
   (treemacs-create-theme "Atom"
     :config
     (progn
