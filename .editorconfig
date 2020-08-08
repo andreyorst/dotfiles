@@ -7,6 +7,9 @@ trim_trailing_whitespace = true
 [*.{c,cc,cpp,h,hpp,hh}]
 indent_style = tab
 
+[{Makefile,*.mk}]
+indent_style = tab
+
 [*.{rs,toml}]
 indent_style = space
 indent_size = 4
@@ -22,3 +25,10 @@ indent_style = tab
 trim_trailing_whitespace = false
 indent_style = space
 indent_size = 4
+
+[*.org]
+trim_trailing_whitespace = false
+
+[*.{clj,cljs,cljc,edn}]
+indent_style = space
+indent_size = 2
