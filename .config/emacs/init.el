@@ -464,8 +464,8 @@ offset variables."
     (setq-local mode-line--major-mode-string
                (propertize
                  (concat "  " (format-mode-line mode-name))
-                 'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
-    mode-line--major-mode-string))
+                 'help-echo (format "Major-mode: %s" (format-mode-line mode-name)))))
+  mode-line--major-mode-string)
 
 (defun aorst/mode-line-git-branch ()
   (when (and vc-mode buffer-file-name)
@@ -1299,17 +1299,21 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
          ((cider-repl-mode cider-mode) . eldoc-mode))
-  ;; :custom
-  ;; (nrepl-log-messages nil)
-  ;; (cider-repl-display-help-banner nil)
-  ;; (cider-repl-tab-command #'company-complete-common-or-cycle)
-  ;; (nrepl-hide-special-buffers t)
+  :custom
+  (nrepl-log-messages nil)
+  (cider-repl-display-help-banner nil)
+  (cider-repl-tab-command #'company-complete-common-or-cycle)
+  (nrepl-hide-special-buffers t)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
     (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip"))
   (when (file-exists-p "/usr/lib/jvm/java-11-openjdk/lib/src.zip")
-    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip")))
+    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip"))
+  (when (file-exists-p "~/.clojure-src/")
+    (setq cider-jdk-src-paths
+          (append cider-jdk-src-paths
+                  (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))))
 
 (use-package flycheck-clj-kondo
   :if (executable-find "clj-kondo")
@@ -1337,6 +1341,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package sql-indent
   :hook (sql-mode . sqlind-minor-mode))
+
+(use-package elixir-mode)
 
 (use-package help
   :straight nil
@@ -1660,6 +1666,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (magit-ediff-dwim-show-on-hunks t)
   :config
   (advice-add 'magit-set-header-line-format :override #'ignore))
+
+(use-package magit-todos
+  :hook (magit-mode . magit-todos-mode))
 
 (use-package ediff
   :straight nil

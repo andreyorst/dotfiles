@@ -1029,8 +1029,8 @@ Major mode module for mode-line
       (setq-local mode-line--major-mode-string
                  (propertize
                    (concat "  " (format-mode-line mode-name))
-                   'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
-      mode-line--major-mode-string))
+                   'help-echo (format "Major-mode: %s" (format-mode-line mode-name)))))
+    mode-line--major-mode-string)
 #+end_src
 
 **** =mode-line-git-branch=
@@ -2031,17 +2031,21 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
   (use-package cider
     :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
            ((cider-repl-mode cider-mode) . eldoc-mode))
-    ;; :custom
-    ;; (nrepl-log-messages nil)
-    ;; (cider-repl-display-help-banner nil)
-    ;; (cider-repl-tab-command #'company-complete-common-or-cycle)
-    ;; (nrepl-hide-special-buffers t)
+    :custom
+    (nrepl-log-messages nil)
+    (cider-repl-display-help-banner nil)
+    (cider-repl-tab-command #'company-complete-common-or-cycle)
+    (nrepl-hide-special-buffers t)
     :config
     (setq cider-jdk-src-paths nil)
     (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
       (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip"))
     (when (file-exists-p "/usr/lib/jvm/java-11-openjdk/lib/src.zip")
-      (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip")))
+      (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip"))
+    (when (file-exists-p "~/.clojure-src/")
+      (setq cider-jdk-src-paths
+            (append cider-jdk-src-paths
+                    (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))))
 #+end_src
 
 *** flycheck-clj-kondo
@@ -2106,6 +2110,15 @@ Syntax based indentation for SQL:
 #+begin_src emacs-lisp
   (use-package sql-indent
     :hook (sql-mode . sqlind-minor-mode))
+#+end_src
+
+** Elixir
+Elixir is a dynamic, functional language designed for building scalable and maintainable applications.
+It runs on Erlang VM (BEAM), and has nice macro system, making language core small, yet still very extensible.
+And it also has good interop with Erlang itself.
+
+#+begin_src emacs-lisp
+  (use-package elixir-mode)
 #+end_src
 
 * Tools
@@ -2524,6 +2537,14 @@ I've heard that it has many nice features, so I want to try it out.
     (magit-ediff-dwim-show-on-hunks t)
     :config
     (advice-add 'magit-set-header-line-format :override #'ignore))
+#+end_src
+
+*** Magit TODOs
+Display TODO items in Magit buffers.
+
+#+begin_src emacs-lisp
+  (use-package magit-todos
+    :hook (magit-mode . magit-todos-mode))
 #+end_src
 
 ** Ediff
