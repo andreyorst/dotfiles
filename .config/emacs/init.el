@@ -294,7 +294,9 @@ are defining or executing a macro."
   (org-level-8 ((t (:inherit outline-6))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (load-theme 'doom-one-light t))
+  (if (display-graphic-p)
+      (load-theme 'doom-one-light t)
+    (load-theme 'doom-one t)))
 
 (use-package solaire-mode
   :straight (:host github

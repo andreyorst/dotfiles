@@ -793,7 +793,9 @@ But it is also an amazingly well put set of themes, which define colors for pret
     (org-level-8 ((t (:inherit outline-6))))
     (font-lock-comment-face ((t (:background unspecified))))
     :config
-    (load-theme 'doom-one-light t))
+    (if (display-graphic-p)
+        (load-theme 'doom-one-light t)
+      (load-theme 'doom-one t)))
 #+end_src
 
 ** Solaire Mode
