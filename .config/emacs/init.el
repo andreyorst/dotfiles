@@ -61,13 +61,13 @@
   :init
   (load custom-file :noerror))
 
-(defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
+(defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
   "File to store disabled commands, that were enabled permamently.")
 (defadvice en/disable-command (around put-in-custom-file activate)
   "Put declarations in disabled.el."
-  (let ((user-init-file disabled-commands))
+  (let ((user-init-file aorst--disabled-commands))
     ad-do-it))
-(load disabled-commands :noerror)
+(load aorst--disabled-commands :noerror)
 
 (use-package savehist
   :straight nil
@@ -391,52 +391,52 @@ are defining or executing a macro."
    'help-echo 'mode-line-mule-info-help-echo
    'local-map mode-line-coding-system-map))
 
-(defvar-local mode-line--current-major-mode nil
+(defvar-local aorst--mode-line--current-major-mode nil
   "Holds current major mode.
 Used for quicker check if `aorst/mode-line-indent-mode' need to
 do any meaningful stuff.")
 
-(defvar-local mode-line--indent-var nil
+(defvar-local aorst--mode-line--indent-var nil
   "Holds variable that is used for setting indent offset in current major mode.
 Used for both checking if we need to do meaningful work in
 `aorst/mode-line-indent-mode', and for getting updated value.")
 
-(defvar-local mode-line--indent-var-value nil
+(defvar-local aorst--mode-line--indent-var-value nil
   "Holds indent offset value, that was gathered before.
 Used to check if we need to preform meaningful work in
 `aorst/mode-line-indent-mode'.")
 
-(defvar-local mode-line--indent-mode-string nil)
+(defvar-local aorst--mode-line--indent-mode-string nil)
 
 (defun aorst/mode-line-indent-mode ()
   "Compute mode-line string with current indent mode.
 Does heavy work only if major-mode has changed since last call,
 or if current indent offset has changed since last call, or if
 there's no previous result of this function stored."
-  (unless (and (eq major-mode mode-line--current-major-mode)
-               (eq mode-line--indent-var-value
-                   (symbol-value mode-line--indent-var))
-               mode-line--indent-mode-string)
-    (setq-local mode-line--current-major-mode major-mode)
-    (setq-local mode-line--indent-var (aorst/mode-line--get-indent-var))
-    (setq-local mode-line--indent-var-value (symbol-value mode-line--indent-var))
-    (setq-local mode-line--indent-mode-string
+  (unless (and (eq major-mode aorst--mode-line--current-major-mode)
+               (eq aorst--mode-line--indent-var-value
+                   (symbol-value aorst--mode-line--indent-var))
+               aorst--mode-line--indent-mode-string)
+    (setq-local aorst--mode-line--current-major-mode major-mode)
+    (setq-local aorst--mode-line--indent-var (aorst/mode-line--get-indent-var))
+    (setq-local aorst--mode-line--indent-var-value (symbol-value aorst--mode-line--indent-var))
+    (setq-local aorst--mode-line--indent-mode-string
                 (propertize
                  (concat "  "
                          (when (and (not indent-tabs-mode)
-                                    mode-line--indent-var-value)
-                           (format "%d " mode-line--indent-var-value))
+                                    aorst--mode-line--indent-var-value)
+                           (format "%d " aorst--mode-line--indent-var-value))
                          (if indent-tabs-mode "Tabs" "Spaces"))
                  'help-echo (concat "Indent mode"
-                                    (when mode-line--indent-var
-                                      (format ": %S" mode-line--indent-var))
+                                    (when aorst--mode-line--indent-var
+                                      (format ": %S" aorst--mode-line--indent-var))
                                     "\nmouse-1: toggle indent "
                                     (if indent-tabs-mode "Spaces" "Tabs")
                                     " mode")
                  'local-map (let ((map (make-sparse-keymap)))
                               (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
                               map))))
-  mode-line--indent-mode-string)
+  aorst--mode-line--indent-mode-string)
 
 (defun aorst/mode-line--get-indent-var ()
   "Get variable that holds indent offset for current major mode.
@@ -455,17 +455,17 @@ offset variables."
   (interactive)
   (setq-local indent-tabs-mode (not indent-tabs-mode)))
 
-(defvar-local mode-line--major-mode-string nil)
+(defvar-local aorst--mode-line--major-mode-string nil)
 
 (defun aorst/mode-line-mode-name ()
-  (unless (and (eq mode-line--current-major-mode
+  (unless (and (eq aorst--mode-line--current-major-mode
                    major-mode)
-               mode-line--major-mode-string)
-    (setq-local mode-line--major-mode-string
+               aorst--mode-line--major-mode-string)
+    (setq-local aorst--mode-line--major-mode-string
                (propertize
                  (concat "  " (format-mode-line mode-name))
                  'help-echo (format "Major-mode: %s" (format-mode-line mode-name)))))
-  mode-line--major-mode-string)
+  aorst--mode-line--major-mode-string)
 
 (defun aorst/mode-line-git-branch ()
   (when (and vc-mode buffer-file-name)
@@ -1845,7 +1845,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :bind (("C-c p f" . project-find-file)
          ("C-c p r" . project-find-regexp))
   :config
-  (defvar project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
+  (defvar aorst--project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
     "Files or directories that indicate the root of a project.")
   (defun aorst/project-find-root (path)
     "Recursive search in PATH for root markers."
@@ -1860,7 +1860,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     "Check if current PATH has any of project root markers."
     (let ((results (mapcar (lambda (marker)
                              (file-exists-p (concat path marker)))
-                           project-root-markers)))
+                           aorst--project-root-markers)))
       (eval `(or ,@ results))))
   (add-to-list 'project-find-functions #'aorst/project-find-root))
 
