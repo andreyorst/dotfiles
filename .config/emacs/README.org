@@ -2949,6 +2949,15 @@ A useful package that displays all keybindings available for the chord you're en
     :config (which-key-mode t))
 #+end_src
 
+** GCMH
+Garbage Collector Magic Hack.
+Runs GC when Emacs is idle, and increases GC treshold during active use.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :config (gcmh-mode t))
+#+end_src
+
 * Postscript
 This Emacs Configuration features various cool E-Lisp hacks somewhere that I've found over the Internet, and I try to keep references to original places, so reader could refer to those, because I alter these pieces of code for my personal needs and thus it may not be compatible with other people tastes, and because I want to credit original author.
 

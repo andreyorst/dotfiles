@@ -1962,5 +1962,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package which-key
   :config (which-key-mode t))
 
+(use-package gcmh
+  :config (gcmh-mode t))
+
 (provide 'init)
 ;;; init.el ends here
