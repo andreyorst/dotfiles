@@ -292,8 +292,9 @@ are defining or executing a macro."
   (org-level-6 ((t (:inherit outline-3))))
   (org-level-7 ((t (:inherit outline-4))))
   (org-level-8 ((t (:inherit outline-6))))
+  (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (load-theme 'doom-one t))
+  (load-theme 'doom-one-light t))
 
 (use-package solaire-mode
   :straight (:host github
@@ -405,19 +406,20 @@ Used for both checking if we need to do meaningful work in
 Used to check if we need to preform meaningful work in
 `aorst/mode-line-indent-mode'.")
 
+(defvar-local mode-line--indent-mode-string nil)
+
 (defun aorst/mode-line-indent-mode ()
   "Compute mode-line string with current indent mode.
 Does heavy work only if major-mode has changed since last call,
 or if current indent offset has changed since last call, or if
 there's no previous result of this function stored."
-  (if (and (eq major-mode mode-line--current-major-mode)
-           (eq mode-line--indent-var-value
-               (symbol-value mode-line--indent-var))
-           mode-line--indent-mode-string)
-      mode-line--indent-mode-string
+  (unless (and (eq major-mode mode-line--current-major-mode)
+               (eq mode-line--indent-var-value
+                   (symbol-value mode-line--indent-var))
+               mode-line--indent-mode-string)
     (setq-local mode-line--current-major-mode major-mode)
-    (aorst/mode-line--update-indent-var)
-    (aorst/mode-line--update-indent-var-value)
+    (setq-local mode-line--indent-var (aorst/mode-line--get-indent-var))
+    (setq-local mode-line--indent-var-value (symbol-value mode-line--indent-var))
     (setq-local mode-line--indent-mode-string
                 (propertize
                  (concat "  "
@@ -426,43 +428,44 @@ there's no previous result of this function stored."
                            (format "%d " mode-line--indent-var-value))
                          (if indent-tabs-mode "Tabs" "Spaces"))
                  'help-echo (concat "Indent mode"
-                                    (when mode-line--indent-var-value
+                                    (when mode-line--indent-var
                                       (format ": %S" mode-line--indent-var))
                                     "\nmouse-1: toggle indent "
                                     (if indent-tabs-mode "Spaces" "Tabs")
                                     " mode")
                  'local-map (let ((map (make-sparse-keymap)))
                               (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
-                              map)))
-    mode-line--indent-mode-string))
+                              map))))
+  mode-line--indent-mode-string)
 
-(defun aorst/mode-line--update-indent-var ()
+(defun aorst/mode-line--get-indent-var ()
   "Get variable that holds indent offset for current major mode.
 Uses `editorconfig-indentation-alist' variable as a source for
 all relationshipts between major modes and their respective
 offset variables."
-  (setq-local mode-line--indent-var
-              (and (boundp 'editorconfig-indentation-alist)
-                   (car (assoc-default
-                         major-mode
-                         editorconfig-indentation-alist
-                         (lambda (car key)
-                           (provided-mode-derived-p key car)))))))
-
-(defun aorst/mode-line--update-indent-var-value ()
-  "Set buffer local indent offset value."
-  (setq-local mode-line--indent-var-value (symbol-value mode-line--indent-var)))
-
+  (when (boundp 'editorconfig-indentation-alist)
+    (car (assoc-default
+          major-mode
+          editorconfig-indentation-alist
+          (lambda (car key)
+            (provided-mode-derived-p key car))))))
 
 (defun aorst/toggle-indent-mode ()
   "Toggle `indent-tabs-mode' on and off."
   (interactive)
   (setq-local indent-tabs-mode (not indent-tabs-mode)))
 
+(defvar-local mode-line--major-mode-string nil)
+
 (defun aorst/mode-line-mode-name ()
-  (propertize
-   (concat "  " (format-mode-line mode-name))
-   'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
+  (unless (and (eq mode-line--current-major-mode
+                   major-mode)
+               mode-line--major-mode-string)
+    (setq-local mode-line--major-mode-string
+               (propertize
+                 (concat "  " (format-mode-line mode-name))
+                 'help-echo (format "Major-mode: %s" (format-mode-line mode-name))))
+    mode-line--major-mode-string))
 
 (defun aorst/mode-line-git-branch ()
   (when (and vc-mode buffer-file-name)
@@ -1295,26 +1298,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-         ((cider-repl-mode cider-mode) . eldoc-mode)
-         (cider-disconnected . (lambda () (ignore-errors (delete-window)))))
-  :custom-face
-  (cider-error-highlight-face ((t (:inherit flymake-error))))
-  (cider-fringe-face ((t (:inherit flymake-warning))))
-  (cider-fragile-button-face ((t (:box (:line-width -1
-                                        :color nil
-                                        :style nil)
-                                  :inherit (font-lock-warning-face)))))
-  (cider-deprecated-face ((t (:inherit smerge-upper))))
-  (cider-instrumented-face ((t (:box (:line-width -1
-                                      :color "#ff6c6b"
-                                      :style nil)))))
-  (cider-fringe-good-face ((t (:inherit cider-repl-stdout-face))))
-  (cider-result-overlay-face ((t (:inherit cider-debug-code-overlay-face))))
-  :custom
-  (nrepl-log-messages nil)
-  (cider-repl-display-help-banner nil)
-  (cider-repl-tab-command #'company-complete-common-or-cycle)
-  (nrepl-hide-special-buffers t)
+         ((cider-repl-mode cider-mode) . eldoc-mode))
+  ;; :custom
+  ;; (nrepl-log-messages nil)
+  ;; (cider-repl-display-help-banner nil)
+  ;; (cider-repl-tab-command #'company-complete-common-or-cycle)
+  ;; (nrepl-hide-special-buffers t)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -1329,76 +1318,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package clj-refactor
   :hook ((cider-mode . clj-refactor-mode)
-         (cider-mode . yas-minor-mode))
-  :bind (:map cider-mode-map
-         ("C-c C-r" . hydrant/clj-refactor-menu/body))
-  :config
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/clj-refactor-menu (:color blue :hint nil)
-      "
- ^Add^                     ^Extract^       ^Clean^          ^Rename^      ^Unwind^
- _ad_: declaration         _ec_: constant  _cp_: project    _rs_: symbol  _ua_: unwind all
- _ai_: import to ns        _ed_: def       _cn_: namespace  _rf_: file    _uw_: unwind
- _am_: missing-libspec     _ef_: function  ^  ^             ^  ^          ^  ^
- _ap_: project-dependency  ^  ^            ^  ^             ^  ^          ^  ^
- _au_: use-to-ns           ^Expand^        ^Cycle^          ^Remove^      ^Update^
- _ar_: require-to-n        _el_: let       _ci_: if         _rl_: let     _ud_: dependencies
- _as_: stubs               ^  ^            _cp_: privacy
- ^  ^                      ^  ^            ^  ^             ^Require^     ^Hotload^
- ^  ^                      ^  ^            ^  ^             _rm_: macro   _hd_: dependency
-
- ^Uncategorized^            ^Misc^                      ^Thread^
- _pf_: promote fn           _q_:  exit                  _tf_: thread first all
- _mf_: move form            _?_:  describe refactoring  _th_: thread
- _ml_: move to let          _sc_: show changelog        _tl_: thread last all
- _il_: introduce let        _sp_: sort project deps     _ct_: cycle thread
- _is_: inline symbol        _sr_: stop referring        ^  ^
- _fe_: fn from example
- _fu_: find usages
- _dk_: destructure keys
- _cs_: change fn signature
-"
-      ("pf" cljr-promote-function)
-      ("mf" cljr-move-form)
-      ("ml" cljr-move-to-let)
-      ("il" cljr-introduce-let)
-      ("is" cljr-inline-symbol)
-      ("fe" cljr-create-fn-from-example)
-      ("fu" cljr-find-usages)
-      ("dk" cljr-destructure-keys)
-      ("cs" cljr-change-function-signature)
-      ("?"  cljr-describe-refactoring)
-      ("q"  ignore :exit t)
-      ("cp" cljr-project-clean)
-      ("cn" cljr-clean-ns)
-      ("ad" cljr-add-declaration)
-      ("ai" cljr-add-import-to-ns)
-      ("am" cljr-add-missing-libspec)
-      ("ap" cljr-add-project-dependency)
-      ("ar" cljr-add-require-to-ns)
-      ("as" cljr-add-stubs)
-      ("au" cljr-add-use-to-ns)
-      ("ec" cljr-extract-constant)
-      ("ed" cljr-extract-def)
-      ("ef" cljr-extract-function)
-      ("el" cljr-expand-let)
-      ("hd" cljr-hotload-dependency)
-      ("ua" clojure-unwind-all)
-      ("ud" cljr-update-project-dependencies)
-      ("uw" clojure-unwind)
-      ("tf" clojure-thread-first-all)
-      ("th" clojure-thread)
-      ("tl" clojure-thread-last-all)
-      ("sc" cljr-show-changelog)
-      ("sp" cljr-sort-project-dependencies)
-      ("sr" cljr-stop-referring)
-      ("ci" clojure-cycle-if)
-      ("cp" clojure-cycle-privacy)
-      ("ct" cljr-cycle-thread)
-      ("rf" cljr-rename-file-or-dir)
-      ("rl" cljr-remove-let)
-      ("rm" cljr-require-macro)
-      ("rs" cljr-rename-symbol))))
+         (cider-mode . yas-minor-mode)))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
@@ -1638,6 +1558,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-x C-b" . ivy-switch-buffer))
+  :custom-face
+  (ivy-org ((t (:inherit default))))
   :custom
   (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-count-format "")
@@ -1734,7 +1656,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode))
   :bind (("<f12>" . magit-status))
-  :custom (magit-ediff-dwim-show-on-hunks t))
+  :custom
+  (magit-ediff-dwim-show-on-hunks t)
+  :config
+  (advice-add 'magit-set-header-line-format :override #'ignore))
 
 (use-package ediff
   :straight nil
@@ -1882,7 +1807,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-rust-clippy-preference "on")
   (lsp-prefer-capf t)
   (lsp-enable-indentation nil)
-  (lsp-enable-symbol-highlighting nil)
+  ;; (lsp-enable-symbol-highlighting nil)
   (lsp-rust-server 'rust-analyzer)
   (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
 
