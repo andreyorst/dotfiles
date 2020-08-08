@@ -287,12 +287,14 @@ are defining or executing a macro."
                              :inherit region))))
   (org-level-2 ((t (:inherit outline-3))))
   (org-level-3 ((t (:inherit outline-4))))
-  (org-level-4 ((t (:inherit outline-6))))
+  (org-level-4 ((t (:inherit outline-2))))
   (org-level-5 ((t (:inherit outline-1))))
   (org-level-6 ((t (:inherit outline-3))))
   (org-level-7 ((t (:inherit outline-4))))
-  (org-level-8 ((t (:inherit outline-6))))
+  (org-level-8 ((t (:inherit outline-2))))
+  (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
+  (fill-column-indicator ((t (:inherit font-lock-comment-face))))
   :config
   (if (display-graphic-p)
       (load-theme 'doom-one-light t)
@@ -1975,6 +1977,13 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package gcmh
   :config (gcmh-mode t))
+
+(use-package highlight-indent-guides
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :custom
+  (highlight-indent-guides-responsive 'stack)
+  (highlight-indent-guides-method 'bitmap)
+  (highlight-indent-guides-bitmap-function #'highlight-indent-guides--bitmap-line))
 
 (provide 'init)
 ;;; init.el ends here

@@ -786,12 +786,14 @@ But it is also an amazingly well put set of themes, which define colors for pret
                                :inherit region))))
     (org-level-2 ((t (:inherit outline-3))))
     (org-level-3 ((t (:inherit outline-4))))
-    (org-level-4 ((t (:inherit outline-6))))
+    (org-level-4 ((t (:inherit outline-2))))
     (org-level-5 ((t (:inherit outline-1))))
     (org-level-6 ((t (:inherit outline-3))))
     (org-level-7 ((t (:inherit outline-4))))
-    (org-level-8 ((t (:inherit outline-6))))
+    (org-level-8 ((t (:inherit outline-2))))
+    (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
     (font-lock-comment-face ((t (:background unspecified))))
+    (fill-column-indicator ((t (:inherit font-lock-comment-face))))
     :config
     (if (display-graphic-p)
         (load-theme 'doom-one-light t)
@@ -2797,7 +2799,7 @@ A package to format C code with Clang Format.
     :bind (:map c-mode-base-map
            ("C-c C-M-f" . clang-format-buffer)))
 #+end_src
-
+p
 ** Server
 I'm using =server-start= command not because I do not want to load my Emacs every time, but because I want to have single instance of Emacs running at a time, so all files that I open from GUI will be opened in existing Emacs.
 If no Emacs exist, it should start one, start a server and open a file.
@@ -2979,6 +2981,18 @@ Runs GC when Emacs is idle, and increases GC treshold during active use.
 #+begin_src emacs-lisp
   (use-package gcmh
     :config (gcmh-mode t))
+#+end_src
+
+** Indent guides
+Indentation guides for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :custom
+    (highlight-indent-guides-responsive 'stack)
+    (highlight-indent-guides-method 'bitmap)
+    (highlight-indent-guides-bitmap-function #'highlight-indent-guides--bitmap-line))
 #+end_src
 
 * Postscript
