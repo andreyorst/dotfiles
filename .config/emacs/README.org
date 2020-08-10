@@ -2857,9 +2857,9 @@ I use =transient= to create little interactive menu for easy interaction.
         ("hb" hs-hide-block)
         ("sa" hs-show-all)
         ("sb" hs-show-block)
-        ("qq"  ignore :exit t)
-        ("qs"  hs-show-all :exit t)
-        ("qh"  hs-hide-all :exit t))))
+        ("qq" ignore :exit t)
+        ("qs" hs-show-all :exit t)
+        ("qh" hs-hide-all :exit t))))
 #+end_src
 
 ** Desktop
@@ -2987,12 +2987,12 @@ Runs GC when Emacs is idle, and increases GC treshold during active use.
 Indentation guides for Emacs.
 
 #+begin_src emacs-lisp
-  (use-package highlight-indent-guides
-    :hook (prog-mode . highlight-indent-guides-mode)
+  (use-package indent-guide
+    :hook (prog-mode . indent-guide-mode)
+    :custom-face
+    (indent-guide-face ((t (:inherit font-lock-comment-face))))
     :custom
-    (highlight-indent-guides-responsive 'stack)
-    (highlight-indent-guides-method 'bitmap)
-    (highlight-indent-guides-bitmap-function #'highlight-indent-guides--bitmap-line))
+    (indent-guide-char "┊")) ;; ┊│┆
 #+end_src
 
 * Postscript

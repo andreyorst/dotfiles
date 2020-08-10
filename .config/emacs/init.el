@@ -1897,9 +1897,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       ("hb" hs-hide-block)
       ("sa" hs-show-all)
       ("sb" hs-show-block)
-      ("qq"  ignore :exit t)
-      ("qs"  hs-show-all :exit t)
-      ("qh"  hs-hide-all :exit t))))
+      ("qq" ignore :exit t)
+      ("qs" hs-show-all :exit t)
+      ("qh" hs-hide-all :exit t))))
 
 (use-package desktop
   :straight nil
@@ -1978,12 +1978,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package gcmh
   :config (gcmh-mode t))
 
-(use-package highlight-indent-guides
-  :hook (prog-mode . highlight-indent-guides-mode)
+(use-package indent-guide
+  :hook (prog-mode . indent-guide-mode)
+  :custom-face
+  (indent-guide-face ((t (:inherit font-lock-comment-face))))
   :custom
-  (highlight-indent-guides-responsive 'stack)
-  (highlight-indent-guides-method 'bitmap)
-  (highlight-indent-guides-bitmap-function #'highlight-indent-guides--bitmap-line))
+  (indent-guide-char "┊")) ;; ┊│┆
 
 (provide 'init)
 ;;; init.el ends here
