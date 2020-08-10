@@ -2218,6 +2218,7 @@ Some languages have better support with =flycheck=.
            ("C-c ! C-h" . hydrant/flycheck/body))
     :custom
     (flycheck-indication-mode 'right-fringe)
+    (flycheck-display-error-messages #'ignore)
     :config
     (when (fboundp #'define-fringe-bitmap)
       (define-fringe-bitmap 'flycheck-double-exclamation-mark
@@ -2981,18 +2982,6 @@ Runs GC when Emacs is idle, and increases GC treshold during active use.
 #+begin_src emacs-lisp
   (use-package gcmh
     :config (gcmh-mode t))
-#+end_src
-
-** Indent guides
-Indentation guides for Emacs.
-
-#+begin_src emacs-lisp
-  (use-package indent-guide
-    :hook (prog-mode . indent-guide-mode)
-    :custom-face
-    (indent-guide-face ((t (:inherit font-lock-comment-face))))
-    :custom
-    (indent-guide-char "┊")) ;; ┊│┆
 #+end_src
 
 * Postscript

@@ -1413,6 +1413,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c ! C-h" . hydrant/flycheck/body))
   :custom
   (flycheck-indication-mode 'right-fringe)
+  (flycheck-display-error-messages #'ignore)
   :config
   (when (fboundp #'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-double-exclamation-mark
@@ -1977,13 +1978,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package gcmh
   :config (gcmh-mode t))
-
-(use-package indent-guide
-  :hook (prog-mode . indent-guide-mode)
-  :custom-face
-  (indent-guide-face ((t (:inherit font-lock-comment-face))))
-  :custom
-  (indent-guide-char "┊")) ;; ┊│┆
 
 (provide 'init)
 ;;; init.el ends here
