@@ -1,8 +1,8 @@
 # Package manager wrappers
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+
 for pm in yay pacman rpm-ostree dnf yum apt; do
     if [ -n "$(command -v $pm)" ]; then
-        alias pm="pm_$(echo $pm | sed "s/[^a-zA-Z_]/_/g")"
+        alias pm="pm_\$(echo \$pm | sed 's/[^a-zA-Z_]/_/g')"
         break
     fi
 done

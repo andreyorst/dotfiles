@@ -45,7 +45,7 @@ getpasswd() {
                         }
                     }
                 }
-            ' $@
+            ' "$@"
         }
         copy="true"
         file="$HOME/.passwords.gpg"
@@ -83,14 +83,14 @@ getpasswd() {
         if [ $# -lt 1 ]; then
             printf "Enter service name(s) (separated by space): " >&2
             read -r inputs
-            set -- $inputs
+            set -- "$inputs"
         fi
         # in case when there's only one password queue was provided,
         # and if no `-print' option was specified we're going to copy
         # the password via `xsel'.
         if [ $# -eq 1 ] && [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
-            result=$({ err=$(gpg --decrypt "$file" 2>&1 >&3 3>&-); } 3>&1 | filter $name)
+            result=$({ err=$(gpg --decrypt "$file" 2>&1 >&3 3>&-); } 3>&1 | filter "$name")
             if [ $? -gt 1 ]; then
                 printf "%s\n" "$err"
                 printf "gpg error occured. Exiting\n" >&2
@@ -102,34 +102,34 @@ getpasswd() {
             amount=$(printf "%s\n" "$result" | wc -l)
             # if multiple passwords found in the search results we
             # have to select 1 to copy
-            if [ $amount -gt 1 ]; then
+            if [ "$amount" -gt 1 ]; then
                 printf "Multiple passwords found for '%s':\n" "$name" >&2
-                for i in $(seq 1 $amount); do
-                    item=$(printf "%s\n" "$result" | head -n $i | tail -n +$i | tr -d '\n' | sed "s|/\w\+: .*$||")
+                for i in $(seq 1 "$amount"); do
+                    item=$(printf "%s\n" "$result" | head -n "$i" | tail -n +"$i" | tr -d '\n' | sed "s|/\w\+: .*$||")
                     printf "%s) %s\n" "$i" "$item" >&2
                 done
-                printf "Select which to copy [%s]: " "$(seq -s ', ' 1 $amount)" >&2
+                printf "Select which to copy [%s]: " "$(seq -s ', ' 1 "$amount")" >&2
                 read -r choice
                 # this `case' checks if user input is a number and
                 # that it is in range of available passwords
                 case $choice in
-                    ''|*[!0-9]*) printf "Bad choice '%s', expected one of these: %s.\n" "$choice" "$(seq -s ', ' 1 $amount)" >&2
+                    ''|*[!0-9]*) printf "Bad choice '%s', expected one of these: %s.\n" "$choice" "$(seq -s ', ' 1 "$amount")" >&2
                                  return 1 ;;
-                    *) if [ $choice -lt 1 ] || [ $choice -gt $amount ]; then
-                           printf "Bad choice '%s', expected one of these: %s.\n" "$choice" "$(seq -s ', ' 1 $amount)" >&2
+                    *) if [ "$choice" -lt 1 ] || [ "$choice" -gt "$amount" ]; then
+                           printf "Bad choice '%s', expected one of these: %s.\n" "$choice" "$(seq -s ', ' 1 "$amount")" >&2
                            return 1
                        fi ;;
                 esac
                 # filter the input by specific line
-                name="$(printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | sed "s|/\w\+: .*$||")"
-                printf "%s\n" "$result" | head -n $choice | tail -n +$choice | tr -d '\n' | sed "s/.*: //" | xsel -b -i
+                name="$(printf "%s\n" "$result" | head -n "$choice" | tail -n +"$choice" | tr -d '\n' | sed "s|/\w\+: .*$||")"
+                printf "%s\n" "$result" | head -n "$choice" | tail -n +"$choice" | tr -d '\n' | sed "s/.*: //" | xsel -b -i
             else
                 printf "%s" "$result" | sed "s/.*: //" | xsel -b -i
             fi
             printf "Password for '%s' copied to clipboard\n" "$name" >&2
         else
             # multiple passwords were specified or copy was false
-            for name in $@; do
+            for name in "$@"; do
                 names="$names $name"
             done
 
@@ -169,10 +169,10 @@ genpasswd () {
             shift
         done
         if [ "$copy" = "true" ]; then
-            cat /dev/random | tr -dc $allowed | head -c ${size:-22} | xsel -b -i
+            tr -dc "$allowed" </dev/random | head -c "${size:-22}" | xsel -b -i
             printf "password copied to clipboard\n" >&2
         else
-            cat /dev/random | tr -dc $allowed | head -c ${size:-22} && echo
+            tr -dc "$allowed" </dev/random | head -c "${size:-22}" && printf "\n"
         fi
     )
 }

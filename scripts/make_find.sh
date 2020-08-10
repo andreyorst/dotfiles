@@ -10,8 +10,8 @@ bake_find_command() {
             (-D) shift; exclude_dirs="'$1' $exclude_dirs" ;;
             (-exclude-dir=*) exclude_files="'${1#-exclude-dir=}' $exclude_files" ;;
             (-default)
-                exclude_files="'*.o' '*.bin' '*.obj'"
-                exclude_dirs="'.git' '.svn'" ;;
+                exclude_files="'*.o' '*.bin' '*.obj' $exclude_files"
+                exclude_dirs="'.git' '.svn' $exclude_dirs" ;;
             (-help|-h)
                 printf "%s\n" "usage: bake_find_command [-F <filename>] ... [-D <dirname>] ...\n" >&2
                 printf "%s\n" "  -F -exclude-file=: exclude this file from search." >&2
