@@ -90,7 +90,7 @@ getpasswd() {
         # the password via `xsel'.
         if [ $# -eq 1 ] && [ -n "$(command -v xsel)" ] && [ "$copy" = "true" ]; then
             name="$1"
-            result=$({ gpg --decrypt "$file" 2>&1 >&3 3>&-; } 3>&1 | filter "$name")
+            result=$(gpg --decrypt "$file" 2>/dev/null | filter "$name")
             if [ $? -gt 1 ]; then
                 printf "gpg error occured. Exiting\n" >&2
                 return 1;
@@ -132,7 +132,7 @@ getpasswd() {
                 names="$names $name"
             done
 
-            result=$({ gpg --decrypt "$file" 2>&1 >&3 3>&-; } 3>&1 | filter $names)
+            result=$(gpg --decrypt "$file" 2>/dev/null | filter $names)
             if [ $? -gt 1 ]; then
                 printf "gpg error occured. Exiting\n" >&2
                 return 1;
