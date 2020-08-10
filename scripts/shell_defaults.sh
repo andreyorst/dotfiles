@@ -1,5 +1,4 @@
 # Aliases and Defaults
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 
 unset LS_COLORS
 unset LSCOLORS
@@ -13,7 +12,7 @@ alias g="git"
 [ -n "$(command -v tmux)" ] && alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
 
 # Edit things in apropriate environment
-alias tmuxconf="$EDITOR ~/.tmux.conf"
+alias tmuxconf="\$EDITOR ~/.tmux.conf"
 alias emacsconf="emacs ~/.emacs.d/README.org"
 
 alias less="less --tabs 4 -R"
@@ -44,13 +43,13 @@ HISTFILESIZE=10000000
 shopt -s histappend
 
 # smarter `emacs' launcher that will open file in existing emacs if one exists
-function emacs() { [ $# -gt 0 ] && emacsclient -a emacs -n "$@" || command emacs; }
+emacs() { if [ $# -gt 0 ]; then emacsclient -a emacs -n "$@"; else command emacs; fi; }
 
 # create dir and cd into it
-function mkcd() { mkdir -p "$1" && cd "$1"; }
+mkcd() { mkdir -p "$1" && cd "$1" || return $?; }
 
 # convert webm to mp4
-function webmp4() {
+webmp4() {
     if [ -z "$(command -v ffmpeg)" ]; then
         printf "%s\n" "ffmpeg is not installed" >&2
         return 1
@@ -61,7 +60,7 @@ function webmp4() {
     done
 }
 
-function scour() {
+scour() {
     if [ -z "$(command -v scour)"  ]; then
         printf "%s\n" "scour is not installed" >&2
         return 1
@@ -74,18 +73,24 @@ function scour() {
 }
 
 # gifify wrapper for fast gif creating
-function gif() {
-    if [ -z "$(command -v gifify)" ]; then
+gif() {
+    if [ -z "$(command -v gifsicle)" ]; then
         printf "%s\n" "gifify is not installed" >&2
         return 1
     fi
-    gifify $1 -o ${1#.*}.gif --colors 256 --compress 0 --fps 30
+    palette=$(mktemp "/tmp/palette-XXXXXXXXX.png")
+    filters="fps=30,scale=-1:-1:flags=lanczos"
+    file="$1"
+    shift
+    ffmpeg -v warning -i "$file" -vf "$filters,palettegen" -y "$palette"
+    ffmpeg -v warning -i "$file" -i "$palette" -lavfi "$filters [x]; [x][1:v] paletteuse" -f gif - | gifsicle "$@" > "${1%.*}.gif"
+    rm -f "$palette"
 }
 
-function sep() {
-    for i in $(seq 1 $(tput cols)); do
+sep() {
+    for _ in $(seq 1 "$(tput cols)"); do
         sep="${sep}="
     done
-    echo $sep
+    echo "$sep"
     unset sep
 }
