@@ -1518,31 +1518,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       :fringe-face 'flycheck-fringe-info
       :error-list-face 'flycheck-error-list-info))
 
-  (when (executable-find "textlint")
-    (flycheck-define-checker textlint
-      "A linter for textlint."
-      :command ("textlint"
-                "--format" "unix"
-                "--rule" "write-good"
-                "--rule" "no-start-duplicated-conjunction"
-                "--rule" "max-comma"
-                "--rule" "terminology"
-                "--rule" "period-in-list-item"
-                "--rule" "abbr-within-parentheses"
-                "--rule" "alex"
-                "--rule" "common-misspellings"
-                "--rule" "en-max-word-count"
-                "--rule" "diacritics"
-                "--rule" "stop-words"
-                source-inplace)
-      :error-patterns
-      ((warning line-start (file-name) ":" line ":" column ": "
-                (message (one-or-more not-newline)
-                         (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-                line-end))
-      :modes (text-mode latex-mode org-mode markdown-mode))
-    (add-to-list 'flycheck-checkers 'textlint))
-
  (when (fboundp #'defhydra)
    (defhydra hydrant/flycheck (:color blue :hint nil)
      "
@@ -1565,6 +1540,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package flycheck-cask
   :hook (flycheck-mode . flycheck-cask-setup))
+
+(use-package flycheck-vale
+  :hook (flycheck-mode . flycheck-vale-setup))
 
 (use-package hydra)
 

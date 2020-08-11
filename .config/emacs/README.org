@@ -2146,7 +2146,7 @@ Syntax based indentation for SQL:
 
 ** Elixir
 Elixir is a dynamic, functional language designed for building scalable and maintainable applications.
-It runs on Erlang VM (BEAM), and has nice macro system, making language core small, yet still very extensible.
+It runs on Erlang VM (BEAM), and has nice macro system, making language core small, yet still very extendable.
 And it also has good interop with Erlang itself.
 
 #+begin_src emacs-lisp
@@ -2325,31 +2325,6 @@ Some languages have better support with =flycheck=.
         :fringe-face 'flycheck-fringe-info
         :error-list-face 'flycheck-error-list-info))
 
-    (when (executable-find "textlint")
-      (flycheck-define-checker textlint
-        "A linter for textlint."
-        :command ("textlint"
-                  "--format" "unix"
-                  "--rule" "write-good"
-                  "--rule" "no-start-duplicated-conjunction"
-                  "--rule" "max-comma"
-                  "--rule" "terminology"
-                  "--rule" "period-in-list-item"
-                  "--rule" "abbr-within-parentheses"
-                  "--rule" "alex"
-                  "--rule" "common-misspellings"
-                  "--rule" "en-max-word-count"
-                  "--rule" "diacritics"
-                  "--rule" "stop-words"
-                  source-inplace)
-        :error-patterns
-        ((warning line-start (file-name) ":" line ":" column ": "
-                  (message (one-or-more not-newline)
-                           (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-                  line-end))
-        :modes (text-mode latex-mode org-mode markdown-mode))
-      (add-to-list 'flycheck-checkers 'textlint))
-
    (when (fboundp #'defhydra)
      (defhydra hydrant/flycheck (:color blue :hint nil)
        "
@@ -2371,11 +2346,20 @@ Some languages have better support with =flycheck=.
        ("s" flycheck-select-checker))))
 #+end_src
 
+*** Flycheck Cask
 =flycheck-cask= is a package for using [[https://github.com/cask/cask][Cask]] files with Flycheck.
 
 #+begin_src emacs-lisp
   (use-package flycheck-cask
     :hook (flycheck-mode . flycheck-cask-setup))
+#+end_src
+
+*** Flycheck Vale
+=flycheck-vale= is a package for using [[https://github.com/errata-ai/vale][Vale]] linter for prose.
+
+#+begin_src emacs-lisp
+  (use-package flycheck-vale
+    :hook (flycheck-mode . flycheck-vale-setup))
 #+end_src
 
 ** Hydra
