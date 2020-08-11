@@ -43,7 +43,7 @@ HISTFILESIZE=10000000
 shopt -s histappend
 
 # smarter `emacs' launcher that will open file in existing emacs if one exists
-emacs() { if [ $# -gt 0 ]; then emacsclient -a emacs -n "$@"; else command emacs; fi; }
+emacs() { if [ $# -gt 0 ]; then emacsclient -a emacs -n "$@" 2>/dev/null 1>&2; else command emacs; fi; }
 
 # create dir and cd into it
 mkcd() { mkdir -p "$1" && cd "$1" || return $?; }
