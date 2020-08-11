@@ -79,18 +79,24 @@ scour() {
     done
 }
 
-# gifify wrapper for fast gif creating
+# ffmpeg and gifsicle wrapper for fast gif creating
 gif() {
+    if [ -z "$(command -v ffmpeg)" ]; then
+        printf "%s\n" "ffmpeg is not installed" >&2
+        return 1
+    fi
     if [ -z "$(command -v gifsicle)" ]; then
-        printf "%s\n" "gifify is not installed" >&2
+        printf "%s\n" "gifsicle is not installed" >&2
         return 1
     fi
     palette=$(mktemp "/tmp/palette-XXXXXXXXX.png")
     filters="fps=30,scale=-1:-1:flags=lanczos"
     file="$1"
     shift
+    echo "generating palette"
     ffmpeg -v warning -i "$file" -vf "$filters,palettegen" -y "$palette"
-    ffmpeg -v warning -i "$file" -i "$palette" -lavfi "$filters [x]; [x][1:v] paletteuse" -f gif - | gifsicle "$@" > "${1%.*}.gif"
+    echo "generating gif"
+    ffmpeg -v warning -i "$file" -i "$palette" -lavfi "$filters [x]; [x][1:v] paletteuse" -f gif - | gifsicle "$@" > "${file%.*}.gif"
     rm -f "$palette"
 }
 
