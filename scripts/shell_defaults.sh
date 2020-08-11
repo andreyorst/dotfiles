@@ -60,6 +60,13 @@ webmp4() {
     done
 }
 
+# Reverse mv.
+# Handy when you need to do `mv file file.tmp' and you don't want to
+# rewrite command to revert this change, so you can use `remv file file.tmp'
+remv() {
+    mv "$2" "$1"
+}
+
 scour() {
     if [ -z "$(command -v scour)"  ]; then
         printf "%s\n" "scour is not installed" >&2
