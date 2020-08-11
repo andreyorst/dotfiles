@@ -871,9 +871,12 @@ Returns buffer name or empty string if buffer is special and starts from space.
 
 #+begin_src emacs-lisp
   (defun aorst/mode-line-buffer-name ()
-    (let* ((name (buffer-name))
-           (match (string-match " " name)))
-      (if (and match (= match 0)) nil (concat "  " name))))
+    (when-let ((name (buffer-file-name)))
+      (propertize (concat "  " name)
+                  'help-echo (concat (file-name-nondirectory (buffer-file-name))
+                                     (when (buffer-modified-p)
+                                       (if (char-displayable-p ?💾) " 💾" " [modified]"))))))
+
 #+end_src
 
 **** =mode-line-buffer-modified=
@@ -1123,25 +1126,25 @@ Fallback format for modeline.
   (setq-default
    mode-line-format
    '(:eval
-     (let ((format
-            (format-mode-line
-             (concat
-              (aorst/mode-line-buffer-modified)
-              (aorst/mode-line-readonly)
-              (aorst/mode-line-line-column)
-              (aorst/mode-line-input-method)
-              (aorst/mode-line-line-encoding)
-              (aorst/mode-line-buffer-encoding)
-              (aorst/mode-line-indent-mode)
-              (aorst/mode-line-mode-name)
-              (aorst/mode-line-git-branch)
-              (aorst/mode-line-flycheck)
-              (aorst/mode-line-structural)))))
-       (concat (make-string (- (window-width)
-                               (string-width format)
-                               1)
+     (let ((l-format (concat " " (aorst/mode-line-buffer-name)))
+           (r-format (concat
+                      (aorst/mode-line-buffer-modified)
+                      (aorst/mode-line-readonly)
+                      (aorst/mode-line-line-column)
+                      (aorst/mode-line-input-method)
+                      (aorst/mode-line-line-encoding)
+                      (aorst/mode-line-buffer-encoding)
+                      (aorst/mode-line-indent-mode)
+                      (aorst/mode-line-mode-name)
+                      (aorst/mode-line-git-branch)
+                      (aorst/mode-line-flycheck)
+                      (aorst/mode-line-structural))))
+       (concat l-format
+               (make-string (- (window-width)
+                               (string-width (format-mode-line l-format))
+                               (string-width (format-mode-line r-format)))
                             ?\s)
-               format))))
+               r-format))))
 #+end_src
 
 *** Mini Modeline
@@ -1153,7 +1156,9 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
     :straight (:host github
                :repo "kiennq/emacs-mini-modeline")
     :custom
+    (mini-modeline-right-padding 1)
     (mini-modeline-display-gui-line nil)
+    (mini-modeline-l-format '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
     (mini-modeline-r-format
      '(:eval (concat
               (aorst/mode-line-buffer-modified)
@@ -2982,6 +2987,28 @@ Runs GC when Emacs is idle, and increases GC treshold during active use.
 #+begin_src emacs-lisp
   (use-package gcmh
     :config (gcmh-mode t))
+#+end_src
+
+** COMMENT Indent Guides
+Indentation guides for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :custom
+    (highlight-indent-guides-method (if (display-graphic-p) 'bitmap 'character))
+    (highlight-indent-guides-character ?▏) ;; ┊│┆
+    (highlight-indent-guides-bitmap-function #'aorst/indent-guides-thin-line)
+    (highlight-indent-guides-responsive 'top)
+    (highlight-indent-guides-delay 0)
+    :config
+    (defun aorst/indent-guides-thin-line (width height crep)
+      "Defines a solid guide line, one pixel wide."
+      (let* ((right (- width 2))
+             (row (concat (make-string 1 ?0) (make-string 1 crep) (make-string right ?0)))
+             rows)
+        (dotimes (i height rows)
+          (setq rows (cons row rows))))))
 #+end_src
 
 * Postscript

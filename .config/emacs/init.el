@@ -341,9 +341,11 @@ are defining or executing a macro."
                       :box nil))
 
 (defun aorst/mode-line-buffer-name ()
-  (let* ((name (buffer-name))
-         (match (string-match " " name)))
-    (if (and match (= match 0)) nil (concat "  " name))))
+  (when-let ((name (buffer-file-name)))
+    (propertize (concat "  " name)
+                'help-echo (concat (file-name-nondirectory (buffer-file-name))
+                                   (when (buffer-modified-p)
+                                     (if (char-displayable-p ?💾) " 💾" " [modified]"))))))
 
 (defun aorst/mode-line-buffer-modified ()
   (when (and buffer-file-name (buffer-modified-p))
@@ -533,31 +535,33 @@ offset variables."
 (setq-default
  mode-line-format
  '(:eval
-   (let ((format
-          (format-mode-line
-           (concat
-            (aorst/mode-line-buffer-modified)
-            (aorst/mode-line-readonly)
-            (aorst/mode-line-line-column)
-            (aorst/mode-line-input-method)
-            (aorst/mode-line-line-encoding)
-            (aorst/mode-line-buffer-encoding)
-            (aorst/mode-line-indent-mode)
-            (aorst/mode-line-mode-name)
-            (aorst/mode-line-git-branch)
-            (aorst/mode-line-flycheck)
-            (aorst/mode-line-structural)))))
-     (concat (make-string (- (window-width)
-                             (string-width format)
-                             1)
+   (let ((l-format (concat " " (aorst/mode-line-buffer-name)))
+         (r-format (concat
+                    (aorst/mode-line-buffer-modified)
+                    (aorst/mode-line-readonly)
+                    (aorst/mode-line-line-column)
+                    (aorst/mode-line-input-method)
+                    (aorst/mode-line-line-encoding)
+                    (aorst/mode-line-buffer-encoding)
+                    (aorst/mode-line-indent-mode)
+                    (aorst/mode-line-mode-name)
+                    (aorst/mode-line-git-branch)
+                    (aorst/mode-line-flycheck)
+                    (aorst/mode-line-structural))))
+     (concat l-format
+             (make-string (- (window-width)
+                             (string-width (format-mode-line l-format))
+                             (string-width (format-mode-line r-format)))
                           ?\s)
-             format))))
+             r-format))))
 
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
   :custom
+  (mini-modeline-right-padding 1)
   (mini-modeline-display-gui-line nil)
+  (mini-modeline-l-format '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
   (mini-modeline-r-format
    '(:eval (concat
             (aorst/mode-line-buffer-modified)
