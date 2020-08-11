@@ -269,6 +269,36 @@ are defining or executing a macro."
              (window-system))
     (all-the-icons-install-fonts t)))
 
+(use-package solaire-mode
+  :straight (:host github
+             :repo "hlissner/emacs-solaire-mode")
+  :commands (solaire-global-mode
+             solaire-mode-swap-bg
+             turn-on-solaire-mode
+             solaire-mode-in-minibuffer
+             solaire-mode-reset)
+  :hook (((after-revert
+           change-major-mode
+           org-src-mode) . turn-on-solaire-mode)
+         (snippet-mode . solaire-mode)
+         (after-load-theme . solaire-mode-swap-bg))
+  :custom
+  (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
+  (solaire-mode-auto-swap-bg t)
+  :config
+  (solaire-global-mode 1)
+  (defun aorst/create-image-with-background-color (args)
+    "Specify background color of inline image by modifing ARGS."
+    (apply (lambda (file type data-p &rest props)
+             (append (list file type data-p)
+                     (list :background (face-attribute
+                                        (let ((face (cadr (assq 'default face-remapping-alist))))
+                                          (if (facep face) face 'default))
+                                        :background nil t))
+                     props))
+           args))
+  (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color))
+
 (use-package doom-themes
   :custom
   (doom-themes-enable-bold t)
@@ -299,35 +329,6 @@ are defining or executing a macro."
   (if (display-graphic-p)
       (load-theme 'doom-one-light t)
     (load-theme 'doom-one t)))
-
-(use-package solaire-mode
-  :straight (:host github
-             :repo "hlissner/emacs-solaire-mode")
-  :commands (solaire-global-mode
-             solaire-mode-swap-bg
-             turn-on-solaire-mode
-             solaire-mode-in-minibuffer
-             solaire-mode-reset)
-  :hook (((after-revert
-           change-major-mode
-           org-src-mode) . turn-on-solaire-mode)
-         (snippet-mode . solaire-mode))
-  :custom
-  (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
-  :config
-  (solaire-global-mode 1)
-  (defun aorst/create-image-with-background-color (args)
-    "Specify background color of Org-mode inline image through modify `ARGS'."
-    (apply (lambda (file type data-p &rest props)
-             (append (list file type data-p)
-                     (list :background (face-attribute
-                                        (let ((face (cadr (assq 'default face-remapping-alist))))
-                                          (if (facep face) face 'default))
-                                        :background nil t))
-                     props))
-           args))
-  (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
-  (solaire-mode-swap-bg))
 
 (setq-default column-number-mode t
               line-number-mode t

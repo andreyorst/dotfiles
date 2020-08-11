@@ -761,6 +761,47 @@ Although I don't need =auto-composition-mode= for all buffers, so let's disable 
 
 I don't use this package directly yet, but some other packages do, like DOOM Modeline or Treemacs.
 
+** Solaire Mode
+This package helps distinguish buffers that have file opened and buffers that are for utilities like file browser.
+Also it has cool name!
+=\[T]/=
+
+I really want Solaire to treat =*scratch*= buffer as real.
+For that I need to define my own function that will decide if buffer is real or not.
+Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode-real-buffer-fn=.
+
+#+begin_src emacs-lisp
+  (use-package solaire-mode
+    :straight (:host github
+               :repo "hlissner/emacs-solaire-mode")
+    :commands (solaire-global-mode
+               solaire-mode-swap-bg
+               turn-on-solaire-mode
+               solaire-mode-in-minibuffer
+               solaire-mode-reset)
+    :hook (((after-revert
+             change-major-mode
+             org-src-mode) . turn-on-solaire-mode)
+           (snippet-mode . solaire-mode)
+           (after-load-theme . solaire-mode-swap-bg))
+    :custom
+    (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
+    (solaire-mode-auto-swap-bg t)
+    :config
+    (solaire-global-mode 1)
+    (defun aorst/create-image-with-background-color (args)
+      "Specify background color of inline image by modifing ARGS."
+      (apply (lambda (file type data-p &rest props)
+               (append (list file type data-p)
+                       (list :background (face-attribute
+                                          (let ((face (cadr (assq 'default face-remapping-alist))))
+                                            (if (facep face) face 'default))
+                                          :background nil t))
+                       props))
+             args))
+    (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color))
+#+end_src
+
 ** Theme
 I'm using *doom-themes* package to make my Emacs look modern.
 This theme collection was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find these themes actually great on its own.
@@ -798,46 +839,6 @@ But it is also an amazingly well put set of themes, which define colors for pret
     (if (display-graphic-p)
         (load-theme 'doom-one-light t)
       (load-theme 'doom-one t)))
-#+end_src
-
-** Solaire Mode
-This package helps distinguish buffers that have file opened and buffers that are for utilities like file browser.
-Also it has cool name!
-=\[T]/=
-
-I really want Solaire to treat =*scratch*= buffer as real.
-For that I need to define my own function that will decide if buffer is real or not.
-Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode-real-buffer-fn=.
-
-#+begin_src emacs-lisp
-  (use-package solaire-mode
-    :straight (:host github
-               :repo "hlissner/emacs-solaire-mode")
-    :commands (solaire-global-mode
-               solaire-mode-swap-bg
-               turn-on-solaire-mode
-               solaire-mode-in-minibuffer
-               solaire-mode-reset)
-    :hook (((after-revert
-             change-major-mode
-             org-src-mode) . turn-on-solaire-mode)
-           (snippet-mode . solaire-mode))
-    :custom
-    (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
-    :config
-    (solaire-global-mode 1)
-    (defun aorst/create-image-with-background-color (args)
-      "Specify background color of Org-mode inline image through modify `ARGS'."
-      (apply (lambda (file type data-p &rest props)
-               (append (list file type data-p)
-                       (list :background (face-attribute
-                                          (let ((face (cadr (assq 'default face-remapping-alist))))
-                                            (if (facep face) face 'default))
-                                          :background nil t))
-                       props))
-             args))
-    (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
-    (solaire-mode-swap-bg))
 #+end_src
 
 ** Mode-line
