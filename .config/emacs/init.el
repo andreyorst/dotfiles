@@ -208,10 +208,10 @@ are defining or executing a macro."
   :custom
   (inhibit-splash-screen t))
 
-(tooltip-mode -1)
-(fset 'menu-bar-open nil)
-
 (when window-system
+  (setq-default x-gtk-use-system-tooltips nil)
+  (setq-default tooltip-x-offset 5)
+  (setq-default tooltip-y-offset 7)
   (scroll-bar-mode -1)
   (tool-bar-mode -1))
 
