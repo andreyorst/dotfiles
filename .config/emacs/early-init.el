@@ -36,6 +36,8 @@
 (setq frame-inhibit-implied-resize t
       x-gtk-resize-child-frames 'resize-mode)
 
+(defvar straight-process-buffer)
+(setq-default straight-process-buffer " *straight-process*")
 (defvar bootstrap-version)
 (defvar straight-repository-branch)
 (setq straight-repository-branch "develop")

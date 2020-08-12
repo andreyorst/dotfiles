@@ -144,6 +144,8 @@ It installs packages from Git repositories listed on ELPA and MELPA, or from Git
 First, we have to bootstrap it:
 
 #+begin_src emacs-lisp
+  (defvar straight-process-buffer)
+  (setq-default straight-process-buffer " *straight-process*")
   (defvar bootstrap-version)
   (defvar straight-repository-branch)
   (setq straight-repository-branch "develop")
@@ -363,33 +365,30 @@ Emacs displays pressed key after some time but it's too fast for me, because I u
 #+end_src
 
 ** Mouse and Scrolling
-I don't want menus on shift clicks:
+I don't want menus on shift clicks.
+I also don't like how Emacs handles scrolling, in particular how it speeds it up and automatically.
+Changing =mouse-highlight= to =nil= value disables highlighting of hovered item when the point moves which is kinda convenient when working with =flycheck=.
+If by chance I would need to use Emacs in terminal, I'd like to keep mouse working.
 
 #+begin_src emacs-lisp
-  (global-unset-key (kbd "S-<down-mouse-1>"))
-  (global-unset-key (kbd "<mouse-3>"))
-  (global-set-key [mouse-3] menu-bar-edit-menu)
-  (global-unset-key (kbd "S-<mouse-3>"))
-#+end_src
-
-I also don't like how Emacs handles scrolling, that it speeds it up and automatically scrolls horizontally.
-
-Also, changing =mouse-highlight= to =nil= value disables highlighting of hovered item when the point moves which is kinda convenient when working with =flycheck=.
-
-#+begin_src emacs-lisp
-  (setq-default mouse-wheel-progressive-speed nil
-                auto-window-vscroll nil
-                mouse-highlight nil
-                hscroll-step 1
-                hscroll-margin 1
-                scroll-step 10)
-#+end_src
-
-If by chance I would need to use Emacs in terminal, I'd like to keep mouse working:
-
-#+begin_src emacs-lisp
-  (unless (display-graphic-p)
-    (xterm-mouse-mode t))
+  (use-package mwheel
+    :straight nil
+    :demand
+    :bind (("S-<down-mouse-1>" . nil)
+           ("S-<mouse-3>" . nil))
+    :custom
+    (mouse-wheel-flip-direction t)
+    (mouse-wheel-tilt-scroll t)
+    (mouse-wheel-progressive-speed nil)
+    :config
+    (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu)
+    (setq-default auto-window-vscroll nil
+                  mouse-highlight nil
+                  hscroll-step 1
+                  hscroll-margin 1
+                  scroll-step 10)
+    (unless (display-graphic-p)
+      (xterm-mouse-mode t)))
 #+end_src
 
 ** Tab character
@@ -565,6 +564,7 @@ This is due to the fact of how I stylize [[*Tabline][Tabline]] package from Emac
                             " *Minibuf"
                             " *Echo Area"
                             "*Process List*"
+                            "*Ediff"
                             " *LV*"))
               (buffer-name buffer))
              (minibufferp))))
@@ -1219,7 +1219,6 @@ But there's more: DOOM Themes support this package as well, which means that Tre
   (use-package treemacs
     :commands (treemacs-follow-mode
                treemacs-filewatch-mode
-               treemacs-fringe-indicator-mode
                treemacs-load-theme)
     :bind (("<f7>" . treemacs)
            ("<f8>" . treemacs-select-window)
@@ -1241,7 +1240,6 @@ But there's more: DOOM Themes support this package as well, which means that Tre
     (use-package treemacs-magit)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode t)
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (face-attribute 'default :foreground)
                         :height 1.0
@@ -1446,6 +1444,7 @@ But there's more: DOOM Themes support this package as well, which means that Tre
         (treemacs-load-theme "Atom"))
       (setq treemacs-collapse-dirs 0)
       (treemacs)
+      (treemacs-fringe-indicator-mode -1)
       (aorst/treemacs-expand-all-projects)
       (windmove-right))
     (defun aorst/after-treemacs-setup ()
@@ -1814,7 +1813,8 @@ So I enable it for every programming language.
   (use-package prog-mode
     :straight nil
     :hook ((prog-mode . show-paren-mode)
-           (prog-mode . display-line-numbers-mode)))
+           (prog-mode . display-line-numbers-mode)
+           (prog-mode . hl-line-mode)))
 #+end_src
 
 ** CC
@@ -2063,6 +2063,8 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
   (use-package cider
     :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
            ((cider-repl-mode cider-mode) . eldoc-mode))
+    :custom-face
+    (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
     :custom
     (nrepl-log-messages nil)
     (cider-repl-display-help-banner nil)
@@ -2595,6 +2597,21 @@ Previously I was using [[https://github.com/justbur/emacs-vdiff][Vdiff]] but I h
       (define-key ediff-mode-map "d" #'aorst/ediff-copy-both-to-C)))
 #+end_src
 
+** Diff
+Some tweaks to inbuild diff mode.
+
+#+begin_src emacs-lisp
+  (use-package diff
+    :straight nil
+    :custom-face
+    (diff-added ((t (:foreground unspecified
+                     :background unspecified
+                     :inherit ediff-current-diff-B))))
+    (diff-removed ((t (:foreground unspecified
+                       :background unspecified
+                       :inherit ediff-current-diff-A)))))
+#+end_src
+
 ** Multiple Cursors
 This package provides multiple cursors functionality to Emacs.
 It isn't much like Kakoune's multiple selections, but anything will do.
@@ -3016,6 +3033,17 @@ Indentation guides for Emacs.
              rows)
         (dotimes (i height rows)
           (setq rows (cons row rows))))))
+#+end_src
+
+** Parens
+Some tweaks to inbuilt parenthesis highlighting mode.
+
+#+begin_src emacs-lisp
+  (use-package paren
+    :straight nil
+    :custom
+    (show-paren-when-point-in-periphery t)
+    (show-paren-delay 0))
 #+end_src
 
 * Postscript

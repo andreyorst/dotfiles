@@ -37,20 +37,24 @@
 
 (add-hook 'after-init-hook (lambda () (setq echo-keystrokes 5)))
 
-(global-unset-key (kbd "S-<down-mouse-1>"))
-(global-unset-key (kbd "<mouse-3>"))
-(global-set-key [mouse-3] menu-bar-edit-menu)
-(global-unset-key (kbd "S-<mouse-3>"))
-
-(setq-default mouse-wheel-progressive-speed nil
-              auto-window-vscroll nil
-              mouse-highlight nil
-              hscroll-step 1
-              hscroll-margin 1
-              scroll-step 10)
-
-(unless (display-graphic-p)
-  (xterm-mouse-mode t))
+(use-package mwheel
+  :straight nil
+  :demand
+  :bind (("S-<down-mouse-1>" . nil)
+         ("S-<mouse-3>" . nil))
+  :custom
+  (mouse-wheel-flip-direction t)
+  (mouse-wheel-tilt-scroll t)
+  (mouse-wheel-progressive-speed nil)
+  :config
+  (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu)
+  (setq-default auto-window-vscroll nil
+                mouse-highlight nil
+                hscroll-step 1
+                hscroll-margin 1
+                scroll-step 10)
+  (unless (display-graphic-p)
+    (xterm-mouse-mode t)))
 
 (setq-default indent-tabs-mode nil)
 
@@ -142,6 +146,7 @@
                           " *Minibuf"
                           " *Echo Area"
                           "*Process List*"
+                          "*Ediff"
                           " *LV*"))
             (buffer-name buffer))
            (minibufferp))))
@@ -599,7 +604,6 @@ offset variables."
 (use-package treemacs
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode
              treemacs-load-theme)
   :bind (("<f7>" . treemacs)
          ("<f8>" . treemacs-select-window)
@@ -621,7 +625,6 @@ offset variables."
   (use-package treemacs-magit)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode t)
   (set-face-attribute 'treemacs-root-face nil
                       :foreground (face-attribute 'default :foreground)
                       :height 1.0
@@ -826,6 +829,7 @@ offset variables."
       (treemacs-load-theme "Atom"))
     (setq treemacs-collapse-dirs 0)
     (treemacs)
+    (treemacs-fringe-indicator-mode -1)
     (aorst/treemacs-expand-all-projects)
     (windmove-right))
   (defun aorst/after-treemacs-setup ()
@@ -1161,7 +1165,8 @@ truncates text if needed.  Minimal width can be set with
 (use-package prog-mode
   :straight nil
   :hook ((prog-mode . show-paren-mode)
-         (prog-mode . display-line-numbers-mode)))
+         (prog-mode . display-line-numbers-mode)
+         (prog-mode . hl-line-mode)))
 
 (use-package cc-mode
   :straight nil
@@ -1329,6 +1334,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
          ((cider-repl-mode cider-mode) . eldoc-mode))
+  :custom-face
+  (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   :custom
   (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)
@@ -1704,6 +1711,16 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (defun aorst/ediff-setup-keys ()
     (define-key ediff-mode-map "d" #'aorst/ediff-copy-both-to-C)))
 
+(use-package diff
+  :straight nil
+  :custom-face
+  (diff-added ((t (:foreground unspecified
+                   :background unspecified
+                   :inherit ediff-current-diff-B))))
+  (diff-removed ((t (:foreground unspecified
+                     :background unspecified
+                     :inherit ediff-current-diff-A)))))
+
 (use-package phi-search)
 (use-package mc-extras)
 (use-package multiple-cursors
@@ -1982,6 +1999,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package gcmh
   :config (gcmh-mode t))
+
+(use-package paren
+  :straight nil
+  :custom
+  (show-paren-when-point-in-periphery t)
+  (show-paren-delay 0))
 
 (provide 'init)
 ;;; init.el ends here
