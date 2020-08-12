@@ -285,11 +285,9 @@ are defining or executing a macro."
   :hook (((after-revert
            change-major-mode
            org-src-mode) . turn-on-solaire-mode)
-         (snippet-mode . solaire-mode)
-         (after-load-theme . solaire-mode-swap-bg))
+         (snippet-mode . solaire-mode))
   :custom
   (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
-  (solaire-mode-auto-swap-bg t)
   :config
   (solaire-global-mode 1)
   (defun aorst/create-image-with-background-color (args)
@@ -302,7 +300,12 @@ are defining or executing a macro."
                                         :background nil t))
                      props))
            args))
-  (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color))
+  (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
+  (defvar aorst--solaire-swap-bg-hook nil
+    "Run hooks after solaire swaps backgrounds.")
+  (defadvice solaire-mode--swap-bg-faces-maybe (after run-solaire-swap-hook activate)
+    "Run `aorst--solaire-swap-hook'."
+    (run-hooks 'aorst--solaire-swap-bg-hook)))
 
 (use-package doom-themes
   :custom
@@ -334,6 +337,18 @@ are defining or executing a macro."
   (if (display-graphic-p)
       (load-theme 'doom-one-light t)
     (load-theme 'doom-one t)))
+
+(defvar aorst--load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+(defadvice load-theme (after run-load-theme-hook activate)
+  "Run `aorst--load-theme-hook'."
+  (run-hooks 'aorst--load-theme-hook))
+
+(defvar aorst--disable-theme-hook nil
+  "Hook run after a color theme is disabled using `disable-theme'.")
+(defadvice disable-theme (after run-disable-theme-hook activate)
+  "Run `aorst--disable-theme-hook'."
+  (run-hooks 'aorst--disable-theme-hook))
 
 (setq-default column-number-mode t
               line-number-mode t
@@ -564,6 +579,9 @@ offset variables."
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
+  :hook ((aorst--load-theme
+          aorst--disable-theme
+          aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
   :custom
   (mini-modeline-right-padding 1)
   (mini-modeline-display-gui-line nil)
@@ -582,20 +600,29 @@ offset variables."
             (aorst/mode-line-flycheck)
             (aorst/mode-line-structural))))
   :config
-  (mini-modeline-mode t))
+  (mini-modeline-mode t)
+  (defun aorst/mini-modeline-setup-faces ()
+    (setq mini-modeline-face-attr
+          (plist-put mini-modeline-face-attr
+                     :background (face-attribute 'mode-line :background)))))
 
 (when window-system
   (use-package frame
     :straight nil
+    :hook ((aorst--disable-theme
+            aorst--load-theme
+            aorst--solaire-swap-bg) . aorst/window-divider-setup-faces)
     :custom
     (window-divider-default-bottom-width 1)
     (window-divider-default-right-width 1)
     (window-divider-default-places t)
     :config
     (window-divider-mode t)
-    (set-face-attribute 'window-divider nil
-                        :foreground (face-attribute
-                                     'mode-line-inactive :background))))
+    (defun aorst/window-divider-setup-faces ()
+      (set-face-attribute 'window-divider nil
+                          :foreground (face-attribute
+                                       'mode-line-inactive :background)))
+    (aorst/window-divider-setup-faces)))
 
 (setq-default frame-title-format
               '(:eval (let ((match (string-match "[ *]" (buffer-name))))
@@ -613,7 +640,13 @@ offset variables."
          (treemacs-mode . aorst/after-treemacs-setup)
          (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
          (treemacs-switch-workspace . treemacs-set-fallback-workspace)
-         (treemacs-mode . aorst/treemacs-setup-title))
+         (treemacs-mode . aorst/treemacs-setup-title)
+         ((aorst--load-theme
+           aorst--disable-theme
+           aorst--solaire-swap-bg) . aorst/treemacs-setup-title)
+         ((aorst--load-theme
+           aorst--disable-theme
+           aorst--solaire-swap-bg) . aorst/treemacs-setup-faces))
   :custom-face
   (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
   :custom
@@ -625,10 +658,12 @@ offset variables."
   (use-package treemacs-magit)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
-  (set-face-attribute 'treemacs-root-face nil
-                      :foreground (face-attribute 'default :foreground)
-                      :height 1.0
-                      :weight 'normal)
+  (defun aorst/treemacs-setup-faces ()
+    (set-face-attribute 'treemacs-root-face nil
+                        :foreground (face-attribute 'default :foreground)
+                        :height 1.0
+                        :weight 'normal))
+  (aorst/treemacs-setup-faces)
   (treemacs-create-theme "Atom"
     :config
     (progn
@@ -841,17 +876,19 @@ offset variables."
     (setq-local scroll-conservatively 10000)
     (aorst/treemacs-variable-pitch-labels))
   (defun aorst/treemacs-setup-title ()
-    (let ((bg (face-attribute 'default :background))
-          (fg (face-attribute 'default :foreground)))
-      (face-remap-add-relative 'header-line
-                               :background bg :foreground fg
-                               :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
-    (setq header-line-format
-          '((:eval
-             (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
-                    (extra-align (+ (/ (length text) 2) 1))
-                    (width (- (/ (window-width) 2) extra-align)))
-               (concat (make-string width ?\s) text)))))))
+    (when-let ((treemacs-buffer (treemacs-get-local-buffer)))
+      (with-current-buffer treemacs-buffer
+        (let ((bg (face-attribute 'default :background))
+              (fg (face-attribute 'default :foreground)))
+          (face-remap-add-relative 'header-line
+                                   :background bg :foreground fg
+                                   :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+        (setq header-line-format
+              '((:eval
+                 (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                        (extra-align (+ (/ (length text) 2) 1))
+                        (width (- (/ (window-width) 2) extra-align)))
+                   (concat (make-string width ?\s) text)))))))))
 
 (use-package uniquify
   :straight nil
@@ -996,40 +1033,49 @@ truncates text if needed.  Minimal width can be set with
                                  term-mode
                                  vterm-mode))
 
+  (defun aorst/tabline-setup-faces ()
+    (let ((bg (if (and (facep 'solaire-default-face)
+                       (not (eq (face-attribute 'solaire-default-face :background)
+                                'unspecified)))
+                  (face-attribute 'solaire-default-face :background)
+                (face-attribute 'default :background)))
+          (fg (face-attribute 'default :foreground))
+          (dark-fg (face-attribute 'shadow :foreground))
+          (base (if (and (facep 'solaire-default-face)
+                         (not (eq (face-attribute 'solaire-default-face :background)
+                                  'unspecified)))
+                    (face-attribute 'default :background)
+                  (face-attribute 'mode-line :background)))
+          (box-width (/ (line-pixel-height) 2)))
+      (set-face-attribute 'tab-line nil
+                          :background base
+                          :foreground dark-fg
+                          :height 1.0
+                          :inherit nil
+                          :box (when (> box-width 0) (list :line-width -1 :color base)))
+      (set-face-attribute 'tab-line-tab nil
+                          :foreground dark-fg
+                          :background bg
+                          :weight 'normal
+                          :inherit nil
+                          :box (when (> box-width 0) (list :line-width box-width :color bg)))
+      (set-face-attribute 'tab-line-tab-inactive nil
+                          :foreground dark-fg
+                          :background base
+                          :weight 'normal
+                          :inherit nil
+                          :box (when (> box-width 0) (list :line-width box-width :color base)))
+      (set-face-attribute 'tab-line-tab-current nil
+                          :foreground fg
+                          :background bg
+                          :weight 'normal
+                          :inherit nil
+                          :box (when (> box-width 0) (list :line-width box-width :color bg)))))
 
-  (let ((bg (if (facep 'solaire-default-face)
-                (face-attribute 'solaire-default-face :background)
-              (face-attribute 'default :background)))
-        (fg (face-attribute 'default :foreground))
-        (dark-fg (face-attribute 'shadow :foreground))
-        (base (if (facep 'solaire-default-face)
-                  (face-attribute 'default :background)
-                (face-attribute 'mode-line :background)))
-        (box-width (/ (line-pixel-height) 2)))
-    (set-face-attribute 'tab-line nil
-                        :background base
-                        :foreground dark-fg
-                        :height 1.0
-                        :inherit nil
-                        :box (when (> box-width 0) (list :line-width -1 :color base)))
-    (set-face-attribute 'tab-line-tab nil
-                        :foreground dark-fg
-                        :background bg
-                        :weight 'normal
-                        :inherit nil
-                        :box (when (> box-width 0) (list :line-width box-width :color bg)))
-    (set-face-attribute 'tab-line-tab-inactive nil
-                        :foreground dark-fg
-                        :background base
-                        :weight 'normal
-                        :inherit nil
-                        :box (when (> box-width 0) (list :line-width box-width :color base)))
-    (set-face-attribute 'tab-line-tab-current nil
-                        :foreground fg
-                        :background bg
-                        :weight 'normal
-                        :inherit nil
-                        :box (when (> box-width 0) (list :line-width box-width :color bg))))
+  (aorst/tabline-setup-faces)
+  (add-hook 'aorst--load-theme-hook #'aorst/tabline-setup-faces)
+  (add-hook 'aorst--disable-theme-hook #'aorst/tabline-setup-faces)
+  (add-hook 'aorst--solaire-swap-bg-hook #'aorst/tabline-setup-faces)
 
   (defun aorst/tab-line-drop-caches ()
     "Drops `tab-line' cache in every window."
