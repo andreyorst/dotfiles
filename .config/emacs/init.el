@@ -67,10 +67,11 @@
 
 (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
   "File to store disabled commands, that were enabled permamently.")
-(defadvice en/disable-command (around put-in-custom-file activate)
-  "Put declarations in disabled.el."
+
+(define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
   (let ((user-init-file aorst--disabled-commands))
-    ad-do-it))
+    (funcall foo command)))
+
 (load aorst--disabled-commands :noerror)
 
 (use-package savehist
@@ -303,9 +304,10 @@ are defining or executing a macro."
   (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
   (defvar aorst--solaire-swap-bg-hook nil
     "Run hooks after solaire swaps backgrounds.")
-  (defadvice solaire-mode--swap-bg-faces-maybe (after run-solaire-swap-hook activate)
+  (defun aorst/run-solaire-swap-hooks ()
     "Run `aorst--solaire-swap-hook'."
-    (run-hooks 'aorst--solaire-swap-bg-hook)))
+    (run-hooks 'aorst--solaire-swap-bg-hook))
+  (advice-add 'solaire-mode--swap-bg-faces-maybe :after #'aorst/run-solaire-swap-hooks))
 
 (use-package doom-themes
   :custom
@@ -340,15 +342,28 @@ are defining or executing a macro."
 
 (defvar aorst--load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
-(defadvice load-theme (after run-load-theme-hook activate)
+(defun aorst/run-load-theme-hooks (&rest _)
   "Run `aorst--load-theme-hook'."
   (run-hooks 'aorst--load-theme-hook))
 
+(advice-add 'load-theme :after #'aorst/run-load-theme-hooks)
+
 (defvar aorst--disable-theme-hook nil
   "Hook run after a color theme is disabled using `disable-theme'.")
-(defadvice disable-theme (after run-disable-theme-hook activate)
+(defun aorst/run-disable-theme-hooks (&rest _)
   "Run `aorst--disable-theme-hook'."
   (run-hooks 'aorst--disable-theme-hook))
+
+(advice-add 'disable-theme :after #'aorst/run-disable-theme-hooks)
+
+(defun aorst/disable-all-themes (&rest _)
+  "Disable all active themes."
+  (dolist (theme custom-enabled-themes)
+    (disable-theme theme)))
+
+(advice-add 'load-theme :before #'aorst/disable-all-themes)
+
+(setq-default custom-safe-themes t)
 
 (setq-default column-number-mode t
               line-number-mode t
@@ -579,9 +594,10 @@ offset variables."
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
-  :hook ((aorst--load-theme
-          aorst--disable-theme
-          aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
+  :hook (((aorst--load-theme
+           aorst--disable-theme
+           aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
+         (after-init . mini-modeline-mode))
   :custom
   (mini-modeline-right-padding 1)
   (mini-modeline-display-gui-line nil)
@@ -600,7 +616,6 @@ offset variables."
             (aorst/mode-line-flycheck)
             (aorst/mode-line-structural))))
   :config
-  (mini-modeline-mode t)
   (defun aorst/mini-modeline-setup-faces ()
     (setq mini-modeline-face-attr
           (plist-put mini-modeline-face-attr
@@ -1084,7 +1099,7 @@ truncates text if needed.  Minimal width can be set with
 
   (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)
 
-  (define-advice tab-line-select-tab (:after (&optional e))
+  (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
     (select-window (posn-window (event-start e)))))
 
 (use-package display-line-numbers
@@ -1667,10 +1682,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-h l" . counsel-find-library))
   :config
   (when (executable-find "fd")
-    (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory))
+    (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory) aorst:counsel-fd)
       (let ((find-program "fd")
             (counsel-file-jump-args (split-string "-L --type f --hidden")))
-        (funcall foo))))
+        (funcall foo initial-input initial-directory))))
   (when (executable-find "rg")
     (setq counsel-rg-base-command
           "rg -S --no-heading --hidden --line-number --color never %s .")))
@@ -1905,7 +1920,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
   :config
   (when (fboundp #'aorst/escape)
-    (define-advice lsp-ui-doc--make-request (:around (foo))
+    (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
   (lsp-ui-mode))

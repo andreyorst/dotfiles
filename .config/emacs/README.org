@@ -418,10 +418,11 @@ Let's put those commands to =disabled.el= file instead:
 #+begin_src emacs-lisp
   (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
     "File to store disabled commands, that were enabled permamently.")
-  (defadvice en/disable-command (around put-in-custom-file activate)
-    "Put declarations in disabled.el."
+
+  (define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
     (let ((user-init-file aorst--disabled-commands))
-      ad-do-it))
+      (funcall foo command)))
+
   (load aorst--disabled-commands :noerror)
 #+end_src
 
@@ -801,9 +802,10 @@ Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode
     (advice-add 'create-image :filter-args #'aorst/create-image-with-background-color)
     (defvar aorst--solaire-swap-bg-hook nil
       "Run hooks after solaire swaps backgrounds.")
-    (defadvice solaire-mode--swap-bg-faces-maybe (after run-solaire-swap-hook activate)
+    (defun aorst/run-solaire-swap-hooks ()
       "Run `aorst--solaire-swap-hook'."
-      (run-hooks 'aorst--solaire-swap-bg-hook)))
+      (run-hooks 'aorst--solaire-swap-bg-hook))
+    (advice-add 'solaire-mode--swap-bg-faces-maybe :after #'aorst/run-solaire-swap-hooks))
 
 #+end_src
 
@@ -852,15 +854,38 @@ It is usefult to update some faces that are out of scope of current theme and ha
 #+begin_src emacs-lisp
   (defvar aorst--load-theme-hook nil
     "Hook run after a color theme is loaded using `load-theme'.")
-  (defadvice load-theme (after run-load-theme-hook activate)
+  (defun aorst/run-load-theme-hooks (&rest _)
     "Run `aorst--load-theme-hook'."
     (run-hooks 'aorst--load-theme-hook))
 
+  (advice-add 'load-theme :after #'aorst/run-load-theme-hooks)
+
   (defvar aorst--disable-theme-hook nil
     "Hook run after a color theme is disabled using `disable-theme'.")
-  (defadvice disable-theme (after run-disable-theme-hook activate)
+  (defun aorst/run-disable-theme-hooks (&rest _)
     "Run `aorst--disable-theme-hook'."
     (run-hooks 'aorst--disable-theme-hook))
+
+  (advice-add 'disable-theme :after #'aorst/run-disable-theme-hooks)
+#+end_src
+
+When I switch themes, I want for only one theme to be active at a time.
+This advice helps:
+
+#+begin_src emacs-lisp
+  (defun aorst/disable-all-themes (&rest _)
+    "Disable all active themes."
+    (dolist (theme custom-enabled-themes)
+      (disable-theme theme)))
+
+  (advice-add 'load-theme :before #'aorst/disable-all-themes)
+#+end_src
+
+And can you please Emacs treat all themes as safe by default?
+Yes, I understand that there's a possibility of malicious code to be stored inside theme, but the same can be said about any package.
+
+#+begin_src emacs-lisp
+  (setq-default custom-safe-themes t)
 #+end_src
 
 ** Mode-line
@@ -1178,9 +1203,10 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
   (use-package mini-modeline
     :straight (:host github
                :repo "kiennq/emacs-mini-modeline")
-    :hook ((aorst--load-theme
-            aorst--disable-theme
-            aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
+    :hook (((aorst--load-theme
+             aorst--disable-theme
+             aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
+           (after-init . mini-modeline-mode))
     :custom
     (mini-modeline-right-padding 1)
     (mini-modeline-display-gui-line nil)
@@ -1716,7 +1742,7 @@ I want to customize tab appearance to match my theme.
 
     (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)
 
-    (define-advice tab-line-select-tab (:after (&optional e))
+    (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
       (select-window (posn-window (event-start e)))))
 #+end_src
 
@@ -2516,10 +2542,10 @@ The same thing is for =rg=, but counsel actually has it's own variable for it, s
            ("C-h l" . counsel-find-library))
     :config
     (when (executable-find "fd")
-      (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory))
+      (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory) aorst:counsel-fd)
         (let ((find-program "fd")
               (counsel-file-jump-args (split-string "-L --type f --hidden")))
-          (funcall foo))))
+          (funcall foo initial-input initial-directory))))
     (when (executable-find "rg")
       (setq counsel-rg-base-command
             "rg -S --no-heading --hidden --line-number --color never %s .")))
@@ -2827,7 +2853,7 @@ LSP client for Emacs.
     (lsp-ui-doc-delay 1 "higher than eldoc delay")
     :config
     (when (fboundp #'aorst/escape)
-      (define-advice lsp-ui-doc--make-request (:around (foo))
+      (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
         (unless (eq this-command 'aorst/escape)
           (funcall foo))))
     (lsp-ui-mode))
