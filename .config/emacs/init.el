@@ -216,8 +216,13 @@ are defining or executing a macro."
 
 (when window-system
   (setq-default x-gtk-use-system-tooltips nil)
-  (setq-default tooltip-x-offset 5)
-  (setq-default tooltip-y-offset 7)
+  (setq-default tooltip-x-offset 0)
+  (setq-default tooltip-y-offset (line-pixel-height))
+  (setq-default tooltip-frame-parameters
+                `((name . "tooltip")
+                  (internal-border-width . ,(/ (line-pixel-height) 2))
+                  (border-width . 1)
+                  (no-special-glyphs . t)))
   (scroll-bar-mode -1)
   (tool-bar-mode -1))
 
@@ -379,7 +384,7 @@ are defining or executing a macro."
 (defun aorst/mode-line-buffer-name ()
   (when-let ((name (buffer-file-name)))
     (propertize (concat "  " (file-name-nondirectory name))
-                'help-echo (concat name
+                'help-echo (concat (abbreviate-file-name name)
                                    (when (buffer-modified-p)
                                      (if (char-displayable-p ?💾) " 💾" " [modified]"))))))
 
@@ -403,7 +408,7 @@ are defining or executing a macro."
        (1 "  CRLF")
        (2 "  CR")
        (_ ""))
-     'help-echo (format "End-of-line style: %s"
+     'help-echo (format "Line ending style: %s"
                         (pcase eol
                           (0 "Unix-style LF")
                           (1 "DOS-style CRLF")
@@ -687,7 +692,7 @@ offset variables."
                      (all-the-icons-octicon
                       "repo"
                       :v-adjust -0.1
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (root))
       (treemacs-create-icon
        :icon (format "%s\t%s\t"
@@ -695,11 +700,11 @@ offset variables."
                       "chevron-down"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
                      (all-the-icons-octicon
                       "file-directory"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (dir-open))
       (treemacs-create-icon
        :icon (format "%s\t%s\t"
@@ -707,11 +712,11 @@ offset variables."
                       "chevron-right"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
                      (all-the-icons-octicon
                       "file-directory"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (dir-closed))
       (treemacs-create-icon
        :icon (format "%s\t%s\t"
@@ -719,11 +724,11 @@ offset variables."
                       "chevron-down"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
                      (all-the-icons-octicon
                       "package"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (tag-open))
       (treemacs-create-icon
        :icon (format "%s\t%s\t"
@@ -731,11 +736,11 @@ offset variables."
                       "chevron-right"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
                      (all-the-icons-octicon
                       "package"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (tag-closed))
       (treemacs-create-icon
        :icon (format "%s\t"
@@ -743,21 +748,21 @@ offset variables."
                       "tag"
                       :height 0.9
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (tag-leaf))
       (treemacs-create-icon
        :icon (format "%s\t"
                      (all-the-icons-octicon
                       "flame"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (error))
       (treemacs-create-icon
        :icon (format "%s\t"
                      (all-the-icons-octicon
                       "stop"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (warning))
       (treemacs-create-icon
        :icon (format "%s\t"
@@ -765,14 +770,14 @@ offset variables."
                       "info"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (info))
       (treemacs-create-icon
        :icon (format "  %s\t"
                      (all-the-icons-octicon
                       "file-media"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
                     "wav" "mp3" "ogg" "midi"))
@@ -781,7 +786,7 @@ offset variables."
                      (all-the-icons-octicon
                       "file-code"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
                     "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
                     "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
@@ -798,7 +803,7 @@ offset variables."
                      (all-the-icons-octicon
                       "book"
                       :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal)))
+                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
                     "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
                     "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
@@ -807,32 +812,32 @@ offset variables."
        :icon (format "  %s\t" (all-the-icons-octicon
                                "file-text"
                                :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
+                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("md" "markdown" "rst" "log" "org" "txt"
                     "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
       (treemacs-create-icon
        :icon (format "  %s\t" (all-the-icons-octicon
                                "file-binary"
                                :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
+                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("exe" "dll" "obj" "so" "o" "out"))
       (treemacs-create-icon
        :icon (format "  %s\t" (all-the-icons-octicon
                                "file-pdf"
                                :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
+                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("pdf"))
       (treemacs-create-icon
        :icon (format "  %s\t" (all-the-icons-octicon
                                "file-zip"
                                :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
+                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
       (treemacs-create-icon
        :icon (format "  %s\t" (all-the-icons-octicon
                                "file-text"
                                :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal)))
+                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :extensions (fallback))))
   :init
   (defun aorst/treemacs-expand-all-projects (&optional _)
@@ -1019,12 +1024,17 @@ truncates text if needed.  Minimal width can be set with
              (truncate-width (- width
                                 (length tab-line-ellipsis-string)
                                 (length right-pad))))
-        (if (>= name-width truncate-width)
-            (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
-          (let* ((padding (aorst/tab-line--make-pad width name-width))
-                 (tab-text (concat padding buffer))
-                 (text-width (length tab-text)))
-            (concat tab-text (make-string (- width text-width) ?\s)))))))
+        (propertize
+         (if (>= name-width truncate-width)
+             (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
+           (let* ((padding (aorst/tab-line--make-pad width name-width))
+                  (tab-text (concat padding buffer))
+                  (text-width (length tab-text)))
+             (concat tab-text (make-string (- width text-width) ?\s))))
+         'help-echo (when-let ((name (buffer-file-name)))
+                      (concat (abbreviate-file-name name)
+                       (when (buffer-modified-p)
+                         (if (char-displayable-p ?💾) " 💾" " [modified]"))))))))
 
 
   (setq tab-line-close-button-show t
@@ -1618,7 +1628,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :if (and (bound-and-true-p module-file-suffix)
            (not (string-match-p "aarch" system-configuration)))
   :straight (:host github
-             :repo "andreyorst/parinfer-rust-mode")
+             :repo "justinbarclay/parinfer-rust-mode")
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode
@@ -2043,12 +2053,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight nil
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\"))
-
-(use-package smooth-scroll
-  :config
-  (smooth-scroll-mode)
-  (setq smooth-scroll/vscroll-step-size 10)
-  (setq smooth-scroll/hscroll-step-size 4))
 
 (use-package dumb-jump
   :custom (dumb-jump-prefer-searcher 'rg)
