@@ -606,7 +606,6 @@ offset variables."
   :custom
   (mini-modeline-right-padding 1)
   (mini-modeline-display-gui-line nil)
-  (mini-modeline-l-format '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
   (mini-modeline-r-format
    '(:eval (concat
             (aorst/mode-line-buffer-modified)
