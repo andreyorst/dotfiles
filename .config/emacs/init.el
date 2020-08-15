@@ -52,6 +52,7 @@
                 mouse-highlight nil
                 hscroll-step 1
                 hscroll-margin 1
+                scroll-margin 1
                 scroll-step 10)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
@@ -390,7 +391,8 @@ are defining or executing a macro."
 
 (defun aorst/mode-line-buffer-modified ()
   (when (and buffer-file-name (buffer-modified-p))
-      (if (char-displayable-p ?💾) " 💾" "*")))
+    (propertize (if (char-displayable-p ?💾) " 💾" "*")
+                'help-echo (concat (buffer-name) " has unsaved changes"))))
 
 (defun aorst/mode-line-line-column ()
   (propertize
@@ -467,22 +469,23 @@ there's no previous result of this function stored."
     (setq-local aorst--mode-line--current-major-mode major-mode)
     (setq-local aorst--mode-line--indent-var (aorst/mode-line--get-indent-var))
     (setq-local aorst--mode-line--indent-var-value (symbol-value aorst--mode-line--indent-var))
-    (setq-local aorst--mode-line--indent-mode-string
-                (propertize
-                 (concat "  "
-                         (when (and (not indent-tabs-mode)
-                                    aorst--mode-line--indent-var-value)
-                           (format "%d " aorst--mode-line--indent-var-value))
-                         (if indent-tabs-mode "Tabs" "Spaces"))
-                 'help-echo (concat "Indent mode"
-                                    (when aorst--mode-line--indent-var
-                                      (format ": %S" aorst--mode-line--indent-var))
-                                    "\nmouse-1: toggle indent "
-                                    (if indent-tabs-mode "Spaces" "Tabs")
-                                    " mode")
-                 'local-map (let ((map (make-sparse-keymap)))
-                              (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
-                              map))))
+    (let ((indent-mode-str (concat (when (and (not indent-tabs-mode)
+                                              aorst--mode-line--indent-var-value)
+                                     (format "%d " aorst--mode-line--indent-var-value))
+                                   (if indent-tabs-mode "Tabs" "Spaces"))))
+      (setq-local aorst--mode-line--indent-mode-string
+                  (propertize
+                   (concat "  " indent-mode-str)
+                   'help-echo (concat "Indent mode: "
+                                      indent-mode-str
+                                      (when aorst--mode-line--indent-var
+                                        (format "\nindent var: %S" aorst--mode-line--indent-var))
+                                      "\nmouse-1: toggle indent-"
+                                      (if indent-tabs-mode "spaces" "tabs")
+                                      "-mode")
+                   'local-map (let ((map (make-sparse-keymap)))
+                                (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
+                                map)))))
   aorst--mode-line--indent-mode-string)
 
 (defun aorst/mode-line--get-indent-var ()
@@ -1031,9 +1034,7 @@ truncates text if needed.  Minimal width can be set with
                   (text-width (length tab-text)))
              (concat tab-text (make-string (- width text-width) ?\s))))
          'help-echo (when-let ((name (buffer-file-name)))
-                      (concat (abbreviate-file-name name)
-                       (when (buffer-modified-p)
-                         (if (char-displayable-p ?💾) " 💾" " [modified]"))))))))
+                      (abbreviate-file-name name))))))
 
 
   (setq tab-line-close-button-show t
