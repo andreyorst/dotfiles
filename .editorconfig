@@ -18,9 +18,6 @@ indent_size = 4
 indent_size = 8
 indent_style = tab
 
-[{Makefile,makefile,*.mk}]
-indent_style = tab
-
 [*.md]
 trim_trailing_whitespace = false
 indent_style = space
@@ -28,6 +25,7 @@ indent_size = 4
 
 [*.org]
 trim_trailing_whitespace = false
+indent_style = space
 
 [*.{clj,cljs,cljc,edn}]
 indent_style = space
