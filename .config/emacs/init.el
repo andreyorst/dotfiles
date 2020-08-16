@@ -1450,6 +1450,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package sql-indent
   :hook (sql-mode . sqlind-minor-mode))
 
+(use-package erlang)
+
 (use-package elixir-mode)
 
 (use-package help

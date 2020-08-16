@@ -2232,6 +2232,15 @@ Syntax based indentation for SQL:
     :hook (sql-mode . sqlind-minor-mode))
 #+end_src
 
+** Erlang
+Erlang is a great councurrency oriented functional language.
+It is mostly used to build massively scalable soft real-time systems with requirements on high availability.
+It runs on BEAM - an Erlang VM, and can also be used as a general purpose language.
+
+#+begin_src emacs-lisp
+  (use-package erlang)
+#+end_src
+
 ** Elixir
 Elixir is a dynamic, functional language designed for building scalable and maintainable applications.
 It runs on Erlang VM (BEAM), and has nice macro system, making language core small, yet still very extendable.
