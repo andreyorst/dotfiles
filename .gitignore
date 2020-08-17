@@ -12,6 +12,7 @@ saved_workspaces
 !.config/emacs/.sceenshot.png
 !.config/emacs/.mc-lists.el
 !.config/emacs/disabled.el
+!.config/emacs/treemacs-atom-theme.el
 !.config/emacs/straight/
 .config/emacs/straight/*
 !.config/emacs/straight/versions/

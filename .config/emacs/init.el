@@ -48,6 +48,34 @@
   (mouse-wheel-progressive-speed nil)
   :config
   (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu)
+  (defun aorst/truncated-lines-p ()
+    "Non-nil if any line is longer than `window-width' + `window-hscroll'.
+Returns t if any line exceeds right border of the window.  Used
+for stopping scrolling scroll from going beyond longest line.
+Based on `so-long-detected-long-line-p'."
+    (save-excursion
+      (goto-char (point-min))
+      (let ((threshold (+ (window-width)
+                          (window-hscroll)
+                          ;; cancel line numbers width
+                          (or (and display-line-numbers-mode
+                                   (- display-line-numbers-width)) 0)
+                          ;; cancel fringe widths
+                          -2)))
+        (catch 'excessive
+          (while (not (eobp))
+            (setq start (point))
+            (save-restriction
+              (narrow-to-region start (min (+ start 1 threshold)
+                                           (point-max)))
+              (forward-line 1))
+            (unless (or (bolp)
+                        (and (eobp) (<= (- (point) start)
+                                        threshold)))
+              (throw 'excessive t)))))))
+  (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
+    (when (aorst/truncated-lines-p)
+      (funcall foo arg set-minimum)))
   (setq-default auto-window-vscroll nil
                 mouse-highlight nil
                 hscroll-step 1
@@ -391,54 +419,64 @@ are defining or executing a macro."
 
 (defun aorst/mode-line-buffer-modified ()
   (when (and buffer-file-name (buffer-modified-p))
-    (propertize (if (char-displayable-p ?💾) " 💾" "*")
-                'help-echo (concat (buffer-name) " has unsaved changes"))))
+    (concat
+     "  "
+     (propertize (if (char-displayable-p ?💾) "💾" "[*]"
+                  'help-echo (concat (buffer-name) " has unsaved changes"))))))
 
 (defun aorst/mode-line-line-column ()
-  (propertize
-   "  %C:%l"
-   'help-echo "goto line"
-   'local-map (let ((map (make-sparse-keymap)))
-                (define-key map [mode-line mouse-1] #'goto-line)
-                map)))
+  (concat
+   "  "
+   (propertize
+    "%C:%l"
+    'help-echo "goto line"
+    'local-map (let ((map (make-sparse-keymap)))
+                 (define-key map [mode-line mouse-1] #'goto-line)
+                 map))))
 
 (defun aorst/mode-line-line-encoding ()
   (let ((eol (coding-system-eol-type buffer-file-coding-system)))
-    (propertize
-     (pcase eol
-       (0 "  LF")
-       (1 "  CRLF")
-       (2 "  CR")
-       (_ ""))
-     'help-echo (format "Line ending style: %s"
-                        (pcase eol
-                          (0 "Unix-style LF")
-                          (1 "DOS-style CRLF")
-                          (2 "Mac-style CR")
-                          (_ "Undecided")))
-     'local-map (let ((map (make-sparse-keymap)))
-                  (define-key map [mode-line mouse-1] 'mode-line-change-eol)
-                  map))))
+    (concat
+     "  "
+     (propertize
+       (pcase eol
+         (0 "LF")
+         (1 "CRLF")
+         (2 "CR")
+         (_ ""))
+       'help-echo (format "Line ending style: %s"
+                          (pcase eol
+                            (0 "Unix-style LF")
+                            (1 "DOS-style CRLF")
+                            (2 "Mac-style CR")
+                            (_ "Undecided")))
+       'local-map (let ((map (make-sparse-keymap)))
+                    (define-key map [mode-line mouse-1] 'mode-line-change-eol)
+                    map)))))
 
 (defun aorst/mode-line-input-method ()
   (when current-input-method
-    (propertize
-     (concat "  " current-input-method-title)
-     'help-echo (concat
-                 "Current input method: "
-                 current-input-method
-                 "\nmouse-2: Disable input method\nmouse-3: Describe current input method")
-     'local-map mode-line-input-method-map)))
+    (concat
+     "  "
+     (propertize
+      current-input-method-title
+      'help-echo (concat
+                  "Current input method: "
+                  current-input-method
+                  "\nmouse-2: Disable input method\nmouse-3: Describe current input method")
+      'local-map mode-line-input-method-map))))
 
 (defun aorst/mode-line-buffer-encoding ()
-  (propertize
-   (let ((sys (coding-system-plist buffer-file-coding-system)))
-     (if (memq (plist-get sys :category)
-               '(coding-category-undecided coding-category-utf-8))
-         "  UTF-8"
-       (concat "  " (upcase (symbol-name (plist-get sys :name))))))
-   'help-echo 'mode-line-mule-info-help-echo
-   'local-map mode-line-coding-system-map))
+  (concat
+   "  "
+   (propertize
+    (let ((sys (coding-system-plist buffer-file-coding-system)))
+      (if (memq (plist-get sys :category)
+                '(coding-category-undecided coding-category-utf-8))
+          "UTF-8"
+        (upcase (symbol-name (plist-get sys :name)))))
+    'help-echo 'mode-line-mule-info-help-echo
+    'local-map mode-line-coding-system-map)))
 
 (defvar-local aorst--mode-line--current-major-mode nil
   "Holds current major mode.
@@ -474,18 +512,20 @@ there's no previous result of this function stored."
                                      (format "%d " aorst--mode-line--indent-var-value))
                                    (if indent-tabs-mode "Tabs" "Spaces"))))
       (setq-local aorst--mode-line--indent-mode-string
-                  (propertize
-                   (concat "  " indent-mode-str)
-                   'help-echo (concat "Indent mode: "
-                                      indent-mode-str
-                                      (when aorst--mode-line--indent-var
-                                        (format "\nindent var: %S" aorst--mode-line--indent-var))
-                                      "\nmouse-1: toggle indent-"
-                                      (if indent-tabs-mode "spaces" "tabs")
-                                      "-mode")
-                   'local-map (let ((map (make-sparse-keymap)))
-                                (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
-                                map)))))
+                  (concat
+                   "  "
+                   (propertize
+                    indent-mode-str
+                    'help-echo (concat "Indent mode: "
+                                       indent-mode-str
+                                       (when aorst--mode-line--indent-var
+                                         (format "\nindent var: %S" aorst--mode-line--indent-var))
+                                       "\nmouse-1: toggle indent-"
+                                       (if indent-tabs-mode "spaces" "tabs")
+                                       "-mode")
+                    'local-map (let ((map (make-sparse-keymap)))
+                                 (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
+                                 map))))))
   aorst--mode-line--indent-mode-string)
 
 (defun aorst/mode-line--get-indent-var ()
@@ -512,9 +552,11 @@ offset variables."
                    major-mode)
                aorst--mode-line--major-mode-string)
     (setq-local aorst--mode-line--major-mode-string
-               (propertize
-                 (concat "  " (format-mode-line mode-name))
-                 'help-echo (format "Major-mode: %s" (format-mode-line mode-name)))))
+                (concat
+                 "  "
+                 (propertize
+                  (format-mode-line mode-name)
+                  'help-echo (format "Major mode: %s" (format-mode-line mode-name))))))
   aorst--mode-line--major-mode-string)
 
 (defun aorst/mode-line-git-branch ()
@@ -525,18 +567,20 @@ offset variables."
                    (+ (if (eq (vc-backend buffer-file-name) 'Hg) 2 3)
                       2)))))
       (when str
-        (concat (if (char-displayable-p ?) "   " "  @ ") str)))))
+        (concat (if (char-displayable-p ?) "   " "  @") str)))))
 
 (defun aorst/mode-line-readonly ()
   (when buffer-read-only
-    (propertize
-     (if (char-displayable-p ?🔒) "  🔒" "  RO")
-     'help-echo "Make file writable"
-     'local-map (let ((map (make-sparse-keymap)))
-                  (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
-                  map))))
+    (concat
+     "  "
+     (propertize
+       (if (char-displayable-p ?🔒) "🔒" "RO")
+       'help-echo "Make file writable"
+       'local-map (let ((map (make-sparse-keymap)))
+                    (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
+                    map)))))
     ;; (propertize
-    ;;  (if (char-displayable-p ?🔓) "  🔓" "  RW")
+    ;;  (if (char-displayable-p ?🔓) "🔓" "RW")
     ;;  'help-echo "Make file read only"
     ;;  'local-map (let ((map (make-sparse-keymap)))
     ;;               (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
@@ -555,26 +599,31 @@ offset variables."
         (let-alist (flycheck-count-errors flycheck-current-errors)
           (propertize (format "%s/%s" (or .error 0) (or .warning 0))
                       'help-echo (if (or .error .warning)
-                                     "Flycheck: errors\nmouse-1: list errors"
+                                     (concat "Flycheck: "
+                                             (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                             (when .warning (format "%d warnings" .warning))
+                                             "\nmouse-1: list errors")
                                    "Flycheck: no errors or warnings")
                       'local-map 'flycheck-error-list-mode-line-map)))
        (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
        (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))))
 
 (defun aorst/mode-line-structural ()
-  (cond ((bound-and-true-p parinfer-rust-mode)
-         (propertize (concat "  Parinfer: " parinfer-rust--mode)
-                     'help-echo (concat "Parinfer " parinfer-rust--mode
-                                        " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
-                     'local-map (let ((map (make-sparse-keymap)))
-                                  (define-key map [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode)
-                                  map)))
-        ((bound-and-true-p paredit-mode)
-         (propertize "  Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
-        ((bound-and-true-p lispy-mode)
-         (propertize "  Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
-        ((bound-and-true-p electric-pair-mode)
-         (propertize "  EPM" 'help-echo "Electric Pair mode is enabled for current buffer"))))
+  (when-let ((structural
+              (cond ((bound-and-true-p parinfer-rust-mode)
+                     (propertize (concat "Parinfer: " parinfer-rust--mode)
+                                 'help-echo (concat "Parinfer " parinfer-rust--mode
+                                                    " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
+                                 'local-map (let ((map (make-sparse-keymap)))
+                                              (define-key map [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode)
+                                              map)))
+                    ((bound-and-true-p paredit-mode)
+                     (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+                    ((bound-and-true-p lispy-mode)
+                     (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
+                    ((bound-and-true-p electric-pair-mode)
+                     (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
+    (concat "  " structural)))
 
 (setq-default
  mode-line-format
@@ -686,161 +735,6 @@ offset variables."
                         :height 1.0
                         :weight 'normal))
   (aorst/treemacs-setup-faces)
-  (treemacs-create-theme "Atom"
-    :config
-    (progn
-      (treemacs-create-icon
-       :icon (format " %s\t"
-                     (all-the-icons-octicon
-                      "repo"
-                      :v-adjust -0.1
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (root))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-down"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
-                     (all-the-icons-octicon
-                      "file-directory"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (dir-open))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-right"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
-                     (all-the-icons-octicon
-                      "file-directory"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (dir-closed))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-down"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
-                     (all-the-icons-octicon
-                      "package"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (tag-open))
-      (treemacs-create-icon
-       :icon (format "%s\t%s\t"
-                     (all-the-icons-octicon
-                      "chevron-right"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal))
-                     (all-the-icons-octicon
-                      "package"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (tag-closed))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "tag"
-                      :height 0.9
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (tag-leaf))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "flame"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (error))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "stop"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (warning))
-      (treemacs-create-icon
-       :icon (format "%s\t"
-                     (all-the-icons-octicon
-                      "info"
-                      :height 0.75
-                      :v-adjust 0.1
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (info))
-      (treemacs-create-icon
-       :icon (format "  %s\t"
-                     (all-the-icons-octicon
-                      "file-media"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
-                    "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
-                    "wav" "mp3" "ogg" "midi"))
-      (treemacs-create-icon
-       :icon (format "  %s\t"
-                     (all-the-icons-octicon
-                      "file-code"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
-                    "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
-                    "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
-                    "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
-                    "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
-                    "vagrantfile" "j2" "jinja2" "tex" "racket" "rkt" "rktl" "rktd"
-                    "scrbl" "scribble" "plt" "makefile" "elm" "xml" "xsl" "rb"
-                    "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
-                    "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
-                    "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                    "gitconfig"))
-      (treemacs-create-icon
-       :icon (format "  %s\t"
-                     (all-the-icons-octicon
-                      "book"
-                      :v-adjust 0
-                      :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
-                    "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
-                    "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
-                    "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-text"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("md" "markdown" "rst" "log" "org" "txt"
-                    "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-binary"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("exe" "dll" "obj" "so" "o" "out"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-pdf"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("pdf"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-zip"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
-      (treemacs-create-icon
-       :icon (format "  %s\t" (all-the-icons-octicon
-                               "file-text"
-                               :v-adjust 0
-                               :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-       :extensions (fallback))))
   :init
   (defun aorst/treemacs-expand-all-projects (&optional _)
     "Expand all projects."
@@ -883,6 +777,7 @@ offset variables."
   (defun aorst/treemacs-after-init-setup ()
     "Set treemacs theme, open treemacs, and expand all projects."
     (when (display-graphic-p)
+      (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
       (treemacs-load-theme "Atom"))
     (setq treemacs-collapse-dirs 0)
     (treemacs)
@@ -960,7 +855,7 @@ function."
     :group 'tab-line)
 
 
-  (defcustom tab-line-tab-max-width 30
+  (defcustom tab-line-tab-max-width 33
     "Maximum width of a tab in characters."
     :type 'integer
     :group 'tab-line)
@@ -1025,7 +920,8 @@ truncates text if needed.  Minimal width can be set with
              (right-pad (if tab-line-close-button-show "" " "))
              (truncate-width (- width
                                 (length tab-line-ellipsis-string)
-                                (length right-pad))))
+                                (length right-pad)
+                                1)))
         (propertize
          (if (>= name-width truncate-width)
              (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
@@ -1450,7 +1346,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package sql-indent
   :hook (sql-mode . sqlind-minor-mode))
 
-(use-package erlang)
+(use-package erlang
+  :hook (erlang-mode . (lambda ()
+                         (add-hook 'xref-backend-functions
+                                   #'dumb-jump-xref-activate
+                                   nil t))))
 
 (use-package elixir-mode)
 
@@ -1937,7 +1837,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
         (funcall foo))))
   (lsp-ui-mode))
 
-(use-package dap-mode)
+(use-package dap-mode
+  :hook (lsp-mode . dap-mode))
 
 (use-package project
   :straight nil

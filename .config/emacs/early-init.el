@@ -36,6 +36,9 @@
 (setq frame-inhibit-implied-resize t
       x-gtk-resize-child-frames 'resize-mode)
 
+(setq-default fringe-indicator-alist
+              (assq-delete-all 'truncation fringe-indicator-alist))
+
 (defvar straight-process-buffer)
 (setq-default straight-process-buffer " *straight-process*")
 (defvar bootstrap-version)
