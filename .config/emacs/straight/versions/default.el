@@ -57,6 +57,7 @@
  ("mc-extras.el" . "053abc52181b8718559d7361a587bbb795faf164")
  ("melpa" . "26f2af3e31a2ddbf8600cb9a625d138c924d8a53")
  ("multiple-cursors.el" . "b880554d04b8f61165afba7d4de19ac9e39bb7ab")
+ ("otp" . "a0d79cfdb8b44abe8475530ab90a06c43dda03f8")
  ("paredit" . "8330a41e8188fe18d3fa805bb9aa529f015318e8")
  ("parinfer-rust-mode" . "9e2e91cf1697582a396a5365f24d74634acfc744")
  ("parseclj" . "b34d3e13a249d4b92f1a008cdc1df20a92f866c5")

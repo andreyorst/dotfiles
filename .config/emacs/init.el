@@ -435,24 +435,24 @@ are defining or executing a macro."
                  map))))
 
 (defun aorst/mode-line-line-encoding ()
-  (let ((eol (coding-system-eol-type buffer-file-coding-system)))
+  (when-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
+                    (0 "LF")
+                    (1 "CRLF")
+                    (2 "CR")
+                    (_ nil))))
     (concat
      "  "
      (propertize
-       (pcase eol
-         (0 "LF")
-         (1 "CRLF")
-         (2 "CR")
-         (_ ""))
-       'help-echo (format "Line ending style: %s"
-                          (pcase eol
-                            (0 "Unix-style LF")
-                            (1 "DOS-style CRLF")
-                            (2 "Mac-style CR")
-                            (_ "Undecided")))
-       'local-map (let ((map (make-sparse-keymap)))
-                    (define-key map [mode-line mouse-1] 'mode-line-change-eol)
-                    map)))))
+      eol
+      'help-echo (format "Line ending style: %s"
+                         (pcase eol
+                           ("LF" "Unix style LF")
+                           ("CRLF" "DOS style CRLF")
+                           ("CR" "Mac style CR")
+                           (_ "Undecided")))
+      'local-map (let ((map (make-sparse-keymap)))
+                   (define-key map [mode-line mouse-1] 'mode-line-change-eol)
+                   map)))))
 
 (defun aorst/mode-line-input-method ()
   (when current-input-method
@@ -570,7 +570,8 @@ offset variables."
         (concat (if (char-displayable-p ?) "   " "  @") str)))))
 
 (defun aorst/mode-line-readonly ()
-  (when buffer-read-only
+  (when (and buffer-read-only
+             (not (eq major-mode 'vterm-mode)))
     (concat
      "  "
      (propertize
@@ -656,7 +657,7 @@ offset variables."
            aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode))
   :custom
-  (mini-modeline-right-padding 1)
+  (mini-modeline-right-padding 2)
   (mini-modeline-display-gui-line nil)
   (mini-modeline-r-format
    '(:eval (concat
@@ -922,15 +923,18 @@ truncates text if needed.  Minimal width can be set with
                                 (length tab-line-ellipsis-string)
                                 (length right-pad)
                                 1)))
-        (propertize
-         (if (>= name-width truncate-width)
-             (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
-           (let* ((padding (aorst/tab-line--make-pad width name-width))
-                  (tab-text (concat padding buffer))
-                  (text-width (length tab-text)))
-             (concat tab-text (make-string (- width text-width) ?\s))))
-         'help-echo (when-let ((name (buffer-file-name)))
-                      (abbreviate-file-name name))))))
+        (if (>= name-width truncate-width)
+            (propertize (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
+                        'help-echo (if-let ((name (buffer-file-name)))
+                                       (abbreviate-file-name name)
+                                     (buffer-name)))
+          (let* ((padding (aorst/tab-line--make-pad width name-width))
+                 (tab-text (concat padding buffer))
+                 (text-width (length tab-text)))
+            (propertize (concat tab-text (make-string (- width text-width) ?\s))
+                        'help-echo (when-let ((name (buffer-file-name)))
+                                    (abbreviate-file-name name))))))))
+
 
 
   (setq tab-line-close-button-show t

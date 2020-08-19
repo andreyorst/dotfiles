@@ -20,6 +20,7 @@
         c-end-of-defun
         c-indent-line-or-region
         cider-eval-defun-at-point
+        cljr-slash
         comment-line
         counsel-M-x
         default-indent-new-line
@@ -32,6 +33,7 @@
         hydra--negative-argument
         hydrant/er/er/contract-region
         hydrant/er/er/expand-region
+        hydrant/mc/mc/keyboard-quit-and-exit
         indent-for-tab-command
         kill-region
         markdown-electric-backquote
@@ -67,6 +69,7 @@
 (setq mc/cmds-to-run-once
       '(
         aorst/treemacs-expand-all-projects
+        cider-debug-mode-send-reply
         cider-repl-return
         clang-format-buffer
         counsel-describe-function
