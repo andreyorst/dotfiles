@@ -2285,7 +2285,8 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
 #+begin_src emacs-lisp
   (use-package clj-refactor
     :hook ((cider-mode . clj-refactor-mode)
-           (cider-mode . yas-minor-mode)))
+           (cider-mode . yas-minor-mode))
+    :custom (cljr-suppress-no-project-warning nil))
 #+end_src
 
 ** Fennel

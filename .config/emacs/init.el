@@ -1330,7 +1330,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package clj-refactor
   :hook ((cider-mode . clj-refactor-mode)
-         (cider-mode . yas-minor-mode)))
+         (cider-mode . yas-minor-mode))
+  :custom (cljr-suppress-no-project-warning nil))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
