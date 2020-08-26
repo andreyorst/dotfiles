@@ -130,6 +130,7 @@
         term-send-raw
         toggle-input-method
         treemacs-collapse-all-projects
+        treemacs-leftclick-action
         treemacs-rename
         undo-tree-visualize
         vterm--self-insert
