@@ -2364,6 +2364,15 @@ And it also has good interop with Erlang itself.
   (use-package elixir-mode)
 #+end_src
 
+** JSON
+Json support for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :hook (json-mode . flycheck-mode)
+    :custom (js-indent-level 2))
+#+end_src
+
 * Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 

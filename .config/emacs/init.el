@@ -1364,6 +1364,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package elixir-mode)
 
+(use-package json-mode
+  :hook (json-mode . flycheck-mode)
+  :custom (js-indent-level 2))
+
 (use-package help
   :straight nil
   :custom (help-window-select t))
