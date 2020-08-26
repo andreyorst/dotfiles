@@ -1397,12 +1397,14 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
             (let ((windows (seq-drop-while #'window-dedicated-p (window-list))))
               (when (not (null windows))
                 (select-window (car windows)))))
-        (let* ((win-side (if (symbolp arg)
-                             (cons (split-window-below) 'bot)
-                           (cons (split-window-right) 'right)))
+        (let* ((win-side (unless (string= (buffer-name) " *Install vterm* ")
+                           (if (symbolp arg)
+                               (cons (split-window-below) 'bot)
+                             (cons (split-window-right) 'right))))
                (window (car win-side))
                (side (cdr win-side)))
-          (select-window window)
+          (when window
+            (select-window window))
           (cond ((get-buffer bufname)
                  (switch-to-buffer bufname))
                 (t (let ((default-directory directory))
@@ -1411,7 +1413,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
             (setq tab-line-format nil))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-parameter window 'window-side side)
+          (when side
+            (set-window-parameter window 'window-side side))
           (set-window-parameter window 'no-other-window t)))))
   (defun aorst/vterm-focus (&optional arg)
     "Focus `vterm' or open one if there's none."
