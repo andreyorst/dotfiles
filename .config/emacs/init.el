@@ -243,13 +243,18 @@ are defining or executing a macro."
   :custom
   (inhibit-splash-screen t))
 
+(defvar aorst--line-pixel-height (line-pixel-height)
+  "Line height in pixels.
+Used in various places to avoid getting wrong line height when
+`text-scale-mode' is active.")
+
 (when window-system
   (setq-default x-gtk-use-system-tooltips nil)
   (setq-default tooltip-x-offset 0)
-  (setq-default tooltip-y-offset (line-pixel-height))
+  (setq-default tooltip-y-offset aorst--line-pixel-height)
   (setq-default tooltip-frame-parameters
                 `((name . "tooltip")
-                  (internal-border-width . ,(/ (line-pixel-height) 2))
+                  (internal-border-width . ,(/ aorst--line-pixel-height 2))
                   (border-width . 1)
                   (no-special-glyphs . t)))
   (scroll-bar-mode -1)
@@ -800,7 +805,7 @@ offset variables."
               (fg (face-attribute 'default :foreground)))
           (face-remap-add-relative 'header-line
                                    :background bg :foreground fg
-                                   :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+                                   :box `(:line-width ,(/ aorst--line-pixel-height 2) :color ,bg)))
         (setq header-line-format
               '((:eval
                  (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
@@ -971,7 +976,7 @@ truncates text if needed.  Minimal width can be set with
                                   'unspecified)))
                     (face-attribute 'default :background)
                   (face-attribute 'mode-line :background)))
-          (box-width (/ (line-pixel-height) 2)))
+          (box-width (/ aorst--line-pixel-height 2)))
       (set-face-attribute 'tab-line nil
                           :background base
                           :foreground dark-fg

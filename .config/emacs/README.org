@@ -702,6 +702,15 @@ I don't need it, so let's disable it.
     (inhibit-splash-screen t))
 #+end_src
 
+** Line height
+
+#+begin_src emacs-lisp
+  (defvar aorst--line-pixel-height (line-pixel-height)
+    "Line height in pixels.
+  Used in various places to avoid getting wrong line height when
+  `text-scale-mode' is active.")
+#+end_src
+
 ** Menus and Tooltips
 I don't need all these tooltips, menus and scroll bars.
 Emacs enables all of those by default, so let's disable them as early as possible:
@@ -710,10 +719,10 @@ Emacs enables all of those by default, so let's disable them as early as possibl
   (when window-system
     (setq-default x-gtk-use-system-tooltips nil)
     (setq-default tooltip-x-offset 0)
-    (setq-default tooltip-y-offset (line-pixel-height))
+    (setq-default tooltip-y-offset aorst--line-pixel-height)
     (setq-default tooltip-frame-parameters
                   `((name . "tooltip")
-                    (internal-border-width . ,(/ (line-pixel-height) 2))
+                    (internal-border-width . ,(/ aorst--line-pixel-height 2))
                     (border-width . 1)
                     (no-special-glyphs . t)))
     (scroll-bar-mode -1)
@@ -1437,7 +1446,7 @@ Which is good.
                 (fg (face-attribute 'default :foreground)))
             (face-remap-add-relative 'header-line
                                      :background bg :foreground fg
-                                     :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+                                     :box `(:line-width ,(/ aorst--line-pixel-height 2) :color ,bg)))
           (setq header-line-format
                 '((:eval
                    (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
@@ -1812,7 +1821,7 @@ I want to customize tab appearance to match my theme.
                                     'unspecified)))
                       (face-attribute 'default :background)
                     (face-attribute 'mode-line :background)))
-            (box-width (/ (line-pixel-height) 2)))
+            (box-width (/ aorst--line-pixel-height 2)))
         (set-face-attribute 'tab-line nil
                             :background base
                             :foreground dark-fg
