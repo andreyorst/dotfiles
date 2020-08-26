@@ -3199,17 +3199,6 @@ Settings to =recentf= mode.
     (add-to-list 'recentf-exclude "\\.gpg\\"))
 #+end_src
 
-** COMMENT Smooth Scroll
-This minor mode provides a nice way of having fake smooth scrolling that helps seeing where.
-
-#+begin_src emacs-lisp
-(use-package smooth-scroll
-  :config
-  (smooth-scroll-mode)
-  (setq smooth-scroll/vscroll-step-size 10)
-  (setq smooth-scroll/hscroll-step-size 4))
-#+end_src
-
 ** Dumb Jump
 Dumbest definition jumping that just work.
 
@@ -3242,18 +3231,26 @@ Indentation guides for Emacs.
 
 #+begin_src emacs-lisp
   (use-package highlight-indent-guides
-    :hook (prog-mode . highlight-indent-guides-mode)
+    :hook ((prog-mode . highlight-indent-guides-mode)
+           (aorst--load-theme . aorst/indent-guides-setup-faces))
     :custom
     (highlight-indent-guides-method (if (display-graphic-p) 'bitmap 'character))
-    (highlight-indent-guides-character ?▏) ;; ┊│┆
+    (highlight-indent-guides-character ?│) ;; ┊│┆▏
     (highlight-indent-guides-bitmap-function #'aorst/indent-guides-thin-line)
     (highlight-indent-guides-responsive 'top)
     (highlight-indent-guides-delay 0)
     :config
-    (defun aorst/indent-guides-thin-line (width height crep)
+    (defun aorst/indent-guides-setup-faces ()
+      (mapc (lambda (buffer)
+              (with-current-buffer buffer
+                (when highlight-indent-guides-mode
+                  (highlight-indent-guides-mode -1)
+                  (highlight-indent-guides-mode 1))))
+            (buffer-list)))
+    (defun aorst/indent-guides-thin-line (width height crep zrep)
       "Defines a solid guide line, one pixel wide."
       (let* ((right (- width 2))
-             (row (concat (make-string 1 ?0) (make-string 1 crep) (make-string right ?0)))
+             (row (append (make-list 1 zrep) (make-list 1 crep) (make-list right zrep)))
              rows)
         (dotimes (i height rows)
           (setq rows (cons row rows))))))
