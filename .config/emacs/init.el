@@ -274,10 +274,10 @@ Used in various places to avoid getting wrong line height when
 (when (aorst/font-installed-p "JetBrainsMono")
   (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
                      (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
-                     (?*  ,(regexp-opt '("*>"))) ;; "***" "*/"
+                     (?*  ,(regexp-opt '("*>" "***" "*/")))
                      (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                           "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
-                                           "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
+                                         "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
+                                         "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
                      (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
                      (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
                      (?!  ,(regexp-opt '("!==" "!!" "!=")))
@@ -289,7 +289,7 @@ Used in various places to avoid getting wrong line height when
                      (?\[ ,(regexp-opt '("[||]" "[<" "[|")))
                      (?\{ ,(regexp-opt '("{|")))
                      (?\? ,(regexp-opt '("??" "?." "?=" "?:")))
-                     (?#  ,(regexp-opt '("####" "###" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" "##")))
+                     (?#  ,(regexp-opt '("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(")))
                      (?\; ,(regexp-opt '(";;")))
                      (?_  ,(regexp-opt '("_|_" "__")))
                      (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
@@ -300,7 +300,7 @@ Used in various places to avoid getting wrong line height when
       (apply (lambda (char regexp)
                (set-char-table-range
                 composition-function-table
-                char `([,regexp 0 font-shape-gstring])))
+                char `([,(concat regexp "\\(\\_>\\|.\\)") 0 font-shape-gstring])))
              char-regexp))))
 
 (use-package composite

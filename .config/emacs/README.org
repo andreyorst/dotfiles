@@ -762,10 +762,10 @@ What's especially cool, is that we can specify which ligatures we want, by defin
   (when (aorst/font-installed-p "JetBrainsMono")
     (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
                        (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
-                       (?*  ,(regexp-opt '("*>"))) ;; "***" "*/"
+                       (?*  ,(regexp-opt '("*>" "***" "*/")))
                        (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                             "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
-                                             "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
+                                           "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
+                                           "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
                        (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
                        (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
                        (?!  ,(regexp-opt '("!==" "!!" "!=")))
@@ -777,7 +777,7 @@ What's especially cool, is that we can specify which ligatures we want, by defin
                        (?\[ ,(regexp-opt '("[||]" "[<" "[|")))
                        (?\{ ,(regexp-opt '("{|")))
                        (?\? ,(regexp-opt '("??" "?." "?=" "?:")))
-                       (?#  ,(regexp-opt '("####" "###" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" "##")))
+                       (?#  ,(regexp-opt '("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(")))
                        (?\; ,(regexp-opt '(";;")))
                        (?_  ,(regexp-opt '("_|_" "__")))
                        (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
@@ -788,7 +788,7 @@ What's especially cool, is that we can specify which ligatures we want, by defin
         (apply (lambda (char regexp)
                  (set-char-table-range
                   composition-function-table
-                  char `([,regexp 0 font-shape-gstring])))
+                  char `([,(concat regexp "\\(\\_>\\|.\\)") 0 font-shape-gstring])))
                char-regexp))))
 #+end_src
 
