@@ -576,7 +576,7 @@ offset variables."
 
 (defun aorst/mode-line-readonly ()
   (when (and buffer-read-only
-             (not (eq major-mode 'vterm-mode)))
+             (not (memq major-mode '(vterm-mode treemacs-mode))))
     (concat
      "  "
      (propertize

@@ -1175,7 +1175,7 @@ Read only state module for mode-line.
 #+begin_src emacs-lisp
   (defun aorst/mode-line-readonly ()
     (when (and buffer-read-only
-               (not (eq major-mode 'vterm-mode)))
+               (not (memq major-mode '(vterm-mode treemacs-mode))))
       (concat
        "  "
        (propertize
