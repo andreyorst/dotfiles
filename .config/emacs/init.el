@@ -284,35 +284,36 @@ Used in various places to avoid getting wrong line height when
        (set-face-attribute 'default nil :font "Source Code Pro 10")))
 
 (when (aorst/font-installed-p "JetBrainsMono")
-  (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
-                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
-                     (?*  ,(regexp-opt '("*>" "***" "*/")))
-                     (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                         "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
-                                         "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
+  (let ((ligatures `((?-  ,(concat (regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")) "\\_>"))
+                     (?/  ,(concat (regexp-opt '("///" "/=" "/==" "/>" "//")) "\\_>")) ;; "/*"
+                     (?*  ,(concat (regexp-opt '("*>" "***" "*/")) "\\_>"))
+                     (?<  ,(concat (regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
+                                                 "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
+                                                 "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--"))
+                                   "\\_>"))
                      (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
-                     (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
-                     (?!  ,(regexp-opt '("!==" "!!" "!=")))
+                     (?=  ,(concat (regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")) "\\_>"))
+                     (?!  ,(concat (regexp-opt '("!==" "!!" "!=")) "\\_>"))
                      (?>  ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
-                     (?&  ,(regexp-opt '("&&&" "&&")))
-                     (?|  ,(regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")))
-                     (?.  ,(regexp-opt '(".." ".?" ".=" ".-" "..<" "...")))
-                     (?+  ,(regexp-opt '("+++" "+>" "++")))
-                     (?\[ ,(regexp-opt '("[||]" "[<" "[|")))
-                     (?\{ ,(regexp-opt '("{|")))
-                     (?\? ,(regexp-opt '("??" "?." "?=" "?:")))
+                     (?&  ,(concat (regexp-opt '("&&&" "&&")) "\\_>"))
+                     (?|  ,(concat (regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")) "\\_>"))
+                     (?.  ,(concat (regexp-opt '(".." ".?" ".=" ".-" "..<" "...")) "\\_>"))
+                     (?+  ,(concat (regexp-opt '("+++" "+>" "++")) "\\_>"))
+                     (?\[ ,(concat (regexp-opt '("[||]" "[<" "[|")) "\\_>"))
+                     (?\{ ,(concat (regexp-opt '("{|")) "\\_>"))
+                     (?\? ,(concat (regexp-opt '("??" "?." "?=" "?:")) "\\_>"))
                      (?#  ,(regexp-opt '("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(")))
                      (?\; ,(regexp-opt '(";;")))
-                     (?_  ,(regexp-opt '("_|_" "__")))
-                     (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
-                     (?$  ,(regexp-opt '("$>")))
-                     (?^  ,(regexp-opt '("^=")))
+                     (?_  ,(concat (regexp-opt '("_|_" "__")) "\\_>"))
+                     (?~  ,(concat (regexp-opt '("~~" "~~>" "~>" "~-" "~@")) "\\_>"))
+                     (?$  ,(concat (regexp-opt '("$>")) "\\_>"))
+                     (?^  ,(concat (regexp-opt '("^=")) "\\_>"))
                      (?\] ,(regexp-opt '("]#"))))))
     (dolist (char-regexp ligatures)
       (apply (lambda (char regexp)
                (set-char-table-range
                 composition-function-table
-                char `([,(concat regexp "\\(\\_>\\|.\\)") 0 font-shape-gstring])))
+                char `([,regexp 0 font-shape-gstring])))
              char-regexp))))
 
 (use-package composite
