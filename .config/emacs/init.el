@@ -831,7 +831,10 @@ offset variables."
 (use-package tab-line
   :straight nil
   :unless (version< emacs-version "27")
-  :hook (after-init . global-tab-line-mode)
+  :hook ((after-init . global-tab-line-mode)
+         ((aorst--load-theme
+           aorst--disable-theme
+           aorst--solaire-swap-bg) . aorst/tabline-setup-faces))
   :config
   (defun tab-line-close-tab (&optional e)
     "Close the selected tab.
@@ -1014,9 +1017,6 @@ truncates text if needed.  Minimal width can be set with
                           :box (when (> box-width 0) (list :line-width box-width :color bg)))))
 
   (aorst/tabline-setup-faces)
-  (add-hook 'aorst--load-theme-hook #'aorst/tabline-setup-faces)
-  (add-hook 'aorst--disable-theme-hook #'aorst/tabline-setup-faces)
-  (add-hook 'aorst--solaire-swap-bg-hook #'aorst/tabline-setup-faces)
 
   (defun aorst/tab-line-drop-caches ()
     "Drops `tab-line' cache in every window."
