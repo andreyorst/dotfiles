@@ -385,7 +385,6 @@ Used in various places to avoid getting wrong line height when
   (org-level-8 ((t (:inherit outline-2))))
   (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
-  (fill-column-indicator ((t (:inherit font-lock-comment-face))))
   :config
   (if (display-graphic-p)
       (load-theme 'doom-one-light t)
@@ -2002,6 +2001,20 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom
   (show-paren-when-point-in-periphery t)
   (show-paren-delay 0))
+
+(use-package display-fill-column-indicator
+  :straight nil
+  :hook (((aorst--load-theme aorst--disable-theme) . aorst/display-fill-column-indicator-setup-faces)
+         (prog-mode . display-fill-column-indicator-mode))
+  :custom
+  (display-fill-column-indicator-character ?▏)
+  (display-fill-column-indicator-column 120)
+  :config
+  (defun aorst/display-fill-column-indicator-setup-faces ()
+    (if (eq (frame-parameter nil 'background-mode) 'dark)
+        (set-face-attribute 'fill-column-indicator nil :foreground "gray30" :inherit nil)
+      (set-face-attribute 'fill-column-indicator nil :foreground "gray90" :inherit nil)))
+  (aorst/display-fill-column-indicator-setup-faces))
 
 (provide 'init)
 ;;; init.el ends here

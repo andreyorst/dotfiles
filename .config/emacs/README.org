@@ -904,7 +904,6 @@ But it is also an amazingly well put set of themes, which define colors for pret
     (org-level-8 ((t (:inherit outline-2))))
     (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
     (font-lock-comment-face ((t (:background unspecified))))
-    (fill-column-indicator ((t (:inherit font-lock-comment-face))))
     :config
     (if (display-graphic-p)
         (load-theme 'doom-one-light t)
@@ -3277,6 +3276,25 @@ Some tweaks to inbuilt parenthesis highlighting mode.
     :custom
     (show-paren-when-point-in-periphery t)
     (show-paren-delay 0))
+#+end_src
+
+** Fill column indicaror
+Emacs 27 added direct support for fill column indicator, which displays thin line at the desired column.
+
+#+begin_src emacs-lisp
+  (use-package display-fill-column-indicator
+    :straight nil
+    :hook (((aorst--load-theme aorst--disable-theme) . aorst/display-fill-column-indicator-setup-faces)
+           (prog-mode . display-fill-column-indicator-mode))
+    :custom
+    (display-fill-column-indicator-character ?▏)
+    (display-fill-column-indicator-column 120)
+    :config
+    (defun aorst/display-fill-column-indicator-setup-faces ()
+      (if (eq (frame-parameter nil 'background-mode) 'dark)
+          (set-face-attribute 'fill-column-indicator nil :foreground "gray30" :inherit nil)
+        (set-face-attribute 'fill-column-indicator nil :foreground "gray90" :inherit nil)))
+    (aorst/display-fill-column-indicator-setup-faces))
 #+end_src
 
 * Postscript
