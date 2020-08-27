@@ -2480,7 +2480,7 @@ Some languages have better support with =flycheck=.
            ("C-c ! C-h" . hydrant/flycheck/body))
     :custom
     (flycheck-indication-mode 'right-fringe)
-    (flycheck-display-error-messages #'ignore)
+    (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
     :config
     (when (fboundp #'define-fringe-bitmap)
       (define-fringe-bitmap 'flycheck-double-exclamation-mark
@@ -3245,8 +3245,8 @@ Indentation guides for Emacs.
     :hook ((prog-mode . highlight-indent-guides-mode)
            (aorst--load-theme . aorst/indent-guides-setup-faces))
     :custom
-    (highlight-indent-guides-method (if (display-graphic-p) 'bitmap 'character))
-    (highlight-indent-guides-character ?│) ;; ┊│┆▏
+    (highlight-indent-guides-method 'character)
+    (highlight-indent-guides-character ?▏) ;; ┊│┆▏
     (highlight-indent-guides-bitmap-function #'aorst/indent-guides-thin-line)
     (highlight-indent-guides-responsive 'top)
     (highlight-indent-guides-delay 0)

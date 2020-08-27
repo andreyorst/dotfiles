@@ -1447,7 +1447,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c ! C-h" . hydrant/flycheck/body))
   :custom
   (flycheck-indication-mode 'right-fringe)
-  (flycheck-display-error-messages #'ignore)
+  (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
   :config
   (when (fboundp #'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-double-exclamation-mark
