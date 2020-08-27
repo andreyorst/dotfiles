@@ -55,24 +55,36 @@ for stopping scrolling scroll from going beyond longest line.
 Based on `so-long-detected-long-line-p'."
     (save-excursion
       (goto-char (point-min))
-      (let ((threshold (+ (window-width)
-                          (window-hscroll)
-                          ;; cancel line numbers width
-                          (or (and display-line-numbers-mode
-                                   (- display-line-numbers-width)) 0)
-                          ;; cancel fringe widths
-                          -2)))
+      (let* ((window-width
+              ;; this computes a more accurate width rather than `window-width', and respects
+              ;; `text-scale-mode' font width.
+              (/ (window-body-width nil t) (window-font-width)))
+             (hscroll-offset
+              ;; `window-hscroll' returns columns that are not affected by `text-scale-mode'.
+              ;; Because of that we have to recompute correct `window-hscroll' by multiplying
+              ;; it with a non-scaled value, and divide with scaled width value, and round it
+              ;; to upper boundary.  Since there's no way to get unscaled value, we have to
+              ;; get width of a face that is not scaled by `text-scale-mode', such as
+              ;; `window-divider' face.
+              (ceiling (/ (* (window-hscroll) (window-font-width nil 'window-divider))
+                          (float (window-font-width)))))
+             (line-number-width
+              ;; compensate line numbers width
+              (or (and display-line-numbers-mode
+                       (- display-line-numbers-width))
+                  0))
+             (threshold (+ window-width hscroll-offset line-number-width -4)))
         (catch 'excessive
-          (while (not (eobp))
-            (setq start (point))
-            (save-restriction
-              (narrow-to-region start (min (+ start 1 threshold)
-                                           (point-max)))
-              (forward-line 1))
-            (unless (or (bolp)
-                        (and (eobp) (<= (- (point) start)
-                                        threshold)))
-              (throw 'excessive t)))))))
+         (while (not (eobp))
+           (setq start (point))
+           (save-restriction
+             (narrow-to-region start (min (+ start 1 threshold)
+                                          (point-max)))
+             (forward-line 1))
+           (unless (or (bolp)
+                       (and (eobp) (<= (- (point) start)
+                                       threshold)))
+             (throw 'excessive t)))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
     (when (aorst/truncated-lines-p)
       (funcall foo arg set-minimum)))
