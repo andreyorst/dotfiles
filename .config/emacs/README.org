@@ -2621,8 +2621,7 @@ Not as strict as Emacs Lisp implementation, because it does not force any format
             common-lisp-mode
             scheme-mode
             lisp-mode
-            racket-mode
-            fennel-mode) . parinfer-rust-mode)
+            racket-mode) . parinfer-rust-mode)
     :custom (parinfer-rust-check-before-enable 'defer)
     :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
     :config

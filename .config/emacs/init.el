@@ -1565,8 +1565,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           common-lisp-mode
           scheme-mode
           lisp-mode
-          racket-mode
-          fennel-mode) . parinfer-rust-mode)
+          racket-mode) . parinfer-rust-mode)
   :custom (parinfer-rust-check-before-enable 'defer)
   :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
   :config
