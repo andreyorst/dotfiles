@@ -1187,7 +1187,9 @@ Read only state module for mode-line.
 #+begin_src emacs-lisp
   (defun aorst/mode-line-readonly ()
     (when (and buffer-read-only
-               (not (memq major-mode '(vterm-mode treemacs-mode))))
+               (not (memq major-mode '(vterm-mode
+                                       treemacs-mode
+                                       xref--xref-buffer-mode))))
       (concat
        "  "
        (propertize
@@ -1927,6 +1929,7 @@ I primary use it for taking notes on different programming languages, and manage
     (org-log-done t)
     (org-agenda-files '("~/Tasks"))
     (org-image-actual-width nil)
+    (org-src-window-setup 'other-window)
     :config
     (defun aorst/get-system-font-scale ()
       (if (executable-find "gsettings")
@@ -3292,8 +3295,14 @@ Emacs 27 added direct support for fill column indicator, which displays thin lin
     :config
     (defun aorst/display-fill-column-indicator-setup-faces ()
       (if (eq (frame-parameter nil 'background-mode) 'dark)
-          (set-face-attribute 'fill-column-indicator nil :foreground "gray30" :inherit nil)
-        (set-face-attribute 'fill-column-indicator nil :foreground "gray90" :inherit nil)))
+          (set-face-attribute 'fill-column-indicator nil
+                              :foreground "gray30"
+                              :distant-foreground "gray30"
+                              :inherit nil)
+        (set-face-attribute 'fill-column-indicator nil
+                            :foreground "gray80"
+                            :distant-foreground "gray80"
+                            :inherit nil)))
     (aorst/display-fill-column-indicator-setup-faces))
 #+end_src
 

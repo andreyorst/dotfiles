@@ -588,7 +588,9 @@ offset variables."
 
 (defun aorst/mode-line-readonly ()
   (when (and buffer-read-only
-             (not (memq major-mode '(vterm-mode treemacs-mode))))
+             (not (memq major-mode '(vterm-mode
+                                     treemacs-mode
+                                     xref--xref-buffer-mode))))
     (concat
      "  "
      (propertize
@@ -1067,6 +1069,7 @@ truncates text if needed.  Minimal width can be set with
   (org-log-done t)
   (org-agenda-files '("~/Tasks"))
   (org-image-actual-width nil)
+  (org-src-window-setup 'other-window)
   :config
   (defun aorst/get-system-font-scale ()
     (if (executable-find "gsettings")
@@ -2012,8 +2015,14 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config
   (defun aorst/display-fill-column-indicator-setup-faces ()
     (if (eq (frame-parameter nil 'background-mode) 'dark)
-        (set-face-attribute 'fill-column-indicator nil :foreground "gray30" :inherit nil)
-      (set-face-attribute 'fill-column-indicator nil :foreground "gray90" :inherit nil)))
+        (set-face-attribute 'fill-column-indicator nil
+                            :foreground "gray30"
+                            :distant-foreground "gray30"
+                            :inherit nil)
+      (set-face-attribute 'fill-column-indicator nil
+                          :foreground "gray80"
+                          :distant-foreground "gray80"
+                          :inherit nil)))
   (aorst/display-fill-column-indicator-setup-faces))
 
 (provide 'init)
