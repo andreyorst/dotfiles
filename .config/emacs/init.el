@@ -1069,7 +1069,6 @@ truncates text if needed.  Minimal width can be set with
   (org-log-done t)
   (org-agenda-files '("~/Tasks"))
   (org-image-actual-width nil)
-  (org-src-window-setup 'other-window)
   :config
   (defun aorst/get-system-font-scale ()
     (if (executable-find "gsettings")
