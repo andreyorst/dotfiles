@@ -1683,6 +1683,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :bind (("<f12>" . magit-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
+  (magit-diff-refine-ignore-whitespace nil)
+  (magit-diff-refine-hunk 'all)
   :config
   (advice-add 'magit-set-header-line-format :override #'ignore))
 

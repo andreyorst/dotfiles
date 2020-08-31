@@ -2788,6 +2788,8 @@ I've heard that it has many nice features, so I want to try it out.
     :bind (("<f12>" . magit-status))
     :custom
     (magit-ediff-dwim-show-on-hunks t)
+    (magit-diff-refine-ignore-whitespace nil)
+    (magit-diff-refine-hunk 'all)
     :config
     (advice-add 'magit-set-header-line-format :override #'ignore))
 #+end_src
