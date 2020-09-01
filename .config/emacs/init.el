@@ -249,6 +249,29 @@ are defining or executing a macro."
         (when (looking-at "^$")
           (backward-delete-char 1))))))
 
+(defun aorst/create-accent-face (face ref-face)
+  "Set FACE background to accent color by blending REF-FACE foreground and background.
+Depends on `doom-blend'."
+  (let ((fg (face-attribute ref-face :foreground))
+        (bg (face-attribute ref-face :background)))
+    (if (and (stringp fg)
+             (stringp bg)
+             (fboundp #'doom-blend))
+        (set-face-attribute face nil
+                            :foreground fg
+                            :weight 'bold
+                            :background (doom-blend bg fg 0.85)
+                            :inherit nil
+                            :extend t
+                            :inverse-video nil)
+      (set-face-attribute face nil
+                          :foreground nil
+                          :background nil
+                          :weight 'bold
+                          :inherit ref-face
+                          :extend t
+                          :inverse-video t))))
+
 (use-package startup
   :no-require t
   :straight nil
@@ -1718,13 +1741,21 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package diff
   :straight nil
+  :after magit
+  :hook (aorst--load-theme . aorst/diff-setup-faces)
   :custom-face
   (diff-added ((t (:foreground unspecified
                    :background unspecified
-                   :inherit ediff-current-diff-B))))
+                   :inherit magit-diff-added))))
   (diff-removed ((t (:foreground unspecified
                      :background unspecified
-                     :inherit ediff-current-diff-A)))))
+                     :inherit magit-diff-removed))))
+  :config
+  (defun aorst/diff-setup-faces ()
+    (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
+                              (diff-refine-removed magit-diff-removed-highlight)))
+      (apply #'aorst/create-accent-face face-reference)))
+  (aorst/diff-setup-faces))
 
 (use-package phi-search)
 (use-package mc-extras)

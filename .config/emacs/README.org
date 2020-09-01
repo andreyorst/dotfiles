@@ -699,6 +699,33 @@ I can write text as normal, fill it if I feel like it, and then reformat it with
             (backward-delete-char 1))))))
 #+end_src
 
+** =create-accent-face=
+
+#+begin_src emacs-lisp
+  (defun aorst/create-accent-face (face ref-face)
+    "Set FACE background to accent color by blending REF-FACE foreground and background.
+  Depends on `doom-blend'."
+    (let ((fg (face-attribute ref-face :foreground))
+          (bg (face-attribute ref-face :background)))
+      (if (and (stringp fg)
+               (stringp bg)
+               (fboundp #'doom-blend))
+          (set-face-attribute face nil
+                              :foreground fg
+                              :weight 'bold
+                              :background (doom-blend bg fg 0.85)
+                              :inherit nil
+                              :extend t
+                              :inverse-video nil)
+        (set-face-attribute face nil
+                            :foreground nil
+                            :background nil
+                            :weight 'bold
+                            :inherit ref-face
+                            :extend t
+                            :inverse-video t))))
+#+end_src
+
 * User Interface
 Packages that affect user interface.
 
@@ -2804,7 +2831,6 @@ Display TODO items in Magit buffers.
 
 ** Ediff
 This is a built in mode for diffing files in Emacs.
-Previously I was using [[https://github.com/justbur/emacs-vdiff][Vdiff]] but I have to say that I've used it so rarely, so I decided to avoid extra dependency and configure Ediff.
 
 #+begin_src emacs-lisp
   (use-package ediff
@@ -2839,13 +2865,21 @@ Some tweaks to inbuild diff mode.
 #+begin_src emacs-lisp
   (use-package diff
     :straight nil
+    :after magit
+    :hook (aorst--load-theme . aorst/diff-setup-faces)
     :custom-face
     (diff-added ((t (:foreground unspecified
                      :background unspecified
-                     :inherit ediff-current-diff-B))))
+                     :inherit magit-diff-added))))
     (diff-removed ((t (:foreground unspecified
                        :background unspecified
-                       :inherit ediff-current-diff-A)))))
+                       :inherit magit-diff-removed))))
+    :config
+    (defun aorst/diff-setup-faces ()
+      (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
+                                (diff-refine-removed magit-diff-removed-highlight)))
+        (apply #'aorst/create-accent-face face-reference)))
+    (aorst/diff-setup-faces))
 #+end_src
 
 ** Multiple Cursors
