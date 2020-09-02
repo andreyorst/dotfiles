@@ -452,10 +452,7 @@ Used in various places to avoid getting wrong line height when
 
 (defun aorst/mode-line-buffer-name ()
   (when-let ((name (buffer-file-name)))
-    (propertize (concat "  " (file-name-nondirectory name))
-                'help-echo (concat (abbreviate-file-name name)
-                                   (when (buffer-modified-p)
-                                     (if (char-displayable-p ?💾) " 💾" " [modified]"))))))
+    (concat "  " (abbreviate-file-name name))))
 
 (defun aorst/mode-line-buffer-modified ()
   (when (and buffer-file-name (buffer-modified-p))
@@ -701,6 +698,7 @@ offset variables."
   :custom
   (mini-modeline-right-padding 2)
   (mini-modeline-display-gui-line nil)
+  (mini-modeline-l-format '(:eval (string-trim-left (aorst/mode-line-buffer-name))))
   (mini-modeline-r-format
    '(:eval (concat
             (aorst/mode-line-buffer-modified)

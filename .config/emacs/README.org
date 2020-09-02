@@ -1010,10 +1010,7 @@ Returns buffer name or empty string if buffer is special and starts from space.
 #+begin_src emacs-lisp
   (defun aorst/mode-line-buffer-name ()
     (when-let ((name (buffer-file-name)))
-      (propertize (concat "  " (file-name-nondirectory name))
-                  'help-echo (concat (abbreviate-file-name name)
-                                     (when (buffer-modified-p)
-                                       (if (char-displayable-p ?💾) " 💾" " [modified]"))))))
+      (concat "  " (abbreviate-file-name name))))
 #+end_src
 
 **** =mode-line-buffer-modified=
@@ -1325,6 +1322,7 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
     :custom
     (mini-modeline-right-padding 2)
     (mini-modeline-display-gui-line nil)
+    (mini-modeline-l-format '(:eval (string-trim-left (aorst/mode-line-buffer-name))))
     (mini-modeline-r-format
      '(:eval (concat
               (aorst/mode-line-buffer-modified)
