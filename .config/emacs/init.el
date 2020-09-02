@@ -610,7 +610,8 @@ offset variables."
   (when (and buffer-read-only
              (not (memq major-mode '(vterm-mode
                                      treemacs-mode
-                                     xref--xref-buffer-mode))))
+                                     xref--xref-buffer-mode
+                                     magit-status-mode))))
     (concat
      "  "
      (propertize
