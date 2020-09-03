@@ -211,8 +211,7 @@ are defining or executing a macro."
         (t
          (unless (or defining-kbd-macro
                      executing-kbd-macro)
-           (keyboard-quit))))
-  (message this-command))
+           (keyboard-quit)))))
 (global-set-key [remap keyboard-quit] #'aorst/escape)
 
 (defun aorst/font-installed-p (font-name)

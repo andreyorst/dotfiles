@@ -644,8 +644,7 @@ This function intelligently tries to cancel regardless of active window:
           (t
            (unless (or defining-kbd-macro
                        executing-kbd-macro)
-             (keyboard-quit))))
-    (message this-command))
+             (keyboard-quit)))))
   (global-set-key [remap keyboard-quit] #'aorst/escape)
 #+end_src
 
