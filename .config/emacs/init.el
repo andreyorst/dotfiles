@@ -271,6 +271,19 @@ Depends on `doom-blend'."
                           :extend t
                           :inverse-video t))))
 
+(defmacro doto (x &rest forms)
+  "Evaluates x then calls all of the functions with the value of
+x supplied at the front of the given arguments.  The forms are
+evaluated in order.  Returns x."
+  (let ((gx (gensym)))
+    `(let ((,gx ,x))
+       ,@(mapcar (lambda (f)
+                   (if (listp f)
+                       `(,(car f) ,gx ,@(cdr f))
+                     `(,f ,gx)))
+                 forms)
+       ,gx)))
+
 (use-package startup
   :no-require t
   :straight nil
@@ -466,9 +479,8 @@ Used in various places to avoid getting wrong line height when
    (propertize
     "%C:%l"
     'help-echo "goto line"
-    'local-map (let ((map (make-sparse-keymap)))
-                 (define-key map [mode-line mouse-1] #'goto-line)
-                 map))))
+    'local-map (doto (make-sparse-keymap)
+                     (define-key [mode-line mouse-1] #'goto-line)))))
 
 (defun aorst/mode-line-line-encoding ()
   (when-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
@@ -486,9 +498,8 @@ Used in various places to avoid getting wrong line height when
                            ("CRLF" "DOS style CRLF")
                            ("CR" "Mac style CR")
                            (_ "Undecided")))
-      'local-map (let ((map (make-sparse-keymap)))
-                   (define-key map [mode-line mouse-1] 'mode-line-change-eol)
-                   map)))))
+      'local-map (doto (make-sparse-keymap)
+                       (define-key [mode-line mouse-1] 'mode-line-change-eol))))))
 
 (defun aorst/mode-line-input-method ()
   (when current-input-method
@@ -559,9 +570,8 @@ there's no previous result of this function stored."
                                        "\nmouse-1: toggle indent-"
                                        (if indent-tabs-mode "spaces" "tabs")
                                        "-mode")
-                    'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [mode-line mouse-1] 'aorst/toggle-indent-mode)
-                                 map))))))
+                    'local-map (doto (make-sparse-keymap)
+                                     (define-key [mode-line mouse-1] 'aorst/toggle-indent-mode)))))))
   aorst--mode-line--indent-mode-string)
 
 (defun aorst/mode-line--get-indent-var ()
@@ -614,17 +624,10 @@ offset variables."
     (concat
      "  "
      (propertize
-       (if (char-displayable-p ?🔒) "🔒" "RO")
-       'help-echo "Make file writable"
-       'local-map (let ((map (make-sparse-keymap)))
-                    (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
-                    map)))))
-    ;; (propertize
-    ;;  (if (char-displayable-p ?🔓) "🔓" "RW")
-    ;;  'help-echo "Make file read only"
-    ;;  'local-map (let ((map (make-sparse-keymap)))
-    ;;               (define-key map [mode-line mouse-1] 'mode-line-toggle-read-only)
-    ;;               map))))
+      (if (char-displayable-p ?🔒) "🔒" "RO")
+      'help-echo "Make file writable"
+      'local-map (doto (make-sparse-keymap)
+                       (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))))
 
 (defun aorst/mode-line-flycheck ()
   (when (bound-and-true-p flycheck-mode)
@@ -654,9 +657,8 @@ offset variables."
                      (propertize (concat "Parinfer: " parinfer-rust--mode)
                                  'help-echo (concat "Parinfer " parinfer-rust--mode
                                                     " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
-                                 'local-map (let ((map (make-sparse-keymap)))
-                                              (define-key map [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode)
-                                              map)))
+                                 'local-map (doto (make-sparse-keymap)
+                                              (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
                     ((bound-and-true-p paredit-mode)
                      (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
                     ((bound-and-true-p lispy-mode)
