@@ -1863,6 +1863,7 @@ I want to customize tab appearance to match my theme.
                                    term-mode
                                    vterm-mode))
 
+
     (defun aorst/tabline-setup-faces ()
       (let ((bg (if (and (facep 'solaire-default-face)
                          (not (eq (face-attribute 'solaire-default-face :background)
@@ -2484,8 +2485,6 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
                    (switch-to-buffer bufname))
                   (t (let ((default-directory directory))
                        (vterm bufname))))
-            (when (bound-and-true-p global-tab-line-mode)
-              (setq tab-line-format nil))
             (set-window-dedicated-p window t)
             (set-window-parameter window 'no-delete-other-windows t)
             (when side

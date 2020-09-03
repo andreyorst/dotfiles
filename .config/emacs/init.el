@@ -1003,6 +1003,7 @@ truncates text if needed.  Minimal width can be set with
                                  term-mode
                                  vterm-mode))
 
+
   (defun aorst/tabline-setup-faces ()
     (let ((bg (if (and (facep 'solaire-default-face)
                        (not (eq (face-attribute 'solaire-default-face :background)
@@ -1446,8 +1447,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                  (switch-to-buffer bufname))
                 (t (let ((default-directory directory))
                      (vterm bufname))))
-          (when (bound-and-true-p global-tab-line-mode)
-            (setq tab-line-format nil))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
           (when side
