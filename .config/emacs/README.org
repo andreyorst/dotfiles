@@ -210,6 +210,7 @@ We do it as early as possible, as it is important to load these settings before 
 
 ** COMMENT =package.el=
 #+begin_comment
+If you're reading this, then you're probably reading the source of this file and not rendered version.
 This section is commented because I'm no longer using =package.el= as my package manager.
 Instead I'm using =straight.el=, which provides more facilites, and does not have most of =package.el= problems.
 However, I still keep this configuration, since I might switch back, and I would not want to configure everything again.
@@ -272,7 +273,7 @@ And we need a variable that holds amount of hours that will trigger the refresh:
 This advice first checks if our date-time string exists, and then checks if there's more than 24 hours passed since last check.
 
 #+begin_src emacs-lisp
-  (define-advice package-install (:before (&rest _))
+  (define-advice package-install (:before (&rest _) aorst:package-install)
     (let ((seconds-per-hour 3600))
       (when (or (null package-last-refresh-date)
                 (> (/ (float-time
@@ -287,7 +288,7 @@ Now all packages that use =package-install= should periodically refresh package 
 In order to update time we also have to advice =package-refresh-contents=:
 
 #+begin_src emacs-lisp
-  (define-advice package-refresh-contents (:after (&rest _))
+  (define-advice package-refresh-contents (:after (&rest _) aorst:package-refresh-contents)
     (customize-save-variable 'package-last-refresh-date (format-time-string "%Y-%m-%dT%H:%M")))
 #+end_src
 
