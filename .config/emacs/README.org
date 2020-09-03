@@ -2880,10 +2880,10 @@ Some tweaks to inbuild diff mode.
     :custom-face
     (diff-added ((t (:foreground unspecified
                      :background unspecified
-                     :inherit magit-diff-added))))
+                     :inherit magit-diff-added-highlight))))
     (diff-removed ((t (:foreground unspecified
                        :background unspecified
-                       :inherit magit-diff-removed))))
+                       :inherit magit-diff-removed-highlight))))
     :config
     (defun aorst/diff-setup-faces ()
       (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)

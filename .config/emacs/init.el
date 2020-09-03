@@ -1745,10 +1745,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom-face
   (diff-added ((t (:foreground unspecified
                    :background unspecified
-                   :inherit magit-diff-added))))
+                   :inherit magit-diff-added-highlight))))
   (diff-removed ((t (:foreground unspecified
                      :background unspecified
-                     :inherit magit-diff-removed))))
+                     :inherit magit-diff-removed-highlight))))
   :config
   (defun aorst/diff-setup-faces ()
     (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
