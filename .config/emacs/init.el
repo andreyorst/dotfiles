@@ -259,7 +259,7 @@ Depends on `doom-blend'."
         (set-face-attribute face nil
                             :foreground fg
                             :weight 'bold
-                            :background (doom-blend bg fg 0.85)
+                            :background (doom-blend bg fg 0.8)
                             :inherit nil
                             :extend t
                             :inverse-video nil)
