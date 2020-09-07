@@ -11,17 +11,18 @@ pm_yay() {
     cmd="$1"
     shift
     case "$cmd" in
-        (update)  yay -Syyu \
-                      --noconfirm \
-                      --devel \
-                      --nodiffmenu \
-                      --noeditmenu \
-                      --noupgrademenu \
-                      --removemake "$@" ;;
-        (install) yay -Sy "$@" ;;
-        (remove)  yay -Rsc "$@" ;;
-        (search)  yay -Ss "$@" ;;
-        (*)       yay "$cmd" "$@" ;;
+        (update)     yay -Syyu \
+                         --noconfirm \
+                         --devel \
+                         --nodiffmenu \
+                         --noeditmenu \
+                         --noupgrademenu \
+                         --removemake "$@" ;;
+        (install)    yay -Sy "$@" ;;
+        (remove)     yay -Rsc "$@" ;;
+        (autoremove) yay -C "$@" ;;
+        (search)     yay -Ss "$@" ;;
+        (*)          yay "$cmd" "$@" ;;
     esac
 }
 
@@ -29,16 +30,17 @@ pm_packman() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) sudo pacman -Sy "$@" ;;
-        (update)  sudo pacman -Syyu --noconfirm "$@" ;;
-        (remove)  sudo pacman -Rsc "$@" ;;
-        (search)  pacman -Ss "$@" ;;
-        (list)    case $1 in
-                      (all) pacman -Qe ;;
-                      (*)   echo "wrong argument for 'list'" >&2
-                            return 1 ;;
-                  esac ;;
-        (*)       pacman "$cmd" "$@" ;;
+        (install)    sudo pacman -Sy "$@" ;;
+        (update)     sudo pacman -Syyu --noconfirm "$@" ;;
+        (remove)     sudo pacman -Rsc "$@" ;;
+        (autoremove) pacman -Qtdq "$@" | sudo pacman -Rns - ;;
+        (search)     pacman -Ss "$@" ;;
+        (list)       case $1 in
+                         (all) pacman -Qe ;;
+                         (*)   echo "wrong argument for 'list'" >&2
+                               return 1 ;;
+                     esac ;;
+        (*)          pacman "$cmd" "$@" ;;
     esac
 }
 
@@ -46,17 +48,18 @@ pm_dnf() {
     cmd="$1"
     shift
     case "$cmd" in
-        (install) sudo dnf install "$@" ;;
-        (update)  sudo dnf upgrade "$@" ;;
-        (remove)  sudo dnf remove "$@" ;;
-        (search)  dnf search "$@" ;;
-        (list)    case $1 in
-                      (all)       dnf list all ;;
-                      (installed) dnf list installed ;;
-                      (*)         echo "wrong argument for 'list'" >&2
-                                  return 1 ;;
-                  esac ;;
-        (*)       dnf "$cmd" "$@" ;;
+        (install)    sudo dnf install "$@" ;;
+        (update)     sudo dnf upgrade "$@" ;;
+        (remove)     sudo dnf remove "$@" ;;
+        (autoremove) sudo dnf autoremove "$@" ;;
+        (search)     dnf search "$@" ;;
+        (list)       case $1 in
+                         (all)       dnf list all ;;
+                         (installed) dnf list installed ;;
+                         (*)         echo "wrong argument for 'list'" >&2
+                                     return 1 ;;
+                     esac ;;
+        (*)          dnf "$cmd" "$@" ;;
     esac
 }
 
