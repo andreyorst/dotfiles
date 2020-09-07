@@ -1253,7 +1253,7 @@ Flycheck module for mode-line.
       (concat
        "  "
        (pcase flycheck-last-status-change
-         (`not-checked (propertize "-" 'help-echo "Flycheck: not checked"))
+         (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
          (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
          (`running (propertize "*" 'help-echo "Flycheck: checking"))
          (`errored (propertize "!" 'help-echo "Flycheck: error"))
@@ -2426,6 +2426,14 @@ Json support for Emacs.
     :custom (js-indent-level 2))
 #+end_src
 
+** Shell script
+
+#+begin_src emacs-lisp
+  (use-package sh-script
+    :straight nil
+    :hook (sh-mode . flycheck-mode))
+#+end_src
+
 * Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 
@@ -2836,7 +2844,12 @@ Display TODO items in Magit buffers.
 
 #+begin_src emacs-lisp
   (use-package magit-todos
-    :hook (magit-mode . magit-todos-mode))
+    :after magit
+    :config
+    (let ((inhibit-message t))
+      (magit-todos-mode 1))
+    (transient-append-suffix 'magit-status-jump '(0 0 -1)
+      '("T " "Todos" magit-todos-jump-to-todos)))
 #+end_src
 
 ** Ediff

@@ -634,7 +634,7 @@ offset variables."
     (concat
      "  "
      (pcase flycheck-last-status-change
-       (`not-checked (propertize "-" 'help-echo "Flycheck: not checked"))
+       (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
        (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
        (`running (propertize "*" 'help-echo "Flycheck: checking"))
        (`errored (propertize "!" 'help-echo "Flycheck: error"))
@@ -1406,6 +1406,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :hook (json-mode . flycheck-mode)
   :custom (js-indent-level 2))
 
+(use-package sh-script
+  :straight nil
+  :hook (sh-mode . flycheck-mode))
+
 (use-package help
   :straight nil
   :custom (help-window-select t))
@@ -1711,7 +1715,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (advice-add 'magit-set-header-line-format :override #'ignore))
 
 (use-package magit-todos
-  :hook (magit-mode . magit-todos-mode))
+  :after magit
+  :config
+  (let ((inhibit-message t))
+    (magit-todos-mode 1))
+  (transient-append-suffix 'magit-status-jump '(0 0 -1)
+    '("T " "Todos" magit-todos-jump-to-todos)))
 
 (use-package ediff
   :straight nil
