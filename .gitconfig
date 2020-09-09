@@ -11,3 +11,5 @@
 	bra = branch -a
 [include]
 	path = .gitconfig.local
+[core]
+	autocrlf = true
