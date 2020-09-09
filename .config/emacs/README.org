@@ -2280,10 +2280,13 @@ It is one of the few modern and refreshing languages, that bring both innovation
 
 #+begin_src emacs-lisp
   (use-package clojure-mode
-    :hook (((clojure-mode clojurescript-mode) . flycheck-mode))
+    :hook (((clojure-mode
+             clojurec-mode
+             clojurescript-mode) . flycheck-mode))
     :bind (:map clojure-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)
            ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
+    :custom (clojure-indent-style 'always-indent)
     :config
     (defun aorst/clojure-toggle-ignore-form ()
       "Add or remove #_ literal before the current form."
@@ -2349,6 +2352,13 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
     :hook ((cider-mode . clj-refactor-mode)
            (cider-mode . yas-minor-mode))
     :custom (cljr-suppress-no-project-warning nil))
+#+end_src
+
+*** Kibit
+Integration package for Kibit linter.
+
+#+begin_src emacs-lisp
+  (use-package kibit-helper)
 #+end_src
 
 ** Fennel

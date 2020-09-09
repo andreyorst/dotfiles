@@ -1322,10 +1322,13 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
-  :hook (((clojure-mode clojurescript-mode) . flycheck-mode))
+  :hook (((clojure-mode
+           clojurec-mode
+           clojurescript-mode) . flycheck-mode))
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
          ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
+  :custom (clojure-indent-style 'always-indent)
   :config
   (defun aorst/clojure-toggle-ignore-form ()
     "Add or remove #_ literal before the current form."
@@ -1375,6 +1378,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :hook ((cider-mode . clj-refactor-mode)
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning nil))
+
+(use-package kibit-helper)
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
