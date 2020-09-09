@@ -275,6 +275,7 @@ Depends on `doom-blend'."
   "Evaluates x then calls all of the functions with the value of
 x supplied at the front of the given arguments.  The forms are
 evaluated in order.  Returns x."
+  (declare (indent defun))
   (let ((gx (gensym)))
     `(let ((,gx ,x))
        ,@(mapcar (lambda (f)
@@ -480,7 +481,7 @@ Used in various places to avoid getting wrong line height when
     "%C:%l"
     'help-echo "goto line"
     'local-map (doto (make-sparse-keymap)
-                     (define-key [mode-line mouse-1] #'goto-line)))))
+                 (define-key [mode-line mouse-1] #'goto-line)))))
 
 (defun aorst/mode-line-line-encoding ()
   (when-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
@@ -499,7 +500,7 @@ Used in various places to avoid getting wrong line height when
                            ("CR" "Mac style CR")
                            (_ "Undecided")))
       'local-map (doto (make-sparse-keymap)
-                       (define-key [mode-line mouse-1] 'mode-line-change-eol))))))
+                   (define-key [mode-line mouse-1] 'mode-line-change-eol))))))
 
 (defun aorst/mode-line-input-method ()
   (when current-input-method
@@ -571,7 +572,7 @@ there's no previous result of this function stored."
                                        (if indent-tabs-mode "spaces" "tabs")
                                        "-mode")
                     'local-map (doto (make-sparse-keymap)
-                                     (define-key [mode-line mouse-1] 'aorst/toggle-indent-mode)))))))
+                                 (define-key [mode-line mouse-1] 'aorst/toggle-indent-mode)))))))
   aorst--mode-line--indent-mode-string)
 
 (defun aorst/mode-line--get-indent-var ()
@@ -627,7 +628,7 @@ offset variables."
       (if (char-displayable-p ?🔒) "🔒" "RO")
       'help-echo "Make file writable"
       'local-map (doto (make-sparse-keymap)
-                       (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))))
+                   (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))))
 
 (defun aorst/mode-line-flycheck ()
   (when (bound-and-true-p flycheck-mode)

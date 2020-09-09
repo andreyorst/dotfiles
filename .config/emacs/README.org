@@ -739,6 +739,7 @@ Very useful with =make-sparse-keymap=.
     "Evaluates x then calls all of the functions with the value of
   x supplied at the front of the given arguments.  The forms are
   evaluated in order.  Returns x."
+    (declare (indent defun))
     (let ((gx (gensym)))
       `(let ((,gx ,x))
          ,@(mapcar (lambda (f)
@@ -1059,7 +1060,7 @@ Line-column module for mode-line.
       "%C:%l"
       'help-echo "goto line"
       'local-map (doto (make-sparse-keymap)
-                       (define-key [mode-line mouse-1] #'goto-line)))))
+                   (define-key [mode-line mouse-1] #'goto-line)))))
 #+end_src
 
 **** =mode-line-line-encoding=
@@ -1083,7 +1084,7 @@ Line encoding module for mode-line.
                              ("CR" "Mac style CR")
                              (_ "Undecided")))
         'local-map (doto (make-sparse-keymap)
-                         (define-key [mode-line mouse-1] 'mode-line-change-eol))))))
+                     (define-key [mode-line mouse-1] 'mode-line-change-eol))))))
 #+end_src
 
 **** =mode-line-input-method=
@@ -1170,7 +1171,7 @@ Indentation info module for mode-line.
                                          (if indent-tabs-mode "spaces" "tabs")
                                          "-mode")
                       'local-map (doto (make-sparse-keymap)
-                                       (define-key [mode-line mouse-1] 'aorst/toggle-indent-mode)))))))
+                                   (define-key [mode-line mouse-1] 'aorst/toggle-indent-mode)))))))
     aorst--mode-line--indent-mode-string)
 
   (defun aorst/mode-line--get-indent-var ()
@@ -1241,7 +1242,7 @@ Read only state module for mode-line.
         (if (char-displayable-p ?🔒) "🔒" "RO")
         'help-echo "Make file writable"
         'local-map (doto (make-sparse-keymap)
-                         (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))))
+                     (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))))
 #+end_src
 
 **** =mode-line-flycheck=
