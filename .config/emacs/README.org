@@ -1033,7 +1033,12 @@ Returns buffer name or empty string if buffer is special and starts from space.
 #+begin_src emacs-lisp
   (defun aorst/mode-line-buffer-name ()
     (when-let ((name (buffer-file-name)))
-      (concat "  " (abbreviate-file-name name))))
+      (concat
+       "  "
+       (if-let ((project (project-current)))
+           (string-trim-left (abbreviate-file-name name)
+                             (car (project-roots project)))
+         (abbreviate-file-name name)))))
 #+end_src
 
 **** =mode-line-buffer-modified=
@@ -1255,7 +1260,7 @@ Flycheck module for mode-line.
        (pcase flycheck-last-status-change
          (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
          (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
-         (`running (propertize "*" 'help-echo "Flycheck: checking"))
+         (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
          (`errored (propertize "!" 'help-echo "Flycheck: error"))
          (`finished
           (let-alist (flycheck-count-errors flycheck-current-errors)
@@ -1335,7 +1340,8 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
     :custom
     (mini-modeline-right-padding 2)
     (mini-modeline-display-gui-line nil)
-    (mini-modeline-l-format '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
+    (mini-modeline-l-format
+     '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
     (mini-modeline-r-format
      '(:eval (concat
               (aorst/mode-line-buffer-modified)
@@ -1854,7 +1860,7 @@ I want to customize tab appearance to match my theme.
                                            'keymap tab-line-left-map
                                            'mouse-face 'tab-line-highlight
                                            'help-echo "Click to scroll left")
-          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+          tab-line-close-button (propertize (if (char-displayable-p ?❌) " ❌ " " x ")
                                             'keymap tab-line-tab-close-map
                                             'mouse-face 'tab-line-close-highlight
                                             'help-echo "Click to close tab")
@@ -2286,7 +2292,6 @@ It is one of the few modern and refreshing languages, that bring both innovation
     :bind (:map clojure-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)
            ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
-    :custom (clojure-indent-style 'always-indent)
     :config
     (defun aorst/clojure-toggle-ignore-form ()
       "Add or remove #_ literal before the current form."

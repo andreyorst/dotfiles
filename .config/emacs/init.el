@@ -464,7 +464,12 @@ Used in various places to avoid getting wrong line height when
 
 (defun aorst/mode-line-buffer-name ()
   (when-let ((name (buffer-file-name)))
-    (concat "  " (abbreviate-file-name name))))
+    (concat
+     "  "
+     (if-let ((project (project-current)))
+         (string-trim-left (abbreviate-file-name name)
+                           (car (project-roots project)))
+       (abbreviate-file-name name)))))
 
 (defun aorst/mode-line-buffer-modified ()
   (when (and buffer-file-name (buffer-modified-p))
@@ -636,7 +641,7 @@ offset variables."
      (pcase flycheck-last-status-change
        (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
        (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
-       (`running (propertize "*" 'help-echo "Flycheck: checking"))
+       (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
        (`errored (propertize "!" 'help-echo "Flycheck: error"))
        (`finished
         (let-alist (flycheck-count-errors flycheck-current-errors)
@@ -700,7 +705,8 @@ offset variables."
   :custom
   (mini-modeline-right-padding 2)
   (mini-modeline-display-gui-line nil)
-  (mini-modeline-l-format '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
+  (mini-modeline-l-format
+   '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
   (mini-modeline-r-format
    '(:eval (concat
             (aorst/mode-line-buffer-modified)
@@ -1328,7 +1334,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
          ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
-  :custom (clojure-indent-style 'always-indent)
   :config
   (defun aorst/clojure-toggle-ignore-form ()
     "Add or remove #_ literal before the current form."
