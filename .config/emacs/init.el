@@ -1335,6 +1335,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c C-M-f" . aorst/indent-buffer)
          ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
   :config
+  (define-clojure-indent
+    (try! '(:defn))
+    (try+ '(:defn)))
   (defun aorst/clojure-toggle-ignore-form ()
     "Add or remove #_ literal before the current form."
     (interactive)
