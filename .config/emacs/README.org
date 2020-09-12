@@ -2248,7 +2248,10 @@ I write some Emacs Lisp and experience is already quite good, I just want to ena
                         (lisp-indent-specform method state
                                               indent-point normal-indent))
                        (method
-                        (funcall method indent-point state)))))))))
+                        (funcall method indent-point state))))))))
+    (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
+      "Setup Emacs Lisp buffer for Org Babel."
+      (setq lexical-binding t)))
 #+end_src
 
 ** Yaml

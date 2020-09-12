@@ -1311,7 +1311,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                       (lisp-indent-specform method state
                                             indent-point normal-indent))
                      (method
-                      (funcall method indent-point state)))))))))
+                      (funcall method indent-point state))))))))
+  (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
+    "Setup Emacs Lisp buffer for Org Babel."
+    (setq lexical-binding t)))
 
 (use-package yaml-mode)
 
