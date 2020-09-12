@@ -1610,7 +1610,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           scheme-mode
           lisp-mode
           racket-mode) . parinfer-rust-mode)
-  :custom (parinfer-rust-check-before-enable 'defer)
+  :custom
+  (parinfer-rust-check-before-enable 'defer)
+  (parinfer-rust-dim-parens nil)
   :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
   :config
   (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
@@ -2080,6 +2082,14 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                           :distant-foreground "gray80"
                           :inherit nil)))
   (aorst/display-fill-column-indicator-setup-faces))
+
+(use-package rainbow-delimiters
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode) . rainbow-delimiters-mode))
 
 (provide 'init)
 ;;; init.el ends here

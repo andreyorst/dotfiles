@@ -2690,7 +2690,9 @@ Not as strict as Emacs Lisp implementation, because it does not force any format
             scheme-mode
             lisp-mode
             racket-mode) . parinfer-rust-mode)
-    :custom (parinfer-rust-check-before-enable 'defer)
+    :custom
+    (parinfer-rust-check-before-enable 'defer)
+    (parinfer-rust-dim-parens nil)
     :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
     :config
     (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
@@ -2800,7 +2802,8 @@ Complete anything framework. Nothing much to say. Does it's job.
 
 This package also optionally requires these extra dependencies:
 
-- =company-posframe= - provides posframe frontend for company.
+*** Company Posframe
+Provides posframe frontend for company.
 
 #+begin_src emacs-lisp
   (use-package company-posframe
@@ -3383,6 +3386,19 @@ Emacs 27 added direct support for fill column indicator, which displays thin lin
                             :distant-foreground "gray80"
                             :inherit nil)))
     (aorst/display-fill-column-indicator-setup-faces))
+#+end_src
+
+** Rainbow Delimiters
+Color delimiters in different colors based on exression depth.
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode) . rainbow-delimiters-mode))
 #+end_src
 
 * Postscript
