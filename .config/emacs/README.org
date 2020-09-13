@@ -1867,7 +1867,8 @@ I want to customize tab appearance to match my theme.
           tab-line-exclude-modes '(ediff-mode
                                    process-menu-mode
                                    term-mode
-                                   vterm-mode))
+                                   vterm-mode
+                                   treemacs-mode))
 
 
     (defun aorst/tabline-setup-faces ()
@@ -3073,12 +3074,13 @@ LSP client for Emacs.
     (lsp-rust-clippy-preference "on")
     (lsp-prefer-capf t)
     (lsp-enable-indentation nil)
-    ;; (lsp-enable-symbol-highlighting nil)
+    (lsp-enable-symbol-highlighting t)
     (lsp-rust-server 'rust-analyzer)
     (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
 #+end_src
 
-User interface package for LSP:
+*** LSP UI
+User interface package for LSP.
 
 #+begin_src emacs-lisp
   (use-package lsp-ui
@@ -3092,6 +3094,7 @@ User interface package for LSP:
     (lsp-ui-sideline-enable nil)
     (lsp-ui-imenu-enable nil)
     (lsp-ui-doc-delay 1 "higher than eldoc delay")
+    (lsp-ui-doc-position 'at-point)
     :config
     (when (fboundp #'aorst/escape)
       (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)

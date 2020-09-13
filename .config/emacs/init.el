@@ -1007,7 +1007,8 @@ truncates text if needed.  Minimal width can be set with
         tab-line-exclude-modes '(ediff-mode
                                  process-menu-mode
                                  term-mode
-                                 vterm-mode))
+                                 vterm-mode
+                                 treemacs-mode))
 
 
   (defun aorst/tabline-setup-faces ()
@@ -1904,7 +1905,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-rust-clippy-preference "on")
   (lsp-prefer-capf t)
   (lsp-enable-indentation nil)
-  ;; (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-symbol-highlighting t)
   (lsp-rust-server 'rust-analyzer)
   (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
 
@@ -1919,6 +1920,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-ui-sideline-enable nil)
   (lsp-ui-imenu-enable nil)
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
+  (lsp-ui-doc-position 'at-point)
   :config
   (when (fboundp #'aorst/escape)
     (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
