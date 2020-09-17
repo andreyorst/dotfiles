@@ -1395,7 +1395,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer))
+  :config
+  (put 'time 'fennel-indent-function 0)
+  (put 'dotimes 'fennel-indent-function 1)
+  (put 'when-let 'fennel-indent-function 1)
+  (put 'if-let 'fennel-indent-function 1))
 
 (use-package lua-mode
   :bind (:map lua-mode-map

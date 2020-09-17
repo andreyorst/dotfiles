@@ -2380,7 +2380,12 @@ It supports compile-time macro system, and full Lua compatibility.
 #+begin_src emacs-lisp
   (use-package fennel-mode
     :bind (:map fennel-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer))
+    :config
+    (put 'time 'fennel-indent-function 0)
+    (put 'dotimes 'fennel-indent-function 1)
+    (put 'when-let 'fennel-indent-function 1)
+    (put 'if-let 'fennel-indent-function 1))
 #+end_src
 
 ** Lua
