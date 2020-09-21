@@ -53,6 +53,7 @@ pm_dnf() {
         (remove)     sudo dnf remove "$@" ;;
         (autoremove) sudo dnf autoremove "$@" ;;
         (search)     dnf search "$@" ;;
+        (copr)       sudo dnf copr "$@" ;;
         (list)       case $1 in
                          (all)       dnf list all ;;
                          (installed) dnf list installed ;;
