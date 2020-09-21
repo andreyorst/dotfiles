@@ -1735,6 +1735,19 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace nil)
   (magit-diff-refine-hunk 'all)
+  (magit-blame-styles
+   '((headings
+      (heading-format . "%-20a %C %s\n"))
+     (margin
+      (margin-format " %s%f" " %C %a" " %H")
+      (margin-width . 42)
+      (margin-face . magit-blame-margin)
+      (margin-body-face magit-blame-dimmed))
+     (highlight
+      (highlight-face . magit-blame-highlight))
+     (lines
+      (show-lines . nil)
+      (show-message . t))))
   :config
   (advice-add 'magit-set-header-line-format :override #'ignore))
 
