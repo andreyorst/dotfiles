@@ -2,12 +2,14 @@
 	email = andreyorst@gmail.com
 	name = Andrey Orst
 [alias]
-	clean-all = clean -x -d -f
+	clean-all = clean -xdf
 	st = status
 	co = checkout
 	ci = commit
 	cim = commit -m
 	br = branch
 	bra = branch -a
+        root = rev-parse --show-toplevel
+	exec = "!exec "
 [include]
 	path = .gitconfig.local
