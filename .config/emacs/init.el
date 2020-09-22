@@ -86,7 +86,8 @@ Based on `so-long-detected-long-line-p'."
                                        threshold)))
              (throw 'excessive t)))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
-    (when (aorst/truncated-lines-p)
+    (when (and (aorst/truncated-lines-p)
+               (not (memq major-mode '(vterm-mode term-mode))))
       (funcall foo arg set-minimum)))
   (setq-default auto-window-vscroll nil
                 mouse-highlight nil
