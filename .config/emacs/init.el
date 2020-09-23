@@ -41,7 +41,9 @@
   :straight nil
   :demand
   :bind (("S-<down-mouse-1>" . nil)
-         ("S-<mouse-3>" . nil))
+         ("S-<mouse-3>" . nil)
+         ("<mouse-4>" . mwheel-scroll)
+         ("<mouse-5>" . mwheel-scroll))
   :custom
   (mouse-wheel-flip-direction t)
   (mouse-wheel-tilt-scroll t)
@@ -75,16 +77,16 @@ Based on `so-long-detected-long-line-p'."
                   0))
              (threshold (+ window-width hscroll-offset line-number-width -4)))
         (catch 'excessive
-         (while (not (eobp))
-           (setq start (point))
-           (save-restriction
-             (narrow-to-region start (min (+ start 1 threshold)
-                                          (point-max)))
-             (forward-line 1))
-           (unless (or (bolp)
-                       (and (eobp) (<= (- (point) start)
-                                       threshold)))
-             (throw 'excessive t)))))))
+           (while (not (eobp))
+               (setq start (point))
+               (save-restriction
+                   (narrow-to-region start (min (+ start 1 threshold)
+                                                (point-max)))
+                   (forward-line 1))
+               (unless (or (bolp)
+                           (and (eobp) (<= (- (point) start)
+                                           threshold)))
+                   (throw 'excessive t)))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
     (when (and (aorst/truncated-lines-p)
                (not (memq major-mode '(vterm-mode term-mode))))
