@@ -820,6 +820,13 @@ If neither =JetBrainsMono=, nor =Hack= are not found, we try =Source Code Pro= a
          (set-face-attribute 'default nil :font "Source Code Pro 10")))
 #+end_src
 
+For variable pitched fonts I would like to use DejaVu fonts if available:
+
+#+begin_src emacs-lisp
+  (when (aorst/font-installed-p "DejaVu Sans")
+    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
+#+end_src
+
 *** Ligatures
 With the inclusion of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]] support into Emacs 27+, it is now possible to use =auto-composition-mode= to add ligatures.
 What's especially cool, is that we can specify which ligatures we want, by defining regular expressions:

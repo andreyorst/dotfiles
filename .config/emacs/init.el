@@ -322,6 +322,9 @@ Used in various places to avoid getting wrong line height when
       ((aorst/font-installed-p "Source Code Pro")
        (set-face-attribute 'default nil :font "Source Code Pro 10")))
 
+(when (aorst/font-installed-p "DejaVu Sans")
+  (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
+
 (when (aorst/font-installed-p "JetBrainsMono")
   (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
                      (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
