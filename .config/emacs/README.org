@@ -3193,15 +3193,33 @@ If no Emacs exist, it should start one, start a server and open a file.
       (server-start)))
 #+end_src
 
-To fully achieve this behavior one needs a =.desktop= file to exist that will decide which kind of Emacs to call: =emacs= or =emacsclient=:
+We also need a launcher for Emacs, that will decide what to run - a client, or a server:
 
-#+begin_src conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes :results silent
+#+begin_src sh :tangle ~/.local/bin/emacs-launcher :mkdirp yes :shebang #!/bin/sh
+if [ $# -gt 0 ]; then
+    emacsclient -a emacs -n "$@"
+else
+    command emacs
+fi
+#+end_src
+
+This will allow us to open files with =emacs-launcher=, and it will automatically reuse existing window if present.
+Precisely what it does is:
+
+- call =emacs= if no arguments provided, or
+- call =emacsclient -a emacs= with arguments.
+  =emacsclient= will try to connect to a server, and if there's none, it will fire up =emacs= which will create server, and opening new files will be done in this instance of =emacs=.
+
+However it is clumsy to do this from the shell, and I want this to be available in file managers.
+So to fully achieve this behavior we need a =.desktop= file, that will call our =emacs-launcher= and pass arguments to it:
+
+#+begin_src conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes
   [Desktop Entry]
   Name=Emacs
   GenericName=Text Editor
   Comment=Edit text
   MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-  Exec=sh -c "[ $# -gt 0 ] && emacsclient -a emacs -n \"\$@\" || command emacs" dummy %F
+  Exec=emacs-launcher %F
   Icon=emacs
   Type=Application
   Terminal=false
@@ -3209,11 +3227,7 @@ To fully achieve this behavior one needs a =.desktop= file to exist that will de
   StartupWMClass=Emacs
 #+end_src
 
-This code above automatically creates user local =emacs.desktop= file in =~/.local/share/applications= that will:
-
-- call =emacs= if no arguments provided, or
-- call =emacsclient -a emacs= with arguments.
-  =emacsclient= will try to connect to a server, and if there's none, it will fire up =emacs= which will create server, and opening new files will be done in this instance of =emacs=.
+With this file we should be able to launch Emacs from the file context menu, or whit "open with" sub menu, and it will reuse existing window if present.
 
 ** Hideshow
 This built in mode provides code folding.
