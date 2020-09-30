@@ -3197,9 +3197,9 @@ We also need a launcher for Emacs, that will decide what to run - a client, or a
 
 #+begin_src sh :tangle ~/.local/bin/emacs-launcher :mkdirp yes :shebang #!/bin/sh
 if [ $# -gt 0 ]; then
-    emacsclient -a emacs -n "$@"
+    exec emacsclient -a emacs -n "$@"
 else
-    command emacs
+    exec command emacs
 fi
 #+end_src
 
