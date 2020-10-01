@@ -13,3 +13,6 @@
 	exec = "!exec "
 [include]
 	path = .gitconfig.local
+[pull]
+	ff = only
+	rebase = false
