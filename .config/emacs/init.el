@@ -1344,29 +1344,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            clojurec-mode
            clojurescript-mode) . flycheck-mode))
   :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)
-         ("C-x C-M-;" . aorst/clojure-toggle-ignore-form))
+         ("C-c C-M-f" . aorst/indent-buffer))
   :config
   (define-clojure-indent
     (try! '(:defn))
-    (try+ '(:defn)))
-  (defun aorst/clojure-toggle-ignore-form ()
-    "Add or remove #_ literal before the current form."
-    (interactive)
-    (save-excursion
-      (condition-case nil
-          (progn
-            (backward-up-list)
-            (if (looking-back "#_")
-                (delete-char -2)
-              (insert "#_")))
-        (scan-error
-         (progn
-           (forward-sexp)
-           (if (looking-back "#_")
-               (delete-char -2)
-             (backward-sexp)
-             (insert "#_"))))))))
+    (try+ '(:defn))))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
@@ -1397,7 +1379,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package clj-refactor
   :hook ((cider-mode . clj-refactor-mode)
          (cider-mode . yas-minor-mode))
-  :custom (cljr-suppress-no-project-warning nil))
+  :custom (cljr-suppress-no-project-warning nil)
+          (cljr-warn-on-eval nil))
 
 (use-package kibit-helper)
 
@@ -1962,23 +1945,21 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :bind (("C-c p f" . project-find-file)
          ("C-c p r" . project-find-regexp))
   :config
-  (defvar aorst--project-root-markers '("Cargo.toml" "compile_commands.json" "compile_flags.txt")
+  (defvar aorst--project-root-markers
+    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj")
     "Files or directories that indicate the root of a project.")
   (defun aorst/project-find-root (path)
     "Recursive search in PATH for root markers."
-    (let* ((this-dir (file-name-as-directory (file-truename path)))
-           (parent-dir (expand-file-name (concat this-dir "../")))
-           (system-root-dir (expand-file-name "/")))
+    (let ((this-dir (file-name-as-directory (file-truename path))))
       (cond
        ((aorst/project-root-p this-dir) (cons 'transient this-dir))
-       ((equal system-root-dir this-dir) nil)
-       (t (aorst/project-find-root parent-dir)))))
+       ((equal "/" this-dir) nil)
+       (t (aorst/project-find-root (concat this-dir "../"))))))
   (defun aorst/project-root-p (path)
     "Check if current PATH has any of project root markers."
-    (let ((results (mapcar (lambda (marker)
-                             (file-exists-p (concat path marker)))
-                           aorst--project-root-markers)))
-      (eval `(or ,@ results))))
+    (memq t (mapcar (lambda (file)
+                      (file-exists-p (concat path file)))
+                    aorst--project-root-markers)))
   (add-to-list 'project-find-functions #'aorst/project-find-root))
 
 (use-package clang-format
