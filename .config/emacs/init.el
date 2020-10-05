@@ -294,6 +294,12 @@ evaluated in order.  Returns x."
   :custom
   (inhibit-splash-screen t))
 
+(use-package menu-bar
+  :straight nil
+  :config
+  (when (not (display-graphic-p))
+    (menu-bar-mode -1)))
+
 (defvar aorst--line-pixel-height (line-pixel-height)
   "Line height in pixels.
 Used in various places to avoid getting wrong line height when
@@ -325,42 +331,37 @@ Used in various places to avoid getting wrong line height when
 (when (aorst/font-installed-p "DejaVu Sans")
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
-(when (aorst/font-installed-p "JetBrainsMono")
-  (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
-                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
-                     (?*  ,(regexp-opt '("*>" "***" "*/")))
-                     (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                         "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~" "<~"
-                                         "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
-                     (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
-                     (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
-                     (?!  ,(regexp-opt '("!==" "!!" "!=")))
-                     (?>  ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
-                     (?&  ,(regexp-opt '("&&&" "&&")))
-                     (?|  ,(regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")))
-                     (?.  ,(regexp-opt '(".." ".?" ".=" ".-" "..<" "...")))
-                     (?+  ,(regexp-opt '("+++" "+>" "++")))
-                     (?\[ ,(regexp-opt '("[||]" "[<" "[|")))
-                     (?\{ ,(regexp-opt '("{|")))
-                     (?\? ,(regexp-opt '("??" "?." "?=" "?:")))
-                     (?#  ,(regexp-opt '("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(")))
-                     (?\; ,(regexp-opt '(";;")))
-                     (?_  ,(regexp-opt '("_|_" "__")))
-                     (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
-                     (?$  ,(regexp-opt '("$>")))
-                     (?^  ,(regexp-opt '("^=")))
-                     (?\] ,(regexp-opt '("]#"))))))
-    (dolist (char-regexp ligatures)
-      (apply (lambda (char regexp)
-               (set-char-table-range
-                composition-function-table
-                char `([,regexp 0 font-shape-gstring])))
-             char-regexp))))
-
-(use-package composite
-  :straight nil
-  :hook (prog-mode . auto-composition-mode)
-  :init (global-auto-composition-mode -1))
+(use-package ligature
+  :when (aorst/font-installed-p "JetBrainsMono")
+  :straight (:host github
+             :repo "mickeynp/ligature.el")
+  :config
+  (ligature-set-ligatures
+   '(prog-mode cider-repl-mode)
+   '("!!" "!=" "!=="
+     "#!" "##" "###" "####" "#(" "#:" "#=" "#?" "#[" "#_" "#_(" "#{"
+     "$>" "&&" "&&&" "&="
+     "***" "*/" "*>"
+     "++" "+++" "+>"
+     "--" "---" "-->" "-<" "-<<" "->" "->>" "-|" "-~"
+     ".-" ".." "..." "..<" ".=" ".?"
+     "/*" "/**" "//" "///" "/=" "/==" "/>"
+     "::" ":::" "::=" ":<" ":=" ":>" ":?" ":?>"
+     ";;"
+     "<!--" "<$" "<$>" "<*" "<*>" "<+" "<+>" "<-" "<-<" "<->" "<-|"
+     "</" "</>" "<:" "<<" "<<-" "<<<" "<<=" "<=" "<=<" "<==" "<==>"
+     "<=>" "<=|" "<>" "<|" "<|>" "<||" "<|||" "<~" "<~>" "<~~"
+     "=!=" "=/=" "=:=" "=<<" "==" "===" "==>" "=>" "=>>"
+     ">-" ">:" ">=" ">=>" ">>" ">>-" ">>=" ">>>" ">]"
+     "?." "?:" "?=" "??"
+     "[<" "[|" "[||]"
+     "]#"
+     "^="
+     "__" "_|_"
+     "{|"
+     "|-" "|->" "|=" "|=>" "|>" "|]" "||" "||-" "||=" "||>" "|||" "|||>" "|}" "|~>"
+     "~-" "~=" "~>" "~@" "~~" "~~>"))
+  (global-ligature-mode t))
 
 (use-package all-the-icons
   :config
@@ -831,14 +832,14 @@ offset variables."
          `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
   (defun aorst/treemacs-after-init-setup ()
     "Set treemacs theme, open treemacs, and expand all projects."
+    (setq treemacs-collapse-dirs 0)
     (when (display-graphic-p)
       (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
-      (treemacs-load-theme "Atom"))
-    (setq treemacs-collapse-dirs 0)
-    (treemacs)
-    (treemacs-fringe-indicator-mode -1)
-    (aorst/treemacs-expand-all-projects)
-    (windmove-right))
+      (treemacs-load-theme "Atom")
+      (treemacs)
+      (treemacs-fringe-indicator-mode -1)
+      (aorst/treemacs-expand-all-projects)
+      (windmove-right)))
   (defun aorst/after-treemacs-setup ()
     "Set treemacs buffer common settings."
     (setq tab-width 1
@@ -868,7 +869,8 @@ offset variables."
 
 (use-package tab-line
   :straight nil
-  :unless (version< emacs-version "27")
+  :unless (or (version< emacs-version "27")
+              (not (display-graphic-p)))
   :hook ((after-init . global-tab-line-mode)
          ((aorst--load-theme
            aorst--disable-theme
