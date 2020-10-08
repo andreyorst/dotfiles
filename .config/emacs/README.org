@@ -2507,7 +2507,7 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
                   (select-window (car windows)))))
           (let* ((win-side (unless (string= (buffer-name) " *Install vterm* ")
                              (if (symbolp arg)
-                                 (cons (split-window-below) 'bot)
+                                 (cons (split-window-below (floor (* (window-height) 0.65))) 'bot)
                                (cons (split-window-right) 'right))))
                  (window (car win-side))
                  (side (cdr win-side)))

@@ -1454,7 +1454,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                 (select-window (car windows)))))
         (let* ((win-side (unless (string= (buffer-name) " *Install vterm* ")
                            (if (symbolp arg)
-                               (cons (split-window-below) 'bot)
+                               (cons (split-window-below (floor (* (window-height) 0.65))) 'bot)
                              (cons (split-window-right) 'right))))
                (window (car win-side))
                (side (cdr win-side)))
