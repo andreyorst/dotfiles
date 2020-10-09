@@ -147,6 +147,8 @@ Based on `so-long-detected-long-line-p'."
 (use-package simple
   :straight nil
   :bind (("C-w" . aorst/kill-region-or-word)
+         ("C-x C-l" . aorst/downcase-region-or-word)
+         ("C-x C-u" . aorst/upcase-region-or-word)
          ("C-x C-x" . aorst/exchange-point-and-mark)
          ("C-o" . aorst/newline-below)
          ("C-S-o" . aorst/newline-above)
@@ -162,6 +164,18 @@ Based on `so-long-detected-long-line-p'."
              mark-active)
         (kill-region (region-beginning) (region-end))
       (backward-kill-word arg)))
+  (defun aorst/downcase-region-or-word (arg)
+    (interactive "*p")
+    (if (and transient-mark-mode
+             mark-active)
+        (downcase-region (region-beginning) (region-end))
+      (downcase-word (- arg))))
+  (defun aorst/upcase-region-or-word (arg)
+    (interactive "*p")
+    (if (and transient-mark-mode
+             mark-active)
+        (upcase-region (region-beginning) (region-end))
+      (upcase-word (- arg))))
   (defun aorst/exchange-point-and-mark (arg)
    (interactive "*p")
    (when (and transient-mark-mode
