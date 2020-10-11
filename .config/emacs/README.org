@@ -1951,6 +1951,23 @@ I want to customize tab appearance to match my theme.
       (select-window (posn-window (event-start e)))))
 #+end_src
 
+** Diff HL
+Highlight changes in file at the left fringe.
+
+#+begin_src emacs-lisp
+  (use-package diff-hl
+    :straight (:host github
+               :repo "dgutov/diff-hl")
+    :hook
+    (magit-pre-refresh . diff-hl-magit-pre-refresh)
+    (magit-post-refresh . diff-hl-magit-post-refresh)
+    :custom
+    (diff-hl-flydiff-delay 0)
+    :config
+    (global-diff-hl-mode 1)
+    (diff-hl-flydiff-mode 1))
+#+end_src
+
 ** Line Numbers
 =display-line-numbers= provides line numbers on the left side of the window, which doesn't lag.
 I don't like that it changes width, so let's make it grow only, and calculate maximum width on file open:

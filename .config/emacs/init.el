@@ -1084,6 +1084,18 @@ truncates text if needed.  Minimal width can be set with
   (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
     (select-window (posn-window (event-start e)))))
 
+(use-package diff-hl
+  :straight (:host github
+             :repo "dgutov/diff-hl")
+  :hook
+  (magit-pre-refresh . diff-hl-magit-pre-refresh)
+  (magit-post-refresh . diff-hl-magit-post-refresh)
+  :custom
+  (diff-hl-flydiff-delay 0)
+  :config
+  (global-diff-hl-mode 1)
+  (diff-hl-flydiff-mode 1))
+
 (use-package display-line-numbers
   :straight nil
   :custom
