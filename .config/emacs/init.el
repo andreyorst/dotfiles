@@ -795,6 +795,7 @@ offset variables."
   (treemacs-is-never-other-window t)
   (treemacs-space-between-root-nodes nil)
   (treemacs-indentation 2)
+  (treemacs-collapse-dirs 0)
   :config
   (use-package treemacs-magit)
   (treemacs-follow-mode t)
@@ -846,7 +847,6 @@ offset variables."
          `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
   (defun aorst/treemacs-after-init-setup ()
     "Set treemacs theme, open treemacs, and expand all projects."
-    (setq treemacs-collapse-dirs 0)
     (when (display-graphic-p)
       (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
       (treemacs-load-theme "Atom")
@@ -1090,11 +1090,14 @@ truncates text if needed.  Minimal width can be set with
   :hook
   (magit-pre-refresh . diff-hl-magit-pre-refresh)
   (magit-post-refresh . diff-hl-magit-post-refresh)
+  (after-init . global-diff-hl-mode)
   :custom
   (diff-hl-flydiff-delay 0)
+  (diff-hl-draw-borders nil)
   :config
-  (global-diff-hl-mode 1)
-  (diff-hl-flydiff-mode 1))
+  (unless (display-graphic-p)
+    (diff-hl-margin-mode 1))
+  (diff-hl-flydiff-mode 1)
 
 (use-package display-line-numbers
   :straight nil
@@ -2037,7 +2040,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (desktop-restore-frames nil)
   :config
   (dolist (mode '(solaire-mode
-                  parinfer-rust-mode))
+                  parinfer-rust-mode
+                  global-diff-hl-mode
+                  diff-hl-mode
+                  diff-hl-flydiff-mode
+                  diff-hl-margin-mode))
     (add-to-list 'desktop-minor-mode-table `(,mode ,nil)))
   :init
   (defun aorst/desktop-restore ()
