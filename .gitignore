@@ -16,4 +16,7 @@ saved_workspaces
 !.config/emacs/straight/
 .config/emacs/straight/*
 !.config/emacs/straight/versions/
+!.config/emacs/transient/
+.config/emacs/transient/*
+!.config/emacs/transient/values.el
 .recentf
