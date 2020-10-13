@@ -1092,12 +1092,10 @@ truncates text if needed.  Minimal width can be set with
   (magit-post-refresh . diff-hl-magit-post-refresh)
   (after-init . global-diff-hl-mode)
   :custom
-  (diff-hl-flydiff-delay 0)
   (diff-hl-draw-borders nil)
   :config
   (unless (display-graphic-p)
-    (diff-hl-margin-mode 1))
-  (diff-hl-flydiff-mode 1)
+    (diff-hl-margin-mode 1)))
 
 (use-package display-line-numbers
   :straight nil
