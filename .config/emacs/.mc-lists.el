@@ -55,6 +55,7 @@
         org-toggle-comment
         org-yank
         overwrite-mode
+        paredit-backward
         parinfer-backward-delete-char
         parinfer-double-quote
         parinfer-region-delete-region
@@ -62,6 +63,7 @@
         parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        sp-delete-char
         upcase-region
         zap-up-to-char
         ))
