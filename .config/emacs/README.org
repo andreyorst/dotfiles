@@ -2313,11 +2313,7 @@ It is one of the few modern and refreshing languages, that bring both innovation
              clojurec-mode
              clojurescript-mode) . flycheck-mode))
     :bind (:map clojure-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
-    :config
-    (define-clojure-indent
-      (try! '(:defn))
-      (try+ '(:defn))))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 *** CIDER

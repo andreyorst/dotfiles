@@ -1349,11 +1349,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            clojurec-mode
            clojurescript-mode) . flycheck-mode))
   :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
-  :config
-  (define-clojure-indent
-    (try! '(:defn))
-    (try+ '(:defn))))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
