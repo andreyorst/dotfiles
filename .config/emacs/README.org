@@ -1306,6 +1306,8 @@ Support for various structural editing modes in mode-line.
                                                 (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
                       ((bound-and-true-p paredit-mode)
                        (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+                      ((or (bound-and-true-p smartparens-strict-mode) (bound-and-true-p smartparens-mode))
+                       (propertize "Smartparens" 'help-echo "Smartparens mode is enabled for current buffer"))
                       ((bound-and-true-p lispy-mode)
                        (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
                       ((bound-and-true-p electric-pair-mode)
@@ -2698,7 +2700,50 @@ This package will be used in many other package configurations to provide sane k
   (use-package hydra)
 #+end_src
 
-** Parinfer
+** Smartparens
+Smartparens is a package that enables structural editing in many different languages.
+
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode
+            fennel-mode
+            cider-repl-mode
+            racket-repl-mode
+            geiser-repl-mode
+            minibuffer-inactive-mode) . smartparens-strict-mode)
+    :custom
+    (sp-highlight-pair-overlay nil)
+    (sp-highlight-wrap-overlay nil)
+    (sp-highlight-wrap-tag-overlay nil)
+    :config
+    (require 'smartparens-config)
+    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+    (sp-use-paredit-bindings))
+#+end_src
+
+** COMMENT Paredit
+Paredit is a package that enables structural editing in Lisp languages.
+
+#+begin_src emacs-lisp
+  (use-package paredit
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode
+            fennel-mode
+            cider-repl-mode
+            racket-repl-mode
+            geiser-repl-mode) . paredit-mode))
+#+end_src
+
+** COMMENT Parinfer
 Parinfer implementation written in Rust language.
 Not as strict as Emacs Lisp implementation, because it does not force any formatting rules, and theoretically should be faster, but in very early stages of development.
 

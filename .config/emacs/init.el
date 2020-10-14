@@ -676,6 +676,8 @@ offset variables."
                                               (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
                     ((bound-and-true-p paredit-mode)
                      (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+                    ((or (bound-and-true-p smartparens-strict-mode) (bound-and-true-p smartparens-mode))
+                     (propertize "Smartparens" 'help-echo "Smartparens mode is enabled for current buffer"))
                     ((bound-and-true-p lispy-mode)
                      (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
                     ((bound-and-true-p electric-pair-mode)
@@ -1612,25 +1614,26 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package hydra)
 
-(use-package parinfer-rust-mode
-  :if (and (bound-and-true-p module-file-suffix)
-           (not (string-match-p "aarch" system-configuration)))
-  :straight (:host github
-             :repo "justinbarclay/parinfer-rust-mode")
+(use-package smartparens
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode
           scheme-mode
           lisp-mode
-          racket-mode) . parinfer-rust-mode)
+          racket-mode
+          fennel-mode
+          cider-repl-mode
+          racket-repl-mode
+          geiser-repl-mode
+          minibuffer-inactive-mode) . smartparens-strict-mode)
   :custom
-  (parinfer-rust-check-before-enable 'defer)
-  (parinfer-rust-dim-parens nil)
-  :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
+  (sp-highlight-pair-overlay nil)
+  (sp-highlight-wrap-overlay nil)
+  (sp-highlight-wrap-tag-overlay nil)
   :config
-  (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
-  :init
-  (setq parinfer-rust-auto-download t))
+  (require 'smartparens-config)
+  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+  (sp-use-paredit-bindings))
 
 (use-package flx)
 
