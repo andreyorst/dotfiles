@@ -118,7 +118,7 @@ And Emacs will do it's native compilation in background for every loaded package
 That's amazing!
 
 *** User Interface
-Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
+Prevent the glimpse of unstyled Emacs by disabling these UI elements early.
 
 #+begin_src emacs-lisp
   (setq initial-frame-alist '((width . 170)
@@ -138,7 +138,7 @@ Setting =x-gtk-resize-child-frames= variable to =resize-mode= fixes the [[https:
 #+end_src
 
 Also, let's disable these arrows that are displayed for truncated lines in fringes.
-Usually I can see that line is truncated, and with horizontal scolling these arrows are a bit annoying.
+Usually I can see that line is truncated, and with horizontal scrolling these arrows are a bit annoying.
 
 #+begin_src emacs-lisp
   (setq-default fringe-indicator-alist
@@ -212,7 +212,7 @@ We do it as early as possible, as it is important to load these settings before 
 #+begin_comment
 If you're reading this, then you're probably reading the source of this file and not rendered version.
 This section is commented because I'm no longer using =package.el= as my package manager.
-Instead I'm using =straight.el=, which provides more facilites, and does not have most of =package.el= problems.
+Instead I'm using =straight.el=, which provides more facilities, and does not have most of =package.el= problems.
 However, I still keep this configuration, since I might switch back, and I would not want to configure everything again.
 If you want to use =package.el= instead, make sure to uncomment this heading, and comment =straight.el= heading.
 #+end_comment
@@ -221,7 +221,7 @@ To obtain plugins we need =package.el= package.
 Although this is builtin and convenient, it's also slow and messy.
 Instead of using =package= directly we will use =use-package= to manage package configurations.
 
-Melpa is a package repository, that I use to get packages.
+MELPA is a package repository, that I use to get packages.
 Since all packages that I need can be obtained from there, I did not bothered with different methods of installation.
 
 #+begin_src emacs-lisp
@@ -231,7 +231,7 @@ Since all packages that I need can be obtained from there, I did not bothered wi
           ("melpa" . "https://melpa.org/packages/")))
 #+end_src
 
-Emacs 26.2 had a bug with downloading from Elpa.
+Emacs 26.2 had a bug with downloading from ELPA.
 Here's a workaround, although it is dangerous to use this, as it is pretty insecure.
 So please upgrade to more recent Emacs, in case you're still using Emacs 26.2.
 
@@ -539,7 +539,7 @@ It is convenient to delete selection by typing:
 ** Default Bindings and More
 Configurations for inbuilt =simple.el= module.
 By default Emacs uses =kill-region= command on =C-w= shortcut, and changes region case with =C-x C-l= and =C-x C-u= shortcuts.
-I find this counter intuitive, and actually had a lot of problems with the latter one, because Org mode has a similar shortcut =C-x C-l=, and I sometimes used the wrong one resulting in lowercasing a lot of text, and often noticing it only much later.
+I find this counter intuitive, and actually had a lot of problems with the latter one, because Org mode has a similar shortcut =C-x C-l=, and I sometimes used the wrong one resulting in lower-casing a lot of text, and often noticing it only much later.
 GNU Readline uses =C-w= to kill word backwards.
 Other software uses this shortcut to kill window.
 I prefer Readline approach, and I think it also maps well to case changing functions.
@@ -549,7 +549,7 @@ With =newline-below= and =newline-above= it is now possible to have same shortcu
 Emacs has nice function, =zap-up-to-char= but for some reason it's not bound to any key.
 I find it more usable than =zap-to-char= so let's swap those here.
 
-Also, I don't want my files to contain trailing whitespaces, so =before-save-hook= hook will get rid of those automatically for me.
+Also, I don't want my files to contain trailing whitespace, so =before-save-hook= hook will get rid of those automatically for me.
 
 #+begin_src emacs-lisp
   (use-package simple
@@ -690,7 +690,7 @@ If there's a tool that can properly format buffer it should be used instead of t
 #+end_src
 
 ** =split-paragraph-into-lines=
-This function helps me follow one sentence per line style of edxiting.
+This function helps me follow one sentence per line style of editing.
 I can write text as normal, fill it if I feel like it, and then reformat it with a single keybinding.
 
 #+begin_src emacs-lisp
@@ -718,7 +718,7 @@ I can write text as normal, fill it if I feel like it, and then reformat it with
 
 ** =create-accent-face=
 Creates a slight variation of a face, by blending =ref-face= background color with foreground color.
-It is used to create refine faces for diffs, whcich is the only purpose I've wrote this function for.
+It is used to create refine faces for diffs, which is the only purpose I've wrote this function for.
 It depends on DOOM's =doom-blend= function, and if it is not available, it fallbacks to =inverse-video= method, which is used by default for refine face anyways.
 
 #+begin_src emacs-lisp
@@ -892,7 +892,7 @@ What's especially cool, is that we can specify which ligatures we want, by defin
       (all-the-icons-install-fonts t)))
 #+end_src
 
-I don't use this package directly yet, but some other packages do, like DOOM Modeline or Treemacs.
+I don't use this package directly yet, but some other packages do, like Treemacs.
 
 ** Solaire Mode
 This package helps distinguish buffers that have file opened and buffers that are for utilities like file browser.
@@ -978,7 +978,7 @@ But it is also an amazingly well put set of themes, which define colors for pret
 #+end_src
 
 This code specifies hooks that will run via advice that runs after =load-theme= and =disable-theme= functions.
-It is usefult to update some faces that are out of scope of current theme and have to be recalculated.
+It is useful to update some faces that are out of scope of current theme and have to be recalculated.
 
 #+begin_src emacs-lisp
   (defvar aorst--load-theme-hook nil
@@ -2105,8 +2105,7 @@ These settings are for editing C source files.
                     comment-start "//"
                     comment-end ""
                     tab-width 4))
-    :hook ((c-mode-common . aorst/cc-mode-setup)
-           (c-mode-common . electric-pair-local-mode)))
+    :hook ((c-mode-common . aorst/cc-mode-setup)))
 #+end_src
 
 ** Markdown
@@ -2140,7 +2139,6 @@ Since I make notes in Org-mode, and I started to use it for Rust too, I need som
 #+begin_src emacs-lisp
   (use-package rust-mode
     :commands (rust-format-buffer)
-    :hook (rust-mode . electric-pair-local-mode)
     :bind (:map rust-mode-map
            ("C-c C-M-f" . rust-format-buffer)))
 #+end_src
@@ -2191,7 +2189,6 @@ Racket is nice LISP/Scheme language that I might to get into.
 
 #+begin_src emacs-lisp
   (use-package racket-mode
-    :hook (racket-repl-mode . electric-pair-local-mode)
     :bind (:map racket-mode-map
            ("C-c C-d" . racket-run-with-debugging)
            ("C-c C-M-f" . aorst/indent-buffer)
@@ -2297,8 +2294,7 @@ Perl related configurations.
 #+begin_src emacs-lisp
   (use-package perl-mode
     :straight nil
-    :hook ((perl-mode . electric-pair-local-mode)
-           (perl-mode . flycheck-mode))
+    :hook ((perl-mode . flycheck-mode))
     :bind (:map perl-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
@@ -2421,7 +2417,7 @@ Syntax based indentation for SQL:
 #+end_src
 
 ** Erlang
-Erlang is a great councurrency oriented functional language.
+Erlang is a great concurrency oriented functional language.
 It is mostly used to build massively scalable soft real-time systems with requirements on high availability.
 It runs on BEAM - an Erlang VM, and can also be used as a general purpose language.
 
@@ -2680,45 +2676,51 @@ This package will be used in many other package configurations to provide sane k
 
 ** Smartparens
 Smartparens is a package that enables structural editing in many different languages.
+Basically, for all Lisp related modes I use =smartparens-strict-mode= while for other modes I use =smartparens-mode=.
+There's also a reason I don't want to use =smart-parens-strict-mode= with something other than Lisp related modes, and it is the =;= key.
+I've kinda liked in Paredit and Parinfer that when you simply type ";", your parentheses will remain balanced.
+Smartparens also has such feature via =sp-comment= function.
+Unfortunately it is not bound by default in Lisp related configs, that are provided with Smartparens, and I don't really know if there is a clean way of binding it in this =use-package= declaration that will work for autoloaded mode-maps.
+Another problem is that not all Lisp related modes have such mode map, e.g. Racket's REPL mode doesn't have one, and I don't really know what mode map to use in this case, so binding this to strict mode map is fine by me.
 
 #+begin_src emacs-lisp
   (use-package smartparens
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode
-            cider-repl-mode
-            racket-repl-mode
-            geiser-repl-mode
-            minibuffer-inactive-mode) . smartparens-strict-mode)
+    :hook (((clojure-mode
+             emacs-lisp-mode
+             common-lisp-mode
+             scheme-mode
+             lisp-mode
+             racket-mode
+             fennel-mode
+             cider-repl-mode
+             racket-repl-mode
+             geiser-repl-mode)
+            . smartparens-strict-mode)
+           ((c-common-mode
+             rust-mode
+             perl-mode
+             org-mode
+             markdown-mode)
+            . smartparens-mode))
     :custom
     (sp-highlight-pair-overlay nil)
     (sp-highlight-wrap-overlay nil)
     (sp-highlight-wrap-tag-overlay nil)
+    (sp-wrap-respect-direction t)
+    :bind (:map smartparens-strict-mode-map
+           (";" . sp-comment))
     :config
     (require 'smartparens-config)
-    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-    (sp-use-paredit-bindings))
-#+end_src
-
-** COMMENT Paredit
-Paredit is a package that enables structural editing in Lisp languages.
-
-#+begin_src emacs-lisp
-  (use-package paredit
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode
-            cider-repl-mode
-            racket-repl-mode
-            geiser-repl-mode) . paredit-mode))
+    (sp-use-paredit-bindings)
+    (defun aorst/wrap-fix-cursor-position (_ action _)
+      "Set cursor position inside expression when wrapping."
+      (when (and (eq action 'wrap)
+                 (eq (point)
+                     (marker-position (sp-get sp-last-wrapped-region :beg))))
+        (goto-char (sp-get sp-last-wrapped-region :beg-in))))
+    (sp-pair "(" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position))
+    (sp-pair "[" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position))
+    (sp-pair "[" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position)))
 #+end_src
 
 ** COMMENT Parinfer
@@ -2967,7 +2969,7 @@ This is a built in mode for diffing files in Emacs.
 #+end_src
 
 ** Diff
-Some tweaks to inbuild diff mode.
+Some tweaks to inbuilt diff mode.
 
 #+begin_src emacs-lisp
   (use-package diff
@@ -3393,7 +3395,7 @@ A useful package that displays all keybindings available for the chord you're en
 
 ** GCMH
 Garbage Collector Magic Hack.
-Runs GC when Emacs is idle, and increases GC treshold during active use.
+Runs GC when Emacs is idle, and increases GC threshold during active use.
 
 #+begin_src emacs-lisp
   (use-package gcmh
@@ -3441,7 +3443,7 @@ Some tweaks to inbuilt parenthesis highlighting mode.
     (show-paren-delay 0))
 #+end_src
 
-** Fill column indicaror
+** Fill column indicator
 Emacs 27 added direct support for fill column indicator, which displays thin line at the desired column.
 
 #+begin_src emacs-lisp
@@ -3467,7 +3469,7 @@ Emacs 27 added direct support for fill column indicator, which displays thin lin
 #+end_src
 
 ** Rainbow Delimiters
-Color delimiters in different colors based on exression depth.
+Color delimiters in different colors based on expression depth.
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
@@ -3493,3 +3495,16 @@ And as a final step of a proper init file:
 #+end_src
 
 Thanks for reading!
+
+#  LocalWords:  init el startup GC unstyled UI Resizing resized ELPA
+#  LocalWords:  MELPA uncomment Makefile Readline Kakoune whitespace
+#  LocalWords:  Solaire DOOM's fallbacks doto Clojure Tooltips DejaVu
+#  LocalWords:  tooltips Treemacs Flycheck modeline minibuffer config
+#  LocalWords:  filetree Uniquify Tabline Prog TOML Geiser REPL Cmake
+#  LocalWords:  cmake Yaml IDE ClojureScript flycheck clj kondo Kibit
+#  LocalWords:  backend refactor refactoring linter Lua CSS Erlang VM
+#  LocalWords:  scalable interop JSON Json vterm EditorConfig Paredit
+#  LocalWords:  Smartparens Parinfer configs Flx runtime Posframe LSP
+#  LocalWords:  posframe frontend Yasnippet Magit TODOs TODO Ediff
+#  LocalWords:  Kakoune's Iedit DAP Hideshow workspace Separedit GCMH
+#  LocalWords:  Parens readonly

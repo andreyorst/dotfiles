@@ -1212,8 +1212,7 @@ truncates text if needed.  Minimal width can be set with
                   comment-start "//"
                   comment-end ""
                   tab-width 4))
-  :hook ((c-mode-common . aorst/cc-mode-setup)
-         (c-mode-common . electric-pair-local-mode)))
+  :hook ((c-mode-common . aorst/cc-mode-setup)))
 
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
@@ -1232,7 +1231,6 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package rust-mode
   :commands (rust-format-buffer)
-  :hook (rust-mode . electric-pair-local-mode)
   :bind (:map rust-mode-map
          ("C-c C-M-f" . rust-format-buffer)))
 
@@ -1258,7 +1256,6 @@ truncates text if needed.  Minimal width can be set with
   (geiser-default-implementation 'guile))
 
 (use-package racket-mode
-  :hook (racket-repl-mode . electric-pair-local-mode)
   :bind (:map racket-mode-map
          ("C-c C-d" . racket-run-with-debugging)
          ("C-c C-M-f" . aorst/indent-buffer)
@@ -1339,8 +1336,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package perl-mode
   :straight nil
-  :hook ((perl-mode . electric-pair-local-mode)
-         (perl-mode . flycheck-mode))
+  :hook ((perl-mode . flycheck-mode))
   :bind (:map perl-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
@@ -1598,25 +1594,42 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package hydra)
 
 (use-package smartparens
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode
-          fennel-mode
-          cider-repl-mode
-          racket-repl-mode
-          geiser-repl-mode
-          minibuffer-inactive-mode) . smartparens-strict-mode)
+  :hook (((clojure-mode
+           emacs-lisp-mode
+           common-lisp-mode
+           scheme-mode
+           lisp-mode
+           racket-mode
+           fennel-mode
+           cider-repl-mode
+           racket-repl-mode
+           geiser-repl-mode)
+          . smartparens-strict-mode)
+         ((c-common-mode
+           rust-mode
+           perl-mode
+           org-mode
+           markdown-mode)
+          . smartparens-mode))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
   (sp-highlight-wrap-tag-overlay nil)
+  (sp-wrap-respect-direction t)
+  :bind (:map smartparens-strict-mode-map
+         (";" . sp-comment))
   :config
   (require 'smartparens-config)
-  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-  (sp-use-paredit-bindings))
+  (sp-use-paredit-bindings)
+  (defun aorst/wrap-fix-cursor-position (_ action _)
+    "Set cursor position inside expression when wrapping."
+    (when (and (eq action 'wrap)
+               (eq (point)
+                   (marker-position (sp-get sp-last-wrapped-region :beg))))
+      (goto-char (sp-get sp-last-wrapped-region :beg-in))))
+  (sp-pair "(" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position))
+  (sp-pair "[" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position))
+  (sp-pair "[" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position)))
 
 (use-package flx)
 
