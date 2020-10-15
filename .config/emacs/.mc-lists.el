@@ -63,7 +63,10 @@
         parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        sp-backward-delete-char
+        sp-comment
         sp-delete-char
+        sp-forward-sexp
         upcase-region
         zap-up-to-char
         ))
