@@ -1603,14 +1603,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            fennel-mode
            cider-repl-mode
            racket-repl-mode
-           geiser-repl-mode)
-          . smartparens-strict-mode)
+           geiser-repl-mode) . smartparens-strict-mode)
          ((c-common-mode
            rust-mode
            perl-mode
            org-mode
-           markdown-mode)
-          . smartparens-mode))
+           markdown-mode) . smartparens-mode))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
@@ -1627,9 +1625,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                (eq (point)
                    (marker-position (sp-get sp-last-wrapped-region :beg))))
       (goto-char (sp-get sp-last-wrapped-region :beg-in))))
-  (sp-pair "(" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position))
-  (sp-pair "[" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position))
-  (sp-pair "[" nil :post-handlers '(:add aorst/sp--wrap-fix-cursor-position)))
+  (dolist (paren '("(" "[" "{"))
+    (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
 (use-package flx)
 
@@ -1915,7 +1912,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       "toggle iedit mode for item under point, and open `hydrant/iedit'."
       (interactive)
       (ignore-errors
-        (iedit-mode 1)
+        (unless (bound-and-true-p iedit-mode)
+          (iedit-mode 1))
         (hydrant/iedit/body)))))
 
 (use-package lsp-mode
