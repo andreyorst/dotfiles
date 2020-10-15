@@ -118,6 +118,11 @@ Based on `so-long-detected-long-line-p'."
 
 (load aorst--disabled-commands :noerror)
 
+(defcustom aorst-use-parinfer nil
+  "Whether Emacs should use Parinfer for Lisp editing."
+  :type 'boolean
+  :group 'aorst)
+
 (use-package savehist
   :straight nil
   :config (savehist-mode 1))
@@ -1594,6 +1599,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package hydra)
 
 (use-package smartparens
+  :unless aorst-use-parinfer
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1627,6 +1633,26 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (goto-char (sp-get sp-last-wrapped-region :beg-in))))
   (dolist (paren '("(" "[" "{"))
     (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
+
+(use-package parinfer-rust-mode
+  :if (and aorst-use-parinfer
+           (bound-and-true-p module-file-suffix)
+           (not (string-match-p "aarch" system-configuration)))
+  :straight (:host github
+             :repo "justinbarclay/parinfer-rust-mode")
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode) . parinfer-rust-mode)
+  :custom
+  (parinfer-rust-check-before-enable 'defer)
+  (parinfer-rust-dim-parens nil)
+  :custom-face
+  (parinfer-rust-dim-parens ((t (:inherit shadow))))
+  :init
+  (setq parinfer-rust-auto-download t))
 
 (use-package flx)
 

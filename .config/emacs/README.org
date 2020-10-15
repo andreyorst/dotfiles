@@ -479,6 +479,23 @@ Let's put those commands to =disabled.el= file instead:
   (load aorst--disabled-commands :noerror)
 #+end_src
 
+** Custom variables
+This section lists some custom variables that I use to toggle some parts of my configuration.
+This is rather an experiment, that allows my changing configuration without commenting out headings in this file.
+And it allows making machine local setups, since I don't include =custom.el= as a part of Emacs configuration in the repository.
+For now I'm unsure if I'll take this approach or not.
+
+*** =use-parinfer=
+This variable specifies if Parinfer should be used for Lisp editing.
+Conflicting packages, such as Paredit or Smartparens, may be configured so they check if this variable is =true= or not.
+
+#+begin_src emacs-lisp
+  (defcustom aorst-use-parinfer nil
+    "Whether Emacs should use Parinfer for Lisp editing."
+    :type 'boolean
+    :group 'aorst)
+#+end_src
+
 ** History
 Another feature I want is history between sessions. I'm not sure why it isn't default.
 
@@ -2685,6 +2702,7 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
 
 #+begin_src emacs-lisp
   (use-package smartparens
+    :unless aorst-use-parinfer
     :hook (((clojure-mode
              emacs-lisp-mode
              common-lisp-mode
@@ -2720,13 +2738,14 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
       (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 #+end_src
 
-** COMMENT Parinfer
+** Parinfer
 Parinfer implementation written in Rust language.
 Not as strict as Emacs Lisp implementation, because it does not force any formatting rules, and theoretically should be faster, but in very early stages of development.
 
 #+begin_src emacs-lisp
   (use-package parinfer-rust-mode
-    :if (and (bound-and-true-p module-file-suffix)
+    :if (and aorst-use-parinfer
+             (bound-and-true-p module-file-suffix)
              (not (string-match-p "aarch" system-configuration)))
     :straight (:host github
                :repo "justinbarclay/parinfer-rust-mode")
@@ -2739,9 +2758,8 @@ Not as strict as Emacs Lisp implementation, because it does not force any format
     :custom
     (parinfer-rust-check-before-enable 'defer)
     (parinfer-rust-dim-parens nil)
-    :custom-face (parinfer-rust-dim-parens ((t (:inherit shadow))))
-    :config
-    (add-to-list 'parinfer-rust-treat-command-as '(aorst/indent-buffer . "indent"))
+    :custom-face
+    (parinfer-rust-dim-parens ((t (:inherit shadow))))
     :init
     (setq parinfer-rust-auto-download t))
 #+end_src
