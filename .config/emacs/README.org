@@ -485,15 +485,44 @@ This is rather an experiment, that allows my changing configuration without comm
 And it allows making machine local setups, since I don't include =custom.el= as a part of Emacs configuration in the repository.
 For now I'm unsure if I'll take this approach or not.
 
-*** =use-parinfer=
+#+begin_src emacs-lisp
+  (defgroup aorst ()
+    "Various customization options that alter Emacs configuration."
+    :tag "Andrey Orst customization options")
+#+end_src
+
+*** =aorst-structural-editing=
 This variable specifies if Parinfer should be used for Lisp editing.
 Conflicting packages, such as Paredit or Smartparens, may be configured so they check if this variable is =true= or not.
 
 #+begin_src emacs-lisp
-  (defcustom aorst-use-parinfer nil
-    "Whether Emacs should use Parinfer for Lisp editing."
+  (defcustom aorst-structural-editing 'smartparens
+    "Controls what structural editing to use in various modes.
+
+  Defines main strucutral editing package for Lisp modes, if the
+  choice is PARINFER or SMARTPARENS.  Other programming modes
+  will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
+    :type '(choice (const :tag "Parinfer" parinfer)
+                   (const :tag "Smartparens" smartparens)
+                   (const :tag "Electric Pair Mode" electric-pair-mode))
+    :safe #'symbolp
+    :group 'aorst
+    :tag "Structural editing package")
+#+end_src
+
+*** =aorst-indent-guides=
+Indentation guides package is awesome, yet doesn't work as good as I'd like to, so it is disabled by default, but can be enabled here.
+
+#+begin_src emacs-lisp
+  (defcustom aorst-indent-guides nil
+    "Controls what structural editing to use in various modes.
+
+  Defines main strucutral editing package for Lisp modes, if the
+  choice is PARINFER or SMARTPARENS.  Other programming modes
+  will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
     :type 'boolean
-    :group 'aorst)
+    :group 'aorst
+    :tag "Enable indent guides")
 #+end_src
 
 ** History
@@ -2702,18 +2731,31 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
 
 #+begin_src emacs-lisp
   (use-package smartparens
-    :unless aorst-use-parinfer
-    :hook (((clojure-mode
-             emacs-lisp-mode
-             common-lisp-mode
-             scheme-mode
-             lisp-mode
-             racket-mode
-             fennel-mode
-             cider-repl-mode
-             racket-repl-mode
-             geiser-repl-mode) . smartparens-strict-mode)
-           ((c-common-mode
+    :when (eq aorst-structural-editing 'smartparens)
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode
+            fennel-mode
+            cider-repl-mode
+            racket-repl-mode
+            geiser-repl-mode) . smartparens-strict-mode)
+    :bind (:map smartparens-strict-mode-map
+           (";" . sp-comment)))
+#+end_src
+
+This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
+I do so with =aorst-structural-editing= defcustom, which configures the package to use.
+However, there are two possible ways of managing parentheses in Lisps structurally - Smartparens, and Parinfer.
+Therefore I check if  =aorst-structural-editing= is set to ='smartparens= or to ='parinfer= in the above config, but I use Smartparens in non lisp modes as well.
+For that purpose I do additional check if it is not set to ='electric-pair-mode=, which should be used for everything by default if I don't want to use Smartparens or Parinfer.
+
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :unless (eq aorst-structural-editing 'electric-pair-mode)
+    :hook (((c-common-mode
              rust-mode
              perl-mode
              org-mode
@@ -2723,8 +2765,6 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
     (sp-highlight-wrap-overlay nil)
     (sp-highlight-wrap-tag-overlay nil)
     (sp-wrap-respect-direction t)
-    :bind (:map smartparens-strict-mode-map
-           (";" . sp-comment))
     :config
     (require 'smartparens-config)
     (sp-use-paredit-bindings)
@@ -2744,7 +2784,7 @@ Not as strict as Emacs Lisp implementation, because it does not force any format
 
 #+begin_src emacs-lisp
   (use-package parinfer-rust-mode
-    :if (and aorst-use-parinfer
+    :if (and (eq aorst-structural-editing 'parinfer)
              (bound-and-true-p module-file-suffix)
              (not (string-match-p "aarch" system-configuration)))
     :straight (:host github
@@ -2762,6 +2802,15 @@ Not as strict as Emacs Lisp implementation, because it does not force any format
     (parinfer-rust-dim-parens ((t (:inherit shadow))))
     :init
     (setq parinfer-rust-auto-download t))
+#+end_src
+
+** Electric pair mode
+
+#+begin_src emacs-lisp
+  (use-package electric-pair-mode
+    :straight nil
+    :when (eq aorst-structural-editing 'electric-pair-mode)
+    :hook ((prog-mode) . electric-pair-local-mode))
 #+end_src
 
 ** Flx
@@ -3418,11 +3467,12 @@ Runs GC when Emacs is idle, and increases GC threshold during active use.
     :config (gcmh-mode t))
 #+end_src
 
-** COMMENT Indent Guides
+** Indent Guides
 Indentation guides for Emacs.
 
 #+begin_src emacs-lisp
   (use-package highlight-indent-guides
+    :when aorst-indent-guides
     :hook ((prog-mode . highlight-indent-guides-mode)
            (aorst--load-theme . aorst/indent-guides-setup-faces))
     :custom

@@ -118,10 +118,32 @@ Based on `so-long-detected-long-line-p'."
 
 (load aorst--disabled-commands :noerror)
 
-(defcustom aorst-use-parinfer nil
-  "Whether Emacs should use Parinfer for Lisp editing."
+(defgroup aorst ()
+  "Various customization options that alter Emacs configuration."
+  :tag "Andrey Orst customization options")
+
+(defcustom aorst-structural-editing 'smartparens
+  "Controls what structural editing to use in various modes.
+
+Defines main strucutral editing package for Lisp modes, if the
+choice is PARINFER or SMARTPARENS.  Other programming modes
+will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
+  :type '(choice (const :tag "Parinfer" parinfer)
+                 (const :tag "Smartparens" smartparens)
+                 (const :tag "Electric Pair Mode" electric-pair-mode))
+  :safe #'symbolp
+  :group 'aorst
+  :tag "Structural editing package")
+
+(defcustom aorst-indent-guides nil
+  "Controls what structural editing to use in various modes.
+
+Defines main strucutral editing package for Lisp modes, if the
+choice is PARINFER or SMARTPARENS.  Other programming modes
+will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :type 'boolean
-  :group 'aorst)
+  :group 'aorst
+  :tag "Enable indent guides")
 
 (use-package savehist
   :straight nil
@@ -1599,18 +1621,23 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package hydra)
 
 (use-package smartparens
-  :unless aorst-use-parinfer
-  :hook (((clojure-mode
-           emacs-lisp-mode
-           common-lisp-mode
-           scheme-mode
-           lisp-mode
-           racket-mode
-           fennel-mode
-           cider-repl-mode
-           racket-repl-mode
-           geiser-repl-mode) . smartparens-strict-mode)
-         ((c-common-mode
+  :when (eq aorst-structural-editing 'smartparens)
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode
+          fennel-mode
+          cider-repl-mode
+          racket-repl-mode
+          geiser-repl-mode) . smartparens-strict-mode)
+  :bind (:map smartparens-strict-mode-map
+         (";" . sp-comment)))
+
+(use-package smartparens
+  :unless (eq aorst-structural-editing 'electric-pair-mode)
+  :hook (((c-common-mode
            rust-mode
            perl-mode
            org-mode
@@ -1620,8 +1647,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (sp-highlight-wrap-overlay nil)
   (sp-highlight-wrap-tag-overlay nil)
   (sp-wrap-respect-direction t)
-  :bind (:map smartparens-strict-mode-map
-         (";" . sp-comment))
   :config
   (require 'smartparens-config)
   (sp-use-paredit-bindings)
@@ -1635,7 +1660,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
 (use-package parinfer-rust-mode
-  :if (and aorst-use-parinfer
+  :if (and (eq aorst-structural-editing 'parinfer)
            (bound-and-true-p module-file-suffix)
            (not (string-match-p "aarch" system-configuration)))
   :straight (:host github
@@ -1653,6 +1678,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (parinfer-rust-dim-parens ((t (:inherit shadow))))
   :init
   (setq parinfer-rust-auto-download t))
+
+(use-package electric-pair-mode
+  :straight nil
+  :when (eq aorst-structural-editing 'electric-pair-mode)
+  :hook ((prog-mode) . electric-pair-local-mode))
 
 (use-package flx)
 
@@ -2108,6 +2138,32 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package gcmh
   :config (gcmh-mode t))
+
+(use-package highlight-indent-guides
+  :when aorst-indent-guides
+  :hook ((prog-mode . highlight-indent-guides-mode)
+         (aorst--load-theme . aorst/indent-guides-setup-faces))
+  :custom
+  (highlight-indent-guides-method 'character)
+  (highlight-indent-guides-character ?▏) ;; ┊│┆▏
+  (highlight-indent-guides-bitmap-function #'aorst/indent-guides-thin-line)
+  (highlight-indent-guides-responsive 'top)
+  (highlight-indent-guides-delay 0)
+  :config
+  (defun aorst/indent-guides-setup-faces ()
+    (mapc (lambda (buffer)
+            (with-current-buffer buffer
+              (when highlight-indent-guides-mode
+                (highlight-indent-guides-mode -1)
+                (highlight-indent-guides-mode 1))))
+          (buffer-list)))
+  (defun aorst/indent-guides-thin-line (width height crep zrep)
+    "Defines a solid guide line, one pixel wide."
+    (let* ((right (- width 2))
+           (row (append (make-list 1 zrep) (make-list 1 crep) (make-list right zrep)))
+           rows)
+      (dotimes (i height rows)
+        (setq rows (cons row rows))))))
 
 (use-package paren
   :straight nil
