@@ -143,7 +143,7 @@ choice is PARINFER or SMARTPARENS.  Other programming modes
 will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :type 'boolean
   :group 'aorst
-  :tag "Enable indent guides")
+  :tag "Indent guides")
 
 (use-package savehist
   :straight nil

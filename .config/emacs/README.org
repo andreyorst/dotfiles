@@ -215,6 +215,8 @@ This section is commented because I'm no longer using =package.el= as my package
 Instead I'm using =straight.el=, which provides more facilities, and does not have most of =package.el= problems.
 However, I still keep this configuration, since I might switch back, and I would not want to configure everything again.
 If you want to use =package.el= instead, make sure to uncomment this heading, and comment =straight.el= heading.
+You will also need to replace =:straight= with equivalent variant of =:ensure= keywords in =use-package= declarations.
+However not all of the packages may be available on ELPA or MELPA.
 #+end_comment
 
 To obtain plugins we need =package.el= package.
@@ -522,7 +524,7 @@ Indentation guides package is awesome, yet doesn't work as good as I'd like to, 
   will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
     :type 'boolean
     :group 'aorst
-    :tag "Enable indent guides")
+    :tag "Indent guides")
 #+end_src
 
 ** History
