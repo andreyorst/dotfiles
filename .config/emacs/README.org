@@ -2404,7 +2404,7 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
   (use-package clj-refactor
     :hook ((cider-mode . clj-refactor-mode)
            (cider-mode . yas-minor-mode))
-    :custom (cljr-suppress-no-project-warning nil)
+    :custom (cljr-suppress-no-project-warning t)
             (cljr-warn-on-eval nil))
 #+end_src
 
@@ -2703,14 +2703,6 @@ Some languages have better support with =flycheck=.
 #+begin_src emacs-lisp
   (use-package flycheck-cask
     :hook (flycheck-mode . flycheck-cask-setup))
-#+end_src
-
-*** Flycheck Vale
-=flycheck-vale= is a package for using [[https://github.com/errata-ai/vale][Vale]] linter for prose.
-
-#+begin_src emacs-lisp
-  (use-package flycheck-vale
-    :hook (flycheck-mode . flycheck-vale-setup))
 #+end_src
 
 ** Hydra
