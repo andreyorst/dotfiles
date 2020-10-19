@@ -135,7 +135,7 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :group 'aorst
   :tag "Structural editing package")
 
-(defcustom aorst-indent-guides nil
+(defcustom aorst-enable-indent-guides nil
   "Controls what structural editing to use in various modes.
 
 Defines main strucutral editing package for Lisp modes, if the
@@ -144,6 +144,12 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :type 'boolean
   :group 'aorst
   :tag "Indent guides")
+
+(defcustom aorst-enable-treemacs t
+  "Whether to enable Treemacs."
+  :type 'boolean
+  :group 'aorst
+  :tag "Treemacs")
 
 (use-package savehist
   :straight nil
@@ -788,6 +794,7 @@ offset variables."
                         (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
 
 (use-package treemacs
+  :when aorst-enable-treemacs
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-load-theme)
@@ -865,13 +872,12 @@ offset variables."
          `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
   (defun aorst/treemacs-after-init-setup ()
     "Set treemacs theme, open treemacs, and expand all projects."
-    (when (display-graphic-p)
-      (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
-      (treemacs-load-theme "Atom")
-      (treemacs)
-      (treemacs-fringe-indicator-mode -1)
-      (aorst/treemacs-expand-all-projects)
-      (windmove-right)))
+    (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
+    (treemacs-load-theme "Atom")
+    (treemacs)
+    (treemacs-fringe-indicator-mode -1)
+    (aorst/treemacs-expand-all-projects)
+    (windmove-right))
   (defun aorst/after-treemacs-setup ()
     "Set treemacs buffer common settings."
     (setq tab-width 1
@@ -2137,7 +2143,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config (gcmh-mode t))
 
 (use-package highlight-indent-guides
-  :when aorst-indent-guides
+  :when aorst-enable-indent-guides
   :hook ((prog-mode . highlight-indent-guides-mode)
          (aorst--load-theme . aorst/indent-guides-setup-faces))
   :custom

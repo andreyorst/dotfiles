@@ -512,11 +512,11 @@ Conflicting packages, such as Paredit or Smartparens, may be configured so they 
     :tag "Structural editing package")
 #+end_src
 
-*** =aorst-indent-guides=
+*** =aorst-indent-guides-enabled=
 Indentation guides package is awesome, yet doesn't work as good as I'd like to, so it is disabled by default, but can be enabled here.
 
 #+begin_src emacs-lisp
-  (defcustom aorst-indent-guides nil
+  (defcustom aorst-enable-indent-guides nil
     "Controls what structural editing to use in various modes.
 
   Defines main strucutral editing package for Lisp modes, if the
@@ -525,6 +525,18 @@ Indentation guides package is awesome, yet doesn't work as good as I'd like to, 
     :type 'boolean
     :group 'aorst
     :tag "Indent guides")
+#+end_src
+
+*** =aorst-indent-guides-enabled=
+Controls if Treemacs package should be enabled for current configuration.
+Handy for using Emacs in terminal only systems.
+
+#+begin_src emacs-lisp
+  (defcustom aorst-enable-treemacs t
+    "Whether to enable Treemacs."
+    :type 'boolean
+    :group 'aorst
+    :tag "Treemacs")
 #+end_src
 
 ** History
@@ -1471,6 +1483,7 @@ Which is good.
 
 #+begin_src emacs-lisp
   (use-package treemacs
+    :when aorst-enable-treemacs
     :commands (treemacs-follow-mode
                treemacs-filewatch-mode
                treemacs-load-theme)
@@ -1548,13 +1561,12 @@ Which is good.
            `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
     (defun aorst/treemacs-after-init-setup ()
       "Set treemacs theme, open treemacs, and expand all projects."
-      (when (display-graphic-p)
-        (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
-        (treemacs-load-theme "Atom")
-        (treemacs)
-        (treemacs-fringe-indicator-mode -1)
-        (aorst/treemacs-expand-all-projects)
-        (windmove-right)))
+      (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
+      (treemacs-load-theme "Atom")
+      (treemacs)
+      (treemacs-fringe-indicator-mode -1)
+      (aorst/treemacs-expand-all-projects)
+      (windmove-right))
     (defun aorst/after-treemacs-setup ()
       "Set treemacs buffer common settings."
       (setq tab-width 1
@@ -3466,7 +3478,7 @@ Indentation guides for Emacs.
 
 #+begin_src emacs-lisp
   (use-package highlight-indent-guides
-    :when aorst-indent-guides
+    :when aorst-enable-indent-guides
     :hook ((prog-mode . highlight-indent-guides-mode)
            (aorst--load-theme . aorst/indent-guides-setup-faces))
     :custom
