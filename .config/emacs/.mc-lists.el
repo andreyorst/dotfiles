@@ -130,6 +130,7 @@
         parinfer-toggle-mode
         phi-search
         rust-format-buffer
+        sp-backward-sexp
         tab-line-select-tab
         term-line-mode
         term-send-raw
