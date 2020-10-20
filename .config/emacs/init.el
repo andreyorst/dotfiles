@@ -715,8 +715,10 @@ offset variables."
                                               (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
                     ((bound-and-true-p paredit-mode)
                      (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
-                    ((or (bound-and-true-p smartparens-strict-mode) (bound-and-true-p smartparens-mode))
-                     (propertize "Smartparens" 'help-echo "Smartparens mode is enabled for current buffer"))
+                    ((bound-and-true-p smartparens-strict-mode)
+                     (propertize "SP (Strict)" 'help-echo "Smartparens mode is enabled for current buffer"))
+                    ((bound-and-true-p smartparens-mode)
+                     (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
                     ((bound-and-true-p lispy-mode)
                      (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
                     ((bound-and-true-p electric-pair-mode)
@@ -1645,11 +1647,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package smartparens
   :unless (eq aorst-structural-editing 'electric-pair-mode)
-  :hook (((c-common-mode
-           rust-mode
-           perl-mode
-           org-mode
-           markdown-mode) . smartparens-mode))
+  :hook (((org-mode
+           markdown-mode
+           prog-mode) . smartparens-mode))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
