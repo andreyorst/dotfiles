@@ -151,6 +151,12 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :group 'aorst
   :tag "Treemacs")
 
+(defcustom aorst-enable-tabline t
+  "Whether to enable Tabline."
+  :type 'boolean
+  :group 'aorst
+  :tag "Tabline")
+
 (use-package savehist
   :straight nil
   :config (savehist-mode 1))
@@ -907,8 +913,7 @@ offset variables."
 
 (use-package tab-line
   :straight nil
-  :unless (or (version< emacs-version "27")
-              (not (display-graphic-p)))
+  :when aorst-enable-tabline
   :hook ((after-init . global-tab-line-mode)
          ((aorst--load-theme
            aorst--disable-theme

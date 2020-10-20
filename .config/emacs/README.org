@@ -512,7 +512,7 @@ Conflicting packages, such as Paredit or Smartparens, may be configured so they 
     :tag "Structural editing package")
 #+end_src
 
-*** =aorst-indent-guides-enabled=
+*** =aorst-enable-indent-guides=
 Indentation guides package is awesome, yet doesn't work as good as I'd like to, so it is disabled by default, but can be enabled here.
 
 #+begin_src emacs-lisp
@@ -527,7 +527,7 @@ Indentation guides package is awesome, yet doesn't work as good as I'd like to, 
     :tag "Indent guides")
 #+end_src
 
-*** =aorst-indent-guides-enabled=
+*** =aorst-enable-treemacs=
 Controls if Treemacs package should be enabled for current configuration.
 Handy for using Emacs in terminal only systems.
 
@@ -537,6 +537,17 @@ Handy for using Emacs in terminal only systems.
     :type 'boolean
     :group 'aorst
     :tag "Treemacs")
+#+end_src
+
+*** =aorst-enable-tabline=
+Controls if Tabline package should be enabled for current configuration.
+
+#+begin_src emacs-lisp
+  (defcustom aorst-enable-tabline t
+    "Whether to enable Tabline."
+    :type 'boolean
+    :group 'aorst
+    :tag "Tabline")
 #+end_src
 
 ** History
@@ -1800,8 +1811,7 @@ I want to customize tab appearance to match my theme.
 #+begin_src emacs-lisp
   (use-package tab-line
     :straight nil
-    :unless (or (version< emacs-version "27")
-                (not (display-graphic-p)))
+    :when aorst-enable-tabline
     :hook ((after-init . global-tab-line-mode)
            ((aorst--load-theme
              aorst--disable-theme
