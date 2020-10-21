@@ -1604,6 +1604,7 @@ Which is good.
                      (concat (make-string width ?\s) text)))))))))
 #+end_src
 
+*** Treemacs Atom theme
 Here's a Atom inspired theme for Treemacs, that I'm tangling to separate file, to reduce Treemacs config size a bit:
 
 #+begin_src emacs-lisp :tangle ./treemacs-atom-theme.el
@@ -1744,7 +1745,7 @@ Here's a Atom inspired theme for Treemacs, that I'm tangling to separate file, t
                     "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
                     "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
                     "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                    "gitconfig"))
+                    "gitconfig" "gitignore" "conf" "lock" "project"))
       (treemacs-create-icon
        :icon (format "  %s\t"
                      (all-the-icons-octicon
@@ -1763,7 +1764,7 @@ Here's a Atom inspired theme for Treemacs, that I'm tangling to separate file, t
                                :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
        :fallback ""
        :extensions ("md" "markdown" "rst" "log" "org" "txt"
-                    "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
+                    "contribute" "license" "readme" "changelog"))
       (treemacs-create-icon
        :icon (format "  %s\t" (all-the-icons-octicon
                                "file-binary"

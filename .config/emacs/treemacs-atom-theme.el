@@ -59,7 +59,7 @@
                     "package"
                     :v-adjust 0
                     :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-     :fallback (propertize "▾ " 'face 'font-lock-string-face)
+     :fallback (propertize "v " 'face 'font-lock-string-face)
      :extensions (tag-open))
     (treemacs-create-icon
      :icon (format "%s\t%s\t"
@@ -72,7 +72,7 @@
                     "package"
                     :v-adjust 0
                     :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-     :fallback (propertize "▸ " 'face 'font-lock-string-face)
+     :fallback (propertize "> " 'face 'font-lock-string-face)
      :extensions (tag-closed))
     (treemacs-create-icon
      :icon (format "%s\t"
@@ -135,7 +135,7 @@
                   "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
                   "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
                   "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                  "gitconfig"))
+                  "gitconfig" "gitignore" "conf" "lock" "project"))
     (treemacs-create-icon
      :icon (format "  %s\t"
                    (all-the-icons-octicon
@@ -154,7 +154,7 @@
                              :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("md" "markdown" "rst" "log" "org" "txt"
-                  "CONTRIBUTE" "LICENSE" "README" "CHANGELOG"))
+                  "contribute" "license" "readme" "changelog"))
     (treemacs-create-icon
      :icon (format "  %s\t" (all-the-icons-octicon
                              "file-binary"
