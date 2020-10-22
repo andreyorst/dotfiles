@@ -1397,6 +1397,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (cider-repl-display-help-banner nil)
   (cider-repl-tab-command #'company-complete-common-or-cycle)
   (nrepl-hide-special-buffers t)
+  (cider-test-show-report-on-success t)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")

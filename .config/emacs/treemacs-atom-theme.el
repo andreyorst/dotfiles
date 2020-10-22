@@ -59,7 +59,7 @@
                     "package"
                     :v-adjust 0
                     :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-     :fallback (propertize "v " 'face 'font-lock-string-face)
+     :fallback (propertize "▾ " 'face 'font-lock-string-face)
      :extensions (tag-open))
     (treemacs-create-icon
      :icon (format "%s\t%s\t"
@@ -72,7 +72,7 @@
                     "package"
                     :v-adjust 0
                     :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
-     :fallback (propertize "> " 'face 'font-lock-string-face)
+     :fallback (propertize "▸ " 'face 'font-lock-string-face)
      :extensions (tag-closed))
     (treemacs-create-icon
      :icon (format "%s\t"
