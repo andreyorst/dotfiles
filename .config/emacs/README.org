@@ -1745,7 +1745,7 @@ Here's a Atom inspired theme for Treemacs, that I'm tangling to separate file, t
                     "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
                     "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
                     "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                    "gitconfig" "gitignore" "conf" "lock" "project"))
+                    "gitconfig" "gitignore" "conf" "lock" "project" "fnl"))
       (treemacs-create-icon
        :icon (format "  %s\t"
                      (all-the-icons-octicon
@@ -2400,6 +2400,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
     (cider-repl-tab-command #'company-complete-common-or-cycle)
     (nrepl-hide-special-buffers t)
     (cider-test-show-report-on-success t)
+    (cider-allow-jack-in-without-project t)
     :config
     (setq cider-jdk-src-paths nil)
     (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
