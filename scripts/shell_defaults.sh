@@ -11,6 +11,8 @@ alias g="git"
 
 alias ssh="TERM=xterm ssh"
 
+alias copy="xsel -bi"
+
 [ -n "$(command -v tmux)" ] && alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
 
 # Edit things in apropriate environment
