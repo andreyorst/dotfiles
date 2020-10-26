@@ -64,9 +64,11 @@
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
         sp-backward-delete-char
+        sp-backward-sexp
         sp-comment
         sp-delete-char
         sp-forward-sexp
+        sp-forward-slurp-sexp
         upcase-region
         zap-up-to-char
         ))
@@ -74,6 +76,7 @@
 (setq mc/cmds-to-run-once
       '(
         aorst/treemacs-expand-all-projects
+        aorst/vterm-focus
         cider-debug-mode-send-reply
         cider-repl-return
         clang-format-buffer
@@ -130,7 +133,6 @@
         parinfer-toggle-mode
         phi-search
         rust-format-buffer
-        sp-backward-sexp
         tab-line-select-tab
         term-line-mode
         term-send-raw
@@ -141,6 +143,8 @@
         undo-tree-visualize
         vterm--self-insert
         vterm-send-C-a
+        vterm-send-C-c
+        vterm-send-backspace
         xref-find-definitions
         yank-rectangle
         ))
