@@ -2348,7 +2348,18 @@ I write some Emacs Lisp and experience is already quite good, I just want to ena
 Support for =.yaml= files.
 
 #+begin_src emacs-lisp
-  (use-package yaml-mode)
+  (use-package yaml-mode
+    :custom (yaml-indent-offset 4))
+#+end_src
+
+*** flycheck-yamllint
+Yaml linter integration with Flycheck.
+
+#+begin_src emacs-lisp
+  (use-package flycheck-yamllint
+    :when (executable-find "yamllint")
+    :hook ((yaml-mode . flycheck-yamllint-setup)
+           (yaml-mode . flycheck-mode)))
 #+end_src
 
 ** Shell Script

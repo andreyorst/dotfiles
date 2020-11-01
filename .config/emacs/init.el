@@ -1367,7 +1367,13 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)))
 
-(use-package yaml-mode)
+(use-package yaml-mode
+  :custom (yaml-indent-offset 4))
+
+(use-package flycheck-yamllint
+  :when (executable-find "yamllint")
+  :hook ((yaml-mode . flycheck-yamllint-setup)
+         (yaml-mode . flycheck-mode)))
 
 (use-package sh-script
   :straight nil
