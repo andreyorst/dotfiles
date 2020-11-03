@@ -1448,8 +1448,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom
   (css-indent-offset 2))
 
-(use-package lsp-java)
-
 (use-package sql-indent
   :hook (sql-mode . sqlind-minor-mode))
 
@@ -2022,6 +2020,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
   (lsp-ui-mode))
+
+(use-package lsp-java
+  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
+  :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
 (use-package dap-mode
   :hook (lsp-mode . dap-mode))

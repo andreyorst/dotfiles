@@ -2488,13 +2488,6 @@ CSS indentation tweaks.
     (css-indent-offset 2))
 #+end_src
 
-** Java
-Support for Java is inbuilt, but to use Java Language Server we need this package:
-
-#+begin_src emacs-lisp
-  (use-package lsp-java)
-#+end_src
-
 ** SQL
 Syntax based indentation for SQL:
 
@@ -3258,6 +3251,16 @@ User interface package for LSP.
         (unless (eq this-command 'aorst/escape)
           (funcall foo))))
     (lsp-ui-mode))
+#+end_src
+
+*** LSP Java
+In order to use Java Language Server we need this package.
+However, language server requires JDK 11 to run, so we only load it when JDK 11 is available.
+
+#+begin_src emacs-lisp
+  (use-package lsp-java
+    :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
+    :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 #+end_src
 
 ** DAP Mode
