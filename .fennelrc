@@ -1,0 +1,5 @@
+;; -*- mode: fennel -*-
+
+(match package.loaded.readline
+  rl (rl.set_options {:histfile  "~/.fennel_history"
+                      :keeplines 1000}))
