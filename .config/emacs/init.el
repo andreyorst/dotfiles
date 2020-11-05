@@ -1650,7 +1650,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           racket-repl-mode
           geiser-repl-mode) . smartparens-strict-mode)
   :bind (:map smartparens-strict-mode-map
-         (";" . sp-comment)))
+         (";" . sp-comment))
+  :config
+  (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
   :unless (eq aorst-structural-editing 'electric-pair-mode)
