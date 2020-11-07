@@ -3583,6 +3583,14 @@ Color delimiters in different colors based on expression depth.
             racket-mode) . rainbow-delimiters-mode))
 #+end_src
 
+** Writable Grep
+This package provides a way of editing grep buffer and applying edits to the files.
+Extremely useful with ivy-occur.
+
+#+begin_src emacs-lisp
+  (use-package wgrep)
+#+end_src
+
 * Postscript
 This Emacs Configuration features various cool E-Lisp hacks that I've found over the Internet.
 I try to keep references to original places because I want to credit original author, and because I alter these pieces of code for my personal needs, and it is good to have the original source.

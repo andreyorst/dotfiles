@@ -2220,5 +2220,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           lisp-mode
           racket-mode) . rainbow-delimiters-mode))
 
+(use-package wgrep)
+
 (provide 'init)
 ;;; init.el ends here
