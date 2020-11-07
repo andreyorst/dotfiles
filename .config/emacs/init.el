@@ -2222,5 +2222,18 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package wgrep)
 
+(use-package xref
+  :straight nil
+  :hook (xref-after-jump . aorst/xref-remove-treemacs-from-marker-ring)
+  :requires seq
+  :config
+  (defun aorst/xref-remove-treemacs-from-marker-ring ()
+    (when-let ((i (seq-position (ring-elements xref--marker-ring)
+                                " \*Treemacs-Scoped-Buffer.*"
+                                (lambda (elem re)
+                                  (when elem
+                                    (string-match-p re (buffer-name (marker-buffer elem))))))))
+      (ring-remove xref--marker-ring i))))
+
 (provide 'init)
 ;;; init.el ends here

@@ -3591,6 +3591,24 @@ Extremely useful with ivy-occur.
   (use-package wgrep)
 #+end_src
 
+** Xref
+Workaround for a problem with Treemacs and marker stack: [[https://github.com/Alexander-Miller/treemacs/issues/734][Alexander-Miller/treemacs#734]].
+
+#+begin_src emacs-lisp
+  (use-package xref
+    :straight nil
+    :hook (xref-after-jump . aorst/xref-remove-treemacs-from-marker-ring)
+    :requires seq
+    :config
+    (defun aorst/xref-remove-treemacs-from-marker-ring ()
+      (when-let ((i (seq-position (ring-elements xref--marker-ring)
+                                  " \*Treemacs-Scoped-Buffer.*"
+                                  (lambda (elem re)
+                                    (when elem
+                                      (string-match-p re (buffer-name (marker-buffer elem))))))))
+        (ring-remove xref--marker-ring i))))
+#+end_src
+
 * Postscript
 This Emacs Configuration features various cool E-Lisp hacks that I've found over the Internet.
 I try to keep references to original places because I want to credit original author, and because I alter these pieces of code for my personal needs, and it is good to have the original source.
