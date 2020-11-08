@@ -1648,7 +1648,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           fennel-mode
           cider-repl-mode
           racket-repl-mode
-          geiser-repl-mode) . smartparens-strict-mode)
+          geiser-repl-mode
+          inferior-emacs-lisp-mode) . smartparens-strict-mode)
   :bind (:map smartparens-strict-mode-map
          (";" . sp-comment))
   :config

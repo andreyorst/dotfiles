@@ -2767,7 +2767,8 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
             fennel-mode
             cider-repl-mode
             racket-repl-mode
-            geiser-repl-mode) . smartparens-strict-mode)
+            geiser-repl-mode
+            inferior-emacs-lisp-mode) . smartparens-strict-mode)
     :bind (:map smartparens-strict-mode-map
            (";" . sp-comment))
     :config
