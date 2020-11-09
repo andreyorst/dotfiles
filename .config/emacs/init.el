@@ -245,7 +245,8 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
                           " *Echo Area"
                           "*Process List*"
                           "*Ediff"
-                          " *LV*"))
+                          " *LV*"
+                          "*Ilist*"))
             (buffer-name buffer))
            (minibufferp))))
 
@@ -1061,7 +1062,8 @@ truncates text if needed.  Minimal width can be set with
                                  process-menu-mode
                                  term-mode
                                  vterm-mode
-                                 treemacs-mode))
+                                 treemacs-mode
+                                 imenu-list-major-mode))
 
 
   (defun aorst/tabline-setup-faces ()
@@ -2235,6 +2237,16 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                   (when elem
                                     (string-match-p re (buffer-name (marker-buffer elem))))))))
       (ring-remove xref--marker-ring i))))
+
+(use-package imenu-list
+  :custom
+  (imenu-list-position 'right)
+  (imenu-list-size 32)
+  (imenu-list-mode-line-format nil))
+
+(use-package vc-hooks
+  :straight nil
+  :custom (vc-follow-symlinks t))
 
 (provide 'init)
 ;;; init.el ends here
