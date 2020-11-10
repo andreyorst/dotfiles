@@ -2238,12 +2238,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                     (string-match-p re (buffer-name (marker-buffer elem))))))))
       (ring-remove xref--marker-ring i))))
 
-(use-package imenu-list
-  :custom
-  (imenu-list-position 'right)
-  (imenu-list-size 32)
-  (imenu-list-mode-line-format nil))
-
 (use-package vc-hooks
   :straight nil
   :custom (vc-follow-symlinks t))

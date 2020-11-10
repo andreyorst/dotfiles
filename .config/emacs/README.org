@@ -3612,16 +3612,6 @@ Workaround for a problem with Treemacs and marker stack: [[https://github.com/Al
         (ring-remove xref--marker-ring i))))
 #+end_src
 
-** Imenu List
-
-#+begin_src emacs-lisp
-  (use-package imenu-list
-    :custom
-    (imenu-list-position 'right)
-    (imenu-list-size 32)
-    (imenu-list-mode-line-format nil))
-#+end_src
-
 ** VC mode
 Tweaks for inbuild VC mode.
 
