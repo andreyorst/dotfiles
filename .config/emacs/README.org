@@ -2576,7 +2576,7 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
       (let* ((directory (if default-directory
                             default-directory
                           (expand-file-name "~/")))
-             (bufname "*vterm*")
+             (bufname " *vterm*")
              (window (get-buffer-window bufname)))
         (if window
             (ignore-errors (delete-window window))
@@ -2595,7 +2595,11 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
             (cond ((get-buffer bufname)
                    (switch-to-buffer bufname))
                   (t (let ((default-directory directory))
-                       (vterm bufname))))
+                       (vterm "*vterm*")
+                       (when (bound-and-true-p global-tab-line-mode)
+                         (previous-buffer)
+                         (bury-buffer))
+                       (rename-buffer " *vterm*"))))
             (set-window-dedicated-p window t)
             (set-window-parameter window 'no-delete-other-windows t)
             (when side
@@ -2604,7 +2608,7 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
     (defun aorst/vterm-focus (&optional arg)
       "Focus `vterm' or open one if there's none."
       (interactive "P")
-      (let ((window (get-buffer-window "*vterm*")))
+      (let ((window (get-buffer-window " *vterm*")))
         (if window
             (select-window window)
           (aorst/vterm-toggle arg))))

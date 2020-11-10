@@ -1490,7 +1490,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (let* ((directory (if default-directory
                           default-directory
                         (expand-file-name "~/")))
-           (bufname "*vterm*")
+           (bufname " *vterm*")
            (window (get-buffer-window bufname)))
       (if window
           (ignore-errors (delete-window window))
@@ -1509,7 +1509,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           (cond ((get-buffer bufname)
                  (switch-to-buffer bufname))
                 (t (let ((default-directory directory))
-                     (vterm bufname))))
+                     (vterm "*vterm*")
+                     (when (bound-and-true-p global-tab-line-mode)
+                       (previous-buffer)
+                       (bury-buffer))
+                     (rename-buffer " *vterm*"))))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
           (when side
@@ -1518,7 +1522,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (defun aorst/vterm-focus (&optional arg)
     "Focus `vterm' or open one if there's none."
     (interactive "P")
-    (let ((window (get-buffer-window "*vterm*")))
+    (let ((window (get-buffer-window " *vterm*")))
       (if window
           (select-window window)
         (aorst/vterm-toggle arg))))
