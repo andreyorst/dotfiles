@@ -2275,5 +2275,16 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight nil
   :custom (vc-follow-symlinks t))
 
+(use-package quail
+  :straight nil
+  :config
+  (defun aorst/hide-quail-buffer ()
+    "Hide Quail buffer."
+    (with-current-buffer quail-completion-buf
+      (when (string= "*Quail Completions*" (buffer-name))
+        (rename-buffer " *Quail Completions*"))))
+  (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
+    (aorst/hide-quail-buffer)))
+
 (provide 'init)
 ;;; init.el ends here
