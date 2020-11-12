@@ -70,6 +70,7 @@
         sp-forward-sexp
         sp-forward-slurp-sexp
         sp-kill-hybrid-sexp
+        sp-splice-sexp-killing-backward
         upcase-region
         zap-up-to-char
         ))
