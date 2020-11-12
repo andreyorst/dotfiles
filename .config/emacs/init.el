@@ -159,9 +159,10 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
 
 (defcustom aorst-theme-variant 'light
   "What theme variant to use."
-  :type '(choice (const :tag "light" 'light)
-                 (const :tag "dark" 'dark))
+  :type '(choice (const :tag "light" light)
+                 (const :tag "dark" dark))
   :group 'aorst
+  :safe #'symbolp
   :tag "Theme variant")
 
 (use-package savehist
@@ -487,9 +488,12 @@ Used in various places to avoid getting wrong line height when
   (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (if (eq aorst-theme-variant 'light)
-      (load-theme 'doom-one-light t)
-    (load-theme 'doom-spacegrey t)))
+  (defun aorst/change-theme-variant (_ val &rest _)
+    (if (eq val 'light)
+        (load-theme 'doom-one-light t)
+      (load-theme 'doom-spacegrey t)))
+  (add-variable-watcher 'aorst-theme-variant #'aorst/change-theme-variant)
+  (aorst/change-theme-variant nil aorst-theme-variant))
 
 (defvar aorst--load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
@@ -810,7 +814,7 @@ offset variables."
     (defun aorst/window-divider-setup-faces ()
       (let* ((color (face-attribute 'mode-line-inactive :background))
              (color (if (fboundp #'doom-darken)
-                        (doom-darken color 0.3))))
+                        (doom-darken color 0.15))))
         (set-face-attribute 'window-divider nil :foreground color)))
     (aorst/window-divider-setup-faces)))
 
