@@ -505,6 +505,7 @@ Conflicting packages, such as Paredit or Smartparens, may be configured so they 
   choice is PARINFER or SMARTPARENS.  Other programming modes
   will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
     :type '(choice (const :tag "Parinfer" parinfer)
+                   (const :tag "Parinfer ELisp" parinfer-elisp)
                    (const :tag "Smartparens" smartparens)
                    (const :tag "Electric Pair Mode" electric-pair-mode))
     :safe #'symbolp
@@ -2828,7 +2829,7 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
 
 #+begin_src emacs-lisp
   (use-package smartparens
-    :unless (eq aorst-structural-editing 'electric-pair-mode)
+    :unless (not (eq aorst-structural-editing 'electric-pair-mode))
     :hook (((org-mode
              markdown-mode
              prog-mode) . smartparens-mode))
@@ -2850,7 +2851,7 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
       (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 #+end_src
 
-** Parinfer
+** Parinfer Rust
 Parinfer implementation written in Rust language.
 Not as strict as Emacs Lisp implementation, because it does not force any formatting rules, and theoretically should be faster, but in very early stages of development.
 
@@ -2874,6 +2875,29 @@ Not as strict as Emacs Lisp implementation, because it does not force any format
     (parinfer-rust-dim-parens ((t (:inherit shadow))))
     :init
     (setq parinfer-rust-auto-download t))
+#+end_src
+
+** Parinfer ELisp
+Parinfer implemented in Emacs Lisp.
+The most portable version, as it doesn't require neither module support, nor compilation for specific architecture.
+Extremely useful on mobile phone, where shortcut options are very limited, and such packages, like Smartparens or Paredit would require to set a lot of uncommon keybindings.
+
+#+begin_src emacs-lisp
+  (use-package parinfer-smart
+    :when (eq aorst-structural-editing 'parinfer-elisp)
+    :straight (:host github
+               :repo "DogLooksGood/parinfer-mode"
+               :branch "smart")
+    :hook ((clojure-mode
+            emacs-lisp-mode
+            common-lisp-mode
+            scheme-mode
+            lisp-mode
+            racket-mode
+            fennel-mode) . parinfer-mode)
+    :init
+    (use-package paredit)
+    (use-package selected))
 #+end_src
 
 ** Electric pair mode

@@ -129,6 +129,7 @@ Defines main strucutral editing package for Lisp modes, if the
 choice is PARINFER or SMARTPARENS.  Other programming modes
 will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :type '(choice (const :tag "Parinfer" parinfer)
+                 (const :tag "Parinfer ELisp" parinfer-elisp)
                  (const :tag "Smartparens" smartparens)
                  (const :tag "Electric Pair Mode" electric-pair-mode))
   :safe #'symbolp
@@ -1691,7 +1692,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
-  :unless (eq aorst-structural-editing 'electric-pair-mode)
+  :unless (not (eq aorst-structural-editing 'electric-pair-mode))
   :hook (((org-mode
            markdown-mode
            prog-mode) . smartparens-mode))
@@ -1731,6 +1732,22 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (parinfer-rust-dim-parens ((t (:inherit shadow))))
   :init
   (setq parinfer-rust-auto-download t))
+
+(use-package parinfer-smart
+  :when (eq aorst-structural-editing 'parinfer-elisp)
+  :straight (:host github
+             :repo "DogLooksGood/parinfer-mode"
+             :branch "smart")
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode
+          fennel-mode) . parinfer-mode)
+  :init
+  (use-package paredit)
+  (use-package selected))
 
 (use-package electric-pair-mode
   :straight nil
