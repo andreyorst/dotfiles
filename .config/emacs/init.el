@@ -157,6 +157,13 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :group 'aorst
   :tag "Tabline")
 
+(defcustom aorst-theme-variant 'light
+  "What theme variant to use."
+  :type '(choice (const :tag "light" 'light)
+                 (const :tag "dark" 'dark))
+  :group 'aorst
+  :tag "Theme variant")
+
 (use-package savehist
   :straight nil
   :config (savehist-mode 1))
@@ -457,11 +464,14 @@ Used in various places to avoid getting wrong line height when
                   :background unspecified))))
   (org-block-begin-line ((t (:slant unspecified
                              :background unspecified
-                             :inherit org-block))))
-  (org-block-end-line   ((t (:inherit org-block-begin-line))))
+                             :inherit org-block
+                             :extend t))))
+  (org-block ((t (:extend t))))
+  (org-block-end-line   ((t (:inherit org-block-begin-line :extend t))))
   (secondary-selection  ((t (:foreground unspecified
                              :background unspecified
-                             :inherit region))))
+                             :inherit region
+                             :extend t))))
   (org-level-2 ((t (:inherit outline-3))))
   (org-level-3 ((t (:inherit outline-4))))
   (org-level-4 ((t (:inherit outline-2))))
@@ -472,9 +482,9 @@ Used in various places to avoid getting wrong line height when
   (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (if (display-graphic-p)
+  (if (eq aorst-theme-variant 'light)
       (load-theme 'doom-one-light t)
-    (load-theme 'doom-one t)))
+    (load-theme 'doom-spacegrey t)))
 
 (defvar aorst--load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
@@ -793,9 +803,10 @@ offset variables."
     :config
     (window-divider-mode t)
     (defun aorst/window-divider-setup-faces ()
-      (set-face-attribute 'window-divider nil
-                          :foreground (face-attribute
-                                       'mode-line-inactive :background)))
+      (let* ((color (face-attribute 'mode-line-inactive :background))
+             (color (if (fboundp #'doom-darken)
+                        (doom-darken color 0.3))))
+        (set-face-attribute 'window-divider nil :foreground color)))
     (aorst/window-divider-setup-faces)))
 
 (setq-default frame-title-format

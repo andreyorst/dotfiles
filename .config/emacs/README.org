@@ -550,6 +550,18 @@ Controls if Tabline package should be enabled for current configuration.
     :tag "Tabline")
 #+end_src
 
+*** =aorst-theme-variant=
+Controls what theme variant to use:
+
+#+begin_src emacs-lisp
+  (defcustom aorst-theme-variant 'light
+    "What theme variant to use."
+    :type '(choice (const :tag "light" 'light)
+                   (const :tag "dark" 'dark))
+    :group 'aorst
+    :tag "Theme variant")
+#+end_src
+
 ** History
 Another feature I want is history between sessions. I'm not sure why it isn't default.
 
@@ -1029,11 +1041,14 @@ But it is also an amazingly well put set of themes, which define colors for pret
                     :background unspecified))))
     (org-block-begin-line ((t (:slant unspecified
                                :background unspecified
-                               :inherit org-block))))
-    (org-block-end-line   ((t (:inherit org-block-begin-line))))
+                               :inherit org-block
+                               :extend t))))
+    (org-block ((t (:extend t))))
+    (org-block-end-line   ((t (:inherit org-block-begin-line :extend t))))
     (secondary-selection  ((t (:foreground unspecified
                                :background unspecified
-                               :inherit region))))
+                               :inherit region
+                               :extend t))))
     (org-level-2 ((t (:inherit outline-3))))
     (org-level-3 ((t (:inherit outline-4))))
     (org-level-4 ((t (:inherit outline-2))))
@@ -1044,9 +1059,9 @@ But it is also an amazingly well put set of themes, which define colors for pret
     (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
     (font-lock-comment-face ((t (:background unspecified))))
     :config
-    (if (display-graphic-p)
+    (if (eq aorst-theme-variant 'light)
         (load-theme 'doom-one-light t)
-      (load-theme 'doom-one t)))
+      (load-theme 'doom-spacegrey t)))
 #+end_src
 
 This code specifies hooks that will run via advice that runs after =load-theme= and =disable-theme= functions.
@@ -1471,9 +1486,10 @@ Some tweaks to window divider colors.
       :config
       (window-divider-mode t)
       (defun aorst/window-divider-setup-faces ()
-        (set-face-attribute 'window-divider nil
-                            :foreground (face-attribute
-                                         'mode-line-inactive :background)))
+        (let* ((color (face-attribute 'mode-line-inactive :background))
+               (color (if (fboundp #'doom-darken)
+                          (doom-darken color 0.3))))
+          (set-face-attribute 'window-divider nil :foreground color)))
       (aorst/window-divider-setup-faces)))
 #+end_src
 
