@@ -147,6 +147,8 @@
         vterm-send-C-a
         vterm-send-C-c
         vterm-send-backspace
+        wgrep-change-to-wgrep-mode
+        wgrep-finish-edit
         xref-find-definitions
         yank-rectangle
         ))
