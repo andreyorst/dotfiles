@@ -243,6 +243,11 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
 
 (setq-default truncate-lines t)
 
+(use-package minibuffer
+  :straight nil
+  :bind (:map minibuffer-inactive-mode-map
+         ("<mouse-1>" . ignore)))
+
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
   (not (or (string-match-p
@@ -1655,44 +1660,118 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package hydra)
 
 (use-package smartparens
-  :when (eq aorst-structural-editing 'smartparens)
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode
-          fennel-mode
-          cider-repl-mode
-          racket-repl-mode
-          geiser-repl-mode
-          inferior-emacs-lisp-mode) . smartparens-strict-mode)
-  :bind (:map smartparens-strict-mode-map
-         (";" . sp-comment))
-  :config
-  (add-to-list 'sp-lisp-modes 'fennel-mode t))
+    :when (eq aorst-structural-editing 'smartparens)
+    :hook (((clojure-mode
+             emacs-lisp-mode
+             common-lisp-mode
+             scheme-mode
+             lisp-mode
+             racket-mode
+             fennel-mode
+             cider-repl-mode
+             racket-repl-mode
+             geiser-repl-mode
+             inferior-emacs-lisp-mode) . smartparens-strict-mode)
+           (minibuffer-setup . aorst/minibuffer-enable-sp))
+    :bind (:map smartparens-strict-mode-map
+           (";" . sp-comment))
+    :config
+    (defun aorst/minibuffer-enable-sp ()
+      "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
+      (when (eq this-command 'eval-expression)
+        (setq-local comment-start ";")
+        (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+        (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+        (sp-update-local-pairs 'minibuffer-pairs)
+        (smartparens-strict-mode 1)))
+    (add-to-list 'sp-lisp-modes 'fennel-mode t))
+#+end_src`
+
+This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
+I do so with =aorst-structural-editing= defcustom, which configures the package to use.
+However, there are two possible ways of managing parentheses in Lisps structurally - Smartparens, and Parinfer.
+Therefore I check if  =aorst-structural-editing= is set to ='smartparens= or to ='parinfer= in the above config, but I use Smartparens in non lisp modes as well.
+For that purpose I do additional check if it is not set to ='electric-pair-mode=, which should be used for everything by default if I don't want to use Smartparens or Parinfer.
+
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :unless (eq aorst-structural-editing 'electric-pair-mode)
+    :hook (((org-mode
+             markdown-mode
+             prog-mode) . smartparens-mode))
+    :custom
+    (sp-highlight-pair-overlay nil)
+    (sp-highlight-wrap-overlay nil)
+    (sp-highlight-wrap-tag-overlay nil)
+    (sp-wrap-respect-direction t)
+    :config
+    (require 'smartparens-config)
+    (sp-use-paredit-bindings)
+    (defun aorst/wrap-fix-cursor-position (_ action _)
+      "Set cursor position inside expression when wrapping."
+      (when (and (eq action 'wrap)
+                 (eq (point)
+                     (marker-position (sp-get sp-last-wrapped-region :beg))))
+        (goto-char (sp-get sp-last-wrapped-region :beg-in))))
+    (dolist (paren '("(" "[" "{"))
+      (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
 (use-package smartparens
-  :unless (eq aorst-structural-editing 'electric-pair-mode)
-  :hook (((org-mode
-           markdown-mode
-           prog-mode) . smartparens-mode))
-  :custom
-  (sp-highlight-pair-overlay nil)
-  (sp-highlight-wrap-overlay nil)
-  (sp-highlight-wrap-tag-overlay nil)
-  (sp-wrap-respect-direction t)
-  :config
-  (require 'smartparens-config)
-  (sp-use-paredit-bindings)
-  (defun aorst/wrap-fix-cursor-position (_ action _)
-    "Set cursor position inside expression when wrapping."
-    (when (and (eq action 'wrap)
-               (eq (point)
-                   (marker-position (sp-get sp-last-wrapped-region :beg))))
-      (goto-char (sp-get sp-last-wrapped-region :beg-in))))
-  (dolist (paren '("(" "[" "{"))
-    (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
+    :when (eq aorst-structural-editing 'smartparens)
+    :hook (((clojure-mode
+             emacs-lisp-mode
+             common-lisp-mode
+             scheme-mode
+             lisp-mode
+             racket-mode
+             fennel-mode
+             cider-repl-mode
+             racket-repl-mode
+             geiser-repl-mode
+             inferior-emacs-lisp-mode) . smartparens-strict-mode)
+           (minibuffer-setup . aorst/minibuffer-enable-sp))
+    :bind (:map smartparens-strict-mode-map
+           (";" . sp-comment))
+    :config
+    (defun aorst/minibuffer-enable-sp ()
+      "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
+      (when (eq this-command 'eval-expression)
+        (setq-local comment-start ";")
+        (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+        (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+        (sp-update-local-pairs 'minibuffer-pairs)
+        (smartparens-strict-mode 1)))
+    (add-to-list 'sp-lisp-modes 'fennel-mode t))
+#+end_src`
+
+This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
+I do so with =aorst-structural-editing= defcustom, which configures the package to use.
+However, there are two possible ways of managing parentheses in Lisps structurally - Smartparens, and Parinfer.
+Therefore I check if  =aorst-structural-editing= is set to ='smartparens= or to ='parinfer= in the above config, but I use Smartparens in non lisp modes as well.
+For that purpose I do additional check if it is not set to ='electric-pair-mode=, which should be used for everything by default if I don't want to use Smartparens or Parinfer.
+
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :unless (eq aorst-structural-editing 'electric-pair-mode)
+    :hook (((org-mode
+             markdown-mode
+             prog-mode) . smartparens-mode))
+    :custom
+    (sp-highlight-pair-overlay nil)
+    (sp-highlight-wrap-overlay nil)
+    (sp-highlight-wrap-tag-overlay nil)
+    (sp-wrap-respect-direction t)
+    :config
+    (require 'smartparens-config)
+    (sp-use-paredit-bindings)
+    (defun aorst/wrap-fix-cursor-position (_ action _)
+      "Set cursor position inside expression when wrapping."
+      (when (and (eq action 'wrap)
+                 (eq (point)
+                     (marker-position (sp-get sp-last-wrapped-region :beg))))
+        (goto-char (sp-get sp-last-wrapped-region :beg-in))))
+    (dolist (paren '("(" "[" "{"))
+      (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
 (use-package parinfer-rust-mode
   :if (and (eq aorst-structural-editing 'parinfer)

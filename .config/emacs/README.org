@@ -694,6 +694,16 @@ Let's disable line wrapping by default, unless I need it:
   (setq-default truncate-lines t)
 #+end_src
 
+** Minibuffer
+Disabling clicks in minibuffer, because opening =*Messages*= buffer by clicking anywhere on the minibuffer is just plain stupid.
+
+#+begin_src emacs-lisp
+  (use-package minibuffer
+    :straight nil
+    :bind (:map minibuffer-inactive-mode-map
+           ("<mouse-1>" . ignore)))
+#+end_src
+
 * Functions
 This section describes functions I have defined for use inside configurations of various packages, that are general enough to be placed in particular package configuration.
 For example when function is shared between configurations and some configuration may not be loaded.
@@ -2780,22 +2790,31 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
 #+begin_src emacs-lisp
   (use-package smartparens
     :when (eq aorst-structural-editing 'smartparens)
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode
-            cider-repl-mode
-            racket-repl-mode
-            geiser-repl-mode
-            inferior-emacs-lisp-mode) . smartparens-strict-mode)
+    :hook (((clojure-mode
+             emacs-lisp-mode
+             common-lisp-mode
+             scheme-mode
+             lisp-mode
+             racket-mode
+             fennel-mode
+             cider-repl-mode
+             racket-repl-mode
+             geiser-repl-mode
+             inferior-emacs-lisp-mode) . smartparens-strict-mode)
+           (minibuffer-setup . aorst/minibuffer-enable-sp))
     :bind (:map smartparens-strict-mode-map
            (";" . sp-comment))
     :config
+    (defun aorst/minibuffer-enable-sp ()
+      "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
+      (when (eq this-command 'eval-expression)
+        (setq-local comment-start ";")
+        (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+        (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+        (sp-update-local-pairs 'minibuffer-pairs)
+        (smartparens-strict-mode 1)))
     (add-to-list 'sp-lisp-modes 'fennel-mode t))
-#+end_src
+#+end_src`
 
 This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
 I do so with =aorst-structural-editing= defcustom, which configures the package to use.
