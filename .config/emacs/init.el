@@ -1429,6 +1429,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (nrepl-hide-special-buffers t)
   (cider-test-show-report-on-success t)
   (cider-allow-jack-in-without-project t)
+  (cider-use-fringe-indicators nil)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -1692,7 +1693,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
-  :unless (not (eq aorst-structural-editing 'electric-pair-mode))
+  :unless (eq aorst-structural-editing 'electric-pair-mode)
   :hook (((org-mode
            markdown-mode
            prog-mode) . smartparens-mode))
@@ -1841,9 +1842,14 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
    (list :poshandler #'company-posframe-quickhelp-right-poshandler
          :internal-border-width 1
          :timeout 60
-         :internal-border-color (face-attribute 'mode-line-inactive :background)
-         :no-properties nil
-         :poshandler nil))
+         :internal-border-color (face-attribute 'mode-line :background)
+         :no-properties nil))
+  (company-posframe-show-params
+   (list :poshandler #'company-posframe-quickhelp-right-poshandler
+         :internal-border-width 1
+         :timeout 60
+         :internal-border-color (face-attribute 'mode-line :background)
+         :no-properties nil))
   :config
   (company-posframe-mode))
 

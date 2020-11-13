@@ -2446,6 +2446,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
     (nrepl-hide-special-buffers t)
     (cider-test-show-report-on-success t)
     (cider-allow-jack-in-without-project t)
+    (cider-use-fringe-indicators nil)
     :config
     (setq cider-jdk-src-paths nil)
     (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -2829,7 +2830,7 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
 
 #+begin_src emacs-lisp
   (use-package smartparens
-    :unless (not (eq aorst-structural-editing 'electric-pair-mode))
+    :unless (eq aorst-structural-editing 'electric-pair-mode)
     :hook (((org-mode
              markdown-mode
              prog-mode) . smartparens-mode))
@@ -3025,9 +3026,14 @@ Provides posframe frontend for company.
      (list :poshandler #'company-posframe-quickhelp-right-poshandler
            :internal-border-width 1
            :timeout 60
-           :internal-border-color (face-attribute 'mode-line-inactive :background)
-           :no-properties nil
-           :poshandler nil))
+           :internal-border-color (face-attribute 'mode-line :background)
+           :no-properties nil))
+    (company-posframe-show-params
+     (list :poshandler #'company-posframe-quickhelp-right-poshandler
+           :internal-border-width 1
+           :timeout 60
+           :internal-border-color (face-attribute 'mode-line :background)
+           :no-properties nil))
     :config
     (company-posframe-mode))
 #+end_src
