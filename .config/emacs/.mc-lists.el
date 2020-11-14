@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        aorst/exchange-point-and-mark
         aorst/kill-region-or-word
         aorst/newline-above
         aorst/newline-below
