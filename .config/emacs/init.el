@@ -1690,7 +1690,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
       (sp-update-local-pairs 'minibuffer-pairs)
       (smartparens-strict-mode 1)))
-  (add-to-list 'sp-lisp-modes 'fennel-mode t))
+  (add-to-list 'sp-lisp-modes 'fennel-mode t)
+  (sp-local-pair 'fennel-mode "`" "`"
+                 :when '(sp-in-string-p
+                         sp-in-comment-p)
+                 :unless '(sp-lisp-invalid-hyperlink-p)))
 
 (use-package smartparens
   :unless (eq aorst-structural-editing 'electric-pair-mode)

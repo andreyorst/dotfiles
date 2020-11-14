@@ -2819,7 +2819,11 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
         (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
         (sp-update-local-pairs 'minibuffer-pairs)
         (smartparens-strict-mode 1)))
-    (add-to-list 'sp-lisp-modes 'fennel-mode t))
+    (add-to-list 'sp-lisp-modes 'fennel-mode t)
+    (sp-local-pair 'fennel-mode "`" "`"
+                   :when '(sp-in-string-p
+                           sp-in-comment-p)
+                   :unless '(sp-lisp-invalid-hyperlink-p)))
 #+end_src
 
 This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
