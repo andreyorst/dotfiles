@@ -1530,13 +1530,15 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           (when window
             (select-window window))
           (cond ((get-buffer bufname)
-                 (switch-to-buffer bufname))
+                 (switch-to-buffer bufname)
+                 ;; for `bury-buffer' to work we need a non-hidden buffer
+                 (rename-buffer "*vterm*"))
                 (t (let ((default-directory directory))
-                     (vterm "*vterm*")
-                     (when (bound-and-true-p global-tab-line-mode)
-                       (previous-buffer)
-                       (bury-buffer))
-                     (rename-buffer " *vterm*"))))
+                     (vterm "*vterm*"))))
+          (when (bound-and-true-p global-tab-line-mode)
+            (previous-buffer)
+            (bury-buffer)
+            (rename-buffer " *vterm*"))
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
           (when side
@@ -1691,12 +1693,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
       (sp-update-local-pairs 'minibuffer-pairs)
       (smartparens-strict-mode 1)))
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
-  (sp-with-modes '(fennel-mode)
-    (sp-local-pair "`" "`"
-                   :when '(sp-in-string-p
-                           sp-in-comment-p)
-                   :unless '(sp-lisp-invalid-hyperlink-p))))
+  (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
   :unless (eq aorst-structural-editing 'electric-pair-mode)
@@ -1710,6 +1707,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (sp-wrap-respect-direction t)
   :config
   (require 'smartparens-config)
+  (sp-with-modes '(fennel-mode)
+    (sp-local-pair "`" "`"
+                   :when '(sp-in-string-p
+                           sp-in-comment-p)
+                   :unless '(sp-lisp-invalid-hyperlink-p)))
   (sp-use-paredit-bindings)
   (defun aorst/wrap-fix-cursor-position (_ action _)
     "Set cursor position inside expression when wrapping."
