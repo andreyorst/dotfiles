@@ -1284,12 +1284,13 @@ truncates text if needed.  Minimal width can be set with
          ("\\.markdown\\'" . markdown-mode))
   :bind (:map markdown-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines))
+  :custom
+  (markdown-fontify-code-blocks-natively t)
   :config
   (defvar markdown-command "multimarkdown")
   (defun aorst/markdown-setup ()
     "Set buffer local variables."
-    (setq fill-column 80
-          default-justification 'left))
+    (setq default-justification 'left))
   :hook ((markdown-mode . flyspell-mode)
          (markdown-mode . aorst/markdown-setup)))
 
@@ -1691,10 +1692,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (sp-update-local-pairs 'minibuffer-pairs)
       (smartparens-strict-mode 1)))
   (add-to-list 'sp-lisp-modes 'fennel-mode t)
-  (sp-local-pair 'fennel-mode "`" "`"
-                 :when '(sp-in-string-p
-                         sp-in-comment-p)
-                 :unless '(sp-lisp-invalid-hyperlink-p)))
+  (sp-with-modes '(fennel-mode)
+    (sp-local-pair "`" "`"
+                   :when '(sp-in-string-p
+                           sp-in-comment-p)
+                   :unless '(sp-lisp-invalid-hyperlink-p))))
 
 (use-package smartparens
   :unless (eq aorst-structural-editing 'electric-pair-mode)

@@ -2229,12 +2229,13 @@ This can be achieved with =edit-indirect= package.
            ("\\.markdown\\'" . markdown-mode))
     :bind (:map markdown-mode-map
            ("M-Q" . aorst/split-pararagraph-into-lines))
+    :custom
+    (markdown-fontify-code-blocks-natively t)
     :config
     (defvar markdown-command "multimarkdown")
     (defun aorst/markdown-setup ()
       "Set buffer local variables."
-      (setq fill-column 80
-            default-justification 'left))
+      (setq default-justification 'left))
     :hook ((markdown-mode . flyspell-mode)
            (markdown-mode . aorst/markdown-setup)))
 #+end_src
@@ -2820,10 +2821,11 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
         (sp-update-local-pairs 'minibuffer-pairs)
         (smartparens-strict-mode 1)))
     (add-to-list 'sp-lisp-modes 'fennel-mode t)
-    (sp-local-pair 'fennel-mode "`" "`"
-                   :when '(sp-in-string-p
-                           sp-in-comment-p)
-                   :unless '(sp-lisp-invalid-hyperlink-p)))
+    (sp-with-modes '(fennel-mode)
+      (sp-local-pair "`" "`"
+                     :when '(sp-in-string-p
+                             sp-in-comment-p)
+                     :unless '(sp-lisp-invalid-hyperlink-p))))
 #+end_src
 
 This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
