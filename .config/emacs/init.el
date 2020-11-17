@@ -2189,7 +2189,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c C-c" . edit-indirect-commit)
          ("C-c C-k" . edit-indirect-abort)
          ("C-c '" . nil))
-  :init
+  :config
   (defun aorst/edit-indirect-header-line-setup ()
     (setq-local
      header-line-format
