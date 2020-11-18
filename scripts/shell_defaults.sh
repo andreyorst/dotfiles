@@ -105,10 +105,13 @@ gif() {
 }
 
 sep() {
+    local sep=""
     for _ in $(seq 1 "$(tput cols)"); do
         sep="${sep}${1:-=}"
     done
-    echo "$sep" | cut -c 1-"$(tput cols)"
+    [ ! -z "$2" ] && local file="${1:-=} $2 ${1:-=}"
+    echo "${file}${sep}" | cut -c 1-"$(tput cols)"
+    unset file
     unset sep
 }
 
@@ -124,11 +127,8 @@ sepcat() {
             esac
             shift
         done
-        eval set -- "$files"
-        cat "$1"
-        shift
         for file in "$@"; do
-            sep "$separator"
+            sep "$separator" "$file"
             cat "$file"
         done
     )
