@@ -31,6 +31,7 @@
         end-of-buffer
         end-of-defun
         forward-sexp
+        hs-toggle-hiding
         hydra--negative-argument
         hydrant/er/er/contract-region
         hydrant/er/er/expand-region
