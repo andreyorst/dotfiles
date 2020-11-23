@@ -1456,6 +1456,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package kibit-helper)
 
 (use-package fennel-mode
+  :straight (:host gitlab
+             :repo "technomancy/fennel-mode")
   :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
   :config

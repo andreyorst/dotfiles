@@ -2495,6 +2495,8 @@ It supports compile-time macro system, and full Lua compatibility.
 
 #+begin_src emacs-lisp
   (use-package fennel-mode
+    :straight (:host gitlab
+               :repo "technomancy/fennel-mode")
     :bind (:map fennel-mode-map
            ("C-c C-M-f" . aorst/indent-buffer))
     :config
