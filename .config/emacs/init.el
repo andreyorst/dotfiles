@@ -1494,6 +1494,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight nil
   :hook (sh-mode . flycheck-mode))
 
+(use-package scala-mode)
+
 (use-package help
   :straight nil
   :custom (help-window-select t))

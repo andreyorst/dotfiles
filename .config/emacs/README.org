@@ -2572,6 +2572,13 @@ Json support for Emacs.
     :hook (sh-mode . flycheck-mode))
 #+end_src
 
+** Scala
+Scala language support.
+
+#+begin_src emacs-lisp
+  (use-package scala-mode)
+#+end_src
+
 * Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 
