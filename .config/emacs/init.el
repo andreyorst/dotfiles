@@ -205,6 +205,8 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
          ("M-S-z" . zap-to-char))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
+  :custom
+  (yank-excluded-properties t "Disable all text properties when yanking.")
   :init
   (defun aorst/kill-region-or-word (arg)
     (interactive "*p")
@@ -1508,7 +1510,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package vterm
   :if (bound-and-true-p module-file-suffix)
   :bind (("C-`" . aorst/vterm-toggle)
-         ("C-t" . aorst/vterm-focus))
+         ("C-t" . aorst/vterm-focus)
+         :map vterm-mode-map
+         ("<insert>" . ignore))
   :hook (vterm-exit . aorst/kill-vterm)
   :config
   (defun aorst/vterm-toggle (&optional arg)
