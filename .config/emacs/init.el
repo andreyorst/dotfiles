@@ -2211,13 +2211,13 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          :map edit-indirect-mode-map
          ("C-c '" . separedit))
   :custom
-  (separedit-default-mode 'markdown-mode)
-  :init
+  (separedit-default-mode 'gfm-mode)
+  :config
   (defun aorst/separedit-header-line-setup ()
     (setq-local
      header-line-format
      (substitute-command-keys
-      "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
+      "\\<edit-indirect-mode-map>Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
 (use-package recentf
   :straight nil

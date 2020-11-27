@@ -7,6 +7,7 @@
         aorst/kill-region-or-word
         aorst/newline-above
         aorst/newline-below
+        aorst/upcase-region-or-word
         backward-sexp
         beginning-of-buffer
         c-electric-brace
@@ -149,6 +150,7 @@
         vterm-send-C-a
         vterm-send-C-c
         vterm-send-backspace
+        vterm-send-return
         wgrep-change-to-wgrep-mode
         wgrep-finish-edit
         xref-find-definitions
