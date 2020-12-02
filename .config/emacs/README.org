@@ -652,6 +652,8 @@ Also, I don't want my files to contain trailing whitespace, so =before-save-hook
            (overwrite-mode . aorst/overwrite-set-cursor-shape))
     :custom
     (yank-excluded-properties t "Disable all text properties when yanking.")
+    (blink-matching-delay 0)
+    (blink-matching-paren 1)
     :init
     (defun aorst/kill-region-or-word (arg)
       (interactive "*p")
@@ -2195,8 +2197,7 @@ So I enable it for every programming language.
 #+begin_src emacs-lisp
   (use-package prog-mode
     :straight nil
-    :hook ((prog-mode . show-paren-mode)
-           (prog-mode . display-line-numbers-mode)
+    :hook ((prog-mode . display-line-numbers-mode)
            (prog-mode . hl-line-mode)))
 #+end_src
 
@@ -2554,7 +2555,10 @@ It runs on Erlang VM (BEAM), and has nice macro system, making language core sma
 And it also has good interop with Erlang itself.
 
 #+begin_src emacs-lisp
-  (use-package elixir-mode)
+  (use-package elixir-mode
+    :custom-face
+    (elixir-atom-face ((t (:foreground unspecified
+                           :inherit elixir-attribute-face)))))
 #+end_src
 
 ** JSON
@@ -2849,12 +2853,14 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
     :unless (eq aorst-structural-editing 'electric-pair-mode)
     :hook (((org-mode
              markdown-mode
-             prog-mode) . smartparens-mode))
+             prog-mode) . smartparens-mode)
+           (prog-mode . show-smartparens-mode))
     :custom
     (sp-highlight-pair-overlay nil)
     (sp-highlight-wrap-overlay nil)
     (sp-highlight-wrap-tag-overlay nil)
     (sp-wrap-respect-direction t)
+    (sp-show-pair-delay 0)
     :config
     (require 'smartparens-config)
     (sp-with-modes '(fennel-mode)
@@ -2928,7 +2934,8 @@ Extremely useful on mobile phone, where shortcut options are very limited, and s
   (use-package electric-pair-mode
     :straight nil
     :when (eq aorst-structural-editing 'electric-pair-mode)
-    :hook ((prog-mode) . electric-pair-local-mode))
+    :hook ((prog-mode . electric-pair-local-mode)
+           (prog-mode . show-paren-mode)))
 #+end_src
 
 ** Flx
@@ -3124,6 +3131,8 @@ Display TODO items in Magit buffers.
     (transient-append-suffix 'magit-status-jump '(0 0 -1)
       '("T " "Todos" magit-todos-jump-to-todos)))
 #+end_src
+
+*** Magit Forge
 
 ** Ediff
 This is a built in mode for diffing files in Emacs.

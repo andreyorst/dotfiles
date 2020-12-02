@@ -207,6 +207,8 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :custom
   (yank-excluded-properties t "Disable all text properties when yanking.")
+  (blink-matching-delay 0)
+  (blink-matching-paren 1)
   :init
   (defun aorst/kill-region-or-word (arg)
     (interactive "*p")
@@ -1264,8 +1266,7 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package prog-mode
   :straight nil
-  :hook ((prog-mode . show-paren-mode)
-         (prog-mode . display-line-numbers-mode)
+  :hook ((prog-mode . display-line-numbers-mode)
          (prog-mode . hl-line-mode)))
 
 (use-package cc-mode
@@ -1486,7 +1487,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                    #'dumb-jump-xref-activate
                                    nil t))))
 
-(use-package elixir-mode)
+(use-package elixir-mode
+  :custom-face
+  (elixir-atom-face ((t (:foreground unspecified
+                         :inherit elixir-attribute-face)))))
 
 (use-package json-mode
   :hook (json-mode . flycheck-mode)
@@ -1707,12 +1711,14 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :unless (eq aorst-structural-editing 'electric-pair-mode)
   :hook (((org-mode
            markdown-mode
-           prog-mode) . smartparens-mode))
+           prog-mode) . smartparens-mode)
+         (prog-mode . show-smartparens-mode))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
   (sp-highlight-wrap-tag-overlay nil)
   (sp-wrap-respect-direction t)
+  (sp-show-pair-delay 0)
   :config
   (require 'smartparens-config)
   (sp-with-modes '(fennel-mode)
@@ -1769,7 +1775,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package electric-pair-mode
   :straight nil
   :when (eq aorst-structural-editing 'electric-pair-mode)
-  :hook ((prog-mode) . electric-pair-local-mode))
+  :hook ((prog-mode . electric-pair-local-mode)
+         (prog-mode . show-paren-mode)))
 
 (use-package flx)
 
