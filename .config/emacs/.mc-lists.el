@@ -33,6 +33,7 @@
         end-of-defun
         forward-sexp
         hs-toggle-hiding
+        goto-line
         hydra--negative-argument
         hydrant/er/er/contract-region
         hydrant/er/er/expand-region
@@ -66,6 +67,7 @@
         parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        save-some-buffers
         sp-backward-delete-char
         sp-backward-sexp
         sp-comment
@@ -110,6 +112,7 @@
         hydrant/mc/mc/remove-duplicated-cursors
         hydrant/mc/mc/remove-duplicated-cursors-and-exit
         hydrant/mc/mc/vertical-align-with-space
+        iedit-next-occurrence
         iedit-switch-to-mc-mode
         isearch-abort
         isearch-delete-char

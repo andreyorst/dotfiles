@@ -738,6 +738,9 @@ offset variables."
                                                     " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
                                  'local-map (doto (make-sparse-keymap)
                                               (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
+                    ((bound-and-true-p parinfer-mode)
+                     (propertize "Parinfer"
+                                 'help-echo "Parinfer smart mode is enabled for current buffer"))
                     ((bound-and-true-p paredit-mode)
                      (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
                     ((bound-and-true-p smartparens-strict-mode)
@@ -1708,7 +1711,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
-  :unless (eq aorst-structural-editing 'electric-pair-mode)
+  :when (eq aorst-structural-editing 'smartparens)
   :hook (((org-mode
            markdown-mode
            prog-mode) . smartparens-mode)
