@@ -1491,9 +1491,17 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                    nil t))))
 
 (use-package elixir-mode
+  :hook (elixir-mode . flycheck-mode)
   :custom-face
   (elixir-atom-face ((t (:foreground unspecified
                          :inherit elixir-attribute-face)))))
+
+(use-package mix
+  :hook (elixir-mode . mix-minor-mode))
+
+(use-package inf-elixir
+  :straight (:host github
+             :repo "J3RN/inf-elixir"))
 
 (use-package json-mode
   :hook (json-mode . flycheck-mode)
@@ -2075,7 +2083,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
         (hydrant/iedit/body)))))
 
 (use-package lsp-mode
-  :hook (((rust-mode c-mode c++-mode java-mode) . lsp)
+  :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
          (lsp-mode . yas-minor-mode))
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))

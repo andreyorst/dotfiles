@@ -2559,9 +2559,27 @@ And it also has good interop with Erlang itself.
 
 #+begin_src emacs-lisp
   (use-package elixir-mode
+    :hook (elixir-mode . flycheck-mode)
     :custom-face
     (elixir-atom-face ((t (:foreground unspecified
                            :inherit elixir-attribute-face)))))
+#+end_src
+
+*** Mix
+=Mix= is a build tool for Elixir.
+
+#+begin_src emacs-lisp
+  (use-package mix
+    :hook (elixir-mode . mix-minor-mode))
+#+end_src
+
+*** Inferior IEx
+Allows to interact with IEx from Emacs.
+
+#+begin_src emacs-lisp
+  (use-package inf-elixir
+    :straight (:host github
+               :repo "J3RN/inf-elixir"))
 #+end_src
 
 ** JSON
@@ -3325,7 +3343,7 @@ LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :hook (((rust-mode c-mode c++-mode java-mode) . lsp)
+    :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
            (lsp-mode . yas-minor-mode))
     :custom-face
     (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
