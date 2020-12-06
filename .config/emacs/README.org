@@ -2869,6 +2869,9 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
 
 #+begin_src emacs-lisp
   (use-package smartparens
+    :straight (:host github
+               :repo "andreyorst/smartparens"
+               :branch "elixir-better-search")
     :when (eq aorst-structural-editing 'smartparens)
     :hook (((clojure-mode
              emacs-lisp-mode
@@ -2903,6 +2906,9 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
 
 #+begin_src emacs-lisp
   (use-package smartparens
+    :straight (:host github
+               :repo "andreyorst/smartparens"
+               :branch "elixir-better-search")
     :unless (eq aorst-structural-editing 'electric-pair-mode)
     :hook ((org-mode
             markdown-mode

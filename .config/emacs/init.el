@@ -1720,6 +1720,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package hydra)
 
 (use-package smartparens
+  :straight (:host github
+             :repo "andreyorst/smartparens"
+             :branch "elixir-better-search")
   :when (eq aorst-structural-editing 'smartparens)
   :hook (((clojure-mode
            emacs-lisp-mode
@@ -1746,6 +1749,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
+  :straight (:host github
+             :repo "andreyorst/smartparens"
+             :branch "elixir-better-search")
   :unless (eq aorst-structural-editing 'electric-pair-mode)
   :hook ((org-mode
           markdown-mode
