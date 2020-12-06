@@ -158,13 +158,27 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :group 'aorst
   :tag "Tabline")
 
-(defcustom aorst-theme-variant 'light
+(defcustom aorst-theme-variant 'dark
   "What theme variant to use."
   :type '(choice (const :tag "light" light)
                  (const :tag "dark" dark))
   :group 'aorst
   :safe #'symbolp
   :tag "Theme variant")
+
+(defcustom aorst-dark-theme 'doom-one
+  "What dark theme to use."
+  :type 'symbol
+  :group 'aorst
+  :safe #'symbolp
+  :tag "Dark theme")
+
+(defcustom aorst-light-theme 'doom-one-light
+  "What light theme to use."
+  :type 'symbol
+  :group 'aorst
+  :safe #'symbolp
+  :tag "Light theme")
 
 (use-package savehist
   :straight nil
@@ -493,12 +507,26 @@ Used in various places to avoid getting wrong line height when
   (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
+  (defvar aorst--current-theme nil
+    "Caching theme in order not to run expensive theme change function.")
   (defun aorst/change-theme-variant (_ val &rest _)
-    (if (eq val 'light)
-        (load-theme 'doom-one-light t)
-      (load-theme 'doom-spacegrey t)))
+    "Sets current theme to either `aorst-dark-theme' or
+`aorst-light-theme' depending on value in `aorst-theme-variant'."
+    (let ((theme (pcase val
+                   ('light aorst-light-theme)
+                   ('dark aorst-dark-theme))))
+      (unless (equal aorst--current-theme theme)
+        (setq aorst--current-theme theme)
+        (load-theme theme t))))
+  (defun aorst/refresh-theme (&rest _)
+    "Updates theme as soon as `aorst-dark-theme' or
+`aorst-light-theme' changes, if selected `aorst-theme-variant'
+matches changed variable."
+    (aorst/change-theme-variant nil aorst-theme-variant))
+  (aorst/change-theme-variant nil aorst-theme-variant)
   (add-variable-watcher 'aorst-theme-variant #'aorst/change-theme-variant)
-  (aorst/change-theme-variant nil aorst-theme-variant))
+  (add-variable-watcher 'aorst-dark-theme #'aorst/refresh-theme)
+  (add-variable-watcher 'aorst-light-theme #'aorst/refresh-theme))
 
 (defvar aorst--load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
@@ -1704,26 +1732,24 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            racket-repl-mode
            geiser-repl-mode
            inferior-emacs-lisp-mode) . smartparens-strict-mode)
-         (minibuffer-setup . aorst/minibuffer-enable-sp))
+         (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp))
   :bind (:map smartparens-strict-mode-map
          (";" . sp-comment))
   :config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
-    (when (eq this-command 'eval-expression)
-      (setq-local comment-start ";")
-      (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-      (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-      (sp-update-local-pairs 'minibuffer-pairs)
-      (smartparens-strict-mode 1)))
+    (setq-local comment-start ";")
+    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+    (sp-update-local-pairs 'minibuffer-pairs)
+    (smartparens-strict-mode 1))
   (add-to-list 'sp-lisp-modes 'fennel-mode t))
 
 (use-package smartparens
-  :when (eq aorst-structural-editing 'smartparens)
-  :hook (((org-mode
-           markdown-mode
-           prog-mode) . smartparens-mode)
-         (prog-mode . show-smartparens-mode))
+  :unless (eq aorst-structural-editing 'electric-pair-mode)
+  :hook ((org-mode
+          markdown-mode
+          prog-mode) . aorst/enable-smartparens)
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
@@ -1732,6 +1758,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (sp-show-pair-delay 0)
   :config
   (require 'smartparens-config)
+  (defun aorst/enable-smartparens ()
+    (smartparens-mode 1)
+    (show-smartparens-mode 1))
   (sp-with-modes '(fennel-mode)
     (sp-local-pair "`" "`"
                    :when '(sp-in-string-p
@@ -1758,12 +1787,23 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           common-lisp-mode
           scheme-mode
           lisp-mode
-          racket-mode) . parinfer-rust-mode)
+          racket-mode) . aorst/enable-parinfer)
   :custom
   (parinfer-rust-check-before-enable 'defer)
   (parinfer-rust-dim-parens nil)
   :custom-face
   (parinfer-rust-dim-parens ((t (:inherit shadow))))
+  :config
+  (defun aorst/enable-parinfer ()
+    "Disables conficting structural editing modes that might be
+active and enables parinfer."
+    (when (bound-and-true-p smartparens-mode)
+      (smartparens-mode -1))
+    (when (bound-and-true-p smartparens-strict-mode)
+      (smartparens-strict-mode -1))
+    (when (bound-and-true-p electric-pair-mode)
+      (electric-pair-local-mode -1))
+    (parinfer-rust-mode 1))
   :init
   (setq parinfer-rust-auto-download t))
 
@@ -1778,7 +1818,18 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           scheme-mode
           lisp-mode
           racket-mode
-          fennel-mode) . parinfer-mode)
+          fennel-mode) . aorst/enable-parinfer-elisp)
+  :config
+  (defun aorst/enable-parinfer-elisp ()
+    "Disables conficting structural editing modes that might be
+active and enables parinfer."
+    (when (bound-and-true-p smartparens-mode)
+      (smartparens-mode -1))
+    (when (bound-and-true-p smartparens-strict-mode)
+      (smartparens-strict-mode -1))
+    (when (bound-and-true-p electric-pair-mode)
+      (electric-pair-local-mode -1))
+    (parinfer-mode 1))
   :init
   (use-package paredit)
   (use-package selected))
