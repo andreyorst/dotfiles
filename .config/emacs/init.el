@@ -216,7 +216,9 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
          ("C-S-o" . aorst/newline-above)
          ("M-z" . zap-up-to-char)
          ("C-x k" . kill-this-buffer)
-         ("M-S-z" . zap-to-char))
+         ("M-S-z" . zap-to-char)
+         ("<kp-begin>" . ignore)
+         ("<kp-5>" . ignore))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :custom
