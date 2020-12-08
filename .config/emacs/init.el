@@ -158,25 +158,31 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :group 'aorst
   :tag "Tabline")
 
+(defgroup theme ()
+  "Control what theme variant to use, and which particular theme
+is used for each variant."
+  :tag "Theme configurations"
+  :group 'aorst)
+
 (defcustom aorst-theme-variant 'dark
   "What theme variant to use."
   :type '(choice (const :tag "light" light)
                  (const :tag "dark" dark))
-  :group 'aorst
+  :group 'theme
   :safe #'symbolp
   :tag "Theme variant")
 
 (defcustom aorst-dark-theme 'doom-one
   "What dark theme to use."
   :type 'symbol
-  :group 'aorst
+  :group 'theme
   :safe #'symbolp
   :tag "Dark theme")
 
 (defcustom aorst-light-theme 'doom-one-light
   "What light theme to use."
   :type 'symbol
-  :group 'aorst
+  :group 'theme
   :safe #'symbolp
   :tag "Light theme")
 
@@ -852,7 +858,9 @@ offset variables."
     (defun aorst/window-divider-setup-faces ()
       (let* ((color (face-attribute 'mode-line-inactive :background))
              (color (if (fboundp #'doom-darken)
-                        (doom-darken color 0.15))))
+                        (pcase aorst-theme-variant
+                          ('light (doom-lighten color 0.10))
+                          ('dark (doom-darken color 0.15))))))
         (set-face-attribute 'window-divider nil :foreground color)))
     (aorst/window-divider-setup-faces)))
 

@@ -551,7 +551,17 @@ Controls if Tabline package should be enabled for current configuration.
     :tag "Tabline")
 #+end_src
 
-*** =aorst-theme-variant=
+*** Theme configuration variables
+Theme configuration happens under =theme= subroup:
+
+#+begin_src emacs-lisp
+  (defgroup theme ()
+    "Control what theme variant to use, and which particular theme
+  is used for each variant."
+    :tag "Theme configurations"
+    :group 'aorst)
+#+end_src
+
 Controls what theme variant to use:
 
 #+begin_src emacs-lisp
@@ -559,7 +569,7 @@ Controls what theme variant to use:
     "What theme variant to use."
     :type '(choice (const :tag "light" light)
                    (const :tag "dark" dark))
-    :group 'aorst
+    :group 'theme
     :safe #'symbolp
     :tag "Theme variant")
 #+end_src
@@ -571,14 +581,14 @@ Note, that it is currently not possible to load theme without modifying one of t
   (defcustom aorst-dark-theme 'doom-one
     "What dark theme to use."
     :type 'symbol
-    :group 'aorst
+    :group 'theme
     :safe #'symbolp
     :tag "Dark theme")
 
   (defcustom aorst-light-theme 'doom-one-light
     "What light theme to use."
     :type 'symbol
-    :group 'aorst
+    :group 'theme
     :safe #'symbolp
     :tag "Light theme")
 #+end_src
@@ -1062,9 +1072,8 @@ Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode
 
 ** Theme
 I'm using *doom-themes* package to make my Emacs look modern.
-This theme collection was developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find these themes actually great on its own.
-This package contains nice variant of Atom-like One theme which I like.
-But it is also an amazingly well put set of themes, which define colors for pretty much every popular Emacs package.
+It is a theme collection, originally developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find these themes actually great on its own.
+And provided thems define colors for pretty much every popular Emacs package, which helps make Emacs look very consistent.
 
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -1118,8 +1127,8 @@ But it is also an amazingly well put set of themes, which define colors for pret
     (add-variable-watcher 'aorst-light-theme #'aorst/refresh-theme))
 #+end_src
 
-This code specifies hooks that will run via advice that runs after =load-theme= and =disable-theme= functions.
-It is useful to update some faces that are out of scope of current theme and have to be recalculated.
+The following code specifies hooks that will run via advice, which in turn runs after =load-theme= and =disable-theme= functions.
+It is useful to update some faces that are out of scope of current theme or dynamically changed by me, therefore have to be recalculated.
 
 #+begin_src emacs-lisp
   (defvar aorst--load-theme-hook nil
@@ -1139,7 +1148,7 @@ It is useful to update some faces that are out of scope of current theme and hav
   (advice-add 'disable-theme :after #'aorst/run-disable-theme-hooks)
 #+end_src
 
-When I switch themes, I want for only one theme to be active at a time.
+When themes are switched, it is better for only one theme to be active at a time.
 This advice helps:
 
 #+begin_src emacs-lisp
@@ -1545,7 +1554,9 @@ Some tweaks to window divider colors.
       (defun aorst/window-divider-setup-faces ()
         (let* ((color (face-attribute 'mode-line-inactive :background))
                (color (if (fboundp #'doom-darken)
-                          (doom-darken color 0.15))))
+                          (pcase aorst-theme-variant
+                            ('light (doom-lighten color 0.10))
+                            ('dark (doom-darken color 0.15))))))
           (set-face-attribute 'window-divider nil :foreground color)))
       (aorst/window-divider-setup-faces)))
 #+end_src
