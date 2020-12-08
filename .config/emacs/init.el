@@ -2081,25 +2081,23 @@ active and enables parinfer."
   (when (fboundp #'defhydra)
     (defhydra hydrant/er (:color pink :hint nil)
       "
- ^Expand/Discard^                ^Mark^
- _e_ or _+_: expand region         _(_:      inside pairs
- _r_ or _-_: reduce region         _)_:      around pairs
- _g_:      exit hydrant          _q_ or _'_: inside quotes
- _G_:      discard region, exit  _Q_ or _\"_: around quotes
- ^ ^    ^ ^                        _p_:      paragraph"
+ ^Expand/Discard^              ^Mark^
+ _e_:    expand region         _(_: inside pairs
+ _r_:    reduce region         _)_: around pairs
+ _g_, _q_: exit hydrant          _'_: inside quotes
+ _G_, _Q_: discard region, exit  _\"_: around quotes
+ ^ ^  ^ ^                        _p_: paragraph"
       ("e" er/expand-region)
-      ("+" er/expand-region)
       ("r" er/contract-region)
-      ("-" er/contract-region)
       ("p" er/mark-paragraph)
       ("(" er/mark-inside-pairs)
       (")" er/mark-outside-pairs)
-      ("q" er/mark-inside-quotes)
       ("'" er/mark-inside-quotes)
-      ("Q" er/mark-outside-quotes)
       ("\"" er/mark-outside-quotes)
       ("g" ignore :exit t)
-      ("G" (lambda () (interactive) (deactivate-mark)) :exit t))))
+      ("q" ignore :exit t)
+      ("G" (lambda () (interactive) (deactivate-mark)) :exit t)
+      ("Q" (lambda () (interactive) (deactivate-mark)) :exit t))))
 
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
@@ -2409,6 +2407,9 @@ active and enables parinfer."
         (rename-buffer " *Quail Completions*"))))
   (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
     (aorst/hide-quail-buffer)))
+
+(use-package rg
+  :bind ("C-c r" . rg))
 
 (provide 'init)
 ;;; init.el ends here
