@@ -19,8 +19,11 @@ PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$SSH_PS1\$CONTAINER_PS1\$GIT
 
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -n; git_ps1; ssh_ps1; container_ps1"
 
+
+## NO_GIT_PS1 can be bound in order to skip parsing if repository is
+## too big and it takes too long for prompt to appear
 function git_ps1() {
-    if git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
+    if test -z "$NO_GIT_PS1" && git rev-parse --is-inside-work-tree 1>/dev/null 2>&1; then
         if ! branch=$(git symbolic-ref --short HEAD 2>/dev/null); then
             if ! branch=$(git name-rev HEAD --name-only --no-undefined --tags 2>/dev/null); then
                 branch=$(git rev-parse --short HEAD)
