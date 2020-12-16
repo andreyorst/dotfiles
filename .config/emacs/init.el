@@ -2081,12 +2081,12 @@ active and enables parinfer."
   (when (fboundp #'defhydra)
     (defhydra hydrant/er (:color pink :hint nil)
       "
- ^Expand/Discard^              ^Mark^
- _e_:    expand region         _(_: inside pairs
- _r_:    reduce region         _)_: around pairs
- _g_, _q_: exit hydrant          _'_: inside quotes
- _G_, _Q_: discard region, exit  _\"_: around quotes
- ^ ^  ^ ^                        _p_: paragraph"
+ ^Expand/Discard^                ^Mark^
+ _e_:      expand region         _(_: inside pairs
+ _r_:      reduce region         _)_: around pairs
+ _g_ or _q_: exit hydrant          _'_: inside quotes
+ _G_:      discard region, exit  _\"_: around quotes
+ ^ ^  ^ ^                          _p_: paragraph"
       ("e" er/expand-region)
       ("r" er/contract-region)
       ("p" er/mark-paragraph)
@@ -2096,8 +2096,8 @@ active and enables parinfer."
       ("\"" er/mark-outside-quotes)
       ("g" ignore :exit t)
       ("q" ignore :exit t)
-      ("G" (lambda () (interactive) (deactivate-mark)) :exit t)
-      ("Q" (lambda () (interactive) (deactivate-mark)) :exit t))))
+      ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
+      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t))))
 
 (use-package iedit
   :bind (("M-n" . aorst/iedit-current-or-expand)
