@@ -572,13 +572,16 @@ matches changed variable."
   (set-face-attribute face nil
                       :box nil))
 
+(defvar-local project-cache nil)
+
 (defun aorst/mode-line-buffer-name ()
   (when-let ((name (buffer-file-name)))
     (concat
      "  "
-     (if-let ((project (project-current)))
-         (string-trim-left (abbreviate-file-name name)
-                           (car (project-roots project)))
+     (if-let ((project (or project-cache (project-current))))
+         (progn (setq-local project-cache project)
+                (string-trim-left (abbreviate-file-name name)
+                                  (car (project-roots project))))
        (abbreviate-file-name name)))))
 
 (defun aorst/mode-line-buffer-modified ()
