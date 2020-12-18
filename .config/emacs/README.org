@@ -976,7 +976,7 @@ What's especially cool, is that we can specify which ligatures we want, by defin
                :repo "mickeynp/ligature.el")
     :config
     (ligature-set-ligatures
-     '(prog-mode cider-repl-mode)
+     '(prog-mode cider-repl-mode inferior-lisp-mode)
      '("--" "---" "==" "===" "!=" "!==" "=!=" "=:=" "=/=" "<=" ">="
        "&&" "&&&" "&=" "++" "+++" ";;" "!!" "??" "?:" "?." "?="
        "<:" ":<" ":>" ">:" "<>" "<<<" ">>>" "<<" ">>" "||" "-|" "_|_"

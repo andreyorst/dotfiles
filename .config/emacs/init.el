@@ -417,7 +417,7 @@ Used in various places to avoid getting wrong line height when
              :repo "mickeynp/ligature.el")
   :config
   (ligature-set-ligatures
-   '(prog-mode cider-repl-mode)
+   '(prog-mode cider-repl-mode inferior-lisp-mode)
    '("--" "---" "==" "===" "!=" "!==" "=!=" "=:=" "=/=" "<=" ">="
      "&&" "&&&" "&=" "++" "+++" ";;" "!!" "??" "?:" "?." "?="
      "<:" ":<" ":>" ">:" "<>" "<<<" ">>>" "<<" ">>" "||" "-|" "_|_"
