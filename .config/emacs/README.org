@@ -493,26 +493,6 @@ For now I'm unsure if I'll take this approach or not.
     :tag "Andrey Orst customization options")
 #+end_src
 
-*** =aorst-structural-editing=
-This variable specifies if Parinfer should be used for Lisp editing.
-Conflicting packages, such as Paredit or Smartparens, may be configured so they check if this variable is =true= or not.
-
-#+begin_src emacs-lisp
-  (defcustom aorst-structural-editing 'smartparens
-    "Controls what structural editing to use in various modes.
-
-  Defines main strucutral editing package for Lisp modes, if the
-  choice is PARINFER or SMARTPARENS.  Other programming modes
-  will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
-    :type '(choice (const :tag "Parinfer" parinfer)
-                   (const :tag "Parinfer ELisp" parinfer-elisp)
-                   (const :tag "Smartparens" smartparens)
-                   (const :tag "Electric Pair Mode" electric-pair-mode))
-    :safe #'symbolp
-    :group 'aorst
-    :tag "Structural editing package")
-#+end_src
-
 *** =aorst-enable-indent-guides=
 Indentation guides package is awesome, yet doesn't work as good as I'd like to, so it is disabled by default, but can be enabled here.
 
@@ -2956,77 +2936,6 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
       (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 #+end_src
 
-** Parinfer Rust
-Parinfer implementation written in Rust language.
-Not as strict as Emacs Lisp implementation, because it does not force any formatting rules, and theoretically should be faster, but in very early stages of development.
-
-#+begin_src emacs-lisp
-  (use-package parinfer-rust-mode
-    :if (and (eq aorst-structural-editing 'parinfer)
-             (bound-and-true-p module-file-suffix)
-             (not (string-match-p "aarch" system-configuration)))
-    :straight (:host github
-               :repo "justinbarclay/parinfer-rust-mode")
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode) . aorst/enable-parinfer)
-    :custom
-    (parinfer-rust-check-before-enable 'defer)
-    (parinfer-rust-dim-parens nil)
-    :custom-face
-    (parinfer-rust-dim-parens ((t (:inherit shadow))))
-    :config
-    (defun aorst/enable-parinfer ()
-      "Disables conficting structural editing modes that might be
-  active and enables parinfer."
-      (when (bound-and-true-p smartparens-mode)
-        (smartparens-mode -1))
-      (when (bound-and-true-p smartparens-strict-mode)
-        (smartparens-strict-mode -1))
-      (when (bound-and-true-p electric-pair-mode)
-        (electric-pair-local-mode -1))
-      (parinfer-rust-mode 1))
-    :init
-    (setq parinfer-rust-auto-download t))
-#+end_src
-
-** Parinfer ELisp
-Parinfer implemented in Emacs Lisp.
-The most portable version, as it doesn't require neither module support, nor compilation for specific architecture.
-Extremely useful on mobile phone, where shortcut options are very limited, and such packages, like Smartparens or Paredit would require to set a lot of uncommon keybindings.
-
-#+begin_src emacs-lisp
-  (use-package parinfer-smart
-    :when (eq aorst-structural-editing 'parinfer-elisp)
-    :straight (:host github
-               :repo "DogLooksGood/parinfer-mode"
-               :branch "smart")
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode
-            fennel-mode) . aorst/enable-parinfer-elisp)
-    :config
-    (defun aorst/enable-parinfer-elisp ()
-      "Disables conficting structural editing modes that might be
-  active and enables parinfer."
-      (when (bound-and-true-p smartparens-mode)
-        (smartparens-mode -1))
-      (when (bound-and-true-p smartparens-strict-mode)
-        (smartparens-strict-mode -1))
-      (when (bound-and-true-p electric-pair-mode)
-        (electric-pair-local-mode -1))
-      (parinfer-mode 1))
-    :init
-    (use-package paredit)
-    (use-package selected))
-#+end_src
-
 ** Electric pair mode
 
 #+begin_src emacs-lisp
@@ -3231,8 +3140,6 @@ Display TODO items in Magit buffers.
       '("T " "Todos" magit-todos-jump-to-todos)))
 #+end_src
 
-*** Magit Forge
-
 ** Ediff
 This is a built in mode for diffing files in Emacs.
 
@@ -3414,7 +3321,10 @@ Still pretty usable though, as multiple cursor some times looses cursors for som
           (hydrant/iedit/body)))))
 #+end_src
 
-** LSP Mode
+** LSP
+Packages providing integration with Language Server Protocol.
+
+*** LSP Mode
 LSP client for Emacs.
 
 #+begin_src emacs-lisp
@@ -3431,11 +3341,12 @@ LSP client for Emacs.
     (lsp-enable-indentation nil)
     (lsp-enable-symbol-highlighting t)
     (lsp-rust-server 'rust-analyzer)
-    (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
+    (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)))
 #+end_src
 
 *** LSP UI
 User interface package for LSP.
+This package provides documentation popup, definitions in split-view, imenu list, e.t.c.
 
 #+begin_src emacs-lisp
   (use-package lsp-ui
@@ -3468,7 +3379,7 @@ However, language server requires JDK 11 to run, so we only load it when JDK 11 
     :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 #+end_src
 
-** DAP Mode
+*** DAP Mode
 Debug Adapter Protocol support for Emacs.
 
 #+begin_src emacs-lisp

@@ -122,20 +122,6 @@ Based on `so-long-detected-long-line-p'."
   "Various customization options that alter Emacs configuration."
   :tag "Andrey Orst customization options")
 
-(defcustom aorst-structural-editing 'smartparens
-  "Controls what structural editing to use in various modes.
-
-Defines main strucutral editing package for Lisp modes, if the
-choice is PARINFER or SMARTPARENS.  Other programming modes
-will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
-  :type '(choice (const :tag "Parinfer" parinfer)
-                 (const :tag "Parinfer ELisp" parinfer-elisp)
-                 (const :tag "Smartparens" smartparens)
-                 (const :tag "Electric Pair Mode" electric-pair-mode))
-  :safe #'symbolp
-  :group 'aorst
-  :tag "Structural editing package")
-
 (defcustom aorst-enable-indent-guides nil
   "Controls what structural editing to use in various modes.
 
@@ -1795,64 +1781,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (dolist (paren '("(" "[" "{"))
     (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
-(use-package parinfer-rust-mode
-  :if (and (eq aorst-structural-editing 'parinfer)
-           (bound-and-true-p module-file-suffix)
-           (not (string-match-p "aarch" system-configuration)))
-  :straight (:host github
-             :repo "justinbarclay/parinfer-rust-mode")
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode) . aorst/enable-parinfer)
-  :custom
-  (parinfer-rust-check-before-enable 'defer)
-  (parinfer-rust-dim-parens nil)
-  :custom-face
-  (parinfer-rust-dim-parens ((t (:inherit shadow))))
-  :config
-  (defun aorst/enable-parinfer ()
-    "Disables conficting structural editing modes that might be
-active and enables parinfer."
-    (when (bound-and-true-p smartparens-mode)
-      (smartparens-mode -1))
-    (when (bound-and-true-p smartparens-strict-mode)
-      (smartparens-strict-mode -1))
-    (when (bound-and-true-p electric-pair-mode)
-      (electric-pair-local-mode -1))
-    (parinfer-rust-mode 1))
-  :init
-  (setq parinfer-rust-auto-download t))
-
-(use-package parinfer-smart
-  :when (eq aorst-structural-editing 'parinfer-elisp)
-  :straight (:host github
-             :repo "DogLooksGood/parinfer-mode"
-             :branch "smart")
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode
-          fennel-mode) . aorst/enable-parinfer-elisp)
-  :config
-  (defun aorst/enable-parinfer-elisp ()
-    "Disables conficting structural editing modes that might be
-active and enables parinfer."
-    (when (bound-and-true-p smartparens-mode)
-      (smartparens-mode -1))
-    (when (bound-and-true-p smartparens-strict-mode)
-      (smartparens-strict-mode -1))
-    (when (bound-and-true-p electric-pair-mode)
-      (electric-pair-local-mode -1))
-    (parinfer-mode 1))
-  :init
-  (use-package paredit)
-  (use-package selected))
-
 (use-package electric-pair-mode
   :straight nil
   :when (eq aorst-structural-editing 'electric-pair-mode)
@@ -2163,7 +2091,7 @@ active and enables parinfer."
   (lsp-enable-indentation nil)
   (lsp-enable-symbol-highlighting t)
   (lsp-rust-server 'rust-analyzer)
-  (lsp-session-file (expand-file-name "lsp-session" user-emacs-directory)))
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)))
 
 (use-package lsp-ui
   :after lsp-mode
