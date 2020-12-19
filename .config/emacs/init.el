@@ -1722,7 +1722,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight (:host github
              :repo "andreyorst/smartparens"
              :branch "elixir-better-search")
-  :when (eq aorst-structural-editing 'smartparens)
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1734,9 +1733,18 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            racket-repl-mode
            geiser-repl-mode
            inferior-emacs-lisp-mode) . smartparens-strict-mode)
-         (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp))
+         (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
+         ((org-mode
+          markdown-mode
+          prog-mode) . aorst/enable-smartparens))
   :bind (:map smartparens-strict-mode-map
          (";" . sp-comment))
+  :custom
+  (sp-highlight-pair-overlay nil)
+  (sp-highlight-wrap-overlay nil)
+  (sp-highlight-wrap-tag-overlay nil)
+  (sp-wrap-respect-direction t)
+  (sp-show-pair-delay 0)
   :config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
@@ -1745,23 +1753,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
     (smartparens-strict-mode 1))
-  (add-to-list 'sp-lisp-modes 'fennel-mode t))
-
-(use-package smartparens
-  :straight (:host github
-             :repo "andreyorst/smartparens"
-             :branch "elixir-better-search")
-  :unless (eq aorst-structural-editing 'electric-pair-mode)
-  :hook ((org-mode
-          markdown-mode
-          prog-mode) . aorst/enable-smartparens)
-  :custom
-  (sp-highlight-pair-overlay nil)
-  (sp-highlight-wrap-overlay nil)
-  (sp-highlight-wrap-tag-overlay nil)
-  (sp-wrap-respect-direction t)
-  (sp-show-pair-delay 0)
-  :config
+  (add-to-list 'sp-lisp-modes 'fennel-mode t)
   (require 'smartparens-config)
   (defun aorst/enable-smartparens ()
     (smartparens-mode 1)
@@ -1780,12 +1772,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       (goto-char (sp-get sp-last-wrapped-region :beg-in))))
   (dolist (paren '("(" "[" "{"))
     (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
-
-(use-package electric-pair-mode
-  :straight nil
-  :when (eq aorst-structural-editing 'electric-pair-mode)
-  :hook ((prog-mode . electric-pair-local-mode)
-         (prog-mode . show-paren-mode)))
 
 (use-package flx)
 

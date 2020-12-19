@@ -2868,7 +2868,6 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
     :straight (:host github
                :repo "andreyorst/smartparens"
                :branch "elixir-better-search")
-    :when (eq aorst-structural-editing 'smartparens)
     :hook (((clojure-mode
              emacs-lisp-mode
              common-lisp-mode
@@ -2880,9 +2879,18 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
              racket-repl-mode
              geiser-repl-mode
              inferior-emacs-lisp-mode) . smartparens-strict-mode)
-           (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp))
+           (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
+           ((org-mode
+            markdown-mode
+            prog-mode) . aorst/enable-smartparens))
     :bind (:map smartparens-strict-mode-map
            (";" . sp-comment))
+    :custom
+    (sp-highlight-pair-overlay nil)
+    (sp-highlight-wrap-overlay nil)
+    (sp-highlight-wrap-tag-overlay nil)
+    (sp-wrap-respect-direction t)
+    (sp-show-pair-delay 0)
     :config
     (defun aorst/minibuffer-enable-sp ()
       "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
@@ -2891,31 +2899,7 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
       (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
       (sp-update-local-pairs 'minibuffer-pairs)
       (smartparens-strict-mode 1))
-    (add-to-list 'sp-lisp-modes 'fennel-mode t))
-#+end_src
-
-This package configuration is split in two parts, because I want to be able to toggle what structural editing tool to use per machine.
-I do so with =aorst-structural-editing= defcustom, which configures the package to use.
-However, there are two possible ways of managing parentheses in Lisps structurally - Smartparens, and Parinfer.
-Therefore I check if  =aorst-structural-editing= is set to ='smartparens= or to ='parinfer= in the above config, but I use Smartparens in non lisp modes as well.
-For that purpose I do additional check if it is not set to ='electric-pair-mode=, which should be used for everything by default if I don't want to use Smartparens or Parinfer.
-
-#+begin_src emacs-lisp
-  (use-package smartparens
-    :straight (:host github
-               :repo "andreyorst/smartparens"
-               :branch "elixir-better-search")
-    :unless (eq aorst-structural-editing 'electric-pair-mode)
-    :hook ((org-mode
-            markdown-mode
-            prog-mode) . aorst/enable-smartparens)
-    :custom
-    (sp-highlight-pair-overlay nil)
-    (sp-highlight-wrap-overlay nil)
-    (sp-highlight-wrap-tag-overlay nil)
-    (sp-wrap-respect-direction t)
-    (sp-show-pair-delay 0)
-    :config
+    (add-to-list 'sp-lisp-modes 'fennel-mode t)
     (require 'smartparens-config)
     (defun aorst/enable-smartparens ()
       (smartparens-mode 1)
@@ -2934,16 +2918,6 @@ For that purpose I do additional check if it is not set to ='electric-pair-mode=
         (goto-char (sp-get sp-last-wrapped-region :beg-in))))
     (dolist (paren '("(" "[" "{"))
       (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
-#+end_src
-
-** Electric pair mode
-
-#+begin_src emacs-lisp
-  (use-package electric-pair-mode
-    :straight nil
-    :when (eq aorst-structural-editing 'electric-pair-mode)
-    :hook ((prog-mode . electric-pair-local-mode)
-           (prog-mode . show-paren-mode)))
 #+end_src
 
 ** Flx
