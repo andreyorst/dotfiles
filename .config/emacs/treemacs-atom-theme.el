@@ -126,7 +126,7 @@
                     :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
-                  "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el"
+                  "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el" "erl"
                   "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
                   "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
                   "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
@@ -135,7 +135,8 @@
                   "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
                   "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
                   "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                  "gitconfig" "gitignore" "gitmodules" "conf" "lock" "project" "fnl"))
+                  "gitconfig" "gitignore" "gitmodules" "conf" "lock" "project" "fnl"
+                  "config"))
     (treemacs-create-icon
      :icon (format "  %s\t"
                    (all-the-icons-octicon

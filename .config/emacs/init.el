@@ -123,11 +123,7 @@ Based on `so-long-detected-long-line-p'."
   :tag "Andrey Orst customization options")
 
 (defcustom aorst-enable-indent-guides nil
-  "Controls what structural editing to use in various modes.
-
-Defines main strucutral editing package for Lisp modes, if the
-choice is PARINFER or SMARTPARENS.  Other programming modes
-will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
+  "Controls if settings for `highlight-indent-guides' package should be enabled."
   :type 'boolean
   :group 'aorst
   :tag "Indent guides")
@@ -137,6 +133,12 @@ will use SMARTPARENS unless ELECTRIC-PAIR-MODE is selected."
   :type 'boolean
   :group 'aorst
   :tag "Treemacs")
+
+(defcustom aorst-enable-line-numbers nil
+  "Controls if settings for `display-line-numbers-mode' should be enabled."
+  :type 'boolean
+  :group 'aorst
+  :tag "Display line numbers")
 
 (defcustom aorst-enable-tabline t
   "Whether to enable Tabline."
@@ -1175,6 +1177,8 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package display-line-numbers
   :straight nil
+  :when aorst-enable-line-numbers
+  :hook (prog-mode . display-line-numbers)
   :custom
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
@@ -1296,8 +1300,7 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package prog-mode
   :straight nil
-  :hook ((prog-mode . display-line-numbers-mode)
-         (prog-mode . hl-line-mode)))
+  :hook (prog-mode . hl-line-mode))
 
 (use-package cc-mode
   :straight nil
@@ -1423,7 +1426,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                       (funcall method indent-point state))))))))
   (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
     "Setup Emacs Lisp buffer for Org Babel."
-    (setq lexical-binding t)))
+    (setq lexical-binding t)
+    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
 (use-package yaml-mode
   :custom (yaml-indent-offset 4))
