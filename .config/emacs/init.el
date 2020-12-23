@@ -129,7 +129,7 @@ Based on `so-long-detected-long-line-p'."
   :tag "Indent guides")
 
 (defcustom aorst-enable-treemacs t
-  "Whether to enable Treemacs."
+  "Controls if settings for `treemacs' package should be enabled."
   :type 'boolean
   :group 'aorst
   :tag "Treemacs")
@@ -141,7 +141,7 @@ Based on `so-long-detected-long-line-p'."
   :tag "Display line numbers")
 
 (defcustom aorst-enable-tabline t
-  "Whether to enable Tabline."
+  "Controls if settings for `tab-line' package should be enabled."
   :type 'boolean
   :group 'aorst
   :tag "Tabline")
@@ -450,7 +450,8 @@ Used in various places to avoid getting wrong line height when
              solaire-mode-reset)
   :hook (((after-revert
            change-major-mode
-           org-src-mode) . turn-on-solaire-mode)
+           org-src-mode)
+          . turn-on-solaire-mode)
          (snippet-mode . solaire-mode))
   :custom
   (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -560,14 +561,14 @@ matches changed variable."
   (set-face-attribute face nil
                       :box nil))
 
-(defvar-local project-cache nil)
+(defvar-local modeline-project-cache nil)
 
 (defun aorst/mode-line-buffer-name ()
   (when-let ((name (buffer-file-name)))
     (concat
      "  "
-     (if-let ((project (or project-cache (project-current))))
-         (progn (setq-local project-cache project)
+     (if-let ((project (or modeline-project-cache (project-current))))
+         (progn (setq-local modeline-project-cache project)
                 (string-trim-left (abbreviate-file-name name)
                                   (car (project-roots project))))
        (abbreviate-file-name name)))))
@@ -808,7 +809,8 @@ offset variables."
              :repo "kiennq/emacs-mini-modeline")
   :hook (((aorst--load-theme
            aorst--disable-theme
-           aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
+           aorst--solaire-swap-bg)
+          . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode))
   :custom
   (mini-modeline-right-padding 2)
@@ -839,7 +841,8 @@ offset variables."
     :straight nil
     :hook ((aorst--disable-theme
             aorst--load-theme
-            aorst--solaire-swap-bg) . aorst/window-divider-setup-faces)
+            aorst--solaire-swap-bg)
+           . aorst/window-divider-setup-faces)
     :custom
     (window-divider-default-bottom-width 1)
     (window-divider-default-right-width 1)
@@ -875,10 +878,12 @@ offset variables."
          (treemacs-mode . aorst/treemacs-setup-title)
          ((aorst--load-theme
            aorst--disable-theme
-           aorst--solaire-swap-bg) . aorst/treemacs-setup-title)
+           aorst--solaire-swap-bg)
+          . aorst/treemacs-setup-title)
          ((aorst--load-theme
            aorst--disable-theme
-           aorst--solaire-swap-bg) . aorst/treemacs-setup-faces))
+           aorst--solaire-swap-bg)
+          . aorst/treemacs-setup-faces))
   :custom-face
   (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
   :custom
@@ -977,7 +982,8 @@ offset variables."
   :hook ((after-init . global-tab-line-mode)
          ((aorst--load-theme
            aorst--disable-theme
-           aorst--solaire-swap-bg) . aorst/tabline-setup-faces))
+           aorst--solaire-swap-bg)
+          . aorst/tabline-setup-faces))
   :config
   (defun tab-line-close-tab (&optional e)
     "Close the selected tab.
@@ -1178,9 +1184,9 @@ truncates text if needed.  Minimal width can be set with
 (use-package display-line-numbers
   :straight nil
   :when aorst-enable-line-numbers
-  :hook (prog-mode . display-line-numbers)
+  :hook (prog-mode . display-line-numbers-mode)
   :custom
-  (display-line-numbers-grow-only t)
+  (display-line-numbers-width 4)
   (display-line-numbers-width-start t))
 
 (use-package org
@@ -1322,11 +1328,7 @@ truncates text if needed.  Minimal width can be set with
          ("M-Q" . aorst/split-pararagraph-into-lines))
   :custom
   (markdown-fontify-code-blocks-natively t)
-  :config
-  (defvar markdown-command "multimarkdown")
-  (defun aorst/markdown-setup ()
-    "Set buffer local variables."
-    (setq default-justification 'left))
+  (markdown-command "pandoc")
   :hook ((markdown-mode . flyspell-mode)
          (markdown-mode . aorst/markdown-setup)))
 
@@ -1451,7 +1453,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package clojure-mode
   :hook (((clojure-mode
            clojurec-mode
-           clojurescript-mode) . flycheck-mode))
+           clojurescript-mode)
+          . flycheck-mode))
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
@@ -1480,7 +1483,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                   (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))))
 
 (use-package flycheck-clj-kondo
-  :if (executable-find "clj-kondo")
+  :when (executable-find "clj-kondo")
   :straight (:host github
              :repo "borkdude/flycheck-clj-kondo"))
 
@@ -1489,8 +1492,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning t)
           (cljr-warn-on-eval nil))
-
-(use-package kibit-helper)
 
 (use-package fennel-mode
   :straight (:host gitlab
@@ -1736,11 +1737,13 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            cider-repl-mode
            racket-repl-mode
            geiser-repl-mode
-           inferior-emacs-lisp-mode) . smartparens-strict-mode)
+           inferior-emacs-lisp-mode)
+          . smartparens-strict-mode)
          (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
          ((org-mode
           markdown-mode
-          prog-mode) . aorst/enable-smartparens))
+          prog-mode)
+         . aorst/enable-smartparens))
   :bind (:map smartparens-strict-mode-map
          (";" . sp-comment))
   :custom
@@ -2297,7 +2300,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
           common-lisp-mode
           scheme-mode
           lisp-mode
-          racket-mode) . rainbow-delimiters-mode))
+          racket-mode)
+         . rainbow-delimiters-mode))
 
 (use-package wgrep)
 

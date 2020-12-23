@@ -510,7 +510,7 @@ Handy for using Emacs in terminal only systems.
 
 #+begin_src emacs-lisp
   (defcustom aorst-enable-treemacs t
-    "Whether to enable Treemacs."
+    "Controls if settings for `treemacs' package should be enabled."
     :type 'boolean
     :group 'aorst
     :tag "Treemacs")
@@ -532,7 +532,7 @@ Controls if Tabline package should be enabled for current configuration.
 
 #+begin_src emacs-lisp
   (defcustom aorst-enable-tabline t
-    "Whether to enable Tabline."
+    "Controls if settings for `tab-line' package should be enabled."
     :type 'boolean
     :group 'aorst
     :tag "Tabline")
@@ -1032,7 +1032,8 @@ Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode
                solaire-mode-reset)
     :hook (((after-revert
              change-major-mode
-             org-src-mode) . turn-on-solaire-mode)
+             org-src-mode)
+            . turn-on-solaire-mode)
            (snippet-mode . solaire-mode))
     :custom
     (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -1184,14 +1185,14 @@ Buffer name module for mode-line.
 Returns buffer name or empty string if buffer is special and starts from space.
 
 #+begin_src emacs-lisp
-  (defvar-local project-cache nil)
+  (defvar-local modeline-project-cache nil)
 
   (defun aorst/mode-line-buffer-name ()
     (when-let ((name (buffer-file-name)))
       (concat
        "  "
-       (if-let ((project (or project-cache (project-current))))
-           (progn (setq-local project-cache project)
+       (if-let ((project (or modeline-project-cache (project-current))))
+           (progn (setq-local modeline-project-cache project)
                   (string-trim-left (abbreviate-file-name name)
                                     (car (project-roots project))))
          (abbreviate-file-name name)))))
@@ -1498,7 +1499,8 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
                :repo "kiennq/emacs-mini-modeline")
     :hook (((aorst--load-theme
              aorst--disable-theme
-             aorst--solaire-swap-bg) . aorst/mini-modeline-setup-faces)
+             aorst--solaire-swap-bg)
+            . aorst/mini-modeline-setup-faces)
            (after-init . mini-modeline-mode))
     :custom
     (mini-modeline-right-padding 2)
@@ -1534,7 +1536,8 @@ Some tweaks to window divider colors.
       :straight nil
       :hook ((aorst--disable-theme
               aorst--load-theme
-              aorst--solaire-swap-bg) . aorst/window-divider-setup-faces)
+              aorst--solaire-swap-bg)
+             . aorst/window-divider-setup-faces)
       :custom
       (window-divider-default-bottom-width 1)
       (window-divider-default-right-width 1)
@@ -1586,10 +1589,12 @@ Which is good.
            (treemacs-mode . aorst/treemacs-setup-title)
            ((aorst--load-theme
              aorst--disable-theme
-             aorst--solaire-swap-bg) . aorst/treemacs-setup-title)
+             aorst--solaire-swap-bg)
+            . aorst/treemacs-setup-title)
            ((aorst--load-theme
              aorst--disable-theme
-             aorst--solaire-swap-bg) . aorst/treemacs-setup-faces))
+             aorst--solaire-swap-bg)
+            . aorst/treemacs-setup-faces))
     :custom-face
     (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
     :custom
@@ -1894,7 +1899,8 @@ I want to customize tab appearance to match my theme.
     :hook ((after-init . global-tab-line-mode)
            ((aorst--load-theme
              aorst--disable-theme
-             aorst--solaire-swap-bg) . aorst/tabline-setup-faces))
+             aorst--solaire-swap-bg)
+            . aorst/tabline-setup-faces))
     :config
     (defun tab-line-close-tab (&optional e)
       "Close the selected tab.
@@ -2101,9 +2107,9 @@ I don't like that it changes width, so let's make it grow only, and calculate ma
   (use-package display-line-numbers
     :straight nil
     :when aorst-enable-line-numbers
-    :hook (prog-mode . display-line-numbers)
+    :hook (prog-mode . display-line-numbers-mode)
     :custom
-    (display-line-numbers-grow-only t)
+    (display-line-numbers-width 4)
     (display-line-numbers-width-start t))
 #+end_src
 
@@ -2275,11 +2281,7 @@ This can be achieved with =edit-indirect= package.
            ("M-Q" . aorst/split-pararagraph-into-lines))
     :custom
     (markdown-fontify-code-blocks-natively t)
-    :config
-    (defvar markdown-command "multimarkdown")
-    (defun aorst/markdown-setup ()
-      "Set buffer local variables."
-      (setq default-justification 'left))
+    (markdown-command "pandoc")
     :hook ((markdown-mode . flyspell-mode)
            (markdown-mode . aorst/markdown-setup)))
 #+end_src
@@ -2471,7 +2473,8 @@ It is one of the few modern and refreshing languages, that bring both innovation
   (use-package clojure-mode
     :hook (((clojure-mode
              clojurec-mode
-             clojurescript-mode) . flycheck-mode))
+             clojurescript-mode)
+            . flycheck-mode))
     :bind (:map clojure-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
@@ -2510,7 +2513,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
 
 #+begin_src emacs-lisp
   (use-package flycheck-clj-kondo
-    :if (executable-find "clj-kondo")
+    :when (executable-find "clj-kondo")
     :straight (:host github
                :repo "borkdude/flycheck-clj-kondo"))
 #+end_src
@@ -2525,13 +2528,6 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
            (cider-mode . yas-minor-mode))
     :custom (cljr-suppress-no-project-warning t)
             (cljr-warn-on-eval nil))
-#+end_src
-
-*** Kibit
-Integration package for Kibit linter.
-
-#+begin_src emacs-lisp
-  (use-package kibit-helper)
 #+end_src
 
 ** Fennel
@@ -2888,11 +2884,13 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
              cider-repl-mode
              racket-repl-mode
              geiser-repl-mode
-             inferior-emacs-lisp-mode) . smartparens-strict-mode)
+             inferior-emacs-lisp-mode)
+            . smartparens-strict-mode)
            (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
            ((org-mode
             markdown-mode
-            prog-mode) . aorst/enable-smartparens))
+            prog-mode)
+           . aorst/enable-smartparens))
     :bind (:map smartparens-strict-mode-map
            (";" . sp-comment))
     :custom
@@ -3678,7 +3676,8 @@ Color delimiters in different colors based on expression depth.
             common-lisp-mode
             scheme-mode
             lisp-mode
-            racket-mode) . rainbow-delimiters-mode))
+            racket-mode)
+           . rainbow-delimiters-mode))
 #+end_src
 
 ** Writable Grep
