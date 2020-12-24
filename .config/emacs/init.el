@@ -104,10 +104,8 @@ Based on `so-long-detected-long-line-p'."
 
 (use-package cus-edit
   :straight nil
-  :custom
-  (custom-file (expand-file-name "custom.el" user-emacs-directory))
-  :init
-  (load custom-file :noerror))
+  :custom (custom-file (expand-file-name "custom.el" user-emacs-directory))
+  :init (load custom-file :noerror))
 
 (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
   "File to store disabled commands, that were enabled permamently.")
@@ -134,7 +132,7 @@ Based on `so-long-detected-long-line-p'."
   :group 'aorst
   :tag "Treemacs")
 
-(defcustom aorst-enable-line-numbers nil
+(defcustom aorst-enable-line-numbers t
   "Controls if settings for `display-line-numbers-mode' should be enabled."
   :type 'boolean
   :group 'aorst
@@ -1471,6 +1469,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (cider-test-show-report-on-success t)
   (cider-allow-jack-in-without-project t)
   (cider-use-fringe-indicators nil)
+  ;; (cider-font-lock-dynamically '(macro var))
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -1512,9 +1511,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :straight nil
   :custom
   (css-indent-offset 2))
-
-(use-package sql-indent
-  :hook (sql-mode . sqlind-minor-mode))
 
 (use-package erlang
   :hook (erlang-mode . (lambda ()
@@ -2293,15 +2289,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                           :distant-foreground "gray80"
                           :inherit nil)))
   (aorst/display-fill-column-indicator-setup-faces))
-
-(use-package rainbow-delimiters
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode)
-         . rainbow-delimiters-mode))
 
 (use-package wgrep)
 

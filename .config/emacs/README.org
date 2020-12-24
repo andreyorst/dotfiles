@@ -456,15 +456,13 @@ For the record, I need tab characters only when I work with C/C++ code and Makef
 #+end_src
 
 ** Custom File and Disabled Commands
-I don't like custom, and especially would like to stop it from interfering to my configuration files, so lets move it to separate file.
+I would like to stop custom from inserting code into my configuration files, so lets move it to separate file.
 
 #+begin_src emacs-lisp
   (use-package cus-edit
     :straight nil
-    :custom
-    (custom-file (expand-file-name "custom.el" user-emacs-directory))
-    :init
-    (load custom-file :noerror))
+    :custom (custom-file (expand-file-name "custom.el" user-emacs-directory))
+    :init (load custom-file :noerror))
 #+end_src
 
 I also don't like that Emacs has disabled commands, and enabling them modifies my =init.el= that I don't modify myself.
@@ -520,7 +518,7 @@ Handy for using Emacs in terminal only systems.
 Line numbers are still slow on scrolling even when using pretty optimized =display-line-numbers-mode=.
 
 #+begin_src emacs-lisp
-  (defcustom aorst-enable-line-numbers nil
+  (defcustom aorst-enable-line-numbers t
     "Controls if settings for `display-line-numbers-mode' should be enabled."
     :type 'boolean
     :group 'aorst
@@ -2496,6 +2494,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
     (cider-test-show-report-on-success t)
     (cider-allow-jack-in-without-project t)
     (cider-use-fringe-indicators nil)
+    ;; (cider-font-lock-dynamically '(macro var))
     :config
     (setq cider-jdk-src-paths nil)
     (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -2564,14 +2563,6 @@ CSS indentation tweaks.
     :straight nil
     :custom
     (css-indent-offset 2))
-#+end_src
-
-** SQL
-Syntax based indentation for SQL:
-
-#+begin_src emacs-lisp
-  (use-package sql-indent
-    :hook (sql-mode . sqlind-minor-mode))
 #+end_src
 
 ** Erlang
@@ -3664,20 +3655,6 @@ Emacs 27 added direct support for fill column indicator, which displays thin lin
                             :distant-foreground "gray80"
                             :inherit nil)))
     (aorst/display-fill-column-indicator-setup-faces))
-#+end_src
-
-** Rainbow Delimiters
-Color delimiters in different colors based on expression depth.
-
-#+begin_src emacs-lisp
-  (use-package rainbow-delimiters
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode)
-           . rainbow-delimiters-mode))
 #+end_src
 
 ** Writable Grep
