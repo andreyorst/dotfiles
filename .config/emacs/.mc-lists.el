@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        aorst/downcase-region-or-word
         aorst/exchange-point-and-mark
         aorst/kill-region-or-word
         aorst/newline-above
@@ -32,8 +33,8 @@
         end-of-buffer
         end-of-defun
         forward-sexp
-        hs-toggle-hiding
         goto-line
+        hs-toggle-hiding
         hydra--negative-argument
         hydrant/er/er/contract-region
         hydrant/er/er/expand-region
