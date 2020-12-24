@@ -72,9 +72,9 @@ Based on `so-long-detected-long-line-p'."
                           (float (window-font-width)))))
              (line-number-width
               ;; compensate line numbers width
-              (or (and display-line-numbers-mode
-                       (- display-line-numbers-width))
-                  0))
+              (if (bound-and-true-p display-line-numbers-mode)
+                  (- display-line-numbers-width)
+                0))
              (threshold (+ window-width hscroll-offset line-number-width -4)))
         (catch 'excessive
            (while (not (eobp))
@@ -261,6 +261,21 @@ is used for each variant."
   :straight nil
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore)))
+
+(defun aorst/formfeed-line ()
+  "Display the formfeed ^L char as comment or as continuous line."
+  (unless buffer-display-table
+    (setq buffer-display-table (make-display-table)))
+  (aset buffer-display-table ?\^L
+        (vconcat (make-list (or fill-column 70)
+                            (make-glyph-code
+                             (string-to-char (or comment-start "─"))
+                             'font-lock-comment-face)))))
+
+(dolist (mode-hook '(emacs-lisp-mode-hook
+                     help-mode-hook
+                     org-mode-hook))
+  (add-hook mode-hook 'aorst/formfeed-line))
 
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
@@ -2080,7 +2095,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (lsp-enable-indentation nil)
   (lsp-enable-symbol-highlighting t)
   (lsp-rust-server 'rust-analyzer)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)))
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-headerline-breadcrumb-enable nil))
 
 (use-package lsp-ui
   :after lsp-mode

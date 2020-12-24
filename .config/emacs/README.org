@@ -417,9 +417,9 @@ If by chance I would need to use Emacs in terminal, I'd like to keep mouse worki
                             (float (window-font-width)))))
                (line-number-width
                 ;; compensate line numbers width
-                (or (and display-line-numbers-mode
-                         (- display-line-numbers-width))
-                    0))
+                (if (bound-and-true-p display-line-numbers-mode)
+                    (- display-line-numbers-width)
+                  0))
                (threshold (+ window-width hscroll-offset line-number-width -4)))
           (catch 'excessive
              (while (not (eobp))
@@ -724,6 +724,33 @@ Disabling clicks in minibuffer, because opening =*Messages*= buffer by clicking 
     :straight nil
     :bind (:map minibuffer-inactive-mode-map
            ("<mouse-1>" . ignore)))
+#+end_src
+
+** =^L=
+…also known as [[https://en.wikipedia.org/wiki/Page_break#Form_feed][form feed character]].
+Emacs often uses it to mark sections in files, and in buffers like =*Help*=.
+I don't quite enjoy seeing =^L= everywhere, so let's fix this:
+
+#+begin_src emacs-lisp
+  (defun aorst/formfeed-line ()
+    "Display the formfeed ^L char as comment or as continuous line."
+    (unless buffer-display-table
+      (setq buffer-display-table (make-display-table)))
+    (aset buffer-display-table ?\^L
+          (vconcat (make-list (or fill-column 70)
+                              (make-glyph-code
+                               (string-to-char (or comment-start "─"))
+                               'font-lock-comment-face)))))
+#+end_src
+
+This function will replace =^L= with a string of =fill-column= width out of =comment-start= character (=;= in Emacs Lisp) or of =─= char.
+Let's enable it in modes where it is fequently used.
+
+#+begin_src emacs-lisp
+  (dolist (mode-hook '(emacs-lisp-mode-hook
+                       help-mode-hook
+                       org-mode-hook))
+    (add-hook mode-hook 'aorst/formfeed-line))
 #+end_src
 
 * Functions
@@ -3314,7 +3341,8 @@ LSP client for Emacs.
     (lsp-enable-indentation nil)
     (lsp-enable-symbol-highlighting t)
     (lsp-rust-server 'rust-analyzer)
-    (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)))
+    (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+    (lsp-headerline-breadcrumb-enable nil))
 #+end_src
 
 *** LSP UI
