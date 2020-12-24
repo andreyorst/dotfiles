@@ -85,6 +85,7 @@
       '(
         aorst/treemacs-expand-all-projects
         aorst/vterm-focus
+        aorst/vterm-toggle
         cider-debug-mode-send-reply
         cider-repl-return
         clang-format-buffer
@@ -155,6 +156,7 @@
         vterm-send-C-c
         vterm-send-backspace
         vterm-send-return
+        vterm-send-tab
         wgrep-change-to-wgrep-mode
         wgrep-finish-edit
         xref-find-definitions
