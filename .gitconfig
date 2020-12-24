@@ -1,6 +1,3 @@
-[user]
-	email = andreyorst@gmail.com
-	name = Andrey Orst
 [alias]
 	clean-all = clean -xdf
 	st = status
@@ -11,8 +8,8 @@
 	bra = branch -a
         root = rev-parse --show-toplevel
 	exec = "!exec "
-[include]
-	path = .gitconfig.local
 [pull]
 	ff = only
 	rebase = false
+[include]
+	path = .gitconfig.local
