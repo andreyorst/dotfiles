@@ -939,6 +939,8 @@ However in terminal Emacs it is completely useless, so we disable it.
 #+end_src
 
 ** Line height
+When =text-scale-mode= is active it's hard to tell what line height actually is.
+This variable helps calulating that reliably.
 
 #+begin_src emacs-lisp
   (defvar aorst--line-pixel-height (line-pixel-height)
@@ -2513,6 +2515,8 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
            ((cider-repl-mode cider-mode) . eldoc-mode))
     :custom-face
     (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
+    (cider-error-highlight-face ((t (:inherit flymake-error))))
+    (cider-warning-highlight-face ((t (:inherit flymake-warning))))
     :custom
     (nrepl-log-messages nil)
     (cider-repl-display-help-banner nil)
@@ -2659,6 +2663,13 @@ Scala language support.
   (use-package scala-mode)
 #+end_src
 
+** SQL
+SQL mode does not provide inbuilt support for indentation handling, and instead uses this package.
+
+#+begin_src emacs-lisp
+  (use-package sql-indent)
+#+end_src
+
 * Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 
@@ -2750,6 +2761,14 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
 #+begin_src emacs-lisp
   (use-package editorconfig
     :config (editorconfig-mode 1))
+#+end_src
+
+** Flymake
+Flymake is an inbuilt package for checking various programming languages.
+I load it mostly for its faces, since I use =flycheck= instead.
+
+#+begin_src emacs-lisp
+  (use-package flymake :straight nil)
 #+end_src
 
 ** Flycheck
@@ -3000,6 +3019,7 @@ The same thing is for =rg=, but counsel actually has it's own variable for it, s
                counsel-rg
                counsel-describe-function
                counsel-describe-variable
+               counsel-faces
                counsel-find-library)
     :bind (("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
@@ -3007,7 +3027,7 @@ The same thing is for =rg=, but counsel actually has it's own variable for it, s
            ("C-x C-r" . counsel-recentf)
            ("C-x d" . counsel-dired)
            ("C-h f" . counsel-describe-function)
-           ("C-h C-f" . counsel-describe-face)
+           ("C-h C-f" . counsel-faces)
            ("C-h v" . counsel-describe-variable)
            ("C-h l" . counsel-find-library))
     :config

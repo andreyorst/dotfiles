@@ -1476,6 +1476,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ((cider-repl-mode cider-mode) . eldoc-mode))
   :custom-face
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
+  (cider-error-highlight-face ((t (:inherit flymake-error))))
+  (cider-warning-highlight-face ((t (:inherit flymake-warning))))
   :custom
   (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)
@@ -1556,6 +1558,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package scala-mode)
 
+(use-package sql-indent)
+
 (use-package help
   :straight nil
   :custom (help-window-select t))
@@ -1624,6 +1628,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package editorconfig
   :config (editorconfig-mode 1))
+
+(use-package flymake :straight nil)
 
 (use-package flycheck
   :bind (:map flycheck-mode-map
@@ -1828,6 +1834,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
              counsel-rg
              counsel-describe-function
              counsel-describe-variable
+             counsel-faces
              counsel-find-library)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
@@ -1835,7 +1842,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-x C-r" . counsel-recentf)
          ("C-x d" . counsel-dired)
          ("C-h f" . counsel-describe-function)
-         ("C-h C-f" . counsel-describe-face)
+         ("C-h C-f" . counsel-faces)
          ("C-h v" . counsel-describe-variable)
          ("C-h l" . counsel-find-library))
   :config
