@@ -2186,37 +2186,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
       ("qs" hs-show-all :exit t)
       ("qh" hs-hide-all :exit t))))
 
-(use-package desktop
-  :straight nil
-  :if window-system
-  :hook ((after-init . aorst/desktop-restore))
-  :custom
-  (desktop-path `(,user-emacs-directory))
-  (desktop-dirname user-emacs-directory)
-  (desktop-base-file-name "desktop")
-  (desktop-base-lock-name "desktop.lock")
-  (desktop-save t)
-  (desktop-load-locked-desktop t)
-  (desktop-locals-to-save nil)
-  (desktop-globals-to-save nil)
-  (desktop-restore-frames nil)
-  :config
-  (dolist (mode '(solaire-mode
-                  parinfer-rust-mode
-                  global-diff-hl-mode
-                  diff-hl-mode
-                  diff-hl-flydiff-mode
-                  diff-hl-margin-mode))
-    (add-to-list 'desktop-minor-mode-table `(,mode ,nil)))
-  :init
-  (defun aorst/desktop-restore ()
-    "Restore a saved emacs session."
-    (interactive)
-    (desktop-save-mode t)
-    (when (file-exists-p
-           (concat desktop-dirname desktop-base-file-name))
-      (desktop-read))))
-
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
   :bind (:map edit-indirect-mode-map
@@ -2317,16 +2286,13 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package xref
   :straight nil
-  :hook (xref-after-jump . aorst/xref-remove-treemacs-from-marker-ring)
-  :requires seq
   :config
-  (defun aorst/xref-remove-treemacs-from-marker-ring ()
-    (when-let ((i (seq-position (ring-elements xref--marker-ring)
-                                " \*Treemacs-Scoped-Buffer.*"
-                                (lambda (elem re)
-                                  (when elem
-                                    (string-match-p re (buffer-name (marker-buffer elem))))))))
-      (ring-remove xref--marker-ring i))))
+  (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
+    (let ((m (or m (point-marker))))
+      (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
+        (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
+          (setf m (point-marker))))
+      (funcall fn m))))
 
 (use-package vc-hooks
   :straight nil
