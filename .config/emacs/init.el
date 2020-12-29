@@ -1518,7 +1518,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (put 'time 'fennel-indent-function 0)
   (put 'dotimes 'fennel-indent-function 1)
   (put 'when-let 'fennel-indent-function 1)
-  (put 'if-let 'fennel-indent-function 1))
+  (put 'if-let 'fennel-indent-function 1)
+  (put 'try 'fennel-indent-function 0)
+  (put 'catch 'fennel-indent-function 1)
+  (put 'finally 'fennel-indent-function 0))
 
 (use-package lua-mode
   :bind (:map lua-mode-map

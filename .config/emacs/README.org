@@ -2574,7 +2574,10 @@ It supports compile-time macro system, and full Lua compatibility.
     (put 'time 'fennel-indent-function 0)
     (put 'dotimes 'fennel-indent-function 1)
     (put 'when-let 'fennel-indent-function 1)
-    (put 'if-let 'fennel-indent-function 1))
+    (put 'if-let 'fennel-indent-function 1)
+    (put 'try 'fennel-indent-function 0)
+    (put 'catch 'fennel-indent-function 1)
+    (put 'finally 'fennel-indent-function 0))
 #+end_src
 
 ** Lua
