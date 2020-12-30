@@ -15,13 +15,31 @@
   :config
   (progn
     (treemacs-create-icon
-     :icon (format " %s\t"
+     :icon (format "%s\t%s\t"
                    (all-the-icons-octicon
-                    "repo"
-                    :v-adjust -0.1
+                    "chevron-down"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face '(:inherit font-lock-doc-face :slant normal :weight normal))
+                   (all-the-icons-octicon
+                    "file-directory"
+                    :v-adjust 0
+                    :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
+     :fallback (propertize "- " 'face 'font-lock-doc-face)
+     :extensions (root-open))
+    (treemacs-create-icon
+     :icon (format "%s\t%s\t"
+                   (all-the-icons-octicon
+                    "chevron-right"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face '(:inherit font-lock-doc-face :slant normal :weight normal))
+                   (all-the-icons-octicon
+                    "file-directory"
+                    :v-adjust 0
                     :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback (propertize "+ " 'face 'font-lock-doc-face)
-     :extensions (root))
+     :extensions (root-closed))
     (treemacs-create-icon
      :icon (format "%s\t%s\t"
                    (all-the-icons-octicon
