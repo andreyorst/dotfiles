@@ -5,20 +5,38 @@ bake_find_command() {
     fi
     while [ $# -gt 0 ]; do
         case $1 in
-            (-F) shift; exclude_files="'$1' $exclude_files" ;;
-            (-exclude-file=*) exclude_files="'${1#-exclude-file=}' $exclude_files" ;;
-            (-D) shift; exclude_dirs="'$1' $exclude_dirs" ;;
-            (-exclude-dir=*) exclude_files="'${1#-exclude-dir=}' $exclude_files" ;;
+            (-exclude-file=*)  exclude_files="'${1#-exclude-file=}' $exclude_files" ;;
+            (-F|-exclude-file) shift; exclude_files="'$1' $exclude_files" ;;
+            (-exclude-dir=*)  exclude_files="'${1#-exclude-dir=}' $exclude_files" ;;
+            (-D|-exclude-dir) shift; exclude_dirs="'$1' $exclude_dirs" ;;
             (-default)
                 exclude_files="'*.o' '*.bin' '*.obj' $exclude_files"
                 exclude_dirs="'.git' '.svn' $exclude_dirs" ;;
+            (-clean)
+                unset -f find
+                unset exclude_files
+                unset exclude_dirs
+                return 0 ;;
             (-help|-h)
-                printf "%s\n" "usage: bake_find_command [-F <filename>] ... [-D <dirname>] ...\n" >&2
-                printf "%s\n" "  -F -exclude-file=: exclude this file from search." >&2
-                printf "%s\n" "  -D -exclude-dir=: exclude this dir from search." >&2
-                printf "%s\n" "     -default: exclude default set of files and dirs." >&2
-                printf "%s\n" "  -h -help: print this message" >&2 ;;
+                printf "%s"
+                "usage: bake_find_command [-F <filename>]* [-D <dirname>]*
+
+  -F -exclude-file: exclude this file from search.  Globs supported.
+  -D -exclude-dir:  exclude this dir from search.  Globs supported.
+
+     -default:      exclude default set of files and directories.
+                    Default files: '*.o' '*.bin' '*.obj'
+                    Default directories: '.git' '.svn'
+
+     -clean:        remove all ignored patterns and exit.
+
+  -h -help:         print this message and exit." >&2
+                unset exclude_files
+                unset exclude_dirs
+                return 0 ;;
             (*) printf "unknown switch\n" >&2
+                unset exclude_files
+                unset exclude_dirs
                 return 1 ;;
         esac
         shift
