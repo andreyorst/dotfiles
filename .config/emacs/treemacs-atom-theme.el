@@ -15,7 +15,7 @@
   :config
   (progn
     (treemacs-create-icon
-     :icon (format "%s\t%s\t"
+     :icon (format " %s\t%s\t"
                    (all-the-icons-octicon
                     "chevron-down"
                     :height 0.75
@@ -28,7 +28,7 @@
      :fallback (propertize "- " 'face 'font-lock-doc-face)
      :extensions (root-open))
     (treemacs-create-icon
-     :icon (format "%s\t%s\t"
+     :icon (format " %s\t%s\t"
                    (all-the-icons-octicon
                     "chevron-right"
                     :height 0.75
@@ -41,7 +41,7 @@
      :fallback (propertize "+ " 'face 'font-lock-doc-face)
      :extensions (root-closed))
     (treemacs-create-icon
-     :icon (format "%s\t%s\t"
+     :icon (format " %s\t%s\t"
                    (all-the-icons-octicon
                     "chevron-down"
                     :height 0.75
@@ -54,7 +54,7 @@
      :fallback (propertize "- " 'face 'font-lock-doc-face)
      :extensions (dir-open))
     (treemacs-create-icon
-     :icon (format "%s\t%s\t"
+     :icon (format " %s\t%s\t"
                    (all-the-icons-octicon
                     "chevron-right"
                     :height 0.75
@@ -67,7 +67,7 @@
      :fallback (propertize "+ " 'face 'font-lock-doc-face)
      :extensions (dir-closed))
     (treemacs-create-icon
-     :icon (format "%s\t%s\t"
+     :icon (format " %s\t%s\t"
                    (all-the-icons-octicon
                     "chevron-down"
                     :height 0.75
@@ -80,7 +80,7 @@
      :fallback (propertize "▾ " 'face 'font-lock-string-face)
      :extensions (tag-open))
     (treemacs-create-icon
-     :icon (format "%s\t%s\t"
+     :icon (format " %s\t%s\t"
                    (all-the-icons-octicon
                     "chevron-right"
                     :height 0.75
@@ -93,7 +93,7 @@
      :fallback (propertize "▸ " 'face 'font-lock-string-face)
      :extensions (tag-closed))
     (treemacs-create-icon
-     :icon (format "%s\t"
+     :icon (format " %s\t"
                    (all-the-icons-octicon
                     "tag"
                     :height 0.9
@@ -102,7 +102,7 @@
      :fallback ""
      :extensions (tag-leaf))
     (treemacs-create-icon
-     :icon (format "%s\t"
+     :icon (format " %s\t"
                    (all-the-icons-octicon
                     "flame"
                     :v-adjust 0
@@ -110,7 +110,7 @@
      :fallback ""
      :extensions (error))
     (treemacs-create-icon
-     :icon (format "%s\t"
+     :icon (format " %s\t"
                    (all-the-icons-octicon
                     "stop"
                     :v-adjust 0
@@ -118,7 +118,7 @@
      :fallback ""
      :extensions (warning))
     (treemacs-create-icon
-     :icon (format "%s\t"
+     :icon (format " %s\t"
                    (all-the-icons-octicon
                     "info"
                     :height 0.75
@@ -127,7 +127,7 @@
      :fallback ""
      :extensions (info))
     (treemacs-create-icon
-     :icon (format "  %s\t"
+     :icon (format "   %s\t"
                    (all-the-icons-octicon
                     "file-media"
                     :v-adjust 0
@@ -137,7 +137,7 @@
                   "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
                   "wav" "mp3" "ogg" "midi"))
     (treemacs-create-icon
-     :icon (format "  %s\t"
+     :icon (format "   %s\t"
                    (all-the-icons-octicon
                     "file-code"
                     :v-adjust 0
@@ -156,7 +156,7 @@
                   "gitconfig" "gitignore" "gitmodules" "conf" "lock" "project" "fnl"
                   "config"))
     (treemacs-create-icon
-     :icon (format "  %s\t"
+     :icon (format "   %s\t"
                    (all-the-icons-octicon
                     "book"
                     :v-adjust 0
@@ -167,7 +167,7 @@
                   "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
                   "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
     (treemacs-create-icon
-     :icon (format "  %s\t" (all-the-icons-octicon
+     :icon (format "   %s\t" (all-the-icons-octicon
                              "file-text"
                              :v-adjust 0
                              :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
@@ -175,28 +175,28 @@
      :extensions ("md" "markdown" "rst" "log" "org" "txt"
                   "contribute" "license" "readme" "changelog"))
     (treemacs-create-icon
-     :icon (format "  %s\t" (all-the-icons-octicon
+     :icon (format "   %s\t" (all-the-icons-octicon
                              "file-binary"
                              :v-adjust 0
                              :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("exe" "dll" "obj" "so" "o" "out"))
     (treemacs-create-icon
-     :icon (format "  %s\t" (all-the-icons-octicon
+     :icon (format "   %s\t" (all-the-icons-octicon
                              "file-pdf"
                              :v-adjust 0
                              :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("pdf"))
     (treemacs-create-icon
-     :icon (format "  %s\t" (all-the-icons-octicon
+     :icon (format "   %s\t" (all-the-icons-octicon
                              "file-zip"
                              :v-adjust 0
                              :face '(:inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
     (treemacs-create-icon
-     :icon (format "  %s\t" (all-the-icons-octicon
+     :icon (format "   %s\t" (all-the-icons-octicon
                              "file-text"
                              :v-adjust 0
                              :face '(:inherit font-lock-doc-face :slant normal :weight normal)))

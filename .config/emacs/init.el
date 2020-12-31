@@ -969,7 +969,11 @@ offset variables."
           line-spacing 5)
     (setq-local scroll-step 1)
     (setq-local scroll-conservatively 10000)
+    (set-window-fringes nil 0 1 nil)
     (aorst/treemacs-variable-pitch-labels))
+  (define-advice treemacs-select-window (:after () aorst:treemacs-setup-fringes)
+    "Set treemacs buffer fringes."
+    (set-window-fringes nil 0 1 t))
   (defun aorst/treemacs-setup-title ()
     (when-let ((treemacs-buffer (treemacs-get-local-buffer)))
       (with-current-buffer treemacs-buffer
@@ -1757,6 +1761,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            cider-repl-mode
            racket-repl-mode
            geiser-repl-mode
+           inferior-lisp-mode
            inferior-emacs-lisp-mode)
           . smartparens-strict-mode)
          (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
