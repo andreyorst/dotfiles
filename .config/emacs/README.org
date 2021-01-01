@@ -2159,6 +2159,7 @@ I don't like that it changes width, so let's make it grow only, and calculate ma
     :hook (prog-mode . display-line-numbers-mode)
     :custom
     (display-line-numbers-width 4)
+    (display-line-numbers-grow-only t)
     (display-line-numbers-width-start t))
 #+end_src
 
@@ -2599,7 +2600,15 @@ It supports compile-time macro system, and full Lua compatibility.
     (put 'if-let 'fennel-indent-function 1)
     (put 'try 'fennel-indent-function 0)
     (put 'catch 'fennel-indent-function 1)
-    (put 'finally 'fennel-indent-function 0))
+    (put 'finally 'fennel-indent-function 0)
+
+    (defvar org-babel-default-header-args:fennel '((:results . "silent")))
+    (defun org-babel-execute:fennel (body params)
+      "Evaluate a block of Fennel code with Babel."
+      (let ((buffer (current-buffer)))
+        (fennel-repl nil)
+        (select-window (get-buffer-window buffer)))
+      (lisp-eval-string body)))
 #+end_src
 
 ** Lua

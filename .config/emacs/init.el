@@ -1204,6 +1204,7 @@ truncates text if needed.  Minimal width can be set with
   :hook (prog-mode . display-line-numbers-mode)
   :custom
   (display-line-numbers-width 4)
+  (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
 
 (use-package org
@@ -1525,7 +1526,15 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (put 'if-let 'fennel-indent-function 1)
   (put 'try 'fennel-indent-function 0)
   (put 'catch 'fennel-indent-function 1)
-  (put 'finally 'fennel-indent-function 0))
+  (put 'finally 'fennel-indent-function 0)
+
+  (defvar org-babel-default-header-args:fennel '((:results . "silent")))
+  (defun org-babel-execute:fennel (body params)
+    "Evaluate a block of Fennel code with Babel."
+    (let ((buffer (current-buffer)))
+      (fennel-repl nil)
+      (select-window (get-buffer-window buffer)))
+    (lisp-eval-string body)))
 
 (use-package lua-mode
   :bind (:map lua-mode-map
