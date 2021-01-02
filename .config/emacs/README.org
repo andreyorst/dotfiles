@@ -3160,6 +3160,7 @@ Emacs interface to Git.
 I've heard that it has many nice features, so I want to try it out.
 
 #+begin_src emacs-lisp
+  (use-package with-editor)
   (use-package magit
     :hook (git-commit-mode . flyspell-mode)
     :bind (("<f12>" . magit-status))

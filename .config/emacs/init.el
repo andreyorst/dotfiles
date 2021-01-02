@@ -1925,6 +1925,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :config
   (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
 
+(use-package with-editor)
 (use-package magit
   :hook (git-commit-mode . flyspell-mode)
   :bind (("<f12>" . magit-status))
