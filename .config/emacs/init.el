@@ -1491,7 +1491,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (cider-test-show-report-on-success t)
   (cider-allow-jack-in-without-project t)
   (cider-use-fringe-indicators nil)
-  ;; (cider-font-lock-dynamically '(macro var))
+  (cider-font-lock-dynamically '(macro var))
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -1531,10 +1531,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
     "Evaluate a block of Fennel code with Babel."
-    (let ((buffer (current-buffer)))
-      (fennel-repl nil)
-      (select-window (get-buffer-window buffer)))
-    (lisp-eval-string body)))
+    (lisp-eval-string body))
+  (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
+    (setq-local lisp-indent-function 'fennel-indent-function)))
 
 (use-package lua-mode
   :bind (:map lua-mode-map
@@ -1772,7 +1771,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
            geiser-repl-mode
            inferior-lisp-mode
            inferior-emacs-lisp-mode)
-          . smartparens-strict-mode)
+          . aorst/enable-smartparens-strict)
          (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
          ((org-mode
           markdown-mode
@@ -1798,6 +1797,9 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (require 'smartparens-config)
   (defun aorst/enable-smartparens ()
     (smartparens-mode 1)
+    (show-smartparens-mode 1))
+  (defun aorst/enable-smartparens-strict ()
+    (smartparens-strict-mode 1)
     (show-smartparens-mode 1))
   (sp-with-modes '(fennel-mode)
     (sp-local-pair "`" "`"
