@@ -876,7 +876,7 @@ offset variables."
                         (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
 
 (use-package treemacs
-  :when aorst-enable-treemacs
+  :when (and aorst-enable-treemacs window-system)
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-load-theme)
@@ -995,7 +995,7 @@ offset variables."
 
 (use-package tab-line
   :straight nil
-  :when aorst-enable-tabline
+  :when (and window-system aorst-enable-tabline)
   :hook ((after-init . global-tab-line-mode)
          ((aorst--load-theme
            aorst--disable-theme
@@ -1347,8 +1347,7 @@ truncates text if needed.  Minimal width can be set with
   :custom
   (markdown-fontify-code-blocks-natively t)
   (markdown-command "pandoc")
-  :hook ((markdown-mode . flyspell-mode)
-         (markdown-mode . aorst/markdown-setup)))
+  :hook ((markdown-mode . flyspell-mode)))
 
 (use-package rust-mode
   :commands (rust-format-buffer)

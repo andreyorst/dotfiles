@@ -33,7 +33,9 @@ else
 fi
 
 if [ -n "$(command -v emacs)" ]; then
-    export EDITOR="emacs"
+    export EDITOR="command emacs -nw"
+elif [ -n "$(command -v kak)" ]; then
+    export EDITOR="kak"
 elif [ -n "$(command -v vim)" ]; then
     export EDITOR="vim"
 else
