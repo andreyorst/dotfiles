@@ -274,6 +274,7 @@ is used for each variant."
 
 (dolist (mode-hook '(emacs-lisp-mode-hook
                      help-mode-hook
+                     fennel-mode-hook
                      org-mode-hook))
   (add-hook mode-hook 'aorst/formfeed-line))
 

@@ -749,6 +749,7 @@ Let's enable it in modes where it is fequently used.
 #+begin_src emacs-lisp
   (dolist (mode-hook '(emacs-lisp-mode-hook
                        help-mode-hook
+                       fennel-mode-hook
                        org-mode-hook))
     (add-hook mode-hook 'aorst/formfeed-line))
 #+end_src
