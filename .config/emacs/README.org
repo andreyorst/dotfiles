@@ -3335,6 +3335,11 @@ Still pretty usable though, as multiple cursor some times looses cursors for som
            ("C-c i" . aorst/iedit-hydrant))
     :custom
     (iedit-toggle-key-default nil)
+    :custom-face
+    (iedit-occurrence ((t (:background unspecified
+                           :foreground unspecified
+                           :inverse-video unspecified
+                           :inherit region))))
     :init
     (defun aorst/iedit-to-mc-hydrant ()
       "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."

@@ -2066,6 +2066,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
          ("C-c i" . aorst/iedit-hydrant))
   :custom
   (iedit-toggle-key-default nil)
+  :custom-face
+  (iedit-occurrence ((t (:background unspecified
+                         :foreground unspecified
+                         :inverse-video unspecified
+                         :inherit region))))
   :init
   (defun aorst/iedit-to-mc-hydrant ()
     "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
