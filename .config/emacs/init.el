@@ -1622,8 +1622,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                      (vterm "*vterm*"))))
           (when (bound-and-true-p global-tab-line-mode)
             (previous-buffer)
-            (bury-buffer)
-            (rename-buffer " *vterm*"))
+            (bury-buffer))
+          (rename-buffer " *vterm*")
           (set-window-dedicated-p window t)
           (set-window-parameter window 'no-delete-other-windows t)
           (when side

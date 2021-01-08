@@ -2768,8 +2768,8 @@ It works much better than =ansi-term=, though may be buggy and requires compilat
                        (vterm "*vterm*"))))
             (when (bound-and-true-p global-tab-line-mode)
               (previous-buffer)
-              (bury-buffer)
-              (rename-buffer " *vterm*"))
+              (bury-buffer))
+            (rename-buffer " *vterm*")
             (set-window-dedicated-p window t)
             (set-window-parameter window 'no-delete-other-windows t)
             (when side
