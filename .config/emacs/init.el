@@ -1827,7 +1827,6 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :custom-face
   (ivy-org ((t (:inherit default))))
   :custom
-  (ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-count-format "")
   (ivy-ignore-buffers '("\\` " "\\`\\*"))
   (ivy-display-style nil)
@@ -1836,6 +1835,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (ivy-use-virtual-buffers t)
   (enable-recursive-minibuffers t)
   :init
+  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (defun aorst/minibuffer-defer-garbage-collection ()
     "Defer garbage collection for minibuffer"
     (setq gc-cons-threshold most-positive-fixnum))
