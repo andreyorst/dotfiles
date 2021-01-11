@@ -32,6 +32,7 @@
         electric-newline-and-maybe-indent
         end-of-buffer
         end-of-defun
+        fill-paragraph
         forward-sexp
         goto-line
         hs-toggle-hiding
