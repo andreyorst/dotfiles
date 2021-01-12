@@ -77,6 +77,7 @@
         sp-forward-sexp
         sp-forward-slurp-sexp
         sp-kill-hybrid-sexp
+        sp-kill-word
         sp-remove-active-pair-overlay
         sp-splice-sexp-killing-backward
         upcase-region
