@@ -120,58 +120,6 @@ Based on `so-long-detected-long-line-p'."
   "Various customization options that alter Emacs configuration."
   :tag "Andrey Orst customization options")
 
-(defcustom aorst-enable-indent-guides nil
-  "Controls if settings for `highlight-indent-guides' package should be enabled."
-  :type 'boolean
-  :group 'aorst
-  :tag "Indent guides")
-
-(defcustom aorst-enable-treemacs t
-  "Controls if settings for `treemacs' package should be enabled."
-  :type 'boolean
-  :group 'aorst
-  :tag "Treemacs")
-
-(defcustom aorst-enable-line-numbers t
-  "Controls if settings for `display-line-numbers-mode' should be enabled."
-  :type 'boolean
-  :group 'aorst
-  :tag "Display line numbers")
-
-(defcustom aorst-enable-tabline t
-  "Controls if settings for `tab-line' package should be enabled."
-  :type 'boolean
-  :group 'aorst
-  :tag "Tabline")
-
-(defgroup theme ()
-  "Control what theme variant to use, and which particular theme
-is used for each variant."
-  :tag "Theme configurations"
-  :group 'aorst)
-
-(defcustom aorst-theme-variant 'dark
-  "What theme variant to use."
-  :type '(choice (const :tag "light" light)
-                 (const :tag "dark" dark))
-  :group 'theme
-  :safe #'symbolp
-  :tag "Theme variant")
-
-(defcustom aorst-dark-theme 'doom-one
-  "What dark theme to use."
-  :type 'symbol
-  :group 'theme
-  :safe #'symbolp
-  :tag "Dark theme")
-
-(defcustom aorst-light-theme 'doom-one-light
-  "What light theme to use."
-  :type 'symbol
-  :group 'theme
-  :safe #'symbolp
-  :tag "Light theme")
-
 (use-package savehist
   :straight nil
   :config (savehist-mode 1))
@@ -518,49 +466,15 @@ Used in various places to avoid getting wrong line height when
   (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (defvar aorst--current-theme nil
-    "Caching theme in order not to run expensive theme change function.")
-  (defun aorst/change-theme-variant (_ val &rest _)
-    "Sets current theme to either `aorst-dark-theme' or
-`aorst-light-theme' depending on value in `aorst-theme-variant'."
-    (let ((theme (pcase val
-                   ('light aorst-light-theme)
-                   ('dark aorst-dark-theme))))
-      (unless (equal aorst--current-theme theme)
-        (setq aorst--current-theme theme)
-        (load-theme theme t))))
-  (defun aorst/refresh-theme (&rest _)
-    "Updates theme as soon as `aorst-dark-theme' or
-`aorst-light-theme' changes, if selected `aorst-theme-variant'
-matches changed variable."
-    (aorst/change-theme-variant nil aorst-theme-variant))
-  (aorst/change-theme-variant nil aorst-theme-variant)
-  (add-variable-watcher 'aorst-theme-variant #'aorst/change-theme-variant)
-  (add-variable-watcher 'aorst-dark-theme #'aorst/refresh-theme)
-  (add-variable-watcher 'aorst-light-theme #'aorst/refresh-theme))
+  (if (eq 'dark (frame-parameter nil 'background-mode))
+      (load-theme 'doom-spacegrey t)
+    (load-theme 'doom-one-light t)))
 
-(defvar aorst--load-theme-hook nil
+(defvar aorst--theme-change-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
-(defun aorst/run-load-theme-hooks (&rest _)
-  "Run `aorst--load-theme-hook'."
-  (run-hooks 'aorst--load-theme-hook))
 
-(advice-add 'load-theme :after #'aorst/run-load-theme-hooks)
-
-(defvar aorst--disable-theme-hook nil
-  "Hook run after a color theme is disabled using `disable-theme'.")
-(defun aorst/run-disable-theme-hooks (&rest _)
-  "Run `aorst--disable-theme-hook'."
-  (run-hooks 'aorst--disable-theme-hook))
-
-(advice-add 'disable-theme :after #'aorst/run-disable-theme-hooks)
-
-(defun aorst/disable-all-themes (&rest _)
-  "Disable all active themes."
-  (dolist (theme custom-enabled-themes)
-    (disable-theme theme)))
-
-(advice-add 'load-theme :before #'aorst/disable-all-themes)
+(define-advice load-theme (:after (&rest _) aorst:load-theme)
+  (run-hooks 'aorst--theme-change-hook))
 
 (setq-default custom-safe-themes t)
 
@@ -821,8 +735,7 @@ offset variables."
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
-  :hook (((aorst--load-theme
-           aorst--disable-theme
+  :hook (((aorst--theme-change
            aorst--solaire-swap-bg)
           . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode))
@@ -853,8 +766,7 @@ offset variables."
 (when window-system
   (use-package frame
     :straight nil
-    :hook ((aorst--disable-theme
-            aorst--load-theme
+    :hook ((aorst--theme-change
             aorst--solaire-swap-bg)
            . aorst/window-divider-setup-faces)
     :custom
@@ -866,7 +778,7 @@ offset variables."
     (defun aorst/window-divider-setup-faces ()
       (let* ((color (face-attribute 'mode-line-inactive :background))
              (color (if (fboundp #'doom-darken)
-                        (pcase aorst-theme-variant
+                        (pcase (frame-parameter nil 'background-mode)
                           ('light (doom-lighten color 0.10))
                           ('dark (doom-darken color 0.15))))))
         (set-face-attribute 'window-divider nil :foreground color)))
@@ -877,7 +789,7 @@ offset variables."
                         (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
 
 (use-package treemacs
-  :when (and aorst-enable-treemacs window-system)
+  :when window-system
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-load-theme)
@@ -890,12 +802,10 @@ offset variables."
          (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
          (treemacs-switch-workspace . treemacs-set-fallback-workspace)
          (treemacs-mode . aorst/treemacs-setup-title)
-         ((aorst--load-theme
-           aorst--disable-theme
+         ((aorst--theme-change
            aorst--solaire-swap-bg)
           . aorst/treemacs-setup-title)
-         ((aorst--load-theme
-           aorst--disable-theme
+         ((aorst--theme-change
            aorst--solaire-swap-bg)
           . aorst/treemacs-setup-faces))
   :custom-face
@@ -982,7 +892,7 @@ offset variables."
               (fg (face-attribute 'default :foreground)))
           (face-remap-add-relative 'header-line
                                    :background bg :foreground fg
-                                   :box `(:line-width ,(/ aorst--line-pixel-height 2) :color ,bg)))
+                                   :box `(:line-width ,(/ aorst--line-pixel-height 4) :color ,bg)))
         (setq header-line-format
               '((:eval
                  (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
@@ -996,10 +906,9 @@ offset variables."
 
 (use-package tab-line
   :straight nil
-  :when (and window-system aorst-enable-tabline)
+  :when window-system
   :hook ((after-init . global-tab-line-mode)
-         ((aorst--load-theme
-           aorst--disable-theme
+         ((aorst--theme-change
            aorst--solaire-swap-bg)
           . aorst/tabline-setup-faces))
   :config
@@ -1036,57 +945,6 @@ function."
                    (ignore-errors (delete-window window)))))))))
 
 
-  (defcustom tab-line-tab-min-width 10
-    "Minimum width of a tab in characters."
-    :type 'integer
-    :group 'tab-line)
-
-
-  (defcustom tab-line-tab-max-width 33
-    "Maximum width of a tab in characters."
-    :type 'integer
-    :group 'tab-line)
-
-  (defcustom tab-line-ellipsis-string "…"
-    "String for indicating truncated names"
-    :type 'string
-    :group 'tab-line)
-
-  (defun aorst/tab-line--tab-width (window-width tab-amount)
-    "Calculate width of single tab dividing WINDOW-WIDTH by TAB-AMOUNT."
-    (let* ((close-button-size
-            (if tab-line-close-button-show
-                (length (substring-no-properties tab-line-close-button)) 0))
-           (tab-width (/ window-width tab-amount)))
-      (- (cond ((< window-width 0)
-                tab-line-tab-min-width)
-               ((>= tab-width tab-line-tab-max-width)
-                tab-line-tab-max-width)
-               ((< tab-width tab-line-tab-min-width)
-                tab-line-tab-min-width)
-               (t tab-width))
-         close-button-size)))
-
-  (defun aorst/tab-line--max-width (window)
-    "Calculate free width of the WINDOW.
-
-Free width means amount of space we can use to display tabs
-without truncation."
-    (- (window-width window)
-       (length (substring-no-properties tab-line-left-button))
-       (length (substring-no-properties tab-line-right-button))
-       (if tab-line-new-button-show
-           (length (substring-no-properties tab-line-new-button))
-         0)))
-
-
-  (defun aorst/tab-line--make-pad (tab-width name-width)
-    "Generate padding string based on TAB-WIDTH and NAME-WIDTH."
-    (let* ((width (- tab-width name-width))
-           (padding (/ (if (oddp width) (+ width 1) width) 2)))
-      (make-string padding ?\s)))
-
-
   (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
     "Create name for tab with padding and truncation.
 
@@ -1098,29 +956,11 @@ with maximum width, it calculates new width for each tab and
 truncates text if needed.  Minimal width can be set with
 `tab-line-tab-min-width' variable."
     (with-current-buffer buffer
-      (let* ((amount (length (tab-line-tabs-window-buffers)))
-             (width (aorst/tab-line--tab-width
-                     (aorst/tab-line--max-width (get-buffer-window buffer))
-                     amount))
-             (buffer (string-trim (buffer-name)))
-             (name-width (length buffer))
-             (right-pad (if tab-line-close-button-show "" " "))
-             (truncate-width (- width
-                                (length tab-line-ellipsis-string)
-                                (length right-pad)
-                                1)))
-        (if (>= name-width truncate-width)
-            (propertize (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
-                        'help-echo (if-let ((name (buffer-file-name)))
-                                       (abbreviate-file-name name)
-                                     (buffer-name)))
-          (let* ((padding (aorst/tab-line--make-pad width name-width))
-                 (tab-text (concat padding buffer))
-                 (text-width (length tab-text)))
-            (propertize (concat tab-text (make-string (- width text-width) ?\s))
-                        'help-echo (when-let ((name (buffer-file-name)))
-                                    (abbreviate-file-name name))))))))
-
+      (let ((buffer (string-trim (buffer-name)))
+            (right-pad (if tab-line-close-button-show "" " ")))
+        (propertize (concat " " buffer right-pad)
+                    'help-echo (when-let ((name (buffer-file-name)))
+                                 (abbreviate-file-name name))))))
 
 
   (setq tab-line-close-button-show t
@@ -1155,19 +995,21 @@ truncates text if needed.  Minimal width can be set with
                 (face-attribute 'default :background)))
           (fg (face-attribute 'default :foreground))
           (dark-fg (face-attribute 'shadow :foreground))
+          (overline (face-attribute 'font-lock-keyword-face :foreground))
           (base (if (and (facep 'solaire-default-face)
                          (not (eq (face-attribute 'solaire-default-face :background)
                                   'unspecified)))
                     (face-attribute 'default :background)
                   (face-attribute 'mode-line :background)))
-          (box-width (/ aorst--line-pixel-height 2)))
+          (box-width (/ aorst--line-pixel-height 6)))
       (set-face-attribute 'tab-line nil
                           :background base
                           :foreground dark-fg
                           :height 1.0
                           :inherit nil
-                          :box (when (> box-width 0)
-                                 (list :line-width -1 :color base)))
+                          :overline base
+                          :box  (when (> box-width 0)
+                                  (list :line-width -1 :color base)))
       (set-face-attribute 'tab-line-tab nil
                           :foreground dark-fg
                           :background bg
@@ -1184,24 +1026,17 @@ truncates text if needed.  Minimal width can be set with
                           :foreground fg
                           :background bg
                           :inherit nil
+                          :overline overline
                           :box (when (> box-width 0)
                                  (list :line-width box-width :color bg)))))
 
   (aorst/tabline-setup-faces)
-
-  (defun aorst/tab-line-drop-caches ()
-    "Drops `tab-line' cache in every window."
-    (dolist (window (window-list))
-      (set-window-parameter window 'tab-line-cache nil)))
-
-  (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)
 
   (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
     (select-window (posn-window (event-start e)))))
 
 (use-package display-line-numbers
   :straight nil
-  :when aorst-enable-line-numbers
   :hook (prog-mode . display-line-numbers-mode)
   :custom
   (display-line-numbers-width 4)
@@ -1951,6 +1786,10 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 
 (use-package magit-todos
   :after magit
+  :init
+  ;; don't break Magit on systems that don't have `nice'
+  (unless (executable-find "nice")
+    (setq magit-todos-nice nil))
   :config
   (let ((inhibit-message t))
     (magit-todos-mode 1))
@@ -1985,7 +1824,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package diff
   :straight nil
   :after magit
-  :hook (aorst--load-theme . aorst/diff-setup-faces)
+  :hook (aorst--theme-change . aorst/diff-setup-faces)
   :custom-face
   (diff-added ((t (:foreground unspecified
                    :background unspecified
@@ -1999,6 +1838,40 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                               (diff-refine-removed magit-diff-removed-highlight)))
       (apply #'aorst/create-accent-face face-reference)))
   (aorst/diff-setup-faces))
+
+(use-package smerge-mode
+  :straight nil
+  :after magit
+  :hook (aorst--theme-change . aorst/smerge-setup-faces)
+  :custom-face
+  (smerge-refined-added ((t (:foreground unspecified
+                             :distant-foreground unspecified
+                             :background unspecified
+                             :inherit magit-diff-added-highlight))))
+  (smerge-refined-removed ((t (:foreground unspecified
+                               :distant-foreground unspecified
+                               :background unspecified
+                               :inherit magit-diff-removed-highlight))))
+  (smerge-lower ((t (:foreground unspecified
+                     :distant-foreground unspecified
+                     :background unspecified
+                     :inherit magit-diff-added-highlight))))
+  (smerge-upper ((t (:foreground unspecified
+                     :distant-foreground unspecified
+                     :background unspecified
+                     :inherit magit-diff-removed-highlight))))
+  (smerge-markers ((t (:foreground unspecified
+                       :distant-foreground unspecified
+                       :background unspecified
+                       :weight bold
+                       :extend t
+                       :inherit font-lock-comment-face))))
+  :config
+  (defun aorst/smerge-setup-faces ()
+    (dolist (face-reference '((smerge-refined-added magit-diff-added-highlight)
+                              (smerge-refined-removed magit-diff-removed-highlight)))
+      (apply #'aorst/create-accent-face face-reference)))
+  (aorst/smerge-setup-faces))
 
 (use-package phi-search)
 (use-package mc-extras)
@@ -2255,57 +2128,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
 (use-package gcmh
   :config (gcmh-mode t))
 
-(use-package highlight-indent-guides
-  :when aorst-enable-indent-guides
-  :hook ((prog-mode . highlight-indent-guides-mode)
-         (aorst--load-theme . aorst/indent-guides-setup-faces))
-  :custom
-  (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-character ?▏) ;; ┊│┆▏
-  (highlight-indent-guides-bitmap-function #'aorst/indent-guides-thin-line)
-  (highlight-indent-guides-responsive 'top)
-  (highlight-indent-guides-delay 0)
-  :config
-  (defun aorst/indent-guides-setup-faces ()
-    (mapc (lambda (buffer)
-            (with-current-buffer buffer
-              (when highlight-indent-guides-mode
-                (highlight-indent-guides-mode -1)
-                (highlight-indent-guides-mode 1))))
-          (buffer-list)))
-  (defun aorst/indent-guides-thin-line (width height crep zrep)
-    "Defines a solid guide line, one pixel wide."
-    (let* ((right (- width 2))
-           (row (append (make-list 1 zrep) (make-list 1 crep) (make-list right zrep)))
-           rows)
-      (dotimes (i height rows)
-        (setq rows (cons row rows))))))
-
 (use-package paren
   :straight nil
   :custom
   (show-paren-when-point-in-periphery t)
   (show-paren-delay 0))
-
-(use-package display-fill-column-indicator
-  :straight nil
-  :hook (((aorst--load-theme aorst--disable-theme) . aorst/display-fill-column-indicator-setup-faces)
-         (prog-mode . display-fill-column-indicator-mode))
-  :custom
-  (display-fill-column-indicator-character ?▏)
-  (display-fill-column-indicator-column 120)
-  :config
-  (defun aorst/display-fill-column-indicator-setup-faces ()
-    (if (eq (frame-parameter nil 'background-mode) 'dark)
-        (set-face-attribute 'fill-column-indicator nil
-                            :foreground "gray30"
-                            :distant-foreground "gray30"
-                            :inherit nil)
-      (set-face-attribute 'fill-column-indicator nil
-                          :foreground "gray80"
-                          :distant-foreground "gray80"
-                          :inherit nil)))
-  (aorst/display-fill-column-indicator-setup-faces))
 
 (use-package wgrep)
 
