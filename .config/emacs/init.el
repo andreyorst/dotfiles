@@ -1001,7 +1001,7 @@ truncates text if needed.  Minimal width can be set with
                                   'unspecified)))
                     (face-attribute 'default :background)
                   (face-attribute 'mode-line :background)))
-          (box-width (/ aorst--line-pixel-height 6)))
+          (box-width (/ aorst--line-pixel-height 5)))
       (set-face-attribute 'tab-line nil
                           :background base
                           :foreground dark-fg
@@ -1009,26 +1009,23 @@ truncates text if needed.  Minimal width can be set with
                           :inherit nil
                           :overline base
                           :box  (when (> box-width 0)
-                                  (list :line-width -1 :color base)))
+                                  (list :line-width box-width :color base)))
       (set-face-attribute 'tab-line-tab nil
                           :foreground dark-fg
                           :background bg
                           :inherit nil
-                          :box (when (> box-width 0)
-                                 (list :line-width box-width :color bg)))
+                          :box nil)
       (set-face-attribute 'tab-line-tab-inactive nil
                           :foreground dark-fg
                           :background base
                           :inherit nil
-                          :box (when (> box-width 0)
-                                 (list :line-width box-width :color base)))
+                          :box nil)
       (set-face-attribute 'tab-line-tab-current nil
                           :foreground fg
                           :background bg
                           :inherit nil
                           :overline overline
-                          :box (when (> box-width 0)
-                                 (list :line-width box-width :color bg)))))
+                          :box nil)))
 
   (aorst/tabline-setup-faces)
 
