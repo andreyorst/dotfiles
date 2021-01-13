@@ -880,7 +880,7 @@ offset variables."
           line-spacing 5)
     (setq-local scroll-step 1)
     (setq-local scroll-conservatively 10000)
-    (set-window-fringes nil 0 1 nil)
+    (set-window-fringes nil 1 1 nil)
     (aorst/treemacs-variable-pitch-labels))
   (define-advice treemacs-select-window (:after () aorst:treemacs-setup-fringes)
     "Set treemacs buffer fringes."
