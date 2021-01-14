@@ -295,6 +295,10 @@ are defining or executing a macro."
         (when (looking-at "^$")
           (backward-delete-char 1))))))
 
+(defun aorst/dark-mode-p ()
+  "Check if frame is dark or not."
+  (eq 'dark (frame-parameter nil 'background-mode)))
+
 (defun aorst/create-accent-face (face ref-face)
   "Set FACE background to accent color by blending REF-FACE foreground and background.
 Depends on `doom-blend'."
@@ -306,7 +310,9 @@ Depends on `doom-blend'."
         (set-face-attribute face nil
                             :foreground fg
                             :weight 'bold
-                            :background (doom-blend bg fg 0.8)
+                            :background (if (aorst/dark-mode-p)
+                                            (doom-blend bg fg 0.8)
+                                          (doom-blend bg fg 0.9))
                             :inherit nil
                             :extend t
                             :inverse-video nil)
@@ -466,7 +472,7 @@ Used in various places to avoid getting wrong line height when
   (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (if (eq 'dark (frame-parameter nil 'background-mode))
+  (if (aorst/dark-mode-p)
       (load-theme 'doom-spacegrey t)
     (load-theme 'doom-one-light t)))
 
@@ -763,26 +769,26 @@ offset variables."
           (plist-put mini-modeline-face-attr
                      :background (face-attribute 'mode-line :background)))))
 
-(when window-system
-  (use-package frame
-    :straight nil
-    :hook ((aorst--theme-change
-            aorst--solaire-swap-bg)
-           . aorst/window-divider-setup-faces)
-    :custom
-    (window-divider-default-bottom-width 1)
-    (window-divider-default-right-width 1)
-    (window-divider-default-places t)
-    :config
-    (window-divider-mode t)
-    (defun aorst/window-divider-setup-faces ()
-      (let* ((color (face-attribute 'mode-line-inactive :background))
-             (color (if (fboundp #'doom-darken)
-                        (pcase (frame-parameter nil 'background-mode)
-                          ('light (doom-lighten color 0.10))
-                          ('dark (doom-darken color 0.15))))))
-        (set-face-attribute 'window-divider nil :foreground color)))
-    (aorst/window-divider-setup-faces)))
+(use-package frame
+  :straight nil
+  :when window-system
+  :hook ((aorst--theme-change
+          aorst--solaire-swap-bg)
+         . aorst/window-divider-setup-faces)
+  :custom
+  (window-divider-default-bottom-width 1)
+  (window-divider-default-right-width 1)
+  (window-divider-default-places t)
+  :config
+  (window-divider-mode t)
+  (defun aorst/window-divider-setup-faces ()
+    (let* ((color (face-attribute 'mode-line-inactive :background))
+           (color (if (fboundp #'doom-darken)
+                      (if (aorst/dark-mode-p)
+                          (doom-darken color 0.15)
+                        (doom-lighten color 0.10)))))
+      (set-face-attribute 'window-divider nil :foreground color)))
+  (aorst/window-divider-setup-faces))
 
 (setq-default frame-title-format
               '(:eval (let ((match (string-match "[ *]" (buffer-name))))
@@ -817,7 +823,8 @@ offset variables."
   (treemacs-indentation 2)
   (treemacs-collapse-dirs 0)
   :config
-  (use-package treemacs-magit)
+  (use-package treemacs-magit
+    :after magit)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (defun aorst/treemacs-setup-faces ()
@@ -1008,24 +1015,27 @@ truncates text if needed.  Minimal width can be set with
                           :height 1.0
                           :inherit nil
                           :overline base
-                          :box  (when (> box-width 0)
-                                  (list :line-width box-width :color base)))
+                          :box (when (> box-width 0)
+                                 (list :line-width -1 :color base)))
       (set-face-attribute 'tab-line-tab nil
                           :foreground dark-fg
                           :background bg
                           :inherit nil
-                          :box nil)
+                          :box (when (> box-width 0)
+                                 (list :line-width box-width :color bg)))
       (set-face-attribute 'tab-line-tab-inactive nil
                           :foreground dark-fg
                           :background base
                           :inherit nil
-                          :box nil)
+                          :box (when (> box-width 0)
+                                 (list :line-width box-width :color base)))
       (set-face-attribute 'tab-line-tab-current nil
                           :foreground fg
                           :background bg
                           :inherit nil
                           :overline overline
-                          :box nil)))
+                          :box (when (> box-width 0)
+                                 (list :line-width box-width :color bg)))))
 
   (aorst/tabline-setup-faces)
 
@@ -1377,6 +1387,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   (css-indent-offset 2))
 
 (use-package erlang
+  :straight t
   :hook (erlang-mode . (lambda ()
                          (add-hook 'xref-backend-functions
                                    #'dumb-jump-xref-activate

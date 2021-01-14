@@ -675,6 +675,15 @@ I can write text as normal, fill it if I feel like it, and then reformat it with
             (backward-delete-char 1))))))
 #+end_src
 
+** =dark-mode-p=
+Shorter predicate for this check:
+
+#+begin_src emacs-lisp
+  (defun aorst/dark-mode-p ()
+    "Check if frame is dark or not."
+    (eq 'dark (frame-parameter nil 'background-mode)))
+#+end_src
+
 ** =create-accent-face=
 Creates a slight variation of a face, by blending =ref-face= background color with foreground color.
 It is used to create refine faces for diffs, which is the only purpose I've wrote this function for.
@@ -692,7 +701,9 @@ It depends on DOOM's =doom-blend= function, and if it is not available, it fallb
           (set-face-attribute face nil
                               :foreground fg
                               :weight 'bold
-                              :background (doom-blend bg fg 0.8)
+                              :background (if (aorst/dark-mode-p)
+                                              (doom-blend bg fg 0.8)
+                                            (doom-blend bg fg 0.9))
                               :inherit nil
                               :extend t
                               :inverse-video nil)
@@ -936,7 +947,7 @@ And provided thems define colors for pretty much every popular Emacs package, wh
     (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
     (font-lock-comment-face ((t (:background unspecified))))
     :config
-    (if (eq 'dark (frame-parameter nil 'background-mode))
+    (if (aorst/dark-mode-p)
         (load-theme 'doom-spacegrey t)
       (load-theme 'doom-one-light t)))
 #+end_src
@@ -1334,26 +1345,26 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
 Some tweaks to window divider colors.
 
 #+begin_src emacs-lisp
-  (when window-system
-    (use-package frame
-      :straight nil
-      :hook ((aorst--theme-change
-              aorst--solaire-swap-bg)
-             . aorst/window-divider-setup-faces)
-      :custom
-      (window-divider-default-bottom-width 1)
-      (window-divider-default-right-width 1)
-      (window-divider-default-places t)
-      :config
-      (window-divider-mode t)
-      (defun aorst/window-divider-setup-faces ()
-        (let* ((color (face-attribute 'mode-line-inactive :background))
-               (color (if (fboundp #'doom-darken)
-                          (pcase (frame-parameter nil 'background-mode)
-                            ('light (doom-lighten color 0.10))
-                            ('dark (doom-darken color 0.15))))))
-          (set-face-attribute 'window-divider nil :foreground color)))
-      (aorst/window-divider-setup-faces)))
+  (use-package frame
+    :straight nil
+    :when window-system
+    :hook ((aorst--theme-change
+            aorst--solaire-swap-bg)
+           . aorst/window-divider-setup-faces)
+    :custom
+    (window-divider-default-bottom-width 1)
+    (window-divider-default-right-width 1)
+    (window-divider-default-places t)
+    :config
+    (window-divider-mode t)
+    (defun aorst/window-divider-setup-faces ()
+      (let* ((color (face-attribute 'mode-line-inactive :background))
+             (color (if (fboundp #'doom-darken)
+                        (if (aorst/dark-mode-p)
+                            (doom-darken color 0.15)
+                          (doom-lighten color 0.10)))))
+        (set-face-attribute 'window-divider nil :foreground color)))
+    (aorst/window-divider-setup-faces))
 #+end_src
 
 ** Title
@@ -1404,7 +1415,8 @@ Which is good.
     (treemacs-indentation 2)
     (treemacs-collapse-dirs 0)
     :config
-    (use-package treemacs-magit)
+    (use-package treemacs-magit
+      :after magit)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (defun aorst/treemacs-setup-faces ()
@@ -1819,24 +1831,27 @@ I want to customize tab appearance to match my theme.
                             :height 1.0
                             :inherit nil
                             :overline base
-                            :box  (when (> box-width 0)
-                                    (list :line-width box-width :color base)))
+                            :box (when (> box-width 0)
+                                   (list :line-width -1 :color base)))
         (set-face-attribute 'tab-line-tab nil
                             :foreground dark-fg
                             :background bg
                             :inherit nil
-                            :box nil)
+                            :box (when (> box-width 0)
+                                   (list :line-width box-width :color bg)))
         (set-face-attribute 'tab-line-tab-inactive nil
                             :foreground dark-fg
                             :background base
                             :inherit nil
-                            :box nil)
+                            :box (when (> box-width 0)
+                                   (list :line-width box-width :color base)))
         (set-face-attribute 'tab-line-tab-current nil
                             :foreground fg
                             :background bg
                             :inherit nil
                             :overline overline
-                            :box nil)))
+                            :box (when (> box-width 0)
+                                   (list :line-width box-width :color bg)))))
 
     (aorst/tabline-setup-faces)
 
@@ -2330,6 +2345,7 @@ It runs on BEAM - an Erlang VM, and can also be used as a general purpose langua
 
 #+begin_src emacs-lisp
   (use-package erlang
+    :straight t
     :hook (erlang-mode . (lambda ()
                            (add-hook 'xref-backend-functions
                                      #'dumb-jump-xref-activate
