@@ -834,7 +834,6 @@ offset variables."
   (defun aorst/treemacs-setup-faces ()
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (face-attribute 'default :foreground)
-                        :inherit 'default
                         :height 1.0
                         :weight 'normal))
   (aorst/treemacs-setup-faces)
