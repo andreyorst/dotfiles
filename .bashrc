@@ -20,7 +20,7 @@ PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$TIME_PS1\$SSH_PS1\$CONTAINE
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -n; time_ps1; git_ps1; ssh_ps1; container_ps1"
 
 function time_ps1() {
-    TIME_PS1="[$(tput sgr0)$(date +'%d.%m.%y %H:%M')$(tput setaf 1)] "
+    TIME_PS1="[$(tput sgr0)$(date +'%a %H:%M')$(tput setaf 1)] "
 }
 
 ## NO_GIT_PS1 can be bound in order to skip parsing if repository is
