@@ -769,6 +769,20 @@ offset variables."
             (aorst/mode-line-structural))))
   :config
   (defun aorst/mini-modeline-setup-faces ()
+    (when (eq (face-attribute 'mode-line :background)
+              (face-attribute 'ivy-current-match :background))
+      (let ((color (cond ((fboundp #'doom-darken)
+                          (if (aorst/dark-mode-p)
+                              (doom-lighten (face-attribute 'ivy-current-match :background) 0.2)
+                            (doom-darken (face-attribute 'ivy-current-match :background) 0.2)))
+                         ((and (facep 'solaire-mode-line-face)
+                                 (not (eq (face-attribute 'solaire-mode-line-face :background)
+                                          'unspecified))
+                                 (not (eq (face-attribute 'mode-line :background)
+                                          (face-attribute 'solaire-mode-line-face :background))))
+                            (face-attribute 'solaire-mode-line-face :background))
+                         t (face-attribute 'ivy-current-match :background))))
+        (set-face-attribute 'ivy-current-match nil :background color)))
     (setq mini-modeline-face-attr
           (plist-put mini-modeline-face-attr
                      :background (face-attribute 'mode-line :background)))))
@@ -834,6 +848,7 @@ offset variables."
   (defun aorst/treemacs-setup-faces ()
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (face-attribute 'default :foreground)
+                        :inherit 'treemacs-directory-face
                         :height 1.0
                         :weight 'normal))
   (aorst/treemacs-setup-faces)
@@ -851,7 +866,6 @@ offset variables."
     (treemacs--maybe-recenter 'on-distance))
   (defun aorst/treemacs-variable-pitch-labels (&rest _)
     (dolist (face '(treemacs-file-face
-                    treemacs-root-face
                     treemacs-tags-face
                     treemacs-directory-face
                     treemacs-directory-collapsed-face
@@ -896,6 +910,9 @@ offset variables."
   (define-advice treemacs-select-window (:after () aorst:treemacs-setup-fringes)
     "Set treemacs buffer fringes."
     (set-window-fringes nil 0 1 t))
+  (define-advice treemacs-root-down (:after () aorst:treemacs-root-down)
+    "Open all projects on root down"
+    (aorst/treemacs-expand-all-projects))
   (defun aorst/treemacs-setup-title ()
     (when-let ((treemacs-buffer (treemacs-get-local-buffer)))
       (with-current-buffer treemacs-buffer
@@ -1840,12 +1857,8 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :after magit
   :hook (aorst--theme-change . aorst/diff-setup-faces)
   :custom-face
-  (diff-added ((t (:foreground unspecified
-                   :background unspecified
-                   :inherit magit-diff-added-highlight))))
-  (diff-removed ((t (:foreground unspecified
-                     :background unspecified
-                     :inherit magit-diff-removed-highlight))))
+  (diff-added ((t (:inherit magit-diff-added-highlight))))
+  (diff-removed ((t (:inherit magit-diff-removed-highlight))))
   :config
   (defun aorst/diff-setup-faces ()
     (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
@@ -1858,26 +1871,11 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
   :after magit
   :hook (aorst--theme-change . aorst/smerge-setup-faces)
   :custom-face
-  (smerge-refined-added ((t (:foreground unspecified
-                             :distant-foreground unspecified
-                             :background unspecified
-                             :inherit magit-diff-added-highlight))))
-  (smerge-refined-removed ((t (:foreground unspecified
-                               :distant-foreground unspecified
-                               :background unspecified
-                               :inherit magit-diff-removed-highlight))))
-  (smerge-lower ((t (:foreground unspecified
-                     :distant-foreground unspecified
-                     :background unspecified
-                     :inherit magit-diff-added-highlight))))
-  (smerge-upper ((t (:foreground unspecified
-                     :distant-foreground unspecified
-                     :background unspecified
-                     :inherit magit-diff-removed-highlight))))
-  (smerge-markers ((t (:foreground unspecified
-                       :distant-foreground unspecified
-                       :background unspecified
-                       :weight bold
+  (smerge-refined-added ((t (:inherit magit-diff-added-highlight))))
+  (smerge-refined-removed ((t (:inherit magit-diff-removed-highlight))))
+  (smerge-lower ((t (:inherit magit-diff-added-highlight))))
+  (smerge-upper ((t (:inherit magit-diff-removed-highlight))))
+  (smerge-markers ((t (:weight bold
                        :extend t
                        :inherit font-lock-comment-face))))
   :config
