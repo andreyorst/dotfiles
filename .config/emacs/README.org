@@ -884,6 +884,7 @@ What's especially cool, is that we can specify which ligatures we want, by defin
            . auto-composition-mode)
     :init (global-auto-composition-mode -1))
 #+end_src
+
 ** Icons
 =all-the-icons= package provides nice icons for Emacs via custom fonts.
 
