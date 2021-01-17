@@ -386,39 +386,39 @@ Used in various places to avoid getting wrong line height when
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
 (when (aorst/font-installed-p "JetBrainsMono")
-  (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
-                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
-                     (?*  ,(regexp-opt '("*>" "***" "*/")))
-                     (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                         "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~"
-                                         "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
-                     (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
-                     (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
-                     (?!  ,(regexp-opt '("!==" "!!" "!=")))
-                     (?>  ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
-                     (?&  ,(regexp-opt '("&&&" "&&")))
-                     (?|  ,(regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")))
-                     (?.  ,(regexp-opt '(".." ".?" ".=" ".-" "..<" "...")))
-                     (?+  ,(regexp-opt '("+++" "+>" "++")))
-                     (?\[ ,(regexp-opt '("[||]" "[<" "[|")))
-                     (?\{ ,(regexp-opt '("{|")))
-                     (?\? ,(regexp-opt '("??" "?." "?=" "?:")))
-                     (?#  ,(regexp-opt '("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(")))
-                     (?\; ,(regexp-opt '(";;")))
-                     (?_  ,(regexp-opt '("_|_" "__")))
-                     (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
-                     (?$  ,(regexp-opt '("$>")))
-                     (?^  ,(regexp-opt '("^=")))
-                     (?\] ,(regexp-opt '("]#"))))))
-    (dolist (char-regexp ligatures)
-      (apply (lambda (char regexp)
-               (set-char-table-range
-                composition-function-table
-                char `([,(concat "\\(?:^\\|[^" (char-to-string char) "]\\)"
-                                 regexp
-                                 "\\(?:[^" (char-to-string char) "]\\|$\\)")
-                        1 font-shape-gstring])))
-             char-regexp))))
+  (dolist (char-ligatures '((?-  . ("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->"))
+                            (?/  . ("///" "/=" "/==" "/>" "//")) ;; "/*"
+                            (?*  . ("*>" "***" "*/"))
+                            (?<  . ("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
+                                    "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~"
+                                    "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--"))
+                            (?:  . (":>" ":<" ":::" "::" ":?" ":?>" ":=" "::="))
+                            (?=  . ("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "=="))
+                            (?!  . ("!==" "!!" "!="))
+                            (?>  . (">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">="))
+                            (?&  . ("&&&" "&&"))
+                            (?|  . ("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||"))
+                            (?.  . (".." ".?" ".=" ".-" "..<" "..."))
+                            (?+  . ("+++" "+>" "++"))
+                            (?\[ . ("[||]" "[<" "[|"))
+                            (?\{ . ("{|"))
+                            (?\? . ("??" "?." "?=" "?:"))
+                            (?#  . ("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#("))
+                            (?\; . (";;"))
+                            (?_  . ("_|_" "__"))
+                            (?~  . ("~~" "~~>" "~>" "~-" "~@"))
+                            (?$  . ("$>"))
+                            (?^  . ("^="))
+                            (?\] . ("]#"))))
+    (let* ((char (car char-ligatures))
+           (ligatures (cdr char-ligatures))
+           (forbidden-chars (string-to-list (apply #'concat ligatures))))
+      (set-char-table-range
+       composition-function-table
+       char `([,(concat (eval `(rx (group (or line-start (not (any ,@forbidden-chars))))))
+                        (regexp-opt ligatures)
+                        (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end)))))
+               1 font-shape-gstring])))))
 
 (use-package composite
   :straight nil
