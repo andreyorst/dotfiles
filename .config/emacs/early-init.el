@@ -11,6 +11,16 @@
 
 ;;; Code:
 
+(defun aorst/wrap-obsolete (orig-fn &rest args)
+  (if (cddr args)
+      (apply orig-fn args)
+    (apply orig-fn (append args '("0")))))
+
+(advice-add 'make-obsolete :around #'aorst/wrap-obsolete)
+(advice-add 'make-obsolete-variable :around #'aorst/wrap-obsolete)
+(advice-add 'define-obsolete-variable-alias :around #'aorst/wrap-obsolete)
+(advice-add 'define-obsolete-function-alias :around #'aorst/wrap-obsolete)
+
 (defvar aorst--gc-cons-threshold gc-cons-threshold)
 (defvar aorst--gc-cons-percentage gc-cons-percentage)
 (defvar aorst--file-name-handler-alist file-name-handler-alist)

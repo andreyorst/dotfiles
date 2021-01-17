@@ -76,6 +76,22 @@ But before that, let's add top comment as we did for =init.el=:
   ;;; Code:
 #+end_src
 
+*** Emacs 28 Obsolete workaround
+Emacs 28 made some changes to obsolete related functions, making third argument =when= required.
+This broke a lot of packages, so for now, a workaround for that is to define wrapper advice:
+
+#+begin_src emacs-lisp
+  (defun aorst/wrap-obsolete (orig-fn &rest args)
+    (if (cddr args)
+        (apply orig-fn args)
+      (apply orig-fn (append args '("0")))))
+
+  (advice-add 'make-obsolete :around #'aorst/wrap-obsolete)
+  (advice-add 'make-obsolete-variable :around #'aorst/wrap-obsolete)
+  (advice-add 'define-obsolete-variable-alias :around #'aorst/wrap-obsolete)
+  (advice-add 'define-obsolete-function-alias :around #'aorst/wrap-obsolete)
+#+end_src
+
 *** Garbage Collection
 The main problem with Emacs startup is garbage collection system.
 It is invoked so many times on startup that it causes quite big impact on startup time.
