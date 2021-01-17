@@ -1638,9 +1638,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
      ("m" flycheck-mode)
      ("s" flycheck-select-checker))))
 
-(use-package flycheck-cask
-  :hook (flycheck-mode . flycheck-cask-setup))
-
 (use-package hydra)
 
 (use-package smartparens
@@ -1780,7 +1777,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                        company-preview-frontend
                        company-echo-metadata-frontend))
-  (company-backends '(company-capf company-files))
+  (company-backends '(company-capf company-files company-dabbrev-code))
   (company-tooltip-minimum-width 30)
   (company-tooltip-maximum-width 60))
 
