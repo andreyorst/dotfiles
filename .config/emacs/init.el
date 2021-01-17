@@ -1280,7 +1280,7 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package elisp-mode
   :straight nil
-  :commands (aorst/emacs-lisp-indent-function)
+  :commands aorst/emacs-lisp-indent-function
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . (lambda ()
                               (setq-local lisp-indent-function
@@ -1291,9 +1291,10 @@ truncates text if needed.  Minimal width can be set with
   (defun aorst/emacs-lisp-indent-function (indent-point state)
     "A replacement for `lisp-indent-function'.
 Indents plists more sensibly. Adapted from DOOM Emacs:
-https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b637998"
+https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a485253/modules/lang/emacs-lisp/autoload.el#L91"
     (let ((normal-indent (current-column))
-          (orig-point (point)))
+          (orig-point (point))
+          target)
       (goto-char (1+ (elt state 1)))
       (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
       (cond ((and (elt state 2)
@@ -1312,10 +1313,12 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                     (not (eq (char-after) ?:)))
                   (save-excursion
                     (goto-char orig-point)
-                    (eq (char-after) ?:)))
+                    (and (eq (char-after) ?:)
+                         (eq (char-before) ?\()
+                         (setq target (current-column)))))
              (save-excursion
-               (goto-char (+ 2 (elt state 1)))
-               (current-column)))
+               (move-to-column target t)
+               target))
             ((let* ((function (buffer-substring (point) (progn (forward-sexp 1) (point))))
                     (method (or (function-get (intern-soft function) 'lisp-indent-function)
                                 (get (intern-soft function) 'lisp-indent-hook))))
@@ -1325,8 +1328,7 @@ https://github.com/hlissner/doom-emacs/commit/a634e2c8125ed692bb76b2105625fe902b
                                (string-match-p "\\`def" function)))
                       (lisp-indent-defform state indent-point))
                      ((integerp method)
-                      (lisp-indent-specform method state
-                                            indent-point normal-indent))
+                      (lisp-indent-specform method state indent-point normal-indent))
                      (method
                       (funcall method indent-point state))))))))
   (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
