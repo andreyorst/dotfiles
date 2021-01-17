@@ -385,26 +385,48 @@ Used in various places to avoid getting wrong line height when
 (when (aorst/font-installed-p "DejaVu Sans")
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
-(use-package ligature
-  :when (aorst/font-installed-p "JetBrainsMono")
-  :straight (:host github
-             :repo "mickeynp/ligature.el")
-  :config
-  (ligature-set-ligatures
-   '(prog-mode cider-repl-mode inferior-lisp-mode)
-   '("--" "---" "==" "===" "!=" "!==" "=!=" "=:=" "=/=" "<=" ">="
-     "&&" "&&&" "&=" "++" "+++" ";;" "!!" "??" "?:" "?." "?="
-     "<:" ":<" ":>" ">:" "<>" "<<<" ">>>" "<<" ">>" "||" "-|" "_|_"
-     "|-" "||-" "|=" "||=" "##" "###" "####" "#{" "#[" "]#" "#(" "#?"
-     "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$" "$>" "<+>" "<+" "+>"
-     "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--" "-->" "->" "->>"
-     "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>" "==>" "=>" "=>>"
-     ">=>" ">>=" ">>-" ">-" ">--" "-<" "-<<" ">->" "<-<" "<-|" "<=|"
-     "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~" "~@"
-     "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||" "|||>"
-     "<|||" "<|>" "..." ".." ".=" ".-" "..<" ".?" "::" ":::" ":=" "::="
-     ":?" ":?>" "//" "///" "/=" "//=" "/==" "@_" "__"))
-  (global-ligature-mode t))
+(when (aorst/font-installed-p "JetBrainsMono")
+  (let ((ligatures `((?-  ,(regexp-opt '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->")))
+                     (?/  ,(regexp-opt '("///" "/=" "/==" "/>" "//"))) ;; "/*"
+                     (?*  ,(regexp-opt '("*>" "***" "*/")))
+                     (?<  ,(regexp-opt '("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
+                                         "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~"
+                                         "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--")))
+                     (?:  ,(regexp-opt '(":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=")))
+                     (?=  ,(regexp-opt '("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "==")))
+                     (?!  ,(regexp-opt '("!==" "!!" "!=")))
+                     (?>  ,(regexp-opt '(">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">=")))
+                     (?&  ,(regexp-opt '("&&&" "&&")))
+                     (?|  ,(regexp-opt '("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||")))
+                     (?.  ,(regexp-opt '(".." ".?" ".=" ".-" "..<" "...")))
+                     (?+  ,(regexp-opt '("+++" "+>" "++")))
+                     (?\[ ,(regexp-opt '("[||]" "[<" "[|")))
+                     (?\{ ,(regexp-opt '("{|")))
+                     (?\? ,(regexp-opt '("??" "?." "?=" "?:")))
+                     (?#  ,(regexp-opt '("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(")))
+                     (?\; ,(regexp-opt '(";;")))
+                     (?_  ,(regexp-opt '("_|_" "__")))
+                     (?~  ,(regexp-opt '("~~" "~~>" "~>" "~-" "~@")))
+                     (?$  ,(regexp-opt '("$>")))
+                     (?^  ,(regexp-opt '("^=")))
+                     (?\] ,(regexp-opt '("]#"))))))
+    (dolist (char-regexp ligatures)
+      (apply (lambda (char regexp)
+               (set-char-table-range
+                composition-function-table
+                char `([,(concat "\\(?:^\\|[^" (char-to-string char) "]\\)"
+                                 regexp
+                                 "\\(?:[^" (char-to-string char) "]\\|$\\)")
+                        1 font-shape-gstring])))
+             char-regexp))))
+
+(use-package composite
+  :straight nil
+  :hook ((prog-mode
+          cider-repl-mode
+          inferior-lisp-mode)
+         . auto-composition-mode)
+  :init (global-auto-composition-mode -1))
 
 (use-package all-the-icons
   :config
