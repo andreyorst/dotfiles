@@ -1712,7 +1712,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (enable-recursive-minibuffers t)
   :config
   (defun aorst/ivy-setup-faces ()
-    (let ((mode-line-color) (face-attribute 'mode-line :background))
+    (let ((mode-line-color (face-attribute 'mode-line :background)))
       (when (and (fboundp #'doom-darken)
                  (eq (face-attribute 'ivy-current-match :background)
                      mode-line-color))
