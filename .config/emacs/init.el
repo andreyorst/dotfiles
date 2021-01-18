@@ -791,20 +791,6 @@ offset variables."
             (aorst/mode-line-structural))))
   :config
   (defun aorst/mini-modeline-setup-faces ()
-    (when (eq (face-attribute 'mode-line :background)
-              (face-attribute 'ivy-current-match :background))
-      (let ((color (cond ((fboundp #'doom-darken)
-                          (if (aorst/dark-mode-p)
-                              (doom-lighten (face-attribute 'ivy-current-match :background) 0.2)
-                            (doom-darken (face-attribute 'ivy-current-match :background) 0.2)))
-                         ((and (facep 'solaire-mode-line-face)
-                                 (not (eq (face-attribute 'solaire-mode-line-face :background)
-                                          'unspecified))
-                                 (not (eq (face-attribute 'mode-line :background)
-                                          (face-attribute 'solaire-mode-line-face :background))))
-                            (face-attribute 'solaire-mode-line-face :background))
-                         t (face-attribute 'ivy-current-match :background))))
-        (set-face-attribute 'ivy-current-match nil :background color)))
     (setq mini-modeline-face-attr
           (plist-put mini-modeline-face-attr
                      :background (face-attribute 'mode-line :background)))))
@@ -931,7 +917,7 @@ offset variables."
     (aorst/treemacs-variable-pitch-labels))
   (define-advice treemacs-select-window (:after () aorst:treemacs-setup-fringes)
     "Set treemacs buffer fringes."
-    (set-window-fringes nil 0 1 t))
+    (set-window-fringes nil 1 1 t))
   (define-advice treemacs-root-down (:after () aorst:treemacs-root-down)
     "Open all projects on root down"
     (aorst/treemacs-expand-all-projects))
@@ -1708,7 +1694,10 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package ivy
   :commands ivy-mode
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
+         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
+         ((aorst--theme-change
+           aorst--solaire-swap-bg)
+          . aorst/ivy-setup-faces))
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-x C-b" . ivy-switch-buffer))
   :custom-face
@@ -1721,8 +1710,17 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (ivy-minibuffer-faces '(default default default default))
   (ivy-use-virtual-buffers t)
   (enable-recursive-minibuffers t)
-  :init
-  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
+  :config
+  (defun aorst/ivy-setup-faces ()
+    (let ((mode-line-color) (face-attribute 'mode-line :background))
+      (when (and (fboundp #'doom-darken)
+                 (eq (face-attribute 'ivy-current-match :background)
+                     mode-line-color))
+        (set-face-attribute
+         'ivy-current-match nil
+         :background (if (aorst/dark-mode-p)
+                         (doom-lighten mode-line-color 0.2)
+                       (doom-darken mode-line-color 0.1))))))
   (defun aorst/minibuffer-defer-garbage-collection ()
     "Defer garbage collection for minibuffer"
     (setq gc-cons-threshold most-positive-fixnum))
@@ -1730,6 +1728,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     "Resotre garbage collection settings."
     (run-at-time
      1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
+  :init
+  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
   (ivy-mode 1))
 
 (use-package counsel
