@@ -221,13 +221,14 @@ Based on `so-long-detected-long-line-p'."
   (aset buffer-display-table ?\^L
         (vconcat (make-list (or fill-column 70)
                             (make-glyph-code
-                             (string-to-char (or comment-start "─"))
+                             (string-to-char (or comment-start "-"))
                              'font-lock-comment-face)))))
 
 (dolist (mode-hook '(emacs-lisp-mode-hook
                      help-mode-hook
                      fennel-mode-hook
-                     org-mode-hook))
+                     org-mode-hook
+                     outline-mode-hook))
   (add-hook mode-hook 'aorst/formfeed-line))
 
 (defun aorst/real-buffer-p (&optional buffer)

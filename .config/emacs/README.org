@@ -584,7 +584,7 @@ I don't quite enjoy seeing =^L= everywhere, so let's fix this:
     (aset buffer-display-table ?\^L
           (vconcat (make-list (or fill-column 70)
                               (make-glyph-code
-                               (string-to-char (or comment-start "─"))
+                               (string-to-char (or comment-start "-"))
                                'font-lock-comment-face)))))
 #+end_src
 
@@ -595,7 +595,8 @@ Let's enable it in modes where it is fequently used.
   (dolist (mode-hook '(emacs-lisp-mode-hook
                        help-mode-hook
                        fennel-mode-hook
-                       org-mode-hook))
+                       org-mode-hook
+                       outline-mode-hook))
     (add-hook mode-hook 'aorst/formfeed-line))
 #+end_src
 
