@@ -1675,7 +1675,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (sp-wrap-respect-direction t)
   (sp-show-pair-delay 0)
   :custom-face
-  (sp-show-pair-match-face ((t (:background unspecified))))
+  (sp-show-pair-match-face ((t (:background unspecified
+                                :weight normal))))
   :config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
@@ -1805,19 +1806,17 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (company-posframe-quickhelp-show-header nil)
   (company-posframe-show-indicator nil)
   (company-posframe-show-metadata nil)
-  (company-posframe-quickhelp-show-params
-   (list :poshandler #'company-posframe-quickhelp-right-poshandler
-         :internal-border-width 1
-         :timeout 60
-         :internal-border-color (face-attribute 'mode-line :background)
-         :no-properties nil))
-  (company-posframe-show-params
-   (list :poshandler #'company-posframe-quickhelp-right-poshandler
-         :internal-border-width 1
-         :timeout 60
-         :internal-border-color (face-attribute 'mode-line :background)
-         :no-properties nil))
   :config
+  (let ((params (list :poshandler #'company-posframe-quickhelp-right-poshandler
+                      :internal-border-width 1
+                      :timeout 60
+                      :internal-border-color (face-attribute 'mode-line :background)
+                      :lines-truncate t
+                      :left-fringe 1
+                      :right-fringe 1
+                      :no-properties nil)))
+    (setq company-posframe-quickhelp-show-params params
+          company-posframe-show-params params))
   (company-posframe-mode))
 
 (use-package undo-tree
@@ -2065,6 +2064,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (lsp-ui-sideline-enable nil)
   (lsp-ui-imenu-enable nil)
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
+  (lsp-ui-doc-max-width 1000)
+  (lsp-ui-doc-show-with-cursor nil)
   (lsp-ui-doc-position 'at-point)
   :config
   (when (fboundp #'aorst/escape)

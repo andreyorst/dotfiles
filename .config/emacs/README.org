@@ -2748,7 +2748,8 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
     (sp-wrap-respect-direction t)
     (sp-show-pair-delay 0)
     :custom-face
-    (sp-show-pair-match-face ((t (:background unspecified))))
+    (sp-show-pair-match-face ((t (:background unspecified
+                                  :weight normal))))
     :config
     (defun aorst/minibuffer-enable-sp ()
       "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
@@ -2814,7 +2815,7 @@ It integrates with Counsel that handles minibuffer, so let's install it too.
     (enable-recursive-minibuffers t)
     :config
     (defun aorst/ivy-setup-faces ()
-      (let ((mode-line-color) (face-attribute 'mode-line :background))
+      (let ((mode-line-color (face-attribute 'mode-line :background)))
         (when (and (fboundp #'doom-darken)
                    (eq (face-attribute 'ivy-current-match :background)
                        mode-line-color))
@@ -2885,6 +2886,7 @@ Complete anything framework. Nothing much to say. Does it's job.
            ("C-p" . company-select-previous))
     :hook (after-init . global-company-mode)
     :custom
+    (company-idle-delay 0)
     (company-require-match 'never)
     (company-minimum-prefix-length 2)
     (company-tooltip-align-annotations t)
@@ -2906,19 +2908,17 @@ Provides posframe frontend for company.
     (company-posframe-quickhelp-show-header nil)
     (company-posframe-show-indicator nil)
     (company-posframe-show-metadata nil)
-    (company-posframe-quickhelp-show-params
-     (list :poshandler #'company-posframe-quickhelp-right-poshandler
-           :internal-border-width 1
-           :timeout 60
-           :internal-border-color (face-attribute 'mode-line :background)
-           :no-properties nil))
-    (company-posframe-show-params
-     (list :poshandler #'company-posframe-quickhelp-right-poshandler
-           :internal-border-width 1
-           :timeout 60
-           :internal-border-color (face-attribute 'mode-line :background)
-           :no-properties nil))
     :config
+    (let ((params (list :poshandler #'company-posframe-quickhelp-right-poshandler
+                        :internal-border-width 1
+                        :timeout 60
+                        :internal-border-color (face-attribute 'mode-line :background)
+                        :lines-truncate t
+                        :left-fringe 1
+                        :right-fringe 1
+                        :no-properties nil)))
+      (setq company-posframe-quickhelp-show-params params
+            company-posframe-show-params params))
     (company-posframe-mode))
 #+end_src
 
@@ -3239,6 +3239,8 @@ This package provides documentation popup, definitions in split-view, imenu list
     (lsp-ui-sideline-enable nil)
     (lsp-ui-imenu-enable nil)
     (lsp-ui-doc-delay 1 "higher than eldoc delay")
+    (lsp-ui-doc-max-width 1000)
+    (lsp-ui-doc-show-with-cursor nil)
     (lsp-ui-doc-position 'at-point)
     :config
     (when (fboundp #'aorst/escape)
