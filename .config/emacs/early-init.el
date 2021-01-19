@@ -37,6 +37,8 @@
                   gc-cons-percentage aorst--gc-cons-percentage
                   file-name-handler-alist aorst--file-name-handler-alist)))
 
+(setq read-process-output-max (* 1024 1024 4)) ;; 4mb
+
 (defvar comp-deferred-compilation)
 (setq comp-deferred-compilation t)
 

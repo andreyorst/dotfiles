@@ -92,7 +92,7 @@ This broke a lot of packages, so for now, a workaround for that is to define wra
   (advice-add 'define-obsolete-function-alias :around #'aorst/wrap-obsolete)
 #+end_src
 
-*** Garbage Collection
+*** Garbage Collection and Performance
 The main problem with Emacs startup is garbage collection system.
 It is invoked so many times on startup that it causes quite big impact on startup time.
 We're talking /seconds/.
@@ -125,6 +125,12 @@ Then we need a hook that restores initial values once initialization done:
               (setq gc-cons-threshold aorst--gc-cons-threshold
                     gc-cons-percentage aorst--gc-cons-percentage
                     file-name-handler-alist aorst--file-name-handler-alist)))
+#+end_src
+
+Also, let's increase =read-process-output-max= as 4k is too small these days.
+
+#+begin_src emacs-lisp
+  (setq read-process-output-max (* 1024 1024 4)) ;; 4mb
 #+end_src
 
 *** Native Compiled Emacs Lisp
