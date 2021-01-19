@@ -742,6 +742,21 @@ offset variables."
                      (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
     (concat "  " structural)))
 
+(defvar-local aorst--mode-line-lsp nil)
+
+(defun aorst/mode-line-update-lsp (&rest _)
+  (setq aorst--mode-line-lsp
+        (concat "  "
+                (if-let ((workspaces (lsp-workspaces)))
+                    (propertize "LSP" 'help-echo "LSP Connected")
+                  (propertize "LSP" 'help-echo "LSP Disconnected")))))
+
+(add-hook 'lsp-before-initialize-hook #'aorst/mode-line-update-lsp)
+(add-hook 'lsp-after-initialize-hook #'aorst/mode-line-update-lsp)
+(add-hook 'lsp-after-uninitialized-functions #'aorst/mode-line-update-lsp)
+(add-hook 'lsp-before-open-hook #'aorst/mode-line-update-lsp)
+(add-hook 'lsp-after-open-hook #'aorst/mode-line-update-lsp)
+
 (setq-default
  mode-line-format
  '(:eval
@@ -756,6 +771,7 @@ offset variables."
                     (aorst/mode-line-indent-mode)
                     (aorst/mode-line-mode-name)
                     (aorst/mode-line-git-branch)
+                    aorst--mode-line-lsp
                     (aorst/mode-line-flycheck)
                     (aorst/mode-line-structural))))
      (concat l-format
@@ -788,6 +804,7 @@ offset variables."
             (aorst/mode-line-indent-mode)
             (aorst/mode-line-mode-name)
             (aorst/mode-line-git-branch)
+            aorst--mode-line-lsp
             (aorst/mode-line-flycheck)
             (aorst/mode-line-structural))))
   :config
