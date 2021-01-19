@@ -1790,6 +1790,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          ("C-p" . company-select-previous))
   :hook (after-init . global-company-mode)
   :custom
+  (company-idle-delay 0)
   (company-require-match 'never)
   (company-minimum-prefix-length 2)
   (company-tooltip-align-annotations t)
@@ -2039,6 +2040,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package lsp-mode
   :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
+         ((clojure-mode clojurec-mode clojurescript-mode) . aorst/clojure-lsp-setup)
          (lsp-mode . yas-minor-mode))
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
@@ -2046,12 +2048,21 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (lsp-enable-links nil)
   (lsp-keymap-prefix "C-c l")
   (lsp-rust-clippy-preference "on")
-  (lsp-prefer-capf t)
+  (lsp-completion-provider :capf)
   (lsp-enable-indentation nil)
   (lsp-enable-symbol-highlighting t)
   (lsp-rust-server 'rust-analyzer)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-headerline-breadcrumb-enable nil))
+  (lsp-headerline-breadcrumb-enable nil)
+  :config
+  (defun aorst/clojure-lsp-set-options ()
+    (setq-local lsp-completion-enable nil))
+  (defun aorst/clojure-lsp-setup ()
+    (if (bound-and-true-p cider-mode)
+        (aorst/clojure-lsp-set-options)
+      ;; disabling lsp-mode completion as soon as CIDER kicks in
+      (add-hook 'cider-mode-hook 'aorst/clojure-lsp-set-options))
+    (lsp)))
 
 (use-package lsp-ui
   :after lsp-mode
