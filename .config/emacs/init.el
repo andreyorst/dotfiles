@@ -418,7 +418,8 @@ Used in various places to avoid getting wrong line height when
        composition-function-table
        char `([,(concat (eval `(rx (group (or line-start (not (any ,@forbidden-chars))))))
                         (regexp-opt ligatures)
-                        (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end)))))
+                        ;; (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end))))
+                        )
                1 font-shape-gstring])))))
 
 (use-package composite

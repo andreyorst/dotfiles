@@ -894,7 +894,8 @@ What's especially cool, is that we can specify which ligatures we want, by defin
          composition-function-table
          char `([,(concat (eval `(rx (group (or line-start (not (any ,@forbidden-chars))))))
                           (regexp-opt ligatures)
-                          (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end)))))
+                          ;; (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end))))
+                          )
                  1 font-shape-gstring])))))
 #+end_src
 
