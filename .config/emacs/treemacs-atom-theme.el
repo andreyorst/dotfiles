@@ -145,8 +145,8 @@
                   "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
                   "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
                   "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                  "gitconfig" "gitignore" "gitmodules" "conf" "lock" "project" "fnl"
-                  "config"))
+                  "gitconfig" "gitignore" "gitmodules" "gitattributes" "conf" "lock"
+                  "project" "fnl" "config"))
     (treemacs-create-icon
      :icon (format "   %s\t"
                    (all-the-icons-octicon

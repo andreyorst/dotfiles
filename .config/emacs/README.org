@@ -1732,8 +1732,8 @@ Here's a Atom inspired theme for Treemacs, that I'm tangling to separate file, t
                     "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
                     "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
                     "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
-                    "gitconfig" "gitignore" "gitmodules" "conf" "lock" "project" "fnl"
-                    "config"))
+                    "gitconfig" "gitignore" "gitmodules" "gitattributes" "conf" "lock"
+                    "project" "fnl" "config"))
       (treemacs-create-icon
        :icon (format "   %s\t"
                      (all-the-icons-octicon
@@ -3251,6 +3251,7 @@ This package provides documentation popup, definitions in split-view, imenu list
     (lsp-ui-doc-delay 1 "higher than eldoc delay")
     (lsp-ui-doc-max-width 1000)
     (lsp-ui-doc-show-with-cursor nil)
+    (lsp-ui-doc-show-with-mouse nil)
     (lsp-ui-doc-position 'at-point)
     :config
     (when (fboundp #'aorst/escape)

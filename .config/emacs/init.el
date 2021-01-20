@@ -2077,6 +2077,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
   (lsp-ui-doc-max-width 1000)
   (lsp-ui-doc-show-with-cursor nil)
+  (lsp-ui-doc-show-with-mouse nil)
   (lsp-ui-doc-position 'at-point)
   :config
   (when (fboundp #'aorst/escape)
