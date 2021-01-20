@@ -1353,6 +1353,48 @@ Support for various structural editing modes in mode-line.
   (add-hook 'lsp-after-open-hook #'aorst/mode-line-update-lsp)
 #+end_src
 
+**** mode-line-flymake
+
+#+begin_src emacs-lisp
+  (defvar-local aorst--mode-line-flymake nil)
+
+  (defun aorst/flymake-mode-line-update (&rest _)
+    (when (bound-and-true-p flymake-mode)
+      (let* ((known (hash-table-keys flymake--backend-state))
+             (running (flymake-running-backends))
+             (disabled (flymake-disabled-backends))
+             (reported (flymake-reporting-backends))
+             (all-disabled (and disabled (null running)))
+             (some-waiting (cl-set-difference running reported)))
+        (setq aorst--mode-line-flymake
+              (concat
+               "  "
+               (cond (some-waiting (propertize "*/*" 'help-echo "Flymake: running"))
+                     ((null known) (propertize "?"   'help-echo "Flymake: no info"))
+                     (all-disabled (propertize "-"   'help-echo "Flymake: disabled"))
+                     (t (let ((.error 0) (.warning 0))
+                          (progn
+                            (cl-loop with warning-level = (warning-numeric-level :warning)
+                                     with note-level = (warning-numeric-level :debug)
+                                     for state being the hash-values of flymake--backend-state
+                                     do (cl-loop with diags = (flymake--backend-state-diags state)
+                                                 for diag in diags do
+                                                 (let ((severity (flymake--lookup-type-property
+                                                                  (flymake--diag-type diag) 'severity
+                                                                  (warning-numeric-level :error))))
+                                                   (cond ((> severity warning-level) (cl-incf .error))
+                                                         ((> severity note-level)    (cl-incf .warning))))))
+                            (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                                        'help-echo (if (or .error .warning)
+                                                       (concat "Flymake: "
+                                                               (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                               (when .warning (format "%d warnings" .warning)))
+                                                     "Flymake: no errors or warnings")))))))))))
+
+  (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
+  (add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
+#+end_src
+
 *** Mode-line format
 Fallback format for modeline.
 
@@ -1372,6 +1414,7 @@ Fallback format for modeline.
                       (aorst/mode-line-mode-name)
                       (aorst/mode-line-git-branch)
                       aorst--mode-line-lsp
+                      aorst--mode-line-flymake
                       (aorst/mode-line-flycheck)
                       (aorst/mode-line-structural))))
        (concat l-format
@@ -1411,6 +1454,7 @@ Currently it uses default format, and I'm looking forward to integrate DOOM mode
               (aorst/mode-line-mode-name)
               (aorst/mode-line-git-branch)
               aorst--mode-line-lsp
+              aorst--mode-line-flymake
               (aorst/mode-line-flycheck)
               (aorst/mode-line-structural))))
     :config
@@ -2306,12 +2350,16 @@ It is one of the few modern and refreshing languages, that bring both innovation
 
 #+begin_src emacs-lisp
   (use-package clojure-mode
-    :hook (((clojure-mode
-             clojurec-mode
-             clojurescript-mode)
-            . flycheck-mode))
+    :hook ((clojure-mode
+            clojurec-mode
+            clojurescript-mode)
+           . aorst/clojure-flycheck-maybe)
     :bind (:map clojure-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer))
+    :config
+    (defun aorst/clojure-flycheck-maybe ()
+      (unless (bound-and-true-p lsp-mode)
+        (flycheck-mode 1))))
 #+end_src
 
 *** CIDER
@@ -2587,7 +2635,10 @@ Flymake is an inbuilt package for checking various programming languages.
 I load it mostly for its faces, since I use =flycheck= instead.
 
 #+begin_src emacs-lisp
-  (use-package flymake :straight nil)
+  (use-package flymake
+    :straight nil
+    :custom
+    (flymake-fringe-indicator-position 'right-fringe))
 #+end_src
 
 ** Flycheck
@@ -3210,6 +3261,7 @@ LSP client for Emacs.
   (use-package lsp-mode
     :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
            ((clojure-mode clojurec-mode clojurescript-mode) . aorst/clojure-lsp-setup)
+           (lsp-mode . aorst/disable-flycheck)
            (lsp-mode . yas-minor-mode))
     :custom-face
     (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
@@ -3218,20 +3270,23 @@ LSP client for Emacs.
     (lsp-keymap-prefix "C-c l")
     (lsp-rust-clippy-preference "on")
     (lsp-completion-provider :capf)
+    (lsp-diagnostics-provider :flymake)
     (lsp-enable-indentation nil)
     (lsp-enable-symbol-highlighting t)
     (lsp-rust-server 'rust-analyzer)
     (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
     (lsp-headerline-breadcrumb-enable nil)
+    (lsp-enable-dap-auto-configure nil)
+    (lsp-enable-semantic-highlighting nil)
     :config
-    (defun aorst/clojure-lsp-set-options ()
-      (setq-local lsp-completion-enable nil))
+    (defun aorst/disable-flycheck ()
+      (flycheck-mode -1))
     (defun aorst/clojure-lsp-setup ()
       (if (bound-and-true-p cider-mode)
-          (aorst/clojure-lsp-set-options)
+          (setq-local lsp-completion-enable nil)
         ;; disabling lsp-mode completion as soon as CIDER kicks in
-        (add-hook 'cider-mode-hook 'aorst/clojure-lsp-set-options))
-      (lsp)))
+        (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil))))
+      (lsp))
 #+end_src
 
 *** LSP UI
@@ -3248,6 +3303,7 @@ This package provides documentation popup, definitions in split-view, imenu list
     :custom
     (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
     (lsp-ui-sideline-enable nil)
+    (lsp-ui-doc-enable nil)
     (lsp-ui-imenu-enable nil)
     (lsp-ui-doc-delay 1 "higher than eldoc delay")
     (lsp-ui-doc-max-width 1000)
@@ -3270,14 +3326,6 @@ However, language server requires JDK 11 to run, so we only load it when JDK 11 
   (use-package lsp-java
     :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
     :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
-#+end_src
-
-*** DAP Mode
-Debug Adapter Protocol support for Emacs.
-
-#+begin_src emacs-lisp
-  (use-package dap-mode
-    :hook (lsp-mode . dap-mode))
 #+end_src
 
 ** Project

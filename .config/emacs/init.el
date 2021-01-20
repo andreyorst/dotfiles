@@ -758,6 +758,44 @@ offset variables."
 (add-hook 'lsp-before-open-hook #'aorst/mode-line-update-lsp)
 (add-hook 'lsp-after-open-hook #'aorst/mode-line-update-lsp)
 
+(defvar-local aorst--mode-line-flymake nil)
+
+(defun aorst/flymake-mode-line-update (&rest _)
+  (when (bound-and-true-p flymake-mode)
+    (let* ((known (hash-table-keys flymake--backend-state))
+           (running (flymake-running-backends))
+           (disabled (flymake-disabled-backends))
+           (reported (flymake-reporting-backends))
+           (all-disabled (and disabled (null running)))
+           (some-waiting (cl-set-difference running reported)))
+      (setq aorst--mode-line-flymake
+            (concat
+             "  "
+             (cond (some-waiting (propertize "*/*" 'help-echo "Flymake: running"))
+                   ((null known) (propertize "?"   'help-echo "Flymake: no info"))
+                   (all-disabled (propertize "-"   'help-echo "Flymake: disabled"))
+                   (t (let ((.error 0) (.warning 0))
+                        (progn
+                          (cl-loop with warning-level = (warning-numeric-level :warning)
+                                   with note-level = (warning-numeric-level :debug)
+                                   for state being the hash-values of flymake--backend-state
+                                   do (cl-loop with diags = (flymake--backend-state-diags state)
+                                               for diag in diags do
+                                               (let ((severity (flymake--lookup-type-property
+                                                                (flymake--diag-type diag) 'severity
+                                                                (warning-numeric-level :error))))
+                                                 (cond ((> severity warning-level) (cl-incf .error))
+                                                       ((> severity note-level)    (cl-incf .warning))))))
+                          (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                                      'help-echo (if (or .error .warning)
+                                                     (concat "Flymake: "
+                                                             (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                             (when .warning (format "%d warnings" .warning)))
+                                                   "Flymake: no errors or warnings")))))))))))
+
+(advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
+(add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
+
 (setq-default
  mode-line-format
  '(:eval
@@ -773,6 +811,7 @@ offset variables."
                     (aorst/mode-line-mode-name)
                     (aorst/mode-line-git-branch)
                     aorst--mode-line-lsp
+                    aorst--mode-line-flymake
                     (aorst/mode-line-flycheck)
                     (aorst/mode-line-structural))))
      (concat l-format
@@ -806,6 +845,7 @@ offset variables."
             (aorst/mode-line-mode-name)
             (aorst/mode-line-git-branch)
             aorst--mode-line-lsp
+            aorst--mode-line-flymake
             (aorst/mode-line-flycheck)
             (aorst/mode-line-structural))))
   :config
@@ -1361,12 +1401,16 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
-  :hook (((clojure-mode
-           clojurec-mode
-           clojurescript-mode)
-          . flycheck-mode))
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . aorst/clojure-flycheck-maybe)
   :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer))
+  :config
+  (defun aorst/clojure-flycheck-maybe ()
+    (unless (bound-and-true-p lsp-mode)
+      (flycheck-mode 1))))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
@@ -1537,7 +1581,10 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package editorconfig
   :config (editorconfig-mode 1))
 
-(use-package flymake :straight nil)
+(use-package flymake
+  :straight nil
+  :custom
+  (flymake-fringe-indicator-position 'right-fringe))
 
 (use-package flycheck
   :bind (:map flycheck-mode-map
@@ -2042,6 +2089,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package lsp-mode
   :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
          ((clojure-mode clojurec-mode clojurescript-mode) . aorst/clojure-lsp-setup)
+         (lsp-mode . aorst/disable-flycheck)
          (lsp-mode . yas-minor-mode))
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
@@ -2050,20 +2098,23 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (lsp-keymap-prefix "C-c l")
   (lsp-rust-clippy-preference "on")
   (lsp-completion-provider :capf)
+  (lsp-diagnostics-provider :flymake)
   (lsp-enable-indentation nil)
   (lsp-enable-symbol-highlighting t)
   (lsp-rust-server 'rust-analyzer)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
   (lsp-headerline-breadcrumb-enable nil)
+  (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-semantic-highlighting nil)
   :config
-  (defun aorst/clojure-lsp-set-options ()
-    (setq-local lsp-completion-enable nil))
+  (defun aorst/disable-flycheck ()
+    (flycheck-mode -1))
   (defun aorst/clojure-lsp-setup ()
     (if (bound-and-true-p cider-mode)
-        (aorst/clojure-lsp-set-options)
+        (setq-local lsp-completion-enable nil)
       ;; disabling lsp-mode completion as soon as CIDER kicks in
-      (add-hook 'cider-mode-hook 'aorst/clojure-lsp-set-options))
-    (lsp)))
+      (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil))))
+    (lsp))
 
 (use-package lsp-ui
   :after lsp-mode
@@ -2074,6 +2125,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :custom
   (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
   (lsp-ui-sideline-enable nil)
+  (lsp-ui-doc-enable nil)
   (lsp-ui-imenu-enable nil)
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
   (lsp-ui-doc-max-width 1000)
@@ -2090,9 +2142,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package lsp-java
   :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
   :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
-
-(use-package dap-mode
-  :hook (lsp-mode . dap-mode))
 
 (use-package project
   :straight nil
