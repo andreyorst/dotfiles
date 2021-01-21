@@ -2114,7 +2114,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
         (setq-local lsp-completion-enable nil)
       ;; disabling lsp-mode completion as soon as CIDER kicks in
       (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil))))
-    (lsp))
+    (lsp)))
 
 (use-package lsp-ui
   :after lsp-mode

@@ -3286,7 +3286,7 @@ LSP client for Emacs.
           (setq-local lsp-completion-enable nil)
         ;; disabling lsp-mode completion as soon as CIDER kicks in
         (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil))))
-      (lsp))
+      (lsp)))
 #+end_src
 
 *** LSP UI
