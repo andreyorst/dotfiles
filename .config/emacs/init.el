@@ -314,6 +314,7 @@ Depends on `doom-blend'."
              (fboundp #'doom-blend))
         (set-face-attribute face nil
                             :foreground fg
+                            :distant-foreground fg
                             :weight 'bold
                             :background (if (aorst/dark-mode-p)
                                             (doom-blend bg fg 0.8)
@@ -323,6 +324,7 @@ Depends on `doom-blend'."
                             :inverse-video nil)
       (set-face-attribute face nil
                           :foreground nil
+                          :distant-foreground nil
                           :background nil
                           :weight 'bold
                           :inherit ref-face
@@ -1455,6 +1457,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
              :repo "technomancy/fennel-mode")
   :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
+  :hook (fennel-mode . fennel-mode-setup)
   :config
   (put 'time 'fennel-indent-function 0)
   (put 'dotimes 'fennel-indent-function 1)
@@ -1463,7 +1466,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (put 'try 'fennel-indent-function 0)
   (put 'catch 'fennel-indent-function 1)
   (put 'finally 'fennel-indent-function 0)
-
+  (defun fennel-mode-setup ()
+    "Set common variables."
+    (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
     "Evaluate a block of Fennel code with Babel."
@@ -1919,6 +1924,13 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
          (ediff-quit . aorst/restore-pre-ediff-winconfig)
          (ediff-keymap-setup . aorst/ediff-setup-keys))
+  :custom-face
+  (ediff-fine-diff-C ((t (:background unspecified
+                          :inherit ediff-current-diff-C))))
+  (ediff-fine-diff-B ((t (:background unspecified
+                          :inherit diff-refine-added))))
+  (ediff-fine-diff-A ((t (:background unspecified
+                          :inherit diff-refine-removed))))
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
   :custom
@@ -1948,6 +1960,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (diff-removed ((t (:inherit magit-diff-removed-highlight))))
   :config
   (defun aorst/diff-setup-faces ()
+    (set-face-attribute 'diff-added nil :foreground nil :background nil)
+    (set-face-attribute 'diff-removed nil :foreground nil :background nil)
     (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
                               (diff-refine-removed magit-diff-removed-highlight)))
       (apply #'aorst/create-accent-face face-reference)))
