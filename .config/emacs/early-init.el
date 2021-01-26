@@ -41,6 +41,7 @@
 
 (defvar comp-deferred-compilation)
 (setq comp-deferred-compilation t)
+(setq comp-async-report-warnings-errors nil)
 
 (setq initial-frame-alist '((width . 170)
                             (height . 56)

@@ -908,7 +908,6 @@ offset variables."
   (treemacs-is-never-other-window t)
   (treemacs-space-between-root-nodes nil)
   (treemacs-indentation 2)
-  (treemacs-collapse-dirs 0)
   :config
   (use-package treemacs-magit
     :after magit)
@@ -1142,47 +1141,36 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package org
   :straight (:type built-in)
-  :hook ((after-save . aorst/org-tangle-on-config-save)
-         (org-babel-after-execute . aorst/org-update-inline-images)
-         (ediff-prepare-buffer . outline-show-all)
-         ((org-capture-mode org-src-mode) . aorst/discard-history)
-         (text-scale-mode . aorst/update-latex-preview-scale))
-  :bind (("C-c a" . org-agenda)
-         :map org-mode-map
+  :hook ((ediff-prepare-buffer . outline-show-all)
+         ((org-capture-mode org-src-mode) . aorst/discard-history))
+  :bind (:map org-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines)
          ("C-c l" . org-store-link))
   :custom
   (org-startup-with-inline-images nil)
-  (org-tags-column -100)
+  (org-tags-column -120)
   (org-startup-folded 'content)
   (org-hide-emphasis-markers t)
   (org-adapt-indentation nil)
   (org-hide-leading-stars t)
   (org-highlight-latex-and-related '(latex))
-  (revert-without-query '(".*\.pdf"))
   (org-preview-latex-default-process 'dvisvgm)
   (org-src-fontify-natively t)
   (org-preview-latex-image-directory ".ltximg/")
-  (org-latex-listings 'minted)
-  (org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
   (org-confirm-babel-evaluate nil)
   (org-imenu-depth 8)
   (org-log-done t)
   (org-agenda-files '("~/Tasks"))
   (org-image-actual-width nil)
   :config
-  (defun aorst/get-system-font-scale ()
-    (if (executable-find "gsettings")
-        (string-to-number
-         (shell-command-to-string
-          "gsettings get org.gnome.desktop.interface text-scaling-factor"))
-      1.0))
   (setq org-format-latex-options
         (plist-put org-format-latex-options
                    :scale
-                   (aorst/get-system-font-scale)))
+                   (if (executable-find "gsettings")
+                       (string-to-number
+                        (shell-command-to-string
+                         "gsettings get org.gnome.desktop.interface text-scaling-factor"))
+                     1.0)))
   (use-package ox-latex
     :straight nil)
   (use-package ox-hugo
@@ -1190,61 +1178,14 @@ truncates text if needed.  Minimal width can be set with
   (when (not (version<= org-version "9.1.9"))
     (use-package org-tempo
       :straight nil))
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-+]\\) "
-                             (0 (prog1 nil (compose-region (match-beginning 1)
-                                                           (match-end 1)
-                                                           "•"))))))
-  (defun aorst/org-tangle-on-config-save ()
-    "Tangle source code blocks when configuration file is saved."
-    (when (string= buffer-file-name (file-truename (concat user-emacs-directory "README.org")))
-      (org-babel-tangle)))
-  (defun aorst/org-update-inline-images ()
-    "Update inline images in Org-mode."
-    (interactive)
-    (when org-inline-image-overlays
-      (org-redisplay-inline-images)))
   (defun aorst/discard-history ()
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
-  (defun aorst/update-latex-preview-scale ()
-    (let ((scale (or (plist-get org-format-latex-options :scale) 0)))
-      (setq org-format-latex-options
-            (plist-put org-format-latex-options
-                       :scale (if-let ((scale (aorst/get-system-font-scale)))
-                                  (if (= text-scale-mode-amount 0)
-                                      scale
-                                    (let ((height (cadr (cadr (assq 'default face-remapping-alist)))))
-                                      (if (numberp height)
-                                          (+ (- scale 1) height)
-                                        scale)))
-                                1.0)))))
-  (defvar minted-cache-dir
-    (file-name-as-directory
-     (expand-file-name ".minted/\\jobname"
-                       temporary-file-directory)))
-  (add-to-list 'org-latex-packages-alist
-               `(,(concat "cachedir=" minted-cache-dir)
-                 "minted" nil))
-  (add-to-list 'org-latex-logfiles-extensions "tex")
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((gnuplot . t)
      (scheme . t)))
-  (add-to-list 'org-latex-classes
-               '("article"
-                 "\\documentclass{article}"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   (defun aorst/org-update-latex-preview-background-color (&rest _)
     (setq-default
      org-format-latex-options
@@ -1533,6 +1474,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          :map vterm-mode-map
          ("<insert>" . ignore))
   :hook (vterm-exit . aorst/kill-vterm)
+  :custom (vterm-always-compile-module t)
   :config
   (defun aorst/vterm-toggle (&optional arg)
     "Toggle `vterm' window on and off with the same command."
