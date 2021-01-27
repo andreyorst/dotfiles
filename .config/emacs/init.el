@@ -482,12 +482,14 @@ Used in various places to avoid getting wrong line height when
   (highlight ((t (:foreground unspecified
                   :distant-foreground unspecified
                   :background unspecified))))
+  (org-block ((t (:extend t))))
   (org-block-begin-line ((t (:slant unspecified
                              :background unspecified
                              :inherit org-block
                              :extend t))))
-  (org-block ((t (:extend t))))
-  (org-block-end-line   ((t (:inherit org-block-begin-line :extend t))))
+  (org-block-end-line   ((t (:background unspecified
+                             :inherit org-block-begin-line
+                             :extend t))))
   (secondary-selection  ((t (:foreground unspecified
                              :background unspecified
                              :inherit region
@@ -1098,6 +1100,8 @@ truncates text if needed.  Minimal width can be set with
                     (face-attribute 'default :background)
                   (face-attribute 'mode-line :background)))
           (box-width (/ aorst--line-pixel-height 5)))
+      (set-face-attribute 'tab-line-tab-special nil
+                          :slant 'normal)
       (set-face-attribute 'tab-line nil
                           :background base
                           :foreground dark-fg
@@ -1358,6 +1362,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
          ((cider-repl-mode cider-mode) . eldoc-mode))
+  :bind (:map cider-repl-mode-map
+         ("C-c C-o" . cider-repl-clear-buffer))
   :custom-face
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   (cider-error-highlight-face ((t (:inherit flymake-error))))
@@ -1392,6 +1398,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning t)
           (cljr-warn-on-eval nil))
+
+(use-package elein)
 
 (use-package fennel-mode
   :straight (:host gitlab
@@ -1776,15 +1784,22 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
           "rg -S --no-heading --hidden --line-number --color never %s .")))
 
 (use-package company
-  :bind (:map company-active-map
+  :bind (:map company-mode-map
+         ([remap completion-at-point] . company-complete)
+         ([remap indent-for-tab-command] . company-indent-or-complete-common)
+         ("M-/" . company-complete)
+         :map company-active-map
          ("TAB" . company-complete-common-or-cycle)
          ("<tab>" . company-complete-common-or-cycle)
          ("<S-Tab>" . company-select-previous)
          ("<backtab>" . company-select-previous)
          ("C-n" . company-select-next)
-         ("C-p" . company-select-previous))
+         ("C-p" . company-select-previous)
+         ("C-d" . company-show-doc-buffer)
+         ("M-." . company-show-location))
   :hook (after-init . global-company-mode)
   :custom
+  (tab-always-indent 'complete)
   (company-idle-delay 0)
   (company-require-match 'never)
   (company-minimum-prefix-length 2)
@@ -1804,12 +1819,11 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (company-posframe-show-metadata nil)
   :config
   (let ((params (list :poshandler #'company-posframe-quickhelp-right-poshandler
-                      :internal-border-width 1
-                      :timeout 60
-                      :internal-border-color (face-attribute 'mode-line :background)
+                      :internal-border-width 0
                       :lines-truncate t
                       :left-fringe 1
                       :right-fringe 1
+                      :timeout 60
                       :no-properties nil)))
     (setq company-posframe-quickhelp-show-params params
           company-posframe-show-params params))
@@ -2066,6 +2080,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (defun aorst/disable-flycheck ()
     (flycheck-mode -1))
   (defun aorst/clojure-lsp-setup ()
+    (setq lsp-completion-show-detail nil)
     (if (bound-and-true-p cider-mode)
         (setq-local lsp-completion-enable nil)
       ;; disabling lsp-mode completion as soon as CIDER kicks in
