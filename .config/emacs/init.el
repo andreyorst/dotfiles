@@ -2116,11 +2116,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package project
   :straight nil
-  :bind (("C-c p f" . project-find-file)
-         ("C-c p r" . project-find-regexp))
   :config
   (defvar aorst--project-root-markers
-    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj")
+    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git")
     "Files or directories that indicate the root of a project.")
   (defun aorst/project-find-root (path)
     "Recursive search in PATH for root markers."
