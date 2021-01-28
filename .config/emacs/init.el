@@ -1663,13 +1663,15 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
            geiser-repl-mode
            inferior-lisp-mode
            inferior-emacs-lisp-mode)
-          . aorst/enable-smartparens-strict)
+          . aorst/enable-smartparens-strict-mode)
          (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
          ((org-mode
-          markdown-mode
-          prog-mode)
-         . aorst/enable-smartparens))
-  :bind (:map smartparens-strict-mode-map
+           markdown-mode
+           prog-mode)
+          . aorst/enable-smartparens-mode))
+  :bind (:map smartparens-mode-map
+         ("C-M-q" . sp-indent-defun)
+         :map smartparens-strict-mode-map
          (";" . sp-comment))
   :custom
   (sp-highlight-pair-overlay nil)
@@ -1681,6 +1683,15 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (sp-show-pair-match-face ((t (:background unspecified
                                 :weight normal))))
   :config
+  (add-to-list 'sp-lisp-modes 'fennel-mode t)
+  (require 'smartparens-config)
+  (sp-use-paredit-bindings)
+  (sp-with-modes '(fennel-mode)
+    (sp-local-pair "`" "`"
+                   :when '(sp-in-string-p
+                           sp-in-comment-p)
+                   :unless '(sp-lisp-invalid-hyperlink-p)))
+  :config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
     (setq-local comment-start ";")
@@ -1688,20 +1699,16 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
     (smartparens-strict-mode 1))
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
-  (require 'smartparens-config)
-  (defun aorst/enable-smartparens ()
+  (defun aorst/enable-smartparens-mode ()
+    "Enable `smartparens-mode' and `show-smartparens-mode'."
     (smartparens-mode 1)
     (show-smartparens-mode 1))
-  (defun aorst/enable-smartparens-strict ()
-    (smartparens-strict-mode 1)
-    (show-smartparens-mode 1))
-  (sp-with-modes '(fennel-mode)
-    (sp-local-pair "`" "`"
-                   :when '(sp-in-string-p
-                           sp-in-comment-p)
-                   :unless '(sp-lisp-invalid-hyperlink-p)))
-  (sp-use-paredit-bindings)
+  (defun aorst/enable-smartparens-strict-mode ()
+    "Enable `smartparens-strict-mode' and `show-smartparens-mode'
+unless `parinfer-rust-mode' is enabled."
+    (unless (bound-and-true-p parinfer-rust-mode)
+      (smartparens-strict-mode 1)
+      (show-smartparens-mode 1)))
   (defun aorst/wrap-fix-cursor-position (_ action _)
     "Set cursor position inside expression when wrapping."
     (when (and (eq action 'wrap)
@@ -1786,7 +1793,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package company
   :bind (:map company-mode-map
          ([remap completion-at-point] . company-complete)
-         ([remap indent-for-tab-command] . company-indent-or-complete-common)
+         ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
          ("M-/" . company-complete)
          :map company-active-map
          ("TAB" . company-complete-common-or-cycle)
@@ -1800,6 +1807,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :hook (after-init . global-company-mode)
   :custom
   (tab-always-indent 'complete)
+  (tab-first-completion 'word-or-paren-or-punct)
   (company-idle-delay 0)
   (company-require-match 'never)
   (company-minimum-prefix-length 2)
