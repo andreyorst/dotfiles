@@ -530,61 +530,39 @@ Used in various places to avoid getting wrong line height when
 (defvar-local modeline-project-cache nil)
 
 (defun aorst/mode-line-buffer-name ()
-  (when-let ((name (buffer-file-name)))
-    (concat
-     "  "
-     (if-let ((project (or modeline-project-cache (project-current))))
-         (progn (setq-local modeline-project-cache project)
-                (string-trim-left (abbreviate-file-name name)
-                                  (car (project-roots project))))
-       (abbreviate-file-name name)))))
+  (if-let ((name (buffer-file-name)))
+      (concat
+       "  "
+       (if-let ((project (or modeline-project-cache (project-current))))
+           (progn (setq-local modeline-project-cache project)
+                  (string-trim-left (abbreviate-file-name name)
+                                    (car (project-roots project))))
+         (abbreviate-file-name name)))
+    ""))
 
-(defun aorst/mode-line-buffer-modified ()
-  (when (and buffer-file-name (buffer-modified-p))
-    (concat
-     "  "
-     (propertize (if (char-displayable-p ?💾) "💾" "[*]"
-                  'help-echo (concat (buffer-name) " has unsaved changes"))))))
-
-(defun aorst/mode-line-line-column ()
-  (concat
-   "  "
-   (propertize
-    "%C:%l"
-    'help-echo "goto line"
-    'local-map (doto (make-sparse-keymap)
-                 (define-key [mode-line mouse-1] #'goto-line)))))
-
-(defun aorst/mode-line-line-encoding ()
-  (when-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
-                    (0 "LF")
-                    (1 "CRLF")
-                    (2 "CR")
-                    (_ nil))))
-    (concat
-     "  "
-     (propertize
-      eol
-      'help-echo (format "Line ending style: %s"
-                         (pcase eol
-                           ("LF" "Unix style LF")
-                           ("CRLF" "DOS style CRLF")
-                           ("CR" "Mac style CR")
-                           (_ "Undecided")))
-      'local-map (doto (make-sparse-keymap)
-                   (define-key [mode-line mouse-1] 'mode-line-change-eol))))))
-
-(defun aorst/mode-line-input-method ()
-  (when current-input-method
-    (concat
-     "  "
-     (propertize
-      current-input-method-title
-      'help-echo (concat
-                  "Current input method: "
-                  current-input-method
-                  "\nmouse-2: Disable input method\nmouse-3: Describe current input method")
-      'local-map mode-line-input-method-map))))
+(defun aorst/mode-line-buffer-state ()
+  (concat (if (and buffer-file-name (buffer-modified-p))
+              (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "[*]"
+                                           'help-echo (concat (buffer-name) " has unsaved changes"))))
+            "")
+          (if (or (buffer-narrowed-p)
+                  (and (bound-and-true-p fancy-narrow-mode)
+                       (fancy-narrow-active-p))
+                  (bound-and-true-p dired-narrow-mode))
+              (concat "  " (propertize (if (char-displayable-p ?↕) "↕" "[><]"
+                                           'help-echo (concat (buffer-name) " is narrowed"))))
+            "")
+          (if (and buffer-read-only
+                   (not (memq major-mode '(vterm-mode
+                                           treemacs-mode
+                                           xref--xref-buffer-mode
+                                           magit-status-mode))))
+              (concat "  " (propertize
+                            (if (char-displayable-p ?🔒) "🔒" "[RO]")
+                            'help-echo "Make file writable"
+                            'local-map (doto (make-sparse-keymap)
+                                         (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))
+            "")))
 
 (defun aorst/mode-line-buffer-encoding ()
   (concat
@@ -598,10 +576,47 @@ Used in various places to avoid getting wrong line height when
     'help-echo 'mode-line-mule-info-help-echo
     'local-map mode-line-coding-system-map)))
 
-(defvar-local aorst--mode-line--current-major-mode nil
-  "Holds current major mode.
-Used for quicker check if `aorst/mode-line-indent-mode' need to
-do any meaningful stuff.")
+(defun aorst/mode-line-line-column ()
+  (concat
+   "  "
+   (propertize
+    "%C:%l"
+    'help-echo "goto line"
+    'local-map (doto (make-sparse-keymap)
+                 (define-key [mode-line mouse-1] #'goto-line)))))
+
+(defun aorst/mode-line-line-encoding ()
+  (if-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
+                  (0 "LF")
+                  (1 "CRLF")
+                  (2 "CR")
+                  (_ nil))))
+      (concat
+       "  "
+       (propertize
+        eol
+        'help-echo (format "Line ending style: %s"
+                           (pcase eol
+                             ("LF" "Unix style LF")
+                             ("CRLF" "DOS style CRLF")
+                             ("CR" "Mac style CR")
+                             (_ "Undecided")))
+        'local-map (doto (make-sparse-keymap)
+                     (define-key [mode-line mouse-1] 'mode-line-change-eol))))
+    ""))
+
+(defun aorst/mode-line-input-method ()
+  (if current-input-method
+      (concat
+       "  "
+       (propertize
+        current-input-method-title
+        'help-echo (concat
+                    "Current input method: "
+                    current-input-method
+                    "\nmouse-2: Disable input method\nmouse-3: Describe current input method")
+        'local-map mode-line-input-method-map))
+    ""))
 
 (defvar-local aorst--mode-line--indent-var nil
   "Holds variable that is used for setting indent offset in current major mode.
@@ -613,7 +628,7 @@ Used for both checking if we need to do meaningful work in
 Used to check if we need to preform meaningful work in
 `aorst/mode-line-indent-mode'.")
 
-(defvar-local aorst--mode-line--indent-mode-string nil)
+(defvar-local aorst--mode-line--indent-mode-string "")
 
 (defun aorst/mode-line-indent-mode ()
   "Compute mode-line string with current indent mode.
@@ -664,90 +679,54 @@ offset variables."
   (interactive)
   (setq-local indent-tabs-mode (not indent-tabs-mode)))
 
-(defvar-local aorst--mode-line--major-mode-string nil)
+(defun aorst/mode-line-structural ()
+  (if-let ((structural
+            (cond ((bound-and-true-p parinfer-rust-mode)
+                   (propertize (concat "Parinfer: " parinfer-rust--mode)
+                               'help-echo (concat "Parinfer " parinfer-rust--mode
+                                                  " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
+                               'local-map (doto (make-sparse-keymap)
+                                            (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
+                  ((bound-and-true-p parinfer-mode)
+                   (propertize "Parinfer"
+                               'help-echo "Parinfer smart mode is enabled for current buffer"))
+                  ((bound-and-true-p paredit-mode)
+                   (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+                  ((bound-and-true-p smartparens-strict-mode)
+                   (propertize "SP (Strict)" 'help-echo "Smartparens mode is enabled for current buffer"))
+                  ((bound-and-true-p smartparens-mode)
+                   (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
+                  ((bound-and-true-p lispy-mode)
+                   (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
+                  ((bound-and-true-p electric-pair-mode)
+                   (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
+      (concat "  " structural)
+    ""))
+
+(defvar-local aorst--mode-line--major-mode-string "")
 
 (defun aorst/mode-line-mode-name ()
-  (unless (and (eq aorst--mode-line--current-major-mode
-                   major-mode)
-               aorst--mode-line--major-mode-string)
-    (setq-local aorst--mode-line--major-mode-string
-                (concat
-                 "  "
-                 (propertize
-                  (format-mode-line mode-name)
-                  'help-echo (format "Major mode: %s" (format-mode-line mode-name))))))
-  aorst--mode-line--major-mode-string)
+  (setq-local aorst--mode-line--major-mode-string
+              (concat
+               "  "
+               (propertize
+                (format-mode-line mode-name)
+                'help-echo (format "Major mode: %s" (format-mode-line mode-name))))))
+
+(add-hook 'after-change-major-mode-hook #'aorst/mode-line-mode-name)
 
 (defun aorst/mode-line-git-branch ()
-  (when (and vc-mode buffer-file-name)
-    (let* ((str (when vc-display-status
-                  (substring
-                   vc-mode
-                   (+ (if (eq (vc-backend buffer-file-name) 'Hg) 2 3)
-                      2)))))
-      (when str
-        (concat (if (char-displayable-p ?) "   " "  @") str)))))
+  (if (and vc-mode buffer-file-name)
+      (let* ((str (when vc-display-status
+                    (substring
+                     vc-mode
+                     (+ (if (eq (vc-backend buffer-file-name) 'Hg) 2 3)
+                        2)))))
+        (when str
+          (concat (if (char-displayable-p ?) "   " "  @") str)))
+    ""))
 
-(defun aorst/mode-line-readonly ()
-  (when (and buffer-read-only
-             (not (memq major-mode '(vterm-mode
-                                     treemacs-mode
-                                     xref--xref-buffer-mode
-                                     magit-status-mode))))
-    (concat
-     "  "
-     (propertize
-      (if (char-displayable-p ?🔒) "🔒" "RO")
-      'help-echo "Make file writable"
-      'local-map (doto (make-sparse-keymap)
-                   (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))))
-
-(defun aorst/mode-line-flycheck ()
-  (when (bound-and-true-p flycheck-mode)
-    (concat
-     "  "
-     (pcase flycheck-last-status-change
-       (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
-       (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
-       (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
-       (`errored (propertize "!" 'help-echo "Flycheck: error"))
-       (`finished
-        (let-alist (flycheck-count-errors flycheck-current-errors)
-          (propertize (format "%s/%s" (or .error 0) (or .warning 0))
-                      'help-echo (if (or .error .warning)
-                                     (concat "Flycheck: "
-                                             (when .error (format "%d errors%s" .error (if .warning ", " "")))
-                                             (when .warning (format "%d warnings" .warning))
-                                             "\nmouse-1: list errors")
-                                   "Flycheck: no errors or warnings")
-                      'local-map 'flycheck-error-list-mode-line-map)))
-       (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
-       (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))))
-
-(defun aorst/mode-line-structural ()
-  (when-let ((structural
-              (cond ((bound-and-true-p parinfer-rust-mode)
-                     (propertize (concat "Parinfer: " parinfer-rust--mode)
-                                 'help-echo (concat "Parinfer " parinfer-rust--mode
-                                                    " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
-                                 'local-map (doto (make-sparse-keymap)
-                                              (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
-                    ((bound-and-true-p parinfer-mode)
-                     (propertize "Parinfer"
-                                 'help-echo "Parinfer smart mode is enabled for current buffer"))
-                    ((bound-and-true-p paredit-mode)
-                     (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
-                    ((bound-and-true-p smartparens-strict-mode)
-                     (propertize "SP (Strict)" 'help-echo "Smartparens mode is enabled for current buffer"))
-                    ((bound-and-true-p smartparens-mode)
-                     (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
-                    ((bound-and-true-p lispy-mode)
-                     (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
-                    ((bound-and-true-p electric-pair-mode)
-                     (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
-    (concat "  " structural)))
-
-(defvar-local aorst--mode-line-lsp nil)
+(defvar-local aorst--mode-line-lsp "")
 
 (defun aorst/mode-line-update-lsp (&rest _)
   (setq aorst--mode-line-lsp
@@ -762,7 +741,35 @@ offset variables."
 (add-hook 'lsp-before-open-hook #'aorst/mode-line-update-lsp)
 (add-hook 'lsp-after-open-hook #'aorst/mode-line-update-lsp)
 
-(defvar-local aorst--mode-line-flymake nil)
+(defvar-local aorst--mode-line-flycheck "")
+
+(defun aorst/mode-line-update-flycheck ()
+  (when (bound-and-true-p flycheck-mode)
+    (setq aorst--mode-line-flycheck
+          (concat
+           "  "
+           (pcase flycheck-last-status-change
+             (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
+             (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
+             (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
+             (`errored (propertize "!" 'help-echo "Flycheck: error"))
+             (`finished
+              (let-alist (flycheck-count-errors flycheck-current-errors)
+                (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                            'help-echo (if (or .error .warning)
+                                           (concat "Flycheck: "
+                                                   (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                   (when .warning (format "%d warnings" .warning))
+                                                   "\nmouse-1: list errors")
+                                         "Flycheck: no errors or warnings")
+                            'local-map 'flycheck-error-list-mode-line-map)))
+             (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
+             (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious")))))))
+
+(add-hook 'flycheck-status-changed-functions #'aorst/mode-line-update-flycheck)
+(add-hook 'flycheck-mode-hook #'aorst/mode-line-update-flycheck)
+
+(defvar-local aorst--mode-line-flymake "")
 
 (defun aorst/flymake-mode-line-update (&rest _)
   (when (bound-and-true-p flymake-mode)
@@ -800,30 +807,34 @@ offset variables."
 (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
 (add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
 
+(defvar mode-line-l-format '(aorst/mode-line-buffer-name))
+(defvar mode-line-r-format
+  '(concat
+    (aorst/mode-line-buffer-state)
+    (aorst/mode-line-line-column)
+    (aorst/mode-line-input-method)
+    (aorst/mode-line-line-encoding)
+    (aorst/mode-line-buffer-encoding)
+    (aorst/mode-line-indent-mode)
+    aorst--mode-line--major-mode-string
+    (aorst/mode-line-mode-name)
+    (aorst/mode-line-git-branch)
+    aorst--mode-line-lsp
+    aorst--mode-line-flymake
+    aorst--mode-line-flycheck
+    (aorst/mode-line-structural)))
+
 (setq-default
  mode-line-format
  '(:eval
-   (let ((l-format (concat " " (aorst/mode-line-buffer-name)))
-         (r-format (concat
-                    (aorst/mode-line-buffer-modified)
-                    (aorst/mode-line-readonly)
-                    (aorst/mode-line-line-column)
-                    (aorst/mode-line-input-method)
-                    (aorst/mode-line-line-encoding)
-                    (aorst/mode-line-buffer-encoding)
-                    (aorst/mode-line-indent-mode)
-                    (aorst/mode-line-mode-name)
-                    (aorst/mode-line-git-branch)
-                    aorst--mode-line-lsp
-                    aorst--mode-line-flymake
-                    (aorst/mode-line-flycheck)
-                    (aorst/mode-line-structural))))
-     (concat l-format
+   (let ((mode-line-l-format (concat " " (string-trim-left (eval mode-line-l-format))))
+         (mode-line-r-format (eval mode-line-r-format)))
+     (concat mode-line-l-format
              (make-string (- (window-width)
-                             (string-width (format-mode-line l-format))
-                             (string-width (format-mode-line r-format)))
+                             (string-width (format-mode-line mode-line-l-format))
+                             (string-width (format-mode-line mode-line-r-format)))
                           ?\s)
-             r-format))))
+             mode-line-r-format))))
 
 (use-package mini-modeline
   :straight (:host github
@@ -836,22 +847,9 @@ offset variables."
   (mini-modeline-right-padding 2)
   (mini-modeline-display-gui-line nil)
   (mini-modeline-l-format
-   '(:eval (string-trim-left (or (aorst/mode-line-buffer-name) ""))))
+   '(:eval (string-trim-left (eval mode-line-l-format))))
   (mini-modeline-r-format
-   '(:eval (concat
-            (aorst/mode-line-buffer-modified)
-            (aorst/mode-line-readonly)
-            (aorst/mode-line-line-column)
-            (aorst/mode-line-input-method)
-            (aorst/mode-line-line-encoding)
-            (aorst/mode-line-buffer-encoding)
-            (aorst/mode-line-indent-mode)
-            (aorst/mode-line-mode-name)
-            (aorst/mode-line-git-branch)
-            aorst--mode-line-lsp
-            aorst--mode-line-flymake
-            (aorst/mode-line-flycheck)
-            (aorst/mode-line-structural))))
+   '(:eval (eval mode-line-r-format)))
   :config
   (defun aorst/mini-modeline-setup-faces ()
     (setq mini-modeline-face-attr
