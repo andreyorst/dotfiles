@@ -745,28 +745,29 @@ Used in various places to avoid getting wrong line height when
 
 (defvar-local aorst--mode-line-flycheck "")
 
-(defun aorst/mode-line-update-flycheck ()
-  (when (bound-and-true-p flycheck-mode)
-    (setq aorst--mode-line-flycheck
-          (concat
-           "  "
-           (pcase flycheck-last-status-change
-             (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
-             (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
-             (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
-             (`errored (propertize "!" 'help-echo "Flycheck: error"))
-             (`finished
-              (let-alist (flycheck-count-errors flycheck-current-errors)
-                (propertize (format "%s/%s" (or .error 0) (or .warning 0))
-                            'help-echo (if (or .error .warning)
-                                           (concat "Flycheck: "
-                                                   (when .error (format "%d errors%s" .error (if .warning ", " "")))
-                                                   (when .warning (format "%d warnings" .warning))
-                                                   "\nmouse-1: list errors")
-                                         "Flycheck: no errors or warnings")
-                            'local-map 'flycheck-error-list-mode-line-map)))
-             (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
-             (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious")))))))
+(defun aorst/mode-line-update-flycheck (&rest _)
+  (setq aorst--mode-line-flycheck
+        (if (bound-and-true-p flycheck-mode)
+            (concat
+             "  "
+             (pcase flycheck-last-status-change
+               (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
+               (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
+               (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
+               (`errored (propertize "!" 'help-echo "Flycheck: error"))
+               (`finished
+                (let-alist (flycheck-count-errors flycheck-current-errors)
+                  (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                              'help-echo (if (or .error .warning)
+                                             (concat "Flycheck: "
+                                                     (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                     (when .warning (format "%d warnings" .warning))
+                                                     "\nmouse-1: list errors")
+                                           "Flycheck: no errors or warnings")
+                              'local-map 'flycheck-error-list-mode-line-map)))
+               (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
+               (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))
+          "")))
 
 (add-hook 'flycheck-status-changed-functions #'aorst/mode-line-update-flycheck)
 (add-hook 'flycheck-mode-hook #'aorst/mode-line-update-flycheck)
@@ -1699,20 +1700,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
     (smartparens-strict-mode 1))
-  (defvar-local aorst--sp-last-change nil)
-  (defun aorst/sp-track-changes (start end length)
-    (setq aorst--sp-last-change start))
-  (defun aorst/sp-indent-sexp ()
-    (when-let ((start aorst--sp-last-change))
-      (setq aorst--sp-last-change nil)
-      (ignore-errors
-        (let ((ppss (syntax-ppss)))
-          (save-restriction
-            (save-mark-and-excursion
-              (unless (nth 3 ppss)
-                (widen)
-                (goto-char start)
-                (indent-sexp))))))))
   (defun aorst/enable-smartparens-mode ()
     "Enable `smartparens-mode' and `show-smartparens-mode'."
     (smartparens-mode 1)
@@ -1721,8 +1708,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     "Enable `smartparens-strict-mode' and `show-smartparens-mode'
 unless `parinfer-rust-mode' is enabled."
     (unless (bound-and-true-p parinfer-rust-mode)
-      (add-hook 'after-change-functions #'aorst/sp-track-changes nil 'local)
-      (add-hook 'post-command-hook #'aorst/sp-indent-sexp nil 'local)
       (smartparens-strict-mode 1)
       (show-smartparens-mode 1)))
   (defun aorst/wrap-fix-cursor-position (_ action _)
@@ -2100,6 +2085,8 @@ unless `parinfer-rust-mode' is enabled."
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-semantic-highlighting nil)
+  (lsp-log-io nil)
+  (lsp-enable-folding nil)
   :config
   (defun aorst/disable-flycheck ()
     (flycheck-mode -1))
@@ -2108,7 +2095,7 @@ unless `parinfer-rust-mode' is enabled."
     (if (bound-and-true-p cider-mode)
         (setq-local lsp-completion-enable nil)
       ;; disabling lsp-mode completion as soon as CIDER kicks in
-      (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil))))
+      (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil)) nil 'local))
     (lsp)))
 
 (use-package lsp-ui
