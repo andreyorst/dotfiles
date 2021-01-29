@@ -1252,29 +1252,41 @@ Indentation info module for mode-line.
 Support for various structural editing modes in mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-structural ()
-    (if-let ((structural
-              (cond ((bound-and-true-p parinfer-rust-mode)
-                     (propertize (concat "Parinfer: " parinfer-rust--mode)
-                                 'help-echo (concat "Parinfer " parinfer-rust--mode
-                                                    " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
-                                 'local-map (doto (make-sparse-keymap)
-                                              (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
-                    ((bound-and-true-p parinfer-mode)
-                     (propertize "Parinfer"
-                                 'help-echo "Parinfer smart mode is enabled for current buffer"))
-                    ((bound-and-true-p paredit-mode)
-                     (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
-                    ((bound-and-true-p smartparens-strict-mode)
-                     (propertize "SP (Strict)" 'help-echo "Smartparens mode is enabled for current buffer"))
-                    ((bound-and-true-p smartparens-mode)
-                     (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
-                    ((bound-and-true-p lispy-mode)
-                     (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
-                    ((bound-and-true-p electric-pair-mode)
-                     (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
-        (concat "  " structural)
-      ""))
+  (defvar-local aorst--mode-line-structural "")
+
+  (defun aorst/mode-line-structural (&rest _)
+    (setq aorst--mode-line-structural
+          (if-let ((structural
+                    (cond ((bound-and-true-p parinfer-rust-mode)
+                           (propertize (concat "Parinfer" (pcase parinfer-rust--mode
+                                                            ("smart" "/s")
+                                                            ("indent" "/i")
+                                                            ("paren" "/p")
+                                                            (t "")))
+                                       'help-echo (concat "Parinfer " parinfer-rust--mode
+                                                          " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
+                                       'local-map (doto (make-sparse-keymap)
+                                                    (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
+                          ((bound-and-true-p paredit-mode)
+                           (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
+                          ((bound-and-true-p smartparens-strict-mode)
+                           (propertize "SP/s" 'help-echo "Smartparens mode is enabled for current buffer"))
+                          ((bound-and-true-p smartparens-mode)
+                           (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
+                          ((bound-and-true-p lispy-mode)
+                           (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
+                          ((bound-and-true-p electric-pair-mode)
+                           (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
+              (concat "  " structural)
+            "")))
+
+  (add-hook 'parinfer-rust-mode-hook #'aorst/mode-line-structural)
+  (add-variable-watcher 'parinfer-rust--mode #'aorst/mode-line-structural)
+  (add-hook 'paredit-mode-hook #'aorst/mode-line-structural)
+  (add-hook 'smartparens-mode-hook #'aorst/mode-line-structural)
+  (add-hook 'smartparens-strict-mode-hook #'aorst/mode-line-structural)
+  (add-hook 'lispy-mode-hook #'aorst/mode-line-structural)
+  (add-hook 'electric-pair-mode-hook #'aorst/mode-line-structural)
 #+end_src
 
 **** Major mode
@@ -1425,7 +1437,7 @@ Fallback format for modeline.
       aorst--mode-line-lsp
       aorst--mode-line-flymake
       aorst--mode-line-flycheck
-      (aorst/mode-line-structural)))
+      aorst--mode-line-structural))
 #+end_src
 
 And the format itself.
