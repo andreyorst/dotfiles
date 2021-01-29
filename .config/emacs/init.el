@@ -2258,5 +2258,11 @@ unless `parinfer-rust-mode' is enabled."
 (use-package rg
   :bind ("C-c r" . rg))
 
+(use-package isayt
+  :straight (:host gitlab
+             :repo "andreyorst/isayt.el"
+             :branch "main")
+  :hook (smartparens-strict-mode . isayt-mode))
+
 (provide 'init)
 ;;; init.el ends here
