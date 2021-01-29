@@ -618,23 +618,25 @@ Used in various places to avoid getting wrong line height when
         'local-map mode-line-input-method-map))
     ""))
 
+(defvar-local aorst--mode-line--current-major-mode nil)
+
 (defvar-local aorst--mode-line--indent-var nil
   "Holds variable that is used for setting indent offset in current major mode.
-Used for both checking if we need to do meaningful work in
-`aorst/mode-line-indent-mode', and for getting updated value.")
+ Used for both checking if we need to do meaningful work in
+ `aorst/mode-line-indent-mode', and for getting updated value.")
 
 (defvar-local aorst--mode-line--indent-var-value nil
   "Holds indent offset value, that was gathered before.
-Used to check if we need to preform meaningful work in
-`aorst/mode-line-indent-mode'.")
+ Used to check if we need to preform meaningful work in
+ `aorst/mode-line-indent-mode'.")
 
 (defvar-local aorst--mode-line--indent-mode-string "")
 
 (defun aorst/mode-line-indent-mode ()
   "Compute mode-line string with current indent mode.
-Does heavy work only if major-mode has changed since last call,
-or if current indent offset has changed since last call, or if
-there's no previous result of this function stored."
+ Does heavy work only if major-mode has changed since last call,
+ or if current indent offset has changed since last call, or if
+ there's no previous result of this function stored."
   (unless (and (eq major-mode aorst--mode-line--current-major-mode)
                (eq aorst--mode-line--indent-var-value
                    (symbol-value aorst--mode-line--indent-var))
@@ -664,9 +666,9 @@ there's no previous result of this function stored."
 
 (defun aorst/mode-line--get-indent-var ()
   "Get variable that holds indent offset for current major mode.
-Uses `editorconfig-indentation-alist' variable as a source for
-all relationshipts between major modes and their respective
-offset variables."
+ Uses `editorconfig-indentation-alist' variable as a source for
+ all relationshipts between major modes and their respective
+ offset variables."
   (when (boundp 'editorconfig-indentation-alist)
     (car (assoc-default
           major-mode
@@ -817,7 +819,6 @@ offset variables."
     (aorst/mode-line-buffer-encoding)
     (aorst/mode-line-indent-mode)
     aorst--mode-line--major-mode-string
-    (aorst/mode-line-mode-name)
     (aorst/mode-line-git-branch)
     aorst--mode-line-lsp
     aorst--mode-line-flymake
@@ -1272,9 +1273,7 @@ truncates text if needed.  Minimal width can be set with
   :straight nil
   :commands aorst/emacs-lisp-indent-function
   :hook ((emacs-lisp-mode . eldoc-mode)
-         (emacs-lisp-mode . (lambda ()
-                              (setq-local lisp-indent-function
-                                          #'aorst/emacs-lisp-indent-function))))
+         (emacs-lisp-mode . aorst/emacs-lisp-setup))
   :bind (:map emacs-lisp-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
   :config
@@ -1321,6 +1320,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
                       (lisp-indent-specform method state indent-point normal-indent))
                      (method
                       (funcall method indent-point state))))))))
+  (defun aorst/emacs-lisp-setup ()
+    (setq-local lisp-indent-function
+                #'aorst/emacs-lisp-indent-function))
   (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)
@@ -1697,6 +1699,20 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
     (smartparens-strict-mode 1))
+  (defvar-local aorst--sp-last-change nil)
+  (defun aorst/sp-track-changes (start end length)
+    (setq aorst--sp-last-change start))
+  (defun aorst/sp-indent-sexp ()
+    (when-let ((start aorst--sp-last-change))
+      (setq aorst--sp-last-change nil)
+      (ignore-errors
+        (let ((ppss (syntax-ppss)))
+          (save-restriction
+            (save-mark-and-excursion
+              (unless (nth 3 ppss)
+                (widen)
+                (goto-char start)
+                (indent-sexp))))))))
   (defun aorst/enable-smartparens-mode ()
     "Enable `smartparens-mode' and `show-smartparens-mode'."
     (smartparens-mode 1)
@@ -1705,6 +1721,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     "Enable `smartparens-strict-mode' and `show-smartparens-mode'
 unless `parinfer-rust-mode' is enabled."
     (unless (bound-and-true-p parinfer-rust-mode)
+      (add-hook 'after-change-functions #'aorst/sp-track-changes nil 'local)
+      (add-hook 'post-command-hook #'aorst/sp-indent-sexp nil 'local)
       (smartparens-strict-mode 1)
       (show-smartparens-mode 1)))
   (defun aorst/wrap-fix-cursor-position (_ action _)
