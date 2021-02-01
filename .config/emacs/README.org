@@ -2087,7 +2087,13 @@ I primary use it for taking notes on different programming languages, and manage
                   (face-attribute (let ((face (cadr (assq 'default face-remapping-alist))))
                                     (if (facep face) face 'default))
                                   :background nil t))))
-    (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color))
+    (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color)
+    (define-advice org-return (:around (f &optional indent arg interactive) aorst:org-return)
+      (let ((org-src-preserve-indentation t))
+        (funcall f indent arg interactive)))
+    (define-advice org-cycle (:around (f &optional arg) aorst:org-cycle)
+      (let ((org-src-preserve-indentation t))
+        (funcall f arg))))
 #+end_src
 
 ** Prog Mode
