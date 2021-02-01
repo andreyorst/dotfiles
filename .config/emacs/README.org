@@ -2867,6 +2867,8 @@ And unlike Emacs Lisp version of parinfer, Rust version also has a proper implem
         (smartparens-strict-mode -1))
       (when (bound-and-true-p electric-pair-mode)
         (electric-pair-local-mode -1))
+      (when (bound-and-true-p isayt-mode)
+        (isayt-mode -1))
       (parinfer-rust-mode 1))
     :init
     (setq parinfer-rust-auto-download t))
