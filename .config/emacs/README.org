@@ -1063,25 +1063,43 @@ Buffer name module for mode-line.
 Returns buffer name or empty string if buffer is special and starts from space.
 
 #+begin_src emacs-lisp
-  (defvar-local modeline-project-cache nil)
+  (defvar-local aorst--mode-line-buffer-name "")
+  (defvar-local aorst--modeline-project-cache nil)
 
-  (defun aorst/mode-line-buffer-name ()
-    (if-let ((name (buffer-file-name)))
-        (concat
-         "  "
-         (if-let ((project (or modeline-project-cache (project-current))))
-             (progn (setq-local modeline-project-cache project)
-                    (string-trim-left (abbreviate-file-name name)
-                                      (car (project-roots project))))
-           (abbreviate-file-name name)))
-      ""))
+  (defun aorst/mode-line-update-buffer-name (&rest _)
+    (setq aorst--mode-line-buffer-name
+          (if-let ((name (buffer-file-name)))
+              (concat
+               "  "
+               (if-let ((project (or aorst--modeline-project-cache (project-current))))
+                   (progn (setq-local aorst--modeline-project-cache project)
+                          (string-trim-left (abbreviate-file-name name)
+                                            (car (project-roots project))))
+                 (abbreviate-file-name name)))
+            "")))
+
+  (add-hook 'find-file-hook #'aorst/mode-line-update-buffer-name)
+  (add-hook 'after-change-major-mode-hook #'aorst/mode-line-update-buffer-name)
+  (add-hook 'clone-indirect-buffer-hook #'aorst/mode-line-update-buffer-name)
+  (advice-add #'not-modified :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'rename-buffer :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'set-visited-file-name :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'pop-to-buffer :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'undo :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'undo-tree-undo-1 :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'undo-tree-redo-1 :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'fill-paragraph :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'popup-create :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'popup-delete :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'org-edit-src-save :after #'aorst/mode-line-update-buffer-name)
+  (advice-add #'symbol-overlay-rename :after #'aorst/mode-line-update-buffer-name)
 #+end_src
 
 **** Buffer state
 Modified state module for mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-buffer-state ()
+  (defsubst aorst/mode-line-buffer-state ()
     (concat (if (and buffer-file-name (buffer-modified-p))
                 (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "[*]"
                                              'help-echo (concat (buffer-name) " has unsaved changes"))))
@@ -1110,7 +1128,7 @@ Modified state module for mode-line.
 Buffer encoding module for mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-buffer-encoding ()
+  (defsubst aorst/mode-line-buffer-encoding ()
     (concat
      "  "
      (propertize
@@ -1127,7 +1145,7 @@ Buffer encoding module for mode-line.
 Line-column module for mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-line-column ()
+  (defsubst aorst/mode-line-line-column ()
     (concat
      "  "
      (propertize
@@ -1141,7 +1159,7 @@ Line-column module for mode-line.
 Line encoding module for mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-line-encoding ()
+  (defsubst aorst/mode-line-line-encoding ()
     (if-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
                     (0 "LF")
                     (1 "CRLF")
@@ -1166,7 +1184,7 @@ Line encoding module for mode-line.
 Input method module for mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-input-method ()
+  (defsubst aorst/mode-line-input-method ()
     (if current-input-method
         (concat
          "  "
@@ -1293,24 +1311,19 @@ Support for various structural editing modes in mode-line.
 Major mode module for mode-line
 
 #+begin_src emacs-lisp
-  (defvar-local aorst--mode-line--major-mode-string "")
-
-  (defun aorst/mode-line-mode-name ()
-    (setq-local aorst--mode-line--major-mode-string
-                (concat
-                 "  "
-                 (propertize
-                  (format-mode-line mode-name)
-                  'help-echo (format "Major mode: %s" (format-mode-line mode-name))))))
-
-  (add-hook 'after-change-major-mode-hook #'aorst/mode-line-mode-name)
+  (defsubst aorst/mode-line-mode-name ()
+    (concat
+     "  "
+     (propertize
+      (format-mode-line mode-name)
+      'help-echo (format "Major mode: %s" (format-mode-line mode-name)))))
 #+end_src
 
 **** Git
 Git branch module for mode-line.
 
 #+begin_src emacs-lisp
-  (defun aorst/mode-line-git-branch ()
+  (defsubst aorst/mode-line-git-branch ()
     (if (and vc-mode buffer-file-name)
         (let* ((str (when vc-display-status
                       (substring
@@ -1423,7 +1436,7 @@ Mode line segment for flymake.
 Fallback format for modeline.
 
 #+begin_src emacs-lisp
-  (defvar mode-line-l-format '(aorst/mode-line-buffer-name))
+  (defvar mode-line-l-format 'aorst--mode-line-buffer-name)
   (defvar mode-line-r-format
     '(concat
       (aorst/mode-line-buffer-state)
@@ -1432,7 +1445,7 @@ Fallback format for modeline.
       (aorst/mode-line-line-encoding)
       (aorst/mode-line-buffer-encoding)
       (aorst/mode-line-indent-mode)
-      aorst--mode-line--major-mode-string
+      (aorst/mode-line-mode-name)
       (aorst/mode-line-git-branch)
       aorst--mode-line-lsp
       aorst--mode-line-flymake
@@ -2851,7 +2864,7 @@ And unlike Emacs Lisp version of parinfer, Rust version also has a proper implem
       (parinfer-rust-mode 1))
     :init
     (setq parinfer-rust-auto-download t))
-  #+end_src
+#+end_src
 
 ** Flx
 Flex matching for Emacs.
@@ -3622,7 +3635,7 @@ Nice integration for [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool.
     :bind ("C-c r" . rg))
 #+end_src
 
-** isayt mode
+** ISAYT mode
 Indent S-expressions as you type.
 
 #+begin_src emacs-lisp

@@ -240,6 +240,7 @@ Based on `so-long-detected-long-line-p'."
                           " *Echo Area"
                           "*Process List*"
                           "*Ediff"
+
                           " *LV*"
                           "*Ilist*"))
             (buffer-name buffer))
@@ -527,20 +528,38 @@ Used in various places to avoid getting wrong line height when
   (set-face-attribute face nil
                       :box nil))
 
-(defvar-local modeline-project-cache nil)
+(defvar-local aorst--mode-line-buffer-name "")
+(defvar-local aorst--modeline-project-cache nil)
 
-(defun aorst/mode-line-buffer-name ()
-  (if-let ((name (buffer-file-name)))
-      (concat
-       "  "
-       (if-let ((project (or modeline-project-cache (project-current))))
-           (progn (setq-local modeline-project-cache project)
-                  (string-trim-left (abbreviate-file-name name)
-                                    (car (project-roots project))))
-         (abbreviate-file-name name)))
-    ""))
+(defun aorst/mode-line-update-buffer-name (&rest _)
+  (setq aorst--mode-line-buffer-name
+        (if-let ((name (buffer-file-name)))
+            (concat
+             "  "
+             (if-let ((project (or aorst--modeline-project-cache (project-current))))
+                 (progn (setq-local aorst--modeline-project-cache project)
+                        (string-trim-left (abbreviate-file-name name)
+                                          (car (project-roots project))))
+               (abbreviate-file-name name)))
+          "")))
 
-(defun aorst/mode-line-buffer-state ()
+(add-hook 'find-file-hook #'aorst/mode-line-update-buffer-name)
+(add-hook 'after-change-major-mode-hook #'aorst/mode-line-update-buffer-name)
+(add-hook 'clone-indirect-buffer-hook #'aorst/mode-line-update-buffer-name)
+(advice-add #'not-modified :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'rename-buffer :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'set-visited-file-name :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'pop-to-buffer :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'undo :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'undo-tree-undo-1 :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'undo-tree-redo-1 :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'fill-paragraph :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'popup-create :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'popup-delete :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'org-edit-src-save :after #'aorst/mode-line-update-buffer-name)
+(advice-add #'symbol-overlay-rename :after #'aorst/mode-line-update-buffer-name)
+
+(defsubst aorst/mode-line-buffer-state ()
   (concat (if (and buffer-file-name (buffer-modified-p))
               (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "[*]"
                                            'help-echo (concat (buffer-name) " has unsaved changes"))))
@@ -564,7 +583,7 @@ Used in various places to avoid getting wrong line height when
                                          (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))
             "")))
 
-(defun aorst/mode-line-buffer-encoding ()
+(defsubst aorst/mode-line-buffer-encoding ()
   (concat
    "  "
    (propertize
@@ -576,7 +595,7 @@ Used in various places to avoid getting wrong line height when
     'help-echo 'mode-line-mule-info-help-echo
     'local-map mode-line-coding-system-map)))
 
-(defun aorst/mode-line-line-column ()
+(defsubst aorst/mode-line-line-column ()
   (concat
    "  "
    (propertize
@@ -585,7 +604,7 @@ Used in various places to avoid getting wrong line height when
     'local-map (doto (make-sparse-keymap)
                  (define-key [mode-line mouse-1] #'goto-line)))))
 
-(defun aorst/mode-line-line-encoding ()
+(defsubst aorst/mode-line-line-encoding ()
   (if-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
                   (0 "LF")
                   (1 "CRLF")
@@ -605,7 +624,7 @@ Used in various places to avoid getting wrong line height when
                      (define-key [mode-line mouse-1] 'mode-line-change-eol))))
     ""))
 
-(defun aorst/mode-line-input-method ()
+(defsubst aorst/mode-line-input-method ()
   (if current-input-method
       (concat
        "  "
@@ -717,19 +736,14 @@ Used in various places to avoid getting wrong line height when
 (add-hook 'lispy-mode-hook #'aorst/mode-line-structural)
 (add-hook 'electric-pair-mode-hook #'aorst/mode-line-structural)
 
-(defvar-local aorst--mode-line--major-mode-string "")
+(defsubst aorst/mode-line-mode-name ()
+  (concat
+   "  "
+   (propertize
+    (format-mode-line mode-name)
+    'help-echo (format "Major mode: %s" (format-mode-line mode-name)))))
 
-(defun aorst/mode-line-mode-name ()
-  (setq-local aorst--mode-line--major-mode-string
-              (concat
-               "  "
-               (propertize
-                (format-mode-line mode-name)
-                'help-echo (format "Major mode: %s" (format-mode-line mode-name))))))
-
-(add-hook 'after-change-major-mode-hook #'aorst/mode-line-mode-name)
-
-(defun aorst/mode-line-git-branch ()
+(defsubst aorst/mode-line-git-branch ()
   (if (and vc-mode buffer-file-name)
       (let* ((str (when vc-display-status
                     (substring
@@ -822,7 +836,7 @@ Used in various places to avoid getting wrong line height when
 (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
 (add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
 
-(defvar mode-line-l-format '(aorst/mode-line-buffer-name))
+(defvar mode-line-l-format 'aorst--mode-line-buffer-name)
 (defvar mode-line-r-format
   '(concat
     (aorst/mode-line-buffer-state)
@@ -831,7 +845,7 @@ Used in various places to avoid getting wrong line height when
     (aorst/mode-line-line-encoding)
     (aorst/mode-line-buffer-encoding)
     (aorst/mode-line-indent-mode)
-    aorst--mode-line--major-mode-string
+    (aorst/mode-line-mode-name)
     (aorst/mode-line-git-branch)
     aorst--mode-line-lsp
     aorst--mode-line-flymake
