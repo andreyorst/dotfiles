@@ -1438,6 +1438,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package anakondo
   :straight (:host github
              :repo "didibus/anakondo")
+  :when (executable-find "clj-kondo")
   :hook
   ((clojure-mode-hook
     clojurescript-mode-hook

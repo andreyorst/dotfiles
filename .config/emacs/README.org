@@ -2416,6 +2416,7 @@ Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-k
   (use-package anakondo
     :straight (:host github
                :repo "didibus/anakondo")
+    :when (executable-find "clj-kondo")
     :hook
     ((clojure-mode-hook
       clojurescript-mode-hook
