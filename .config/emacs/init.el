@@ -1291,6 +1291,8 @@ truncates text if needed.  Minimal width can be set with
          (")" . self-insert-command)
          ("]" . self-insert-command)
          ("}" . self-insert-command))
+  :hook (racket-mode . racket-xp-mode)
+  :custom (racket-show-functions '(racket-show-echo-area))
   :config
   (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
   (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
@@ -1432,6 +1434,16 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
           (cljr-warn-on-eval nil))
 
 (use-package elein)
+
+(use-package anakondo
+  :straight (:host github
+             :repo "didibus/anakondo")
+  :hook
+  ((clojure-mode-hook
+    clojurescript-mode-hook
+    clojurec-mode-hook)
+   . anakondo-minor-mode)
+  :commands anakondo-minor-mode)
 
 (use-package fennel-mode
   :straight (:host gitlab
@@ -2098,7 +2110,6 @@ unless `parinfer-rust-mode' is enabled."
 
 (use-package lsp-mode
   :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
-         ((clojure-mode clojurec-mode clojurescript-mode) . aorst/clojure-lsp-setup)
          (lsp-mode . aorst/disable-flycheck)
          (lsp-mode . yas-minor-mode))
   :custom-face
@@ -2120,14 +2131,7 @@ unless `parinfer-rust-mode' is enabled."
   (lsp-enable-folding nil)
   :config
   (defun aorst/disable-flycheck ()
-    (flycheck-mode -1))
-  (defun aorst/clojure-lsp-setup ()
-    (setq lsp-completion-show-detail nil)
-    (if (bound-and-true-p cider-mode)
-        (setq-local lsp-completion-enable nil)
-      ;; disabling lsp-mode completion as soon as CIDER kicks in
-      (add-hook 'cider-mode-hook (lambda () (setq-local lsp-completion-enable nil)) nil 'local))
-    (lsp)))
+    (flycheck-mode -1)))
 
 (use-package lsp-ui
   :after lsp-mode
