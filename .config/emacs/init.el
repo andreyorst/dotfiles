@@ -30,8 +30,14 @@
   :custom
   (backup-by-copying t)
   (create-lockfiles nil)
-  (backup-directory-alist '(("." . "~/.cache/emacs-backups")))
-  (auto-save-file-name-transforms '((".*" "~/.cache/emacs-backups/" t))))
+  (backup-directory-alist
+   `(("." . ,(expand-file-name ".cache/backups" user-emacs-directory))))
+  (auto-save-file-name-transforms
+   `((".*" ,(expand-file-name ".cache/auto-save/" user-emacs-directory) t)))
+  :config
+  (let ((auto-save-dir (expand-file-name ".cache/auto-save/" user-emacs-directory)))
+    (unless (file-exists-p auto-save-dir)
+      (make-directory auto-save-dir))))
 
 (use-package subr
   :no-require t
