@@ -1443,12 +1443,13 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package anakondo
   :straight (:host github
-             :repo "didibus/anakondo")
+	     :repo "andreyorst/anakondo"
+	     :branch "use-project")
   :when (executable-find "clj-kondo")
   :hook
-  ((clojure-mode-hook
-    clojurescript-mode-hook
-    clojurec-mode-hook)
+  ((clojure-mode
+    clojurescript-mode
+    clojurec-mode)
    . anakondo-minor-mode)
   :commands anakondo-minor-mode)
 
@@ -1844,7 +1845,7 @@ unless `parinfer-rust-mode' is enabled."
 (use-package company
   :bind (:map company-mode-map
          ([remap completion-at-point] . company-complete)
-         ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
+         ([remap indent-for-tab-command] . company-indent-or-complete-common)
          ("M-/" . company-complete)
          :map company-active-map
          ("TAB" . company-complete-common-or-cycle)

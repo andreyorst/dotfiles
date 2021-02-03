@@ -2421,12 +2421,13 @@ Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-k
 #+begin_src emacs-lisp
   (use-package anakondo
     :straight (:host github
-               :repo "didibus/anakondo")
+	       :repo "andreyorst/anakondo"
+	       :branch "use-project")
     :when (executable-find "clj-kondo")
     :hook
-    ((clojure-mode-hook
-      clojurescript-mode-hook
-      clojurec-mode-hook)
+    ((clojure-mode
+      clojurescript-mode
+      clojurec-mode)
      . anakondo-minor-mode)
     :commands anakondo-minor-mode)
 #+end_src
@@ -2995,7 +2996,7 @@ Complete anything framework. Nothing much to say. Does it's job.
   (use-package company
     :bind (:map company-mode-map
            ([remap completion-at-point] . company-complete)
-           ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
+           ([remap indent-for-tab-command] . company-indent-or-complete-common)
            ("M-/" . company-complete)
            :map company-active-map
            ("TAB" . company-complete-common-or-cycle)
