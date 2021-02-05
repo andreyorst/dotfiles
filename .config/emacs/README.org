@@ -2453,6 +2453,7 @@ It supports compile-time macro system, and full Lua compatibility.
     (put 'finally 'fennel-indent-function 0)
     (defun fennel-mode-setup ()
       "Set common variables."
+      (setq-local comment-end "")
       (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
     (defvar org-babel-default-header-args:fennel '((:results . "silent")))
     (defun org-babel-execute:fennel (body params)

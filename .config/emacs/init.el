@@ -1469,6 +1469,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (put 'finally 'fennel-indent-function 0)
   (defun fennel-mode-setup ()
     "Set common variables."
+    (setq-local comment-end "")
     (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
