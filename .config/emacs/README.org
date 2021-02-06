@@ -871,53 +871,38 @@ With the inclusion of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]] support
 What's especially cool, is that we can specify which ligatures we want, by defining regular expressions:
 
 #+begin_src emacs-lisp
-  (when (aorst/font-installed-p "JetBrainsMono")
-    (dolist (char-ligatures '((?-  . ("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->"))
-                              (?/  . ("///" "/=" "/==" "/>" "//")) ;; "/*"
-                              (?*  . ("*>" "***" "*/"))
-                              (?<  . ("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                      "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~"
-                                      "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--"))
-                              (?:  . (":>" ":<" ":::" "::" ":?" ":?>" ":=" "::="))
-                              (?=  . ("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "=="))
-                              (?!  . ("!==" "!!" "!="))
-                              (?>  . (">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">="))
-                              (?&  . ("&&&" "&&"))
-                              (?|  . ("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||"))
-                              (?.  . (".." ".?" ".=" ".-" "..<" "..."))
-                              (?+  . ("+++" "+>" "++"))
-                              (?\[ . ("[||]" "[<" "[|"))
-                              (?\{ . ("{|"))
-                              (?\? . ("??" "?." "?=" "?:"))
-                              (?#  . ("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#("))
-                              (?\; . (";;"))
-                              (?_  . ("_|_" "__"))
-                              (?~  . ("~~" "~~>" "~>" "~-" "~@"))
-                              (?$  . ("$>"))
-                              (?^  . ("^="))
-                              (?\] . ("]#"))))
-      (let* ((char (car char-ligatures))
-             (ligatures (cdr char-ligatures))
-             (forbidden-chars (string-to-list (apply #'concat ligatures))))
-        (set-char-table-range
-         composition-function-table
-         char `([,(concat (eval `(rx (group (or line-start (not (any ,@forbidden-chars))))))
-                          (regexp-opt ligatures)
-                          ;; (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end))))
-                          )
-                 1 font-shape-gstring])))))
-#+end_src
-
-Since I don't want ligatures appearing in every major mode, let's disable =global-auto-composition-mode= and selectively enable it in needed modes:
-
-#+begin_src emacs-lisp
-  (use-package composite
-    :straight nil
-    :hook ((prog-mode
-            cider-repl-mode
-            inferior-lisp-mode)
-           . auto-composition-mode)
-    :init (global-auto-composition-mode -1))
+  (use-package ligature
+    :straight (:host github
+               :repo "mickeynp/ligature.el")
+    :config
+    (ligature-set-ligatures
+     '(prog-mode cider-repl-mode inferior-lisp-mode fundamental-mode)
+     '(("=" (rx "=" (or ">>" "=>" "/=" "!=" ">" ":=" (= 2 "=") (= 1 "="))))
+       ("*" (rx "*" (or ">" "/" (= 2 "*"))))
+       ("#" (rx "#" (or "[" "{" "=" "!" ":" "_(" "_" "?" "(" (= 3 "#") (= 2 "#") (= 1 "#"))))
+       ("-" (rx "-" (or "|" "~" "<<" "<" ">" ">>" "->" (= 2 "-") (= 1 "-"))))
+       ("/" (rx "/" (or (any "=" "==" ">" "*") (= 2 "/") (= 1 "/"))))
+       ("<" (rx "<" (or "-" "<-" "=>" "=" "|" "||" "|||" "|>" ":" ">" "-<"
+                        "==" "<=" "=<" "==>" "-|" "<" "~>" "=|" "~~"
+                        "~" "$>" "$" "+>" "+" "/>" "/" "*" "*>" "->" "!--"
+                        (= 2 "<"))))
+       (":" (rx ":" (or ">" "<" "?" "?>" "=" ":=" (= 3 ":") (= 2 ":"))))
+       ("!" (rx "!" (or (any "!==" "!=") (= 2 "!"))))
+       (">" (rx ">" (or "]" ":" ">-" ">=" "=>" "-" "=" (= 2 ">"))))
+       ("&" (rx "&" (or (= 2 "&") (= 1 "&"))))
+       ("|" (rx "|" (or "->" "||>" "|>" ">" "]" "}" "=>" "=" "|-" "-" "|=" (= 1 "|"))))
+       ("." (rx "." (or "?" "=" "-" ".<" (= 2 ".") (= 1 "."))))
+       ("+" (rx "+" (or ">" (= 2 "+") (= 1 "+"))))
+       ("[" (rx "[" (or "||]" "<" "|")))
+       ("{" (rx "{" "|"))
+       ("?" (rx "?" (or "." "=" ":" (= 1 "?"))))
+       (";" (rx ";" (= 2 ";")))
+       ("_" (rx "_" (or "|_" "_")))
+       ("~" (rx "~" (or "~>" "~" ">" "-" "@")))
+       ("$" (rx "$" ">"))
+       ("^" (rx "^" "="))
+       ("]" (rx "]" "#"))))
+    (global-ligature-mode t))
 #+end_src
 
 ** Icons
@@ -2769,6 +2754,15 @@ Some languages have better support with =flycheck=.
        ("d" flycheck-disable-checker)
        ("m" flycheck-mode)
        ("s" flycheck-select-checker))))
+#+end_src
+
+*** Flycheck package
+Emacs package linting via package-lint and Flycheck.
+
+#+begin_src emacs-lisp
+  (use-package flycheck-package
+    :hook ((emacs-lisp-mode . flycheck-mode)
+           (emacs-lisp-mode . flycheck-package-setup)))
 #+end_src
 
 ** Hydra

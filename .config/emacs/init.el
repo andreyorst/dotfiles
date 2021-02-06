@@ -394,49 +394,38 @@ Used in various places to avoid getting wrong line height when
 (when (aorst/font-installed-p "DejaVu Sans")
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
-(when (aorst/font-installed-p "JetBrainsMono")
-  (dolist (char-ligatures '((?-  . ("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->"))
-                            (?/  . ("///" "/=" "/==" "/>" "//")) ;; "/*"
-                            (?*  . ("*>" "***" "*/"))
-                            (?<  . ("<-" "<<-" "<=>" "<=" "<|" "<||" "<|||" "<|>" "<:" "<>" "<-<"
-                                    "<<<" "<==" "<<=" "<=<" "<==>" "<-|" "<<" "<~>" "<=|" "<~~"
-                                    "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*" "<*>" "<->" "<!--"))
-                            (?:  . (":>" ":<" ":::" "::" ":?" ":?>" ":=" "::="))
-                            (?=  . ("=>>" "==>" "=/=" "=!=" "=>" "===" "=:=" "=="))
-                            (?!  . ("!==" "!!" "!="))
-                            (?>  . (">]" ">:" ">>-" ">>=" ">=>" ">>>" ">-" ">="))
-                            (?&  . ("&&&" "&&"))
-                            (?|  . ("|||>" "||>" "|>" "|]" "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||"))
-                            (?.  . (".." ".?" ".=" ".-" "..<" "..."))
-                            (?+  . ("+++" "+>" "++"))
-                            (?\[ . ("[||]" "[<" "[|"))
-                            (?\{ . ("{|"))
-                            (?\? . ("??" "?." "?=" "?:"))
-                            (?#  . ("##" "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#("))
-                            (?\; . (";;"))
-                            (?_  . ("_|_" "__"))
-                            (?~  . ("~~" "~~>" "~>" "~-" "~@"))
-                            (?$  . ("$>"))
-                            (?^  . ("^="))
-                            (?\] . ("]#"))))
-    (let* ((char (car char-ligatures))
-           (ligatures (cdr char-ligatures))
-           (forbidden-chars (string-to-list (apply #'concat ligatures))))
-      (set-char-table-range
-       composition-function-table
-       char `([,(concat (eval `(rx (group (or line-start (not (any ,@forbidden-chars))))))
-                        (regexp-opt ligatures)
-                        ;; (eval `(rx (group (or (not (any ,@forbidden-chars)) line-end))))
-                        )
-               1 font-shape-gstring])))))
-
-(use-package composite
-  :straight nil
-  :hook ((prog-mode
-          cider-repl-mode
-          inferior-lisp-mode)
-         . auto-composition-mode)
-  :init (global-auto-composition-mode -1))
+(use-package ligature
+  :straight (:host github
+             :repo "mickeynp/ligature.el")
+  :config
+  (ligature-set-ligatures
+   '(prog-mode cider-repl-mode inferior-lisp-mode fundamental-mode)
+   '(("=" (rx "=" (or ">>" "=>" "/=" "!=" ">" ":=" (= 2 "=") (= 1 "="))))
+     ("*" (rx "*" (or ">" "/" (= 2 "*"))))
+     ("#" (rx "#" (or "[" "{" "=" "!" ":" "_(" "_" "?" "(" (= 3 "#") (= 2 "#") (= 1 "#"))))
+     ("-" (rx "-" (or "|" "~" "<<" "<" ">" ">>" "->" (= 2 "-") (= 1 "-"))))
+     ("/" (rx "/" (or (any "=" "==" ">" "*") (= 2 "/") (= 1 "/"))))
+     ("<" (rx "<" (or "-" "<-" "=>" "=" "|" "||" "|||" "|>" ":" ">" "-<"
+                      "==" "<=" "=<" "==>" "-|" "<" "~>" "=|" "~~"
+                      "~" "$>" "$" "+>" "+" "/>" "/" "*" "*>" "->" "!--"
+                      (= 2 "<"))))
+     (":" (rx ":" (or ">" "<" "?" "?>" "=" ":=" (= 3 ":") (= 2 ":"))))
+     ("!" (rx "!" (or (any "!==" "!=") (= 2 "!"))))
+     (">" (rx ">" (or "]" ":" ">-" ">=" "=>" "-" "=" (= 2 ">"))))
+     ("&" (rx "&" (or (= 2 "&") (= 1 "&"))))
+     ("|" (rx "|" (or "->" "||>" "|>" ">" "]" "}" "=>" "=" "|-" "-" "|=" (= 1 "|"))))
+     ("." (rx "." (or "?" "=" "-" ".<" (= 2 ".") (= 1 "."))))
+     ("+" (rx "+" (or ">" (= 2 "+") (= 1 "+"))))
+     ("[" (rx "[" (or "||]" "<" "|")))
+     ("{" (rx "{" "|"))
+     ("?" (rx "?" (or "." "=" ":" (= 1 "?"))))
+     (";" (rx ";" (= 2 ";")))
+     ("_" (rx "_" (or "|_" "_")))
+     ("~" (rx "~" (or "~>" "~" ">" "-" "@")))
+     ("$" (rx "$" ">"))
+     ("^" (rx "^" "="))
+     ("]" (rx "]" "#"))))
+  (global-ligature-mode t))
 
 (use-package all-the-icons
   :config
@@ -1697,6 +1686,10 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
      ("d" flycheck-disable-checker)
      ("m" flycheck-mode)
      ("s" flycheck-select-checker))))
+
+(use-package flycheck-package
+  :hook ((emacs-lisp-mode . flycheck-mode)
+         (emacs-lisp-mode . flycheck-package-setup)))
 
 (use-package hydra)
 
