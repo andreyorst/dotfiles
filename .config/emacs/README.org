@@ -871,38 +871,64 @@ With the inclusion of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]] support
 What's especially cool, is that we can specify which ligatures we want, by defining regular expressions:
 
 #+begin_src emacs-lisp
-  (use-package ligature
-    :straight (:host github
-               :repo "mickeynp/ligature.el")
-    :config
-    (ligature-set-ligatures
-     '(prog-mode cider-repl-mode inferior-lisp-mode fundamental-mode)
-     '(("=" (rx "=" (or ">>" "=>" "/=" "!=" ">" ":=" (= 2 "=") (= 1 "="))))
-       ("*" (rx "*" (or ">" "/" (= 2 "*"))))
-       ("#" (rx "#" (or "[" "{" "=" "!" ":" "_(" "_" "?" "(" (= 3 "#") (= 2 "#") (= 1 "#"))))
-       ("-" (rx "-" (or "|" "~" "<<" "<" ">" ">>" "->" (= 2 "-") (= 1 "-"))))
-       ("/" (rx "/" (or (any "=" "==" ">" "*") (= 2 "/") (= 1 "/"))))
-       ("<" (rx "<" (or "-" "<-" "=>" "=" "|" "||" "|||" "|>" ":" ">" "-<"
-                        "==" "<=" "=<" "==>" "-|" "<" "~>" "=|" "~~"
-                        "~" "$>" "$" "+>" "+" "/>" "/" "*" "*>" "->" "!--"
-                        (= 2 "<"))))
-       (":" (rx ":" (or ">" "<" "?" "?>" "=" ":=" (= 3 ":") (= 2 ":"))))
-       ("!" (rx "!" (or (any "!==" "!=") (= 2 "!"))))
-       (">" (rx ">" (or "]" ":" ">-" ">=" "=>" "-" "=" (= 2 ">"))))
-       ("&" (rx "&" (or (= 2 "&") (= 1 "&"))))
-       ("|" (rx "|" (or "->" "||>" "|>" ">" "]" "}" "=>" "=" "|-" "-" "|=" (= 1 "|"))))
-       ("." (rx "." (or "?" "=" "-" ".<" (= 2 ".") (= 1 "."))))
-       ("+" (rx "+" (or ">" (= 2 "+") (= 1 "+"))))
-       ("[" (rx "[" (or "||]" "<" "|")))
-       ("{" (rx "{" "|"))
-       ("?" (rx "?" (or "." "=" ":" (= 1 "?"))))
-       (";" (rx ";" (= 2 ";")))
-       ("_" (rx "_" (or "|_" "_")))
-       ("~" (rx "~" (or "~>" "~" ">" "-" "@")))
-       ("$" (rx "$" ">"))
-       ("^" (rx "^" "="))
-       ("]" (rx "]" "#"))))
-    (global-ligature-mode t))
+  (when (aorst/font-installed-p "JetBrainsMono")
+    (dolist (char/ligature-re
+             `((?-  ,(rx (or (or "-->" "-<<" "->>" "-|" "-~" "-<" "->") (+ "-"))))
+               (?/  ,(rx (or (or "/==" "/=" "/>" "/**" "/*") (+ "/"))))
+               (?*  ,(rx (or (or "*>" "*/") (+ "*"))))
+               (?<  ,(rx (or (or "<<=" "<<-" "<|||" "<==>" "<!--" "<=>" "<||" "<|>" "<-<"
+                                 "<==" "<=<" "<-|" "<~>" "<=|" "<~~" "<$>" "<+>" "</>" "<*>"
+                                 "<->" "<=" "<|" "<:" "<>"  "<$" "<-" "<~" "<+" "</" "<*")
+                             (+ "<"))))
+               (?:  ,(rx (or (or ":?>" "::=" ":>" ":<" ":?" ":=") (+ ":"))))
+               (?=  ,(rx (or (or "=>>" "==>" "=/=" "=!=" "=>" "=:=") (+ "="))))
+               (?!  ,(rx (or (or "!==" "!=") (+ "!"))))
+               (?>  ,(rx (or (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=") (+ ">"))))
+               (?&  ,(rx (+ "&")))
+               (?|  ,(rx (or (or "|->" "|||>" "||>" "|=>" "||-" "||=" "|-" "|>" "|]" "|}" "|=")
+                             (+ "|"))))
+               (?.  ,(rx (or (or ".?" ".=" ".-" "..<") (+ "."))))
+               (?+  ,(rx (or "+>" (+ "+"))))
+               (?\[ ,(rx (or "[||]" "[<" "[|")))
+               (?\{ ,(rx "{|"))
+               (?\? ,(rx (or (or "?." "?=" "?:") (+ "?"))))
+               (?#  ,(rx (or (or "#_(" "#[" "#{" "#=" "#!" "#:" "#_" "#?" "#(") (+ "#"))))
+               (?\; ,(rx (+ ";")))
+               (?_  ,(rx (or "_|_" "__")))
+               (?~  ,(rx (or "~~>" "~~" "~>" "~-" "~@")))
+               (?$  ,(rx "$>"))
+               (?^  ,(rx "^="))
+               (?\] ,(rx "]#"))))
+      (apply (lambda (char ligature-re)
+               (set-char-table-range composition-function-table char
+                                     `([,ligature-re 0 font-shape-gstring])))
+             char/ligature-re)))
+#+end_src
+
+Don't be scared by these nested =rx= =or= macros, this is purely an optimization.
+If only strings are supplied to =or= macro it uses =regexp-opt= optimization on it.
+For example:
+
+#+begin_src emacs-lisp :tangle no
+  ELISP> (rx (or (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=") (+ ">")))
+  "\\(?:>\\(?:=>\\|>[=-]\\|[]:=-]\\)\\)\\|>+"
+  ELISP> (rx (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=" (+ ">")))
+  ">>-\\|>>=\\|>=>\\|>]\\|>:\\|>-\\|>=\\|>+"
+#+end_src
+
+You can notice that first regex starts with ~>~ then checks either for ~=>~ or for ~>[=-]~ or for group ~[]:=-]~, and finally ends with ~>+~.
+Second regexp however explicitly checs for each variant individualy, e.g. it first checks for ~>>-~ and then for ~>>=~, and this is exactly the first optimization we got in previous regexp.
+
+Since I don't want ligatures appearing in every major mode, let's disable =global-auto-composition-mode= and selectively enable it in needed modes:
+
+#+begin_src emacs-lisp
+    (use-package composite
+      :straight nil
+      :hook ((prog-mode
+              cider-repl-mode
+              inferior-lisp-mode)
+             . auto-composition-mode)
+      :init (global-auto-composition-mode -1))
 #+end_src
 
 ** Icons
