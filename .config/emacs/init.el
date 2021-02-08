@@ -1414,16 +1414,15 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-allow-jack-in-without-project t)
   (cider-use-fringe-indicators nil)
   (cider-font-lock-dynamically '(macro var))
+  (cider-save-file-on-load nil)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
-    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip"))
+    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip") t)
   (when (file-exists-p "/usr/lib/jvm/java-11-openjdk/lib/src.zip")
-    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip"))
-  (when (file-exists-p "~/.clojure-src/")
-    (setq cider-jdk-src-paths
-          (append cider-jdk-src-paths
-                  (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))))
+    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip") t)
+  (when-let ((clj-java-src (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))
+    (add-to-list 'cider-jdk-src-paths (car clj-java-src) t)))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo")
