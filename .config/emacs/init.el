@@ -16,6 +16,10 @@
 
 (require 'use-package)
 
+(defgroup local-config nil
+  "Customization group for local settings."
+  :prefix "local-config-")
+
 (use-package startup
   :no-require t
   :straight nil
@@ -907,9 +911,18 @@ Used in various places to avoid getting wrong line height when
       (set-face-attribute 'window-divider nil :foreground color)))
   (aorst/window-divider-setup-faces))
 
+(defcustom aorst--title-show-bufname t
+  "Whether to include bufname to titlebar.
+Bufname is not necessary on GNOME, but may be useful in other DEs."
+  :type 'boolean
+  :group 'local-config)
+
 (setq-default frame-title-format
               '(:eval (let ((match (string-match "[ *]" (buffer-name))))
-                        (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
+                        (if (or (and match (= match 0))
+                                (not aorst--title-show-bufname))
+                            "Emacs"
+                          "%b — Emacs"))))
 
 (use-package treemacs
   :when window-system
@@ -1415,6 +1428,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-use-fringe-indicators nil)
   (cider-font-lock-dynamically '(macro var))
   (cider-save-file-on-load nil)
+  (cider-inspector-fill-frame nil)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -1660,39 +1674,40 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       :fringe-face 'flycheck-fringe-error
       :error-list-face 'flycheck-error-list-error)
     (flycheck-define-error-level 'warning
-      :severity 100
+      :severity 10
       :compilation-level 1
       :overlay-category 'flycheck-warning-overlay
       :fringe-bitmap 'flycheck-exclamation-mark
       :fringe-face 'flycheck-fringe-warning
       :error-list-face 'flycheck-error-list-warning)
     (flycheck-define-error-level 'info
-      :severity 100
+      :severity -10
       :compilation-level 0
       :overlay-category 'flycheck-info-overlay
       :fringe-bitmap 'flycheck-question-mark
       :fringe-face 'flycheck-fringe-info
       :error-list-face 'flycheck-error-list-info))
-
- (when (fboundp #'defhydra)
-   (defhydra hydrant/flycheck (:color blue :hint nil)
-     "
+  (define-advice flycheck-may-use-echo-area-p (:override () aorst:flycheck-no-echo-or-buffer)
+    nil)
+  (when (fboundp #'defhydra)
+    (defhydra hydrant/flycheck (:color blue :hint nil)
+      "
  ^Flycheck^         ^Errors^       ^Checker^
  _q_: quit          _<_: previous  _?_: describe
  _M_: manual        _>_: next      _d_: disable
  _v_: verify setup  _f_: check     _m_: mode
  ^ ^                _l_: list      _s_: select"
-     ("q" ignore :exit t)
-     ("M" flycheck-manual)
-     ("v" flycheck-verify-setup)
-     ("<" flycheck-previous-error :color pink)
-     (">" flycheck-next-error :color pink)
-     ("f" flycheck-buffer)
-     ("l" flycheck-list-errors)
-     ("?" flycheck-describe-checker)
-     ("d" flycheck-disable-checker)
-     ("m" flycheck-mode)
-     ("s" flycheck-select-checker))))
+      ("q" ignore :exit t)
+      ("M" flycheck-manual)
+      ("v" flycheck-verify-setup)
+      ("<" flycheck-previous-error :color pink)
+      (">" flycheck-next-error :color pink)
+      ("f" flycheck-buffer)
+      ("l" flycheck-list-errors)
+      ("?" flycheck-describe-checker)
+      ("d" flycheck-disable-checker)
+      ("m" flycheck-mode)
+      ("s" flycheck-select-checker))))
 
 (use-package flycheck-package
   :hook ((emacs-lisp-mode . flycheck-mode)
@@ -2307,6 +2322,10 @@ unless `parinfer-rust-mode' is enabled."
              :repo "andreyorst/isayt.el"
              :branch "main")
   :hook (smartparens-strict-mode . isayt-mode))
+
+(use-package eldoc
+  :straight nil
+  :custom (eldoc-echo-area-use-multiline-p nil))
 
 (provide 'init)
 ;;; init.el ends here

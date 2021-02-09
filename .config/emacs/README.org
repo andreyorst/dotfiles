@@ -253,6 +253,15 @@ Only thing left to do is to require =use-package= itself:
 Emacs is old.
 I understand that back then it could be appropriate decisions, but as of today they are completely obliterated by the passage of time.
 
+** Local configuration group
+Some configuration variables may be defined in this group if those should be machine local settings.
+
+#+begin_src emacs-lisp
+  (defgroup local-config nil
+    "Customization group for local settings."
+    :prefix "local-config-")
+#+end_src
+
 ** User Credentials
 Let's set full name and e-mail address in case I would send e-mail from Emacs, or some modes can use those settings, like Org Mode:
 
@@ -1546,9 +1555,20 @@ But I don't really need all these special buffers in the frame title.
 We can avoid this with this little check for space and asterisk at the beginning of buffer name.
 
 #+begin_src emacs-lisp
+  (defcustom aorst--title-show-bufname t
+    "Whether to include bufname to titlebar.
+  Bufname is not necessary on GNOME, but may be useful in other DEs."
+    :type 'boolean
+    :group 'local-config)
+#+end_src
+
+#+begin_src emacs-lisp
   (setq-default frame-title-format
                 '(:eval (let ((match (string-match "[ *]" (buffer-name))))
-                          (if (and match (= match 0)) "Emacs" "%b — Emacs"))))
+                          (if (or (and match (= match 0))
+                                  (not aorst--title-show-bufname))
+                              "Emacs"
+                            "%b — Emacs"))))
 #+end_src
 
 ** Treemacs
@@ -2386,6 +2406,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
     (cider-use-fringe-indicators nil)
     (cider-font-lock-dynamically '(macro var))
     (cider-save-file-on-load nil)
+    (cider-inspector-fill-frame nil)
     :config
     (setq cider-jdk-src-paths nil)
     (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
@@ -2746,39 +2767,40 @@ Some languages have better support with =flycheck=.
         :fringe-face 'flycheck-fringe-error
         :error-list-face 'flycheck-error-list-error)
       (flycheck-define-error-level 'warning
-        :severity 100
+        :severity 10
         :compilation-level 1
         :overlay-category 'flycheck-warning-overlay
         :fringe-bitmap 'flycheck-exclamation-mark
         :fringe-face 'flycheck-fringe-warning
         :error-list-face 'flycheck-error-list-warning)
       (flycheck-define-error-level 'info
-        :severity 100
+        :severity -10
         :compilation-level 0
         :overlay-category 'flycheck-info-overlay
         :fringe-bitmap 'flycheck-question-mark
         :fringe-face 'flycheck-fringe-info
         :error-list-face 'flycheck-error-list-info))
-
-   (when (fboundp #'defhydra)
-     (defhydra hydrant/flycheck (:color blue :hint nil)
-       "
+    (define-advice flycheck-may-use-echo-area-p (:override () aorst:flycheck-no-echo-or-buffer)
+      nil)
+    (when (fboundp #'defhydra)
+      (defhydra hydrant/flycheck (:color blue :hint nil)
+        "
    ^Flycheck^         ^Errors^       ^Checker^
    _q_: quit          _<_: previous  _?_: describe
    _M_: manual        _>_: next      _d_: disable
    _v_: verify setup  _f_: check     _m_: mode
    ^ ^                _l_: list      _s_: select"
-       ("q" ignore :exit t)
-       ("M" flycheck-manual)
-       ("v" flycheck-verify-setup)
-       ("<" flycheck-previous-error :color pink)
-       (">" flycheck-next-error :color pink)
-       ("f" flycheck-buffer)
-       ("l" flycheck-list-errors)
-       ("?" flycheck-describe-checker)
-       ("d" flycheck-disable-checker)
-       ("m" flycheck-mode)
-       ("s" flycheck-select-checker))))
+        ("q" ignore :exit t)
+        ("M" flycheck-manual)
+        ("v" flycheck-verify-setup)
+        ("<" flycheck-previous-error :color pink)
+        (">" flycheck-next-error :color pink)
+        ("f" flycheck-buffer)
+        ("l" flycheck-list-errors)
+        ("?" flycheck-describe-checker)
+        ("d" flycheck-disable-checker)
+        ("m" flycheck-mode)
+        ("s" flycheck-select-checker))))
 #+end_src
 
 *** Flycheck package
@@ -3689,6 +3711,15 @@ Indent S-expressions as you type.
                :repo "andreyorst/isayt.el"
                :branch "main")
     :hook (smartparens-strict-mode . isayt-mode))
+#+end_src
+
+** Eldoc
+I don't really like jumping minibuffer window when navigating the code, so let's disable multiline output in eldoc.
+
+#+begin_src emacs-lisp
+  (use-package eldoc
+    :straight nil
+    :custom (eldoc-echo-area-use-multiline-p nil))
 #+end_src
 
 * Postscript
