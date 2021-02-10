@@ -90,6 +90,7 @@
         aorst/vterm-focus
         aorst/vterm-toggle
         cider-debug-mode-send-reply
+        cider-repl-previous-input
         cider-repl-return
         clang-format-buffer
         counsel-describe-function
@@ -159,8 +160,10 @@
         vterm-send-C-a
         vterm-send-C-c
         vterm-send-backspace
+        vterm-send-left
         vterm-send-return
         vterm-send-tab
+        vterm-send-up
         wgrep-change-to-wgrep-mode
         wgrep-finish-edit
         xref-find-definitions

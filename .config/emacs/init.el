@@ -1449,8 +1449,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :custom (cljr-suppress-no-project-warning t)
           (cljr-warn-on-eval nil))
 
-(use-package elein)
-
 (use-package anakondo
   :straight (:host github
 	     :repo "andreyorst/anakondo"
@@ -2022,13 +2020,14 @@ unless `parinfer-rust-mode' is enabled."
 (use-package mc-extras)
 (use-package multiple-cursors
   :commands (mc/cycle-backward
-             mc/cycle-forward)
+	     mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydrant/mc/body)
-         :map mc/keymap
-         ("<return>" . nil)
-         ("C-s" . phi-search)
-         ("C-r" . phi-search-backward))
+	 ("C-c m" . hydrant/mc/body)
+	 ("M-n" . mc/mark-next-like-this-word)
+	 :map mc/keymap
+	 ("<return>" . nil)
+	 ("C-s" . phi-search)
+	 ("C-r" . phi-search-backward))
   :config
   (when (fboundp #'defhydra)
     (defhydra hydrant/mc (:hint nil :color pink)
@@ -2078,59 +2077,6 @@ unless `parinfer-rust-mode' is enabled."
       ("q" ignore :exit t)
       ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
       ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t))))
-
-(use-package iedit
-  :bind (("M-n" . aorst/iedit-current-or-expand)
-         ("C-c i" . aorst/iedit-hydrant))
-  :custom
-  (iedit-toggle-key-default nil)
-  :custom-face
-  (iedit-occurrence ((t (:background unspecified
-                         :foreground unspecified
-                         :inverse-video unspecified
-                         :inherit region))))
-  :init
-  (defun aorst/iedit-to-mc-hydrant ()
-    "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
-    (interactive)
-    (iedit-switch-to-mc-mode)
-    (hydrant/mc/body))
-  (defun aorst/iedit-current-or-expand (&optional arg)
-    "Select only currnent occurrence with `iedit-mode'.  Expand to
-  next occurrence if `iedit-mode' is already active."
-    (interactive "P")
-    (if (bound-and-true-p iedit-mode)
-        (if (symbolp arg)
-            (iedit-expand-down-to-occurrence)
-          (iedit-expand-up-to-occurrence))
-      (iedit-mode 1)))
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/iedit (:hint nil :color pink)
-      "
- ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
- _n_: next occurrence      _M-SPC_:  toggle selection  _u_: uppercase       _(_: previous selection
- _p_: previous occurrence  _q_ or _g_: exit hydrant      _d_: downcase        _)_: next selection
- ^ ^                       _G_:      exit iedit-mode   _#_: insert numbers
- ^ ^                       _m_:      switch to mc"
-      ("n" iedit-expand-down-to-occurrence)
-      ("m" aorst/iedit-to-mc-hydrant :exit t)
-      ("p" iedit-expand-up-to-occurrence)
-      ("u" iedit-upcase-occurrences)
-      ("d" iedit-downcase-occurrences)
-      ("#" iedit-number-occurrences)
-      ("(" iedit-prev-occurrence)
-      (")" iedit-next-occurrence)
-      ("M-SPC" iedit-toggle-selection)
-      ("q" ignore :exit t)
-      ("g" ignore :exit t)
-      ("G" (lambda () (interactive) (iedit-mode -1)) :exit t))
-    (defun aorst/iedit-hydrant ()
-      "toggle iedit mode for item under point, and open `hydrant/iedit'."
-      (interactive)
-      (ignore-errors
-        (unless (bound-and-true-p iedit-mode)
-          (iedit-mode 1))
-        (hydrant/iedit/body)))))
 
 (use-package lsp-mode
   :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)

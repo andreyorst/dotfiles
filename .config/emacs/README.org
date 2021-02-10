@@ -2439,13 +2439,6 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
             (cljr-warn-on-eval nil))
 #+end_src
 
-*** elein-mode
-Support for running [[https://leiningen.org/][Leiningen]] commands.
-
-#+begin_src emacs-lisp
-  (use-package elein)
-#+end_src
-
 *** Anakondo
 Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-kondo][clj-kondo]].
 
@@ -3251,38 +3244,39 @@ I guess I'll figure out best mappings over time.
   (use-package mc-extras)
   (use-package multiple-cursors
     :commands (mc/cycle-backward
-               mc/cycle-forward)
+	       mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-           ("C-c m" . hydrant/mc/body)
-           :map mc/keymap
-           ("<return>" . nil)
-           ("C-s" . phi-search)
-           ("C-r" . phi-search-backward))
+	   ("C-c m" . hydrant/mc/body)
+	   ("M-n" . mc/mark-next-like-this-word)
+	   :map mc/keymap
+	   ("<return>" . nil)
+	   ("C-s" . phi-search)
+	   ("C-r" . phi-search-backward))
     :config
     (when (fboundp #'defhydra)
       (defhydra hydrant/mc (:hint nil :color pink)
-        "
+	"
    ^Select^                 ^Discard^                      ^Edit^               ^Navigate^
    _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
    _s_:   select regexp     _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
    _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
    _p_:   select previous   _q_ or _g_: exit hydrant       ^ ^                  ^ ^
    _C_:   select next line  _G_:      exit mc mode"
-        ("M-s" mc/edit-ends-of-lines)
-        ("s" mc/mark-all-in-region-regexp)
-        ("n" mc/mark-next-like-this-word)
-        ("p" mc/mark-previous-like-this-word)
-        ("&" mc/vertical-align-with-space)
-        ("(" mc/cycle-backward)
-        (")" mc/cycle-forward)
-        ("M-SPC" mc/remove-current-cursor)
-        ("b" mc/remove-cursors-on-blank-lines)
-        ("d" mc/remove-duplicated-cursors)
-        ("C" mc/mark-next-lines)
-        ("#" mc/insert-numbers)
-        ("q" mc/remove-duplicated-cursors :exit t)
-        ("g" mc/remove-duplicated-cursors :exit t)
-        ("G" mc/keyboard-quit :exit t))))
+	("M-s" mc/edit-ends-of-lines)
+	("s" mc/mark-all-in-region-regexp)
+	("n" mc/mark-next-like-this-word)
+	("p" mc/mark-previous-like-this-word)
+	("&" mc/vertical-align-with-space)
+	("(" mc/cycle-backward)
+	(")" mc/cycle-forward)
+	("M-SPC" mc/remove-current-cursor)
+	("b" mc/remove-cursors-on-blank-lines)
+	("d" mc/remove-duplicated-cursors)
+	("C" mc/mark-next-lines)
+	("#" mc/insert-numbers)
+	("q" mc/remove-duplicated-cursors :exit t)
+	("g" mc/remove-duplicated-cursors :exit t)
+	("G" mc/keyboard-quit :exit t))))
 #+end_src
 
 ** Expand Region
@@ -3313,65 +3307,6 @@ Supports most languages that I work with inside Emacs.
         ("q" ignore :exit t)
         ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
         ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t))))
-#+end_src
-
-** Iedit Mode
-Another package for multiple editing purposes, that is kinda faster than multiple cursors, but can edit only fixed width regions of text and has less abilities regarding to commands.
-Still pretty usable though, as multiple cursor some times looses cursors for some reason.
-
-#+begin_src emacs-lisp
-  (use-package iedit
-    :bind (("M-n" . aorst/iedit-current-or-expand)
-           ("C-c i" . aorst/iedit-hydrant))
-    :custom
-    (iedit-toggle-key-default nil)
-    :custom-face
-    (iedit-occurrence ((t (:background unspecified
-                           :foreground unspecified
-                           :inverse-video unspecified
-                           :inherit region))))
-    :init
-    (defun aorst/iedit-to-mc-hydrant ()
-      "Calls `iedit-to-mc-mode' and opens hydra for multiple cursors."
-      (interactive)
-      (iedit-switch-to-mc-mode)
-      (hydrant/mc/body))
-    (defun aorst/iedit-current-or-expand (&optional arg)
-      "Select only currnent occurrence with `iedit-mode'.  Expand to
-    next occurrence if `iedit-mode' is already active."
-      (interactive "P")
-      (if (bound-and-true-p iedit-mode)
-          (if (symbolp arg)
-              (iedit-expand-down-to-occurrence)
-            (iedit-expand-up-to-occurrence))
-        (iedit-mode 1)))
-    (when (fboundp #'defhydra)
-      (defhydra hydrant/iedit (:hint nil :color pink)
-        "
-   ^Select^                  ^Discard^                   ^Edit^               ^Navigate^
-   _n_: next occurrence      _M-SPC_:  toggle selection  _u_: uppercase       _(_: previous selection
-   _p_: previous occurrence  _q_ or _g_: exit hydrant      _d_: downcase        _)_: next selection
-   ^ ^                       _G_:      exit iedit-mode   _#_: insert numbers
-   ^ ^                       _m_:      switch to mc"
-        ("n" iedit-expand-down-to-occurrence)
-        ("m" aorst/iedit-to-mc-hydrant :exit t)
-        ("p" iedit-expand-up-to-occurrence)
-        ("u" iedit-upcase-occurrences)
-        ("d" iedit-downcase-occurrences)
-        ("#" iedit-number-occurrences)
-        ("(" iedit-prev-occurrence)
-        (")" iedit-next-occurrence)
-        ("M-SPC" iedit-toggle-selection)
-        ("q" ignore :exit t)
-        ("g" ignore :exit t)
-        ("G" (lambda () (interactive) (iedit-mode -1)) :exit t))
-      (defun aorst/iedit-hydrant ()
-        "toggle iedit mode for item under point, and open `hydrant/iedit'."
-        (interactive)
-        (ignore-errors
-          (unless (bound-and-true-p iedit-mode)
-            (iedit-mode 1))
-          (hydrant/iedit/body)))))
 #+end_src
 
 ** LSP
@@ -3702,7 +3637,7 @@ Nice integration for [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool.
     :bind ("C-c r" . rg))
 #+end_src
 
-** ISAYT mode
+** ISAYT
 Indent S-expressions as you type.
 
 #+begin_src emacs-lisp
