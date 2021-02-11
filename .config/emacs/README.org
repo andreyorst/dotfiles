@@ -1606,8 +1606,6 @@ Which is good.
     (treemacs-space-between-root-nodes nil)
     (treemacs-indentation 2)
     :config
-    (use-package treemacs-magit
-      :after magit)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (defun aorst/treemacs-setup-faces ()
@@ -1692,6 +1690,14 @@ Which is good.
                           (extra-align (+ (/ (length text) 2) 1))
                           (width (- (/ (window-width) 2) extra-align)))
                      (concat (make-string width ?\s) text)))))))))
+#+end_src
+
+*** Treemacs Magit
+Magit integration for Treemacs.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-magit
+    :after magit)
 #+end_src
 
 *** Treemacs Atom theme
@@ -2101,13 +2107,6 @@ I primary use it for taking notes on different programming languages, and manage
                           (shell-command-to-string
                            "gsettings get org.gnome.desktop.interface text-scaling-factor"))
                        1.0)))
-    (use-package ox-latex
-      :straight nil)
-    (use-package ox-hugo
-      :after ox)
-    (when (not (version<= org-version "9.1.9"))
-      (use-package org-tempo
-        :straight nil))
     (defun aorst/discard-history ()
       "Discard undo history of org src and capture blocks."
       (setq buffer-undo-list nil)
@@ -2131,6 +2130,33 @@ I primary use it for taking notes on different programming languages, and manage
     (define-advice org-cycle (:around (f &optional arg) aorst:org-cycle)
       (let ((org-src-preserve-indentation t))
         (funcall f arg))))
+#+end_src
+
+*** OX Hugo
+Support for using Org export feature with [[https://gohugo.io/][Hugo]] static site generator.
+
+#+begin_src emacs-lisp
+  (use-package ox-hugo
+    :after ox)
+#+end_src
+
+*** OX LaTeX
+Support of exporting to LaTeX.
+
+#+begin_src emacs-lisp
+  (use-package ox-latex
+    :after ox
+    :straight nil)
+#+end_src
+
+*** Org Tempo
+Org previously had an inbuilt snippets that started with =<= followed by a letter which expand to various blocks, like source code blocks, quote blocks e.t.c.
+It was externalized into separate package in more recent Org mode versions.
+
+#+begin_src emacs-lisp
+  (use-package org-tempo
+    :when (not (version<= org-version "9.1.9"))
+    :straight nil)
 #+end_src
 
 ** Prog Mode

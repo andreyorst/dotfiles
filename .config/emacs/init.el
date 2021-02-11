@@ -952,8 +952,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (treemacs-space-between-root-nodes nil)
   (treemacs-indentation 2)
   :config
-  (use-package treemacs-magit
-    :after magit)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (defun aorst/treemacs-setup-faces ()
@@ -1038,6 +1036,9 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                         (extra-align (+ (/ (length text) 2) 1))
                         (width (- (/ (window-width) 2) extra-align)))
                    (concat (make-string width ?\s) text)))))))))
+
+(use-package treemacs-magit
+  :after magit)
 
 (use-package uniquify
   :straight nil
@@ -1216,13 +1217,6 @@ truncates text if needed.  Minimal width can be set with
                         (shell-command-to-string
                          "gsettings get org.gnome.desktop.interface text-scaling-factor"))
                      1.0)))
-  (use-package ox-latex
-    :straight nil)
-  (use-package ox-hugo
-    :after ox)
-  (when (not (version<= org-version "9.1.9"))
-    (use-package org-tempo
-      :straight nil))
   (defun aorst/discard-history ()
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
@@ -1246,6 +1240,17 @@ truncates text if needed.  Minimal width can be set with
   (define-advice org-cycle (:around (f &optional arg) aorst:org-cycle)
     (let ((org-src-preserve-indentation t))
       (funcall f arg))))
+
+(use-package ox-hugo
+  :after ox)
+
+(use-package ox-latex
+  :after ox
+  :straight nil)
+
+(use-package org-tempo
+  :when (not (version<= org-version "9.1.9"))
+  :straight nil)
 
 (use-package prog-mode
   :straight nil
