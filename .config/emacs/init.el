@@ -1248,9 +1248,11 @@ truncates text if needed.  Minimal width can be set with
   :after ox
   :straight nil)
 
-(use-package org-tempo
-  :when (not (version<= org-version "9.1.9"))
-  :straight nil)
+(with-eval-after-load 'org
+  (use-package org-tempo
+    :defines org-version
+    :when (not (version<= org-version "9.1.9"))
+    :straight nil))
 
 (use-package prog-mode
   :straight nil

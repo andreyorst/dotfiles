@@ -2154,9 +2154,11 @@ Org previously had an inbuilt snippets that started with =<= followed by a lette
 It was externalized into separate package in more recent Org mode versions.
 
 #+begin_src emacs-lisp
-  (use-package org-tempo
-    :when (not (version<= org-version "9.1.9"))
-    :straight nil)
+  (with-eval-after-load 'org
+    (use-package org-tempo
+      :defines org-version
+      :when (not (version<= org-version "9.1.9"))
+      :straight nil))
 #+end_src
 
 ** Prog Mode
