@@ -1,6 +1,6 @@
 ;;; init.el --- Emacs main configuration file -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
 
-;; Author: Andrey Orst
+;; Author: Andrey Listopadov
 ;; Keywords: literate programming, Emacs configuration
 ;; Homepage: https://gitlab.com/andreyorst/dotfiles/-/tree/master/.config/emacs
 
@@ -25,7 +25,7 @@
   :straight nil
   :custom
   (user-mail-address "andreyorst@gmail.com")
-  (user-full-name "Andrey Orst"))
+  (user-full-name "Andrey Listopadov"))
 
 (setq ring-bell-function 'ignore)
 
@@ -1866,7 +1866,7 @@ unless `parinfer-rust-mode' is enabled."
 (use-package company
   :bind (:map company-mode-map
          ([remap completion-at-point] . company-complete)
-         ([remap indent-for-tab-command] . company-indent-or-complete-common)
+         ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
          ("M-/" . company-complete)
          :map company-active-map
          ("TAB" . company-complete-common-or-cycle)
@@ -1879,8 +1879,8 @@ unless `parinfer-rust-mode' is enabled."
          ("M-." . company-show-location))
   :hook (after-init . global-company-mode)
   :custom
-  (tab-always-indent 'complete)
-  (tab-first-completion 'word-or-paren-or-punct)
+  ;; (tab-always-indent 'complete)
+  ;; (tab-first-completion 'word-or-paren-or-punct)
   (company-idle-delay 0)
   (company-require-match 'never)
   (company-minimum-prefix-length 2)

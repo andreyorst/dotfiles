@@ -23,6 +23,7 @@
         c-end-of-defun
         c-indent-line-or-region
         cider-eval-defun-at-point
+        cider-repl-newline-and-indent
         cljr-slash
         comment-line
         counsel-M-x
