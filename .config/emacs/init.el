@@ -1256,7 +1256,8 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package prog-mode
   :straight nil
-  :hook (prog-mode . hl-line-mode))
+  :hook ((prog-mode . hl-line-mode)
+         (prog-mode . flyspell-prog-mode)))
 
 (use-package cc-mode
   :straight nil
@@ -2279,6 +2280,43 @@ unless `parinfer-rust-mode' is enabled."
 (use-package eldoc
   :straight nil
   :custom (eldoc-echo-area-use-multiline-p nil))
+
+(defcustom aorst--god-mode nil
+  "Whether to include bufname to titlebar.
+  Bufname is not necessary on GNOME, but may be useful in other DEs."
+  :type 'boolean
+  :group 'local-config)
+
+(use-package god-mode
+  :when aorst--god-mode
+  :hook ((god-mode-enabled
+          god-mode-disabled) . aorst/god-mode-change-cursor-shape)
+  :bind (("<escape>" . god-local-mode)
+         :map god-local-mode-map
+         ("i" . god-local-mode)
+         ("<backspace>" . ignore)
+         ("<escape>" . ignore)
+         ("<return>" . ignore)
+         ("j" . ignore)
+         ("m" . ignore))
+  :config
+  (advice-add 'aorst/newline-below :after #'(lambda () (god-local-mode -1)))
+  (advice-add 'aorst/newline-above :after #'(lambda () (god-local-mode -1)))
+  (dolist (mode '(treemacs-mode
+                  vterm-mode
+                  cider-repl-mode
+                  racket-repl-mode
+                  geiser-repl-mode
+                  magit-mode))
+    (add-to-list 'god-exempt-major-modes mode))
+  :init
+  (defun aorst/god-mode-change-cursor-shape ()
+    (when window-system
+      (setq cursor-type (if god-local-mode 'box 'bar))))
+  (god-mode))
+
+(use-package autorevert
+  :hook (after-init . global-auto-revert-mode))
 
 (provide 'init)
 ;;; init.el ends here

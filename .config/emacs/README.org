@@ -2169,7 +2169,8 @@ So I enable it for every programming language.
 #+begin_src emacs-lisp
   (use-package prog-mode
     :straight nil
-    :hook (prog-mode . hl-line-mode))
+    :hook ((prog-mode . hl-line-mode)
+           (prog-mode . flyspell-prog-mode)))
 #+end_src
 
 ** CC
@@ -3683,6 +3684,55 @@ I don't really like jumping minibuffer window when navigating the code, so let's
   (use-package eldoc
     :straight nil
     :custom (eldoc-echo-area-use-multiline-p nil))
+#+end_src
+
+** God Mode
+God mode is more  like a mode in a sense of a  mode from modal editor,
+such as Vim, or Kakoune. It  makes all shortcuts you press be prefixed
+by =Ctrl= key by default. Not sure if I'm going to use it much, though.
+
+#+begin_src emacs-lisp
+  (defcustom aorst--god-mode nil
+    "Whether to include bufname to titlebar.
+    Bufname is not necessary on GNOME, but may be useful in other DEs."
+    :type 'boolean
+    :group 'local-config)
+
+  (use-package god-mode
+    :when aorst--god-mode
+    :hook ((god-mode-enabled
+            god-mode-disabled) . aorst/god-mode-change-cursor-shape)
+    :bind (("<escape>" . god-local-mode)
+           :map god-local-mode-map
+           ("i" . god-local-mode)
+           ("<backspace>" . ignore)
+           ("<escape>" . ignore)
+           ("<return>" . ignore)
+           ("j" . ignore)
+           ("m" . ignore))
+    :config
+    (advice-add 'aorst/newline-below :after #'(lambda () (god-local-mode -1)))
+    (advice-add 'aorst/newline-above :after #'(lambda () (god-local-mode -1)))
+    (dolist (mode '(treemacs-mode
+                    vterm-mode
+                    cider-repl-mode
+                    racket-repl-mode
+                    geiser-repl-mode
+                    magit-mode))
+      (add-to-list 'god-exempt-major-modes mode))
+    :init
+    (defun aorst/god-mode-change-cursor-shape ()
+      (when window-system
+        (setq cursor-type (if god-local-mode 'box 'bar))))
+    (god-mode))
+#+end_src
+
+** Auto rever mode
+Watch files and update buffer contents if files changed on disk.
+
+#+begin_src emacs-lisp
+  (use-package autorevert
+    :hook (after-init . global-auto-revert-mode))
 #+end_src
 
 * Postscript
