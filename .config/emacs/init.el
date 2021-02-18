@@ -1748,11 +1748,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (add-to-list 'sp-lisp-modes 'fennel-mode t)
   (require 'smartparens-config)
   (sp-use-paredit-bindings)
-  (sp-with-modes '(fennel-mode)
-    (sp-local-pair "`" "`"
-                   :when '(sp-in-string-p
-                           sp-in-comment-p)
-                   :unless '(sp-lisp-invalid-hyperlink-p)))
   :config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."

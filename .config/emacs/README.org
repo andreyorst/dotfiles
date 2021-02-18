@@ -2892,11 +2892,6 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
     (add-to-list 'sp-lisp-modes 'fennel-mode t)
     (require 'smartparens-config)
     (sp-use-paredit-bindings)
-    (sp-with-modes '(fennel-mode)
-      (sp-local-pair "`" "`"
-                     :when '(sp-in-string-p
-                             sp-in-comment-p)
-                     :unless '(sp-lisp-invalid-hyperlink-p)))
     :config
     (defun aorst/minibuffer-enable-sp ()
       "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
