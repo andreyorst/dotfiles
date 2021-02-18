@@ -1457,18 +1457,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :custom (cljr-suppress-no-project-warning t)
           (cljr-warn-on-eval nil))
 
-(use-package anakondo
-  :straight (:host github
-	     :repo "andreyorst/anakondo"
-	     :branch "use-project")
-  :when (executable-find "clj-kondo")
-  :hook
-  ((clojure-mode
-    clojurescript-mode
-    clojurec-mode)
-   . anakondo-minor-mode)
-  :commands anakondo-minor-mode)
-
 (use-package fennel-mode
   :straight (:host gitlab
              :repo "technomancy/fennel-mode")
@@ -2087,7 +2075,15 @@ unless `parinfer-rust-mode' is enabled."
       ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t))))
 
 (use-package lsp-mode
-  :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
+  :hook (((rust-mode
+           c-mode
+           c++-mode
+           java-mode
+           elixir-mode
+           clojure-mode
+           clojurec-mode
+           clojurescript-mode)
+          . lsp)
          (lsp-mode . aorst/disable-flycheck)
          (lsp-mode . yas-minor-mode))
   :custom-face

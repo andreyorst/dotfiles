@@ -2468,7 +2468,7 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
             (cljr-warn-on-eval nil))
 #+end_src
 
-*** Anakondo
+*** COMMENT Anakondo
 Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-kondo][clj-kondo]].
 
 #+begin_src emacs-lisp
@@ -3346,7 +3346,15 @@ LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :hook (((rust-mode c-mode c++-mode java-mode elixir-mode) . lsp)
+    :hook (((rust-mode
+             c-mode
+             c++-mode
+             java-mode
+             elixir-mode
+             clojure-mode
+             clojurec-mode
+             clojurescript-mode)
+            . lsp)
            (lsp-mode . aorst/disable-flycheck)
            (lsp-mode . yas-minor-mode))
     :custom-face
