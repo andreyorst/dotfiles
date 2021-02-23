@@ -13,3 +13,4 @@ set blink-matching-paren on
 Tab: menu-complete
 "\C-\M-b": vi-match
 "\C-\M-f": vi-match
+set enable-bracketed-paste on

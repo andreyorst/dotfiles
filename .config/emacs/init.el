@@ -178,7 +178,7 @@ Based on `so-long-detected-long-line-p'."
   :custom
   (yank-excluded-properties t "Disable all text properties when yanking.")
   (blink-matching-delay 0)
-  (blink-matching-paren 1)
+  (blink-matching-paren t)
   :init
   (defun aorst/kill-region-or-word (arg)
     (interactive "*p")
@@ -1234,12 +1234,12 @@ truncates text if needed.  Minimal width can be set with
                                   (if (facep face) face 'default))
                                 :background nil t))))
   (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color)
-  (define-advice org-return (:around (f &optional indent arg interactive) aorst:org-return)
+  (define-advice org-return (:around (f &rest args) aorst:org-return)
     (let ((org-src-preserve-indentation t))
-      (funcall f indent arg interactive)))
-  (define-advice org-cycle (:around (f &optional arg) aorst:org-cycle)
+      (apply f args)))
+  (define-advice org-cycle (:around (f &rest args) aorst:org-cycle)
     (let ((org-src-preserve-indentation t))
-      (funcall f arg))))
+      (apply f args))))
 
 (use-package ox-hugo
   :after ox)
@@ -1461,7 +1461,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :straight (:host gitlab
              :repo "technomancy/fennel-mode")
   :bind (:map fennel-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
+         ("C-c C-M-f" . aorst/indent-buffer)
+         ("M-." . xref-find-definitions))
   :hook (fennel-mode . fennel-mode-setup)
   :config
   (put 'time 'fennel-indent-function 0)
@@ -2118,6 +2119,11 @@ unless `parinfer-rust-mode' is enabled."
   (lsp-ui-doc-show-with-cursor nil)
   (lsp-ui-doc-show-with-mouse nil)
   (lsp-ui-doc-position 'at-point)
+  :custom-face
+  (lsp-ui-peek-highlight ((t (:foreground unspecified
+                              :background unspecified
+                              :box unspecified
+                              :inherit lsp-face-highlight-textual))))
   :config
   (when (fboundp #'aorst/escape)
     (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
@@ -2216,7 +2222,9 @@ unless `parinfer-rust-mode' is enabled."
   (add-to-list 'recentf-exclude "\\.gpg\\"))
 
 (use-package dumb-jump
-  :custom (dumb-jump-prefer-searcher 'rg)
+  :custom
+  (dumb-jump-prefer-searcher 'rg)
+  (dumb-jump-selector 'ivy)
   :config
   (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 

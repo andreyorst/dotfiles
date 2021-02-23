@@ -530,7 +530,7 @@ Also, I don't want my files to contain trailing whitespace, so =before-save-hook
     :custom
     (yank-excluded-properties t "Disable all text properties when yanking.")
     (blink-matching-delay 0)
-    (blink-matching-paren 1)
+    (blink-matching-paren t)
     :init
     (defun aorst/kill-region-or-word (arg)
       (interactive "*p")
@@ -2124,12 +2124,12 @@ I primary use it for taking notes on different programming languages, and manage
                                     (if (facep face) face 'default))
                                   :background nil t))))
     (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color)
-    (define-advice org-return (:around (f &optional indent arg interactive) aorst:org-return)
+    (define-advice org-return (:around (f &rest args) aorst:org-return)
       (let ((org-src-preserve-indentation t))
-        (funcall f indent arg interactive)))
-    (define-advice org-cycle (:around (f &optional arg) aorst:org-cycle)
+        (apply f args)))
+    (define-advice org-cycle (:around (f &rest args) aorst:org-cycle)
       (let ((org-src-preserve-indentation t))
-        (funcall f arg))))
+        (apply f args))))
 #+end_src
 
 *** OX Hugo
@@ -2494,7 +2494,8 @@ It supports compile-time macro system, and full Lua compatibility.
     :straight (:host gitlab
                :repo "technomancy/fennel-mode")
     :bind (:map fennel-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
+           ("C-c C-M-f" . aorst/indent-buffer)
+           ("M-." . xref-find-definitions))
     :hook (fennel-mode . fennel-mode-setup)
     :config
     (put 'time 'fennel-indent-function 0)
@@ -3395,6 +3396,11 @@ This package provides documentation popup, definitions in split-view, imenu list
     (lsp-ui-doc-show-with-cursor nil)
     (lsp-ui-doc-show-with-mouse nil)
     (lsp-ui-doc-position 'at-point)
+    :custom-face
+    (lsp-ui-peek-highlight ((t (:foreground unspecified
+                                :background unspecified
+                                :box unspecified
+                                :inherit lsp-face-highlight-textual))))
     :config
     (when (fboundp #'aorst/escape)
       (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
@@ -3580,7 +3586,9 @@ Dumbest definition jumping that just work.
 
 #+begin_src emacs-lisp
   (use-package dumb-jump
-    :custom (dumb-jump-prefer-searcher 'rg)
+    :custom
+    (dumb-jump-prefer-searcher 'rg)
+    (dumb-jump-selector 'ivy)
     :config
     (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 #+end_src
