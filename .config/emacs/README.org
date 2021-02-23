@@ -667,7 +667,12 @@ This function intelligently tries to cancel regardless of active window:
           (t
            (unless (or defining-kbd-macro
                        executing-kbd-macro)
-             (keyboard-quit)))))
+             (if (and (bound-and-true-p aorst--god-mode)
+                      (not (bound-and-true-p god-local-mode))
+                      (not (and transient-mark-mode
+                                mark-active)))
+                 (god-local-mode)
+               (keyboard-quit))))))
   (global-set-key [remap keyboard-quit] #'aorst/escape)
 #+end_src
 
@@ -1458,6 +1463,22 @@ Mode line segment for flymake.
   (add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
 #+end_src
 
+**** GOD Mode
+GOD mode indicator for modeline.
+
+#+begin_src emacs-lisp
+  (defvar-local aorst--mode-line-god-mode "")
+
+  (defun aorst/mode-line-god-mode (&rest _)
+    (setq aorst--mode-line-god-mode
+          (if (bound-and-true-p god-local-mode)
+              (concat "  " (propertize "GOD" 'help-echo "GOD mode is enabled for current buffer"))
+            "")))
+
+  (add-hook 'god-mode-enabled-hook #'aorst/mode-line-god-mode)
+  (add-hook 'god-mode-disabled-hook #'aorst/mode-line-god-mode)
+#+end_src
+
 *** Mode-line format
 Fallback format for modeline.
 
@@ -1466,6 +1487,7 @@ Fallback format for modeline.
   (defvar mode-line-r-format
     '(concat
       (aorst/mode-line-buffer-state)
+      aorst--mode-line-god-mode
       (aorst/mode-line-line-column)
       (aorst/mode-line-input-method)
       (aorst/mode-line-line-encoding)
@@ -3738,7 +3760,7 @@ by =Ctrl= key by default. Not sure if I'm going to use it much, though.
     (god-mode))
 #+end_src
 
-** Auto rever mode
+** Auto revert mode
 Watch files and update buffer contents if files changed on disk.
 
 #+begin_src emacs-lisp
