@@ -2,16 +2,25 @@
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-    . /etc/bashrc
+    source /etc/bashrc
 fi
 
 # Scripts and better defaults for shell
-for i in $HOME/.dotfiles/scripts/*.sh; do
-    . "$i"
+for i in "$HOME"/.dotfiles/scripts/*.sh; do
+    source "$i"
 done
 
 # User specific environment
-export PATH="$HOME/.dotfiles/scripts:$HOME/.local/bin:$HOME/.npm/bin:$HOME/.luarocks/bin:$HOME/.cache/rebar3/bin:$PATH"
+export PATH="$HOME/.dotfiles/scripts:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.npm/bin:$PATH"
+export PATH="$HOME/.cache/rebar3/bin:$PATH"
+[ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
+
+export HISTFILESIZE=
+export HISTSIZE=
+export HISTTIMEFORMAT="[%F %T] "
+export HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 
 # Prompt
 PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$TIME_PS1\$SSH_PS1\$CONTAINER_PS1\$GIT_PS1
@@ -61,7 +70,6 @@ function container_ps1() {
         CONTAINER_PS1=
     fi
 }
-
 
 # Tmux
 if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ]; then
