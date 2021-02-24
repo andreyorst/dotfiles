@@ -3392,6 +3392,7 @@ LSP client for Emacs.
     (lsp-enable-semantic-highlighting nil)
     (lsp-log-io nil)
     (lsp-enable-folding nil)
+    (lsp-keep-workspace-alive nil)
     :config
     (defun aorst/disable-flycheck ()
       (flycheck-mode -1)))
@@ -3766,6 +3767,15 @@ Watch files and update buffer contents if files changed on disk.
 #+begin_src emacs-lisp
   (use-package autorevert
     :hook (after-init . global-auto-revert-mode))
+#+end_src
+
+** HL Todo
+Highlight =TODO= markers in files.
+Great addition to [[*Magit TODOs][Magit TODOs]].
+
+#+begin_src emacs-lisp
+  (use-package hl-todo
+    :hook (prog-mode . hl-todo-mode))
 #+end_src
 
 * Postscript

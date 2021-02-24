@@ -2116,6 +2116,7 @@ unless `parinfer-rust-mode' is enabled."
   (lsp-enable-semantic-highlighting nil)
   (lsp-log-io nil)
   (lsp-enable-folding nil)
+  (lsp-keep-workspace-alive nil)
   :config
   (defun aorst/disable-flycheck ()
     (flycheck-mode -1)))
@@ -2333,6 +2334,9 @@ unless `parinfer-rust-mode' is enabled."
 
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode))
+
+(use-package hl-todo
+  :hook (prog-mode . hl-todo-mode))
 
 (provide 'init)
 ;;; init.el ends here
