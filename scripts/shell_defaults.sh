@@ -17,7 +17,9 @@ alias copy="xsel -bi"
 
 # Edit things in apropriate environment
 alias tmuxconf="\$EDITOR ~/.tmux.conf"
-alias emacsconf="emacs ~/.emacs.d/README.org"
+alias kakconf="kak ~/.dotfiles/.config/kak/kakrc"
+alias emacsconf="emacs ~/.dotfiles/.config/emacs/README.org"
+
 
 alias less="less --tabs 4 -R"
 
@@ -50,6 +52,7 @@ shopt -s histappend
 
 # smarter `emacs' launcher that will open file in existing emacs if one exists
 emacs() { if [ $# -gt 0 ]; then emacsclient -a emacs -n "$@" 2>/dev/null 1>&2; else command emacs; fi; }
+emacsupdate() { command emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(straight-pull-all)'; }
 
 # create dir and cd into it
 mkcd() { mkdir -p "$1" && cd "$1" || return $?; }
