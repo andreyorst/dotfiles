@@ -1159,8 +1159,9 @@ truncates text if needed.  Minimal width can be set with
                     (face-attribute 'default :background)
                   (face-attribute 'mode-line :background)))
           (box-width (/ aorst--line-pixel-height 5)))
-      (set-face-attribute 'tab-line-tab-special nil
-                          :slant 'normal)
+      (when (facep 'tab-line-tab-special)
+        (set-face-attribute 'tab-line-tab-special nil
+                            :slant 'normal))
       (set-face-attribute 'tab-line nil
                           :background base
                           :foreground dark-fg
