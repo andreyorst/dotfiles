@@ -3,6 +3,8 @@ spell
 saved_workspaces
 .config/kak/plugins
 .config/kak/colors
+.config/kak/.recentf
+.config/kak/.fzf-projects
 *~
 *#
 .config/emacs/*
