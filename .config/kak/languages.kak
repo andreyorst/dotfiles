@@ -37,7 +37,7 @@ hook global ModuleLoaded gas %{ try %{
     add-highlighter shared/gas/c_line_comment region // (?<!\\\\)(?=\n) fill comment
 }}
 
-hook global WinSetOption filetype=(lisp|clojure|scheme|racket) %{
+hook global WinSetOption filetype=(lisp|clojure|scheme|racket|fennel) %{
     set-option window indentwidth 2
     set-option window tabstop 2
 }

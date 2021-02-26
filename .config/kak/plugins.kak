@@ -3,13 +3,13 @@ evaluate-commands %sh{
     plugins="$HOME/.config/kak/plugins"
     mkdir -p $plugins
     [ ! -e "$plugins/plug.kak" ] && \
-        git clone -q https://github.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+        git clone -q git@github.com:andreyorst/plug.kak.git "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
 }
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "andreyorst/plug.kak" noload config %{
+plug "git@github.com:andreyorst/plug.kak" noload config %{
     set-option global plug_always_ensure true
     set-option global plug_profile true
     hook global WinSetOption filetype=plug %{
@@ -28,7 +28,7 @@ plug "occivink/kakoune-find" config %{
     grep-apply-changes %{ find-apply-changes -force }
 }
 
-plug "andreyorst/base16-gruvbox.kak" theme %{
+plug "git@github.com:andreyorst/base16-gruvbox.kak" theme %{
     if %[ -n "${PATH##*termux*}" ] %{
         colorscheme base16-gruvbox-dark-soft
     } else %{
@@ -36,7 +36,7 @@ plug "andreyorst/base16-gruvbox.kak" theme %{
     }
 }
 
-plug "andreyorst/fzf.kak" config %{
+plug "git@github.com:andreyorst/fzf.kak" config %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
 } defer fzf %{
     set-option global fzf_preview_width '65%'
@@ -74,7 +74,7 @@ plug "andreyorst/fzf.kak" config %{
     }
 }
 
-plug "andreyorst/powerline.kak" defer powerline %{
+plug "git@github.com:andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
     set-option global powerline_shorten_bufname 'short'
@@ -89,7 +89,7 @@ plug "andreyorst/powerline.kak" defer powerline %{
     powerline-start
 }
 
-plug "andreyorst/smarttab.kak" defer smarttab %{
+plug "git@github.com:andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
     set-option global smarttab_expandtab_mode_name   '⋅t⋅'
     set-option global smarttab_noexpandtab_mode_name '→t→'
@@ -108,7 +108,7 @@ plug "alexherbo2/replace.kak" defer replace-mode %{
     map global user r -docstring 'Replace mode' ':<space>enter-replace-mode<ret>'
 } demand
 
-plug "andreyorst/langmap.kak" config %{
+plug "git@github.com:andreyorst/langmap.kak" config %{
     set-option global langmap %opt{langmap_ru_jcuken}
 } defer "langmap" %{
     map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
@@ -116,7 +116,7 @@ plug "andreyorst/langmap.kak" config %{
     map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
 }
 
-plug "andreyorst/kaktree" defer kaktree %{
+plug "git@github.com:andreyorst/kaktree" defer kaktree %{
     map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
     set-option global kaktree_show_help false
     if %[ -n "${PATH##*termux*}" ] %{
@@ -142,4 +142,4 @@ plug "andreyorst/kaktree" defer kaktree %{
     kaktree-enable
 }
 
-plug "andreyorst/pmanage.kak"
+plug "git@github.com:andreyorst/pmanage.kak"
