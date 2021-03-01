@@ -15,7 +15,7 @@ smart-select-file %{
         execute-keys "<a-k>..<ret>"
     } catch %{
         # guess we have nonblank character under cursor
-        execute-keys "<a-k>\w<ret>"
+        execute-keys "<a-k>\S<ret>"
         execute-keys "<a-i><a-w>"
     } catch %{
         # try selecting inside first occurrence of <...> string
@@ -39,7 +39,7 @@ smart-select-file %{
         fail "no file can be selected"
     }
     try %{
-        execute-keys "s/?\w[\S]+(?!/)<ret>)<space>"
+        execute-keys "s/?[\S]+(?!/)<ret>)<space>"
     } catch %{
         fail "failed to select file"
     }
@@ -58,14 +58,14 @@ alt-x -params 1 %{
 
 define-command -docstring \
 "search-file <filename>: search for file recusively under path option: %opt{path}" \
-search-file -params 1 %{ evaluate-commands %sh{
+search-file -params 1 -override %{ evaluate-commands %sh{
     if [ -n "$(command -v fd)" ]; then                          # create find command template
         find='fd -L --type f "${file}" "${path}"'               # if `fd' is installed it will
     else                                                        # be used because it is faster
         find='find -L "${path}" -mount -type f -name "${file}"' # if not, we fallback to find.
     fi
 
-    file=$(printf "%s\n" $1 | sed -E "s:^~/:$HOME/:") # we want full path
+    file=$(eval echo "$1")
 
     eval "set -- ${kak_quoted_buflist}"
     while [ $# -gt 0 ]; do            # Check if buffer with this
