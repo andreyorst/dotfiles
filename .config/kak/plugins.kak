@@ -1,9 +1,9 @@
 # bootstrap the plugin manager
 evaluate-commands %sh{
-    plugins="$HOME/.config/kak/plugins"
+    plugins="$kak_config/plugins"
     mkdir -p $plugins
     [ ! -e "$plugins/plug.kak" ] && \
-        git clone -q git@github.com:andreyorst/plug.kak.git "$plugins/plug.kak"
+        git clone -q git@github.com:andreyorst/plug.kak.git --branch develop "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
 }
 

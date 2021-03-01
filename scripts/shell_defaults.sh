@@ -20,6 +20,10 @@ alias tmuxconf="\$EDITOR ~/.tmux.conf"
 alias kakconf="kak ~/.dotfiles/.config/kak/kakrc"
 alias emacsconf="emacs ~/.dotfiles/.config/emacs/README.org"
 
+if [ -n "$(command -v dash)" ]; then
+    KAKOUNE_POSIX_SHELL="$(command -v dash)"
+    export KAKOUNE_POSIX_SHELL
+fi
 
 alias less="less --tabs 4 -R"
 
