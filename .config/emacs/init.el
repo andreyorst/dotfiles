@@ -1424,16 +1424,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
-  :hook ((clojure-mode
-          clojurec-mode
-          clojurescript-mode)
-         . aorst/clojure-flycheck-maybe)
   :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
-  :config
-  (defun aorst/clojure-flycheck-maybe ()
-    (unless (bound-and-true-p lsp-mode)
-      (flycheck-mode 1))))
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
@@ -1474,6 +1466,17 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning t)
           (cljr-warn-on-eval nil))
+
+(use-package anakondo
+  :straight (:host github
+	     :repo "didibus/anakondo")
+  :when (executable-find "clj-kondo")
+  :hook
+  ((clojure-mode
+    clojurescript-mode
+    clojurec-mode)
+   . anakondo-minor-mode)
+  :commands anakondo-minor-mode)
 
 (use-package fennel-mode
   :straight (:host gitlab
@@ -2093,12 +2096,8 @@ unless `parinfer-rust-mode' is enabled."
            c-mode
            c++-mode
            java-mode
-           elixir-mode
-           clojure-mode
-           clojurec-mode
-           clojurescript-mode)
+           elixir-mode)
           . lsp)
-         (lsp-mode . aorst/disable-flycheck)
          (lsp-mode . yas-minor-mode))
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
@@ -2107,7 +2106,7 @@ unless `parinfer-rust-mode' is enabled."
   (lsp-keymap-prefix "C-c l")
   (lsp-rust-clippy-preference "on")
   (lsp-completion-provider :capf)
-  (lsp-diagnostics-provider :flymake)
+  (lsp-diagnostics-provider :flycheck)
   (lsp-enable-indentation nil)
   (lsp-enable-symbol-highlighting t)
   (lsp-rust-server 'rust-analyzer)
@@ -2117,10 +2116,7 @@ unless `parinfer-rust-mode' is enabled."
   (lsp-enable-semantic-highlighting nil)
   (lsp-log-io nil)
   (lsp-enable-folding nil)
-  (lsp-keep-workspace-alive nil)
-  :config
-  (defun aorst/disable-flycheck ()
-    (flycheck-mode -1)))
+  (lsp-keep-workspace-alive nil))
 
 (use-package lsp-ui
   :after lsp-mode

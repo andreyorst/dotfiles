@@ -2423,16 +2423,8 @@ It is one of the few modern and refreshing languages, that bring both innovation
 
 #+begin_src emacs-lisp
   (use-package clojure-mode
-    :hook ((clojure-mode
-            clojurec-mode
-            clojurescript-mode)
-           . aorst/clojure-flycheck-maybe)
     :bind (:map clojure-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
-    :config
-    (defun aorst/clojure-flycheck-maybe ()
-      (unless (bound-and-true-p lsp-mode)
-        (flycheck-mode 1))))
+           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 *** CIDER
@@ -2491,14 +2483,13 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
             (cljr-warn-on-eval nil))
 #+end_src
 
-*** COMMENT Anakondo
+*** Anakondo
 Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-kondo][clj-kondo]].
 
 #+begin_src emacs-lisp
   (use-package anakondo
     :straight (:host github
-	       :repo "andreyorst/anakondo"
-	       :branch "use-project")
+	       :repo "didibus/anakondo")
     :when (executable-find "clj-kondo")
     :hook
     ((clojure-mode
@@ -3369,12 +3360,8 @@ LSP client for Emacs.
              c-mode
              c++-mode
              java-mode
-             elixir-mode
-             clojure-mode
-             clojurec-mode
-             clojurescript-mode)
+             elixir-mode)
             . lsp)
-           (lsp-mode . aorst/disable-flycheck)
            (lsp-mode . yas-minor-mode))
     :custom-face
     (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
@@ -3383,7 +3370,7 @@ LSP client for Emacs.
     (lsp-keymap-prefix "C-c l")
     (lsp-rust-clippy-preference "on")
     (lsp-completion-provider :capf)
-    (lsp-diagnostics-provider :flymake)
+    (lsp-diagnostics-provider :flycheck)
     (lsp-enable-indentation nil)
     (lsp-enable-symbol-highlighting t)
     (lsp-rust-server 'rust-analyzer)
@@ -3393,10 +3380,7 @@ LSP client for Emacs.
     (lsp-enable-semantic-highlighting nil)
     (lsp-log-io nil)
     (lsp-enable-folding nil)
-    (lsp-keep-workspace-alive nil)
-    :config
-    (defun aorst/disable-flycheck ()
-      (flycheck-mode -1)))
+    (lsp-keep-workspace-alive nil))
 #+end_src
 
 *** LSP UI
