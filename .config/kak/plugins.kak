@@ -40,7 +40,12 @@ plug "git@github.com:andreyorst/fzf.kak" config %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
 } defer fzf %{
     set-option global fzf_preview_width '65%'
+    if %[ -n "$(command -v bat)" ] %{
+        set-option global fzf_highlight_command bat
+    }
+} defer fzf-project %{
     set-option global fzf_project_use_tilda true
+} defer fzf-file %{
     declare-option str-list fzf_exclude_files "*.o" "*.bin" "*.obj" ".*cleanfiles"
     declare-option str-list fzf_exclude_dirs ".git" ".svn"
     set-option global fzf_file_command %sh{
@@ -66,24 +71,16 @@ plug "git@github.com:andreyorst/fzf.kak" config %{
         fi
         echo "$cmd"
     }
-    if %[ -n "$(command -v bat)" ] %{
-        set-option global fzf_highlight_command bat
-    }
-    if %[ -n "${kak_opt_grepcmd}" ] %{
-        set-option global fzf_sk_grep_command %{${kak_opt_grepcmd}}
-    }
 }
 
 plug "git@github.com:andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
-    set-option global powerline_shorten_bufname 'short'
     set-option global powerline_separator '║'
     set-option global powerline_separator_thin ''
-    if %[ ! -n "${PATH##*termux*}" ] %{
-        set-option global powerline_separator ''
-        set-option global powerline_separator_thin ''
-    }
+} defer powerline_bufname %{
+    set-option global powerline_shorten_bufname 'short'
+} defer powerline_base16_gruvbox %{
     powerline-theme base16-gruvbox
 } config %{
     powerline-start
@@ -100,13 +97,13 @@ plug "git@github.com:andreyorst/smarttab.kak" defer smarttab %{
     hook global WinSetOption filetype=(c|cpp) smarttab
 }
 
-plug "alexherbo2/surround.kak" defer surround %{
+plug "alexherbo2/surround.kak" demand surround %{
     map global user 's' ': enter-user-mode surround<ret>' -docstring "surround selection"
-} demand
+}
 
-plug "alexherbo2/replace.kak" defer replace-mode %{
+plug "alexherbo2/replace.kak" demand replace-mode %{
     map global user r -docstring 'Replace mode' ':<space>enter-replace-mode<ret>'
-} demand
+}
 
 plug "git@github.com:andreyorst/langmap.kak" config %{
     set-option global langmap %opt{langmap_ru_jcuken}
