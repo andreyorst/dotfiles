@@ -9,7 +9,7 @@ evaluate-commands %sh{
 
 # Plugin configurations
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-plug "git@github.com:andreyorst/plug.kak" noload config %{
+plug "andreyorst/plug.kak" noload config %{
     set-option global plug_always_ensure true
     set-option global plug_profile true
     hook global WinSetOption filetype=plug %{
