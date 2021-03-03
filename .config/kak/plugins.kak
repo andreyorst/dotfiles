@@ -107,10 +107,10 @@ plug "alexherbo2/replace.kak" demand replace-mode %{
 
 plug "git@github.com:andreyorst/langmap.kak" config %{
     set-option global langmap %opt{langmap_ru_jcuken}
-} defer "langmap" %{
-    map -docstring "toggle layout (C-\)" global normal '' ':      toggle-langmap<ret>'
-    map -docstring "toggle layout (C-\)" global insert '' '<a-;>: toggle-langmap<ret>'
-    map -docstring "toggle layout (C-\)" global prompt '' '<a-;>: toggle-langmap prompt<ret>'
+} demand langmap %{
+    map -docstring "toggle layout" global normal '<c-\>' ':      toggle-langmap<ret>'
+    map -docstring "toggle layout" global insert '<c-\>' '<a-;>: toggle-langmap<ret>'
+    map -docstring "toggle layout" global prompt '<c-\>' '<a-;>: toggle-langmap prompt<ret>'
 }
 
 plug "git@github.com:andreyorst/kaktree" defer kaktree %{

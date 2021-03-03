@@ -31,8 +31,6 @@ alias global & recentf
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 hook global ModuleLoaded fzf %§
 
-map global fzf -docstring "recent files" 'r' '<esc>: fzf-recentf<ret>'
-
 define-command -hidden fzf-recentf %{ evaluate-commands %sh{
     cmd="cat ${kak_quoted_opt_recentf_file} 2>/dev/null"
     message="Open single or multiple recent files.
@@ -46,5 +44,7 @@ $kak_opt_fzf_vertical_map: open file in vertical split"
     [ ! -z "${kak_client_env_TMUX}" ] && additional_flags="--expect $kak_opt_fzf_vertical_map --expect $kak_opt_fzf_horizontal_map"
     printf "%s\n" "fzf -preview -kak-cmd %{edit -existing} -items-cmd %{$cmd} -fzf-args %{-m --expect $kak_opt_fzf_window_map $additional_flags --reverse}"
 }}
+
+map global fzf -docstring "recent files" 'r' '<esc>: fzf-recentf<ret>'
 
 §

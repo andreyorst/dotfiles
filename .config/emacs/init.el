@@ -1424,6 +1424,10 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package clojure-mode
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . flycheck-mode)
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
