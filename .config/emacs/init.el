@@ -721,7 +721,7 @@ Used in various places to avoid getting wrong line height when
                                                           ("smart" "/s")
                                                           ("indent" "/i")
                                                           ("paren" "/p")
-                                                          (t "")))
+                                                          (_ "")))
                                      'help-echo (concat "Parinfer " parinfer-rust--mode
                                                         " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
                                      'local-map (doto (make-sparse-keymap)
@@ -1448,9 +1448,11 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-test-show-report-on-success t)
   (cider-allow-jack-in-without-project t)
   (cider-use-fringe-indicators nil)
-  (cider-font-lock-dynamically '(macro var))
+  (cider-font-lock-dynamically '(macro var deprecated))
   (cider-save-file-on-load nil)
   (cider-inspector-fill-frame nil)
+  (cider-auto-select-error-buffer nil)
+  (cider-eval-spinner nil)
   :config
   (setq cider-jdk-src-paths nil)
   (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
