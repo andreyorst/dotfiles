@@ -105,6 +105,10 @@ plug "alexherbo2/replace.kak" demand replace-mode %{
     map global user r -docstring 'Replace mode' ':<space>enter-replace-mode<ret>'
 }
 
+plug "alexherbo2/word-select.kak" demand word-select %{
+    word-select-add-mappings
+}
+
 plug "git@github.com:andreyorst/langmap.kak" config %{
     set-option global langmap %opt{langmap_ru_jcuken}
 } demand langmap %{
