@@ -1,7 +1,7 @@
 # bootstrap the plugin manager
 evaluate-commands %sh{
-    plugins="$kak_config/plugins"
-    mkdir -p $plugins
+    plugins="${kak_config:?}/plugins"
+    mkdir -p "$plugins"
     [ ! -e "$plugins/plug.kak" ] && \
         git clone -q git@github.com:andreyorst/plug.kak.git --branch develop "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
@@ -50,7 +50,7 @@ plug "git@github.com:andreyorst/fzf.kak" config %{
     declare-option str-list fzf_exclude_dirs ".git" ".svn"
     set-option global fzf_file_command %sh{
         if [ -n "$(command -v fd)" ]; then
-            eval "set -- $kak_quoted_opt_fzf_exclude_files $kak_quoted_opt_fzf_exclude_dirs"
+            eval "set -- ${kak_quoted_opt_fzf_exclude_files:-} ${kak_quoted_opt_fzf_exclude_dirs:-}"
             while [ $# -gt 0 ]; do
                 exclude="$exclude --exclude '$1'"
                 shift

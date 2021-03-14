@@ -67,7 +67,7 @@ search-file -params 1 -override %{ evaluate-commands %sh{
 
     file=$(eval echo "$1")
 
-    eval "set -- ${kak_quoted_buflist}"
+    eval "set -- ${kak_quoted_buflist:?}"
     while [ $# -gt 0 ]; do            # Check if buffer with this
         if [ "${file}" = "$1" ]; then # file already exists. Basically
             printf "%s\n" "buffer $1" # emulating what edit command does
@@ -82,13 +82,13 @@ search-file -params 1 -override %{ evaluate-commands %sh{
     fi                                            # we start recursive searchimg
 
     # if everthing  above fails - search for file under `path'
-    eval "set -- ${kak_quoted_opt_path}"
-    while [ $# -gt 0 ]; do                # Since we want to check fewer places,
-        case $1 in                        # I've swapped ./ and %/ because
+    eval "set -- ${kak_quoted_opt_path:?}"
+    while [ $# -gt 0 ]; do                   # Since we want to check fewer places,
+        case $1 in                           # I've swapped ./ and %/ because
             (./) path=${kak_buffile%/*} ;; # %/ usually has smaller scope. So
-            (%/) path=${PWD}            ;; # this trick is a speedi-up hack.
-            (*)  path=$1                ;; # This means that `path' option should
-        esac                              # first contain `./' and then `%/'
+            (%/) path=${PWD}              ;; # this trick is a speedi-up hack.
+            (*)  path=$1                  ;; # This means that `path' option should
+        esac                                 # first contain `./' and then `%/'
 
         if [ -z "${file##*/*}" ] && [ -e "${path}/${file}" ]; then
             printf "%s\n" "edit -existing %{${path}/${file}}"
@@ -149,7 +149,7 @@ If no symbol given, current selection is used as a symbol name" \
     tagname="${1:-${kak_selection}}"
 
     if [ ! -s "${tags}" ]; then
-        ctags -f "${tags}" "${kak_buffile}"
+        ctags -f "${tags}" "${kak_buffile:-}"
     fi
 
     if [ -n "$(command -v readtags)" ]; then
@@ -232,8 +232,8 @@ file -shell-script-candidates %{
     [ -n "$(command -v fd)" ] && fd . -L --hidden --no-ignore --type f || find . -follow -type f
 } -params 1..2 %{ evaluate-commands %sh{
     file=$(printf "%s\n" "$1" | sed "s/&/&&/g")
-    printf "%s\n" "edit -existing -- %&${file}&"
-    [ $# -gt 1 ] && printf "%s\n" "execute-keys '${2}g'"
+    printf "%s\n" "edit -existing -- %&$file&"
+    [ $# -gt 1 ] && printf "%s\n" "execute-keys '$2g'"
 }}
 
 alias global $ file
@@ -243,13 +243,13 @@ add-highlighter shared/kakrc/code/if_else regex \b(if|else)\b 0:keyword
 
 define-command -docstring "if <condition> <expression> [else [if <condition>] <expression>]: if statement that accepts shell-valid condition string" \
 if -params 2.. %{ evaluate-commands %sh{
-    while [ true ]; do
+    while true; do
         condition="[ $1 ]"
         if [ -n "$3" ] && [ "$3" != "else" ]; then
             printf "%s\n" "fail %{if: unknown operator '$3'}"
         elif [ $# -eq 3 ]; then
             printf "%s\n" "fail %{if: wrong argument count}"
-        elif eval $condition; then
+        elif eval "$condition"; then
             [ -n "${2##*&*}" ] && arg="$2" || arg="$(printf '%s' "$2" | sed 's/&/&&/g')"
             printf "%s\n" "evaluate-commands %& $arg &"
         elif [ $# -eq 4 ]; then
@@ -290,7 +290,7 @@ define-command -hidden clang-find-and-parse-compile-flags %{
     set-option -add window clang_options %sh{ (
         while [ "$PWD" != "$HOME" ]; do
             if [ -e "$PWD/compile_flags.txt" ]; then
-                printf "%s\n" "$(cat "$PWD/compile_flags.txt" | tr '\n' ' ')"
+                printf "%s\n" "$(tr '\n' ' ' < "$PWD"/compile_flags.txt)"
                 exit
             fi
             cd ..

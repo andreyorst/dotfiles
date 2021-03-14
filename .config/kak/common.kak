@@ -118,11 +118,11 @@ hook global WinSetOption filetype=kak %{ hook global NormalIdle .* %{
     evaluate-commands -save-regs 'a' %{ try %{
         execute-keys -draft <a-i>w"ay
         evaluate-commands %sh{ (
-            color="${kak_reg_a}"
+            color="${kak_reg_a:?}"
             inverted_color=$(echo "${color}" | perl -pe 'tr/0123456789abcdefABCDEF/fedcba9876543210543210/')
-            printf "%s\n" "evaluate-commands -client $kak_client %{ try %{
+            printf "%s\n" "evaluate-commands -client ${kak_client:?} %{ try %{
                                echo -markup %{{rgb:${inverted_color},rgb:${color}+b}   #${color}   }
-                           }}" | kak -p $kak_session
+                           }}" | kak -p "${kak_session:?}"
         ) >/dev/null 2>&1 </dev/null & }
     }}
 }}
