@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 # Aliases and Defaults
 
 unset LS_COLORS
@@ -114,15 +115,16 @@ gif() {
 }
 
 sep() {
-    local sep=""
-    for _ in $(seq 1 "$(tput cols)"); do
-        sep="${sep}${1:-=}"
-    done
-    [ ! -z "$2" ] && local file="${1:-=} $2 ${1:-=}"
-    echo "${file}${sep}" | cut -c 1-"$(tput cols)"
-    unset file
-    unset sep
+    (
+        sep=""
+        for _ in $(seq 1 "$(tput cols)"); do
+            sep="${sep}${1:-=}"
+        done
+        [ -n "$2" ] && file="${1:-=} $2 ${1:-=}"
+        echo "${file}${sep}" | cut -c 1-"$(tput cols)"
+    )
 }
+
 
 sepcat() {
     (
@@ -132,11 +134,11 @@ sepcat() {
                 (--sep) shift ; separator="$1" ;;
                 (--help) printf "%s\n" "sepcat -- cat with separator between files" >&2
                          printf "%s\n" "sepcat [-s=<separator>|--sep=<separator>|--sep <separator>] file1 file2 ... fileN" ;;
-                (*) files="$files '$1'" ;;
+                (*) files="$files $1" ;;
             esac
             shift
         done
-        for file in "$@"; do
+        for file in $files; do
             sep "$separator" "$file"
             cat "$file"
         done
