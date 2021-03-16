@@ -605,7 +605,7 @@ I don't quite enjoy seeing =^L= everywhere, so let's fix this:
 #+end_src
 
 This function will replace =^L= with a string of =fill-column= width out of =comment-start= character (=;= in Emacs Lisp) or of =─= char.
-Let's enable it in modes where it is fequently used.
+Let's enable it in modes where it is frequently used.
 
 #+begin_src emacs-lisp
   (dolist (mode-hook '(emacs-lisp-mode-hook
@@ -821,7 +821,7 @@ However in terminal Emacs it is completely useless, so we disable it.
 
 ** Line height
 When =text-scale-mode= is active it's hard to tell what line height actually is.
-This variable helps calulating that reliably.
+This variable helps calculating that reliably.
 
 #+begin_src emacs-lisp
   (defvar aorst--line-pixel-height (line-pixel-height)
@@ -931,7 +931,7 @@ For example:
 #+end_src
 
 You can notice that first regex starts with ~>~ then checks either for ~=>~ or for ~>[=-]~ or for group ~[]:=-]~, and finally ends with ~>+~.
-Second regexp however explicitly checs for each variant individualy, e.g. it first checks for ~>>-~ and then for ~>>=~, and this is exactly the first optimization we got in previous regexp.
+Second regexp however explicitly checks for each variant individual, e.g. it first checks for ~>>-~ and then for ~>>=~, and this is exactly the first optimization we got in previous regexp.
 
 Since I don't want ligatures appearing in every major mode, let's disable =global-auto-composition-mode= and selectively enable it in needed modes:
 
@@ -996,7 +996,7 @@ Now we can set up Solaire Mode and assign =aorst/real-buffer-p= to =solaire-mode
 ** Theme
 I'm using *doom-themes* package to make my Emacs look modern.
 It is a theme collection, originally developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]], and I find these themes actually great on its own.
-And provided thems define colors for pretty much every popular Emacs package, which helps make Emacs look very consistent.
+And provided themes define colors for pretty much every popular Emacs package, which helps make Emacs look very consistent.
 
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -1340,7 +1340,7 @@ Major mode module for mode-line
 #+end_src
 
 **** Git
-Git branch module for mode-line.
+Branch name module for mode-line.
 
 #+begin_src emacs-lisp
   (defsubst aorst/mode-line-git-branch ()
@@ -1376,7 +1376,7 @@ Mode line segment for Language server protocol.
 #+end_src
 
 **** Flycheck
-Flycheck module for mode-line.
+Mode line segment for Flycheck.
 
 #+begin_src emacs-lisp
   (defvar-local aorst--mode-line-flycheck "")
@@ -1410,7 +1410,7 @@ Flycheck module for mode-line.
 #+end_src
 
 **** Flymake
-Mode line segment for flymake.
+Mode line segment for Flymake.
 
 #+begin_src emacs-lisp
   (defvar-local aorst--mode-line-flymake "")
@@ -1704,7 +1704,7 @@ Which is good.
 #+end_src
 
 *** Treemacs Magit
-Magit integration for Treemacs.
+Package for Treemacs and Magit integration.
 
 #+begin_src emacs-lisp
   (use-package treemacs-magit
@@ -2082,7 +2082,7 @@ I don't like that it changes width, so let's make it grow only, and calculate ma
 * Languages
 This section contains various language specific settings and external packages that provide language support.
 
-** Org
+** Org Mode
 Org Mode is a great mode for taking notes, managing to-do lists, writing books, literate programming, and many other things.
 I primary use it for taking notes on different programming languages, and manage my Emacs configuration with it.
 
@@ -2444,7 +2444,7 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
     (cider-font-lock-dynamically '(macro var deprecated))
     (cider-save-file-on-load nil)
     (cider-inspector-fill-frame nil)
-    (cider-auto-select-error-buffer nil)
+    (cider-auto-select-error-buffer t)
     (cider-eval-spinner nil)
     :config
     (setq cider-jdk-src-paths nil)
@@ -2532,7 +2532,8 @@ I'm not into Lua language myself, but in order to view what [[*Fennel][Fennel]] 
 #+begin_src emacs-lisp
   (use-package lua-mode
     :bind (:map lua-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+           ("C-c C-M-f" . aorst/indent-buffer))
+    :hook (lua-mode . flycheck-mode))
 #+end_src
 
 ** CSS
@@ -2854,7 +2855,7 @@ This package will be used in many other package configurations to provide sane k
 #+end_src
 
 ** Smartparens
-Smartparens is a package that enables structural editing in many different languages.
+This is a package that enables structural editing in many different languages.
 Basically, for all Lisp related modes I use =smartparens-strict-mode= while for other modes I use =smartparens-mode=.
 There's also a reason I don't want to use =smart-parens-strict-mode= with something other than Lisp related modes, and it is the =;= key.
 I've kinda liked in Paredit and Parinfer that when you simply type ";", your parentheses will remain balanced.
@@ -2865,8 +2866,7 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
 #+begin_src emacs-lisp
   (use-package smartparens
     :straight (:host github
-               :repo "andreyorst/smartparens"
-               :branch "elixir-better-search")
+               :repo "Fuco1/smartparens")
     :hook (((clojure-mode
              emacs-lisp-mode
              common-lisp-mode
@@ -2879,12 +2879,13 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
              geiser-repl-mode
              inferior-lisp-mode
              inferior-emacs-lisp-mode)
-            . aorst/enable-smartparens-strict-mode)
+            . smartparens-strict-mode)
            (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
            ((org-mode
              markdown-mode
              prog-mode)
-            . aorst/enable-smartparens-mode))
+            . smartparens-mode)
+           (smartparens-mode . show-smartparens-mode))
     :bind (:map smartparens-mode-map
            ("C-M-q" . sp-indent-defun)
            :map smartparens-strict-mode-map
@@ -2895,6 +2896,7 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
     (sp-highlight-wrap-tag-overlay nil)
     (sp-wrap-respect-direction t)
     (sp-show-pair-delay 0)
+    (sp-echo-match-when-invisible nil)
     :custom-face
     (sp-show-pair-match-face ((t (:background unspecified
                                   :weight normal))))
@@ -2910,16 +2912,6 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
       (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
       (sp-update-local-pairs 'minibuffer-pairs)
       (smartparens-strict-mode 1))
-    (defun aorst/enable-smartparens-mode ()
-      "Enable `smartparens-mode' and `show-smartparens-mode'."
-      (smartparens-mode 1)
-      (show-smartparens-mode 1))
-    (defun aorst/enable-smartparens-strict-mode ()
-      "Enable `smartparens-strict-mode' and `show-smartparens-mode'
-  unless `parinfer-rust-mode' is enabled."
-      (unless (bound-and-true-p parinfer-rust-mode)
-        (smartparens-strict-mode 1)
-        (show-smartparens-mode 1)))
     (defun aorst/wrap-fix-cursor-position (_ action _)
       "Set cursor position inside expression when wrapping."
       (when (and (eq action 'wrap)
@@ -2928,44 +2920,6 @@ Another problem is that not all Lisp related modes have such mode map, e.g. Rack
         (goto-char (sp-get sp-last-wrapped-region :beg-in))))
     (dolist (paren '("(" "[" "{"))
       (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
-#+end_src
-
-** COMMENT Parinfer Rust
-Parinfer implementation written in Rust language.
-Not as strict as Emacs Lisp implementation, because it does not force any formatting rules.
-And unlike Emacs Lisp version of parinfer, Rust version also has a proper implementation of smart mode.
-
-#+begin_src emacs-lisp
-  (use-package parinfer-rust-mode
-    :straight (:host github
-               :repo "justinbarclay/parinfer-rust-mode")
-    :hook ((clojure-mode
-            emacs-lisp-mode
-            common-lisp-mode
-            scheme-mode
-            lisp-mode
-            racket-mode)
-           . aorst/enable-parinfer)
-    :custom
-    (parinfer-rust-check-before-enable 'defer)
-    (parinfer-rust-dim-parens t)
-    :custom-face
-    (parinfer-rust-dim-parens ((t (:inherit shadow))))
-    :config
-    (defun aorst/enable-parinfer ()
-      "Disables conficting structural editing modes that might be
-  active and enables parinfer."
-      (when (bound-and-true-p smartparens-mode)
-        (smartparens-mode -1))
-      (when (bound-and-true-p smartparens-strict-mode)
-        (smartparens-strict-mode -1))
-      (when (bound-and-true-p electric-pair-mode)
-        (electric-pair-local-mode -1))
-      (when (bound-and-true-p isayt-mode)
-        (isayt-mode -1))
-      (parinfer-rust-mode 1))
-    :init
-    (setq parinfer-rust-auto-download t))
 #+end_src
 
 ** Flx
@@ -3648,7 +3602,7 @@ Workaround for a problem with Treemacs and marker stack: [[https://github.com/Al
 #+end_src
 
 ** VC mode
-Tweaks for inbuild VC mode.
+Tweaks for inbuilt VC mode.
 
 #+begin_src emacs-lisp
 (use-package vc-hooks
@@ -3749,7 +3703,7 @@ Watch files and update buffer contents if files changed on disk.
     :hook (after-init . global-auto-revert-mode))
 #+end_src
 
-** HL Todo
+** HL TODO
 Highlight =TODO= markers in files.
 Great addition to [[*Magit TODOs][Magit TODOs]].
 
@@ -3780,11 +3734,12 @@ Thanks for reading!
 #  LocalWords:  filetree Uniquify Tabline Prog TOML Geiser REPL Cmake
 #  LocalWords:  cmake Yaml IDE ClojureScript flycheck clj kondo Kibit
 #  LocalWords:  backend refactor refactoring linter Lua CSS Erlang VM
-#  LocalWords:  scalable interop JSON Json vterm EditorConfig Paredit
+#  LocalWords:  scalable interop JSON vterm Json EditorConfig Paredit
 #  LocalWords:  Smartparens Parinfer configs Flx runtime Posframe LSP
-#  LocalWords:  posframe frontend Yasnippet Magit TODOs TODO Ediff
+#  LocalWords:  posframe frontend Yasnippet Magit TODOs TODO Ediff VC
 #  LocalWords:  Kakoune's Iedit DAP Hideshow workspace Separedit GCMH
-#  LocalWords:  Parens readonly
+#  LocalWords:  Parens readonly Flymake autoloaded Smerge popup imenu
+#  LocalWords:  JDK Ripgrep ISAYT Eldoc multiline eldoc HL
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook #'org-babel-tangle nil t)

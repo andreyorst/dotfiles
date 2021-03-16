@@ -121,6 +121,7 @@
         hydrant/mc/mc/vertical-align-with-space
         iedit-next-occurrence
         iedit-switch-to-mc-mode
+        ignore
         isearch-abort
         isearch-delete-char
         isearch-exit

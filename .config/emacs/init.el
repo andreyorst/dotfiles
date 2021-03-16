@@ -1440,7 +1440,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-font-lock-dynamically '(macro var deprecated))
   (cider-save-file-on-load nil)
   (cider-inspector-fill-frame nil)
-  (cider-auto-select-error-buffer nil)
+  (cider-auto-select-error-buffer t)
   (cider-eval-spinner nil)
   :config
   (setq cider-jdk-src-paths nil)
@@ -1501,7 +1501,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package lua-mode
   :bind (:map lua-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer))
+  :hook (lua-mode . flycheck-mode))
 
 (use-package css-mode
   :straight nil
@@ -1728,8 +1729,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package smartparens
   :straight (:host github
-             :repo "andreyorst/smartparens"
-             :branch "elixir-better-search")
+             :repo "Fuco1/smartparens")
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1742,12 +1742,13 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
            geiser-repl-mode
            inferior-lisp-mode
            inferior-emacs-lisp-mode)
-          . aorst/enable-smartparens-strict-mode)
+          . smartparens-strict-mode)
          (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
          ((org-mode
            markdown-mode
            prog-mode)
-          . aorst/enable-smartparens-mode))
+          . smartparens-mode)
+         (smartparens-mode . show-smartparens-mode))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
          :map smartparens-strict-mode-map
@@ -1758,6 +1759,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (sp-highlight-wrap-tag-overlay nil)
   (sp-wrap-respect-direction t)
   (sp-show-pair-delay 0)
+  (sp-echo-match-when-invisible nil)
   :custom-face
   (sp-show-pair-match-face ((t (:background unspecified
                                 :weight normal))))
@@ -1773,16 +1775,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
     (smartparens-strict-mode 1))
-  (defun aorst/enable-smartparens-mode ()
-    "Enable `smartparens-mode' and `show-smartparens-mode'."
-    (smartparens-mode 1)
-    (show-smartparens-mode 1))
-  (defun aorst/enable-smartparens-strict-mode ()
-    "Enable `smartparens-strict-mode' and `show-smartparens-mode'
-unless `parinfer-rust-mode' is enabled."
-    (unless (bound-and-true-p parinfer-rust-mode)
-      (smartparens-strict-mode 1)
-      (show-smartparens-mode 1)))
   (defun aorst/wrap-fix-cursor-position (_ action _)
     "Set cursor position inside expression when wrapping."
     (when (and (eq action 'wrap)

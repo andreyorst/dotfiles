@@ -1,5 +1,9 @@
 ;; -*- mode: fennel -*-
 
+(fn table? [x]
+  (= :table (type x)))
+
 (match package.loaded.readline
-  rl (rl.set_options {:histfile  "~/.fennel_history"
-                      :keeplines 1000}))
+  (where rl (table? rl))
+  (rl.set_options {:histfile  "~/.fennel_history"
+                   :keeplines 1000}))
