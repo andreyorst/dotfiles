@@ -110,6 +110,7 @@
         hydrant/mc/mc/edit-ends-of-lines
         hydrant/mc/mc/insert-numbers
         hydrant/mc/mc/mark-all-in-region-regexp
+        hydrant/mc/mc/mark-next-like-this-symbol
         hydrant/mc/mc/mark-next-like-this-word
         hydrant/mc/mc/mark-next-like-this-word-and-exit
         hydrant/mc/mc/mark-next-lines

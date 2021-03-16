@@ -1194,8 +1194,8 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package org
   :straight (:type built-in)
-  :hook ((ediff-prepare-buffer . outline-show-all)
-         ((org-capture-mode org-src-mode) . aorst/discard-history))
+  :hook (((org-capture-mode org-src-mode) . aorst/discard-history)
+         (org-mode . flyspell-mode))
   :bind (:map org-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines)
          ("C-c l" . org-store-link))
@@ -1719,7 +1719,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("?" flycheck-describe-checker)
       ("d" flycheck-disable-checker)
       ("m" flycheck-mode)
-      ("s" flycheck-select-checker))))
+      ("s" flycheck-select-checker)
+      ("C-g" mc/keyboard-quit :exit t))))
 
 (use-package flycheck-package
   :hook ((emacs-lisp-mode . flycheck-mode)
@@ -1951,7 +1952,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package ediff
   :straight nil
-  :hook ((ediff-before-setup . aorst/store-pre-ediff-winconfig)
+  :hook ((ediff-prepare-buffer . outline-show-all)
+         (ediff-before-setup . aorst/store-pre-ediff-winconfig)
          (ediff-quit . aorst/restore-pre-ediff-winconfig)
          (ediff-keymap-setup . aorst/ediff-setup-keys))
   :custom-face
@@ -2020,28 +2022,37 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package mc-extras)
 (use-package multiple-cursors
   :commands (mc/cycle-backward
-	     mc/cycle-forward)
+             mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-	 ("C-c m" . hydrant/mc/body)
-	 ("M-n" . mc/mark-next-like-this-word)
-	 :map mc/keymap
-	 ("<return>" . nil)
-	 ("C-s" . phi-search)
-	 ("C-r" . phi-search-backward))
+         ("C-c m" . hydrant/mc/body)
+         ("M-n" . mc/mark-next-like-this-symbol)
+         :map mc/keymap
+         ("<return>" . nil)
+         ("C-s" . phi-search)
+         ("C-r" . phi-search-backward))
   :config
+  (define-advice mc/mark-next-like-this-symbol (:after (&rest _) aorst:mc-mark-next-like-this-symbol) (mc/cycle-forward))
+  (define-advice mc/mark-next-like-this-word (:after (&rest _) aorst:mc-mark-next-like-this-word) (mc/cycle-forward))
+  (define-advice mc/mark-next-lines (:after (&rest _) aorst:mc-mark-next-lines) (mc/cycle-forward))
+  (define-advice mc/mark-previous-like-this-symbol (:after (&rest _) aorst:mc-mark-previous-like-this-symbol) (mc/cycle-backward))
+  (define-advice mc/mark-previous-like-this-word (:after (&rest _) aorst:mc-mark-previous-like-this-word) (mc/cycle-backward))
   (when (fboundp #'defhydra)
     (defhydra hydrant/mc (:hint nil :color pink)
       "
- ^Select^                 ^Discard^                      ^Edit^               ^Navigate^
- _M-s_: split lines       _M-SPC_:  discard current      _&_: align           _(_: cycle backward
- _s_:   select regexp     _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
- _n_:   select next       _d_:      remove duplicated    ^ ^                  ^ ^
- _p_:   select previous   _q_ or _g_: exit hydrant       ^ ^                  ^ ^
- _C_:   select next line  _G_:      exit mc mode"
+ ^Select^                       ^Discard^                      ^Edit^               ^Navigate^
+ _M-s_: split lines             _M-SPC_:  discard current      _&_: align           _(_: cycle backward
+ _s_:   select regexp           _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
+ _n_:   select next word        _d_:      remove duplicated    ^ ^                  ^ ^
+ _M-n_: select next symbol      _q_ or _g_: exit hydrant       ^ ^                  ^ ^
+ _p_:   select previous word    _G_:      exit mc mode         ^ ^                  ^ ^
+ _M-p_: select previous symbol  ^ ^                            ^ ^                  ^ ^
+ _C_:   select next line"
       ("M-s" mc/edit-ends-of-lines)
       ("s" mc/mark-all-in-region-regexp)
       ("n" mc/mark-next-like-this-word)
+      ("M-n" mc/mark-next-like-this-symbol)
       ("p" mc/mark-previous-like-this-word)
+      ("M-p" mc/mark-previous-like-this-symbol)
       ("&" mc/vertical-align-with-space)
       ("(" mc/cycle-backward)
       (")" mc/cycle-forward)
@@ -2052,7 +2063,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("#" mc/insert-numbers)
       ("q" mc/remove-duplicated-cursors :exit t)
       ("g" mc/remove-duplicated-cursors :exit t)
-      ("G" mc/keyboard-quit :exit t))))
+      ("G" mc/keyboard-quit :exit t)
+      ("C-g" mc/keyboard-quit :exit t))))
 
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
@@ -2076,7 +2088,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("g" ignore :exit t)
       ("q" ignore :exit t)
       ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
-      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t))))
+      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)))
+      ("C-g" mc/keyboard-quit :exit t))
 
 (use-package lsp-mode
   :hook (((rust-mode
@@ -2188,7 +2201,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("sb" hs-show-block)
       ("qq" ignore :exit t)
       ("qs" hs-show-all :exit t)
-      ("qh" hs-hide-all :exit t))))
+      ("qh" hs-hide-all :exit t)
+      ("C-g" mc/keyboard-quit :exit t))))
 
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
