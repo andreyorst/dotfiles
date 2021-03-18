@@ -7,6 +7,7 @@ fi
 
 # Scripts and better defaults for shell
 for i in "$HOME"/.dotfiles/scripts/*.sh; do
+    # shellcheck disable=SC1090
     source "$i"
 done
 

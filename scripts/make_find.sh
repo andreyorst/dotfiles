@@ -18,19 +18,16 @@ bake_find_command() {
                 unset exclude_dirs
                 return 0 ;;
             (-help|-h)
-                printf "%s"
+                printf "%s\n" \
                 "usage: bake_find_command [-F <filename>]* [-D <dirname>]*
 
-  -F -exclude-file: exclude this file from search.  Globs supported.
-  -D -exclude-dir:  exclude this dir from search.  Globs supported.
-
-     -default:      exclude default set of files and directories.
-                    Default files: '*.o' '*.bin' '*.obj'
-                    Default directories: '.git' '.svn'
-
-     -clean:        remove all ignored patterns and exit.
-
-  -h -help:         print this message and exit." >&2
+  -F -exclude-file : exclude this file from search.  Globs supported.
+  -D -exclude-dir  : exclude this dir from search.  Globs supported.
+     -default      : exclude default set of files and directories.
+                     Default files: '*.o' '*.bin' '*.obj'
+                     Default directories: '.git' '.svn'
+     -clean        : remove all ignored patterns and exit.
+  -h -help         : print this message and exit." >&2
                 unset exclude_files
                 unset exclude_dirs
                 return 0 ;;

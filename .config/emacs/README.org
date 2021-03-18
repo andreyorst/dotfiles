@@ -2448,12 +2448,12 @@ Emacs also has a great package called Cider, which is an IDE for Clojure and Clo
     (cider-eval-spinner nil)
     :config
     (setq cider-jdk-src-paths nil)
-    (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
-      (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip") t)
-    (when (file-exists-p "/usr/lib/jvm/java-11-openjdk/lib/src.zip")
-      (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip") t)
-    (when-let ((clj-java-src (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))
-      (add-to-list 'cider-jdk-src-paths (car clj-java-src) t)))
+    (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
+                         (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/**/src.zip")
+                         (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
+      (when (file-exists-p src)
+        (unless (memq src cider-jdk-src-paths)
+          (add-to-list 'cider-jdk-src-paths src t)))))
 #+end_src
 
 *** flycheck-clj-kondo
@@ -2834,7 +2834,7 @@ Some languages have better support with =flycheck=.
         ("d" flycheck-disable-checker)
         ("m" flycheck-mode)
         ("s" flycheck-select-checker)
-        ("C-g" mc/keyboard-quit :exit t))))
+        ("C-g" ignore :exit t))))
 #+end_src
 
 *** Flycheck package
@@ -3307,7 +3307,7 @@ Supports most languages that I work with inside Emacs.
         ("q" ignore :exit t)
         ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
         ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)))
-        ("C-g" mc/keyboard-quit :exit t))
+        ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))
 #+end_src
 
 ** LSP
@@ -3501,7 +3501,7 @@ I use =transient= to create little interactive menu for easy interaction.
         ("qq" ignore :exit t)
         ("qs" hs-show-all :exit t)
         ("qh" hs-hide-all :exit t)
-        ("C-g" mc/keyboard-quit :exit t))))
+        ("C-g" ignore :exit t))))
 #+end_src
 
 ** Edit Indirect

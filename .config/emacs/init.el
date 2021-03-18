@@ -1444,12 +1444,12 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-eval-spinner nil)
   :config
   (setq cider-jdk-src-paths nil)
-  (when (file-exists-p "/usr/lib/jvm/java-1.8.0-openjdk/src.zip")
-    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-1.8.0-openjdk/src.zip") t)
-  (when (file-exists-p "/usr/lib/jvm/java-11-openjdk/lib/src.zip")
-    (add-to-list 'cider-jdk-src-paths "/usr/lib/jvm/java-11-openjdk/lib/src.zip") t)
-  (when-let ((clj-java-src (file-expand-wildcards "~/.clojure-src/clojure-*.*.*-sources.jar")))
-    (add-to-list 'cider-jdk-src-paths (car clj-java-src) t)))
+  (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
+                       (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/**/src.zip")
+                       (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
+    (when (file-exists-p src)
+      (unless (memq src cider-jdk-src-paths)
+        (add-to-list 'cider-jdk-src-paths src t)))))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo")
@@ -1720,7 +1720,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("d" flycheck-disable-checker)
       ("m" flycheck-mode)
       ("s" flycheck-select-checker)
-      ("C-g" mc/keyboard-quit :exit t))))
+      ("C-g" ignore :exit t))))
 
 (use-package flycheck-package
   :hook ((emacs-lisp-mode . flycheck-mode)
@@ -2089,7 +2089,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("q" ignore :exit t)
       ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
       ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)))
-      ("C-g" mc/keyboard-quit :exit t))
+      ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))
 
 (use-package lsp-mode
   :hook (((rust-mode
@@ -2202,7 +2202,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("qq" ignore :exit t)
       ("qs" hs-show-all :exit t)
       ("qh" hs-hide-all :exit t)
-      ("C-g" mc/keyboard-quit :exit t))))
+      ("C-g" ignore :exit t))))
 
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))

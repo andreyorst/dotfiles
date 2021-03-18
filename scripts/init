@@ -1,0 +1,20 @@
+#!/usr/bin/sh
+
+(
+    dotfiles_dir="$(realpath "$(dirname "$0")"/../)"
+
+    cd "$HOME" || exit
+
+    for file in "$dotfiles_dir"/.*; do
+        [ -f "$file" ] \
+            && [ "$(basename "$file")" != ".gitignore" ] \
+            && ln -sf "$file" ./
+    done
+
+    mkdir -p "$HOME"/.config
+    cd "$HOME"/.config || exit
+
+    for file in "$dotfiles_dir"/.config/*; do
+        ln -sf "$file" ./
+    done
+)

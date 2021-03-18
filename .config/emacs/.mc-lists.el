@@ -103,6 +103,7 @@
         hydrant/-digit-argument
         hydrant/-negative-argument
         hydrant/er/body
+        hydrant/er/lambda-G-and-exit
         hydrant/iedit/aorst/iedit-to-mc-hydrant-and-exit
         hydrant/mc/body
         hydrant/mc/mc/cycle-backward
