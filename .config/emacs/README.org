@@ -3305,8 +3305,8 @@ Supports most languages that I work with inside Emacs.
         ("g" ignore :exit t)
         ("q" ignore :exit t)
         ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
-        ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)))
-        ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))
+        ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)
+        ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))))
 #+end_src
 
 ** LSP
@@ -3483,7 +3483,7 @@ I use =hydra= to create little interactive menu for easy interaction.
     :straight nil
     :hook (prog-mode . hs-minor-mode)
     :bind (:map prog-mode-map
-           ("<f6>" . hydrant/hideshow-menu/body))
+           ("C-c h" . hydrant/hideshow-menu/body))
     :config
     (when (fboundp #'defhydra)
       (defhydra hydrant/hideshow-menu (:color pink :hint nil)
@@ -3725,6 +3725,7 @@ Great addition to [[*Magit TODOs][Magit TODOs]].
 #+end_src
 
 ** Outline
+Simple hydrant for =outline-minor-mode=.
 
 #+begin_src emacs-lisp
   (use-package outline
@@ -3734,9 +3735,9 @@ Great addition to [[*Magit TODOs][Magit TODOs]].
     (when (fboundp #'defhydra)
       (defhydra hydrant/outline-menu (:color pink :hint nil)
         "
-    ^Hide^       ^Show^        ^Move^
-    _ho_: other  _sa_: all     _n_: next
-    ^  ^         _t_:  toggle  _p_: previous"
+   ^Hide^       ^Show^        ^Move^
+   _ho_: other  _sa_: all     _n_: next
+   ^  ^         _t_:  toggle  _p_: previous"
         ("ho" outline-hide-other)
         ("sa" outline-show-all)
         ("t" outline-cycle)

@@ -121,6 +121,7 @@
         hydrant/mc/mc/remove-duplicated-cursors
         hydrant/mc/mc/remove-duplicated-cursors-and-exit
         hydrant/mc/mc/vertical-align-with-space
+        hydrant/outline-menu/ignore-and-exit
         iedit-next-occurrence
         iedit-switch-to-mc-mode
         ignore

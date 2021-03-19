@@ -2087,8 +2087,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       ("g" ignore :exit t)
       ("q" ignore :exit t)
       ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
-      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)))
-      ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))
+      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)
+      ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))))
 
 (use-package lsp-mode
   :hook (((rust-mode
@@ -2184,7 +2184,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :straight nil
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
-         ("<f6>" . hydrant/hideshow-menu/body))
+         ("C-c h" . hydrant/hideshow-menu/body))
   :config
   (when (fboundp #'defhydra)
     (defhydra hydrant/hideshow-menu (:color pink :hint nil)
@@ -2341,9 +2341,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (when (fboundp #'defhydra)
     (defhydra hydrant/outline-menu (:color pink :hint nil)
       "
-  ^Hide^       ^Show^        ^Move^
-  _ho_: other  _sa_: all     _n_: next
-  ^  ^         _t_:  toggle  _p_: previous"
+ ^Hide^       ^Show^        ^Move^
+ _ho_: other  _sa_: all     _n_: next
+ ^  ^         _t_:  toggle  _p_: previous"
       ("ho" outline-hide-other)
       ("sa" outline-show-all)
       ("t" outline-cycle)
