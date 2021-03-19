@@ -234,11 +234,10 @@ Based on `so-long-detected-long-line-p'."
                              (string-to-char (or comment-start "-"))
                              'font-lock-comment-face)))))
 
-(dolist (mode-hook '(emacs-lisp-mode-hook
-                     help-mode-hook
-                     fennel-mode-hook
+(dolist (mode-hook '(help-mode-hook
                      org-mode-hook
-                     outline-mode-hook))
+                     outline-mode-hook
+                     prog-mode-hook))
   (add-hook mode-hook 'aorst/formfeed-line))
 
 (defun aorst/real-buffer-p (&optional buffer)
@@ -2183,7 +2182,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package hideshow
   :straight nil
-  :after transient
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
          ("<f6>" . hydrant/hideshow-menu/body))
@@ -2335,6 +2333,23 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode))
+
+(use-package outline
+  :straight nil
+  :bind (("C-c o" . hydrant/outline-menu/body))
+  :config
+  (when (fboundp #'defhydra)
+    (defhydra hydrant/outline-menu (:color pink :hint nil)
+      "
+  ^Hide^       ^Show^        ^Move^
+  _ho_: other  _sa_: all     _n_: next
+  ^  ^         _t_:  toggle  _p_: previous"
+      ("ho" outline-hide-other)
+      ("sa" outline-show-all)
+      ("t" outline-cycle)
+      ("n" outline-next-heading)
+      ("p" outline-previous-heading)
+      ("C-g" ignore :exit t))))
 
 (provide 'init)
 ;;; init.el ends here
