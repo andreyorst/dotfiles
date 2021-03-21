@@ -144,3 +144,5 @@ plug "git@github.com:andreyorst/kaktree" defer kaktree %{
 }
 
 plug "git@github.com:andreyorst/pmanage.kak"
+
+plug "Screwtapello/kakoune-shellcheck" domain gitlab.com
