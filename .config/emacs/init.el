@@ -41,7 +41,7 @@
   :config
   (let ((auto-save-dir (expand-file-name ".cache/auto-save/" user-emacs-directory)))
     (unless (file-exists-p auto-save-dir)
-      (make-directory auto-save-dir))))
+      (make-directory auto-save-dir t))))
 
 (use-package subr
   :no-require t
