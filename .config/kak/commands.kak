@@ -313,7 +313,7 @@ map-sequence -params 2 %{ evaluate-commands %sh{
 
 map-sequence jj %{exec <esc>}
 
-define-command -docstring "unmap-sequence <scope> <sequence>: unmap <sequence> of keys in insert mode." \
+define-command -docstring "unmap-sequence <sequence>: unmap <sequence> of keys in insert mode." \
 unmap-sequence -params 1 %{
     remove-hooks global "%arg{2}-seq"
 }
