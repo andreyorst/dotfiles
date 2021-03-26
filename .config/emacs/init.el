@@ -240,6 +240,10 @@ Based on `so-long-detected-long-line-p'."
                      prog-mode-hook))
   (add-hook mode-hook 'aorst/formfeed-line))
 
+(use-package window
+  :straight nil
+  :bind ("C-c b" . bury-buffer))
+
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
   (not (or (string-match-p
@@ -935,7 +939,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
              treemacs-filewatch-mode
              treemacs-load-theme)
   :bind (("<f7>" . treemacs)
-         ("<f8>" . treemacs-select-window)
+         ("C-c t" . treemacs-select-window)
          :map treemacs-mode-map
          ([C-tab] . aorst/treemacs-expand-all-projects))
   :hook ((after-init . aorst/treemacs-after-init-setup)
@@ -1441,6 +1445,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-inspector-fill-frame nil)
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner nil)
+  (cider-repl-prompt-function cider-repl-prompt-newline)
   :config
   (setq cider-jdk-src-paths nil)
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
@@ -1448,7 +1453,11 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
                        (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
     (when (file-exists-p src)
       (unless (memq src cider-jdk-src-paths)
-        (add-to-list 'cider-jdk-src-paths src t)))))
+        (add-to-list 'cider-jdk-src-paths src t))))
+  (defun cider-repl-prompt-newline (namespace)
+    "Return a prompt string that mentions NAMESPACE with newline
+afterward."
+    (format "%s\n" namespace)))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo")
@@ -1616,8 +1625,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (flymake-fringe-indicator-position 'right-fringe))
 
 (use-package flycheck
-  :bind (:map flycheck-mode-map
-         ("C-c ! C-h" . hydrant/flycheck/body))
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
@@ -1664,7 +1671,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
               #b00000000
               #b00000000
               #b00111100
-              #b01111110
+              #b01100110
               #b01100110
               #b01100110
               #b00000110
@@ -1699,27 +1706,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
       :fringe-face 'flycheck-fringe-info
       :error-list-face 'flycheck-error-list-info))
   (define-advice flycheck-may-use-echo-area-p (:override () aorst:flycheck-no-echo-or-buffer)
-    nil)
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/flycheck (:color blue :hint nil)
-      "
- ^Flycheck^         ^Errors^       ^Checker^
- _q_: quit          _<_: previous  _?_: describe
- _M_: manual        _>_: next      _d_: disable
- _v_: verify setup  _f_: check     _m_: mode
- ^ ^                _l_: list      _s_: select"
-      ("q" ignore :exit t)
-      ("M" flycheck-manual)
-      ("v" flycheck-verify-setup)
-      ("<" flycheck-previous-error :color pink)
-      (">" flycheck-next-error :color pink)
-      ("f" flycheck-buffer)
-      ("l" flycheck-list-errors)
-      ("?" flycheck-describe-checker)
-      ("d" flycheck-disable-checker)
-      ("m" flycheck-mode)
-      ("s" flycheck-select-checker)
-      ("C-g" ignore :exit t))))
+    nil))
 
 (use-package flycheck-package
   :hook ((emacs-lisp-mode . flycheck-mode)
@@ -2020,6 +2007,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package phi-search)
 (use-package mc-extras)
 (use-package multiple-cursors
+  :requires hydra
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
@@ -2067,28 +2055,28 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
+  :requires hydra
   :config
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/er (:color pink :hint nil)
-      "
+  (defhydra hydrant/er (:color pink :hint nil)
+    "
  ^Expand/Discard^                ^Mark^
  _e_:      expand region         _(_: inside pairs
  _r_:      reduce region         _)_: around pairs
  _g_ or _q_: exit hydrant          _'_: inside quotes
  _G_:      discard region, exit  _\"_: around quotes
  ^ ^  ^ ^                          _p_: paragraph"
-      ("e" er/expand-region)
-      ("r" er/contract-region)
-      ("p" er/mark-paragraph)
-      ("(" er/mark-inside-pairs)
-      (")" er/mark-outside-pairs)
-      ("'" er/mark-inside-quotes)
-      ("\"" er/mark-outside-quotes)
-      ("g" ignore :exit t)
-      ("q" ignore :exit t)
-      ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
-      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)
-      ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t))))
+    ("e" er/expand-region)
+    ("r" er/contract-region)
+    ("p" er/mark-paragraph)
+    ("(" er/mark-inside-pairs)
+    (")" er/mark-outside-pairs)
+    ("'" er/mark-inside-quotes)
+    ("\"" er/mark-outside-quotes)
+    ("g" ignore :exit t)
+    ("q" ignore :exit t)
+    ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
+    ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)
+    ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t)))
 
 (use-package lsp-mode
   :hook (((rust-mode
@@ -2182,25 +2170,23 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package hideshow
   :straight nil
+  :requires hydra
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
          ("C-c h" . hydrant/hideshow-menu/body))
   :config
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/hideshow-menu (:color pink :hint nil)
-      "
+  (defhydra hydrant/hideshow-menu (:color pink :hint nil)
+    "
  ^Hide^       ^Show^       ^Exit^
  _ha_: all    _sa_: all    _qs_: quit show all
- _hb_: block  _sb_: block  _qh_: quit hide all
- ^  ^         ^  ^         _qq_: quit"
-      ("ha" hs-hide-all)
-      ("hb" hs-hide-block)
-      ("sa" hs-show-all)
-      ("sb" hs-show-block)
-      ("qq" ignore :exit t)
-      ("qs" hs-show-all :exit t)
-      ("qh" hs-hide-all :exit t)
-      ("C-g" ignore :exit t))))
+ _hb_: block  _sb_: block  _qh_: quit hide all"
+    ("ha" hs-hide-all)
+    ("hb" hs-hide-block)
+    ("sa" hs-show-all)
+    ("sb" hs-show-block)
+    ("qs" hs-show-all :exit t)
+    ("qh" hs-hide-all :exit t)
+    ("C-g" ignore :exit t)))
 
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
@@ -2337,19 +2323,35 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 (use-package outline
   :straight nil
   :bind (("C-c o" . hydrant/outline-menu/body))
+  :requires hydra
   :config
-  (when (fboundp #'defhydra)
-    (defhydra hydrant/outline-menu (:color pink :hint nil)
-      "
+  (defhydra hydrant/outline-menu (:color pink :hint nil)
+    "
  ^Hide^       ^Show^        ^Move^
  _ho_: other  _sa_: all     _n_: next
  ^  ^         _t_:  toggle  _p_: previous"
-      ("ho" outline-hide-other)
-      ("sa" outline-show-all)
-      ("t" outline-cycle)
-      ("n" outline-next-heading)
-      ("p" outline-previous-heading)
-      ("C-g" ignore :exit t))))
+    ("ho" outline-hide-other)
+    ("sa" outline-show-all)
+    ("t" outline-cycle)
+    ("n" outline-next-heading)
+    ("p" outline-previous-heading)
+    ("C-g" ignore :exit t)))
+
+(use-package paren-face
+  :hook ((clojure-mode
+          emacs-lisp-mode
+          common-lisp-mode
+          scheme-mode
+          lisp-mode
+          racket-mode
+          fennel-mode
+          cider-repl-mode
+          racket-repl-mode
+          geiser-repl-mode
+          inferior-lisp-mode
+          inferior-emacs-lisp-mode)
+         . paren-face-mode)
+  :custom (paren-face-regexp "[][(){}]"))
 
 (provide 'init)
 ;;; init.el ends here

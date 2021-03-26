@@ -97,6 +97,7 @@
         counsel-describe-function
         counsel-find-file
         count-lines-page
+        dabbrev-expand
         god-local-mode
         hydra--digit-argument
         hydra--universal-argument
