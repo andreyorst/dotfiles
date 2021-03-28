@@ -1445,7 +1445,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-inspector-fill-frame nil)
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner nil)
-  (cider-repl-prompt-function cider-repl-prompt-newline)
+  (cider-repl-prompt-function #'cider-repl-prompt-newline)
   :config
   (setq cider-jdk-src-paths nil)
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
@@ -2141,7 +2141,7 @@ afterward."
   :straight nil
   :config
   (defvar aorst--project-root-markers
-    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git")
+    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
     "Files or directories that indicate the root of a project.")
   (defun aorst/project-find-root (path)
     "Recursive search in PATH for root markers."
