@@ -2491,7 +2491,7 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
             (cljr-warn-on-eval nil))
 #+end_src
 
-*** Anakondo
+*** COMMENT Anakondo
 Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-kondo][clj-kondo]].
 
 #+begin_src emacs-lisp

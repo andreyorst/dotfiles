@@ -1470,17 +1470,6 @@ afterward."
   :custom (cljr-suppress-no-project-warning t)
           (cljr-warn-on-eval nil))
 
-(use-package anakondo
-  :straight (:host github
-	     :repo "didibus/anakondo")
-  :when (executable-find "clj-kondo")
-  :hook
-  ((clojure-mode
-    clojurescript-mode
-    clojurec-mode)
-   . anakondo-minor-mode)
-  :commands anakondo-minor-mode)
-
 (use-package fennel-mode
   :straight (:host gitlab
              :repo "technomancy/fennel-mode")
