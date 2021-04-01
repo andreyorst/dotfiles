@@ -1859,25 +1859,13 @@ afterward."
                        company-echo-metadata-frontend))
   (company-backends '(company-capf company-files company-dabbrev-code))
   (company-tooltip-minimum-width 30)
-  (company-tooltip-maximum-width 60))
+  (company-tooltip-maximum-width 120))
 
-(use-package company-posframe
-  :after company
+(use-package company-box
+  :hook (company-mode . company-box-mode)
   :custom
-  (company-posframe-quickhelp-show-header nil)
-  (company-posframe-show-indicator nil)
-  (company-posframe-show-metadata nil)
-  :config
-  (let ((params (list :poshandler #'company-posframe-quickhelp-right-poshandler
-                      :internal-border-width 0
-                      :lines-truncate t
-                      :left-fringe 1
-                      :right-fringe 1
-                      :timeout 60
-                      :no-properties nil)))
-    (setq company-posframe-quickhelp-show-params params
-          company-posframe-show-params params))
-  (company-posframe-mode))
+  (company-box-enable-icon nil)
+  (company-box-scrollbar nil))
 
 (use-package undo-tree
   :commands global-undo-tree-mode

@@ -55,9 +55,9 @@ HISTSIZE=100000
 HISTFILESIZE=10000000
 shopt -s histappend
 
-# smarter `emacs' launcher that will open file in existing emacs if one exists
-emacs() { if [ $# -gt 0 ]; then emacsclient -a emacs -n "$@" 2>/dev/null 1>&2; else command emacs; fi; }
-emacsupdate() { command emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(straight-pull-all)'; }
+emacsupdate() {
+    emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(progn (straight-pull-all) (straight-rebuild-all))';
+}
 
 # create dir and cd into it
 mkcd() { mkdir -p "$1" && cd "$1" || return $?; }

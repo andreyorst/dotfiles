@@ -3005,7 +3005,9 @@ The same thing is for =rg=, but counsel actually has it's own variable for it, s
 #+end_src
 
 ** Company
-Complete anything framework. Nothing much to say. Does it's job.
+Complete anything framework.
+Nothing much to say.
+Does it's job.
 
 #+begin_src emacs-lisp
   (use-package company
@@ -3035,10 +3037,10 @@ Complete anything framework. Nothing much to say. Does it's job.
                          company-echo-metadata-frontend))
     (company-backends '(company-capf company-files company-dabbrev-code))
     (company-tooltip-minimum-width 30)
-    (company-tooltip-maximum-width 60))
+    (company-tooltip-maximum-width 120))
 #+end_src
 
-*** Company Posframe
+*** COMMENT Company Posframe
 Provides posframe frontend for company.
 
 #+begin_src emacs-lisp
@@ -3059,6 +3061,18 @@ Provides posframe frontend for company.
       (setq company-posframe-quickhelp-show-params params
             company-posframe-show-params params))
     (company-posframe-mode))
+#+end_src
+
+*** Company box
+Provides graphical frontend for company.
+I don't need icons or scrollbar, but the documentation here seems to be rendered better than in company posframe package.
+
+#+begin_src emacs-lisp
+  (use-package company-box
+    :hook (company-mode . company-box-mode)
+    :custom
+    (company-box-enable-icon nil)
+    (company-box-scrollbar nil))
 #+end_src
 
 ** Undo Tree
