@@ -3327,7 +3327,6 @@ LSP client for Emacs.
     :hook (((rust-mode
              c-mode
              c++-mode
-             java-mode
              elixir-mode)
             . lsp)
            (lsp-mode . yas-minor-mode))
@@ -3770,6 +3769,18 @@ Dims parentheses a bit, making those less in your face.
             inferior-emacs-lisp-mode)
            . paren-face-mode)
     :custom (paren-face-regexp "[][(){}]"))
+#+end_src
+
+** Jdecomp
+Java bytecode decompiler support for viewing =.class= files.
+
+#+begin_src emacs-lisp
+  (use-package jdecomp
+    :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
+    :hook (archive-mode . jdecomp-mode)
+    :custom
+    (jdecomp-decompiler-type 'fernflower)
+    (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 #+end_src
 
 * Postscript

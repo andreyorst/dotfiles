@@ -2059,7 +2059,6 @@ afterward."
   :hook (((rust-mode
            c-mode
            c++-mode
-           java-mode
            elixir-mode)
           . lsp)
          (lsp-mode . yas-minor-mode))
@@ -2329,6 +2328,13 @@ afterward."
           inferior-emacs-lisp-mode)
          . paren-face-mode)
   :custom (paren-face-regexp "[][(){}]"))
+
+(use-package jdecomp
+  :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
+  :hook (archive-mode . jdecomp-mode)
+  :custom
+  (jdecomp-decompiler-type 'fernflower)
+  (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 
 (provide 'init)
 ;;; init.el ends here
