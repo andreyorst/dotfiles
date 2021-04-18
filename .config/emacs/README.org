@@ -2491,22 +2491,6 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
             (cljr-warn-on-eval nil))
 #+end_src
 
-*** COMMENT Anakondo
-Static code completion for Clojure based on [[https://github.com/clj-kondo/clj-kondo][clj-kondo]].
-
-#+begin_src emacs-lisp
-  (use-package anakondo
-    :straight (:host github
-	       :repo "didibus/anakondo")
-    :when (executable-find "clj-kondo")
-    :hook
-    ((clojure-mode
-      clojurescript-mode
-      clojurec-mode)
-     . anakondo-minor-mode)
-    :commands anakondo-minor-mode)
-#+end_src
-
 ** Fennel
 Fennel is a programming language a lisp dialect, that is being compiled to Lua, which means that it can run anywhere, where Lua can.
 It supports compile-time macro system, and full Lua compatibility.
@@ -3038,29 +3022,6 @@ Does it's job.
     (company-backends '(company-capf company-files company-dabbrev-code))
     (company-tooltip-minimum-width 30)
     (company-tooltip-maximum-width 120))
-#+end_src
-
-*** COMMENT Company Posframe
-Provides posframe frontend for company.
-
-#+begin_src emacs-lisp
-  (use-package company-posframe
-    :after company
-    :custom
-    (company-posframe-quickhelp-show-header nil)
-    (company-posframe-show-indicator nil)
-    (company-posframe-show-metadata nil)
-    :config
-    (let ((params (list :poshandler #'company-posframe-quickhelp-right-poshandler
-                        :internal-border-width 0
-                        :lines-truncate t
-                        :left-fringe 1
-                        :right-fringe 1
-                        :timeout 60
-                        :no-properties nil)))
-      (setq company-posframe-quickhelp-show-params params
-            company-posframe-show-params params))
-    (company-posframe-mode))
 #+end_src
 
 *** Company box
