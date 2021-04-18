@@ -911,7 +911,7 @@ What's especially cool, is that we can specify which ligatures we want, by defin
                              (+ "|"))))
                (?.  ,(rx (or (or ".?" ".=" ".-" "..<") (+ "."))))
                (?+  ,(rx (or "+>" (+ "+"))))
-               (?\[ ,(rx (or "[||]" "[<" "[|")))
+               (?\[ ,(rx (or "[<" "[|")))
                (?\{ ,(rx "{|"))
                (?\? ,(rx (or (or "?." "?=" "?:") (+ "?"))))
                (?#  ,(rx (or (or "#_(" "#[" "#{" "#=" "#!" "#:" "#_" "#?" "#(") (+ "#"))))
