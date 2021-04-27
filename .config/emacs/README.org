@@ -33,7 +33,7 @@ It is meant to configure package initialization and early graphical interface tw
   ;;; Code:
 #+end_src
 
-*** Emacs 28 Obsolete workaround
+** Emacs 28 Obsolete workaround
 Emacs 28 made some changes to obsolete-related functions, making third argument =when= mandatory.
 This broke a lot of packages, so for now, a workaround is to define an =around= advice:
 
@@ -50,7 +50,7 @@ This broke a lot of packages, so for now, a workaround is to define an =around= 
   (advice-add 'define-obsolete-function-alias :around #'aorst/wrap-obsolete)
 #+end_src
 
-*** Garbage Collection and Performance
+** Garbage Collection and Performance
 One of the main problems with Emacs startup time is its garbage collection system.
 It is invoked so many times during startup that it causes quite a big impact on startup time.
 This can be migrated by setting high GC threshold and restoring it back in =after-init-hook=.
@@ -75,7 +75,7 @@ This can be migrated by setting high GC threshold and restoring it back in =afte
   (setq read-process-output-max (* 1024 1024 4)) ; 4mb
 #+end_src
 
-*** Native Compiled Emacs Lisp
+** Native Compiled Emacs Lisp
 Emacs 28 can Emacs Lisp to native code.
 These settings enable background asynchronous compilation and dynamic reloading of compiled modules.
 
@@ -87,7 +87,7 @@ These settings enable background asynchronous compilation and dynamic reloading 
     (setq comp-async-report-warnings-errors nil))
 #+end_src
 
-*** User Interface
+** User Interface
 This code sets default size of the frame and prevents the glimpse of unstyled Emacs by disabling some UI elements early.
 Resizing frame is also expensive, and setting =x-gtk-resize-child-frames= variable to =resize-mode= is a workaround for the [[https://gitlab.gnome.org/GNOME/mutter/-/issues/840][issue]] with child frames not being resized correctly under Mutter.
 
@@ -105,7 +105,7 @@ Resizing frame is also expensive, and setting =x-gtk-resize-child-frames= variab
                 (assq-delete-all 'truncation fringe-indicator-alist))
 #+end_src
 
-*** =straight.el=
+** =straight.el=
 Straight is an alternative way to manage package installations.
 It can install packages from Git repositories listed on ELPA, MELPA, and directly from Git URLs.
 
@@ -135,14 +135,14 @@ It can install packages from Git repositories listed on ELPA, MELPA, and directl
     (load bootstrap-file nil 'nomessage))
 #+end_src
 
-*** early =package.el= settings
+** early =package.el= settings
 =package.el= initialization is expensive, thus should be disabled before loading main init file:
 
 #+begin_src emacs-lisp
   (setq package-enable-at-startup nil)
 #+end_src
 
-*** =(provide 'early-init)=
+** =(provide 'early-init)=
 This concludes the =early-init.el= file.
 
 #+begin_src emacs-lisp
@@ -470,6 +470,10 @@ Disables line wrapping.
 
 #+begin_src emacs-lisp
   (setq-default truncate-lines t)
+  (setq-default bidi-paragraph-direction 'left-to-right)
+
+  (when (version<= "27.1" emacs-version)
+    (setq bidi-inhibit-bpa t))
 #+end_src
 
 *** Minibuffer
@@ -2108,15 +2112,6 @@ REPL support for various Schemes.
     (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 #+end_src
 
-*** Cmake
-A mode for editing cmake files.
-
-#+begin_src emacs-lisp
-  (use-package cmake-mode
-    :bind (:map cmake-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
-#+end_src
-
 *** Emacs Lisp
 Emacs lisp mode tweaks.
 
@@ -2181,6 +2176,137 @@ Emacs lisp mode tweaks.
       (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 #+end_src
 
+*** Fennel
+Fennel is a lisp dialect, that is being compiled to Lua, which means that it can run anywhere, where Lua can.
+It supports compile-time macro system, and full Lua compatibility.
+
+#+begin_src emacs-lisp
+  (use-package fennel-mode
+    :straight (:host gitlab
+               :repo "technomancy/fennel-mode")
+    :bind (:map fennel-mode-map
+           ("C-c C-M-f" . aorst/indent-buffer)
+           ("M-." . xref-find-definitions))
+    :hook (fennel-mode . fennel-mode-setup)
+    :config
+    (put 'time 'fennel-indent-function 0)
+    (put 'dotimes 'fennel-indent-function 1)
+    (put 'when-let 'fennel-indent-function 1)
+    (put 'if-let 'fennel-indent-function 1)
+    (put 'try 'fennel-indent-function 0)
+    (put 'catch 'fennel-indent-function 1)
+    (put 'local 'fennel-indent-function 1)
+    (put 'var 'fennel-indent-function 1)
+    (put 'finally 'fennel-indent-function 0)
+    (modify-syntax-entry ?# "w")
+    (defun fennel-mode-setup ()
+      "Set common variables."
+      (setq-local comment-end "")
+      (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
+    (defvar org-babel-default-header-args:fennel '((:results . "silent")))
+    (defun org-babel-execute:fennel (body params)
+      "Evaluate a block of Fennel code with Babel."
+      (lisp-eval-string body))
+    (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
+      (setq-local lisp-indent-function 'fennel-indent-function)))
+#+end_src
+
+*** Clojure
+[[https://clojure.org/][Clojure]] language support.
+
+#+begin_src emacs-lisp
+  (use-package clojure-mode
+    :hook ((clojure-mode
+            clojurec-mode
+            clojurescript-mode)
+           . flycheck-mode)
+    :bind (:map clojure-mode-map
+           ("C-c C-M-f" . aorst/indent-buffer))
+    :config
+    (modify-syntax-entry ?# "w"))
+#+end_src
+
+**** CIDER
+IDE for Clojure and ClojureScript.
+
+#+begin_src emacs-lisp
+  (use-package cider
+    :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
+           ((cider-repl-mode cider-mode) . eldoc-mode))
+    :bind (:map cider-repl-mode-map
+           ("C-c C-o" . cider-repl-clear-buffer))
+    :custom-face
+    (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
+    (cider-error-highlight-face ((t (:inherit flymake-error))))
+    (cider-warning-highlight-face ((t (:inherit flymake-warning))))
+    :custom
+    (nrepl-log-messages nil)
+    (cider-repl-display-help-banner nil)
+    (cider-repl-tab-command #'indent-for-tab-command)
+    (nrepl-hide-special-buffers t)
+    (cider-test-show-report-on-success t)
+    (cider-allow-jack-in-without-project t)
+    (cider-use-fringe-indicators nil)
+    (cider-font-lock-dynamically '(macro var deprecated))
+    (cider-save-file-on-load nil)
+    (cider-inspector-fill-frame nil)
+    (cider-auto-select-error-buffer t)
+    (cider-eval-spinner nil)
+    (cider-repl-prompt-function #'cider-repl-prompt-newline)
+    :config
+    (setq cider-jdk-src-paths nil)
+    (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
+                         (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/**/src.zip")
+                         (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
+      (when (file-exists-p src)
+        (unless (memq src cider-jdk-src-paths)
+          (add-to-list 'cider-jdk-src-paths src t))))
+    (defun cider-repl-prompt-newline (namespace)
+      "Return a prompt string that mentions NAMESPACE with newline
+  appended."
+      (format "%s\n" namespace)))
+#+end_src
+
+**** flycheck-clj-kondo
+[[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flycheck-clj-kondo= is a backend for =flycheck=, that makes these two things understand each other.
+
+#+begin_src emacs-lisp
+  (use-package flycheck-clj-kondo
+    :when (executable-find "clj-kondo")
+    :straight (:host github
+               :repo "borkdude/flycheck-clj-kondo"))
+#+end_src
+
+**** clj-refactor
+=clj-refactor= provides refactoring support for Clojure projects.
+It complements the refactoring functionality from =clojure-mode= and CIDER.
+
+#+begin_src emacs-lisp
+  (use-package clj-refactor
+    :hook ((cider-mode . clj-refactor-mode)
+           (cider-mode . yas-minor-mode))
+    :custom (cljr-suppress-no-project-warning t)
+    (cljr-warn-on-eval nil))
+#+end_src
+
+*** COMMENT Common Lisp
+Common Lisp IDE for Emacs.
+Disabled until [[https://gitlab.com/technomancy/fennel-mode/-/issues/11][technomancy/fennel-mode#11]] is resolved.
+
+#+begin_src emacs-lisp
+  (use-package sly
+    :custom (inferior-lisp-program "sbcl"))
+#+end_src
+
+*** Cmake
+A mode for editing cmake files.
+
+#+begin_src emacs-lisp
+  (use-package cmake-mode
+    :bind (:map cmake-mode-map
+           ("C-c C-M-f" . aorst/indent-buffer)))
+#+end_src
+
 *** Yaml
 Support for =.yaml= files.
 
@@ -2218,119 +2344,6 @@ Perl related configurations.
     :hook ((perl-mode . flycheck-mode))
     :bind (:map perl-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)))
-#+end_src
-
-*** Clojure
-[[https://clojure.org/][Clojure]] language support.
-
-#+begin_src emacs-lisp
-  (use-package clojure-mode
-    :hook ((clojure-mode
-            clojurec-mode
-            clojurescript-mode)
-           . flycheck-mode)
-    :bind (:map clojure-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
-    :config
-    (modify-syntax-entry ?# "w"))
-#+end_src
-
-**** CIDER
-IDE for Clojure and ClojureScript.
-
-#+begin_src emacs-lisp
-  (use-package cider
-    :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-           ((cider-repl-mode cider-mode) . eldoc-mode))
-    :bind (:map cider-repl-mode-map
-           ("C-c C-o" . cider-repl-clear-buffer))
-    :custom-face
-    (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
-    (cider-error-highlight-face ((t (:inherit flymake-error))))
-    (cider-warning-highlight-face ((t (:inherit flymake-warning))))
-    :custom
-    (nrepl-log-messages nil)
-    (cider-repl-display-help-banner nil)
-    (cider-repl-tab-command #'company-complete-common-or-cycle)
-    (nrepl-hide-special-buffers t)
-    (cider-test-show-report-on-success t)
-    (cider-allow-jack-in-without-project t)
-    (cider-use-fringe-indicators nil)
-    (cider-font-lock-dynamically '(macro var deprecated))
-    (cider-save-file-on-load nil)
-    (cider-inspector-fill-frame nil)
-    (cider-auto-select-error-buffer t)
-    (cider-eval-spinner nil)
-    (cider-repl-prompt-function #'cider-repl-prompt-newline)
-    :config
-    (setq cider-jdk-src-paths nil)
-    (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
-                         (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/**/src.zip")
-                         (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
-      (when (file-exists-p src)
-        (unless (memq src cider-jdk-src-paths)
-          (add-to-list 'cider-jdk-src-paths src t))))
-    (defun cider-repl-prompt-newline (namespace)
-      "Return a prompt string that mentions NAMESPACE with newline
-  afterward."
-      (format "%s\n" namespace)))
-#+end_src
-
-**** flycheck-clj-kondo
-[[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flycheck-clj-kondo= is a backend for =flycheck=, that makes these two things understand each other.
-
-#+begin_src emacs-lisp
-  (use-package flycheck-clj-kondo
-    :when (executable-find "clj-kondo")
-    :straight (:host github
-               :repo "borkdude/flycheck-clj-kondo"))
-#+end_src
-
-**** clj-refactor
-=clj-refactor= provides refactoring support for Clojure projects.
-It complements the refactoring functionality from =clojure-mode= and CIDER.
-
-#+begin_src emacs-lisp
-  (use-package clj-refactor
-    :hook ((cider-mode . clj-refactor-mode)
-           (cider-mode . yas-minor-mode))
-    :custom (cljr-suppress-no-project-warning t)
-    (cljr-warn-on-eval nil))
-#+end_src
-
-*** Fennel
-Fennel is a lisp dialect, that is being compiled to Lua, which means that it can run anywhere, where Lua can.
-It supports compile-time macro system, and full Lua compatibility.
-
-#+begin_src emacs-lisp
-  (use-package fennel-mode
-    :straight (:host gitlab
-               :repo "technomancy/fennel-mode")
-    :bind (:map fennel-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)
-           ("M-." . xref-find-definitions))
-    :hook (fennel-mode . fennel-mode-setup)
-    :config
-    (put 'time 'fennel-indent-function 0)
-    (put 'dotimes 'fennel-indent-function 1)
-    (put 'when-let 'fennel-indent-function 1)
-    (put 'if-let 'fennel-indent-function 1)
-    (put 'try 'fennel-indent-function 0)
-    (put 'catch 'fennel-indent-function 1)
-    (put 'local 'fennel-indent-function 1)
-    (put 'var 'fennel-indent-function 1)
-    (put 'finally 'fennel-indent-function 0)
-    (modify-syntax-entry ?# "w")
-    (defun fennel-mode-setup ()
-      "Set common variables."
-      (setq-local comment-end "")
-      (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
-    (defvar org-babel-default-header-args:fennel '((:results . "silent")))
-    (defun org-babel-execute:fennel (body params)
-      "Evaluate a block of Fennel code with Babel."
-      (lisp-eval-string body))
-    (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
-      (setq-local lisp-indent-function 'fennel-indent-function)))
 #+end_src
 
 *** Lua
@@ -2617,9 +2630,12 @@ Note that the ";" key is set to =sp-comment= function for =smartparens-strict-mo
              racket-repl-mode
              geiser-repl-mode
              inferior-lisp-mode
-             inferior-emacs-lisp-mode)
+             inferior-emacs-lisp-mode
+             sly-mrepl-mode)
             . smartparens-strict-mode)
-           (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
+           ((eval-expression-minibuffer-setup
+             lisp-data-mode)
+            . aorst/minibuffer-enable-sp)
            ((org-mode
              markdown-mode
              prog-mode)
@@ -3494,13 +3510,31 @@ Java bytecode decompiler support for viewing =.class= files.
     (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 #+end_src
 
-** =(provide 'init)=
-This concludes the =init.el= file.
+*** Profiler
+Hydrant for quick access to the Emacs profiling functions:
 
 #+begin_src emacs-lisp
-  (provide 'init)
-  ;;; init.el ends here
+  (use-package profiler
+    :straight nil
+    :requires hydra
+    :config
+    (defhydra hydrant/profiler-menu (:color pink :hint nil)
+        "
+   ^Start^    ^Stop/Report^
+   _c_: CPU   _s_: stop
+   _m_: MEM   _r_: report
+   _b_: both  ^ ^
+   "
+        ("c" (lambda () (interactive) (profiler-start 'cpu)))
+        ("m" (lambda () (interactive) (profiler-start 'mem)))
+        ("b" (lambda () (interactive) (profiler-start 'cpu+mem)))
+        ("s" profiler-stop)
+        ("r" profiler-report)
+        ("C-g" ignore :exit t)))
 #+end_src
+
+** =(provide 'init)=
+This concludes the =init.el= file.
 
 #  LocalWords:  init el startup GC unstyled UI Resizing resized ELPA
 #  LocalWords:  MELPA uncomment Makefile Readline Kakoune whitespace

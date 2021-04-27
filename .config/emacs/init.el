@@ -216,6 +216,10 @@ for stopping scroll from going beyond longest line.  Based on
       (setq cursor-type (if overwrite-mode 'box 'bar)))))
 
 (setq-default truncate-lines t)
+(setq-default bidi-paragraph-direction 'left-to-right)
+
+(when (version<= "27.1" emacs-version)
+  (setq bidi-inhibit-bpa t))
 
 (use-package minibuffer
   :straight nil
@@ -1323,10 +1327,6 @@ truncates text if needed.  Minimal width can be set with
   (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
   (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 
-(use-package cmake-mode
-  :bind (:map cmake-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
-
 (use-package elisp-mode
   :straight nil
   :commands aorst/emacs-lisp-indent-function
@@ -1386,82 +1386,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (setq lexical-binding t)
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
-(use-package yaml-mode
-  :custom (yaml-indent-offset 4))
-
-(use-package flycheck-yamllint
-  :when (executable-find "yamllint")
-  :hook ((yaml-mode . flycheck-yamllint-setup)
-         (yaml-mode . flycheck-mode)))
-
-(use-package sh-script
-  :straight nil
-  :bind (:map sh-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
-
-(use-package perl-mode
-  :straight nil
-  :hook ((perl-mode . flycheck-mode))
-  :bind (:map perl-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
-
-(use-package clojure-mode
-  :hook ((clojure-mode
-          clojurec-mode
-          clojurescript-mode)
-         . flycheck-mode)
-  :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
-  :config
-  (modify-syntax-entry ?# "w"))
-
-(use-package cider
-  :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-         ((cider-repl-mode cider-mode) . eldoc-mode))
-  :bind (:map cider-repl-mode-map
-         ("C-c C-o" . cider-repl-clear-buffer))
-  :custom-face
-  (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
-  (cider-error-highlight-face ((t (:inherit flymake-error))))
-  (cider-warning-highlight-face ((t (:inherit flymake-warning))))
-  :custom
-  (nrepl-log-messages nil)
-  (cider-repl-display-help-banner nil)
-  (cider-repl-tab-command #'company-complete-common-or-cycle)
-  (nrepl-hide-special-buffers t)
-  (cider-test-show-report-on-success t)
-  (cider-allow-jack-in-without-project t)
-  (cider-use-fringe-indicators nil)
-  (cider-font-lock-dynamically '(macro var deprecated))
-  (cider-save-file-on-load nil)
-  (cider-inspector-fill-frame nil)
-  (cider-auto-select-error-buffer t)
-  (cider-eval-spinner nil)
-  (cider-repl-prompt-function #'cider-repl-prompt-newline)
-  :config
-  (setq cider-jdk-src-paths nil)
-  (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
-                       (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/**/src.zip")
-                       (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
-    (when (file-exists-p src)
-      (unless (memq src cider-jdk-src-paths)
-        (add-to-list 'cider-jdk-src-paths src t))))
-  (defun cider-repl-prompt-newline (namespace)
-    "Return a prompt string that mentions NAMESPACE with newline
-afterward."
-    (format "%s\n" namespace)))
-
-(use-package flycheck-clj-kondo
-  :when (executable-find "clj-kondo")
-  :straight (:host github
-             :repo "borkdude/flycheck-clj-kondo"))
-
-(use-package clj-refactor
-  :hook ((cider-mode . clj-refactor-mode)
-         (cider-mode . yas-minor-mode))
-  :custom (cljr-suppress-no-project-warning t)
-  (cljr-warn-on-eval nil))
-
 (use-package fennel-mode
   :straight (:host gitlab
              :repo "technomancy/fennel-mode")
@@ -1490,6 +1414,86 @@ afterward."
     (lisp-eval-string body))
   (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
     (setq-local lisp-indent-function 'fennel-indent-function)))
+
+(use-package clojure-mode
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . flycheck-mode)
+  :bind (:map clojure-mode-map
+         ("C-c C-M-f" . aorst/indent-buffer))
+  :config
+  (modify-syntax-entry ?# "w"))
+
+(use-package cider
+  :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
+         ((cider-repl-mode cider-mode) . eldoc-mode))
+  :bind (:map cider-repl-mode-map
+         ("C-c C-o" . cider-repl-clear-buffer))
+  :custom-face
+  (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
+  (cider-error-highlight-face ((t (:inherit flymake-error))))
+  (cider-warning-highlight-face ((t (:inherit flymake-warning))))
+  :custom
+  (nrepl-log-messages nil)
+  (cider-repl-display-help-banner nil)
+  (cider-repl-tab-command #'indent-for-tab-command)
+  (nrepl-hide-special-buffers t)
+  (cider-test-show-report-on-success t)
+  (cider-allow-jack-in-without-project t)
+  (cider-use-fringe-indicators nil)
+  (cider-font-lock-dynamically '(macro var deprecated))
+  (cider-save-file-on-load nil)
+  (cider-inspector-fill-frame nil)
+  (cider-auto-select-error-buffer t)
+  (cider-eval-spinner nil)
+  (cider-repl-prompt-function #'cider-repl-prompt-newline)
+  :config
+  (setq cider-jdk-src-paths nil)
+  (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
+                       (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/**/src.zip")
+                       (file-expand-wildcards "~/.clojure/clojure-*.*.*-sources.jar")))
+    (when (file-exists-p src)
+      (unless (memq src cider-jdk-src-paths)
+        (add-to-list 'cider-jdk-src-paths src t))))
+  (defun cider-repl-prompt-newline (namespace)
+    "Return a prompt string that mentions NAMESPACE with newline
+appended."
+    (format "%s\n" namespace)))
+
+(use-package flycheck-clj-kondo
+  :when (executable-find "clj-kondo")
+  :straight (:host github
+             :repo "borkdude/flycheck-clj-kondo"))
+
+(use-package clj-refactor
+  :hook ((cider-mode . clj-refactor-mode)
+         (cider-mode . yas-minor-mode))
+  :custom (cljr-suppress-no-project-warning t)
+  (cljr-warn-on-eval nil))
+
+(use-package cmake-mode
+  :bind (:map cmake-mode-map
+         ("C-c C-M-f" . aorst/indent-buffer)))
+
+(use-package yaml-mode
+  :custom (yaml-indent-offset 4))
+
+(use-package flycheck-yamllint
+  :when (executable-find "yamllint")
+  :hook ((yaml-mode . flycheck-yamllint-setup)
+         (yaml-mode . flycheck-mode)))
+
+(use-package sh-script
+  :straight nil
+  :bind (:map sh-mode-map
+         ("C-c C-M-f" . aorst/indent-buffer)))
+
+(use-package perl-mode
+  :straight nil
+  :hook ((perl-mode . flycheck-mode))
+  :bind (:map perl-mode-map
+         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package lua-mode
   :bind (:map lua-mode-map
@@ -1693,9 +1697,12 @@ afterward."
            racket-repl-mode
            geiser-repl-mode
            inferior-lisp-mode
-           inferior-emacs-lisp-mode)
+           inferior-emacs-lisp-mode
+           sly-mrepl-mode)
           . smartparens-strict-mode)
-         (eval-expression-minibuffer-setup . aorst/minibuffer-enable-sp)
+         ((eval-expression-minibuffer-setup
+           lisp-data-mode)
+          . aorst/minibuffer-enable-sp)
          ((org-mode
            markdown-mode
            prog-mode)
@@ -2315,5 +2322,20 @@ afterward."
   (jdecomp-decompiler-type 'fernflower)
   (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 
-(provide 'init)
-;;; init.el ends here
+(use-package profiler
+  :straight nil
+  :requires hydra
+  :config
+  (defhydra hydrant/profiler-menu (:color pink :hint nil)
+      "
+ ^Start^    ^Stop/Report^
+ _c_: CPU   _s_: stop
+ _m_: MEM   _r_: report
+ _b_: both  ^ ^
+ "
+      ("c" (lambda () (interactive) (profiler-start 'cpu)))
+      ("m" (lambda () (interactive) (profiler-start 'mem)))
+      ("b" (lambda () (interactive) (profiler-start 'cpu+mem)))
+      ("s" profiler-stop)
+      ("r" profiler-report)
+      ("C-g" ignore :exit t)))
