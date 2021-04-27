@@ -14,7 +14,24 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
+(straight-use-package 'use-package)
+(defvar straight-use-package-by-default)
+(setq straight-use-package-by-default t)
 (require 'use-package)
+
+(use-package cus-edit
+  :straight nil
+  :custom (custom-file (expand-file-name "custom.el" user-emacs-directory))
+  :init (load custom-file :noerror))
+
+(defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
+  "File to store disabled commands, that were enabled permamently.")
+
+(define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
+  (let ((user-init-file aorst--disabled-commands))
+    (funcall foo command)))
+
+(load aorst--disabled-commands :noerror)
 
 (defgroup local-config nil
   "Customization group for local settings."
@@ -49,8 +66,6 @@
   :init
   (fset 'yes-or-no-p 'y-or-n-p))
 
-(add-hook 'after-init-hook (lambda () (setq echo-keystrokes 5)))
-
 (use-package mwheel
   :straight nil
   :demand
@@ -67,8 +82,8 @@
   (defun aorst/truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
 Returns t if any line exceeds right border of the window.  Used
-for stopping scrolling scroll from going beyond longest line.
-Based on `so-long-detected-long-line-p'."
+for stopping scroll from going beyond longest line.  Based on
+`so-long-detected-long-line-p'."
     (save-excursion
       (goto-char (point-min))
       (let* ((window-width
@@ -89,18 +104,19 @@ Based on `so-long-detected-long-line-p'."
               (if (bound-and-true-p display-line-numbers-mode)
                   (- display-line-numbers-width)
                 0))
+             ;; subtracting 4 for extra space in case some calculations were imprecise
              (threshold (+ window-width hscroll-offset line-number-width -4)))
         (catch 'excessive
-           (while (not (eobp))
-               (setq start (point))
-               (save-restriction
-                   (narrow-to-region start (min (+ start 1 threshold)
-                                                (point-max)))
-                   (forward-line 1))
-               (unless (or (bolp)
-                           (and (eobp) (<= (- (point) start)
-                                           threshold)))
-                   (throw 'excessive t)))))))
+          (while (not (eobp))
+            (setq start (point))
+            (save-restriction
+              (narrow-to-region start (min (+ start 1 threshold)
+                                           (point-max)))
+              (forward-line 1))
+            (unless (or (bolp)
+                        (and (eobp) (<= (- (point) start)
+                                        threshold)))
+              (throw 'excessive t)))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
     (when (and (aorst/truncated-lines-p)
                (not (memq major-mode '(vterm-mode term-mode))))
@@ -115,24 +131,6 @@ Based on `so-long-detected-long-line-p'."
     (xterm-mouse-mode t)))
 
 (setq-default indent-tabs-mode nil)
-
-(use-package cus-edit
-  :straight nil
-  :custom (custom-file (expand-file-name "custom.el" user-emacs-directory))
-  :init (load custom-file :noerror))
-
-(defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
-  "File to store disabled commands, that were enabled permamently.")
-
-(define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
-  (let ((user-init-file aorst--disabled-commands))
-    (funcall foo command)))
-
-(load aorst--disabled-commands :noerror)
-
-(defgroup aorst ()
-  "Various customization options that alter Emacs configuration."
-  :tag "Andrey Orst customization options")
 
 (use-package savehist
   :straight nil
@@ -199,10 +197,10 @@ Based on `so-long-detected-long-line-p'."
         (upcase-region (region-beginning) (region-end))
       (upcase-word (- arg))))
   (defun aorst/exchange-point-and-mark (arg)
-   (interactive "*p")
-   (when (and transient-mark-mode
-              mark-active)
-     (exchange-point-and-mark)))
+    (interactive "*p")
+    (when (and transient-mark-mode
+               mark-active)
+      (exchange-point-and-mark)))
   (defun aorst/newline-below ()
     (interactive)
     (end-of-line)
@@ -282,6 +280,7 @@ are defining or executing a macro."
                               mark-active)))
                (god-local-mode)
              (keyboard-quit))))))
+
 (global-set-key [remap keyboard-quit] #'aorst/escape)
 
 (defun aorst/font-installed-p (font-name)
@@ -371,9 +370,9 @@ evaluated in order.  Returns x."
 
 (use-package menu-bar
   :straight nil
+  :unless (display-graphic-p)
   :config
-  (when (not (display-graphic-p))
-    (menu-bar-mode -1)))
+  (menu-bar-mode -1))
 
 (defvar aorst--line-pixel-height (line-pixel-height)
   "Line height in pixels.
@@ -398,8 +397,6 @@ Used in various places to avoid getting wrong line height when
 
 (cond ((aorst/font-installed-p "JetBrainsMono")
        (set-face-attribute 'default nil :font "JetBrainsMono 10"))
-      ((aorst/font-installed-p "Hack")
-       (set-face-attribute 'default nil :font "Hack 10"))
       ((aorst/font-installed-p "Source Code Pro")
        (set-face-attribute 'default nil :font "Source Code Pro 10")))
 
@@ -912,11 +909,11 @@ Used in various places to avoid getting wrong line height when
   :config
   (window-divider-mode t)
   (defun aorst/window-divider-setup-faces ()
-    (let* ((color (face-attribute 'mode-line-inactive :background))
+    (let* ((color (face-attribute 'default :background))
            (color (if (fboundp #'doom-darken)
                       (if (aorst/dark-mode-p)
-                          (doom-darken color 0.15)
-                        (doom-lighten color 0.10)))))
+                          (doom-darken color 0.2)
+                        (doom-darken color 0.1)))))
       (set-face-attribute 'window-divider nil :foreground color)))
   (aorst/window-divider-setup-faces))
 
@@ -1297,13 +1294,6 @@ truncates text if needed.  Minimal width can be set with
   :bind (:map rust-mode-map
          ("C-c C-M-f" . rust-format-buffer)))
 
-(use-package racer
-  :if (executable-find "racer")
-  :hook (racer-mode . eldoc-mode)
-  :init (defun org-babel-edit-prep:rust (&optional _babel-info)
-          "Run racer mode for Org Babel."
-          (racer-mode 1)))
-
 (use-package cargo
   :if (executable-find "cargo")
   :hook ((rust-mode toml-mode) . cargo-minor-mode))
@@ -1421,7 +1411,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
           clojurescript-mode)
          . flycheck-mode)
   :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+         ("C-c C-M-f" . aorst/indent-buffer))
+  :config
+  (modify-syntax-entry ?# "w"))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
@@ -1468,7 +1460,7 @@ afterward."
   :hook ((cider-mode . clj-refactor-mode)
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning t)
-          (cljr-warn-on-eval nil))
+  (cljr-warn-on-eval nil))
 
 (use-package fennel-mode
   :straight (:host gitlab
@@ -1484,7 +1476,10 @@ afterward."
   (put 'if-let 'fennel-indent-function 1)
   (put 'try 'fennel-indent-function 0)
   (put 'catch 'fennel-indent-function 1)
+  (put 'local 'fennel-indent-function 1)
+  (put 'var 'fennel-indent-function 1)
   (put 'finally 'fennel-indent-function 0)
+  (modify-syntax-entry ?# "w")
   (defun fennel-mode-setup ()
     "Set common variables."
     (setq-local comment-end "")
@@ -1499,32 +1494,13 @@ afterward."
 (use-package lua-mode
   :bind (:map lua-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
-  :hook (lua-mode . flycheck-mode))
+  :hook (lua-mode . flycheck-mode)
+  :custom (lua-indent-level 2))
 
 (use-package css-mode
   :straight nil
   :custom
   (css-indent-offset 2))
-
-(use-package erlang
-  :straight t
-  :hook (erlang-mode . (lambda ()
-                         (add-hook 'xref-backend-functions
-                                   #'dumb-jump-xref-activate
-                                   nil t))))
-
-(use-package elixir-mode
-  :hook (elixir-mode . flycheck-mode)
-  :custom-face
-  (elixir-atom-face ((t (:foreground unspecified
-                         :inherit elixir-attribute-face)))))
-
-(use-package mix
-  :hook (elixir-mode . mix-minor-mode))
-
-(use-package inf-elixir
-  :straight (:host github
-             :repo "J3RN/inf-elixir"))
 
 (use-package json-mode
   :hook (json-mode . flycheck-mode)
@@ -1871,6 +1847,9 @@ afterward."
   :commands global-undo-tree-mode
   :bind (("C-z" . undo-tree-undo)
          ("C-S-z" . undo-tree-redo))
+  :custom
+  (undo-tree-visualizer-relative-timestamps nil)
+  (undo-tree-visualizer-timestamps nil)
   :init (global-undo-tree-mode 1))
 
 (use-package yasnippet

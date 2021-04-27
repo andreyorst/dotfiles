@@ -12,9 +12,10 @@
 ;;; Code:
 
 (defun aorst/wrap-obsolete (orig-fn &rest args)
+  "Append extra argument to ARGS before calling ORIG-FN function."
   (if (cddr args)
       (apply orig-fn args)
-    (apply orig-fn (append args '("0")))))
+    (apply orig-fn `(,@args "0"))))
 
 (advice-add 'make-obsolete :around #'aorst/wrap-obsolete)
 (advice-add 'make-obsolete-variable :around #'aorst/wrap-obsolete)
@@ -37,20 +38,21 @@
                   gc-cons-percentage aorst--gc-cons-percentage
                   file-name-handler-alist aorst--file-name-handler-alist)))
 
-(setq read-process-output-max (* 1024 1024 4)) ;; 4mb
+(setq read-process-output-max (* 1024 1024 4)) ; 4mb
 
-(defvar comp-deferred-compilation)
-(setq comp-deferred-compilation t)
-(setq comp-async-report-warnings-errors nil)
+(when (featurep 'nativecomp)
+  (defvar comp-deferred-compilation)
+  (setq comp-deferred-compilation t)
+  (defvar comp-async-report-warnings-errors)
+  (setq comp-async-report-warnings-errors nil))
 
 (setq initial-frame-alist '((width . 170)
                             (height . 56)
                             (tool-bar-lines . 0)
                             (bottom-divider-width . 0)
                             (right-divider-width . 1))
-      default-frame-alist initial-frame-alist)
-
-(setq frame-inhibit-implied-resize t
+      default-frame-alist initial-frame-alist
+      frame-inhibit-implied-resize t
       x-gtk-resize-child-frames 'resize-mode)
 
 (setq-default fringe-indicator-alist
@@ -58,9 +60,16 @@
 
 (defvar straight-process-buffer)
 (setq-default straight-process-buffer " *straight-process*")
-(defvar bootstrap-version)
+
 (defvar straight-repository-branch)
 (setq straight-repository-branch "develop")
+
+(defvar straight-check-for-modifications)
+(setq straight-check-for-modifications nil)
+
+(defvar straight-build-dir)
+(setq straight-build-dir (format "build-%s" emacs-version))
+
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
@@ -72,10 +81,6 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-(defvar straight-use-package-by-default)
-(setq straight-use-package-by-default t)
 
 (setq package-enable-at-startup nil)
 

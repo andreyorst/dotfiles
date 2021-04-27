@@ -160,38 +160,38 @@
                   "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
-                             "file-text"
-                             :v-adjust 0
-                             :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                              "file-text"
+                              :v-adjust 0
+                              :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("md" "markdown" "rst" "log" "org" "txt"
                   "contribute" "license" "readme" "changelog"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
-                             "file-binary"
-                             :v-adjust 0
-                             :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                              "file-binary"
+                              :v-adjust 0
+                              :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("exe" "dll" "obj" "so" "o" "out"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
-                             "file-pdf"
-                             :v-adjust 0
-                             :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                              "file-pdf"
+                              :v-adjust 0
+                              :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("pdf"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
-                             "file-zip"
-                             :v-adjust 0
-                             :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                              "file-zip"
+                              :v-adjust 0
+                              :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
-                             "file-text"
-                             :v-adjust 0
-                             :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                              "file-text"
+                              :v-adjust 0
+                              :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
      :fallback ""
      :extensions (fallback))))
 
