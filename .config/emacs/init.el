@@ -1403,9 +1403,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (put 'local 'fennel-indent-function 1)
   (put 'var 'fennel-indent-function 1)
   (put 'finally 'fennel-indent-function 0)
-  (modify-syntax-entry ?# "w")
   (defun fennel-mode-setup ()
     "Set common variables."
+    (modify-syntax-entry ?# "w")
     (setq-local comment-end "")
     (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
@@ -1416,14 +1416,17 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (setq-local lisp-indent-function 'fennel-indent-function)))
 
 (use-package clojure-mode
-  :hook ((clojure-mode
-          clojurec-mode
-          clojurescript-mode)
-         . flycheck-mode)
+  :hook (((clojure-mode
+           clojurec-mode
+           clojurescript-mode)
+          . aorst/clojure-mode-setup))
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
   :config
-  (modify-syntax-entry ?# "w"))
+  (defun aorst/clojure-mode-setup ()
+    "Setup Clojure buffer."
+    (modify-syntax-entry ?# "w")
+    (flycheck-mode)))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
