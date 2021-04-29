@@ -323,7 +323,12 @@ are defining or executing a macro."
 
 (defun aorst/dark-mode-p ()
   "Check if frame is dark or not."
-  (eq 'dark (frame-parameter nil 'background-mode)))
+  (if window-system
+      (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
+        (shell-command-to-string)
+        (string-trim-right)
+        (string-suffix-p "-dark'"))
+      (eq 'dark (frame-parameter nil 'background-mode))))
 
 (defun aorst/create-accent-face (face ref-face)
   "Set FACE background to accent color by blending REF-FACE foreground and background.
