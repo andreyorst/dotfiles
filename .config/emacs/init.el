@@ -170,7 +170,8 @@ for stopping scroll from going beyond longest line.  Based on
          ("C-x k" . kill-this-buffer)
          ("M-S-z" . zap-to-char)
          ("<kp-begin>" . ignore)
-         ("<kp-5>" . ignore))
+         ("<kp-5>" . ignore)
+         ("<f2>" . ignore))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :custom
@@ -483,6 +484,18 @@ Used in various places to avoid getting wrong line height when
     (run-hooks 'aorst--solaire-swap-bg-hook))
   (advice-add 'solaire-mode--swap-bg-faces-maybe :after #'aorst/run-solaire-swap-hooks))
 
+(defcustom aorst--dark-theme 'doom-spacegrey
+  "Dark theme to use."
+  :tag "Dark theme"
+  :type 'symbol
+  :group 'local-config)
+
+(defcustom aorst--light-theme 'doom-one-light
+  "Light theme to use."
+  :tag "Light theme"
+  :type 'symbol
+  :group 'local-config)
+
 (use-package doom-themes
   :custom
   (doom-themes-enable-bold t)
@@ -515,8 +528,8 @@ Used in various places to avoid getting wrong line height when
   (font-lock-comment-face ((t (:background unspecified))))
   :config
   (if (aorst/dark-mode-p)
-      (load-theme 'doom-spacegrey t)
-    (load-theme 'doom-one-light t)))
+      (load-theme aorst--dark-theme t)
+    (load-theme aorst--light-theme t)))
 
 (defvar aorst--theme-change-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
@@ -1540,7 +1553,8 @@ appended."
   :bind (("C-`" . aorst/vterm-toggle)
          ("C-t" . aorst/vterm-focus)
          :map vterm-mode-map
-         ("<insert>" . ignore))
+         ("<insert>" . ignore)
+         ("<f2>" . ignore))
   :hook (vterm-exit . aorst/kill-vterm)
   :custom (vterm-always-compile-module t)
   :config

@@ -419,7 +419,8 @@ Configurations for inbuilt =simple.el= module.
            ("C-x k" . kill-this-buffer)
            ("M-S-z" . zap-to-char)
            ("<kp-begin>" . ignore)
-           ("<kp-5>" . ignore))
+           ("<kp-5>" . ignore)
+           ("<f2>" . ignore))
     :hook ((before-save . delete-trailing-whitespace)
            (overwrite-mode . aorst/overwrite-set-cursor-shape))
     :custom
@@ -868,6 +869,18 @@ It uses  =aorst/real-buffer-p= as =solaire-mode-real-buffer-fn=.
 Provided themes define colors for pretty much every popular Emacs package, which helps make Emacs look very consistent.
 
 #+begin_src emacs-lisp
+  (defcustom aorst--dark-theme 'doom-spacegrey
+    "Dark theme to use."
+    :tag "Dark theme"
+    :type 'symbol
+    :group 'local-config)
+
+  (defcustom aorst--light-theme 'doom-one-light
+    "Light theme to use."
+    :tag "Light theme"
+    :type 'symbol
+    :group 'local-config)
+
   (use-package doom-themes
     :custom
     (doom-themes-enable-bold t)
@@ -900,8 +913,8 @@ Provided themes define colors for pretty much every popular Emacs package, which
     (font-lock-comment-face ((t (:background unspecified))))
     :config
     (if (aorst/dark-mode-p)
-        (load-theme 'doom-spacegrey t)
-      (load-theme 'doom-one-light t)))
+        (load-theme aorst--dark-theme t)
+      (load-theme aorst--light-theme t)))
 #+end_src
 
 The following code specifies hooks that will run via advice, which in turn runs after =load-theme= function.
@@ -2438,7 +2451,8 @@ This package provides a bridge to =libvterm= to display terminal as Emacs buffer
     :bind (("C-`" . aorst/vterm-toggle)
            ("C-t" . aorst/vterm-focus)
            :map vterm-mode-map
-           ("<insert>" . ignore))
+           ("<insert>" . ignore)
+           ("<f2>" . ignore))
     :hook (vterm-exit . aorst/kill-vterm)
     :custom (vterm-always-compile-module t)
     :config
