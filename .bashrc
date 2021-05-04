@@ -19,7 +19,7 @@ export PATH="$HOME/.cache/rebar3/bin:$PATH"
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
 
 export HISTFILESIZE=
-export HISTSIZE=
+export HISTSIZE=-1
 export HISTTIMEFORMAT="[%F %T] "
 export HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 

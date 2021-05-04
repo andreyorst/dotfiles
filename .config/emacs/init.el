@@ -960,7 +960,8 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   :bind (("<f7>" . treemacs)
          ("C-c t" . treemacs-select-window)
          :map treemacs-mode-map
-         ([C-tab] . aorst/treemacs-expand-all-projects))
+         ([C-tab] . aorst/treemacs-expand-all-projects)
+         ("<drag-mouse-1>" . ignore))
   :hook ((after-init . aorst/treemacs-after-init-setup)
          (treemacs-mode . aorst/after-treemacs-setup)
          (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
@@ -981,7 +982,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (treemacs-indentation 2)
   :config
   (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
+  (treemacs-filewatch-mode 1)
   (defun aorst/treemacs-setup-faces ()
     (set-face-attribute 'treemacs-root-face nil
                         :foreground (face-attribute 'default :foreground)
