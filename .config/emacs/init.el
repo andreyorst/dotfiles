@@ -537,6 +537,9 @@ Used in various places to avoid getting wrong line height when
 (define-advice load-theme (:after (&rest _) aorst:load-theme)
   (run-hooks 'aorst--theme-change-hook))
 
+(define-advice disable-theme (:after (&rest _) aorst:disable-theme)
+    (run-hooks 'aorst--theme-change-hook))
+
 (setq-default custom-safe-themes t)
 
 (setq-default column-number-mode t
@@ -1790,9 +1793,7 @@ appended."
   :config
   (defun aorst/ivy-setup-faces ()
     (let ((mode-line-color (face-attribute 'mode-line :background)))
-      (when (and (fboundp #'doom-darken)
-                 (eq (face-attribute 'ivy-current-match :background)
-                     mode-line-color))
+      (when (fboundp #'doom-darken)
         (set-face-attribute
          'ivy-current-match nil
          :background (if (aorst/dark-mode-p)
