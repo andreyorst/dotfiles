@@ -2231,12 +2231,13 @@ appended."
 (use-package xref
   :straight nil
   :config
-  (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
-    (let ((m (or m (point-marker))))
-      (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
-        (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
-          (setf m (point-marker))))
-      (funcall fn m))))
+  (when (featurep 'treemacs)
+    (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
+      (let ((m (or m (point-marker))))
+        (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
+          (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
+            (setf m (point-marker))))
+        (funcall fn m)))))
 
 (use-package vc-hooks
   :straight nil

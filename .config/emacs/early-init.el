@@ -40,11 +40,11 @@
 
 (setq read-process-output-max (* 1024 1024 4)) ; 4mb
 
-(when (featurep 'nativecomp)
-  (defvar comp-deferred-compilation)
-  (setq comp-deferred-compilation t)
-  (defvar comp-async-report-warnings-errors)
-  (setq comp-async-report-warnings-errors nil))
+(when (featurep 'native-compile)
+  (defvar native-comp-deferred-compilation)
+  (setq native-comp-deferred-compilation t)
+  (defvar native-comp-async-report-warnings-errors)
+  (setq native-comp-async-report-warnings-errors nil))
 
 (setq initial-frame-alist '((width . 170)
                             (height . 56)

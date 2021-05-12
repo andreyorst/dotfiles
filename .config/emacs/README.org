@@ -76,15 +76,15 @@ This can be migrated by setting high GC threshold and restoring it back in =afte
 #+end_src
 
 ** Native Compiled Emacs Lisp
-Emacs 28 can Emacs Lisp to native code.
+Emacs 28 can compile Emacs Lisp to native code.
 These settings enable background asynchronous compilation and dynamic reloading of compiled modules.
 
 #+begin_src emacs-lisp
-  (when (featurep 'nativecomp)
-    (defvar comp-deferred-compilation)
-    (setq comp-deferred-compilation t)
-    (defvar comp-async-report-warnings-errors)
-    (setq comp-async-report-warnings-errors nil))
+  (when (featurep 'native-compile)
+    (defvar native-comp-deferred-compilation)
+    (setq native-comp-deferred-compilation t)
+    (defvar native-comp-async-report-warnings-errors)
+    (setq native-comp-async-report-warnings-errors nil))
 #+end_src
 
 ** User Interface
@@ -3361,12 +3361,13 @@ Workaround for a problem with Treemacs and marker stack: [[https://github.com/Al
   (use-package xref
     :straight nil
     :config
-    (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
-      (let ((m (or m (point-marker))))
-        (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
-          (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
-            (setf m (point-marker))))
-        (funcall fn m))))
+    (when (featurep 'treemacs)
+      (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
+        (let ((m (or m (point-marker))))
+          (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
+            (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
+              (setf m (point-marker))))
+          (funcall fn m)))))
 #+end_src
 
 *** VC mode
