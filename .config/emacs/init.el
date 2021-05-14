@@ -1313,6 +1313,8 @@ truncates text if needed.  Minimal width can be set with
   :custom
   (markdown-fontify-code-blocks-natively t)
   (markdown-command "pandoc")
+  (markdown-hr-display-char nil)
+  (markdown-list-item-bullets '("•" "◆"))
   :hook ((markdown-mode . flyspell-mode)))
 
 (use-package rust-mode
@@ -2069,7 +2071,10 @@ appended."
   :hook (((rust-mode
            c-mode
            c++-mode
-           elixir-mode)
+           elixir-mode
+           clojure-mode
+           clojurec-mode
+           clojurescript-mode)
           . lsp)
          (lsp-mode . yas-minor-mode))
   :custom-face
@@ -2096,12 +2101,12 @@ appended."
   :commands lsp-ui-mode
   :bind (:map lsp-ui-mode-map
          ("M-." . lsp-ui-peek-find-definitions)
-         ("M-/" . lsp-ui-peek-find-references))
+         ("M-S-." . lsp-ui-peek-find-references))
   :custom
   (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
   (lsp-ui-sideline-enable nil)
   (lsp-ui-doc-enable nil)
-  (lsp-ui-imenu-enable nil)
+  (lsp-ui-imenu-enable t)
   (lsp-ui-doc-delay 1 "higher than eldoc delay")
   (lsp-ui-doc-max-width 1000)
   (lsp-ui-doc-show-with-cursor nil)
@@ -2117,6 +2122,8 @@ appended."
     (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
+  (define-advice lsp-ui-doc--handle-hr-lines (:override () aorst:lspu-ui-hr)
+    nil)
   (lsp-ui-mode))
 
 (use-package lsp-java
