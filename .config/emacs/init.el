@@ -2105,12 +2105,12 @@ appended."
   :custom
   (lsp-ui-doc-border (face-attribute 'mode-line-inactive :background))
   (lsp-ui-sideline-enable nil)
-  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-enable t)
   (lsp-ui-imenu-enable t)
-  (lsp-ui-doc-delay 1 "higher than eldoc delay")
+  (lsp-ui-doc-delay 2 "higher than eldoc delay")
   (lsp-ui-doc-max-width 1000)
   (lsp-ui-doc-show-with-cursor nil)
-  (lsp-ui-doc-show-with-mouse nil)
+  (lsp-ui-doc-show-with-mouse t)
   (lsp-ui-doc-position 'at-point)
   :custom-face
   (lsp-ui-peek-highlight ((t (:foreground unspecified
@@ -2122,7 +2122,7 @@ appended."
     (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
-  (define-advice lsp-ui-doc--handle-hr-lines (:override () aorst:lspu-ui-hr)
+  (define-advice lsp-ui-doc--handle-hr-lines (:override () aorst:lsp-ui-dont-render-hr)
     nil)
   (lsp-ui-mode))
 
