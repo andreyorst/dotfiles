@@ -125,8 +125,10 @@ for stopping scroll from going beyond longest line.  Based on
                 mouse-highlight nil
                 hscroll-step 1
                 hscroll-margin 1
-                scroll-margin 1
-                scroll-step 10)
+                scroll-margin 0
+                scroll-step 1
+                scroll-conservatively 101
+                scroll-preserve-screen-position 1)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
@@ -2371,3 +2373,20 @@ appended."
       ("s" profiler-stop)
       ("r" profiler-report)
       ("C-g" ignore :exit t)))
+
+(use-package scroll-on-jump
+  :straight (:host gitlab
+             :repo "ideasman42/emacs-scroll-on-jump")
+  :custom
+  (scroll-on-jump-smooth nil)
+  (scroll-on-jump-duration 0.15)
+  :config
+  (scroll-on-jump-advice-add beginning-of-buffer)
+  (scroll-on-jump-advice-add end-of-buffer)
+  (scroll-on-jump-with-scroll-advice-add scroll-up-command)
+  (scroll-on-jump-with-scroll-advice-add scroll-down-command)
+  ;; (scroll-on-jump-with-scroll-advice-add isearch-forward)
+  ;; (scroll-on-jump-with-scroll-advice-add isearch-forward-regexp)
+  ;; (scroll-on-jump-with-scroll-advice-add isearch-backward)
+  ;; (scroll-on-jump-with-scroll-advice-add isearch-backward-regexp)
+  (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))
