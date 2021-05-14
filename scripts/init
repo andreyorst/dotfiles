@@ -6,15 +6,17 @@
     cd "$HOME" || exit
 
     for file in "$dotfiles_dir"/.*; do
-        [ -f "$file" ] \
-            && [ "$(basename "$file")" != ".gitignore" ] \
-            && ln -sf "$file" ./
+        if [ -f "$file" ] && [ "$(basename "$file")" != ".gitignore" ]; then
+            printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
+            ln -sf "$file" ./
+        fi
     done
 
     mkdir -p "$HOME"/.config
     cd "$HOME"/.config || exit
 
     for file in "$dotfiles_dir"/.config/*; do
+        printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
         ln -sf "$file" ./
     done
 )

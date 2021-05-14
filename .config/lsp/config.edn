@@ -1,0 +1,6 @@
+{:use-metadata-for-privacy? true
+ :show-docs-arity-on-same-line? true
+ :text-document-sync-kind :full
+ :semantic-tokens? false
+ :auto-add-ns-to-new-files? false
+ :dependency-scheme "jar"}
