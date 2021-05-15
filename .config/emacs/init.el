@@ -125,10 +125,10 @@ for stopping scroll from going beyond longest line.  Based on
                 mouse-highlight nil
                 hscroll-step 1
                 hscroll-margin 1
-                scroll-margin 0
+                scroll-margin 1
                 scroll-step 1
                 scroll-conservatively 101
-                scroll-preserve-screen-position 1)
+                scroll-preserve-screen-position nil)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
@@ -179,7 +179,7 @@ for stopping scroll from going beyond longest line.  Based on
   :custom
   (yank-excluded-properties t "Disable all text properties when yanking.")
   (blink-matching-delay 0)
-  (blink-matching-paren t)
+  (blink-matching-paren nil)
   :init
   (defun aorst/kill-region-or-word (arg)
     (interactive "*p")
@@ -1870,7 +1870,9 @@ appended."
                        company-echo-metadata-frontend))
   (company-backends '(company-capf company-files company-dabbrev-code))
   (company-tooltip-minimum-width 30)
-  (company-tooltip-maximum-width 120))
+  (company-tooltip-maximum-width 120)
+  (company-icon-size aorst--line-pixel-height)
+  (company-format-margin-function nil))
 
 (use-package company-box
   :hook (company-mode . company-box-mode)
