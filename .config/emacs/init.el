@@ -125,7 +125,7 @@ for stopping scroll from going beyond longest line.  Based on
                 mouse-highlight nil
                 hscroll-step 1
                 hscroll-margin 1
-                scroll-margin 1
+                scroll-margin 0
                 scroll-step 1
                 scroll-conservatively 101
                 scroll-preserve-screen-position nil)
@@ -179,7 +179,7 @@ for stopping scroll from going beyond longest line.  Based on
   :custom
   (yank-excluded-properties t "Disable all text properties when yanking.")
   (blink-matching-delay 0)
-  (blink-matching-paren nil)
+  (blink-matching-paren t)
   :init
   (defun aorst/kill-region-or-word (arg)
     (interactive "*p")
@@ -1872,13 +1872,14 @@ appended."
   (company-tooltip-minimum-width 30)
   (company-tooltip-maximum-width 120)
   (company-icon-size aorst--line-pixel-height)
-  (company-format-margin-function nil))
+  ;; (company-format-margin-function nil)
+  )
 
-(use-package company-box
-  :hook (company-mode . company-box-mode)
+(use-package company-quickhelp
+  :hook (company-mode . company-quickhelp-mode)
   :custom
-  (company-box-enable-icon nil)
-  (company-box-scrollbar nil))
+  (company-quickhelp-max-lines 13)
+  (company-quickhelp-use-propertized-text t))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -2098,9 +2099,13 @@ appended."
   (lsp-enable-semantic-highlighting nil)
   (lsp-log-io nil)
   (lsp-enable-folding nil)
-  (lsp-keep-workspace-alive nil))
+  (lsp-keep-workspace-alive nil)
+  (lsp-completion-show-kind nil))
 
 (use-package lsp-ui
+  :straight (:host github
+             :repo "emacs-lsp/lsp-ui"
+             :branch "option-markdown")
   :after lsp-mode
   :commands lsp-ui-mode
   :bind (:map lsp-ui-mode-map
@@ -2116,6 +2121,7 @@ appended."
   (lsp-ui-doc-show-with-cursor nil)
   (lsp-ui-doc-show-with-mouse t)
   (lsp-ui-doc-position 'at-point)
+  (lsp-ui-doc-enhanced-markdown nil)
   :custom-face
   (lsp-ui-peek-highlight ((t (:foreground unspecified
                               :background unspecified
@@ -2126,8 +2132,8 @@ appended."
     (define-advice lsp-ui-doc--make-request (:around (foo) aorst:hide-lsp-ui-doc)
       (unless (eq this-command 'aorst/escape)
         (funcall foo))))
-  (define-advice lsp-ui-doc--handle-hr-lines (:override () aorst:lsp-ui-dont-render-hr)
-    nil)
+  ;; (define-advice lsp-ui-doc--handle-hr-lines (:override () aorst:lsp-ui-dont-render-hr))
+  ;; (define-advice lsp-ui-doc--make-smaller-empty-lines (:override () aorst:lsp-ui-dont-make-empty-lines-smaller))
   (lsp-ui-mode))
 
 (use-package lsp-java
@@ -2386,12 +2392,12 @@ appended."
   (scroll-on-jump-advice-add beginning-of-buffer)
   (scroll-on-jump-advice-add end-of-buffer)
   (scroll-on-jump-advice-add flyspell-goto-next-error)
+  (when (featurep 'smartparens)
+    (define-key smartparens-mode-map
+      (kbd "C-M-f") (scroll-on-jump-interactive 'sp-forward-sexp))
+    (define-key smartparens-mode-map
+      (kbd "C-M-b") (scroll-on-jump-interactive 'sp-backward-sexp)))
   (scroll-on-jump-with-scroll-advice-add scroll-up-command)
   (scroll-on-jump-with-scroll-advice-add scroll-down-command)
-  (scroll-on-jump-advice-add forward-sexp)
-  (scroll-on-jump-advice-add backward-sexp)
-  (when (featurep 'smartparens)
-    (scroll-on-jump-advice-add sp-forward-sexp)
-    (scroll-on-jump-advice-add sp-backward-sexp))
   (scroll-on-jump-with-scroll-advice-add isearch-update)
   (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))

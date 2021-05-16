@@ -64,9 +64,6 @@
 (defvar straight-repository-branch)
 (setq straight-repository-branch "develop")
 
-(defvar straight-check-for-modifications)
-(setq straight-check-for-modifications nil)
-
 (defvar straight-build-dir)
 (setq straight-build-dir (format "build-%s" emacs-version))
 
