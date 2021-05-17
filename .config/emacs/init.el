@@ -125,9 +125,11 @@ for stopping scroll from going beyond longest line.  Based on
                 mouse-highlight nil
                 hscroll-step 1
                 hscroll-margin 1
-                scroll-margin 0
+                scroll-margin 1
                 scroll-step 1
                 scroll-conservatively 101
+                scroll-up-aggressively 0.01
+                scroll-down-aggressively 0.01
                 scroll-preserve-screen-position nil)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
@@ -1218,7 +1220,19 @@ truncates text if needed.  Minimal width can be set with
   :custom
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t))
+  (display-line-numbers-width-start t)
+  :config
+  (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
+    "The `display-line-numbers' mode affects `scroll-margin' variable.
+
+This advice recalculates the amount of lines needed to scroll to
+ensure `scroll-margin' preserved."
+    (apply f args)
+    (let ((diff (- scroll-margin
+                   (- (line-number-at-pos (point))
+                      (line-number-at-pos (window-start))))))
+      (when (> diff 0)
+        (scroll-down diff)))))
 
 (use-package org
   :straight (:type built-in)
@@ -1316,7 +1330,7 @@ truncates text if needed.  Minimal width can be set with
   (markdown-fontify-code-blocks-natively t)
   (markdown-command "pandoc")
   (markdown-hr-display-char nil)
-  (markdown-list-item-bullets '("•" "◆"))
+  (markdown-list-item-bullets '("-"))
   :hook ((markdown-mode . flyspell-mode)))
 
 (use-package rust-mode
@@ -1876,6 +1890,8 @@ appended."
   )
 
 (use-package company-quickhelp
+  :straight (:host github
+             :repo "company-mode/company-quickhelp")
   :hook (company-mode . company-quickhelp-mode)
   :custom
   (company-quickhelp-max-lines 13)
@@ -2085,27 +2101,35 @@ appended."
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
   :custom
-  (lsp-enable-links nil)
+  ;; general settings
   (lsp-keymap-prefix "C-c l")
-  (lsp-rust-clippy-preference "on")
   (lsp-completion-provider :capf)
   (lsp-diagnostics-provider :flycheck)
-  (lsp-enable-indentation nil)
-  (lsp-enable-symbol-highlighting t)
-  (lsp-rust-server 'rust-analyzer)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-enable-dap-auto-configure nil)
-  (lsp-enable-semantic-highlighting nil)
   (lsp-log-io nil)
-  (lsp-enable-folding nil)
   (lsp-keep-workspace-alive nil)
-  (lsp-completion-show-kind nil))
+  ;; DAP
+  (lsp-enable-dap-auto-configure nil)
+  ;; UI
+  (lsp-enable-links nil)
+  (lsp-headerline-breadcrumb-enable nil)
+  ;; semantic code features
+  (lsp-enable-folding nil)
+  (lsp-enable-indentation nil)
+  (lsp-enable-semantic-highlighting nil)
+  (lsp-enable-symbol-highlighting t)
+  ;; completion
+  (lsp-completion-show-kind nil)
+  ;; lens
+  (lsp-lens-enable t)
+  (lsp-lens-place-position 'end-of-line)
+  ;; rust
+  (lsp-rust-clippy-preference "on")
+  (lsp-rust-server 'rust-analyzer))
 
 (use-package lsp-ui
   :straight (:host github
-             :repo "emacs-lsp/lsp-ui"
-             :branch "option-markdown")
+             :repo "emacs-lsp/lsp-ui")
   :after lsp-mode
   :commands lsp-ui-mode
   :bind (:map lsp-ui-mode-map
@@ -2139,6 +2163,10 @@ appended."
 (use-package lsp-java
   :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
   :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
+
+(use-package lsp-treemacs
+  :custom
+  (lsp-treemacs-theme "Iconless"))
 
 (use-package project
   :straight nil
