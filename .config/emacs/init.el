@@ -2427,3 +2427,10 @@ appended."
   (scroll-on-jump-with-scroll-advice-add scroll-down-command)
   (scroll-on-jump-with-scroll-advice-add isearch-update)
   (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))
+
+(use-package reverse-im
+  :straight t
+  :custom
+  (reverse-im-input-methods '("russian-computer"))
+  :config
+  (reverse-im-mode t))

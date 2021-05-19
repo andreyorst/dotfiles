@@ -3640,6 +3640,18 @@ With smooth scrolling it is much easier to see where the text actually moved.
     (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))
 #+end_src
 
+*** Reverse IM
+Reverses input method to allow shortcuts be layout agnostic.
+
+#+begin_src emacs-lisp
+  (use-package reverse-im
+    :straight t
+    :custom
+    (reverse-im-input-methods '("russian-computer"))
+    :config
+    (reverse-im-mode t))
+#+end_src
+
 ** =(provide 'init)=
 This concludes the =init.el= file.
 
