@@ -116,6 +116,7 @@ gif() {
     rm -f "$palette"
 }
 
+# print separator line in the terminal
 sep() {
     (
         sep=""
@@ -127,7 +128,7 @@ sep() {
     )
 }
 
-
+# concatenate files with a separator between those
 sepcat() {
     (
         while [ $# -ne 0 ]; do
@@ -140,9 +141,14 @@ sepcat() {
             esac
             shift
         done
+
         for file in $files; do
             sep "$separator" "$file"
             cat "$file"
         done
     )
 }
+
+# curl-cp - copy files with curl utility.
+# Handy when you want to see the progress.
+ccp() { eval curl -o "$2" FILE://"$1"; }
