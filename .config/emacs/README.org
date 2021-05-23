@@ -2855,18 +2855,6 @@ Documentation popup for company mode.
     (company-quickhelp-use-propertized-text t))
 #+end_src
 
-**** COMMENT Company box
-Provides graphical frontend for company.
-Icons and scrollbar are disabled.
-
-#+begin_src emacs-lisp
-  (use-package company-box
-    :hook (company-mode . company-box-mode)
-    :custom
-    (company-box-enable-icon nil)
-    (company-box-scrollbar nil))
-#+end_src
-
 *** Undo Tree
 This is a more familiar undo mode.
 
@@ -3624,7 +3612,7 @@ With smooth scrolling it is much easier to see where the text actually moved.
                :repo "ideasman42/emacs-scroll-on-jump")
     :custom
     (scroll-on-jump-smooth nil)
-    (scroll-on-jump-duration 0.2)
+    (scroll-on-jump-duration 0.1337)
     :config
     (scroll-on-jump-advice-add beginning-of-buffer)
     (scroll-on-jump-advice-add end-of-buffer)

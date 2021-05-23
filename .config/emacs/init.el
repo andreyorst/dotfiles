@@ -2413,7 +2413,7 @@ appended."
              :repo "ideasman42/emacs-scroll-on-jump")
   :custom
   (scroll-on-jump-smooth nil)
-  (scroll-on-jump-duration 0.2)
+  (scroll-on-jump-duration 0.1337)
   :config
   (scroll-on-jump-advice-add beginning-of-buffer)
   (scroll-on-jump-advice-add end-of-buffer)
