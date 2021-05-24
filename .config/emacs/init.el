@@ -467,26 +467,11 @@ Used in various places to avoid getting wrong line height when
 (use-package solaire-mode
   :straight (:host github
              :repo "hlissner/emacs-solaire-mode")
-  :commands (solaire-global-mode
-             solaire-mode-swap-bg
-             turn-on-solaire-mode
-             solaire-mode-in-minibuffer
-             solaire-mode-reset)
-  :hook (((after-revert
-           change-major-mode
-           org-src-mode)
-          . turn-on-solaire-mode)
-         (snippet-mode . solaire-mode))
+  :commands (solaire-global-mode)
   :custom
   (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
-  :config
-  (solaire-global-mode 1)
-  (defvar aorst--solaire-swap-bg-hook nil
-    "Run hooks after solaire swaps backgrounds.")
-  (defun aorst/run-solaire-swap-hooks ()
-    "Run `aorst--solaire-swap-hook'."
-    (run-hooks 'aorst--solaire-swap-bg-hook))
-  (advice-add 'solaire-mode--swap-bg-faces-maybe :after #'aorst/run-solaire-swap-hooks))
+  :init
+  (solaire-global-mode 1))
 
 (defcustom aorst--dark-theme 'doom-spacegrey
   "Dark theme to use."
@@ -908,9 +893,7 @@ Used in various places to avoid getting wrong line height when
 (use-package mini-modeline
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
-  :hook (((aorst--theme-change
-           aorst--solaire-swap-bg)
-          . aorst/mini-modeline-setup-faces)
+  :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode))
   :custom
   (mini-modeline-right-padding 2)
@@ -921,16 +904,17 @@ Used in various places to avoid getting wrong line height when
    '(:eval (eval mode-line-r-format)))
   :config
   (defun aorst/mini-modeline-setup-faces ()
+    "Setup mini-modeline face."
     (setq mini-modeline-face-attr
           (plist-put mini-modeline-face-attr
-                     :background (face-attribute 'mode-line :background)))))
+                     :background (if (facep 'solaire-minibuffer-face)
+                                     (face-attribute 'solaire-minibuffer-face :background)
+                                   (face-attribute 'mode-line :background))))))
 
 (use-package frame
   :straight nil
   :when window-system
-  :hook ((aorst--theme-change
-          aorst--solaire-swap-bg)
-         . aorst/window-divider-setup-faces)
+  :hook (aorst--theme-change . aorst/window-divider-setup-faces)
   :custom
   (window-divider-default-bottom-width 1)
   (window-divider-default-right-width 1)
@@ -974,12 +958,9 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
          (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
          (treemacs-switch-workspace . treemacs-set-fallback-workspace)
          (treemacs-mode . aorst/treemacs-setup-title)
-         ((aorst--theme-change
-           aorst--solaire-swap-bg)
-          . aorst/treemacs-setup-title)
-         ((aorst--theme-change
-           aorst--solaire-swap-bg)
-          . aorst/treemacs-setup-faces))
+         (aorst--theme-change . aorst/treemacs-setup-title)
+         (aorst--theme-change . aorst/treemacs-setup-faces)
+         (aorst--theme-change . aorst/treemacs-variable-pitch-labels))
   :custom-face
   (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
   :custom
@@ -1061,11 +1042,16 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (defun aorst/treemacs-setup-title ()
     (when-let ((treemacs-buffer (treemacs-get-local-buffer)))
       (with-current-buffer treemacs-buffer
-        (let ((bg (face-attribute 'default :background))
+        (let ((bg (if (and (facep 'solaire-default-face)
+                           (not (eq (face-attribute 'solaire-default-face :background)
+                                    'unspecified)))
+                      (face-attribute 'solaire-default-face :background)
+                    (face-attribute 'default :background)))
               (fg (face-attribute 'default :foreground)))
           (face-remap-add-relative 'header-line
-                                   :background bg :foreground fg
-                                   :box `(:line-width ,(/ aorst--line-pixel-height 4) :color ,bg)))
+                                   :background bg
+                                   :foreground fg
+                                   :box (list :line-width (/ aorst--line-pixel-height 4) :color bg)))
         (setq header-line-format
               '((:eval
                  (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
@@ -1084,9 +1070,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   :straight nil
   :when window-system
   :hook ((after-init . global-tab-line-mode)
-         ((aorst--theme-change
-           aorst--solaire-swap-bg)
-          . aorst/tabline-setup-faces))
+         (aorst--theme-change . aorst/tabline-setup-faces))
   :config
   (defun tab-line-close-tab (&optional e)
     "Close the selected tab.
@@ -1164,18 +1148,14 @@ truncates text if needed.  Minimal width can be set with
 
 
   (defun aorst/tabline-setup-faces ()
-    (let ((bg (if (and (facep 'solaire-default-face)
-                       (not (eq (face-attribute 'solaire-default-face :background)
-                                'unspecified)))
-                  (face-attribute 'solaire-default-face :background)
-                (face-attribute 'default :background)))
+    (let ((bg (face-attribute 'default :background))
           (fg (face-attribute 'default :foreground))
           (dark-fg (face-attribute 'shadow :foreground))
           (overline (face-attribute 'font-lock-keyword-face :foreground))
           (base (if (and (facep 'solaire-default-face)
                          (not (eq (face-attribute 'solaire-default-face :background)
                                   'unspecified)))
-                    (face-attribute 'default :background)
+                    (face-attribute 'solaire-default-face :background)
                   (face-attribute 'mode-line :background)))
           (box-width (/ aorst--line-pixel-height 5)))
       (when (facep 'tab-line-tab-special)
@@ -1793,9 +1773,7 @@ appended."
   :commands ivy-mode
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
          (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
-         ((aorst--theme-change
-           aorst--solaire-swap-bg)
-          . aorst/ivy-setup-faces))
+         (aorst--theme-change . aorst/ivy-setup-faces))
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-x C-b" . ivy-switch-buffer))
   :custom-face
