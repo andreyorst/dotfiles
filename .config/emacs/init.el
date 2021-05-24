@@ -2412,3 +2412,8 @@ appended."
   (reverse-im-input-methods '("russian-computer"))
   :config
   (reverse-im-mode t))
+
+(use-package compile
+  :straight nil
+  :custom
+  (compilation-scroll-output 'first-error))

@@ -3618,6 +3618,16 @@ Reverses input method to allow shortcuts be layout agnostic.
     (reverse-im-mode t))
 #+end_src
 
+*** Compile
+Tweaks to inbuilt =compile.el= mode.
+
+#+begin_src emacs-lisp
+  (use-package compile
+    :straight nil
+    :custom
+    (compilation-scroll-output 'first-error))
+#+end_src
+
 ** =(provide 'init)=
 This concludes the =init.el= file.
 
