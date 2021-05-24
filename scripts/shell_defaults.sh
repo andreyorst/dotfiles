@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # Aliases and Defaults
 
 unset LS_COLORS
@@ -28,7 +28,7 @@ if [ -n "$(command -v dash)" ]; then
     export KAKOUNE_POSIX_SHELL
 fi
 
-alias less="less --tabs 4 -RF"
+alias less="less --tabs 3 -RF"
 
 if [ -n "$(command -v exa)" ]; then
     alias ls="exa"
