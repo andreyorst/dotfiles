@@ -1482,7 +1482,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with newline
 appended."
-    (format "%s\n" namespace)))
+    (format "%s\n> " namespace)))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo")

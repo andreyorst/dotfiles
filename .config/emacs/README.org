@@ -2284,7 +2284,7 @@ IDE for Clojure and ClojureScript.
     (defun cider-repl-prompt-newline (namespace)
       "Return a prompt string that mentions NAMESPACE with newline
   appended."
-      (format "%s\n" namespace)))
+      (format "%s\n> " namespace)))
 #+end_src
 
 **** flycheck-clj-kondo
