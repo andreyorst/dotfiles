@@ -255,6 +255,8 @@ Backup files and auto-save files are kept within =.cache= directory located at =
      `(("." . ,(expand-file-name ".cache/backups" user-emacs-directory))))
     (auto-save-file-name-transforms
      `((".*" ,(expand-file-name ".cache/auto-save/" user-emacs-directory) t)))
+    (auto-save-no-message t)
+    (auto-save-interval 100)
     :config
     (let ((auto-save-dir (expand-file-name ".cache/auto-save/" user-emacs-directory)))
       (unless (file-exists-p auto-save-dir)
@@ -500,7 +502,7 @@ Render =^L= as continuous comment or dashed line.
           (vconcat (make-list (or fill-column 70)
                               (make-glyph-code
                                (string-to-char (or comment-start "-"))
-                               'font-lock-comment-face)))))
+                               'shadow)))))
 
   (dolist (mode-hook '(help-mode-hook
                        org-mode-hook
@@ -861,7 +863,7 @@ Provided themes define colors for pretty much every popular Emacs package, which
     :type 'symbol
     :group 'local-config)
 
-  (defcustom aorst--light-theme 'doom-one-light
+  (defcustom aorst--light-theme 'doom-flatwhite
     "Light theme to use."
     :tag "Light theme"
     :type 'symbol
@@ -872,12 +874,13 @@ Provided themes define colors for pretty much every popular Emacs package, which
     (doom-themes-enable-bold t)
     (doom-themes-enable-italic t)
     :custom-face
-    (shadow    ((t (:foreground "grey50"))))
+    (fringe    ((t (:background nil))))
     (highlight ((t (:foreground unspecified
                     :distant-foreground unspecified
                     :background unspecified))))
-    (org-block ((t (:extend t))))
+    (org-block ((t (:extend t :background unspecified :inherit hl-line))))
     (org-block-begin-line ((t (:slant unspecified
+                               :weight normal
                                :background unspecified
                                :inherit org-block
                                :extend t))))
@@ -895,7 +898,7 @@ Provided themes define colors for pretty much every popular Emacs package, which
     (org-level-6 ((t (:inherit outline-3))))
     (org-level-7 ((t (:inherit outline-4))))
     (org-level-8 ((t (:inherit outline-2))))
-    (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
+    (org-drawer ((t (:foreground nil :inherit shadow))))
     (font-lock-comment-face ((t (:background unspecified))))
     :config
     (if (aorst/dark-mode-p)
@@ -1383,10 +1386,13 @@ A package that displays mode-line in the echo area.
     (defun aorst/mini-modeline-setup-faces ()
       "Setup mini-modeline face."
       (setq mini-modeline-face-attr
-            (plist-put mini-modeline-face-attr
-                       :background (if (facep 'solaire-minibuffer-face)
-                                       (face-attribute 'solaire-minibuffer-face :background)
-                                     (face-attribute 'mode-line :background))))))
+            (plist-put mini-modeline-face-attr :background
+                       (if (facep 'solaire-minibuffer-face)
+                           (face-attribute 'solaire-minibuffer-face :background)
+                         (face-attribute 'mode-line :background)))))
+    (define-advice mini-modeline--set-buffer-face (:after (&rest _) aorst:fix-mini-modeline--set-buffer-face)
+      (push (face-remap-add-relative 'fringe mini-modeline-face-attr)
+            solaire-mode--remaps)))
 #+end_src
 
 *** Frame
@@ -1455,6 +1461,7 @@ File explorer that is displayed in the same frame, unlike inbuilt Speedbar.
            (aorst--theme-change . aorst/treemacs-variable-pitch-labels))
     :custom-face
     (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
+    (treemacs-git-ignored-face ((t (:inherit (shadow)))))
     :custom
     (treemacs-width 32)
     (treemacs-is-never-other-window t)
@@ -1504,10 +1511,12 @@ File explorer that is displayed in the same frame, unlike inbuilt Speedbar.
                       treemacs-fringe-indicator-face
                       treemacs-on-failure-pulse-face
                       treemacs-on-success-pulse-face))
-        (let ((faces (face-attribute face :inherit nil)))
-          (set-face-attribute
-           face nil :inherit
-           `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
+        (let* ((faces (face-attribute face :inherit nil))
+               (faces (if (listp faces) faces (list faces))))
+          (unless (memq 'variable-pitch faces)
+            (set-face-attribute
+             face nil :inherit
+             `(variable-pitch ,@(delq 'unspecified faces)))))))
     (defun aorst/treemacs-after-init-setup ()
       "Set treemacs theme, open treemacs, and expand all projects."
       (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
@@ -1586,11 +1595,11 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "chevron-down"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
                      (all-the-icons-octicon
                       "file-directory"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback (propertize "- " 'face 'font-lock-doc-face)
        :extensions (root-open))
       (treemacs-create-icon
@@ -1599,11 +1608,11 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "chevron-right"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
                      (all-the-icons-octicon
                       "file-directory"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback (propertize "+ " 'face 'font-lock-doc-face)
        :extensions (root-closed))
       (treemacs-create-icon
@@ -1612,11 +1621,11 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "chevron-down"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
                      (all-the-icons-octicon
                       "file-directory"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback (propertize "- " 'face 'font-lock-doc-face)
        :extensions (dir-open))
       (treemacs-create-icon
@@ -1625,11 +1634,11 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "chevron-right"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
                      (all-the-icons-octicon
                       "file-directory"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback (propertize "+ " 'face 'font-lock-doc-face)
        :extensions (dir-closed))
       (treemacs-create-icon
@@ -1638,7 +1647,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "chevron-down"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback (propertize "▾ " 'face 'font-lock-string-face)
        :extensions (tag-open))
       (treemacs-create-icon
@@ -1647,7 +1656,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "chevron-right"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback (propertize "▸ " 'face 'font-lock-string-face)
        :extensions (tag-closed))
       (treemacs-create-icon
@@ -1656,7 +1665,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "tag"
                       :height 0.9
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions (tag-leaf))
       (treemacs-create-icon
@@ -1664,7 +1673,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                      (all-the-icons-octicon
                       "flame"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions (error))
       (treemacs-create-icon
@@ -1672,7 +1681,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                      (all-the-icons-octicon
                       "stop"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions (warning))
       (treemacs-create-icon
@@ -1681,7 +1690,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                       "info"
                       :height 0.75
                       :v-adjust 0.1
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions (info))
       (treemacs-create-icon
@@ -1689,7 +1698,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                      (all-the-icons-octicon
                       "file-media"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                     "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
@@ -1699,7 +1708,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                      (all-the-icons-octicon
                       "file-code"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
                     "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el" "erl"
@@ -1718,7 +1727,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
                      (all-the-icons-octicon
                       "book"
                       :v-adjust 0
-                      :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                      :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
                     "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
@@ -1728,7 +1737,7 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
        :icon (format "   %s\t" (all-the-icons-octicon
                                 "file-text"
                                 :v-adjust 0
-                                :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                                :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("md" "markdown" "rst" "log" "org" "txt"
                     "contribute" "license" "readme" "changelog"))
@@ -1736,28 +1745,28 @@ An Atom inspired theme for Treemacs, that is tangled to a separate file.
        :icon (format "   %s\t" (all-the-icons-octicon
                                 "file-binary"
                                 :v-adjust 0
-                                :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                                :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("exe" "dll" "obj" "so" "o" "out"))
       (treemacs-create-icon
        :icon (format "   %s\t" (all-the-icons-octicon
                                 "file-pdf"
                                 :v-adjust 0
-                                :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                                :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("pdf"))
       (treemacs-create-icon
        :icon (format "   %s\t" (all-the-icons-octicon
                                 "file-zip"
                                 :v-adjust 0
-                                :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                                :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
       (treemacs-create-icon
        :icon (format "   %s\t" (all-the-icons-octicon
                                 "file-text"
                                 :v-adjust 0
-                                :face '(:foreground unspecified :inherit font-lock-doc-face :slant normal :weight normal)))
+                                :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
        :fallback ""
        :extensions (fallback))))
 
@@ -2124,8 +2133,8 @@ REPL support for various Schemes.
     :custom (racket-show-functions '(racket-show-echo-area))
     :config
     (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
-    (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
-    (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
+    (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
+    (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
     (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 #+end_src
 
@@ -2976,7 +2985,7 @@ Some tweaks to inbuilt merge tool:
     (smerge-upper ((t (:inherit magit-diff-removed-highlight))))
     (smerge-markers ((t (:weight bold
                          :extend t
-                         :inherit font-lock-comment-face))))
+                         :inherit shadow))))
     :config
     (defun aorst/smerge-setup-faces ()
       (dolist (face-reference '((smerge-refined-added magit-diff-added-highlight)

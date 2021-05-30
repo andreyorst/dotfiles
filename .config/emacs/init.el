@@ -55,6 +55,8 @@
    `(("." . ,(expand-file-name ".cache/backups" user-emacs-directory))))
   (auto-save-file-name-transforms
    `((".*" ,(expand-file-name ".cache/auto-save/" user-emacs-directory) t)))
+  (auto-save-no-message t)
+  (auto-save-interval 100)
   :config
   (let ((auto-save-dir (expand-file-name ".cache/auto-save/" user-emacs-directory)))
     (unless (file-exists-p auto-save-dir)
@@ -239,7 +241,7 @@ for stopping scroll from going beyond longest line.  Based on
         (vconcat (make-list (or fill-column 70)
                             (make-glyph-code
                              (string-to-char (or comment-start "-"))
-                             'font-lock-comment-face)))))
+                             'shadow)))))
 
 (dolist (mode-hook '(help-mode-hook
                      org-mode-hook
@@ -479,7 +481,7 @@ Used in various places to avoid getting wrong line height when
   :type 'symbol
   :group 'local-config)
 
-(defcustom aorst--light-theme 'doom-one-light
+(defcustom aorst--light-theme 'doom-flatwhite
   "Light theme to use."
   :tag "Light theme"
   :type 'symbol
@@ -490,12 +492,13 @@ Used in various places to avoid getting wrong line height when
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :custom-face
-  (shadow    ((t (:foreground "grey50"))))
+  (fringe    ((t (:background nil))))
   (highlight ((t (:foreground unspecified
                   :distant-foreground unspecified
                   :background unspecified))))
-  (org-block ((t (:extend t))))
+  (org-block ((t (:extend t :background unspecified :inherit hl-line))))
   (org-block-begin-line ((t (:slant unspecified
+                             :weight normal
                              :background unspecified
                              :inherit org-block
                              :extend t))))
@@ -513,7 +516,7 @@ Used in various places to avoid getting wrong line height when
   (org-level-6 ((t (:inherit outline-3))))
   (org-level-7 ((t (:inherit outline-4))))
   (org-level-8 ((t (:inherit outline-2))))
-  (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
+  (org-drawer ((t (:foreground nil :inherit shadow))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
   (if (aorst/dark-mode-p)
@@ -906,10 +909,13 @@ Used in various places to avoid getting wrong line height when
   (defun aorst/mini-modeline-setup-faces ()
     "Setup mini-modeline face."
     (setq mini-modeline-face-attr
-          (plist-put mini-modeline-face-attr
-                     :background (if (facep 'solaire-minibuffer-face)
-                                     (face-attribute 'solaire-minibuffer-face :background)
-                                   (face-attribute 'mode-line :background))))))
+          (plist-put mini-modeline-face-attr :background
+                     (if (facep 'solaire-minibuffer-face)
+                         (face-attribute 'solaire-minibuffer-face :background)
+                       (face-attribute 'mode-line :background)))))
+  (define-advice mini-modeline--set-buffer-face (:after (&rest _) aorst:fix-mini-modeline--set-buffer-face)
+    (push (face-remap-add-relative 'fringe mini-modeline-face-attr)
+          solaire-mode--remaps)))
 
 (use-package frame
   :straight nil
@@ -963,6 +969,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
          (aorst--theme-change . aorst/treemacs-variable-pitch-labels))
   :custom-face
   (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
+  (treemacs-git-ignored-face ((t (:inherit (shadow)))))
   :custom
   (treemacs-width 32)
   (treemacs-is-never-other-window t)
@@ -1012,10 +1019,12 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                     treemacs-fringe-indicator-face
                     treemacs-on-failure-pulse-face
                     treemacs-on-success-pulse-face))
-      (let ((faces (face-attribute face :inherit nil)))
-        (set-face-attribute
-         face nil :inherit
-         `(variable-pitch ,@(delq 'unspecified (if (listp faces) faces (list faces))))))))
+      (let* ((faces (face-attribute face :inherit nil))
+             (faces (if (listp faces) faces (list faces))))
+        (unless (memq 'variable-pitch faces)
+          (set-face-attribute
+           face nil :inherit
+           `(variable-pitch ,@(delq 'unspecified faces)))))))
   (defun aorst/treemacs-after-init-setup ()
     "Set treemacs theme, open treemacs, and expand all projects."
     (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
@@ -1343,8 +1352,8 @@ ensure `scroll-margin' preserved."
   :custom (racket-show-functions '(racket-show-echo-area))
   :config
   (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
-  (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
-  (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'font-lock-comment-face :foreground) :box nil)
+  (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
+  (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
   (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
 
 (use-package elisp-mode
@@ -1984,7 +1993,7 @@ appended."
   (smerge-upper ((t (:inherit magit-diff-removed-highlight))))
   (smerge-markers ((t (:weight bold
                        :extend t
-                       :inherit font-lock-comment-face))))
+                       :inherit shadow))))
   :config
   (defun aorst/smerge-setup-faces ()
     (dolist (face-reference '((smerge-refined-added magit-diff-added-highlight)
