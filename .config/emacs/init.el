@@ -481,7 +481,7 @@ Used in various places to avoid getting wrong line height when
   :type 'symbol
   :group 'local-config)
 
-(defcustom aorst--light-theme 'doom-flatwhite
+(defcustom aorst--light-theme 'doom-one-light
   "Light theme to use."
   :tag "Light theme"
   :type 'symbol
@@ -2080,9 +2080,10 @@ appended."
            c-mode
            c++-mode
            elixir-mode
-           clojure-mode
-           clojurec-mode
-           clojurescript-mode)
+           ;; clojure-mode
+           ;; clojurec-mode
+           ;; clojurescript-mode
+           )
           . lsp)
          (lsp-mode . yas-minor-mode))
   :custom-face
