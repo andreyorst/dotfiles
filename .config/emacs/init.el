@@ -912,10 +912,7 @@ Used in various places to avoid getting wrong line height when
           (plist-put mini-modeline-face-attr :background
                      (if (facep 'solaire-minibuffer-face)
                          (face-attribute 'solaire-minibuffer-face :background)
-                       (face-attribute 'mode-line :background)))))
-  (define-advice mini-modeline--set-buffer-face (:after (&rest _) aorst:fix-mini-modeline--set-buffer-face)
-    (push (face-remap-add-relative 'fringe mini-modeline-face-attr)
-          solaire-mode--remaps)))
+                       (face-attribute 'mode-line :background))))))
 
 (use-package frame
   :straight nil
@@ -1440,7 +1437,8 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
     "Evaluate a block of Fennel code with Babel."
-    (lisp-eval-string body))
+    (let ((inferior-lisp-buffer fennel-repl--buffer))
+      (lisp-eval-string body)))
   (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
     (setq-local lisp-indent-function 'fennel-indent-function)))
 
@@ -2080,10 +2078,9 @@ appended."
            c-mode
            c++-mode
            elixir-mode
-           ;; clojure-mode
-           ;; clojurec-mode
-           ;; clojurescript-mode
-           )
+           clojure-mode
+           clojurec-mode
+           clojurescript-mode)
           . lsp)
          (lsp-mode . yas-minor-mode))
   :custom-face

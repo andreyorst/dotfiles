@@ -1389,10 +1389,7 @@ A package that displays mode-line in the echo area.
             (plist-put mini-modeline-face-attr :background
                        (if (facep 'solaire-minibuffer-face)
                            (face-attribute 'solaire-minibuffer-face :background)
-                         (face-attribute 'mode-line :background)))))
-    (define-advice mini-modeline--set-buffer-face (:after (&rest _) aorst:fix-mini-modeline--set-buffer-face)
-      (push (face-remap-add-relative 'fringe mini-modeline-face-attr)
-            solaire-mode--remaps)))
+                         (face-attribute 'mode-line :background))))))
 #+end_src
 
 *** Frame
@@ -2232,7 +2229,8 @@ It supports compile-time macro system, and full Lua compatibility.
     (defvar org-babel-default-header-args:fennel '((:results . "silent")))
     (defun org-babel-execute:fennel (body params)
       "Evaluate a block of Fennel code with Babel."
-      (lisp-eval-string body))
+      (let ((inferior-lisp-buffer fennel-repl--buffer))
+        (lisp-eval-string body)))
     (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
       (setq-local lisp-indent-function 'fennel-indent-function)))
 #+end_src
@@ -3090,10 +3088,9 @@ LSP client for Emacs.
              c-mode
              c++-mode
              elixir-mode
-             ;; clojure-mode
-             ;; clojurec-mode
-             ;; clojurescript-mode
-             )
+             clojure-mode
+             clojurec-mode
+             clojurescript-mode)
             . lsp)
            (lsp-mode . yas-minor-mode))
     :custom-face
