@@ -228,8 +228,8 @@ Some modes can use full name and e-mail address automatically.
 
 #+begin_src emacs-lisp
   (use-package startup
-    :no-require t
     :straight nil
+    :no-require t
     :custom
     (user-mail-address "andreyorst@gmail.com")
     (user-full-name "Andrey Listopadov"))
@@ -268,8 +268,8 @@ Prompt for =y= or =n= instead of =yes= or =no=.
 
 #+begin_src emacs-lisp
   (use-package subr
-    :no-require t
     :straight nil
+    :no-require t
     :init
     (fset 'yes-or-no-p 'y-or-n-p))
 #+end_src
@@ -369,8 +369,8 @@ This configures two keyboard layouts: =qwerty= and =йцукен=, which can be 
 
 #+begin_src emacs-lisp
   (use-package mule-cmds
-    :no-require t
     :straight nil
+    :no-require t
     :custom
     (default-input-method 'russian-computer))
 #+end_src
@@ -389,8 +389,8 @@ Lisp interaction mode adds a bit of startup time, and is rarely needed.
 
 #+begin_src emacs-lisp
   (use-package startup
-    :no-require t
     :straight nil
+    :no-require t
     :custom
     (initial-major-mode 'fundamental-mode)
     (initial-scratch-message ""))
@@ -701,8 +701,8 @@ Disable splash screen.
 
 #+begin_src emacs-lisp
   (use-package startup
-    :no-require t
     :straight nil
+    :no-require t
     :custom
     (inhibit-splash-screen t))
 #+end_src
@@ -831,6 +831,8 @@ Ligatures are selectively enabled in the following modes:
 
 #+begin_src emacs-lisp
   (use-package all-the-icons
+    :straight (:host github
+               :repo "domtronn/all-the-icons.el")
     :config
     (when (and (not (aorst/font-installed-p "all-the-icons"))
                (window-system))
@@ -870,6 +872,8 @@ Provided themes define colors for pretty much every popular Emacs package, which
     :group 'local-config)
 
   (use-package doom-themes
+    :straight (:host github
+               :repo "hlissner/emacs-doom-themes")
     :custom
     (doom-themes-enable-bold t)
     (doom-themes-enable-italic t)
@@ -1439,6 +1443,8 @@ File explorer that is displayed in the same frame, unlike inbuilt Speedbar.
 
 #+begin_src emacs-lisp
   (use-package treemacs
+    :straight (:host github
+               :repo "Alexander-Miller/treemacs")
     :when window-system
     :commands (treemacs-follow-mode
                treemacs-filewatch-mode
@@ -1563,6 +1569,8 @@ Package for Treemacs and Magit integration.
 
 #+begin_src emacs-lisp
   (use-package treemacs-magit
+    :straight (:host github
+               :repo "Alexander-Miller/treemacs")
     :after magit)
 #+end_src
 
@@ -2008,6 +2016,8 @@ Support for using Org export feature with [[https://gohugo.io/][Hugo]] static si
 
 #+begin_src emacs-lisp
   (use-package ox-hugo
+    :straight (:host github
+               :repo "kaushalmodi/ox-hugo")
     :after ox)
 #+end_src
 
@@ -2016,8 +2026,8 @@ Support of exporting to LaTeX.
 
 #+begin_src emacs-lisp
   (use-package ox-latex
-    :after ox
-    :straight nil)
+    :straight nil
+    :after ox)
 #+end_src
 
 **** Org Tempo
@@ -2027,9 +2037,9 @@ It was externalized into separate package in more recent Org mode versions.
 #+begin_src emacs-lisp
   (with-eval-after-load 'org
     (use-package org-tempo
+      :straight nil
       :defines org-version
-      :when (not (version<= org-version "9.1.9"))
-      :straight nil))
+      :when (not (version<= org-version "9.1.9"))))
 #+end_src
 
 *** Prog Mode
@@ -2064,6 +2074,8 @@ A package for editing markdown files.
 
 #+begin_src emacs-lisp
   (use-package markdown-mode
+    :straight (:host github
+               :repo "jrblevin/markdown-mode")
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode))
@@ -2082,17 +2094,11 @@ A package for editing markdown files.
 
 #+begin_src emacs-lisp
   (use-package rust-mode
+    :straight (:host github
+               :repo "rust-lang/rust-mode")
     :commands (rust-format-buffer)
     :bind (:map rust-mode-map
            ("C-c C-M-f" . rust-format-buffer)))
-#+end_src
-
-There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] integration:
-
-#+begin_src emacs-lisp
-  (use-package cargo
-    :if (executable-find "cargo")
-    :hook ((rust-mode toml-mode) . cargo-minor-mode))
 #+end_src
 
 *** TOML
@@ -2100,6 +2106,8 @@ There's also a package for [[https://github.com/kwrooijen/cargo.el][Cargo]] inte
 
 #+begin_src emacs-lisp
   (use-package toml-mode
+    :straight (:host github
+               :repo "dryman/toml-mode.el")
     :bind (:map toml-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
@@ -2109,6 +2117,8 @@ REPL support for various Schemes.
 
 #+begin_src emacs-lisp
   (use-package geiser
+    :straight (:host gitlab
+               :repo "emacs-geiser/geiser")
     :hook (scheme-mode . geiser-mode)
     :custom
     (geiser-active-implementations '(guile))
@@ -2120,6 +2130,8 @@ REPL support for various Schemes.
 
 #+begin_src emacs-lisp
   (use-package racket-mode
+    :straight (:host github
+               :repo "greghendershott/racket-mode")
     :bind (:map racket-mode-map
            ("C-c C-d" . racket-run-with-debugging)
            ("C-c C-M-f" . aorst/indent-buffer)
@@ -2240,6 +2252,8 @@ It supports compile-time macro system, and full Lua compatibility.
 
 #+begin_src emacs-lisp
   (use-package clojure-mode
+    :straight (:host github
+               :repo "clojure-emacs/clojure-mode")
     :hook (((clojure-mode
              clojurec-mode
              clojurescript-mode)
@@ -2258,6 +2272,8 @@ IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package cider
+    :straight (:host github
+               :repo "clojure-emacs/cider")
     :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
            ((cider-repl-mode cider-mode) . eldoc-mode))
     :bind (:map cider-repl-mode-map
@@ -2299,6 +2315,8 @@ IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package flycheck-clj-kondo
+    :straight (:host github
+               :repo "borkdude/flycheck-clj-kondo")
     :when (executable-find "clj-kondo")
     :straight (:host github
                :repo "borkdude/flycheck-clj-kondo"))
@@ -2310,6 +2328,8 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
 
 #+begin_src emacs-lisp
   (use-package clj-refactor
+    :straight (:host github
+               :repo "clojure-emacs/clj-refactor.el")
     :hook ((cider-mode . clj-refactor-mode)
            (cider-mode . yas-minor-mode))
     :custom (cljr-suppress-no-project-warning t)
@@ -2322,6 +2342,8 @@ Disabled until [[https://gitlab.com/technomancy/fennel-mode/-/issues/11][technom
 
 #+begin_src emacs-lisp
   (use-package sly
+    :straight (:host github
+               :repo "joaotavora/sly")
     :custom (inferior-lisp-program "sbcl"))
 #+end_src
 
@@ -2330,6 +2352,8 @@ A mode for editing cmake files.
 
 #+begin_src emacs-lisp
   (use-package cmake-mode
+    :straight (:host github
+               :repo "Kitware/CMake")
     :bind (:map cmake-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
@@ -2339,17 +2363,9 @@ Support for =.yaml= files.
 
 #+begin_src emacs-lisp
   (use-package yaml-mode
+    :straight (:host github
+               :repo "yoshiki/yaml-mode")
     :custom (yaml-indent-offset 4))
-#+end_src
-
-**** flycheck-yamllint
-Yaml linter integration with Flycheck.
-
-#+begin_src emacs-lisp
-  (use-package flycheck-yamllint
-    :when (executable-find "yamllint")
-    :hook ((yaml-mode . flycheck-yamllint-setup)
-           (yaml-mode . flycheck-mode)))
 #+end_src
 
 *** Shell Script
@@ -2378,6 +2394,8 @@ Lua support, mainly to view what [[*Fennel][Fennel]] compiler produces.
 
 #+begin_src emacs-lisp
   (use-package lua-mode
+    :straight (:host github
+               :repo "immerrr/lua-mode")
     :bind (:map lua-mode-map
            ("C-c C-M-f" . aorst/indent-buffer))
     :hook (lua-mode . flycheck-mode)
@@ -2399,6 +2417,8 @@ Json support for Emacs.
 
 #+begin_src emacs-lisp
   (use-package json-mode
+    :straight (:host github
+               :repo "joshwnj/json-mode")
     :hook (json-mode . flycheck-mode)
     :custom (js-indent-level 2))
 #+end_src
@@ -2416,14 +2436,18 @@ Shell script linting.
 Scala language support.
 
 #+begin_src emacs-lisp
-  (use-package scala-mode)
+  (use-package scala-mode
+    :straight (:host github
+               :repo "hvesalai/emacs-scala-mode"))
 #+end_src
 
 *** SQL
 SQL mode does not provide inbuilt support for indentation handling, and instead uses this package.
 
 #+begin_src emacs-lisp
-  (use-package sql-indent)
+  (use-package sql-indent
+    :straight (:host github
+               :repo "alex-hhh/emacs-sql-indent"))
 #+end_src
 
 ** Tools
@@ -2453,6 +2477,8 @@ This package provides a bridge to =libvterm= to display terminal as Emacs buffer
 #+begin_src emacs-lisp
   (setq use-package-hook-name-suffix "-functions")
   (use-package vterm
+    :straight (:host github
+               :repo "akermu/emacs-libvterm")
     :if (bound-and-true-p module-file-suffix)
     :bind (("C-`" . aorst/vterm-toggle)
            ("C-t" . aorst/vterm-focus)
@@ -2517,6 +2543,8 @@ This package provides a bridge to =libvterm= to display terminal as Emacs buffer
 
 #+begin_src emacs-lisp
   (use-package editorconfig
+    :straight (:host github
+               :repo "editorconfig/editorconfig-emacs")
     :config (editorconfig-mode 1))
 #+end_src
 
@@ -2536,6 +2564,8 @@ Some languages have better support with =flycheck=.
 
 #+begin_src emacs-lisp
   (use-package flycheck
+    :straight (:host github
+               :repo "flycheck/flycheck")
     :custom
     (flycheck-indication-mode 'right-fringe)
     (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
@@ -2625,6 +2655,8 @@ Emacs package linting via package-lint and Flycheck.
 
 #+begin_src emacs-lisp
   (use-package flycheck-package
+    :straight (:host github
+               :repo "purcell/flycheck-package")
     :hook ((emacs-lisp-mode . flycheck-mode)
            (emacs-lisp-mode . flycheck-package-setup)))
 #+end_src
@@ -2635,7 +2667,9 @@ It allows me to press some shortcut and be locked in a mode-like state where key
 This package will be used in many other package configurations to provide sane keybindings.
 
 #+begin_src emacs-lisp
-  (use-package hydra)
+  (use-package hydra
+    :straight (:host github
+               :repo "abo-abo/hydra"))
 #+end_src
 
 *** Smartparens
@@ -2709,7 +2743,9 @@ Note that the ";" key is set to =sp-comment= function for =smartparens-strict-mo
 Flex matching for Emacs.
 
 #+begin_src emacs-lisp
-  (use-package flx)
+  (use-package flx
+    :straight (:host github
+               :repo "lewang/flx"))
 #+end_src
 
 *** Ivy
@@ -2717,6 +2753,8 @@ Ivy is a narrowing framework like Helm, but much lighter.
 
 #+begin_src emacs-lisp
   (use-package ivy
+    :straight (:host github
+               :repo "abo-abo/swiper")
     :commands ivy-mode
     :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
            (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
@@ -2761,6 +2799,8 @@ The same thing is for =rg=, but counsel actually has it's own variable for it, s
 
 #+begin_src emacs-lisp
   (use-package counsel
+    :straight (:host github
+               :repo "abo-abo/swiper")
     :commands (counsel-M-x
                counsel-find-file
                counsel-file-jump
@@ -2795,6 +2835,8 @@ Complete anything framework.
 
 #+begin_src emacs-lisp
   (use-package company
+    :straight (:host github
+               :repo "company-mode/company-mode")
     :bind (:map company-mode-map
            ([remap completion-at-point] . company-complete)
            ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
@@ -2845,6 +2887,8 @@ This is a more familiar undo mode.
 
 #+begin_src emacs-lisp
   (use-package undo-tree
+    :straight (:host gitlab
+               :repo "tsc25/undo-tree")
     :commands global-undo-tree-mode
     :bind (("C-z" . undo-tree-undo)
            ("C-S-z" . undo-tree-redo))
@@ -2859,6 +2903,8 @@ Template engine for Emacs.
 
 #+begin_src emacs-lisp
   (use-package yasnippet
+    :straight (:host github
+               :repo "joaotavora/yasnippet")
     :config
     (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
 #+end_src
@@ -2867,8 +2913,12 @@ Template engine for Emacs.
 Emacs interface to Git.
 
 #+begin_src emacs-lisp
-  (use-package with-editor)
+  (use-package with-editor
+    :straight (:host github
+               :repo "magit/with-editor"))
   (use-package magit
+    :straight (:host github
+               :repo "magit/magit")
     :hook (git-commit-mode . flyspell-mode)
     :bind (("<f12>" . magit-status))
     :custom
@@ -2897,6 +2947,8 @@ Display TODO items in Magit buffers.
 
 #+begin_src emacs-lisp
   (use-package magit-todos
+    :straight (:host github
+               :repo "alphapapa/magit-todos")
     :after magit
     :init
     ;; don't break Magit on systems that don't have `nice'
@@ -2996,9 +3048,15 @@ Some tweaks to inbuilt merge tool:
 This package provides multiple cursors functionality to Emacs.
 
 #+begin_src emacs-lisp
-  (use-package phi-search)
-  (use-package mc-extras)
+  (use-package phi-search
+    :straight (:host github
+               :repo "zk-phi/phi-search"))
+  (use-package mc-extras
+    :straight (:host github
+               :repo "knu/mc-extras.el"))
   (use-package multiple-cursors
+    :straight (:host github
+               :repo "magnars/multiple-cursors.el")
     :requires hydra
     :commands (mc/cycle-backward
                mc/cycle-forward)
@@ -3051,6 +3109,8 @@ Expand or reduce region semantically.
 
 #+begin_src emacs-lisp
   (use-package expand-region
+    :straight (:host github
+               :repo "magnars/expand-region.el")
     :bind (("C-c e" . hydrant/er/body))
     :requires hydra
     :config
@@ -3084,6 +3144,8 @@ LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :straight (:host github
+               :repo "emacs-lsp/lsp-mode")
     :hook (((rust-mode
              c-mode
              c++-mode
@@ -3166,6 +3228,8 @@ Note that path to java may differ on different systems.
 
 #+begin_src emacs-lisp
   (use-package lsp-java
+    :straight (:host github
+               :repo "emacs-lsp/lsp-java")
     :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
     :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 #+end_src
@@ -3175,6 +3239,8 @@ Side panel explorer for LSP based on Treemacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-treemacs
+    :straight (:host github
+               :repo "emacs-lsp/lsp-treemacs")
     :custom
     (lsp-treemacs-theme "Iconless"))
 #+end_src
@@ -3209,6 +3275,8 @@ A package to format C code with Clang Format.
 
 #+begin_src emacs-lisp
   (use-package clang-format
+    :straight (:host github
+               :repo "emacsmirror/clang-format")
     :after cc-mode
     :bind (:map c-mode-base-map
            ("C-c C-M-f" . clang-format-buffer)))
@@ -3291,6 +3359,8 @@ This package makes it possible to edit Markdown code blocks in separate buffers.
 
 #+begin_src emacs-lisp
   (use-package edit-indirect
+    :straight (:host github
+               :repo "Fanael/edit-indirect")
     :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
     :bind (:map edit-indirect-mode-map
            ("C-c C-c" . edit-indirect-commit)
@@ -3310,6 +3380,8 @@ Additionally it provides string escaping, when editing nested strings.
 
 #+begin_src emacs-lisp
   (use-package separedit
+    :straight (:host github
+               :repo "twlz0ne/separedit.el")
     :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
     :bind (:map prog-mode-map
            ("C-c '" . separedit)
@@ -3340,6 +3412,8 @@ Dumbest definition jumping that just work.
 
 #+begin_src emacs-lisp
   (use-package dumb-jump
+    :straight (:host github
+               :repo "jacktasia/dumb-jump")
     :custom
     (dumb-jump-prefer-searcher 'rg)
     (dumb-jump-selector 'ivy)
@@ -3352,6 +3426,8 @@ A useful package that displays all keybindings available for the chord you're en
 
 #+begin_src emacs-lisp
   (use-package which-key
+    :straight (:host github
+               :repo "justbur/emacs-which-key")
     :config (which-key-mode t))
 #+end_src
 
@@ -3361,6 +3437,8 @@ Runs GC when Emacs is idle, and increases GC threshold during active use.
 
 #+begin_src emacs-lisp
   (use-package gcmh
+    :straight (:host gitlab
+               :repo "koral/gcmh")
     :config (gcmh-mode t))
 #+end_src
 
@@ -3380,7 +3458,9 @@ This package provides a way of editing grep buffer and applying edits to the fil
 Extremely useful with ivy-occur.
 
 #+begin_src emacs-lisp
-  (use-package wgrep)
+  (use-package wgrep
+    :straight (:host github
+               :repo "mhayashi1120/Emacs-wgrep"))
 #+end_src
 
 *** Xref
@@ -3424,14 +3504,6 @@ Hide quail buffers from buffer menu.
       (aorst/hide-quail-buffer)))
 #+end_src
 
-*** Ripgrep
-Integration for [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool.
-
-#+begin_src emacs-lisp
-  (use-package rg
-    :bind ("C-c r" . rg))
-#+end_src
-
 *** ISAYT
 Indent S-expressions as you type.
 
@@ -3452,51 +3524,12 @@ Eldoc tweaks.
     :custom (eldoc-echo-area-use-multiline-p nil))
 #+end_src
 
-*** God Mode
-God mode is more like a mode in a sense of a mode from modal editor, such as Vim, or Kakoune.
-It makes all shortcuts you press be prefixed by =Ctrl= key by default.
-
-#+begin_src emacs-lisp
-  (defcustom aorst--god-mode nil
-    "Whether to include bufname to titlebar.
-    Bufname is not necessary on GNOME, but may be useful in other DEs."
-    :type 'boolean
-    :group 'local-config)
-
-  (use-package god-mode
-    :when aorst--god-mode
-    :hook ((god-mode-enabled
-            god-mode-disabled) . aorst/god-mode-change-cursor-shape)
-    :bind (("<escape>" . god-local-mode)
-           :map god-local-mode-map
-           ("i" . god-local-mode)
-           ("<backspace>" . ignore)
-           ("<escape>" . ignore)
-           ("<return>" . ignore)
-           ("j" . ignore)
-           ("m" . ignore))
-    :config
-    (advice-add 'aorst/newline-below :after #'(lambda () (god-local-mode -1)))
-    (advice-add 'aorst/newline-above :after #'(lambda () (god-local-mode -1)))
-    (dolist (mode '(treemacs-mode
-                    vterm-mode
-                    cider-repl-mode
-                    racket-repl-mode
-                    geiser-repl-mode
-                    magit-mode))
-      (add-to-list 'god-exempt-major-modes mode))
-    :init
-    (defun aorst/god-mode-change-cursor-shape ()
-      (when window-system
-        (setq cursor-type (if god-local-mode 'box 'bar))))
-    (god-mode))
-#+end_src
-
 *** Auto revert mode
 Watch files and update buffer contents if files changed on disk.
 
 #+begin_src emacs-lisp
   (use-package autorevert
+    :straight nil
     :hook (after-init . global-auto-revert-mode))
 #+end_src
 
@@ -3506,6 +3539,8 @@ Great addition to [[*Magit TODOs][Magit TODOs]].
 
 #+begin_src emacs-lisp
   (use-package hl-todo
+    :straight (:host github
+               :repo "tarsius/hl-todo")
     :hook (prog-mode . hl-todo-mode))
 #+end_src
 
@@ -3536,6 +3571,8 @@ Dims parentheses a bit, making those less in your face.
 
 #+begin_src emacs-lisp
   (use-package paren-face
+    :straight (:host github
+               :repo "tarsius/paren-face")
     :hook ((clojure-mode
             emacs-lisp-mode
             common-lisp-mode
@@ -3557,6 +3594,8 @@ Java bytecode decompiler support for viewing =.class= files.
 
 #+begin_src emacs-lisp
   (use-package jdecomp
+    :straight (:host github
+               :repo "xiongtx/jdecomp")
     :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
     :hook (archive-mode . jdecomp-mode)
     :custom
@@ -3618,7 +3657,8 @@ Reverses input method to allow shortcuts be layout agnostic.
 
 #+begin_src emacs-lisp
   (use-package reverse-im
-    :straight t
+    :straight (:host github
+               :repo "a13/reverse-im.el")
     :custom
     (reverse-im-input-methods '("russian-computer"))
     :config
