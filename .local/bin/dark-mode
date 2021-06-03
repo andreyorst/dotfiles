@@ -1,0 +1,3 @@
+#!/bin/env sh
+
+emacsclient -e '(progn (disable-theme aorst--light-theme) (load-theme aorst--dark-theme))'
