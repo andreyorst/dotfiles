@@ -1940,6 +1940,7 @@ appended."
   :custom
   (undo-tree-visualizer-relative-timestamps nil)
   (undo-tree-visualizer-timestamps nil)
+  (undo-tree-auto-save-history nil)
   :init (global-undo-tree-mode 1))
 
 (use-package yasnippet

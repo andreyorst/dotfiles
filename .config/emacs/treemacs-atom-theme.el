@@ -25,7 +25,7 @@
                     "file-directory"
                     :v-adjust 0
                     :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
-     :fallback (propertize "- " 'face 'font-lock-doc-face)
+     :fallback (propertize "- " 'face 'shadow)
      :extensions (root-open))
     (treemacs-create-icon
      :icon (format " %s\t%s\t"
@@ -38,7 +38,7 @@
                     "file-directory"
                     :v-adjust 0
                     :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
-     :fallback (propertize "+ " 'face 'font-lock-doc-face)
+     :fallback (propertize "+ " 'face 'shadow)
      :extensions (root-closed))
     (treemacs-create-icon
      :icon (format " %s\t%s\t"
@@ -51,7 +51,7 @@
                     "file-directory"
                     :v-adjust 0
                     :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
-     :fallback (propertize "- " 'face 'font-lock-doc-face)
+     :fallback (propertize "- " 'face 'shadow)
      :extensions (dir-open))
     (treemacs-create-icon
      :icon (format " %s\t%s\t"
@@ -64,7 +64,7 @@
                     "file-directory"
                     :v-adjust 0
                     :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
-     :fallback (propertize "+ " 'face 'font-lock-doc-face)
+     :fallback (propertize "+ " 'face 'shadow)
      :extensions (dir-closed))
     (treemacs-create-icon
      :icon (format "  %s\t"
