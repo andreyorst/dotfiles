@@ -901,7 +901,9 @@ Used in various places to avoid getting wrong line height when
   :straight (:host github
              :repo "kiennq/emacs-mini-modeline")
   :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
-         (after-init . mini-modeline-mode))
+         (after-init . mini-modeline-mode)
+         (isearch-mode . aorst/mini-modeline-isearch)
+         (isearch-mode-end . aorst/mini-modeline-isearch-end))
   :custom
   (mini-modeline-right-padding 2)
   (mini-modeline-display-gui-line nil)
@@ -910,6 +912,14 @@ Used in various places to avoid getting wrong line height when
   (mini-modeline-r-format
    '(:eval (eval mode-line-r-format)))
   :config
+  (defvar aorst--mini-modeline-isearch-delay (* 60 60 1000)
+    "Delay echo area update to keep the isearch prompt.")
+  (defun aorst/mini-modeline-isearch ()
+    (setq mini-modeline-echo-duration aorst--mini-modeline-isearch-delay))
+  (defvar aorst--mini-modeline-echo-delay mini-modeline-echo-duration
+    "Delay echo area update to keep the isearch prompt.")
+  (defun aorst/mini-modeline-isearch-end ()
+    (setq mini-modeline-echo-duration aorst--mini-modeline-echo-delay))
   (defun aorst/mini-modeline-setup-faces ()
     "Setup mini-modeline face."
     (setq mini-modeline-face-attr
