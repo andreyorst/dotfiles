@@ -857,22 +857,10 @@ Used in various places to avoid getting wrong line height when
 (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
 (add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
 
-(defvar-local aorst--mode-line-god-mode "")
-
-(defun aorst/mode-line-god-mode (&rest _)
-  (setq aorst--mode-line-god-mode
-        (if (bound-and-true-p god-local-mode)
-            (concat "  " (propertize "GOD" 'help-echo "GOD mode is enabled for current buffer"))
-          "")))
-
-(add-hook 'god-mode-enabled-hook #'aorst/mode-line-god-mode)
-(add-hook 'god-mode-disabled-hook #'aorst/mode-line-god-mode)
-
 (defvar mode-line-l-format 'aorst--mode-line-buffer-name)
 (defvar mode-line-r-format
   '(concat
     (aorst/mode-line-buffer-state)
-    aorst--mode-line-god-mode
     (aorst/mode-line-line-column)
     (aorst/mode-line-input-method)
     (aorst/mode-line-line-encoding)
