@@ -926,7 +926,8 @@ Used in various places to avoid getting wrong line height when
           (plist-put mini-modeline-face-attr :background
                      (if (facep 'solaire-minibuffer-face)
                          (face-attribute 'solaire-minibuffer-face :background)
-                       (face-attribute 'mode-line :background))))))
+                       (face-attribute 'mode-line :background)))))
+  (aorst/mini-modeline-setup-faces))
 
 (use-package frame
   :straight nil
@@ -1787,7 +1788,8 @@ appended."
          'vertico-current nil
          :background (if (aorst/dark-mode-p)
                          (doom-lighten mode-line-color 0.2)
-                       (doom-darken mode-line-color 0.1)))))))
+                       (doom-darken mode-line-color 0.1))))))
+  (aorst/vertico-setup-faces))
 
 (use-package marginalia
   :init (marginalia-mode))
