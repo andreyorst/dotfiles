@@ -196,13 +196,13 @@ for stopping scroll from going beyond longest line.  Based on
     (if (and transient-mark-mode
              mark-active)
         (downcase-region (region-beginning) (region-end))
-      (downcase-word (- arg))))
+      (downcase-word arg)))
   (defun aorst/upcase-region-or-word (arg)
     (interactive "*p")
     (if (and transient-mark-mode
              mark-active)
         (upcase-region (region-beginning) (region-end))
-      (upcase-word (- arg))))
+      (upcase-word arg)))
   (defun aorst/exchange-point-and-mark (arg)
     (interactive "*p")
     (when (and transient-mark-mode
@@ -231,7 +231,8 @@ for stopping scroll from going beyond longest line.  Based on
 (use-package minibuffer
   :straight nil
   :bind (:map minibuffer-inactive-mode-map
-         ("<mouse-1>" . ignore)))
+         ("<mouse-1>" . ignore))
+  :custom (completion-styles '(basic partial-completion flex)))
 
 (defun aorst/formfeed-line ()
   "Display the formfeed ^L char as comment or as continuous line."
@@ -252,6 +253,14 @@ for stopping scroll from going beyond longest line.  Based on
 (use-package window
   :straight nil
   :bind ("C-c b" . bury-buffer))
+
+(use-package comint
+  :straight nil
+  :hook (comint-mode . aorst/remove-comint-postoutput-scroll-to-bottom)
+  :config
+  (defun aorst/remove-comint-postoutput-scroll-to-bottom ()
+    (remove-hook 'comint-output-filter-functions
+                 'comint-postoutput-scroll-to-bottom)))
 
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
@@ -378,6 +387,15 @@ evaluated in order.  Returns x."
                  forms)
        ,gx)))
 
+(defun aorst/minibuffer-defer-garbage-collection ()
+  "Defer garbage collection for minibuffer"
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun aorst/minibuffer-restore-garbage-collection ()
+  "Resotre garbage collection settings."
+  (run-at-time
+   1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
+
 (use-package startup
   :straight nil
   :no-require t
@@ -461,16 +479,12 @@ Used in various places to avoid getting wrong line height when
   :init (global-auto-composition-mode -1))
 
 (use-package all-the-icons
-  :straight (:host github
-             :repo "domtronn/all-the-icons.el")
   :config
   (when (and (not (aorst/font-installed-p "all-the-icons"))
              (window-system))
     (all-the-icons-install-fonts t)))
 
 (use-package solaire-mode
-  :straight (:host github
-             :repo "hlissner/emacs-solaire-mode")
   :commands (solaire-global-mode)
   :custom
   (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
@@ -490,8 +504,6 @@ Used in various places to avoid getting wrong line height when
   :group 'local-config)
 
 (use-package doom-themes
-  :straight (:host github
-             :repo "hlissner/emacs-doom-themes")
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
@@ -886,8 +898,6 @@ Used in various places to avoid getting wrong line height when
              mode-line-r-format))))
 
 (use-package mini-modeline
-  :straight (:host github
-             :repo "kiennq/emacs-mini-modeline")
   :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode)
          (isearch-mode . aorst/mini-modeline-isearch)
@@ -949,8 +959,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                           "%b — Emacs"))))
 
 (use-package treemacs
-  :straight (:host github
-             :repo "Alexander-Miller/treemacs")
   :when window-system
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
@@ -1070,8 +1078,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                    (concat (make-string width ?\s) text)))))))))
 
 (use-package treemacs-magit
-  :straight (:host github
-             :repo "Alexander-Miller/treemacs")
   :after magit)
 
 (use-package uniquify
@@ -1283,8 +1289,6 @@ ensure `scroll-margin' preserved."
       (apply f args))))
 
 (use-package ox-hugo
-  :straight (:host github
-             :repo "kaushalmodi/ox-hugo")
   :after ox)
 
 (use-package ox-latex
@@ -1315,8 +1319,6 @@ ensure `scroll-margin' preserved."
   :hook ((c-mode-common . aorst/cc-mode-setup)))
 
 (use-package markdown-mode
-  :straight (:host github
-             :repo "jrblevin/markdown-mode")
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
@@ -1330,29 +1332,21 @@ ensure `scroll-margin' preserved."
   :hook ((markdown-mode . flyspell-mode)))
 
 (use-package rust-mode
-  :straight (:host github
-             :repo "rust-lang/rust-mode")
   :commands (rust-format-buffer)
   :bind (:map rust-mode-map
          ("C-c C-M-f" . rust-format-buffer)))
 
 (use-package toml-mode
-  :straight (:host github
-             :repo "dryman/toml-mode.el")
   :bind (:map toml-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package geiser
-  :straight (:host gitlab
-             :repo "emacs-geiser/geiser")
   :hook (scheme-mode . geiser-mode)
   :custom
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
 
 (use-package racket-mode
-  :straight (:host github
-             :repo "greghendershott/racket-mode")
   :bind (:map racket-mode-map
          ("C-c C-d" . racket-run-with-debugging)
          ("C-c C-M-f" . aorst/indent-buffer)
@@ -1427,8 +1421,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
 (use-package fennel-mode
-  :straight (:host gitlab
-             :repo "technomancy/fennel-mode")
   :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
          ("M-." . xref-find-definitions))
@@ -1457,8 +1449,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (setq-local lisp-indent-function 'fennel-indent-function)))
 
 (use-package clojure-mode
-  :straight (:host github
-             :repo "clojure-emacs/clojure-mode")
   :hook (((clojure-mode
            clojurec-mode
            clojurescript-mode)
@@ -1472,8 +1462,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (flycheck-mode)))
 
 (use-package cider
-  :straight (:host github
-             :repo "clojure-emacs/cider")
   :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
          ((cider-repl-mode cider-mode) . eldoc-mode))
   :bind (:map cider-repl-mode-map
@@ -1510,29 +1498,19 @@ appended."
     (format "%s\n> " namespace)))
 
 (use-package flycheck-clj-kondo
-  :straight (:host github
-             :repo "borkdude/flycheck-clj-kondo")
-  :when (executable-find "clj-kondo")
-  :straight (:host github
-             :repo "borkdude/flycheck-clj-kondo"))
+  :when (executable-find "clj-kondo"))
 
 (use-package clj-refactor
-  :straight (:host github
-             :repo "clojure-emacs/clj-refactor.el")
   :hook ((cider-mode . clj-refactor-mode)
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning t)
   (cljr-warn-on-eval nil))
 
 (use-package cmake-mode
-  :straight (:host github
-             :repo "Kitware/CMake")
   :bind (:map cmake-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package yaml-mode
-  :straight (:host github
-             :repo "yoshiki/yaml-mode")
   :custom (yaml-indent-offset 4))
 
 (use-package sh-script
@@ -1547,8 +1525,6 @@ appended."
          ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package lua-mode
-  :straight (:host github
-             :repo "immerrr/lua-mode")
   :bind (:map lua-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
   :hook (lua-mode . flycheck-mode)
@@ -1560,8 +1536,6 @@ appended."
   (css-indent-offset 2))
 
 (use-package json-mode
-  :straight (:host github
-             :repo "joshwnj/json-mode")
   :hook (json-mode . flycheck-mode)
   :custom (js-indent-level 2))
 
@@ -1569,13 +1543,9 @@ appended."
   :straight nil
   :hook (sh-mode . flycheck-mode))
 
-(use-package scala-mode
-  :straight (:host github
-             :repo "hvesalai/emacs-scala-mode"))
+(use-package scala-mode)
 
-(use-package sql-indent
-  :straight (:host github
-             :repo "alex-hhh/emacs-sql-indent"))
+(use-package sql-indent)
 
 (use-package help
   :straight nil
@@ -1587,8 +1557,6 @@ appended."
 
 (setq use-package-hook-name-suffix "-functions")
 (use-package vterm
-  :straight (:host github
-             :repo "akermu/emacs-libvterm")
   :if (bound-and-true-p module-file-suffix)
   :bind (("C-`" . aorst/vterm-toggle)
          ("C-t" . aorst/vterm-focus)
@@ -1648,8 +1616,6 @@ appended."
 (setq use-package-hook-name-suffix "-hook")
 
 (use-package editorconfig
-  :straight (:host github
-             :repo "editorconfig/editorconfig-emacs")
   :config (editorconfig-mode 1))
 
 (use-package flymake
@@ -1658,8 +1624,6 @@ appended."
   (flymake-fringe-indicator-position 'right-fringe))
 
 (use-package flycheck
-  :straight (:host github
-             :repo "flycheck/flycheck")
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
@@ -1744,18 +1708,12 @@ appended."
     nil))
 
 (use-package flycheck-package
-  :straight (:host github
-             :repo "purcell/flycheck-package")
   :hook ((emacs-lisp-mode . flycheck-mode)
          (emacs-lisp-mode . flycheck-package-setup)))
 
-(use-package hydra
-  :straight (:host github
-             :repo "abo-abo/hydra"))
+(use-package hydra)
 
 (use-package smartparens
-  :straight (:host github
-             :repo "Fuco1/smartparens")
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1813,83 +1771,23 @@ appended."
   (dolist (paren '("(" "[" "{"))
     (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
-(use-package flx
-  :straight (:host github
-             :repo "lewang/flx"))
+(use-package flx)
 
-(use-package ivy
-  :straight (:host github
-             :repo "abo-abo/swiper")
-  :commands ivy-mode
+(use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
-         (aorst--theme-change . aorst/ivy-setup-faces))
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-x C-b" . ivy-switch-buffer))
-  :custom-face
-  (ivy-org ((t (:inherit default))))
-  :custom
-  (ivy-count-format "")
-  (ivy-ignore-buffers '("\\` " "\\`\\*"))
-  (ivy-display-style nil)
-  (ivy-minibuffer-faces nil)
-  (ivy-minibuffer-faces '(default default default default))
-  (ivy-use-virtual-buffers t)
-  (enable-recursive-minibuffers t)
-  :config
-  (defun aorst/ivy-setup-faces ()
-    (let ((mode-line-color (face-attribute 'mode-line :background)))
-      (when (fboundp #'doom-darken)
-        (set-face-attribute
-         'ivy-current-match nil
-         :background (if (aorst/dark-mode-p)
-                         (doom-lighten mode-line-color 0.2)
-                       (doom-darken mode-line-color 0.1))))))
-  (defun aorst/minibuffer-defer-garbage-collection ()
-    "Defer garbage collection for minibuffer"
-    (setq gc-cons-threshold most-positive-fixnum))
-  (defun aorst/minibuffer-restore-garbage-collection ()
-    "Resotre garbage collection settings."
-    (run-at-time
-     1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
-  :init
-  (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
-  (ivy-mode 1))
+         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
+  :custom-face (vertico-current ((t (:inherit region))))
+  :init (vertico-mode))
 
-(use-package counsel
-  :straight (:host github
-             :repo "abo-abo/swiper")
-  :commands (counsel-M-x
-             counsel-find-file
-             counsel-file-jump
-             counsel-recentf
-             counsel-rg
-             counsel-describe-function
-             counsel-describe-variable
-             counsel-faces
-             counsel-find-library)
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-x f" . counsel-file-jump)
-         ("C-x C-r" . counsel-recentf)
-         ("C-x d" . counsel-dired)
-         ("C-h f" . counsel-describe-function)
-         ("C-h C-f" . counsel-faces)
-         ("C-h v" . counsel-describe-variable)
-         ("C-h l" . counsel-find-library))
+(use-package marginalia
+  :custom (marginalia-margin-threshold 0)
+  :init (marginalia-mode))
+
+(use-package consult
   :config
-  (when (executable-find "fd")
-    (define-advice counsel-file-jump (:around (foo &optional initial-input initial-directory) aorst:counsel-fd)
-      (let ((find-program "fd")
-            (counsel-file-jump-args (split-string "-L --type f --hidden")))
-        (funcall foo initial-input initial-directory))))
-  (when (executable-find "rg")
-    (setq counsel-rg-base-command
-          "rg -S --no-heading --hidden --line-number --color never %s .")))
+  (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package company
-  :straight (:host github
-             :repo "company-mode/company-mode")
   :bind (:map company-mode-map
          ([remap completion-at-point] . company-complete)
          ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
@@ -1922,16 +1820,12 @@ appended."
   )
 
 (use-package company-quickhelp
-  :straight (:host github
-             :repo "company-mode/company-quickhelp")
   :hook (company-mode . company-quickhelp-mode)
   :custom
   (company-quickhelp-max-lines 13)
   (company-quickhelp-use-propertized-text t))
 
 (use-package undo-tree
-  :straight (:host gitlab
-             :repo "tsc25/undo-tree")
   :commands global-undo-tree-mode
   :bind (("C-z" . undo-tree-undo)
          ("C-S-z" . undo-tree-redo))
@@ -1942,17 +1836,11 @@ appended."
   :init (global-undo-tree-mode 1))
 
 (use-package yasnippet
-  :straight (:host github
-             :repo "joaotavora/yasnippet")
   :config
   (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
 
-(use-package with-editor
-  :straight (:host github
-             :repo "magit/with-editor"))
+(use-package with-editor)
 (use-package magit
-  :straight (:host github
-             :repo "magit/magit")
   :hook (git-commit-mode . flyspell-mode)
   :bind (("<f12>" . magit-status))
   :custom
@@ -1976,8 +1864,6 @@ appended."
   (advice-add 'magit-set-header-line-format :override #'ignore))
 
 (use-package magit-todos
-  :straight (:host github
-             :repo "alphapapa/magit-todos")
   :after magit
   :init
   ;; don't break Magit on systems that don't have `nice'
@@ -2057,15 +1943,9 @@ appended."
       (apply #'aorst/create-accent-face face-reference)))
   (aorst/smerge-setup-faces))
 
-(use-package phi-search
-  :straight (:host github
-             :repo "zk-phi/phi-search"))
-(use-package mc-extras
-  :straight (:host github
-             :repo "knu/mc-extras.el"))
+(use-package phi-search)
+(use-package mc-extras)
 (use-package multiple-cursors
-  :straight (:host github
-             :repo "magnars/multiple-cursors.el")
   :requires hydra
   :commands (mc/cycle-backward
              mc/cycle-forward)
@@ -2113,8 +1993,6 @@ appended."
       ("C-g" mc/keyboard-quit :exit t))))
 
 (use-package expand-region
-  :straight (:host github
-             :repo "magnars/expand-region.el")
   :bind (("C-c e" . hydrant/er/body))
   :requires hydra
   :config
@@ -2140,8 +2018,6 @@ appended."
     ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t)))
 
 (use-package lsp-mode
-  :straight (:host github
-             :repo "emacs-lsp/lsp-mode")
   :hook (((rust-mode
            c-mode
            c++-mode
@@ -2181,8 +2057,6 @@ appended."
   (lsp-rust-server 'rust-analyzer))
 
 (use-package lsp-ui
-  :straight (:host github
-             :repo "emacs-lsp/lsp-ui")
   :after lsp-mode
   :commands lsp-ui-mode
   :bind (:map lsp-ui-mode-map
@@ -2212,14 +2086,10 @@ appended."
   (lsp-ui-mode))
 
 (use-package lsp-java
-  :straight (:host github
-             :repo "emacs-lsp/lsp-java")
   :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
   :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
 (use-package lsp-treemacs
-  :straight (:host github
-             :repo "emacs-lsp/lsp-treemacs")
   :custom
   (lsp-treemacs-theme "Iconless"))
 
@@ -2244,8 +2114,6 @@ appended."
   (add-to-list 'project-find-functions #'aorst/project-find-root))
 
 (use-package clang-format
-  :straight (:host github
-             :repo "emacsmirror/clang-format")
   :after cc-mode
   :bind (:map c-mode-base-map
          ("C-c C-M-f" . clang-format-buffer)))
@@ -2277,8 +2145,6 @@ appended."
     ("C-g" ignore :exit t)))
 
 (use-package edit-indirect
-  :straight (:host github
-             :repo "Fanael/edit-indirect")
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
   :bind (:map edit-indirect-mode-map
          ("C-c C-c" . edit-indirect-commit)
@@ -2292,8 +2158,6 @@ appended."
       "\\<edit-indirect-mode-map>Edit, then exit with `\\[edit-indirect-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
 (use-package separedit
-  :straight (:host github
-             :repo "twlz0ne/separedit.el")
   :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
   :bind (:map prog-mode-map
          ("C-c '" . separedit)
@@ -2314,8 +2178,6 @@ appended."
   (add-to-list 'recentf-exclude "\\.gpg\\"))
 
 (use-package dumb-jump
-  :straight (:host github
-             :repo "jacktasia/dumb-jump")
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'ivy)
@@ -2323,13 +2185,9 @@ appended."
   (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package which-key
-  :straight (:host github
-             :repo "justbur/emacs-which-key")
   :config (which-key-mode t))
 
 (use-package gcmh
-  :straight (:host gitlab
-             :repo "koral/gcmh")
   :config (gcmh-mode t))
 
 (use-package paren
@@ -2338,9 +2196,7 @@ appended."
   (show-paren-when-point-in-periphery t)
   (show-paren-delay 0))
 
-(use-package wgrep
-  :straight (:host github
-             :repo "mhayashi1120/Emacs-wgrep"))
+(use-package wgrep)
 
 (use-package xref
   :straight nil
@@ -2383,8 +2239,6 @@ appended."
   :hook (after-init . global-auto-revert-mode))
 
 (use-package hl-todo
-  :straight (:host github
-             :repo "tarsius/hl-todo")
   :hook (prog-mode . hl-todo-mode))
 
 (use-package outline
@@ -2405,8 +2259,6 @@ appended."
     ("C-g" ignore :exit t)))
 
 (use-package paren-face
-  :straight (:host github
-             :repo "tarsius/paren-face")
   :hook ((clojure-mode
           emacs-lisp-mode
           common-lisp-mode
@@ -2423,8 +2275,6 @@ appended."
   :custom (paren-face-regexp "[][(){}]"))
 
 (use-package jdecomp
-  :straight (:host github
-             :repo "xiongtx/jdecomp")
   :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
   :hook (archive-mode . jdecomp-mode)
   :custom
@@ -2450,8 +2300,6 @@ appended."
       ("C-g" ignore :exit t)))
 
 (use-package scroll-on-jump
-  :straight (:host gitlab
-             :repo "ideasman42/emacs-scroll-on-jump")
   :custom
   (scroll-on-jump-smooth nil)
   (scroll-on-jump-duration 0.1337)
@@ -2470,8 +2318,6 @@ appended."
   (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))
 
 (use-package reverse-im
-  :straight (:host github
-             :repo "a13/reverse-im.el")
   :custom
   (reverse-im-input-methods '("russian-computer"))
   :config

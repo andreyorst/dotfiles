@@ -7,7 +7,7 @@ set mark-symlinked-directories on
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
 set visible-stats on
-set colored-completion-prefix on
+# set colored-completion-prefix on
 set blink-matching-paren on
 "\e[Z": menu-complete-backward
 Tab: menu-complete

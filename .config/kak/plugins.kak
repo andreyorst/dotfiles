@@ -36,7 +36,7 @@ plug "git@github.com:andreyorst/base16-gruvbox.kak" theme %{
     }
 }
 
-plug "git@github.com:andreyorst/fzf.kak" config %{
+plug "fzf.kak" load-path "/home/andreyorst/fzf.kak" config %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
 } defer fzf %{
     set-option global fzf_preview_width '65%'
