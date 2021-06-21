@@ -13,11 +13,12 @@ I should really write a script this does it automatically, but for now here's a 
 ├── .bashrc             ~> ├── .bashrc
 ├── .config/*           ~> ├── .config/
 ├── .config/emacs       ~> ├── .emacs.d (for pre Emacs 27 users)
+├── .local/bin/*        ~> ├── .local/bin
 ├── c_project_template     │
 ├── .editorconfig       ~> ├── .editorconfig
 ├── .git/                  │
 ├── .gitignore             │
-├── .gitconfig         ~?> ├── .gitconfig
+├── .gitconfig          ~> ├── .gitconfig
 ├── .inputrc            ~> ├── .inputrc
 ├── README.md              │
 ├── scripts                │
@@ -31,8 +32,9 @@ These directories and files should be excluded from copying or sym-linking:
   Include it if you want.
 - `c_project_template` - is a template for creating a C project, that is used by a script placed in `scripts` directory.
 - `scripts` - directory stores scripts that I use directly from there, either by sourcing or by invoking from `$PATH`.
-- `.config` directory should not be sym-linked to home directory, since all your configuration files will be visible to git.
+- `.config` - directory should not be sym-linked to home directory, since all your configuration files will be visible to git.
   Only files that inside this directory should be copied or sym-linked.
+- `.local/bin` - directory contains scripts that I want to be automatically available on any system I use.
 
 [1]: .config/emacs
 [2]: .config/kak

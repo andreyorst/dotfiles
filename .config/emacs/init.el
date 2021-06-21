@@ -177,7 +177,8 @@ for stopping scroll from going beyond longest line.  Based on
          ("M-S-z" . zap-to-char)
          ("<kp-begin>" . ignore)
          ("<kp-5>" . ignore)
-         ("<f2>" . ignore))
+         ("<f2>" . ignore)
+         ("C-h C-f" . describe-face))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :custom
@@ -232,7 +233,8 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore))
-  :custom (completion-styles '(basic partial-completion flex)))
+  :custom (completion-styles '(basic partial-completion flex))
+  :custom-face (completions-first-difference ((t (:inherit unspecified)))))
 
 (defun aorst/formfeed-line ()
   "Display the formfeed ^L char as comment or as continuous line."
@@ -248,7 +250,7 @@ for stopping scroll from going beyond longest line.  Based on
                      org-mode-hook
                      outline-mode-hook
                      prog-mode-hook))
-  (add-hook mode-hook 'aorst/formfeed-line))
+  (add-hook mode-hook #'aorst/formfeed-line))
 
 (use-package window
   :straight nil
@@ -867,7 +869,7 @@ Used in various places to avoid getting wrong line height when
                                                    "Flymake: no errors or warnings")))))))))))
 
 (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
-(add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
+(add-hook 'flymake-mode-hook #'aorst/flymake-mode-line-update)
 
 (defvar mode-line-l-format 'aorst--mode-line-buffer-name)
 (defvar mode-line-r-format
@@ -1775,16 +1777,24 @@ appended."
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
-  :custom-face (vertico-current ((t (:inherit region))))
-  :init (vertico-mode))
+         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
+         (aorst--theme-change . aorst/vertico-setup-faces))
+  :init (vertico-mode)
+  (defun aorst/vertico-setup-faces ()
+    (let ((mode-line-color (face-attribute 'mode-line :background)))
+      (when (fboundp #'doom-darken)
+        (set-face-attribute
+         'vertico-current nil
+         :background (if (aorst/dark-mode-p)
+                         (doom-lighten mode-line-color 0.2)
+                       (doom-darken mode-line-color 0.1)))))))
 
 (use-package marginalia
-  :custom (marginalia-margin-threshold 0)
   :init (marginalia-mode))
 
 (use-package consult
-  :config
+  :bind (("C-x C-r" . consult-recent-file))
+  :init
   (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package company
@@ -1996,6 +2006,9 @@ appended."
   :bind (("C-c e" . hydrant/er/body))
   :requires hydra
   :config
+  (defun aorst/er-exit ()
+    (interactive)
+    (deactivate-mark t))
   (defhydra hydrant/er (:color pink :hint nil)
     "
  ^Expand/Discard^                ^Mark^
@@ -2013,9 +2026,9 @@ appended."
     ("\"" er/mark-outside-quotes)
     ("g" ignore :exit t)
     ("q" ignore :exit t)
-    ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
-    ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)
-    ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t)))
+    ("G" aorst/er-exit :exit t)
+    ("Q" aorst/er-exit :exit t)
+    ("C-g" aorst/er-exit :exit t)))
 
 (use-package lsp-mode
   :hook (((rust-mode
@@ -2175,7 +2188,8 @@ appended."
 (use-package recentf
   :straight nil
   :config
-  (add-to-list 'recentf-exclude "\\.gpg\\"))
+  (add-to-list 'recentf-exclude "\\.gpg\\")
+  (recentf-mode))
 
 (use-package dumb-jump
   :custom
@@ -2327,3 +2341,8 @@ appended."
   :straight nil
   :custom
   (compilation-scroll-output 'first-error))
+
+(use-package isearch
+  :straight nil
+  :bind (:map isearch-mode-map
+         ("<backspace>" . isearch-del-char)))

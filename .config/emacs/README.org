@@ -67,7 +67,7 @@ This can be migrated by setting high GC threshold and restoring it back in =afte
                 file-name-handler-alist nil)
 
   (add-hook 'after-init-hook
-            (lambda ()
+            (defun aorst/restore-defaults-after-init ()
               (setq gc-cons-threshold aorst--gc-cons-threshold
                     gc-cons-percentage aorst--gc-cons-percentage
                     file-name-handler-alist aorst--file-name-handler-alist)))
@@ -423,7 +423,8 @@ Configurations for inbuilt =simple.el= module.
            ("M-S-z" . zap-to-char)
            ("<kp-begin>" . ignore)
            ("<kp-5>" . ignore)
-           ("<f2>" . ignore))
+           ("<f2>" . ignore)
+           ("C-h C-f" . describe-face))
     :hook ((before-save . delete-trailing-whitespace)
            (overwrite-mode . aorst/overwrite-set-cursor-shape))
     :custom
@@ -482,13 +483,15 @@ Disables line wrapping.
 
 *** Minibuffer
 Disabling clicks in minibuffer, to prevent opening =*Messages*= buffer.
+Additionally, enabling =flex= matching in completion engine, and tweaking faces.
 
 #+begin_src emacs-lisp
   (use-package minibuffer
     :straight nil
     :bind (:map minibuffer-inactive-mode-map
            ("<mouse-1>" . ignore))
-    :custom (completion-styles '(basic partial-completion flex)))
+    :custom (completion-styles '(basic partial-completion flex))
+    :custom-face (completions-first-difference ((t (:inherit unspecified)))))
 #+end_src
 
 *** Form feed
@@ -509,7 +512,7 @@ Render =^L= as continuous comment or dashed line.
                        org-mode-hook
                        outline-mode-hook
                        prog-mode-hook))
-    (add-hook mode-hook 'aorst/formfeed-line))
+    (add-hook mode-hook #'aorst/formfeed-line))
 #+end_src
 
 *** Window
@@ -1339,7 +1342,7 @@ Mode line segment for Flymake.
                                                      "Flymake: no errors or warnings")))))))))))
 
   (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
-  (add-hook 'flymake-mode-hook 'aorst/flymake-mode-line-update)
+  (add-hook 'flymake-mode-hook #'aorst/flymake-mode-line-update)
 #+end_src
 
 **** Mode-line format
@@ -2782,9 +2785,17 @@ Vertical completion UI for minibuffer.
 #+begin_src emacs-lisp
   (use-package vertico
     :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-           (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
-    :custom-face (vertico-current ((t (:inherit region))))
-    :init (vertico-mode))
+           (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
+           (aorst--theme-change . aorst/vertico-setup-faces))
+    :init (vertico-mode)
+    (defun aorst/vertico-setup-faces ()
+      (let ((mode-line-color (face-attribute 'mode-line :background)))
+        (when (fboundp #'doom-darken)
+          (set-face-attribute
+           'vertico-current nil
+           :background (if (aorst/dark-mode-p)
+                           (doom-lighten mode-line-color 0.2)
+                         (doom-darken mode-line-color 0.1)))))))
 #+end_src
 
 *** Marginalia
@@ -2792,7 +2803,6 @@ Completion candidates annotations for minibuffer.
 
 #+begin_src emacs-lisp
   (use-package marginalia
-    :custom (marginalia-margin-threshold 0)
     :init (marginalia-mode))
 #+end_src
 
@@ -2801,7 +2811,8 @@ A predefined set of commands for minibuffer.
 
 #+begin_src emacs-lisp
   (use-package consult
-    :config
+    :bind (("C-x C-r" . consult-recent-file))
+    :init
     (setq completion-in-region-function #'consult-completion-in-region))
 #+end_src
 
@@ -3068,6 +3079,9 @@ Expand or reduce region semantically.
     :bind (("C-c e" . hydrant/er/body))
     :requires hydra
     :config
+    (defun aorst/er-exit ()
+      (interactive)
+      (deactivate-mark t))
     (defhydra hydrant/er (:color pink :hint nil)
       "
    ^Expand/Discard^                ^Mark^
@@ -3085,9 +3099,9 @@ Expand or reduce region semantically.
       ("\"" er/mark-outside-quotes)
       ("g" ignore :exit t)
       ("q" ignore :exit t)
-      ("G" (lambda () (interactive) (deactivate-mark t)) :exit t)
-      ("Q" (lambda () (interactive) (deactivate-mark t)) :exit t)
-      ("C-g" (lambda () (interactive) (deactivate-mark t)) :exit t)))
+      ("G" aorst/er-exit :exit t)
+      ("Q" aorst/er-exit :exit t)
+      ("C-g" aorst/er-exit :exit t)))
 #+end_src
 
 *** LSP
@@ -3344,7 +3358,8 @@ Settings to =recentf= mode.
   (use-package recentf
     :straight nil
     :config
-    (add-to-list 'recentf-exclude "\\.gpg\\"))
+    (add-to-list 'recentf-exclude "\\.gpg\\")
+    (recentf-mode))
 #+end_src
 
 *** Dumb Jump
@@ -3595,6 +3610,16 @@ Tweaks to inbuilt =compile.el= mode.
     :straight nil
     :custom
     (compilation-scroll-output 'first-error))
+#+end_src
+
+*** Isearch
+Tweaks to inbuilt incremental search mode.
+
+#+begin_src emacs-lisp
+  (use-package isearch
+    :straight nil
+    :bind (:map isearch-mode-map
+           ("<backspace>" . isearch-del-char)))
 #+end_src
 
 ** =(provide 'init)=

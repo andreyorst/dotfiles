@@ -33,7 +33,7 @@
               file-name-handler-alist nil)
 
 (add-hook 'after-init-hook
-          (lambda ()
+          (defun aorst/restore-defaults-after-init ()
             (setq gc-cons-threshold aorst--gc-cons-threshold
                   gc-cons-percentage aorst--gc-cons-percentage
                   file-name-handler-alist aorst--file-name-handler-alist)))
