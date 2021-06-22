@@ -1420,10 +1420,10 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
 (use-package fennel-mode
+  :straight (:fork (:host gitlab :repo "andreyorst/fennel-mode" :branch "lisp-doc-command"))
   :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
          ("M-." . xref-find-definitions))
-  :hook (fennel-mode . fennel-mode-setup)
   :config
   (put 'time 'fennel-indent-function 0)
   (put 'dotimes 'fennel-indent-function 1)
@@ -1434,11 +1434,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (put 'local 'fennel-indent-function 1)
   (put 'var 'fennel-indent-function 1)
   (put 'finally 'fennel-indent-function 0)
-  (defun fennel-mode-setup ()
-    "Set common variables."
-    (modify-syntax-entry ?# "w")
-    (setq-local comment-end "")
-    (setq-local lisp-doc-string-elt-property 'fennel-doc-string-elt))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
     "Evaluate a block of Fennel code with Babel."
