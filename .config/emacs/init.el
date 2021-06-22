@@ -258,11 +258,7 @@ for stopping scroll from going beyond longest line.  Based on
 
 (use-package comint
   :straight nil
-  :hook (comint-mode . aorst/remove-comint-postoutput-scroll-to-bottom)
-  :config
-  (defun aorst/remove-comint-postoutput-scroll-to-bottom ()
-    (remove-hook 'comint-output-filter-functions
-                 'comint-postoutput-scroll-to-bottom)))
+  :custom (comint-scroll-show-maximum-output nil))
 
 (defun aorst/real-buffer-p (&optional buffer)
   "Determines whether BUFFER is real."
@@ -1860,13 +1856,13 @@ appended."
   (magit-diff-refine-ignore-whitespace nil)
   (magit-diff-refine-hunk 'all)
   (magit-blame-styles
-   '((headings
-      (heading-format . "%-20a %C %s\n"))
-     (margin
+   '((margin
       (margin-format " %s%f" " %C %a" " %H")
       (margin-width . 42)
       (margin-face . magit-blame-margin)
       (margin-body-face magit-blame-dimmed))
+     (headings
+      (heading-format . "%-20a %C %s\n"))
      (highlight
       (highlight-face . magit-blame-highlight))
      (lines
@@ -2348,3 +2344,7 @@ appended."
   :straight nil
   :bind (:map isearch-mode-map
          ("<backspace>" . isearch-del-char)))
+
+(use-package esh-mode
+  :straight nil
+  :custom (eshell-scroll-show-maximum-output nil))

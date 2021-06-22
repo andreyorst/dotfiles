@@ -530,11 +530,7 @@ Prevent automatic recentering when using inferior buffers.
 #+begin_src emacs-lisp
   (use-package comint
     :straight nil
-    :hook (comint-mode . aorst/remove-comint-postoutput-scroll-to-bottom)
-    :config
-    (defun aorst/remove-comint-postoutput-scroll-to-bottom ()
-      (remove-hook 'comint-output-filter-functions
-                   'comint-postoutput-scroll-to-bottom)))
+    :custom (comint-scroll-show-maximum-output nil))
 #+end_src
 
 ** Functions
@@ -2904,13 +2900,13 @@ Emacs interface to Git.
     (magit-diff-refine-ignore-whitespace nil)
     (magit-diff-refine-hunk 'all)
     (magit-blame-styles
-     '((headings
-        (heading-format . "%-20a %C %s\n"))
-       (margin
+     '((margin
         (margin-format " %s%f" " %C %a" " %H")
         (margin-width . 42)
         (margin-face . magit-blame-margin)
         (margin-body-face magit-blame-dimmed))
+       (headings
+        (heading-format . "%-20a %C %s\n"))
        (highlight
         (highlight-face . magit-blame-highlight))
        (lines
@@ -3625,6 +3621,15 @@ Tweaks to inbuilt incremental search mode.
            ("<backspace>" . isearch-del-char)))
 #+end_src
 
+*** Eshell
+Emacs shell settings.
+Eshell is a shell implemented in Emacs Lisp, that (in theory) works the same across all systems.
+
+#+begin_src emacs-lisp
+  (use-package esh-mode
+    :straight nil
+    :custom (eshell-scroll-show-maximum-output nil))
+#+end_src
 ** =(provide 'init)=
 This concludes the =init.el= file.
 
