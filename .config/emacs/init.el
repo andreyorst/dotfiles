@@ -1423,17 +1423,11 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   :straight (:fork (:host gitlab :repo "andreyorst/fennel-mode" :branch "lisp-doc-command"))
   :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
-         ("M-." . xref-find-definitions))
+         ("M-." . xref-find-definitions)
+         ("M-," . xref-pop-marker-stack))
   :config
-  (put 'time 'fennel-indent-function 0)
-  (put 'dotimes 'fennel-indent-function 1)
-  (put 'when-let 'fennel-indent-function 1)
-  (put 'if-let 'fennel-indent-function 1)
-  (put 'try 'fennel-indent-function 0)
-  (put 'catch 'fennel-indent-function 1)
   (put 'local 'fennel-indent-function 1)
   (put 'var 'fennel-indent-function 1)
-  (put 'finally 'fennel-indent-function 0)
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
     "Evaluate a block of Fennel code with Babel."
@@ -1499,6 +1493,22 @@ appended."
          (cider-mode . yas-minor-mode))
   :custom (cljr-suppress-no-project-warning t)
   (cljr-warn-on-eval nil))
+
+(use-package sly
+  :custom (inferior-lisp-program "sbcl")
+  :config
+  ;; workaround https://gitlab.com/technomancy/fennel-mode/issues/11
+  ;; Sly author claims that this is `fennel-mode' problem, as
+  ;; `lisp-mode' is meant strictly for Common Lisp.
+  (defun aorst/sly-ignore-fennel (f &rest args)
+    "Prevent sly functions from running in `fennel-mode'."
+    (unless (or (eq major-mode 'fennel-mode)
+                (eq major-mode 'fennel-repl-mode))
+      (apply f args)))
+  (dolist (f '(sly-mode
+               sly-editing-mode))
+    (advice-add f :around #'aorst/sly-ignore-fennel))
+  (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1))))
 
 (use-package cmake-mode
   :bind (:map cmake-mode-map
