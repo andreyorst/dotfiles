@@ -51,6 +51,9 @@ map -docstring "avoid escape key" global normal '<c-g>' ';<space>'
 map -docstring "avoid escape key" global prompt '<c-g>' '<esc>'
 map -docstring "avoid escape key" global insert '<c-g>' '<esc>'
 
+# Emacs things
+map -docstring "prompt" global normal '<a-:>' ':'
+
 # System clipboard mappings
 if %[ -n "$(command -v xsel)" ] %{
     map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
