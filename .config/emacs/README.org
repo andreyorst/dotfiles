@@ -2220,6 +2220,7 @@ It supports compile-time macro system, and full Lua compatibility.
            ("M-." . xref-find-definitions)
            ("M-," . xref-pop-marker-stack))
     :config
+    (put 'global 'fennel-indent-function 1)
     (put 'local 'fennel-indent-function 1)
     (put 'var 'fennel-indent-function 1)
     (defvar org-babel-default-header-args:fennel '((:results . "silent")))
@@ -2421,6 +2422,14 @@ SQL mode does not provide inbuilt support for indentation handling, and instead 
 
 #+begin_src emacs-lisp
   (use-package sql-indent)
+#+end_src
+
+*** CSV
+A mode for viewing and editing char separated value files.
+
+#+begin_src emacs-lisp
+  (use-package csv-mode
+    :custom (csv-align-max-width 80))
 #+end_src
 
 ** Tools

@@ -1426,6 +1426,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
          ("M-." . xref-find-definitions)
          ("M-," . xref-pop-marker-stack))
   :config
+  (put 'global 'fennel-indent-function 1)
   (put 'local 'fennel-indent-function 1)
   (put 'var 'fennel-indent-function 1)
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
@@ -1550,6 +1551,9 @@ appended."
 (use-package scala-mode)
 
 (use-package sql-indent)
+
+(use-package csv-mode
+  :custom (csv-align-max-width 80))
 
 (use-package help
   :straight nil
