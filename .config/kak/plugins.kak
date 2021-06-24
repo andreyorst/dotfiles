@@ -3,7 +3,7 @@ evaluate-commands %sh{
     plugins="${kak_config:?}/plugins"
     mkdir -p "$plugins"
     [ ! -e "$plugins/plug.kak" ] && \
-        git clone -q git@github.com:andreyorst/plug.kak.git --branch develop "$plugins/plug.kak"
+        git clone -q https://github.com/andreyorst/plug.kak.git --branch master "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
 }
 
@@ -28,7 +28,7 @@ plug "occivink/kakoune-find" config %{
     grep-apply-changes %{ find-apply-changes -force }
 }
 
-plug "git@github.com:andreyorst/base16-gruvbox.kak" theme %{
+plug "andreyorst/base16-gruvbox.kak" theme %{
     if %[ -n "${PATH##*termux*}" ] %{
         colorscheme base16-gruvbox-dark-soft
     } else %{
@@ -36,7 +36,7 @@ plug "git@github.com:andreyorst/base16-gruvbox.kak" theme %{
     }
 }
 
-plug "fzf.kak" load-path "/home/andreyorst/fzf.kak" config %{
+plug "andreyorst/fzf.kak" config %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
 } defer fzf %{
     set-option global fzf_preview_width '65%'
@@ -73,7 +73,7 @@ plug "fzf.kak" load-path "/home/andreyorst/fzf.kak" config %{
     }
 }
 
-plug "git@github.com:andreyorst/powerline.kak" defer powerline %{
+plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
     set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
     set-option global powerline_separator '║'
@@ -86,7 +86,7 @@ plug "git@github.com:andreyorst/powerline.kak" defer powerline %{
     powerline-start
 }
 
-plug "git@github.com:andreyorst/smarttab.kak" defer smarttab %{
+plug "andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
     set-option global smarttab_expandtab_mode_name   '⋅a⋅'
     set-option global smarttab_noexpandtab_mode_name '→a→'
@@ -97,19 +97,19 @@ plug "git@github.com:andreyorst/smarttab.kak" defer smarttab %{
     hook global WinSetOption filetype=(c|cpp) smarttab
 }
 
-plug "alexherbo2/surround.kak" demand surround %{
-    map global user 's' ': enter-user-mode surround<ret>' -docstring "surround selection"
-}
+# plug "alexherbo2/surround.kak" demand surround %{
+#     map global user 's' ': enter-user-mode surround<ret>' -docstring "surround selection"
+# }
 
-plug "alexherbo2/replace.kak" demand replace-mode %{
-    map global user r -docstring 'Replace mode' ':<space>enter-replace-mode<ret>'
-}
+# plug "alexherbo2/replace.kak" demand replace-mode %{
+#     map global user r -docstring 'Replace mode' ':<space>enter-replace-mode<ret>'
+# }
 
-plug "alexherbo2/word-select.kak" demand word-select %{
-    word-select-add-mappings
-}
+# plug "alexherbo2/word-select.kak" demand word-select %{
+#     word-select-add-mappings
+# }
 
-plug "git@github.com:andreyorst/langmap.kak" config %{
+plug "andreyorst/langmap.kak" config %{
     set-option global langmap %opt{langmap_ru_jcuken}
 } demand langmap %{
     map -docstring "toggle layout" global normal '<c-\>' ':      toggle-langmap<ret>'
@@ -117,7 +117,7 @@ plug "git@github.com:andreyorst/langmap.kak" config %{
     map -docstring "toggle layout" global prompt '<c-\>' '<a-;>: toggle-langmap prompt<ret>'
 }
 
-plug "git@github.com:andreyorst/kaktree" defer kaktree %{
+plug "andreyorst/kaktree" defer kaktree %{
     map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
     set-option global kaktree_show_help false
     if %[ -n "${PATH##*termux*}" ] %{
@@ -143,6 +143,6 @@ plug "git@github.com:andreyorst/kaktree" defer kaktree %{
     kaktree-enable
 }
 
-plug "git@github.com:andreyorst/pmanage.kak"
+plug "andreyorst/pmanage.kak"
 
 plug "Screwtapello/kakoune-shellcheck" domain gitlab.com
