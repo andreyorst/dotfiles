@@ -1475,8 +1475,10 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   :config
   (setq cider-jdk-src-paths nil)
-  (dolist (src '("/usr/lib/jvm/java-1.8.0-openjdk/src.zip"
-                 "~/.clojure/clojure-*.*.*-sources.jar"))
+  (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
+                       (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/lib/src.zip")
+                       (file-expand-wildcards "~/.clojure/clojure-*-sources.jar")))
+
     (when (file-exists-p src)
       (unless (memq src cider-jdk-src-paths)
         (add-to-list 'cider-jdk-src-paths src t))))
