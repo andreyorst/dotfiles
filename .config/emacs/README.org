@@ -2214,7 +2214,6 @@ It supports compile-time macro system, and full Lua compatibility.
 
 #+begin_src emacs-lisp
   (use-package fennel-mode
-    :straight (:fork (:host gitlab :repo "andreyorst/fennel-mode" :branch "lisp-doc-command"))
     :bind (:map fennel-mode-map
            ("C-c C-M-f" . aorst/indent-buffer)
            ("M-." . xref-find-definitions)

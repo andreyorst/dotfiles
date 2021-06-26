@@ -1420,7 +1420,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
 (use-package fennel-mode
-  :straight (:fork (:host gitlab :repo "andreyorst/fennel-mode" :branch "lisp-doc-command"))
   :bind (:map fennel-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)
          ("M-." . xref-find-definitions)
