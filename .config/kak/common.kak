@@ -3,7 +3,7 @@ set-option global scrolloff 4,4
 set-option global ui_options ncurses_set_title=false
 
 # Grep
-if %[ -n "$(command -v rg)" ] %{
+when %sh{ [ -n "$(command -v rg)" ] && echo true || echo false } %{
     set-option global grepcmd 'rg -L --hidden --with-filename --column'
 }
 
@@ -55,14 +55,14 @@ map -docstring "avoid escape key" global insert '<c-g>' '<esc>'
 map -docstring "prompt" global normal '<a-:>' ':'
 
 # System clipboard mappings
-if %[ -n "$(command -v xsel)" ] %{
+if %sh{ [ -n "$(command -v xsel)" ] && echo true || echo false } %{
     map -docstring "copy to system clipboard"                   global user 'y' '<a-|>xsel -b -i<ret>:<space>echo -markup %{{Information}yanked selection to system clipboard}<ret>'
     map -docstring "cut to system clipboard"                    global user 'd' '|xsel -b -i<ret>'
     map -docstring "cut to system clipboard, enter insert mode" global user 'c' '|xsel -b -i<ret>i'
     map -docstring "paste from system clipboard before cursor"  global user 'P' '!xsel --output --clipboard<ret>'
     map -docstring "paste from system clipboard after cursor"   global user 'p' '<a-!>xsel --output --clipboard<ret>'
     map -docstring "replace selection with system clipboard"    global user 'R' '|xsel --output --clipboard<ret>'
-} else %{
+} %{
     echo -debug "'xsel' is not installed"
 }
 

@@ -29,9 +29,9 @@ plug "occivink/kakoune-find" config %{
 }
 
 plug "andreyorst/base16-gruvbox.kak" theme %{
-    if %[ -n "${PATH##*termux*}" ] %{
+    if %sh{ [ -n "${PATH##*termux*}" ] && echo true || echo false } %{
         colorscheme base16-gruvbox-dark-soft
-    } else %{
+    } %{
         colorscheme base16-gruvbox-dark-hard
     }
 }
@@ -40,7 +40,7 @@ plug "andreyorst/fzf.kak" config %{
     map -docstring 'fzf mode' global normal '<c-p>' ': fzf-mode<ret>'
 } defer fzf %{
     set-option global fzf_preview_width '65%'
-    if %[ -n "$(command -v bat)" ] %{
+    when %sh{ [ -n "$(command -v bat)"  ] && echo true || echo false } %{
         set-option global fzf_highlight_command bat
     }
 } defer fzf-project %{
@@ -120,7 +120,7 @@ plug "andreyorst/langmap.kak" config %{
 plug "andreyorst/kaktree" defer kaktree %{
     map global user 'f' ": kaktree-toggle<ret>" -docstring "toggle filetree panel"
     set-option global kaktree_show_help false
-    if %[ -n "${PATH##*termux*}" ] %{
+    if %sh{ [ -n "${PATH##*termux*}" ] && echo true || echo false } %{
         set-option global kaktree_double_click_duration '0.5'
         set-option global kaktree_indentation 1
         set-option global kaktree_dir_icon_open  '▾ 🗁 '
@@ -129,7 +129,7 @@ plug "andreyorst/kaktree" defer kaktree %{
         # set-option global kaktree_dir_icon_open  ''
         # set-option global kaktree_dir_icon_close ''
         # set-option global kaktree_file_icon      ''
-    } else %{
+    } %{
         set-option global kaktree_split vertical
         set-option global kaktree_size 30%
     }
