@@ -1862,7 +1862,7 @@ appended."
   :bind (("<f12>" . magit-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
-  (magit-diff-refine-ignore-whitespace nil)
+  (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all)
   (magit-blame-styles
    '((margin
