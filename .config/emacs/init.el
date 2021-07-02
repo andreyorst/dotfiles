@@ -540,11 +540,11 @@ Used in various places to avoid getting wrong line height when
 (defvar aorst--theme-change-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
 
-(define-advice load-theme (:after (&rest _) aorst:load-theme)
+(define-advice load-theme (:after (&rest _) aorst:setup-theme)
   (run-hooks 'aorst--theme-change-hook))
 
-(define-advice disable-theme (:after (&rest _) aorst:disable-theme)
-    (run-hooks 'aorst--theme-change-hook))
+(define-advice disable-theme (:after (&rest _) aorst:setup-theme)
+  (run-hooks 'aorst--theme-change-hook))
 
 (setq-default custom-safe-themes t)
 
