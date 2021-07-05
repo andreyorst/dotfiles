@@ -28,35 +28,33 @@
 
 (setq-default gc-cons-threshold 402653184
               gc-cons-percentage 0.6
-              inhibit-compacting-font-caches t
-              message-log-max 16384
               file-name-handler-alist nil)
 
-(add-hook 'after-init-hook
-          (defun aorst/restore-defaults-after-init ()
-            (setq gc-cons-threshold aorst--gc-cons-threshold
-                  gc-cons-percentage aorst--gc-cons-percentage
-                  file-name-handler-alist aorst--file-name-handler-alist)))
+(defun aorst/restore-defaults-after-init ()
+  "Restore default values after initialization."
+  (setq-default gc-cons-threshold aorst--gc-cons-threshold
+                gc-cons-percentage aorst--gc-cons-percentage
+                file-name-handler-alist aorst--file-name-handler-alist))
 
-(setq read-process-output-max (* 1024 1024 4)) ; 4mb
+(add-hook 'after-init-hook #'aorst/restore-defaults-after-init)
+
+(setq read-process-output-max (* 1024 1024 4) ; 4mb
+      inhibit-compacting-font-caches t
+      message-log-max 16384)
 
 (when (featurep 'native-compile)
-  (defvar native-comp-deferred-compilation)
   (setq native-comp-deferred-compilation t)
-  (defvar native-comp-async-report-warnings-errors)
   (setq native-comp-async-report-warnings-errors nil))
 
-(setq initial-frame-alist '((width . 170)
-                            (height . 56)
-                            (tool-bar-lines . 0)
-                            (bottom-divider-width . 0)
-                            (right-divider-width . 1))
-      default-frame-alist initial-frame-alist
-      frame-inhibit-implied-resize t
-      x-gtk-resize-child-frames 'resize-mode)
-
-(setq-default fringe-indicator-alist
-              (assq-delete-all 'truncation fringe-indicator-alist))
+(setq-default initial-frame-alist '((width . 170)
+                                    (height . 56)
+                                    (tool-bar-lines . 0)
+                                    (bottom-divider-width . 0)
+                                    (right-divider-width . 1))
+              default-frame-alist initial-frame-alist
+              frame-inhibit-implied-resize t
+              x-gtk-resize-child-frames 'resize-mode
+              fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
 
 (defvar straight-process-buffer)
 (setq-default straight-process-buffer " *straight-process*")
@@ -68,8 +66,7 @@
 (setq straight-build-dir (format "build-%s" emacs-version))
 
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory)))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously

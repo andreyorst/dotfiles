@@ -8,7 +8,8 @@
 * About this document
 This is a GNU Emacs configuration file, written as an Org document.
 It is meant to be placed in the =user-emacs-directory=, and compiled with =org-babel-tangle=.
-As a result =init.el= and =early-init.el= files are created, located in the same directory as this file.
+As a result =init.el= and =early-init.el= files are created, located in the same directory as this file, as well as some other files across the system.
+You can review such files by searching for =:tangle= in this file.
 Both =init.el= and =early-init.el= are default to the read only mode, thus only this file needs to be edited, and is automatically tangled on save.
 
 * =early-init.el=
@@ -16,7 +17,7 @@ Both =init.el= and =early-init.el= are default to the read only mode, thus only 
 :header-args+: :tangle "./early-init.el"
 :end:
 Emacs 27 introduced new initialization file called =earli-init.el=, which is executed before =init.el=.
-It is meant to configure package initialization and early graphical interface tweaks, that can reduce the startup time.
+It is meant to configure package initialization and early graphical interface tweaks, before actually drawing a window.
 
 #+begin_src emacs-lisp
   ;;; early-init.el --- Early initialization -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
@@ -34,7 +35,7 @@ It is meant to configure package initialization and early graphical interface tw
 #+end_src
 
 ** Emacs 28 Obsolete workaround
-Emacs 28 made some changes to obsolete-related functions, making third argument =when= mandatory.
+Emacs 28 made some changes to obsolete-related functions, making the third argument =when= mandatory.
 This broke a lot of packages, so for now, a workaround is to define an =around= advice:
 
 #+begin_src emacs-lisp
@@ -51,8 +52,7 @@ This broke a lot of packages, so for now, a workaround is to define an =around= 
 #+end_src
 
 ** Garbage Collection and Performance
-One of the main problems with Emacs startup time is its garbage collection system.
-It is invoked so many times during startup that it causes quite a big impact on startup time.
+One of the main reasons why Emacs startup time is big is that the garbage collection is invoked a lot, causing the increase of the startup time.
 This can be migrated by setting high GC threshold and restoring it back in =after-init-hook=.
 
 #+begin_src emacs-lisp
@@ -62,28 +62,28 @@ This can be migrated by setting high GC threshold and restoring it back in =afte
 
   (setq-default gc-cons-threshold 402653184
                 gc-cons-percentage 0.6
-                inhibit-compacting-font-caches t
-                message-log-max 16384
                 file-name-handler-alist nil)
 
-  (add-hook 'after-init-hook
-            (defun aorst/restore-defaults-after-init ()
-              (setq gc-cons-threshold aorst--gc-cons-threshold
-                    gc-cons-percentage aorst--gc-cons-percentage
-                    file-name-handler-alist aorst--file-name-handler-alist)))
+  (defun aorst/restore-defaults-after-init ()
+    "Restore default values after initialization."
+    (setq-default gc-cons-threshold aorst--gc-cons-threshold
+                  gc-cons-percentage aorst--gc-cons-percentage
+                  file-name-handler-alist aorst--file-name-handler-alist))
 
-  (setq read-process-output-max (* 1024 1024 4)) ; 4mb
+  (add-hook 'after-init-hook #'aorst/restore-defaults-after-init)
+
+  (setq read-process-output-max (* 1024 1024 4) ; 4mb
+        inhibit-compacting-font-caches t
+        message-log-max 16384)
 #+end_src
 
 ** Native Compiled Emacs Lisp
 Emacs 28 can compile Emacs Lisp to native code.
-These settings enable background asynchronous compilation and dynamic reloading of compiled modules.
+These settings enable background asynchronous compilation, and dynamic reloading of compiled modules.
 
 #+begin_src emacs-lisp
   (when (featurep 'native-compile)
-    (defvar native-comp-deferred-compilation)
     (setq native-comp-deferred-compilation t)
-    (defvar native-comp-async-report-warnings-errors)
     (setq native-comp-async-report-warnings-errors nil))
 #+end_src
 
@@ -92,17 +92,15 @@ This code sets default size of the frame and prevents the glimpse of unstyled Em
 Resizing frame is also expensive, and setting =x-gtk-resize-child-frames= variable to =resize-mode= is a workaround for the [[https://gitlab.gnome.org/GNOME/mutter/-/issues/840][issue]] with child frames not being resized correctly under Mutter.
 
 #+begin_src emacs-lisp
-  (setq initial-frame-alist '((width . 170)
-                              (height . 56)
-                              (tool-bar-lines . 0)
-                              (bottom-divider-width . 0)
-                              (right-divider-width . 1))
-        default-frame-alist initial-frame-alist
-        frame-inhibit-implied-resize t
-        x-gtk-resize-child-frames 'resize-mode)
-
-  (setq-default fringe-indicator-alist
-                (assq-delete-all 'truncation fringe-indicator-alist))
+  (setq-default initial-frame-alist '((width . 170)
+                                      (height . 56)
+                                      (tool-bar-lines . 0)
+                                      (bottom-divider-width . 0)
+                                      (right-divider-width . 1))
+                default-frame-alist initial-frame-alist
+                frame-inhibit-implied-resize t
+                x-gtk-resize-child-frames 'resize-mode
+                fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
 #+end_src
 
 ** =straight.el=
@@ -120,8 +118,7 @@ It can install packages from Git repositories listed on ELPA, MELPA, and directl
   (setq straight-build-dir (format "build-%s" emacs-version))
 
   (let ((bootstrap-file
-         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-        (bootstrap-version 5))
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory)))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
           (url-retrieve-synchronously
@@ -3602,7 +3599,7 @@ With smooth scrolling it is much easier to see where the text actually moved.
 #+end_src
 
 *** Reverse IM
-Reverses input method to allow shortcuts be layout agnostic.
+Reverses input method to allow shortcuts to be layout agnostic.
 
 #+begin_src emacs-lisp
   (use-package reverse-im
