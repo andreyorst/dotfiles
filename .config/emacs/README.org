@@ -3259,14 +3259,31 @@ Clients will connect to this server to reuse frame.
       (server-start)))
 #+end_src
 
-A special launcher for Emacs, that decides whether it can connect to existing server with Emacsclient, or should start Emacs.
+We need the =.desktop= file that uses the advantage of possibly running server:
 
-#+begin_src sh :tangle ~/.local/bin/emacs-launcher :mkdirp yes :shebang #!/bin/sh
-  if [ $# -gt 0 ]; then
-      exec emacsclient -a emacs -n "$@"
-  else
-      exec command emacs
-  fi
+#+begin_src conf-desktop :tangle "~/.local/share/applications/emacs.desktop" :mkdirp yes
+  [Desktop Entry]
+  Name=Emacs
+  GenericName=Text Editor
+  Comment=Edit text
+  MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
+  Exec=sh -c 'if [ -n "$*" ]; then exec emacsclient -a emacs -n --display="$DISPLAY" "$@"; else exec emacs; fi' dummy %F
+  Icon=emacs
+  Type=Application
+  Terminal=false
+  Categories=Development;TextEditor;
+  StartupNotify=true
+  StartupWMClass=Emacs
+  Keywords=Text;Editor;
+  Actions=new-window;new-instance;
+
+  [Desktop Action new-window]
+  Name=New Window
+  Exec=emacsclient --alternate-editor= --create-frame %F
+
+  [Desktop Action new-instance]
+  Name=New Instance
+  Exec=emacs %F
 #+end_src
 
 This will allow us to open files with =emacs-launcher=, and it will automatically reuse existing window if present.
@@ -3275,22 +3292,6 @@ Precisely what it does is:
 - call =emacs= if no arguments provided, or
 - call =emacsclient -a emacs= with arguments.
   =emacsclient= will try to connect to a server, and if there's none, it will fire up =emacs= which will create server, and opening new files will be done in this instance of =emacs=.
-
-The =.descktop= file that uses this launcher script:
-
-#+begin_src conf-xdefaults :tangle ~/.local/share/applications/emacs.desktop :mkdirp yes
-  [Desktop Entry]
-  Name=Emacs
-  GenericName=Text Editor
-  Comment=Edit text
-  MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-  Exec=emacs-launcher %F
-  Icon=emacs
-  Type=Application
-  Terminal=false
-  Categories=Development;TextEditor;Utility;
-  StartupWMClass=Emacs
-#+end_src
 
 With this file we should be able to launch Emacs from the file context menu, or whit "open with" sub menu, and it will reuse existing window if present.
 
