@@ -15,6 +15,7 @@
     for dir in ".config" ".local/bin"; do
         mkdir -p "$HOME/$dir"
         cd "$HOME/$dir" || exit
+        shopt -s dotglob
 
         for file in "$dotfiles_dir/$dir"/*; do
             printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
