@@ -156,7 +156,7 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :no-require t
   :custom
-  (initial-major-mode 'fundamental-mode)
+  (initial-major-mode 'lisp-interaction-mode)
   (initial-scratch-message ""))
 
 (use-package delsel

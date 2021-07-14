@@ -392,7 +392,7 @@ Lisp interaction mode adds a bit of startup time, and is rarely needed.
     :straight nil
     :no-require t
     :custom
-    (initial-major-mode 'fundamental-mode)
+    (initial-major-mode 'lisp-interaction-mode)
     (initial-scratch-message ""))
 #+end_src
 
