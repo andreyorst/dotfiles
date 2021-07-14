@@ -142,6 +142,8 @@
         minions-minor-modes-menu
         mouse-drag-mode-line
         mouse-drag-secondary
+        mouse-drag-tab-line
+        mouse-drag-vertical-line
         mouse-set-region
         org-edit-src-save
         org-insert-link
