@@ -1,19 +1,24 @@
 ;; -*- mode: fennel -*-
+(local opts ...)
+
+(local prompts
+  (if (= (os.getenv :TERM) :dumb)
+      {:indent "" :in-stack "" :top ">> "} ; disable nested expression prompts
+      {:indent " " :in-stack "   " :top ">> "}))
+
+(fn opts.readChunk [parser-state]
+  (let [rl (or package.loaded.readline
+               {:readline #(do (io.write $) (io.flush) (io.read))})
+        prompt (match parser-state.stack-size
+                 0 prompts.top
+                 n (.. prompts.in-stack (prompts.indent:rep n)))
+        str (rl.readline prompt)]
+    (if str (.. str "\n"))))
+
 (fn table? [x]
   (= :table (type x)))
-
-(local opts ...)
-(local prompts {:indent " " :in-stack "  " :top ">>"})
 
 (match package.loaded.readline
   (where rl (table? rl))
   (do (rl.set_options {:histfile  "~/.fennel_history"
-                       :keeplines 1000})
-      (fn opts.readChunk [parser-state]
-        (let [rl (or package.loaded.readline
-                     {:readline #(do (io.write $) (io.flush) (io.read))})
-              prompt (match parser-state.stack-size
-                       0 prompts.top
-                       n (.. prompts.in-stack (prompts.indent:rep n)))
-              str (rl.readline (.. prompt " "))]
-          (if str (.. str "\n"))))))
+                       :keeplines 1000})))
