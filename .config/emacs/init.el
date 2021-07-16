@@ -1446,9 +1446,10 @@ for module name."
         (save-excursion
           (save-restriction
             (goto-char (point-min))
+            (forward-sexp)
             (while (not (eq (point) (point-max)))
-              (forward-sexp)
-              (lisp-eval-last-sexp))))
+              (lisp-eval-last-sexp)
+              (forward-sexp))))
       (if (equal arg '(4))
           (funcall-interactively 'fennel-reload nil)
         (funcall-interactively 'fennel-reload t))))
