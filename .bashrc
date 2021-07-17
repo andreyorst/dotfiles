@@ -16,8 +16,17 @@ export PATH="$HOME/.dotfiles/scripts:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.npm/bin:$PATH"
 export PATH="$HOME/.cache/rebar3/bin:$PATH"
+
+# Lua related stuff
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
 
+for path in "$HOME"/.local/share/lua/*; do
+    LUA_PATH="$path/?.lua;$LUA_PATH"
+done
+
+export LUA_PATH
+
+# History
 export HISTFILESIZE=
 export HISTSIZE=-1
 export HISTTIMEFORMAT="[%F %T] "
