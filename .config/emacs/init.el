@@ -1449,7 +1449,9 @@ for module name."
             (forward-sexp)
             (while (not (eq (point) (point-max)))
               (lisp-eval-last-sexp)
-              (forward-sexp))))
+              (forward-sexp)))
+          (when fennel-mode-switch-to-repl-after-reload
+            (switch-to-lisp t)))
       (if (equal arg '(4))
           (funcall-interactively 'fennel-reload nil)
         (funcall-interactively 'fennel-reload t))))
