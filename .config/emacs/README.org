@@ -336,10 +336,10 @@ Also advising =scroll-left= to prevent over-scrolling past the visible part of t
                   hscroll-step 1
                   hscroll-margin 1
                   scroll-margin 1
-                  scroll-step 1
-                  scroll-conservatively 101
-                  scroll-up-aggressively 0.01
-                  scroll-down-aggressively 0.01
+                  ;; scroll-step 1
+                  ;; scroll-conservatively 101
+                  ;; scroll-up-aggressively 0.01
+                  ;; scroll-down-aggressively 0.01
                   scroll-preserve-screen-position nil)
     (unless (display-graphic-p)
       (xterm-mouse-mode t)))
@@ -518,7 +518,7 @@ Binding for =bury-buffer= command.
 #+begin_src emacs-lisp
   (use-package window
     :straight nil
-    :bind ("C-c b" . bury-buffer))
+    :bind ("C-x C-b" . bury-buffer))
 #+end_src
 
 *** Comint
@@ -583,7 +583,7 @@ Changes =C-g= to quit current action regardless of active window.
                  (god-local-mode)
                (keyboard-quit))))))
 
-  (global-set-key [remap keyboard-quit] #'aorst/escape)
+  ;; (global-set-key [remap keyboard-quit] #'aorst/escape)
 #+end_src
 
 *** =font-installed-p=
@@ -703,7 +703,7 @@ Creates an object, and puts as a first argument to subsequent forms.
          ,gx)))
 #+end_src
 
-*** =minibuffer-efer-garbage-collection=
+*** =minibuffer-defer-garbage-collection=
 When minibuffer pops up, the garbage collection is deferred for more optimal filtering performance.
 
 #+begin_src emacs-lisp
@@ -777,7 +777,7 @@ When using graphical Emacs, a more traditional bar cursor is used, and shown onl
 
 #+begin_src emacs-lisp
   (when window-system
-    (setq-default cursor-type 'bar
+    (setq-default cursor-type '(bar . 1)
                   cursor-in-non-selected-windows nil))
 #+end_src
 
@@ -799,7 +799,7 @@ For variable pitched fonts DejaVu font is used if available.
     (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 #+end_src
 
-**** Ligatures
+**** COMMENT Ligatures
 With the inclusion of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]] support into Emacs 27, it is now possible to use =auto-composition-mode= to add ligatures.
 Needed ligatures can be specified by defining regular expressions:
 
@@ -1007,14 +1007,14 @@ Modified state module for mode-line.
 #+begin_src emacs-lisp
   (defsubst aorst/mode-line-buffer-state ()
     (concat (if (and buffer-file-name (buffer-modified-p))
-                (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "[*]"
+                (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "*"
                                              'help-echo (concat (buffer-name) " has unsaved changes"))))
               "")
             (if (or (buffer-narrowed-p)
                     (and (bound-and-true-p fancy-narrow-mode)
                          (fancy-narrow-active-p))
                     (bound-and-true-p dired-narrow-mode))
-                (concat "  " (propertize (if (char-displayable-p ?↕) "↕" "[><]"
+                (concat "  " (propertize (if (char-displayable-p ?↕) "↕" "><"
                                              'help-echo (concat (buffer-name) " is narrowed"))))
               "")
             (if (and buffer-read-only
@@ -1023,7 +1023,7 @@ Modified state module for mode-line.
                                              xref--xref-buffer-mode
                                              magit-status-mode))))
                 (concat "  " (propertize
-                              (if (char-displayable-p ?🔒) "🔒" "[RO]")
+                              (if (char-displayable-p ?🔒) "🔒" "RO")
                               'help-echo "Make file writable"
                               'local-map (doto (make-sparse-keymap)
                                            (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))
@@ -1194,7 +1194,7 @@ Support for various structural editing modes in mode-line.
                           ((bound-and-true-p paredit-mode)
                            (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
                           ((bound-and-true-p smartparens-strict-mode)
-                           (propertize "SP/s" 'help-echo "Smartparens mode is enabled for current buffer"))
+                           (propertize "SP/s" 'help-echo "Smartparens strict mode is enabled for current buffer"))
                           ((bound-and-true-p smartparens-mode)
                            (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
                           ((bound-and-true-p lispy-mode)
@@ -1376,6 +1376,9 @@ A package that displays mode-line in the echo area.
 
 #+begin_src emacs-lisp
   (use-package mini-modeline
+    :straight (:fork (:host github
+                      :repo "AmaiKinono/emacs-mini-modeline"
+                      :branch "update-on-need"))
     :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
            (after-init . mini-modeline-mode)
            (isearch-mode . aorst/mini-modeline-isearch)
@@ -1940,17 +1943,18 @@ Tab closing semantic is also not very useful defaulting to bury buffer.
     (display-line-numbers-grow-only t)
     (display-line-numbers-width-start t)
     :config
-    (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
-      "The `display-line-numbers' mode affects `scroll-margin' variable.
+    ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
+  ;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
 
-  This advice recalculates the amount of lines needed to scroll to
-  ensure `scroll-margin' preserved."
-      (apply f args)
-      (let ((diff (- scroll-margin
-                     (- (line-number-at-pos (point))
-                        (line-number-at-pos (window-start))))))
-        (when (> diff 0)
-          (scroll-down diff)))))
+  ;; This advice recalculates the amount of lines needed to scroll to
+  ;; ensure `scroll-margin' preserved."
+  ;;     (apply f args)
+  ;;     (let ((diff (- scroll-margin
+  ;;                    (- (line-number-at-pos (point))
+  ;;                       (line-number-at-pos (window-start))))))
+  ;;       (when (> diff 0)
+  ;;         (scroll-down diff))))
+    )
 #+end_src
 
 ** Languages
@@ -2066,7 +2070,6 @@ These settings are for editing C source files.
               (c-set-offset 'case-label '+)
               (setq c-basic-offset 4
                     c-default-style "linux"
-                    indent-tabs-mode t
                     comment-start "//"
                     comment-end ""
                     tab-width 4))
@@ -2671,7 +2674,44 @@ This package will be used in many other package configurations to provide sane k
   (use-package hydra)
 #+end_src
 
-*** Smartparens
+*** Electric Indent Mode
+Automatic parenthesis insertion.
+
+#+begin_src emacs-lisp
+  (use-package electric-pair-mode
+    :straight nil
+    :hook (prog-mode . electric-pair-local-mode))
+#+end_src
+
+*** Paredit
+Structural editing for Lisp languages.
+
+#+begin_src emacs-lisp
+  (use-package paredit
+    :hook (((clojure-mode
+             emacs-lisp-mode
+             common-lisp-mode
+             scheme-mode
+             lisp-mode
+             racket-mode
+             fennel-mode
+             cider-repl-mode
+             racket-repl-mode
+             geiser-repl-mode
+             inferior-lisp-mode
+             inferior-emacs-lisp-mode
+             sly-mrepl-mode
+             eval-expression-minibuffer-setup
+             lisp-data-mode)
+            . paredit-mode)
+           (paredit-mode . aorst/disable-eplm))
+    :config
+    (defun aorst/disable-eplm ()
+      "Disable `electric-pair-local-mode'."
+      (electric-pair-local-mode -1)))
+#+end_src
+
+*** COMMENT Smartparens
 This is a package that enables structural editing in many different languages.
 Basically, for all Lisp related modes the =smartparens-strict-mode= is used, while for other modes =smartparens-mode= is enough.
 Note that the ";" key is set to =sp-comment= function for =smartparens-strict-mode=.
@@ -2860,7 +2900,6 @@ Complete anything framework.
   (use-package company
     :bind (:map company-mode-map
            ([remap completion-at-point] . company-complete)
-           ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
            ("M-/" . company-complete)
            :map company-active-map
            ("TAB" . company-complete-common-or-cycle)
@@ -2873,8 +2912,6 @@ Complete anything framework.
            ("M-." . company-show-location))
     :hook (after-init . global-company-mode)
     :custom
-    ;; (tab-always-indent 'complete)
-    ;; (tab-first-completion 'word-or-paren-or-punct)
     (company-idle-delay 0)
     (company-require-match 'never)
     (company-minimum-prefix-length 2)
@@ -2885,9 +2922,7 @@ Complete anything framework.
     (company-backends '(company-capf company-files company-dabbrev-code))
     (company-tooltip-minimum-width 30)
     (company-tooltip-maximum-width 120)
-    (company-icon-size aorst--line-pixel-height)
-    ;; (company-format-margin-function nil)
-    )
+    (company-icon-size aorst--line-pixel-height))
 #+end_src
 
 **** Company quickhelp
@@ -3435,9 +3470,8 @@ Some tweaks to inbuilt parenthesis highlighting mode.
 #+begin_src emacs-lisp
   (use-package paren
     :straight nil
-    :custom
-    (show-paren-when-point-in-periphery t)
-    (show-paren-delay 0))
+    :hook (prog-mode . show-paren-mode)
+    :custom (show-paren-delay 0))
 #+end_src
 
 *** Writable Grep
@@ -3549,7 +3583,7 @@ Simple hydrant for =outline-minor-mode=.
       ("C-g" ignore :exit t)))
 #+end_src
 
-*** Paren-face
+*** COMMENT Paren-face
 Dims parentheses a bit, making those less in your face.
 
 #+begin_src emacs-lisp
@@ -3605,7 +3639,7 @@ Hydrant for quick access to the Emacs profiling functions:
         ("C-g" ignore :exit t)))
 #+end_src
 
-*** Scroll on jump
+*** COMMENT Scroll on jump
 This package adds smooth scrolling on events that usually make Emacs jump around.
 With smooth scrolling it is much easier to see where the text actually moved.
 
@@ -3629,7 +3663,7 @@ With smooth scrolling it is much easier to see where the text actually moved.
     (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))
 #+end_src
 
-*** Reverse IM
+*** COMMENT Reverse IM
 Reverses input method to allow shortcuts to be layout agnostic.
 
 #+begin_src emacs-lisp

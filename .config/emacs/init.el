@@ -128,10 +128,10 @@ for stopping scroll from going beyond longest line.  Based on
                 hscroll-step 1
                 hscroll-margin 1
                 scroll-margin 1
-                scroll-step 1
-                scroll-conservatively 101
-                scroll-up-aggressively 0.01
-                scroll-down-aggressively 0.01
+                ;; scroll-step 1
+                ;; scroll-conservatively 101
+                ;; scroll-up-aggressively 0.01
+                ;; scroll-down-aggressively 0.01
                 scroll-preserve-screen-position nil)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
@@ -254,7 +254,7 @@ for stopping scroll from going beyond longest line.  Based on
 
 (use-package window
   :straight nil
-  :bind ("C-c b" . bury-buffer))
+  :bind ("C-x C-b" . bury-buffer))
 
 (use-package comint
   :straight nil
@@ -299,7 +299,7 @@ are defining or executing a macro."
                (god-local-mode)
              (keyboard-quit))))))
 
-(global-set-key [remap keyboard-quit] #'aorst/escape)
+;; (global-set-key [remap keyboard-quit] #'aorst/escape)
 
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
@@ -424,7 +424,7 @@ Used in various places to avoid getting wrong line height when
   (tool-bar-mode -1))
 
 (when window-system
-  (setq-default cursor-type 'bar
+  (setq-default cursor-type '(bar . 1)
                 cursor-in-non-selected-windows nil))
 
 (cond ((aorst/font-installed-p "JetBrainsMono")
@@ -434,47 +434,6 @@ Used in various places to avoid getting wrong line height when
 
 (when (aorst/font-installed-p "DejaVu Sans")
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
-
-(when (aorst/font-installed-p "JetBrainsMono")
-  (dolist (char/ligature-re
-           `((?-  ,(rx (or (or "-->" "-<<" "->>" "-|" "-~" "-<" "->") (+ "-"))))
-             (?/  ,(rx (or (or "/==" "/=" "/>" "/**" "/*") (+ "/"))))
-             (?*  ,(rx (or (or "*>" "*/") (+ "*"))))
-             (?<  ,(rx (or (or "<<=" "<<-" "<|||" "<==>" "<!--" "<=>" "<||" "<|>" "<-<"
-                               "<==" "<=<" "<-|" "<~>" "<=|" "<~~" "<$>" "<+>" "</>" "<*>"
-                               "<->" "<=" "<|" "<:" "<>"  "<$" "<-" "<~" "<+" "</" "<*")
-                           (+ "<"))))
-             (?:  ,(rx (or (or ":?>" "::=" ":>" ":<" ":?" ":=") (+ ":"))))
-             (?=  ,(rx (or (or "=>>" "==>" "=/=" "=!=" "=>" "=:=") (+ "="))))
-             (?!  ,(rx (or (or "!==" "!=") (+ "!"))))
-             (?>  ,(rx (or (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=") (+ ">"))))
-             (?&  ,(rx (+ "&")))
-             (?|  ,(rx (or (or "|->" "|||>" "||>" "|=>" "||-" "||=" "|-" "|>" "|]" "|}" "|=")
-                           (+ "|"))))
-             (?.  ,(rx (or (or ".?" ".=" ".-" "..<") (+ "."))))
-             (?+  ,(rx (or "+>" (+ "+"))))
-             (?\[ ,(rx (or "[<" "[|")))
-             (?\{ ,(rx "{|"))
-             (?\? ,(rx (or (or "?." "?=" "?:") (+ "?"))))
-             (?#  ,(rx (or (or "#_(" "#[" "#{" "#=" "#!" "#:" "#_" "#?" "#(") (+ "#"))))
-             (?\; ,(rx (+ ";")))
-             (?_  ,(rx (or "_|_" "__")))
-             (?~  ,(rx (or "~~>" "~~" "~>" "~-" "~@")))
-             (?$  ,(rx "$>"))
-             (?^  ,(rx "^="))
-             (?\] ,(rx "]#"))))
-    (apply (lambda (char ligature-re)
-             (set-char-table-range composition-function-table char
-                                   `([,ligature-re 0 font-shape-gstring])))
-           char/ligature-re)))
-
-(use-package composite
-  :straight nil
-  :hook ((prog-mode
-          cider-repl-mode
-          inferior-lisp-mode)
-         . auto-composition-mode)
-  :init (global-auto-composition-mode -1))
 
 (use-package all-the-icons
   :config
@@ -592,14 +551,14 @@ Used in various places to avoid getting wrong line height when
 
 (defsubst aorst/mode-line-buffer-state ()
   (concat (if (and buffer-file-name (buffer-modified-p))
-              (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "[*]"
+              (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "*"
                                            'help-echo (concat (buffer-name) " has unsaved changes"))))
             "")
           (if (or (buffer-narrowed-p)
                   (and (bound-and-true-p fancy-narrow-mode)
                        (fancy-narrow-active-p))
                   (bound-and-true-p dired-narrow-mode))
-              (concat "  " (propertize (if (char-displayable-p ?↕) "↕" "[><]"
+              (concat "  " (propertize (if (char-displayable-p ?↕) "↕" "><"
                                            'help-echo (concat (buffer-name) " is narrowed"))))
             "")
           (if (and buffer-read-only
@@ -608,7 +567,7 @@ Used in various places to avoid getting wrong line height when
                                            xref--xref-buffer-mode
                                            magit-status-mode))))
               (concat "  " (propertize
-                            (if (char-displayable-p ?🔒) "🔒" "[RO]")
+                            (if (char-displayable-p ?🔒) "🔒" "RO")
                             'help-echo "Make file writable"
                             'local-map (doto (make-sparse-keymap)
                                          (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))
@@ -749,7 +708,7 @@ Used in various places to avoid getting wrong line height when
                         ((bound-and-true-p paredit-mode)
                          (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
                         ((bound-and-true-p smartparens-strict-mode)
-                         (propertize "SP/s" 'help-echo "Smartparens mode is enabled for current buffer"))
+                         (propertize "SP/s" 'help-echo "Smartparens strict mode is enabled for current buffer"))
                         ((bound-and-true-p smartparens-mode)
                          (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
                         ((bound-and-true-p lispy-mode)
@@ -896,6 +855,9 @@ Used in various places to avoid getting wrong line height when
              mode-line-r-format))))
 
 (use-package mini-modeline
+  :straight (:fork (:host github
+                    :repo "AmaiKinono/emacs-mini-modeline"
+                    :branch "update-on-need"))
   :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode)
          (isearch-mode . aorst/mini-modeline-isearch)
@@ -1219,17 +1181,18 @@ truncates text if needed.  Minimal width can be set with
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t)
   :config
-  (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
-    "The `display-line-numbers' mode affects `scroll-margin' variable.
+  ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
+;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
 
-This advice recalculates the amount of lines needed to scroll to
-ensure `scroll-margin' preserved."
-    (apply f args)
-    (let ((diff (- scroll-margin
-                   (- (line-number-at-pos (point))
-                      (line-number-at-pos (window-start))))))
-      (when (> diff 0)
-        (scroll-down diff)))))
+;; This advice recalculates the amount of lines needed to scroll to
+;; ensure `scroll-margin' preserved."
+;;     (apply f args)
+;;     (let ((diff (- scroll-margin
+;;                    (- (line-number-at-pos (point))
+;;                       (line-number-at-pos (window-start))))))
+;;       (when (> diff 0)
+;;         (scroll-down diff))))
+  )
 
 (use-package org
   :straight (:type built-in)
@@ -1311,7 +1274,6 @@ ensure `scroll-margin' preserved."
             (c-set-offset 'case-label '+)
             (setq c-basic-offset 4
                   c-default-style "linux"
-                  indent-tabs-mode t
                   comment-start "//"
                   comment-end ""
                   tab-width 4))
@@ -1751,7 +1713,11 @@ appended."
 
 (use-package hydra)
 
-(use-package smartparens
+(use-package electric-pair-mode
+  :straight nil
+  :hook (prog-mode . electric-pair-local-mode))
+
+(use-package paredit
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1764,50 +1730,15 @@ appended."
            geiser-repl-mode
            inferior-lisp-mode
            inferior-emacs-lisp-mode
-           sly-mrepl-mode)
-          . smartparens-strict-mode)
-         ((eval-expression-minibuffer-setup
+           sly-mrepl-mode
+           eval-expression-minibuffer-setup
            lisp-data-mode)
-          . aorst/minibuffer-enable-sp)
-         ((org-mode
-           markdown-mode
-           prog-mode)
-          . smartparens-mode)
-         (smartparens-mode . show-smartparens-mode))
-  :bind (:map smartparens-mode-map
-         ("C-M-q" . sp-indent-defun)
-         :map smartparens-strict-mode-map
-         (";" . sp-comment))
-  :custom
-  (sp-highlight-pair-overlay nil)
-  (sp-highlight-wrap-overlay nil)
-  (sp-highlight-wrap-tag-overlay nil)
-  (sp-wrap-respect-direction t)
-  (sp-show-pair-delay 0)
-  (sp-echo-match-when-invisible nil)
-  :custom-face
-  (sp-show-pair-match-face ((t (:background unspecified
-                                :weight normal))))
+          . paredit-mode)
+         (paredit-mode . aorst/disable-eplm))
   :config
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
-  (require 'smartparens-config)
-  (sp-use-paredit-bindings)
-  :config
-  (defun aorst/minibuffer-enable-sp ()
-    "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
-    (setq-local comment-start ";")
-    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-    (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1))
-  (defun aorst/wrap-fix-cursor-position (_ action _)
-    "Set cursor position inside expression when wrapping."
-    (when (and (eq action 'wrap)
-               (eq (point)
-                   (marker-position (sp-get sp-last-wrapped-region :beg))))
-      (goto-char (sp-get sp-last-wrapped-region :beg-in))))
-  (dolist (paren '("(" "[" "{"))
-    (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
+  (defun aorst/disable-eplm ()
+    "Disable `electric-pair-local-mode'."
+    (electric-pair-local-mode -1)))
 
 (use-package flx)
 
@@ -1837,7 +1768,6 @@ appended."
 (use-package company
   :bind (:map company-mode-map
          ([remap completion-at-point] . company-complete)
-         ;; ([remap indent-for-tab-command] . company-indent-or-complete-common)
          ("M-/" . company-complete)
          :map company-active-map
          ("TAB" . company-complete-common-or-cycle)
@@ -1850,8 +1780,6 @@ appended."
          ("M-." . company-show-location))
   :hook (after-init . global-company-mode)
   :custom
-  ;; (tab-always-indent 'complete)
-  ;; (tab-first-completion 'word-or-paren-or-punct)
   (company-idle-delay 0)
   (company-require-match 'never)
   (company-minimum-prefix-length 2)
@@ -1862,9 +1790,7 @@ appended."
   (company-backends '(company-capf company-files company-dabbrev-code))
   (company-tooltip-minimum-width 30)
   (company-tooltip-maximum-width 120)
-  (company-icon-size aorst--line-pixel-height)
-  ;; (company-format-margin-function nil)
-  )
+  (company-icon-size aorst--line-pixel-height))
 
 (use-package company-quickhelp
   :hook (company-mode . company-quickhelp-mode)
@@ -2243,9 +2169,8 @@ appended."
 
 (use-package paren
   :straight nil
-  :custom
-  (show-paren-when-point-in-periphery t)
-  (show-paren-delay 0))
+  :hook (prog-mode . show-paren-mode)
+  :custom (show-paren-delay 0))
 
 (use-package wgrep)
 
@@ -2309,22 +2234,6 @@ appended."
     ("p" outline-previous-heading)
     ("C-g" ignore :exit t)))
 
-(use-package paren-face
-  :hook ((clojure-mode
-          emacs-lisp-mode
-          common-lisp-mode
-          scheme-mode
-          lisp-mode
-          racket-mode
-          fennel-mode
-          cider-repl-mode
-          racket-repl-mode
-          geiser-repl-mode
-          inferior-lisp-mode
-          inferior-emacs-lisp-mode)
-         . paren-face-mode)
-  :custom (paren-face-regexp "[][(){}]"))
-
 (use-package jdecomp
   :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
   :hook (archive-mode . jdecomp-mode)
@@ -2349,30 +2258,6 @@ appended."
       ("s" profiler-stop)
       ("r" profiler-report)
       ("C-g" ignore :exit t)))
-
-(use-package scroll-on-jump
-  :custom
-  (scroll-on-jump-smooth nil)
-  (scroll-on-jump-duration 0.1337)
-  :config
-  (scroll-on-jump-advice-add beginning-of-buffer)
-  (scroll-on-jump-advice-add end-of-buffer)
-  (scroll-on-jump-advice-add flyspell-goto-next-error)
-  (when (featurep 'smartparens)
-    (define-key smartparens-mode-map
-      (kbd "C-M-f") (scroll-on-jump-interactive 'sp-forward-sexp))
-    (define-key smartparens-mode-map
-      (kbd "C-M-b") (scroll-on-jump-interactive 'sp-backward-sexp)))
-  (scroll-on-jump-with-scroll-advice-add scroll-up-command)
-  (scroll-on-jump-with-scroll-advice-add scroll-down-command)
-  (scroll-on-jump-with-scroll-advice-add isearch-update)
-  (scroll-on-jump-with-scroll-advice-add recenter-top-bottom))
-
-(use-package reverse-im
-  :custom
-  (reverse-im-input-methods '("russian-computer"))
-  :config
-  (reverse-im-mode t))
 
 (use-package compile
   :straight nil
