@@ -127,9 +127,6 @@ It can install packages from Git repositories listed on ELPA, MELPA, and directl
         (goto-char (point-max))
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
-
-  (defvar straight-check-for-modifications)
-  (setq-default straight-check-for-modifications '(check-on-save))
 #+end_src
 
 ** early =package.el= settings

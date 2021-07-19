@@ -76,9 +76,6 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(defvar straight-check-for-modifications)
-(setq-default straight-check-for-modifications '(check-on-save))
-
 (setq package-enable-at-startup nil)
 
 (provide 'early-init)
