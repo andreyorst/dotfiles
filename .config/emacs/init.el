@@ -274,7 +274,7 @@ for stopping scroll from going beyond longest line.  Based on
             (buffer-name buffer))
            (minibufferp))))
 
-(defun aorst/escape ()
+(define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
   "Quit in current context.
 
 When there is an active minibuffer and we are not inside it close
@@ -282,24 +282,14 @@ it.  When we are inside the minibuffer use the regular
 `minibuffer-keyboard-quit' which quits any active region before
 exiting.  When there is no minibuffer `keyboard-quit' unless we
 are defining or executing a macro."
-  (interactive)
   (cond ((active-minibuffer-window)
          (if (minibufferp)
              (minibuffer-keyboard-quit)
            (abort-recursive-edit)))
-        ((bound-and-true-p iedit-mode)
-         (iedit-quit))
         (t
          (unless (or defining-kbd-macro
                      executing-kbd-macro)
-           (if (and (bound-and-true-p aorst--god-mode)
-                    (not (bound-and-true-p god-local-mode))
-                    (not (and transient-mark-mode
-                              mark-active)))
-               (god-local-mode)
-             (keyboard-quit))))))
-
-;; (global-set-key [remap keyboard-quit] #'aorst/escape)
+           (funcall quit)))))
 
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
