@@ -233,7 +233,7 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore))
-  :custom (completion-styles '(basic partial-completion flex))
+  :custom (completion-styles '(basic partial-completion))
   :custom-face (completions-first-difference ((t (:inherit unspecified)))))
 
 (defun aorst/formfeed-line ()
@@ -1707,7 +1707,7 @@ appended."
   :straight nil
   :hook (prog-mode . electric-pair-local-mode))
 
-(use-package smartparens
+(use-package paredit
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1720,51 +1720,15 @@ appended."
            geiser-repl-mode
            inferior-lisp-mode
            inferior-emacs-lisp-mode
-           sly-mrepl-mode)
-          . smartparens-strict-mode)
-         ((eval-expression-minibuffer-setup
+           sly-mrepl-mode
+           eval-expression-minibuffer-setup
            lisp-data-mode)
-          . aorst/minibuffer-enable-sp)
-         (smartparens-mode . aorst/sp-disable-eplm))
-  :bind (:map smartparens-mode-map
-         ("C-M-q" . sp-indent-defun)
-         :map smartparens-strict-mode-map
-         (";" . sp-comment))
-  :custom
-  (sp-highlight-pair-overlay nil)
-  (sp-highlight-wrap-overlay nil)
-  (sp-highlight-wrap-tag-overlay nil)
-  (sp-wrap-respect-direction t)
-  (sp-show-pair-delay 0)
-  (sp-echo-match-when-invisible nil)
-  :custom-face
-  (sp-show-pair-match-face ((t (:background unspecified
-                                :weight normal))))
+          . paredit-mode)
+         (paredit-mode . aorst/disable-eplm))
   :config
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
-  (require 'smartparens-config)
-  (sp-use-paredit-bindings)
-  :config
-  (defun aorst/sp-disable-eplm ()
-    "Disable `electric-pair-local-mode' when `smartparens-mode' is active."
-    (electric-pair-local-mode -1))
-  (defun aorst/minibuffer-enable-sp ()
-    "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
-    (setq-local comment-start ";")
-    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-    (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1))
-  (defun aorst/wrap-fix-cursor-position (_ action _)
-    "Set cursor position inside expression when wrapping."
-    (when (and (eq action 'wrap)
-               (eq (point)
-                   (marker-position (sp-get sp-last-wrapped-region :beg))))
-      (goto-char (sp-get sp-last-wrapped-region :beg-in))))
-  (dolist (paren '("(" "[" "{"))
-    (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
-
-(use-package flx)
+  (defun aorst/disable-eplm ()
+    "Disable `electric-pair-local-mode'."
+    (electric-pair-local-mode -1)))
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
@@ -2224,7 +2188,7 @@ appended."
   :straight (:host gitlab
              :repo "andreyorst/isayt.el"
              :branch "main")
-  :hook (smartparens-strict-mode . isayt-mode))
+  :hook ((paredit-mode smartparens-strict-mode) . isayt-mode))
 
 (use-package eldoc
   :straight nil
