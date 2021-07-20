@@ -38,8 +38,14 @@
         goto-line
         hs-toggle-hiding
         hydra--negative-argument
+        hydrant/er/aorst/er-exit-and-exit
         hydrant/er/er/contract-region
         hydrant/er/er/expand-region
+        hydrant/er/er/mark-inside-pairs
+        hydrant/er/er/mark-inside-quotes
+        hydrant/er/er/mark-outside-pairs
+        hydrant/er/er/mark-outside-quotes
+        hydrant/er/er/mark-paragraph
         hydrant/mc/mc/keyboard-quit-and-exit
         indent-for-tab-command
         kill-region
@@ -104,6 +110,7 @@
         hydrant/-digit-argument
         hydrant/-negative-argument
         hydrant/er/body
+        hydrant/er/ignore-and-exit
         hydrant/er/lambda-G-and-exit
         hydrant/iedit/aorst/iedit-to-mc-hydrant-and-exit
         hydrant/mc/body
