@@ -190,7 +190,10 @@ for stopping scroll from going beyond longest line.  Based on
     (interactive "*p")
     (if (and transient-mark-mode
              mark-active)
-        (kill-region (region-beginning) (region-end))
+        (if (and (featurep 'paredit)
+                 paredit-mode)
+            (paredit-kill-region (region-beginning) (region-end))
+          (kill-region (region-beginning) (region-end)))
       (backward-kill-word arg)))
   (defun aorst/downcase-region-or-word (arg)
     (interactive "*p")
@@ -1187,7 +1190,8 @@ truncates text if needed.  Minimal width can be set with
 (use-package org
   :straight (:type built-in)
   :hook (((org-capture-mode org-src-mode) . aorst/discard-history)
-         (org-mode . flyspell-mode))
+         (org-mode . flyspell-mode)
+         (aorst--theme-change . aorst/org-setup-faces))
   :bind (:map org-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines)
          ("C-c l" . org-store-link))
@@ -1220,25 +1224,14 @@ truncates text if needed.  Minimal width can be set with
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((gnuplot . t)
-     (scheme . t)))
-  (defun aorst/org-update-latex-preview-background-color (&rest _)
-    (setq-default
-     org-format-latex-options
-     (plist-put org-format-latex-options
-                :background
-                (face-attribute (let ((face (cadr (assq 'default face-remapping-alist))))
-                                  (if (facep face) face 'default))
-                                :background nil t))))
-  (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color)
   (define-advice org-return (:around (f &rest args) aorst:org-return)
     (let ((org-src-preserve-indentation t))
       (apply f args)))
   (define-advice org-cycle (:around (f &rest args) aorst:org-cycle)
     (let ((org-src-preserve-indentation t))
-      (apply f args))))
+      (apply f args)))
+  (defun aorst/org-setup-faces ()
+    (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background))))
 
 (use-package ox-hugo
   :after ox)
@@ -1251,7 +1244,7 @@ truncates text if needed.  Minimal width can be set with
   (use-package org-tempo
     :straight nil
     :defines org-version
-    :when (not (version<= org-version "9.1.9"))))
+    :unless (version<= org-version "9.1.9")))
 
 (use-package prog-mode
   :straight nil
@@ -1738,8 +1731,7 @@ appended."
     "Allow killing a region if expression is balanced."
     (if (and transient-mark-mode
              mark-active)
-        (let ((kill-ring '())
-              (kill-ring-yank-pointer nil))
+        (let ((kill-ring '()) (kill-ring-yank-pointer nil))
           (paredit-kill-region (region-beginning) (region-end)))
       (apply orig-fn args)))
   (advice-add 'paredit-forward-delete :around #'aorst/paredit-kill-region-if-ttm)
@@ -2248,3 +2240,9 @@ appended."
 (use-package esh-mode
   :straight nil
   :custom (eshell-scroll-show-maximum-output nil))
+
+(use-package orderless
+  :custom
+  (completion-styles '(orderless))
+  ;; (orderless-matching-styles '(orderless-literal orderless-flex))
+  )

@@ -433,7 +433,10 @@ Configurations for inbuilt =simple.el= module.
       (interactive "*p")
       (if (and transient-mark-mode
                mark-active)
-          (kill-region (region-beginning) (region-end))
+          (if (and (featurep 'paredit)
+                   paredit-mode)
+              (paredit-kill-region (region-beginning) (region-end))
+            (kill-region (region-beginning) (region-end)))
         (backward-kill-word arg)))
     (defun aorst/downcase-region-or-word (arg)
       (interactive "*p")
@@ -1957,7 +1960,8 @@ Org Mode is a great mode for taking notes, managing to-do lists, writing books, 
   (use-package org
     :straight (:type built-in)
     :hook (((org-capture-mode org-src-mode) . aorst/discard-history)
-           (org-mode . flyspell-mode))
+           (org-mode . flyspell-mode)
+           (aorst--theme-change . aorst/org-setup-faces))
     :bind (:map org-mode-map
            ("M-Q" . aorst/split-pararagraph-into-lines)
            ("C-c l" . org-store-link))
@@ -1990,25 +1994,14 @@ Org Mode is a great mode for taking notes, managing to-do lists, writing books, 
       "Discard undo history of org src and capture blocks."
       (setq buffer-undo-list nil)
       (set-buffer-modified-p nil))
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((gnuplot . t)
-       (scheme . t)))
-    (defun aorst/org-update-latex-preview-background-color (&rest _)
-      (setq-default
-       org-format-latex-options
-       (plist-put org-format-latex-options
-                  :background
-                  (face-attribute (let ((face (cadr (assq 'default face-remapping-alist))))
-                                    (if (facep face) face 'default))
-                                  :background nil t))))
-    (add-hook 'solaire-mode-hook #'aorst/org-update-latex-preview-background-color)
     (define-advice org-return (:around (f &rest args) aorst:org-return)
       (let ((org-src-preserve-indentation t))
         (apply f args)))
     (define-advice org-cycle (:around (f &rest args) aorst:org-cycle)
       (let ((org-src-preserve-indentation t))
-        (apply f args))))
+        (apply f args)))
+    (defun aorst/org-setup-faces ()
+      (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background))))
 #+end_src
 
 **** OX Hugo
@@ -2037,7 +2030,7 @@ It was externalized into separate package in more recent Org mode versions.
     (use-package org-tempo
       :straight nil
       :defines org-version
-      :when (not (version<= org-version "9.1.9"))))
+      :unless (version<= org-version "9.1.9")))
 #+end_src
 
 *** Prog Mode
@@ -2669,7 +2662,7 @@ This package will be used in many other package configurations to provide sane k
   (use-package hydra)
 #+end_src
 
-*** Electric Indent Mode
+*** Electric Pair Mode
 Automatic parenthesis insertion.
 
 #+begin_src emacs-lisp
@@ -2708,8 +2701,7 @@ Structural editing for Lisp languages.
       "Allow killing a region if expression is balanced."
       (if (and transient-mark-mode
                mark-active)
-          (let ((kill-ring '())
-                (kill-ring-yank-pointer nil))
+          (let ((kill-ring '()) (kill-ring-yank-pointer nil))
             (paredit-kill-region (region-beginning) (region-end)))
         (apply orig-fn args)))
     (advice-add 'paredit-forward-delete :around #'aorst/paredit-kill-region-if-ttm)
@@ -3477,6 +3469,18 @@ Eshell is a shell implemented in Emacs Lisp, that (in theory) works the same acr
     :custom (eshell-scroll-show-maximum-output nil))
 #+end_src
 
+*** Orderless
+An orderless completion style.
+
+#+begin_src emacs-lisp
+  (use-package orderless
+    :custom
+    (completion-styles '(orderless))
+    ;; (orderless-matching-styles '(orderless-literal orderless-flex))
+    )
+
+
+#+end_src
 ** =(provide 'init)=
 This concludes the =init.el= file.
 
@@ -3493,7 +3497,7 @@ This concludes the =init.el= file.
 #  LocalWords:  Kakoune's Iedit DAP Hideshow workspace Separedit GCMH
 #  LocalWords:  Parens readonly Flymake autoloaded Smerge popup imenu
 #  LocalWords:  JDK Ripgrep ISAYT Eldoc multiline eldoc HL LocalWords
-#  LocalWords:  projectless
+#  LocalWords:  projectless Vertico Orderless orderless
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook #'org-babel-tangle nil t)
