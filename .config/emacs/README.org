@@ -2263,6 +2263,10 @@ It supports compile-time macro system, and full Lua compatibility.
     :bind (:map clojure-mode-map
            ("C-c C-M-f" . aorst/indent-buffer))
     :config
+    (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
+    (defun org-babel-execute:clojure (body params)
+      "Evaluate a block of Clojure code with Babel."
+      (lisp-eval-string body))
     (defun aorst/clojure-mode-setup ()
       "Setup Clojure buffer."
       (modify-syntax-entry ?# "w")
@@ -2327,7 +2331,8 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
   (use-package clj-refactor
     :hook ((cider-mode . clj-refactor-mode)
            (cider-mode . yas-minor-mode))
-    :custom (cljr-suppress-no-project-warning t)
+    :custom
+    (cljr-suppress-no-project-warning t)
     (cljr-warn-on-eval nil))
 #+end_src
 
@@ -2693,83 +2698,22 @@ Structural editing for Lisp languages.
              sly-mrepl-mode
              eval-expression-minibuffer-setup
              lisp-data-mode)
-            . paredit-mode)
-           (paredit-mode . aorst/disable-eplm))
+            . aorst/paredit-setup))
     :config
-    (defun aorst/disable-eplm ()
-      "Disable `electric-pair-local-mode'."
-      (electric-pair-local-mode -1)))
-#+end_src
-
-*** COMMENT Smartparens
-This is a package that enables structural editing in many different languages.
-Basically, for all Lisp related modes the =smartparens-strict-mode= is used, while for other modes =smartparens-mode= is enough.
-Note that the ";" key is set to =sp-comment= function for =smartparens-strict-mode=.
-
-#+begin_src emacs-lisp
-  (use-package smartparens
-    :hook (((clojure-mode
-             emacs-lisp-mode
-             common-lisp-mode
-             scheme-mode
-             lisp-mode
-             racket-mode
-             fennel-mode
-             cider-repl-mode
-             racket-repl-mode
-             geiser-repl-mode
-             inferior-lisp-mode
-             inferior-emacs-lisp-mode
-             sly-mrepl-mode)
-            . smartparens-strict-mode)
-           ((eval-expression-minibuffer-setup
-             lisp-data-mode)
-            . aorst/minibuffer-enable-sp)
-           (smartparens-mode . aorst/sp-disable-eplm))
-    :bind (:map smartparens-mode-map
-           ("C-M-q" . sp-indent-defun)
-           :map smartparens-strict-mode-map
-           (";" . sp-comment))
-    :custom
-    (sp-highlight-pair-overlay nil)
-    (sp-highlight-wrap-overlay nil)
-    (sp-highlight-wrap-tag-overlay nil)
-    (sp-wrap-respect-direction t)
-    (sp-show-pair-delay 0)
-    (sp-echo-match-when-invisible nil)
-    :custom-face
-    (sp-show-pair-match-face ((t (:background unspecified
-                                  :weight normal))))
-    :config
-    (add-to-list 'sp-lisp-modes 'fennel-mode t)
-    (require 'smartparens-config)
-    (sp-use-paredit-bindings)
-    :config
-    (defun aorst/sp-disable-eplm ()
-      "Disable `electric-pair-local-mode' when `smartparens-mode' is active."
-      (electric-pair-local-mode -1))
-    (defun aorst/minibuffer-enable-sp ()
-      "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
-      (setq-local comment-start ";")
-      (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-      (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-      (sp-update-local-pairs 'minibuffer-pairs)
-      (smartparens-strict-mode 1))
-    (defun aorst/wrap-fix-cursor-position (_ action _)
-      "Set cursor position inside expression when wrapping."
-      (when (and (eq action 'wrap)
-                 (eq (point)
-                     (marker-position (sp-get sp-last-wrapped-region :beg))))
-        (goto-char (sp-get sp-last-wrapped-region :beg-in))))
-    (dolist (paren '("(" "[" "{"))
-      (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
-#+end_src
-
-*** COMMENT Flx
-Flex matching for Emacs.
-
-#+begin_src emacs-lisp
-  (use-package flx)
+    (defun aorst/paredit-setup ()
+      "Setup paredit mode."
+      (electric-pair-local-mode -1)
+      (paredit-mode 1))
+    (defun aorst/paredit-kill-region-if-ttm (orig-fn &rest args)
+      "Allow killing a region if expression is balanced."
+      (if (and transient-mark-mode
+               mark-active)
+          (let ((kill-ring '())
+                (kill-ring-yank-pointer nil))
+            (paredit-kill-region (region-beginning) (region-end)))
+        (apply orig-fn args)))
+    (advice-add 'paredit-forward-delete :around #'aorst/paredit-kill-region-if-ttm)
+    (advice-add 'paredit-backward-delete :around #'aorst/paredit-kill-region-if-ttm))
 #+end_src
 
 *** Vertico
@@ -2872,9 +2816,7 @@ This is a more familiar undo mode.
 Template engine for Emacs.
 
 #+begin_src emacs-lisp
-  (use-package yasnippet
-    :config
-    (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
+  (use-package yasnippet)
 #+end_src
 
 *** Magit
@@ -3200,6 +3142,11 @@ Tweaks to inbuilt project management mode.
     (defvar aorst--project-root-markers
       '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
       "Files or directories that indicate the root of a project.")
+    (defun aorst/project-root-p (path)
+      "Check if current PATH has any of project root markers."
+      (memq t (mapcar (lambda (file)
+                        (file-exists-p (concat path file)))
+                      aorst--project-root-markers)))
     (defun aorst/project-find-root (path)
       "Recursive search in PATH for root markers."
       (let ((this-dir (file-name-as-directory (file-truename path))))
@@ -3207,11 +3154,6 @@ Tweaks to inbuilt project management mode.
          ((aorst/project-root-p this-dir) (cons 'transient this-dir))
          ((equal "/" this-dir) nil)
          (t (aorst/project-find-root (concat this-dir "../"))))))
-    (defun aorst/project-root-p (path)
-      "Check if current PATH has any of project root markers."
-      (memq t (mapcar (lambda (file)
-                        (file-exists-p (concat path file)))
-                      aorst--project-root-markers)))
     (add-to-list 'project-find-functions #'aorst/project-find-root))
 #+end_src
 
@@ -3355,7 +3297,7 @@ Dumbest definition jumping that just work.
   (use-package dumb-jump
     :custom
     (dumb-jump-prefer-searcher 'rg)
-    (dumb-jump-selector 'ivy)
+    (dumb-jump-selector 'completing-read)
     :config
     (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 #+end_src
@@ -3427,13 +3369,10 @@ Hide quail buffers from buffer menu.
   (use-package quail
     :straight nil
     :config
-    (defun aorst/hide-quail-buffer ()
-      "Hide Quail buffer."
+    (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
       (with-current-buffer quail-completion-buf
         (when (string= "*Quail Completions*" (buffer-name))
-          (rename-buffer " *Quail Completions*"))))
-    (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
-      (aorst/hide-quail-buffer)))
+          (rename-buffer " *Quail Completions*")))))
 #+end_src
 
 *** ISAYT
@@ -3508,29 +3447,6 @@ Java bytecode decompiler support for viewing =.class= files.
     (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 #+end_src
 
-*** Profiler
-Hydrant for quick access to the Emacs profiling functions:
-
-#+begin_src emacs-lisp
-  (use-package profiler
-    :straight nil
-    :requires hydra
-    :config
-    (defhydra hydrant/profiler-menu (:color pink :hint nil)
-        "
-   ^Start^    ^Stop/Report^
-   _c_: CPU   _s_: stop
-   _m_: MEM   _r_: report
-   _b_: both  ^ ^
-   "
-        ("c" (lambda () (interactive) (profiler-start 'cpu)))
-        ("m" (lambda () (interactive) (profiler-start 'mem)))
-        ("b" (lambda () (interactive) (profiler-start 'cpu+mem)))
-        ("s" profiler-stop)
-        ("r" profiler-report)
-        ("C-g" ignore :exit t)))
-#+end_src
-
 *** Compile
 Tweaks to inbuilt =compile.el= mode.
 
@@ -3577,6 +3493,7 @@ This concludes the =init.el= file.
 #  LocalWords:  Kakoune's Iedit DAP Hideshow workspace Separedit GCMH
 #  LocalWords:  Parens readonly Flymake autoloaded Smerge popup imenu
 #  LocalWords:  JDK Ripgrep ISAYT Eldoc multiline eldoc HL LocalWords
+#  LocalWords:  projectless
 
 # Local Variables:
 # eval: (add-hook 'after-save-hook #'org-babel-tangle nil t)

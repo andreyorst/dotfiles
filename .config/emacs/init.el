@@ -1426,6 +1426,10 @@ for module name."
   :bind (:map clojure-mode-map
          ("C-c C-M-f" . aorst/indent-buffer))
   :config
+  (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
+  (defun org-babel-execute:clojure (body params)
+    "Evaluate a block of Clojure code with Babel."
+    (lisp-eval-string body))
   (defun aorst/clojure-mode-setup ()
     "Setup Clojure buffer."
     (modify-syntax-entry ?# "w")
@@ -1474,7 +1478,8 @@ appended."
 (use-package clj-refactor
   :hook ((cider-mode . clj-refactor-mode)
          (cider-mode . yas-minor-mode))
-  :custom (cljr-suppress-no-project-warning t)
+  :custom
+  (cljr-suppress-no-project-warning t)
   (cljr-warn-on-eval nil))
 
 (use-package sly
@@ -1723,12 +1728,22 @@ appended."
            sly-mrepl-mode
            eval-expression-minibuffer-setup
            lisp-data-mode)
-          . paredit-mode)
-         (paredit-mode . aorst/disable-eplm))
+          . aorst/paredit-setup))
   :config
-  (defun aorst/disable-eplm ()
-    "Disable `electric-pair-local-mode'."
-    (electric-pair-local-mode -1)))
+  (defun aorst/paredit-setup ()
+    "Setup paredit mode."
+    (electric-pair-local-mode -1)
+    (paredit-mode 1))
+  (defun aorst/paredit-kill-region-if-ttm (orig-fn &rest args)
+    "Allow killing a region if expression is balanced."
+    (if (and transient-mark-mode
+             mark-active)
+        (let ((kill-ring '())
+              (kill-ring-yank-pointer nil))
+          (paredit-kill-region (region-beginning) (region-end)))
+      (apply orig-fn args)))
+  (advice-add 'paredit-forward-delete :around #'aorst/paredit-kill-region-if-ttm)
+  (advice-add 'paredit-backward-delete :around #'aorst/paredit-kill-region-if-ttm))
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
@@ -1796,9 +1811,7 @@ appended."
   (undo-tree-auto-save-history nil)
   :init (global-undo-tree-mode 1))
 
-(use-package yasnippet
-  :config
-  (add-to-list 'yas-key-syntaxes 'yas-shortest-key-until-whitespace))
+(use-package yasnippet)
 
 (use-package with-editor)
 (use-package magit
@@ -2059,6 +2072,11 @@ appended."
   (defvar aorst--project-root-markers
     '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
     "Files or directories that indicate the root of a project.")
+  (defun aorst/project-root-p (path)
+    "Check if current PATH has any of project root markers."
+    (memq t (mapcar (lambda (file)
+                      (file-exists-p (concat path file)))
+                    aorst--project-root-markers)))
   (defun aorst/project-find-root (path)
     "Recursive search in PATH for root markers."
     (let ((this-dir (file-name-as-directory (file-truename path))))
@@ -2066,11 +2084,6 @@ appended."
        ((aorst/project-root-p this-dir) (cons 'transient this-dir))
        ((equal "/" this-dir) nil)
        (t (aorst/project-find-root (concat this-dir "../"))))))
-  (defun aorst/project-root-p (path)
-    "Check if current PATH has any of project root markers."
-    (memq t (mapcar (lambda (file)
-                      (file-exists-p (concat path file)))
-                    aorst--project-root-markers)))
   (add-to-list 'project-find-functions #'aorst/project-find-root))
 
 (use-package clang-format
@@ -2141,7 +2154,7 @@ appended."
 (use-package dumb-jump
   :custom
   (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'ivy)
+  (dumb-jump-selector 'completing-read)
   :config
   (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
@@ -2176,13 +2189,10 @@ appended."
 (use-package quail
   :straight nil
   :config
-  (defun aorst/hide-quail-buffer ()
-    "Hide Quail buffer."
+  (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
     (with-current-buffer quail-completion-buf
       (when (string= "*Quail Completions*" (buffer-name))
-        (rename-buffer " *Quail Completions*"))))
-  (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
-    (aorst/hide-quail-buffer)))
+        (rename-buffer " *Quail Completions*")))))
 
 (use-package isayt
   :straight (:host gitlab
@@ -2224,24 +2234,6 @@ appended."
   :custom
   (jdecomp-decompiler-type 'fernflower)
   (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
-
-(use-package profiler
-  :straight nil
-  :requires hydra
-  :config
-  (defhydra hydrant/profiler-menu (:color pink :hint nil)
-      "
- ^Start^    ^Stop/Report^
- _c_: CPU   _s_: stop
- _m_: MEM   _r_: report
- _b_: both  ^ ^
- "
-      ("c" (lambda () (interactive) (profiler-start 'cpu)))
-      ("m" (lambda () (interactive) (profiler-start 'mem)))
-      ("b" (lambda () (interactive) (profiler-start 'cpu+mem)))
-      ("s" profiler-stop)
-      ("r" profiler-report)
-      ("C-g" ignore :exit t)))
 
 (use-package compile
   :straight nil
