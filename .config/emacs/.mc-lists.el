@@ -69,6 +69,10 @@
         org-yank
         overwrite-mode
         paredit-backward
+        paredit-forward
+        paredit-forward-delete
+        paredit-kill
+        paredit-splice-sexp-killing-backward
         parinfer-backward-delete-char
         parinfer-double-quote
         parinfer-region-delete-region

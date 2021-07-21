@@ -490,7 +490,11 @@ Additionally, enabling =flex= matching in completion engine, and tweaking faces.
     :straight nil
     :bind (:map minibuffer-inactive-mode-map
            ("<mouse-1>" . ignore))
-    :custom (completion-styles '(basic partial-completion))
+    :custom
+    (completion-styles '(partial-completion))
+    (completion-flex-nospace t)
+    (read-buffer-completion-ignore-case t)
+    (read-file-name-completion-ignore-case t)
     :custom-face (completions-first-difference ((t (:inherit unspecified)))))
 #+end_src
 
@@ -2271,7 +2275,7 @@ IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package cider
-    :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
+    :hook (;;((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
            ((cider-repl-mode cider-mode) . eldoc-mode))
     :bind (:map cider-repl-mode-map
            ("C-c C-o" . cider-repl-clear-buffer))
@@ -3469,18 +3473,6 @@ Eshell is a shell implemented in Emacs Lisp, that (in theory) works the same acr
     :custom (eshell-scroll-show-maximum-output nil))
 #+end_src
 
-*** Orderless
-An orderless completion style.
-
-#+begin_src emacs-lisp
-  (use-package orderless
-    :custom
-    (completion-styles '(orderless))
-    ;; (orderless-matching-styles '(orderless-literal orderless-flex))
-    )
-
-
-#+end_src
 ** =(provide 'init)=
 This concludes the =init.el= file.
 

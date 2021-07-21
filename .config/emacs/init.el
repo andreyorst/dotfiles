@@ -236,7 +236,11 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore))
-  :custom (completion-styles '(basic partial-completion))
+  :custom
+  (completion-styles '(partial-completion))
+  (completion-flex-nospace t)
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
   :custom-face (completions-first-difference ((t (:inherit unspecified)))))
 
 (defun aorst/formfeed-line ()
@@ -1429,7 +1433,7 @@ for module name."
     (flycheck-mode)))
 
 (use-package cider
-  :hook (((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
+  :hook (;;((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
          ((cider-repl-mode cider-mode) . eldoc-mode))
   :bind (:map cider-repl-mode-map
          ("C-c C-o" . cider-repl-clear-buffer))
@@ -2240,9 +2244,3 @@ appended."
 (use-package esh-mode
   :straight nil
   :custom (eshell-scroll-show-maximum-output nil))
-
-(use-package orderless
-  :custom
-  (completion-styles '(orderless))
-  ;; (orderless-matching-styles '(orderless-literal orderless-flex))
-  )
