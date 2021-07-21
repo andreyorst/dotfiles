@@ -8,6 +8,7 @@
         aorst/kill-region-or-word
         aorst/newline-above
         aorst/newline-below
+        aorst/paredit-kill-word
         aorst/upcase-region-or-word
         backward-sexp
         beginning-of-buffer
@@ -69,6 +70,7 @@
         org-yank
         overwrite-mode
         paredit-backward
+        paredit-backward-kill-word
         paredit-forward
         paredit-forward-delete
         paredit-kill
