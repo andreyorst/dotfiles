@@ -237,7 +237,7 @@ for stopping scroll from going beyond longest line.  Based on
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore))
   :custom
-  (completion-styles '(partial-completion))
+  (completion-styles '(partial-completion basic))
   (completion-flex-nospace t)
   (read-buffer-completion-ignore-case t)
   (read-file-name-completion-ignore-case t)
@@ -1710,6 +1710,8 @@ appended."
   :hook (prog-mode . electric-pair-local-mode))
 
 (use-package paredit
+  :bind (:map paredit-mode-map
+         ("C-w" . paredit-backward-kill-word))
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1731,15 +1733,22 @@ appended."
     "Setup paredit mode."
     (electric-pair-local-mode -1)
     (paredit-mode 1))
-  (defun aorst/paredit-kill-region-if-ttm (orig-fn &rest args)
+  (defun aorst/paredit-delete-region-if-ttm (orig-fn &rest args)
     "Allow killing a region if expression is balanced."
     (if (and transient-mark-mode
              mark-active)
-        (let ((kill-ring '()) (kill-ring-yank-pointer nil))
-          (paredit-kill-region (region-beginning) (region-end)))
+        (paredit-delete-region (region-beginning) (region-end))
       (apply orig-fn args)))
-  (advice-add 'paredit-forward-delete :around #'aorst/paredit-kill-region-if-ttm)
-  (advice-add 'paredit-backward-delete :around #'aorst/paredit-kill-region-if-ttm))
+  (defun aorst/paredit-kill-region-if-ttm (orig-fn &rest args)
+    "Kill word backwards respecting structure."
+    (if (and transient-mark-mode
+             mark-active)
+        (paredit-kill-region (region-beginning) (region-end))
+      (apply orig-fn args)))
+  (advice-add 'paredit-forward-delete :around #'aorst/paredit-delete-region-if-ttm)
+  (advice-add 'paredit-backward-delete :around #'aorst/paredit-delete-region-if-ttm)
+  (advice-add 'paredit-backward-kill-word :around #'aorst/paredit-kill-region-if-ttm)
+  (advice-add 'paredit-forward-kill-word :around #'aorst/paredit-kill-region-if-ttm))
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
@@ -2006,7 +2015,7 @@ appended."
   ;; general settings
   (lsp-keymap-prefix "C-c l")
   (lsp-completion-provider :capf)
-  (lsp-diagnostics-provider :flycheck)
+  (lsp-diagnostics-provider :auto)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
   (lsp-log-io nil)
   (lsp-keep-workspace-alive nil)
@@ -2019,7 +2028,9 @@ appended."
   (lsp-enable-folding nil)
   (lsp-enable-indentation nil)
   (lsp-enable-semantic-highlighting nil)
-  (lsp-enable-symbol-highlighting t)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-text-document-color nil)
   ;; completion
   (lsp-completion-show-kind nil)
   ;; lens
@@ -2075,11 +2086,12 @@ appended."
                     aorst--project-root-markers)))
   (defun aorst/project-find-root (path)
     "Recursive search in PATH for root markers."
-    (let ((this-dir (file-name-as-directory (file-truename path))))
-      (cond
-       ((aorst/project-root-p this-dir) (cons 'transient this-dir))
-       ((equal "/" this-dir) nil)
-       (t (aorst/project-find-root (concat this-dir "../"))))))
+    (cond
+     ((aorst/project-root-p path) (cons 'transient path))
+     ((equal "/" path) nil)
+     (t (aorst/project-find-root
+         (file-name-directory
+          (directory-file-name path))))))
   (add-to-list 'project-find-functions #'aorst/project-find-root))
 
 (use-package clang-format
