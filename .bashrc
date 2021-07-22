@@ -5,17 +5,17 @@ if [ -f /etc/bashrc ]; then
     source /etc/bashrc
 fi
 
-# Scripts and better defaults for shell
+# Scripts and better defaults for the shell
 for i in "$HOME"/.dotfiles/scripts/*.sh; do
     # shellcheck disable=SC1090
     source "$i"
 done
 
 # User specific environment
-export PATH="$HOME/.dotfiles/scripts:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.npm/bin:$PATH"
-export PATH="$HOME/.cache/rebar3/bin:$PATH"
+PATH="$HOME/.dotfiles/scripts:$PATH"
+PATH="$HOME/.local/bin:$PATH"
+
+export PATH
 
 # Lua related stuff
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
@@ -81,7 +81,7 @@ function container_ps1() {
     fi
 }
 
-# Tmux
+# Start TMUX session automatically
 if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ]; then
     tmux
 fi
