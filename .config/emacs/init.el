@@ -1395,12 +1395,12 @@ for module name."
         (save-excursion
           (save-restriction
             (goto-char (point-min))
-            (forward-sexp)
-            (while (not (eq (point) (point-max)))
-              (lisp-eval-last-sexp)
-              (forward-sexp)))
-          (when fennel-mode-switch-to-repl-after-reload
-            (switch-to-lisp t)))
+            (while (save-excursion
+                     (search-forward-regexp "[^[:space:]]." nil t))
+              (forward-sexp)
+              (lisp-eval-last-sexp))))
+      (when fennel-mode-switch-to-repl-after-reload
+        (switch-to-lisp t))
       (if (equal arg '(4))
           (funcall-interactively 'fennel-reload nil)
         (funcall-interactively 'fennel-reload t))))
