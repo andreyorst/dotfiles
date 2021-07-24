@@ -50,6 +50,7 @@
         hydrant/mc/mc/keyboard-quit-and-exit
         indent-for-tab-command
         kill-region
+        magit-previous-line
         markdown-electric-backquote
         markdown-enter-key
         markdown-outdent-or-delete
