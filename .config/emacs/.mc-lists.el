@@ -167,6 +167,7 @@
         org-store-link
         org-table-blank-field
         package-menu-mark-obsolete-for-deletion
+        paredit-open-round
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
