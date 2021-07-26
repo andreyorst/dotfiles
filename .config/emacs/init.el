@@ -224,7 +224,13 @@ for stopping scroll from going beyond longest line.  Based on
     (indent-according-to-mode))
   (defun aorst/overwrite-set-cursor-shape ()
     (when (display-graphic-p)
-      (setq cursor-type (if overwrite-mode 'box 'bar)))))
+      (setq cursor-type (if overwrite-mode 'box 'bar))))
+  (define-advice kill-ring-save (:before (beg end &optional region) aorst:pulse-kill-save)
+    "Pulse over yanked region."
+    (save-mark-and-excursion
+      (let ((beg (if region (region-beginning) beg))
+            (end (if region (region-end) end)))
+        (pulse-momentary-highlight-region beg end 'region)))))
 
 (setq-default truncate-lines t)
 (setq-default bidi-paragraph-direction 'left-to-right)
@@ -390,6 +396,23 @@ evaluated in order.  Returns x."
   "Resotre garbage collection settings."
   (run-at-time
    1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
+
+(defun aorst/pulse-last-sexp (&rest _)
+  "Blink last sexp using `pulse-momentary-highlight-region' function."
+  (save-mark-and-excursion
+    (let ((end (point)))
+      (forward-sexp -1)
+      (pulse-momentary-highlight-region
+       (point) end 'region))))
+
+(defun aorst/pulse-defun (&rest _)
+  "Blink defun using `pulse-momentary-highlight-region' function."
+  (save-mark-and-excursion
+    (beginning-of-defun)
+    (let ((start (point)))
+      (forward-sexp)
+      (pulse-momentary-highlight-region
+       start (point) 'region))))
 
 (use-package startup
   :straight nil
@@ -1288,6 +1311,12 @@ truncates text if needed.  Minimal width can be set with
   :bind (:map toml-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
+(use-package inf-lisp
+  :straight nil
+  :config
+  (advice-add 'lisp-eval-defun :before #'aorst/pulse-defun)
+  (advice-add 'lisp-eval-last-sexp :before #'aorst/pulse-last-sexp))
+
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
   :custom
@@ -1366,7 +1395,9 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)
-    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
+    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+  (advice-add 'eval-last-sexp :before #'aorst/pulse-last-sexp)
+  (advice-add 'eval-defun :before #'aorst/pulse-defun))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
@@ -1467,7 +1498,9 @@ for module name."
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with newline
 appended."
-    (format "%s\n> " namespace)))
+    (format "%s\n> " namespace))
+  (advice-add 'cider-eval-defun-at-point :before #'aorst/pulse-defun)
+  (advice-add 'cider-eval-last-sexp :before #'aorst/pulse-last-sexp))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
@@ -1493,7 +1526,9 @@ appended."
   (dolist (f '(sly-mode
                sly-editing-mode))
     (advice-add f :around #'aorst/sly-ignore-fennel))
-  (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1))))
+  (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1)))
+  (advice-add 'sly-eval-defun :before #'aorst/pulse-defun)
+  (advice-add 'sly-eval-last-expression :before #'aorst/pulse-last-sexp))
 
 (use-package cmake-mode
   :bind (:map cmake-mode-map

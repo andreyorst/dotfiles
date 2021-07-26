@@ -467,7 +467,13 @@ Configurations for inbuilt =simple.el= module.
       (indent-according-to-mode))
     (defun aorst/overwrite-set-cursor-shape ()
       (when (display-graphic-p)
-        (setq cursor-type (if overwrite-mode 'box 'bar)))))
+        (setq cursor-type (if overwrite-mode 'box 'bar))))
+    (define-advice kill-ring-save (:before (beg end &optional region) aorst:pulse-kill-save)
+      "Pulse over yanked region."
+      (save-mark-and-excursion
+        (let ((beg (if region (region-beginning) beg))
+              (end (if region (region-end) end)))
+          (pulse-momentary-highlight-region beg end 'region)))))
 #+end_src
 
 *** Line truncation
@@ -712,6 +718,28 @@ When minibuffer pops up, the garbage collection is deferred for more optimal fil
     "Resotre garbage collection settings."
     (run-at-time
      1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
+#+end_src
+
+*** =pulse-sexp=
+Functions for pulsing in Lisp modes.
+
+#+begin_src emacs-lisp
+  (defun aorst/pulse-last-sexp (&rest _)
+    "Blink last sexp using `pulse-momentary-highlight-region' function."
+    (save-mark-and-excursion
+      (let ((end (point)))
+        (forward-sexp -1)
+        (pulse-momentary-highlight-region
+         (point) end 'region))))
+
+  (defun aorst/pulse-defun (&rest _)
+    "Blink defun using `pulse-momentary-highlight-region' function."
+    (save-mark-and-excursion
+      (beginning-of-defun)
+      (let ((start (point)))
+        (forward-sexp)
+        (pulse-momentary-highlight-region
+         start (point) 'region))))
 #+end_src
 
 ** User Interface
@@ -2100,6 +2128,17 @@ A package for editing markdown files.
            ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
+*** inf-lisp
+Settings for the inbuilt =lisp= mode.
+
+#+begin_src emacs-lisp
+  (use-package inf-lisp
+    :straight nil
+    :config
+    (advice-add 'lisp-eval-defun :before #'aorst/pulse-defun)
+    (advice-add 'lisp-eval-last-sexp :before #'aorst/pulse-last-sexp))
+#+end_src
+
 *** Geiser
 REPL support for various Schemes.
 
@@ -2192,7 +2231,9 @@ Emacs lisp mode tweaks.
     (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
       "Setup Emacs Lisp buffer for Org Babel."
       (setq lexical-binding t)
-      (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
+      (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+    (advice-add 'eval-last-sexp :before #'aorst/pulse-last-sexp)
+    (advice-add 'eval-defun :before #'aorst/pulse-defun))
 #+end_src
 
 *** Fennel
@@ -2309,7 +2350,9 @@ IDE for Clojure and ClojureScript.
     (defun cider-repl-prompt-newline (namespace)
       "Return a prompt string that mentions NAMESPACE with newline
   appended."
-      (format "%s\n> " namespace)))
+      (format "%s\n> " namespace))
+    (advice-add 'cider-eval-defun-at-point :before #'aorst/pulse-defun)
+    (advice-add 'cider-eval-last-sexp :before #'aorst/pulse-last-sexp))
 #+end_src
 
 **** flycheck-clj-kondo
@@ -2352,7 +2395,9 @@ Disabled until [[https://gitlab.com/technomancy/fennel-mode/-/issues/11][technom
     (dolist (f '(sly-mode
                  sly-editing-mode))
       (advice-add f :around #'aorst/sly-ignore-fennel))
-    (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1))))
+    (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1)))
+    (advice-add 'sly-eval-defun :before #'aorst/pulse-defun)
+    (advice-add 'sly-eval-last-expression :before #'aorst/pulse-last-sexp))
 #+end_src
 
 *** Cmake
