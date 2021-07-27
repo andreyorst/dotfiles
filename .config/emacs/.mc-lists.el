@@ -72,9 +72,11 @@
         overwrite-mode
         paredit-backward
         paredit-backward-kill-word
+        paredit-doublequote
         paredit-forward
         paredit-forward-delete
         paredit-kill
+        paredit-open-curly
         paredit-splice-sexp-killing-backward
         parinfer-backward-delete-char
         parinfer-double-quote
