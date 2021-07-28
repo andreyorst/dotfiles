@@ -925,7 +925,8 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
          ("C-c t" . treemacs-select-window)
          :map treemacs-mode-map
          ([C-tab] . aorst/treemacs-expand-all-projects)
-         ("<drag-mouse-1>" . ignore))
+         ("<drag-mouse-1>" . ignore)
+         ("q" . nil))
   :hook ((after-init . aorst/treemacs-after-init-setup)
          (treemacs-mode . aorst/after-treemacs-setup)
          (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
@@ -2007,7 +2008,7 @@ appended."
            clojure-mode
            clojurec-mode
            clojurescript-mode)
-          . lsp)
+          . aorst/setup-lsp)
          (lsp-mode . yas-minor-mode))
   :custom-face
   (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
@@ -2038,7 +2039,14 @@ appended."
   (lsp-lens-place-position 'end-of-line)
   ;; rust
   (lsp-rust-clippy-preference "on")
-  (lsp-rust-server 'rust-analyzer))
+  (lsp-rust-server 'rust-analyzer)
+  :config
+  (defun aorst/setup-lsp ()
+    (when (memq major-mode '(clojure-mode
+                             clojurec-mode
+                             clojurescript-mode))
+      (setq-local lsp-diagnostics-provider :none))
+    (lsp)))
 
 (use-package lsp-ui
   :after lsp-mode
