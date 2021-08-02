@@ -34,7 +34,7 @@ It is meant to configure package initialization and early graphical interface tw
   ;;; Code:
 #+end_src
 
-** Emacs 28 Obsolete workaround
+** COMMENT Emacs 28 Obsolete workaround
 Emacs 28 made some changes to obsolete-related functions, making the third argument =when= mandatory.
 This broke a lot of packages, so for now, a workaround is to define an =around= advice:
 
@@ -753,57 +753,6 @@ For variable pitched fonts DejaVu font is used if available.
     (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 #+end_src
 
-**** COMMENT Ligatures
-With the inclusion of [[https://github.com/harfbuzz/harfbuzz][HarfBuzz]] support into Emacs 27, it is now possible to use =auto-composition-mode= to add ligatures.
-Needed ligatures can be specified by defining regular expressions:
-
-#+begin_src emacs-lisp
-  (when (aorst/font-installed-p "JetBrainsMono")
-    (dolist (char/ligature-re
-             `((?-  ,(rx (or (or "-->" "-<<" "->>" "-|" "-~" "-<" "->") (+ "-"))))
-               (?/  ,(rx (or (or "/==" "/=" "/>" "/**" "/*") (+ "/"))))
-               (?*  ,(rx (or (or "*>" "*/") (+ "*"))))
-               (?<  ,(rx (or (or "<<=" "<<-" "<|||" "<==>" "<!--" "<=>" "<||" "<|>" "<-<"
-                                 "<==" "<=<" "<-|" "<~>" "<=|" "<~~" "<$>" "<+>" "</>" "<*>"
-                                 "<->" "<=" "<|" "<:" "<>"  "<$" "<-" "<~" "<+" "</" "<*")
-                             (+ "<"))))
-               (?:  ,(rx (or (or ":?>" "::=" ":>" ":<" ":?" ":=") (+ ":"))))
-               (?=  ,(rx (or (or "=>>" "==>" "=/=" "=!=" "=>" "=:=") (+ "="))))
-               (?!  ,(rx (or (or "!==" "!=") (+ "!"))))
-               (?>  ,(rx (or (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=") (+ ">"))))
-               (?&  ,(rx (+ "&")))
-               (?|  ,(rx (or (or "|->" "|||>" "||>" "|=>" "||-" "||=" "|-" "|>" "|]" "|}" "|=")
-                             (+ "|"))))
-               (?.  ,(rx (or (or ".?" ".=" ".-" "..<") (+ "."))))
-               (?+  ,(rx (or "+>" (+ "+"))))
-               (?\[ ,(rx (or "[<" "[|")))
-               (?\{ ,(rx "{|"))
-               (?\? ,(rx (or (or "?." "?=" "?:") (+ "?"))))
-               (?#  ,(rx (or (or "#_(" "#[" "#{" "#=" "#!" "#:" "#_" "#?" "#(") (+ "#"))))
-               (?\; ,(rx (+ ";")))
-               (?_  ,(rx (or "_|_" "__")))
-               (?~  ,(rx (or "~~>" "~~" "~>" "~-" "~@")))
-               (?$  ,(rx "$>"))
-               (?^  ,(rx "^="))
-               (?\] ,(rx "]#"))))
-      (apply (lambda (char ligature-re)
-               (set-char-table-range composition-function-table char
-                                     `([,ligature-re 0 font-shape-gstring])))
-             char/ligature-re)))
-#+end_src
-
-Ligatures are selectively enabled in the following modes:
-
-#+begin_src emacs-lisp
-  (use-package composite
-    :straight nil
-    :hook ((prog-mode
-            cider-repl-mode
-            inferior-lisp-mode)
-           . auto-composition-mode)
-    :init (global-auto-composition-mode -1))
-#+end_src
-
 *** Icons
 =all-the-icons= package provides icons for Emacs via custom fonts.
 
@@ -1330,9 +1279,6 @@ A package that displays mode-line in the echo area.
 
 #+begin_src emacs-lisp
   (use-package mini-modeline
-    :straight (:fork (:host github
-                      :repo "AmaiKinono/emacs-mini-modeline"
-                      :branch "update-on-need"))
     :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
            (after-init . mini-modeline-mode)
            (isearch-mode . aorst/mini-modeline-isearch)
@@ -1358,7 +1304,7 @@ A package that displays mode-line in the echo area.
       (setq mini-modeline-face-attr
             (plist-put mini-modeline-face-attr :background
                        (if (facep 'solaire-minibuffer-face)
-                           (face-attribute 'solaire-minibuffer-face :background)
+                           (face-attribute 'solaire-mode-line-face :background)
                          (face-attribute 'mode-line :background)))))
     (aorst/mini-modeline-setup-faces))
 #+end_src

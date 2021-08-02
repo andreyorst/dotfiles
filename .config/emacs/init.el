@@ -809,9 +809,6 @@ Used in various places to avoid getting wrong line height when
              mode-line-r-format))))
 
 (use-package mini-modeline
-  :straight (:fork (:host github
-                    :repo "AmaiKinono/emacs-mini-modeline"
-                    :branch "update-on-need"))
   :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode)
          (isearch-mode . aorst/mini-modeline-isearch)
@@ -837,7 +834,7 @@ Used in various places to avoid getting wrong line height when
     (setq mini-modeline-face-attr
           (plist-put mini-modeline-face-attr :background
                      (if (facep 'solaire-minibuffer-face)
-                         (face-attribute 'solaire-minibuffer-face :background)
+                         (face-attribute 'solaire-mode-line-face :background)
                        (face-attribute 'mode-line :background)))))
   (aorst/mini-modeline-setup-faces))
 
