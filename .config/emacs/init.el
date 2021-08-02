@@ -166,62 +166,19 @@ for stopping scroll from going beyond longest line.  Based on
 
 (use-package simple
   :straight nil
-  :bind (("C-w" . aorst/kill-region-or-word)
-         ("C-x C-l" . aorst/downcase-region-or-word)
-         ("C-x C-u" . aorst/upcase-region-or-word)
-         ("C-x C-x" . aorst/exchange-point-and-mark)
-         ("C-o" . aorst/newline-below)
-         ("C-S-o" . aorst/newline-above)
-         ("M-z" . zap-up-to-char)
-         ("C-x k" . kill-this-buffer)
+  :bind (("M-z" . zap-up-to-char)
          ("M-S-z" . zap-to-char)
-         ("<kp-begin>" . ignore)
-         ("<kp-5>" . ignore)
-         ("<f2>" . ignore)
-         ("C-h C-f" . describe-face))
+         ("C-x k" . kill-this-buffer)
+         ("C-h C-f" . describe-face)
+         ("<f2>" . ignore))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :custom
   (yank-excluded-properties t "Disable all text properties when yanking.")
   (blink-matching-delay 0)
   (blink-matching-paren t)
-  :init
-  (defun aorst/kill-region-or-word (arg)
-    (interactive "*p")
-    (if (and transient-mark-mode
-             mark-active)
-        (if (and (featurep 'paredit)
-                 paredit-mode)
-            (paredit-kill-region (region-beginning) (region-end))
-          (kill-region (region-beginning) (region-end)))
-      (backward-kill-word arg)))
-  (defun aorst/downcase-region-or-word (arg)
-    (interactive "*p")
-    (if (and transient-mark-mode
-             mark-active)
-        (downcase-region (region-beginning) (region-end))
-      (downcase-word arg)))
-  (defun aorst/upcase-region-or-word (arg)
-    (interactive "*p")
-    (if (and transient-mark-mode
-             mark-active)
-        (upcase-region (region-beginning) (region-end))
-      (upcase-word arg)))
-  (defun aorst/exchange-point-and-mark (arg)
-    (interactive "*p")
-    (when (and transient-mark-mode
-               mark-active)
-      (exchange-point-and-mark)))
-  (defun aorst/newline-below ()
-    (interactive)
-    (end-of-line)
-    (newline-and-indent))
-  (defun aorst/newline-above ()
-    (interactive)
-    (back-to-indentation)
-    (newline-and-indent)
-    (forward-line -1)
-    (indent-according-to-mode))
+  :config
+  (transient-mark-mode -1)
   (defun aorst/overwrite-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'box 'bar)))))
@@ -921,8 +878,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-load-theme)
-  :bind (("<f7>" . treemacs)
-         ("C-c t" . treemacs-select-window)
+  :bind (("C-c t" . treemacs-select-window)
          :map treemacs-mode-map
          ([C-tab] . aorst/treemacs-expand-all-projects)
          ("<drag-mouse-1>" . ignore)
@@ -1008,6 +964,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
           line-spacing 5)
     (setq-local scroll-step 1)
     (setq-local scroll-conservatively 10000)
+    (setq-local scroll-margin 0)
     (set-window-fringes nil 1 1 nil)
     (aorst/treemacs-variable-pitch-labels))
   (define-advice treemacs-select-window (:after () aorst:treemacs-setup-fringes)
@@ -1170,27 +1127,6 @@ truncates text if needed.  Minimal width can be set with
 
   (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
     (select-window (posn-window (event-start e)))))
-
-(use-package display-line-numbers
-  :straight nil
-  :hook (prog-mode . display-line-numbers-mode)
-  :custom
-  (display-line-numbers-width 4)
-  (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t)
-  :config
-  ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
-;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
-
-;; This advice recalculates the amount of lines needed to scroll to
-;; ensure `scroll-margin' preserved."
-;;     (apply f args)
-;;     (let ((diff (- scroll-margin
-;;                    (- (line-number-at-pos (point))
-;;                       (line-number-at-pos (window-start))))))
-;;       (when (> diff 0)
-;;         (scroll-down diff))))
-  )
 
 (use-package org
   :straight (:type built-in)
@@ -1410,8 +1346,9 @@ for module name."
     (let ((window (get-buffer-window fennel-repl--buffer))
           (kill-buffer-query-functions
            (delq 'process-kill-buffer-query-function kill-buffer-query-functions)))
-      (when window
-        (delete-window window))
+      (ignore-errors
+        (when window
+          (delete-window window)))
       (kill-buffer fennel-repl--buffer)))
   (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
     (setq-local lisp-indent-function 'fennel-indent-function)))
@@ -1711,8 +1648,6 @@ appended."
   :hook (prog-mode . electric-pair-local-mode))
 
 (use-package paredit
-  :bind (:map paredit-mode-map
-         ("C-w" . paredit-backward-kill-word))
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1809,8 +1744,6 @@ appended."
 
 (use-package undo-tree
   :commands global-undo-tree-mode
-  :bind (("C-z" . undo-tree-undo)
-         ("C-S-z" . undo-tree-redo))
   :custom
   (undo-tree-visualizer-relative-timestamps nil)
   (undo-tree-visualizer-timestamps nil)
@@ -1827,19 +1760,6 @@ appended."
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all)
-  (magit-blame-styles
-   '((margin
-      (margin-format " %s%f" " %C %a" " %H")
-      (margin-width . 42)
-      (margin-face . magit-blame-margin)
-      (margin-body-face magit-blame-dimmed))
-     (headings
-      (heading-format . "%-20a %C %s\n"))
-     (highlight
-      (highlight-face . magit-blame-highlight))
-     (lines
-      (show-lines . nil)
-      (show-message . t))))
   :config
   (advice-add 'magit-set-header-line-format :override #'ignore))
 
@@ -2226,23 +2146,6 @@ appended."
 
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode))
-
-(use-package outline
-  :straight nil
-  :bind (("C-c o" . hydrant/outline-menu/body))
-  :requires hydra
-  :config
-  (defhydra hydrant/outline-menu (:color pink :hint nil)
-    "
- ^Hide^       ^Show^        ^Move^
- _ho_: other  _sa_: all     _n_: next
- ^  ^         _t_:  toggle  _p_: previous"
-    ("ho" outline-hide-other)
-    ("sa" outline-show-all)
-    ("t" outline-cycle)
-    ("n" outline-next-heading)
-    ("p" outline-previous-heading)
-    ("C-g" ignore :exit t)))
 
 (use-package jdecomp
   :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
