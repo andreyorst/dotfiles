@@ -1661,6 +1661,8 @@ appended."
            eval-expression-minibuffer-setup
            lisp-data-mode)
           . aorst/paredit-setup))
+  :bind (:map paredit-mode-map
+         ("C-<backspace>" . paredit-backward-kill-word))
   :config
   (defun aorst/paredit-setup ()
     "Setup paredit mode."
@@ -1677,6 +1679,26 @@ appended."
     (if (and transient-mark-mode
              mark-active)
         (paredit-kill-region (region-beginning) (region-end))
+      (apply orig-fn args)))
+  (define-advice paredit-forward-delete (:around (orig-fn &rest args) aorst:use-prefix-arg)
+    (if (eq current-prefix-arg '-)
+        (let (current-prefix-arg)
+          (apply #'paredit-backward-delete args))
+      (apply orig-fn args)))
+  (define-advice paredit-backward-delete (:around (orig-fn &rest args) aorst:use-prefix-arg)
+    (if (eq current-prefix-arg '-)
+        (let (current-prefix-arg)
+          (apply #'paredit-forward-delete args))
+      (apply orig-fn args)))
+  (define-advice paredit-forward-kill-word (:around (orig-fn &rest args) aorst:use-prefix-arg)
+    (if (eq current-prefix-arg '-)
+        (let (current-prefix-arg)
+          (apply #'paredit-backward-kill-word args))
+      (apply orig-fn args)))
+  (define-advice paredit-backward-kill-word (:around (orig-fn &rest args) aorst:use-prefix-arg)
+    (if (eq current-prefix-arg '-)
+        (let (current-prefix-arg)
+          (apply #'paredit-forward-kill-word args))
       (apply orig-fn args)))
   (advice-add 'paredit-forward-delete :around #'aorst/paredit-delete-region-if-ttm)
   (advice-add 'paredit-backward-delete :around #'aorst/paredit-delete-region-if-ttm)
