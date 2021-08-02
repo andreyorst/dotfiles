@@ -79,6 +79,7 @@
         paredit-kill
         paredit-open-round
         paredit-splice-sexp-killing-backward
+        paredit-wrap-round
         parinfer-backward-delete-char
         parinfer-double-quote
         parinfer-region-delete-region
