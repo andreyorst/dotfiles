@@ -75,7 +75,9 @@
         paredit-doublequote
         paredit-forward
         paredit-forward-delete
+        paredit-forward-slurp-sexp
         paredit-kill
+        paredit-open-round
         paredit-splice-sexp-killing-backward
         parinfer-backward-delete-char
         parinfer-double-quote
@@ -97,7 +99,6 @@
         sp-splice-sexp-killing-backward
         upcase-region
         zap-up-to-char
-        paredit-open-round
         ))
 
 (setq mc/cmds-to-run-once
