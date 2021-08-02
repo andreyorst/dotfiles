@@ -89,8 +89,13 @@ scour() {
         return 1
     fi
     while [ $# -ne 0 ]; do
-        command scour -i "$1" -o tmp.svg
-        mv tmp.svg "$1"
+        if [ -e "$1" ]; then
+            tmp=$(mktemp "${TMPDIR:-/tmp}"/scour.svg.XXXXXXXX)
+            command scour -i "$1" -o "$tmp"
+            mv "$tmp" "$1"
+        else
+            printf "file %s not found\n" "$1" >&2
+        fi
         shift
     done
 }
