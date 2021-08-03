@@ -1668,42 +1668,46 @@ appended."
     "Setup paredit mode."
     (electric-pair-local-mode -1)
     (paredit-mode 1))
-  (defun aorst/paredit-delete-region-if-ttm (orig-fn &rest args)
-    "Allow killing a region if expression is balanced."
+  (defvar aorst--paredit-delete-region-functions
+    '(paredit-forward-delete
+      paredit-backward-delete)
+    "List of `paredit-mode' functions that should support tmm region
+deletion.")
+  (defvar aorst--paredit-kill-region-functions
+    '(paredit-forward-kill-word
+      paredit-backward-kill-word)
+    "List of `paredit-mode' functions that should support tmm region
+killing.")
+  (defun aorst/paredit-fix-tmm (orig-fn &rest args)
+    "Allow deleting/killing a region if expression is balanced."
     (if (and transient-mark-mode
              mark-active)
-        (paredit-delete-region (region-beginning) (region-end))
+        (cond ((memq this-command aorst--paredit-delete-region-functions)
+               (paredit-delete-region (region-beginning) (region-end)))
+              ((memq this-command aorst--paredit-kill-region-functions)
+               (paredit-kill-region (region-beginning) (region-end)))
+              (t (apply orig-fn args)))
       (apply orig-fn args)))
-  (defun aorst/paredit-kill-region-if-ttm (orig-fn &rest args)
-    "Kill word backwards respecting structure."
-    (if (and transient-mark-mode
-             mark-active)
-        (paredit-kill-region (region-beginning) (region-end))
-      (apply orig-fn args)))
-  (define-advice paredit-forward-delete (:around (orig-fn &rest args) aorst:use-prefix-arg)
+  (dolist (f (append aorst--paredit-delete-region-functions
+                     aorst--paredit-kill-region-functions))
+    (advice-add f :around #'aorst/paredit-fix-tmm))
+  (defvar aorst--paredit-reversable-commands
+    '((paredit-forward-delete . paredit-backward-delete)
+      (paredit-forward-kill-word . paredit-backward-kill-word))
+    "Alist of `paredit-mode' command and their backward motion equivalents.")
+  (defun aorst/paredit-support-negative-arg (orig-fn &rest args)
+    "Find ORIG-FN in `aorst--paredit-reversable-commands' variable, and
+apply it's counterpart, when the `current-prefix-arg' is negative."
     (if (eq current-prefix-arg '-)
         (let (current-prefix-arg)
-          (apply #'paredit-backward-delete args))
+          (if-let ((f (assoc this-command aorst--paredit-reversable-commands)))
+              (apply (cdr f) args)
+            (if-let ((f (rassoc this-command aorst--paredit-reversable-commands)))
+                (apply (car f) args)
+              (apply orig-fn args))))
       (apply orig-fn args)))
-  (define-advice paredit-backward-delete (:around (orig-fn &rest args) aorst:use-prefix-arg)
-    (if (eq current-prefix-arg '-)
-        (let (current-prefix-arg)
-          (apply #'paredit-forward-delete args))
-      (apply orig-fn args)))
-  (define-advice paredit-forward-kill-word (:around (orig-fn &rest args) aorst:use-prefix-arg)
-    (if (eq current-prefix-arg '-)
-        (let (current-prefix-arg)
-          (apply #'paredit-backward-kill-word args))
-      (apply orig-fn args)))
-  (define-advice paredit-backward-kill-word (:around (orig-fn &rest args) aorst:use-prefix-arg)
-    (if (eq current-prefix-arg '-)
-        (let (current-prefix-arg)
-          (apply #'paredit-forward-kill-word args))
-      (apply orig-fn args)))
-  (advice-add 'paredit-forward-delete :around #'aorst/paredit-delete-region-if-ttm)
-  (advice-add 'paredit-backward-delete :around #'aorst/paredit-delete-region-if-ttm)
-  (advice-add 'paredit-backward-kill-word :around #'aorst/paredit-kill-region-if-ttm)
-  (advice-add 'paredit-forward-kill-word :around #'aorst/paredit-kill-region-if-ttm))
+  (dolist (f (flatten-list aorst--paredit-reversable-commands))
+    (advice-add f :around #'aorst/paredit-support-negative-arg)))
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
