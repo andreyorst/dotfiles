@@ -1664,8 +1664,8 @@ appended."
           . smartparens-mode)
          (smartparens-mode . show-smartparens-mode))
   :bind (:map smartparens-mode-map
-         ("C-S-q" . sp-indent-defun)
-         ("C-q" . indent-sexp)
+         ("C-M-q" . sp-indent-defun)
+         ("M-q" . indent-sexp)
          ("M-r" . sp-rewrap-sexp)
          :map smartparens-strict-mode-map
          (";" . sp-comment))
