@@ -1947,7 +1947,7 @@ This isn't really a configuration of Prog Mode itself, but some hooks that chang
 #+begin_src emacs-lisp
   (use-package prog-mode
     :straight nil
-    :hook ((prog-mode . hl-line-mode)
+    :hook (;; (prog-mode . hl-line-mode)
            (prog-mode . flyspell-prog-mode)))
 #+end_src
 
@@ -2180,8 +2180,7 @@ IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
   (use-package cider
-    :hook (;;((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-           ((cider-repl-mode cider-mode) . eldoc-mode))
+    :hook ((cider-repl-mode cider-mode) . eldoc-mode)
     :bind (:map cider-repl-mode-map
            ("C-c C-o" . cider-repl-clear-buffer))
     :custom-face
@@ -2571,7 +2570,7 @@ This package will be used in many other package configurations to provide sane k
   (use-package hydra)
 #+end_src
 
-*** Electric Pair Mode
+*** COMMENT Electric Pair Mode
 Automatic parenthesis insertion.
 
 #+begin_src emacs-lisp
@@ -2580,8 +2579,80 @@ Automatic parenthesis insertion.
     :hook (prog-mode . electric-pair-local-mode))
 #+end_src
 
-*** Paredit
+*** Smartparens
+Structural editing similar to Paredit.
+
+#+begin_src emacs-lisp
+  (use-package smartparens-config
+    :straight smartparens
+    :hook (((clojure-mode
+             emacs-lisp-mode
+             common-lisp-mode
+             scheme-mode
+             lisp-mode
+             racket-mode
+             fennel-mode
+             cider-repl-mode
+             racket-repl-mode
+             geiser-repl-mode
+             inferior-lisp-mode
+             inferior-emacs-lisp-mode
+             sly-mrepl-mode)
+            . smartparens-strict-mode)
+           ((eval-expression-minibuffer-setup
+             lisp-data-mode)
+            . aorst/minibuffer-enable-sp)
+           ((org-mode
+             markdown-mode
+             prog-mode)
+            . smartparens-mode)
+           (smartparens-mode . show-smartparens-mode))
+    :bind (:map smartparens-mode-map
+           ("C-S-q" . sp-indent-defun)
+           ("C-q" . indent-sexp)
+           ("M-r" . sp-rewrap-sexp)
+           :map smartparens-strict-mode-map
+           (";" . sp-comment))
+    :custom
+    (sp-highlight-pair-overlay nil)
+    (sp-highlight-wrap-overlay nil)
+    (sp-highlight-wrap-tag-overlay nil)
+    (sp-wrap-respect-direction t)
+    (sp-show-pair-delay 0)
+    (sp-echo-match-when-invisible nil)
+    :config
+    (add-to-list 'sp-lisp-modes 'fennel-mode t)
+    (sp-use-paredit-bindings)
+    (defun aorst/minibuffer-enable-sp ()
+      "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
+      (setq-local comment-start ";")
+      (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+      (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+      (sp-update-local-pairs 'minibuffer-pairs)
+      (smartparens-strict-mode 1))
+    (defun aorst/wrap-fix-cursor-position (_ action _)
+      "Set cursor position inside expression when wrapping."
+      (when (and (eq action 'wrap)
+                 (eq (point)
+                     (marker-position (sp-get sp-last-wrapped-region :beg))))
+        (goto-char (sp-get sp-last-wrapped-region :beg-in))))
+    (dolist (paren '("(" "[" "{"))
+      (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
+#+end_src
+
+*** COMMENT Paredit
 Structural editing for Lisp languages.
+
+Note to self - why Paredit doesn't work for me:
+
+- Point position is wrong after using splice command in CIDER REPL or inferior-lisp type REPLs.
+- Most of commands that should accept negative (or just arbitrary prefix argument) due to being mapped on a key that usually accepts it, completely ignore it instead (=M-- M-d= for example).
+  This can be partially fixed by using advice system, however proven to be difficult to do.
+- Transient mark mode deletion feature that was added in Emacs 24 is purposely ignored by Paredit.
+  This again can be fixed with an advice, and actually works reliably enough, making me only wonder why Paredit maintainers decide to put /censored swearing/ in the comment instead of implementing the feature.
+
+While this is possible to workaround, the main reason I've switched from Smartparens to Paredit is that Paredit didn't needed configuration.
+That was false, as it can be seen below.
 
 #+begin_src emacs-lisp
   (use-package paredit
@@ -2640,10 +2711,10 @@ Structural editing for Lisp languages.
   apply it's counterpart, when the `current-prefix-arg' is negative."
       (if (eq current-prefix-arg '-)
           (let (current-prefix-arg)
-            (if-let ((f (assoc this-command aorst--paredit-reversable-commands)))
-                (apply (cdr f) args)
-              (if-let ((f (rassoc this-command aorst--paredit-reversable-commands)))
-                  (apply (car f) args)
+            (if-let ((f (cdr (assoc this-command aorst--paredit-reversable-commands))))
+                (apply f args)
+              (if-let ((f (car (rassoc this-command aorst--paredit-reversable-commands))))
+                  (apply f args)
                 (apply orig-fn args))))
         (apply orig-fn args)))
     (dolist (f (flatten-list aorst--paredit-reversable-commands))
@@ -3254,7 +3325,7 @@ Some tweaks to inbuilt parenthesis highlighting mode.
 #+begin_src emacs-lisp
   (use-package paren
     :straight nil
-    :hook (prog-mode . show-paren-mode)
+    ;; :hook (prog-mode . show-paren-mode)
     :custom (show-paren-delay 0))
 #+end_src
 

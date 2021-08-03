@@ -1186,7 +1186,7 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package prog-mode
   :straight nil
-  :hook ((prog-mode . hl-line-mode)
+  :hook (;; (prog-mode . hl-line-mode)
          (prog-mode . flyspell-prog-mode)))
 
 (use-package cc-mode
@@ -1368,8 +1368,7 @@ for module name."
     (flycheck-mode)))
 
 (use-package cider
-  :hook (;;((cider-repl-mode cider-mode) . cider-company-enable-fuzzy-completion)
-         ((cider-repl-mode cider-mode) . eldoc-mode))
+  :hook ((cider-repl-mode cider-mode) . eldoc-mode)
   :bind (:map cider-repl-mode-map
          ("C-c C-o" . cider-repl-clear-buffer))
   :custom-face
@@ -1640,11 +1639,8 @@ appended."
 
 (use-package hydra)
 
-(use-package electric-pair-mode
-  :straight nil
-  :hook (prog-mode . electric-pair-local-mode))
-
-(use-package paredit
+(use-package smartparens-config
+  :straight smartparens
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1657,57 +1653,47 @@ appended."
            geiser-repl-mode
            inferior-lisp-mode
            inferior-emacs-lisp-mode
-           sly-mrepl-mode
-           eval-expression-minibuffer-setup
+           sly-mrepl-mode)
+          . smartparens-strict-mode)
+         ((eval-expression-minibuffer-setup
            lisp-data-mode)
-          . aorst/paredit-setup))
-  :bind (:map paredit-mode-map
-         ("C-<backspace>" . paredit-backward-kill-word))
+          . aorst/minibuffer-enable-sp)
+         ((org-mode
+           markdown-mode
+           prog-mode)
+          . smartparens-mode)
+         (smartparens-mode . show-smartparens-mode))
+  :bind (:map smartparens-mode-map
+         ("C-S-q" . sp-indent-defun)
+         ("C-q" . indent-sexp)
+         ("M-r" . sp-rewrap-sexp)
+         :map smartparens-strict-mode-map
+         (";" . sp-comment))
+  :custom
+  (sp-highlight-pair-overlay nil)
+  (sp-highlight-wrap-overlay nil)
+  (sp-highlight-wrap-tag-overlay nil)
+  (sp-wrap-respect-direction t)
+  (sp-show-pair-delay 0)
+  (sp-echo-match-when-invisible nil)
   :config
-  (defun aorst/paredit-setup ()
-    "Setup paredit mode."
-    (electric-pair-local-mode -1)
-    (paredit-mode 1))
-  (defvar aorst--paredit-delete-region-functions
-    '(paredit-forward-delete
-      paredit-backward-delete)
-    "List of `paredit-mode' functions that should support tmm region
-deletion.")
-  (defvar aorst--paredit-kill-region-functions
-    '(paredit-forward-kill-word
-      paredit-backward-kill-word)
-    "List of `paredit-mode' functions that should support tmm region
-killing.")
-  (defun aorst/paredit-fix-tmm (orig-fn &rest args)
-    "Allow deleting/killing a region if expression is balanced."
-    (if (and transient-mark-mode
-             mark-active)
-        (cond ((memq this-command aorst--paredit-delete-region-functions)
-               (paredit-delete-region (region-beginning) (region-end)))
-              ((memq this-command aorst--paredit-kill-region-functions)
-               (paredit-kill-region (region-beginning) (region-end)))
-              (t (apply orig-fn args)))
-      (apply orig-fn args)))
-  (dolist (f (append aorst--paredit-delete-region-functions
-                     aorst--paredit-kill-region-functions))
-    (advice-add f :around #'aorst/paredit-fix-tmm))
-  (defvar aorst--paredit-reversable-commands
-    '((paredit-forward-delete . paredit-backward-delete)
-      (paredit-forward-kill-word . paredit-backward-kill-word))
-    "Alist of `paredit-mode' command and their backward motion equivalents.")
-  (defun aorst/paredit-support-negative-arg (orig-fn &rest args)
-    "Find ORIG-FN in `aorst--paredit-reversable-commands' variable, and
-apply it's counterpart, when the `current-prefix-arg' is negative."
-    (if (eq current-prefix-arg '-)
-        (let (current-prefix-arg)
-          (if-let ((f (assoc this-command aorst--paredit-reversable-commands)))
-              (apply (cdr f) args)
-            (if-let ((f (rassoc this-command aorst--paredit-reversable-commands)))
-                (apply (car f) args)
-              (apply orig-fn args))))
-      (apply orig-fn args)))
-  (dolist (f (flatten-list aorst--paredit-reversable-commands))
-    (advice-add f :around #'aorst/paredit-support-negative-arg)))
+  (add-to-list 'sp-lisp-modes 'fennel-mode t)
+  (sp-use-paredit-bindings)
+  (defun aorst/minibuffer-enable-sp ()
+    "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
+    (setq-local comment-start ";")
+    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+    (sp-update-local-pairs 'minibuffer-pairs)
+    (smartparens-strict-mode 1))
+  (defun aorst/wrap-fix-cursor-position (_ action _)
+    "Set cursor position inside expression when wrapping."
+    (when (and (eq action 'wrap)
+               (eq (point)
+                   (marker-position (sp-get sp-last-wrapped-region :beg))))
+      (goto-char (sp-get sp-last-wrapped-region :beg-in))))
+  (dolist (paren '("(" "[" "{"))
+    (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
@@ -2125,7 +2111,7 @@ apply it's counterpart, when the `current-prefix-arg' is negative."
 
 (use-package paren
   :straight nil
-  :hook (prog-mode . show-paren-mode)
+  ;; :hook (prog-mode . show-paren-mode)
   :custom (show-paren-delay 0))
 
 (use-package wgrep)
