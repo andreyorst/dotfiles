@@ -49,6 +49,7 @@
         hydrant/er/er/mark-paragraph
         hydrant/mc/mc/keyboard-quit-and-exit
         indent-for-tab-command
+        indent-sexp
         kill-region
         magit-previous-line
         markdown-electric-backquote
@@ -95,6 +96,7 @@
         sp-forward-sexp
         sp-forward-slurp-sexp
         sp-kill-hybrid-sexp
+        sp-kill-region
         sp-kill-word
         sp-remove-active-pair-overlay
         sp-splice-sexp-killing-backward
