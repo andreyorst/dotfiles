@@ -11,6 +11,13 @@
 (require 'treemacs)
 (require 'all-the-icons)
 
+(defvar aorst--treemacs-icon-face
+  '(:foreground unspecified
+    :background unspecified
+    :inherit shadow
+    :slant normal
+    :weight normal))
+
 (treemacs-create-theme "Atom"
   :config
   (progn
@@ -20,11 +27,11 @@
                     "chevron-down"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
+                    :face aorst--treemacs-icon-face)
                    (all-the-icons-octicon
                     "file-directory"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback (propertize "- " 'face 'shadow)
      :extensions (root-open))
     (treemacs-create-icon
@@ -33,11 +40,11 @@
                     "chevron-right"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
+                    :face aorst--treemacs-icon-face)
                    (all-the-icons-octicon
                     "file-directory"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback (propertize "+ " 'face 'shadow)
      :extensions (root-closed))
     (treemacs-create-icon
@@ -46,11 +53,11 @@
                     "chevron-down"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
+                    :face aorst--treemacs-icon-face)
                    (all-the-icons-octicon
                     "file-directory"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback (propertize "- " 'face 'shadow)
      :extensions (dir-open))
     (treemacs-create-icon
@@ -59,11 +66,11 @@
                     "chevron-right"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal))
+                    :face aorst--treemacs-icon-face)
                    (all-the-icons-octicon
                     "file-directory"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback (propertize "+ " 'face 'shadow)
      :extensions (dir-closed))
     (treemacs-create-icon
@@ -72,7 +79,7 @@
                     "chevron-down"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback (propertize "▾ " 'face 'font-lock-string-face)
      :extensions (tag-open))
     (treemacs-create-icon
@@ -81,7 +88,7 @@
                     "chevron-right"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback (propertize "▸ " 'face 'font-lock-string-face)
      :extensions (tag-closed))
     (treemacs-create-icon
@@ -90,7 +97,7 @@
                     "tag"
                     :height 0.9
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions (tag-leaf))
     (treemacs-create-icon
@@ -98,7 +105,7 @@
                    (all-the-icons-octicon
                     "flame"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions (error))
     (treemacs-create-icon
@@ -106,7 +113,7 @@
                    (all-the-icons-octicon
                     "stop"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions (warning))
     (treemacs-create-icon
@@ -115,7 +122,7 @@
                     "info"
                     :height 0.75
                     :v-adjust 0.1
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions (info))
     (treemacs-create-icon
@@ -123,7 +130,7 @@
                    (all-the-icons-octicon
                     "file-media"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
                   "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
@@ -133,7 +140,7 @@
                    (all-the-icons-octicon
                     "file-code"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
                   "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el" "erl"
@@ -152,7 +159,7 @@
                    (all-the-icons-octicon
                     "book"
                     :v-adjust 0
-                    :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                    :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
                   "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
@@ -162,7 +169,7 @@
      :icon (format "   %s\t" (all-the-icons-octicon
                               "file-text"
                               :v-adjust 0
-                              :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                              :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("md" "markdown" "rst" "log" "org" "txt"
                   "contribute" "license" "readme" "changelog"))
@@ -170,30 +177,30 @@
      :icon (format "   %s\t" (all-the-icons-octicon
                               "file-binary"
                               :v-adjust 0
-                              :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                              :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("exe" "dll" "obj" "so" "o" "out"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
                               "file-pdf"
                               :v-adjust 0
-                              :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                              :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("pdf"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
                               "file-zip"
                               :v-adjust 0
-                              :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                              :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
     (treemacs-create-icon
      :icon (format "   %s\t" (all-the-icons-octicon
                               "file-text"
                               :v-adjust 0
-                              :face '(:foreground unspecified :inherit shadow :slant normal :weight normal)))
+                              :face aorst--treemacs-icon-face))
      :fallback ""
      :extensions (fallback))))
 
 (provide 'treemacs-atom-theme)
-;; treemacs-atom-theme.el ends here
+;;; treemacs-atom-theme.el ends here

@@ -901,7 +901,8 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (treemacs-filewatch-mode 1)
   (defun aorst/treemacs-setup-faces ()
     (set-face-attribute 'treemacs-root-face nil
-                        :foreground (face-attribute 'default :foreground)
+                        :foreground nil
+                        :underline nil
                         :inherit 'treemacs-directory-face
                         :height 1.0
                         :weight 'normal))
