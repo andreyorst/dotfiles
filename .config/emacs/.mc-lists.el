@@ -9,6 +9,7 @@
         aorst/newline-above
         aorst/newline-below
         aorst/paredit-kill-word
+        aorst/split-pararagraph-into-lines
         aorst/upcase-region-or-word
         backward-sexp
         beginning-of-buffer
@@ -101,6 +102,7 @@
         sp-remove-active-pair-overlay
         sp-splice-sexp-killing-backward
         upcase-region
+        yaml-electric-backspace
         zap-up-to-char
         ))
 
