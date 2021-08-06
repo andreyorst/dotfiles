@@ -1187,8 +1187,18 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package prog-mode
   :straight nil
-  :hook (;; (prog-mode . hl-line-mode)
-         (prog-mode . flyspell-prog-mode)))
+  :hook (prog-mode . flyspell-prog-mode)
+  :bind (:map prog-mode-map
+         ("M-q" . aorst/indent-or-fill-sexp))
+  :config
+  (defun aorst/indent-or-fill-sexp ()
+    "Indent s-expression or fill string/comment."
+    (interactive)
+    (let ((ppss (syntax-ppss)))
+      (if (or (nth 3 ppss)
+              (nth 4 ppss))
+          (fill-paragraph)
+        (indent-sexp)))))
 
 (use-package cc-mode
   :straight nil
@@ -1659,18 +1669,12 @@ appended."
          ((eval-expression-minibuffer-setup
            lisp-data-mode)
           . aorst/minibuffer-enable-sp)
-         ((org-mode
-           markdown-mode
-           prog-mode)
-          . smartparens-mode)
-         (smartparens-mode . show-smartparens-mode))
+         ((org-mode)
+          . smartparens-mode))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
-         ("M-r" . sp-rewrap-sexp)
          :map smartparens-strict-mode-map
-         (";" . sp-comment)
-         :map prog-mode-map
-         ("M-q" . indent-sexp))
+         (";" . sp-comment))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
@@ -1681,6 +1685,7 @@ appended."
   :config
   (add-to-list 'sp-lisp-modes 'fennel-mode t)
   (sp-use-paredit-bindings)
+  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
     (setq-local comment-start ";")
@@ -2113,7 +2118,7 @@ appended."
 
 (use-package paren
   :straight nil
-  ;; :hook (prog-mode . show-paren-mode)
+  :hook (prog-mode . show-paren-mode)
   :custom (show-paren-delay 0))
 
 (use-package wgrep)
@@ -2178,3 +2183,7 @@ appended."
 (use-package esh-mode
   :straight nil
   :custom (eshell-scroll-show-maximum-output nil))
+
+(use-package vlf-setup
+  :straight vlf
+  :custom (vlf-tune-enabled nil))
