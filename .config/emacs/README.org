@@ -111,21 +111,20 @@ It can install packages from Git repositories listed on ELPA, MELPA, and directl
   (defvar straight-process-buffer)
   (setq-default straight-process-buffer " *straight-process*")
 
-  (defvar straight-repository-branch)
-  (setq straight-repository-branch "develop")
-
   (defvar straight-build-dir)
   (setq straight-build-dir (format "build-%s" emacs-version))
 
+  (defvar bootstrap-version)
   (let ((bootstrap-file
-         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory)))
+	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
+	  (url-retrieve-synchronously
+	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	   'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 #+end_src
 
@@ -2617,10 +2616,11 @@ Structural editing similar to Paredit.
            (smartparens-mode . show-smartparens-mode))
     :bind (:map smartparens-mode-map
            ("C-M-q" . sp-indent-defun)
-           ("M-q" . indent-sexp)
            ("M-r" . sp-rewrap-sexp)
            :map smartparens-strict-mode-map
-           (";" . sp-comment))
+           (";" . sp-comment)
+           :map prog-mode-map
+           ("M-q" . indent-sexp))
     :custom
     (sp-highlight-pair-overlay nil)
     (sp-highlight-wrap-overlay nil)

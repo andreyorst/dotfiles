@@ -1666,10 +1666,11 @@ appended."
          (smartparens-mode . show-smartparens-mode))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
-         ("M-q" . indent-sexp)
          ("M-r" . sp-rewrap-sexp)
          :map smartparens-strict-mode-map
-         (";" . sp-comment))
+         (";" . sp-comment)
+         :map prog-mode-map
+         ("M-q" . indent-sexp))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
