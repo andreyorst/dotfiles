@@ -420,10 +420,11 @@ Configurations for inbuilt =simple.el= module.
     (blink-matching-delay 0)
     (blink-matching-paren t)
     :config
-    (transient-mark-mode -1)
     (defun aorst/overwrite-set-cursor-shape ()
       (when (display-graphic-p)
-        (setq cursor-type (if overwrite-mode 'box 'bar)))))
+        (setq cursor-type (if overwrite-mode 'box 'bar))))
+    :init
+    (transient-mark-mode -1))
 #+end_src
 
 *** Line truncation
@@ -3209,14 +3210,6 @@ We need the =.desktop= file that uses the advantage of possibly running server:
   StartupWMClass=Emacs
   Keywords=Text;Editor;
   Actions=new-window;new-instance;
-
-  [Desktop Action new-window]
-  Name=New Window
-  Exec=emacsclient --alternate-editor= --create-frame %F
-
-  [Desktop Action new-instance]
-  Name=New Instance
-  Exec=emacs %F
 #+end_src
 
 This will allow us to open files with =emacs-launcher=, and it will automatically reuse existing window if present.

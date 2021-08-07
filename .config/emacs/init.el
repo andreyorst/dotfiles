@@ -178,10 +178,11 @@ for stopping scroll from going beyond longest line.  Based on
   (blink-matching-delay 0)
   (blink-matching-paren t)
   :config
-  (transient-mark-mode -1)
   (defun aorst/overwrite-set-cursor-shape ()
     (when (display-graphic-p)
-      (setq cursor-type (if overwrite-mode 'box 'bar)))))
+      (setq cursor-type (if overwrite-mode 'box 'bar))))
+  :init
+  (transient-mark-mode -1))
 
 (setq-default truncate-lines t)
 (setq-default bidi-paragraph-direction 'left-to-right)
