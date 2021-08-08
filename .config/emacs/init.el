@@ -1670,8 +1670,7 @@ appended."
          ((eval-expression-minibuffer-setup
            lisp-data-mode)
           . aorst/minibuffer-enable-sp)
-         ((org-mode)
-          . smartparens-mode))
+         (prog-mode . smartparens-mode))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
          :map smartparens-strict-mode-map
