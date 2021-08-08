@@ -11,5 +11,10 @@
 [pull]
 	ff = only
 	rebase = false
+[sendemail]
+        transferencoding = base64
+        smtpserver = smtp.googlemail.com
+        smtpencryption = tls
+        smtpserverport = 587
 [include]
 	path = .gitconfig.local
