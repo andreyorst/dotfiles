@@ -106,8 +106,8 @@ for stopping scroll from going beyond longest line.  Based on
               (if (bound-and-true-p display-line-numbers-mode)
                   (- display-line-numbers-width)
                 0))
-             ;; subtracting 4 for extra space in case some calculations were imprecise
-             (threshold (+ window-width hscroll-offset line-number-width -4)))
+             ;; subtracting 2 for extra space in case some calculations were imprecise
+             (threshold (+ window-width hscroll-offset line-number-width -2)))
         (catch 'excessive
           (while (not (eobp))
             (setq start (point))
@@ -120,7 +120,8 @@ for stopping scroll from going beyond longest line.  Based on
                                         threshold)))
               (throw 'excessive t)))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
-    (when (and (aorst/truncated-lines-p)
+    (when (and truncate-lines
+               (aorst/truncated-lines-p)
                (not (memq major-mode '(vterm-mode term-mode))))
       (funcall foo arg set-minimum)))
   (setq-default auto-window-vscroll nil
