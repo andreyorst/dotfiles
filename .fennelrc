@@ -10,8 +10,8 @@
   (= :table (type x)))
 
 (fn opts.readChunk [parser-state]
-  (let [rl (or (and (table? package.loaded.readline)
-                    package.loaded.readline)
+  (let [rl (if (table? package.loaded.readline)
+               package.loaded.readline
                {:readline #(do (io.write $) (io.flush) (io.read))})
         prompt (match parser-state.stack-size
                  0 prompts.top
