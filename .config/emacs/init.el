@@ -1241,21 +1241,6 @@ truncates text if needed.  Minimal width can be set with
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
 
-(use-package racket-mode
-  :bind (:map racket-mode-map
-         ("C-c C-d" . racket-run-with-debugging)
-         ("C-c C-M-f" . aorst/indent-buffer)
-         (")" . self-insert-command)
-         ("]" . self-insert-command)
-         ("}" . self-insert-command))
-  :hook (racket-mode . racket-xp-mode)
-  :custom (racket-show-functions '(racket-show-echo-area))
-  :config
-  (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
-  (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
-  (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
-  (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
-
 (use-package elisp-mode
   :straight nil
   :commands aorst/emacs-lisp-indent-function
@@ -1441,10 +1426,6 @@ appended."
                sly-editing-mode))
     (advice-add f :around #'aorst/sly-ignore-fennel))
   (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1))))
-
-(use-package cmake-mode
-  :bind (:map cmake-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
 
 (use-package yaml-mode
   :custom (yaml-indent-offset 4))
@@ -2174,7 +2155,16 @@ appended."
 (use-package compile
   :straight nil
   :custom
-  (compilation-scroll-output 'first-error))
+  (compilation-scroll-output 'first-error)
+  :config
+  (add-to-list 'compilation-error-regexp-alist 'kaocha-tap)
+  (add-to-list 'compilation-error-regexp-alist 'kaocha-tap-fail)
+  (add-to-list 'compilation-error-regexp-alist-alist
+               '(kaocha-tap "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
+                        (1 "src/%s" "test/%s") 2))
+  (add-to-list 'compilation-error-regexp-alist-alist
+               '(kaocha-tap-fail "^#.*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
+                        (1 "src/%s" "test/%s") 2 nil 1)))
 
 (use-package isearch
   :straight nil

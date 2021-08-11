@@ -34,23 +34,6 @@ It is meant to configure package initialization and early graphical interface tw
   ;;; Code:
 #+end_src
 
-** COMMENT Emacs 28 Obsolete workaround
-Emacs 28 made some changes to obsolete-related functions, making the third argument =when= mandatory.
-This broke a lot of packages, so for now, a workaround is to define an =around= advice:
-
-#+begin_src emacs-lisp
-  (defun aorst/wrap-obsolete (orig-fn &rest args)
-    "Append extra argument to ARGS before calling ORIG-FN function."
-    (if (cddr args)
-        (apply orig-fn args)
-      (apply orig-fn `(,@args "0"))))
-
-  (advice-add 'make-obsolete :around #'aorst/wrap-obsolete)
-  (advice-add 'make-obsolete-variable :around #'aorst/wrap-obsolete)
-  (advice-add 'define-obsolete-variable-alias :around #'aorst/wrap-obsolete)
-  (advice-add 'define-obsolete-function-alias :around #'aorst/wrap-obsolete)
-#+end_src
-
 ** Garbage Collection and Performance
 One of the main reasons why Emacs startup time is big is that the garbage collection is invoked a lot, causing the increase of the startup time.
 This can be migrated by setting high GC threshold and restoring it back in =after-init-hook=.
@@ -2034,26 +2017,6 @@ REPL support for various Schemes.
     (geiser-default-implementation 'guile))
 #+end_src
 
-*** Racket
-[[https://racket-lang.org/][Racket]] language support
-
-#+begin_src emacs-lisp
-  (use-package racket-mode
-    :bind (:map racket-mode-map
-           ("C-c C-d" . racket-run-with-debugging)
-           ("C-c C-M-f" . aorst/indent-buffer)
-           (")" . self-insert-command)
-           ("]" . self-insert-command)
-           ("}" . self-insert-command))
-    :hook (racket-mode . racket-xp-mode)
-    :custom (racket-show-functions '(racket-show-echo-area))
-    :config
-    (set-face-attribute 'racket-debug-break-face nil :background (face-attribute 'error :foreground) :foreground (face-attribute 'default :background))
-    (set-face-attribute 'racket-debug-result-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
-    (set-face-attribute 'racket-debug-locals-face nil :foreground (face-attribute 'shadow :foreground) :box nil)
-    (set-face-attribute 'racket-selfeval-face nil :foreground (face-attribute 'default :foreground)))
-#+end_src
-
 *** Emacs Lisp
 Emacs lisp mode tweaks.
 
@@ -2276,15 +2239,6 @@ Disabled until [[https://gitlab.com/technomancy/fennel-mode/-/issues/11][technom
                  sly-editing-mode))
       (advice-add f :around #'aorst/sly-ignore-fennel))
     (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1))))
-#+end_src
-
-*** Cmake
-A mode for editing cmake files.
-
-#+begin_src emacs-lisp
-  (use-package cmake-mode
-    :bind (:map cmake-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
 #+end_src
 
 *** Yaml
@@ -3438,7 +3392,16 @@ Tweaks to inbuilt =compile.el= mode.
   (use-package compile
     :straight nil
     :custom
-    (compilation-scroll-output 'first-error))
+    (compilation-scroll-output 'first-error)
+    :config
+    (add-to-list 'compilation-error-regexp-alist 'kaocha-tap)
+    (add-to-list 'compilation-error-regexp-alist 'kaocha-tap-fail)
+    (add-to-list 'compilation-error-regexp-alist-alist
+                 '(kaocha-tap "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
+                          (1 "src/%s" "test/%s") 2))
+    (add-to-list 'compilation-error-regexp-alist-alist
+                 '(kaocha-tap-fail "^#.*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
+                          (1 "src/%s" "test/%s") 2 nil 1)))
 #+end_src
 
 *** Isearch
