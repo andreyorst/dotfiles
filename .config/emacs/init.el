@@ -392,9 +392,9 @@ Used in various places to avoid getting wrong line height when
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
 (use-package all-the-icons
+  :when (window-system)
   :config
-  (when (and (not (aorst/font-installed-p "all-the-icons"))
-             (window-system))
+  (when (not (aorst/font-installed-p "all-the-icons"))
     (all-the-icons-install-fonts t)))
 
 (use-package solaire-mode
@@ -782,34 +782,6 @@ Used in various places to avoid getting wrong line height when
 (advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
 (add-hook 'flymake-mode-hook #'aorst/flymake-mode-line-update)
 
-(defvar mode-line-l-format 'aorst--mode-line-buffer-name)
-(defvar mode-line-r-format
-  '(concat
-    (aorst/mode-line-buffer-state)
-    (aorst/mode-line-line-column)
-    (aorst/mode-line-input-method)
-    (aorst/mode-line-line-encoding)
-    (aorst/mode-line-buffer-encoding)
-    (aorst/mode-line-indent-mode)
-    (aorst/mode-line-mode-name)
-    (aorst/mode-line-git-branch)
-    aorst--mode-line-lsp
-    aorst--mode-line-flymake
-    aorst--mode-line-flycheck
-    aorst--mode-line-structural))
-
-(setq-default
- mode-line-format
- '(:eval
-   (let ((mode-line-l-format (concat " " (string-trim-left (eval mode-line-l-format))))
-         (mode-line-r-format (eval mode-line-r-format)))
-     (concat mode-line-l-format
-             (make-string (- (window-width)
-                             (string-width (format-mode-line mode-line-l-format))
-                             (string-width (format-mode-line mode-line-r-format)))
-                          ?\s)
-             mode-line-r-format))))
-
 (use-package mini-modeline
   :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
          (after-init . mini-modeline-mode)
@@ -839,6 +811,22 @@ Used in various places to avoid getting wrong line height when
                          (face-attribute 'solaire-mode-line-face :background)
                        (face-attribute 'mode-line :background)))))
   (aorst/mini-modeline-setup-faces))
+
+(defvar mode-line-l-format 'aorst--mode-line-buffer-name)
+(defvar mode-line-r-format
+  '(concat
+    (aorst/mode-line-buffer-state)
+    (aorst/mode-line-line-column)
+    (aorst/mode-line-input-method)
+    (aorst/mode-line-line-encoding)
+    (aorst/mode-line-buffer-encoding)
+    (aorst/mode-line-indent-mode)
+    (aorst/mode-line-mode-name)
+    (aorst/mode-line-git-branch)
+    aorst--mode-line-lsp
+    aorst--mode-line-flymake
+    aorst--mode-line-flycheck
+    aorst--mode-line-structural))
 
 (use-package frame
   :straight nil
@@ -1127,6 +1115,27 @@ truncates text if needed.  Minimal width can be set with
 
   (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
     (select-window (posn-window (event-start e)))))
+
+(use-package display-line-numbers
+  :straight nil
+  ;; :hook (prog-mode . display-line-numbers-mode)
+  :custom
+  (display-line-numbers-width 4)
+  (display-line-numbers-grow-only t)
+  (display-line-numbers-width-start t)
+  :config
+  ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
+;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
+
+;; This advice recalculates the amount of lines needed to scroll to
+;; ensure `scroll-margin' preserved."
+;;     (apply f args)
+;;     (let ((diff (- scroll-margin
+;;                    (- (line-number-at-pos (point))
+;;                       (line-number-at-pos (window-start))))))
+;;       (when (> diff 0)
+;;         (scroll-down diff))))
+  )
 
 (use-package org
   :straight (:type built-in)
@@ -1432,6 +1441,7 @@ appended."
 
 (use-package sh-script
   :straight nil
+  :hook (sh-mode . flycheck-mode)
   :bind (:map sh-mode-map
          ("C-c C-M-f" . aorst/indent-buffer)))
 
@@ -1456,13 +1466,7 @@ appended."
   :hook (json-mode . flycheck-mode)
   :custom (js-indent-level 2))
 
-(use-package sh-script
-  :straight nil
-  :hook (sh-mode . flycheck-mode))
-
 (use-package scala-mode)
-
-(use-package sql-indent)
 
 (use-package csv-mode
   :custom (csv-align-max-width 80))
@@ -1855,11 +1859,13 @@ appended."
          ("C-s" . phi-search)
          ("C-r" . phi-search-backward))
   :config
-  (define-advice mc/mark-next-like-this-symbol (:after (&rest _) aorst:mc-mark-next-like-this-symbol) (mc/cycle-forward))
-  (define-advice mc/mark-next-like-this-word (:after (&rest _) aorst:mc-mark-next-like-this-word) (mc/cycle-forward))
-  (define-advice mc/mark-next-lines (:after (&rest _) aorst:mc-mark-next-lines) (mc/cycle-forward))
-  (define-advice mc/mark-previous-like-this-symbol (:after (&rest _) aorst:mc-mark-previous-like-this-symbol) (mc/cycle-backward))
-  (define-advice mc/mark-previous-like-this-word (:after (&rest _) aorst:mc-mark-previous-like-this-word) (mc/cycle-backward))
+  (dolist (f '(mc/mark-next-like-this-symbol
+               mc/mark-next-like-this-word
+               mc/mark-next-lines))
+    (advice-add f :after (lambda (&rest _) (mc/cycle-forward))))
+  (dolist (f '(mc/mark-previous-like-this-symbol
+               mc/mark-previous-like-this-word))
+    (advice-add f :after (lambda (&rest _) (mc/cycle-backward))))
   (when (fboundp #'defhydra)
     (defhydra hydrant/mc (:hint nil :color pink)
       "
@@ -1995,10 +2001,6 @@ appended."
   :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
   :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
-(use-package lsp-treemacs
-  :custom
-  (lsp-treemacs-theme "Iconless"))
-
 (use-package project
   :straight nil
   :config
@@ -2020,36 +2022,11 @@ appended."
           (directory-file-name path))))))
   (add-to-list 'project-find-functions #'aorst/project-find-root))
 
-(use-package clang-format
-  :after cc-mode
-  :bind (:map c-mode-base-map
-         ("C-c C-M-f" . clang-format-buffer)))
-
 (use-package server
   :straight nil
   :config
   (unless (server-running-p)
     (server-start)))
-
-(use-package hideshow
-  :straight nil
-  :requires hydra
-  :hook (prog-mode . hs-minor-mode)
-  :bind (:map prog-mode-map
-         ("C-c h" . hydrant/hideshow-menu/body))
-  :config
-  (defhydra hydrant/hideshow-menu (:color pink :hint nil)
-    "
- ^Hide^       ^Show^       ^Exit^
- _ha_: all    _sa_: all    _qs_: quit show all
- _hb_: block  _sb_: block  _qh_: quit hide all"
-    ("ha" hs-hide-all)
-    ("hb" hs-hide-block)
-    ("sa" hs-show-all)
-    ("sb" hs-show-block)
-    ("qs" hs-show-all :exit t)
-    ("qh" hs-hide-all :exit t)
-    ("C-g" ignore :exit t)))
 
 (use-package edit-indirect
   :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
@@ -2102,8 +2079,6 @@ appended."
   :straight nil
   :hook (prog-mode . show-paren-mode)
   :custom (show-paren-delay 0))
-
-(use-package wgrep)
 
 (use-package xref
   :straight nil
@@ -2158,13 +2133,13 @@ appended."
   (compilation-scroll-output 'first-error)
   :config
   (add-to-list 'compilation-error-regexp-alist 'kaocha-tap)
-  (add-to-list 'compilation-error-regexp-alist 'kaocha-tap-fail)
+  (add-to-list 'compilation-error-regexp-alist 'kaocha-fail)
   (add-to-list 'compilation-error-regexp-alist-alist
                '(kaocha-tap "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
                         (1 "src/%s" "test/%s") 2))
   (add-to-list 'compilation-error-regexp-alist-alist
-               '(kaocha-tap-fail "^#.*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
-                        (1 "src/%s" "test/%s") 2 nil 1)))
+               '(kaocha-fail ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
+                        (1 "src/%s" "test/%s") 2)))
 
 (use-package isearch
   :straight nil
@@ -2178,3 +2153,6 @@ appended."
 (use-package vlf-setup
   :straight vlf
   :custom (vlf-tune-enabled nil))
+
+(provide 'init)
+;;; init.el ends here
