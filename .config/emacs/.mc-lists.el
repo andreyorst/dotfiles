@@ -91,6 +91,7 @@
         parinfer-smart-yank:yank
         save-some-buffers
         sp-backward-delete-char
+        sp-backward-kill-word
         sp-backward-sexp
         sp-comment
         sp-delete-char

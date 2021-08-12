@@ -1304,7 +1304,7 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
   (defun aorst/emacs-lisp-setup ()
     (setq-local lisp-indent-function
                 #'aorst/emacs-lisp-indent-function))
-  (defun org-babel-edit-prep:emacs-lisp (&optional _babel-info)
+  (defun org-babel-edit-prep:emacs-lisp (_info)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
@@ -2127,24 +2127,44 @@ appended."
   (jdecomp-decompiler-type 'fernflower)
   (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 
+(defmacro aorst/add-compilation-error-syntax (name regexp file line &optional col level)
+  "Register new compilation error syntax.
+
+Add NAME symbol to `compilation-error-regexp-alist', and then add
+REGEXP FILE LINE and optional COL LEVEL info to
+`compilation-error-regexp-alist-alist'."
+  (declare (indent 1))
+  `(progn (add-to-list 'compilation-error-regexp-alist ',name)
+          (add-to-list 'compilation-error-regexp-alist-alist
+                       '(,name ,regexp ,file ,line ,col ,level))))
+
 (use-package compile
   :straight nil
   :custom
   (compilation-scroll-output 'first-error)
   :config
-  (add-to-list 'compilation-error-regexp-alist 'kaocha-tap)
-  (add-to-list 'compilation-error-regexp-alist 'kaocha-fail)
-  (add-to-list 'compilation-error-regexp-alist-alist
-               '(kaocha-tap "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
-                        (1 "src/%s" "test/%s") 2))
-  (add-to-list 'compilation-error-regexp-alist-alist
-               '(kaocha-fail ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
-                        (1 "src/%s" "test/%s") 2)))
+  (aorst/add-compilation-error-syntax kaocha-tap
+    "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
+    (1 "src/%s" "test/%s") 2)
+  (aorst/add-compilation-error-syntax kaocha-fail
+    ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
+    (1 "src/%s" "test/%s") 2)
+  (aorst/add-compilation-error-syntax lua-stacktrace
+    "^[[:space:]]+\\([^:]+\\):\\([0-9]+\\):[[:space:]]+in"
+    1 2))
 
 (use-package isearch
   :straight nil
   :bind (:map isearch-mode-map
-         ("<backspace>" . isearch-del-char)))
+         ("<backspace>" . isearch-del-char)
+         ("<left>" . aorst/isearch-backward-char)
+         :map minibuffer-local-isearch-map
+         ("<right>" . forward-char))
+  :config
+  (defun aorst/isearch-backward-char (&optional n)
+    (interactive)
+    (isearch-edit-string)
+    (backward-char n)))
 
 (use-package esh-mode
   :straight nil
