@@ -1779,52 +1779,11 @@ appended."
 
 (use-package ediff
   :straight nil
-  :hook ((ediff-prepare-buffer . outline-show-all)
-         (ediff-before-setup . aorst/store-pre-ediff-winconfig)
-         (ediff-quit . aorst/restore-pre-ediff-winconfig)
-         (ediff-keymap-setup . aorst/ediff-setup-keys))
-  :custom-face
-  (ediff-fine-diff-C ((t (:background unspecified
-                          :inherit ediff-current-diff-C))))
-  (ediff-fine-diff-B ((t (:background unspecified
-                          :inherit diff-refine-added))))
-  (ediff-fine-diff-A ((t (:background unspecified
-                          :inherit diff-refine-removed))))
+  :hook (ediff-prepare-buffer . outline-show-all)
   :config
   (advice-add 'ediff-window-display-p :override #'ignore)
   :custom
-  (ediff-split-window-function 'split-window-horizontally)
-  :init
-  (defvar aorst--ediff-last-windows nil
-    "Stores window configuration before `ediff' was invoked.")
-  (defun aorst/store-pre-ediff-winconfig ()
-    (setq aorst--ediff-last-windows (current-window-configuration)))
-  (defun aorst/restore-pre-ediff-winconfig ()
-    (set-window-configuration aorst--ediff-last-windows))
-  (defun aorst/ediff-copy-both-to-C ()
-    (interactive)
-    (ediff-copy-diff ediff-current-difference nil 'C nil
-                     (concat
-                      (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
-                      (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
-  (defun aorst/ediff-setup-keys ()
-    (define-key ediff-mode-map "d" #'aorst/ediff-copy-both-to-C)))
-
-(use-package diff
-  :straight nil
-  :after magit
-  :hook (aorst--theme-change . aorst/diff-setup-faces)
-  :custom-face
-  (diff-added ((t (:inherit magit-diff-added-highlight))))
-  (diff-removed ((t (:inherit magit-diff-removed-highlight))))
-  :config
-  (defun aorst/diff-setup-faces ()
-    (set-face-attribute 'diff-added nil :foreground nil :background nil)
-    (set-face-attribute 'diff-removed nil :foreground nil :background nil)
-    (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
-                              (diff-refine-removed magit-diff-removed-highlight)))
-      (apply #'aorst/create-accent-face face-reference)))
-  (aorst/diff-setup-faces))
+  (ediff-split-window-function 'split-window-horizontally))
 
 (use-package phi-search)
 (use-package mc-extras)
@@ -1855,7 +1814,7 @@ appended."
  _s_:   select regexp           _b_:      discard blank lines  _#_: insert numbers  _)_: cycle forward
  _n_:   select next word        _d_:      remove duplicated    ^ ^                  ^ ^
  _M-n_: select next symbol      _q_ or _g_: exit hydrant       ^ ^                  ^ ^
- _p_:   select previous word    _G_:      exit mc mode         ^ ^                  ^ ^
+ _p_:   select previous word    ^ ^    ^ ^                     ^ ^                  ^ ^
  _M-p_: select previous symbol  ^ ^                            ^ ^                  ^ ^
  _C_:   select next line"
       ("M-s" mc/edit-ends-of-lines)
@@ -1874,8 +1833,7 @@ appended."
       ("#" mc/insert-numbers)
       ("q" mc/remove-duplicated-cursors :exit t)
       ("g" mc/remove-duplicated-cursors :exit t)
-      ("G" mc/keyboard-quit :exit t)
-      ("C-g" mc/keyboard-quit :exit t))))
+      ("C-g" keyboard-quit :exit t))))
 
 (use-package expand-region
   :bind (("C-c e" . hydrant/er/body))
@@ -1886,12 +1844,12 @@ appended."
     (deactivate-mark t))
   (defhydra hydrant/er (:color pink :hint nil)
     "
- ^Expand/Discard^                ^Mark^
- _e_:      expand region         _(_: inside pairs
- _r_:      reduce region         _)_: around pairs
- _g_ or _q_: exit hydrant          _'_: inside quotes
- _G_:      discard region, exit  _\"_: around quotes
- ^ ^  ^ ^                          _p_: paragraph"
+ ^Mark^              ^Expand or Discard^
+ _(_: inside pairs   _e_:   ^ ^  expand region
+ _)_: around pairs   _r_:   ^ ^  reduce region
+ _'_: inside quotes  _g_ or _q_: exit hydrant
+ _\"_: around quotes ^ ^    ^ ^
+ _p_: paragraph      ^ ^    ^ ^"
     ("e" er/expand-region)
     ("r" er/contract-region)
     ("p" er/mark-paragraph)
@@ -1901,8 +1859,6 @@ appended."
     ("\"" er/mark-outside-quotes)
     ("g" ignore :exit t)
     ("q" ignore :exit t)
-    ("G" aorst/er-exit :exit t)
-    ("Q" aorst/er-exit :exit t)
     ("C-g" aorst/er-exit :exit t)))
 
 (use-package lsp-mode
