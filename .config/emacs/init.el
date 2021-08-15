@@ -1826,25 +1826,6 @@ appended."
       (apply #'aorst/create-accent-face face-reference)))
   (aorst/diff-setup-faces))
 
-(use-package smerge-mode
-  :straight nil
-  :after magit
-  :hook (aorst--theme-change . aorst/smerge-setup-faces)
-  :custom-face
-  (smerge-refined-added ((t (:inherit magit-diff-added-highlight))))
-  (smerge-refined-removed ((t (:inherit magit-diff-removed-highlight))))
-  (smerge-lower ((t (:inherit magit-diff-added-highlight))))
-  (smerge-upper ((t (:inherit magit-diff-removed-highlight))))
-  (smerge-markers ((t (:weight bold
-                       :extend t
-                       :inherit shadow))))
-  :config
-  (defun aorst/smerge-setup-faces ()
-    (dolist (face-reference '((smerge-refined-added magit-diff-added-highlight)
-                              (smerge-refined-removed magit-diff-removed-highlight)))
-      (apply #'aorst/create-accent-face face-reference)))
-  (aorst/smerge-setup-faces))
-
 (use-package phi-search)
 (use-package mc-extras)
 (use-package multiple-cursors

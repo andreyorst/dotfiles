@@ -2204,7 +2204,6 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
 
 *** Common Lisp
 Common Lisp IDE for Emacs.
-Disabled until [[https://gitlab.com/technomancy/fennel-mode/-/issues/11][technomancy/fennel-mode#11]] is resolved.
 
 #+begin_src emacs-lisp
   (use-package sly
@@ -2758,30 +2757,6 @@ Some tweaks to inbuilt diff mode.
                                 (diff-refine-removed magit-diff-removed-highlight)))
         (apply #'aorst/create-accent-face face-reference)))
     (aorst/diff-setup-faces))
-#+end_src
-
-*** Smerge
-Some tweaks to inbuilt merge tool:
-
-#+begin_src emacs-lisp
-  (use-package smerge-mode
-    :straight nil
-    :after magit
-    :hook (aorst--theme-change . aorst/smerge-setup-faces)
-    :custom-face
-    (smerge-refined-added ((t (:inherit magit-diff-added-highlight))))
-    (smerge-refined-removed ((t (:inherit magit-diff-removed-highlight))))
-    (smerge-lower ((t (:inherit magit-diff-added-highlight))))
-    (smerge-upper ((t (:inherit magit-diff-removed-highlight))))
-    (smerge-markers ((t (:weight bold
-                         :extend t
-                         :inherit shadow))))
-    :config
-    (defun aorst/smerge-setup-faces ()
-      (dolist (face-reference '((smerge-refined-added magit-diff-added-highlight)
-                                (smerge-refined-removed magit-diff-removed-highlight)))
-        (apply #'aorst/create-accent-face face-reference)))
-    (aorst/smerge-setup-faces))
 #+end_src
 
 *** Multiple Cursors
