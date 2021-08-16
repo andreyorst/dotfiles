@@ -1843,7 +1843,6 @@ Org Mode is a great mode for taking notes, managing to-do lists, writing books, 
   (use-package org
     :straight (:type built-in)
     :hook (((org-capture-mode org-src-mode) . aorst/discard-history)
-           (org-mode . flyspell-mode)
            (aorst--theme-change . aorst/org-setup-faces))
     :bind (:map org-mode-map
            ("M-Q" . aorst/split-pararagraph-into-lines)
@@ -1922,7 +1921,6 @@ This isn't really a configuration of Prog Mode itself, but some hooks that chang
 #+begin_src emacs-lisp
   (use-package prog-mode
     :straight nil
-    :hook (prog-mode . flyspell-prog-mode)
     :bind (:map prog-mode-map
            ("M-q" . aorst/indent-or-fill-sexp))
     :config
@@ -1966,8 +1964,7 @@ A package for editing markdown files.
     (markdown-fontify-code-blocks-natively t)
     (markdown-command "pandoc")
     (markdown-hr-display-char nil)
-    (markdown-list-item-bullets '("-"))
-    :hook ((markdown-mode . flyspell-mode)))
+    (markdown-list-item-bullets '("-")))
 #+end_src
 
 *** Rust
@@ -2403,6 +2400,18 @@ It is loaded mostly to define faces.
     (flymake-fringe-indicator-position 'right-fringe))
 #+end_src
 
+*** Flyspell
+On the fly spell checking.
+
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :when (or (executable-find "ispell")
+              (executable-find "aspell")
+              (executable-find "hunspell"))
+    :hook (((org-mode git-commit-mode markdown-mode) . flyspell-mode)
+           (prog-mode . flyspell-prog-mode)))
+#+end_src
+
 *** Flycheck
 Some languages have better support with =flycheck=.
 
@@ -2673,7 +2682,6 @@ Emacs interface to Git.
 #+begin_src emacs-lisp
   (use-package with-editor)
   (use-package magit
-    :hook (git-commit-mode . flyspell-mode)
     :bind (("<f12>" . magit-status))
     :custom
     (magit-ediff-dwim-show-on-hunks t)

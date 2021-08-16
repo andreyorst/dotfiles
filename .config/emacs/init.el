@@ -1140,7 +1140,6 @@ truncates text if needed.  Minimal width can be set with
 (use-package org
   :straight (:type built-in)
   :hook (((org-capture-mode org-src-mode) . aorst/discard-history)
-         (org-mode . flyspell-mode)
          (aorst--theme-change . aorst/org-setup-faces))
   :bind (:map org-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines)
@@ -1198,7 +1197,6 @@ truncates text if needed.  Minimal width can be set with
 
 (use-package prog-mode
   :straight nil
-  :hook (prog-mode . flyspell-prog-mode)
   :bind (:map prog-mode-map
          ("M-q" . aorst/indent-or-fill-sexp))
   :config
@@ -1232,8 +1230,7 @@ truncates text if needed.  Minimal width can be set with
   (markdown-fontify-code-blocks-natively t)
   (markdown-command "pandoc")
   (markdown-hr-display-char nil)
-  (markdown-list-item-bullets '("-"))
-  :hook ((markdown-mode . flyspell-mode)))
+  (markdown-list-item-bullets '("-")))
 
 (use-package rust-mode
   :commands (rust-format-buffer)
@@ -1547,6 +1544,13 @@ appended."
   :custom
   (flymake-fringe-indicator-position 'right-fringe))
 
+(use-package flyspell
+  :when (or (executable-find "ispell")
+            (executable-find "aspell")
+            (executable-find "hunspell"))
+  :hook (((org-mode git-commit-mode markdown-mode) . flyspell-mode)
+         (prog-mode . flyspell-prog-mode)))
+
 (use-package flycheck
   :custom
   (flycheck-indication-mode 'right-fringe)
@@ -1756,7 +1760,6 @@ appended."
 
 (use-package with-editor)
 (use-package magit
-  :hook (git-commit-mode . flyspell-mode)
   :bind (("<f12>" . magit-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
