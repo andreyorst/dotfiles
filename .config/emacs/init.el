@@ -303,8 +303,8 @@ are defining or executing a macro."
 (defun aorst/create-accent-face (face ref-face)
   "Set FACE background to accent color by blending REF-FACE foreground and background.
 Depends on `doom-blend'."
-  (let ((fg (face-attribute ref-face :foreground))
-        (bg (face-attribute ref-face :background)))
+  (let ((fg (face-attribute ref-face :foreground nil t))
+        (bg (face-attribute ref-face :background nil t)))
     (if (and (stringp fg)
              (stringp bg)
              (fboundp #'doom-blend))
@@ -1760,13 +1760,26 @@ appended."
 
 (use-package with-editor)
 (use-package magit
+  :hook ((git-commit-mode . flyspell-mode)
+         (aorst--theme-change . aorst/magit-setup-diff-faces))
   :bind (("<f12>" . magit-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all)
   :config
-  (advice-add 'magit-set-header-line-format :override #'ignore))
+  (advice-add 'magit-set-header-line-format :override #'ignore)
+  (defun aorst/magit-setup-diff-faces ()
+    (set-face-attribute 'diff-added nil :foreground nil :background nil :inherit 'magit-diff-added)
+    (set-face-attribute 'diff-removed nil :foreground nil :background nil :inherit 'magit-diff-removed)
+    (set-face-attribute 'smerge-lower nil :foreground nil :background nil :inherit 'magit-diff-added)
+    (set-face-attribute 'smerge-upper nil :foreground nil :background nil :inherit 'magit-diff-removed)
+    (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
+                              (diff-refine-removed magit-diff-removed-highlight)
+                              (smerge-refined-added magit-diff-added-highlight)
+                              (smerge-refined-removed magit-diff-removed-highlight)))
+      (apply #'aorst/create-accent-face face-reference)))
+  (aorst/magit-setup-diff-faces))
 
 (use-package magit-todos
   :after magit
