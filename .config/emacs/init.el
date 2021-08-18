@@ -1641,8 +1641,7 @@ appended."
 
 (use-package hydra)
 
-(use-package smartparens-config
-  :straight smartparens
+(use-package smartparens
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -1673,9 +1672,10 @@ appended."
   (sp-show-pair-delay 0)
   (sp-echo-match-when-invisible nil)
   :config
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
+  (require 'smartparens-config)
   (sp-use-paredit-bindings)
   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before config
+  (add-to-list 'sp-lisp-modes 'fennel-mode t)
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
     (setq-local comment-start ";")
