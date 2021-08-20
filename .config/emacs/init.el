@@ -261,15 +261,6 @@ are defining or executing a macro."
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 
-(defun aorst/indent-buffer ()
-  "Indent whole buffer."
-  (interactive)
-  (save-excursion
-    (save-restriction
-      (indent-region (point-min) (point-max)))))
-
-(global-set-key (kbd "C-c C-M-f") #'aorst/indent-buffer)
-
 (defun aorst/split-pararagraph-into-lines ()
   "Split current paragraph into lines with one sentence each."
   (interactive)
@@ -865,7 +856,8 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
              treemacs-load-theme)
-  :bind (("C-c t" . treemacs-select-window)
+  :bind (:map mode-specific-map
+         ("t" . treemacs-select-window)
          :map treemacs-mode-map
          ([C-tab] . aorst/treemacs-expand-all-projects)
          ("<drag-mouse-1>" . ignore)
@@ -1237,9 +1229,7 @@ truncates text if needed.  Minimal width can be set with
   :bind (:map rust-mode-map
          ("C-c C-M-f" . rust-format-buffer)))
 
-(use-package toml-mode
-  :bind (:map toml-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+(use-package toml-mode)
 
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
@@ -1252,8 +1242,6 @@ truncates text if needed.  Minimal width can be set with
   :commands aorst/emacs-lisp-indent-function
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . aorst/emacs-lisp-setup))
-  :bind (:map emacs-lisp-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
   :config
   (defun aorst/emacs-lisp-indent-function (indent-point state)
     "A replacement for `lisp-indent-function'.
@@ -1308,7 +1296,6 @@ https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a48
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)
          ("C-c C-k" . aorst/eval-each-sexp)
          ("M-." . xref-find-definitions)
          ("M-," . xref-pop-marker-stack)
@@ -1359,8 +1346,6 @@ for module name."
            clojurec-mode
            clojurescript-mode)
           . aorst/clojure-mode-setup))
-  :bind (:map clojure-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
   :config
   (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
   (defun org-babel-execute:clojure (body params)
@@ -1438,19 +1423,13 @@ appended."
 
 (use-package sh-script
   :straight nil
-  :hook (sh-mode . flycheck-mode)
-  :bind (:map sh-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+  :hook (sh-mode . flycheck-mode))
 
 (use-package perl-mode
   :straight nil
-  :hook ((perl-mode . flycheck-mode))
-  :bind (:map perl-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer)))
+  :hook ((perl-mode . flycheck-mode)))
 
 (use-package lua-mode
-  :bind (:map lua-mode-map
-         ("C-c C-M-f" . aorst/indent-buffer))
   :hook (lua-mode . flycheck-mode)
   :custom (lua-indent-level 2))
 
@@ -1808,8 +1787,9 @@ appended."
   :commands (mc/cycle-backward
              mc/cycle-forward)
   :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c m" . hydrant/mc/body)
          ("M-n" . mc/mark-next-like-this-symbol)
+         :map mode-specific-map
+         ("m" . hydrant/mc/body)
          :map mc/keymap
          ("<return>" . nil)
          ("C-s" . phi-search)
@@ -1852,7 +1832,8 @@ appended."
       ("C-g" keyboard-quit :exit t))))
 
 (use-package expand-region
-  :bind (("C-c e" . hydrant/er/body))
+  :bind (:map mode-specific-map
+         ("e" . hydrant/er/body))
   :requires hydra
   :config
   (defun aorst/er-exit ()

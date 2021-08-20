@@ -533,21 +533,6 @@ Checks if font is available on the system.
     (find-font (font-spec :name font-name)))
 #+end_src
 
-*** =indent-buffer=
-Indent a buffer by using language indentation rules provided by current mode.
-If there's a tool that can properly format buffer it should be used instead of this function.
-
-#+begin_src emacs-lisp
-  (defun aorst/indent-buffer ()
-    "Indent whole buffer."
-    (interactive)
-    (save-excursion
-      (save-restriction
-        (indent-region (point-min) (point-max)))))
-
-  (global-set-key (kbd "C-c C-M-f") #'aorst/indent-buffer)
-#+end_src
-
 *** =split-paragraph-into-lines=
 Format paragraph by following one sentence per line style of editing.
 
@@ -1327,7 +1312,8 @@ File explorer that is displayed in the same frame, unlike inbuilt Speedbar.
     :commands (treemacs-follow-mode
                treemacs-filewatch-mode
                treemacs-load-theme)
-    :bind (("C-c t" . treemacs-select-window)
+    :bind (:map mode-specific-map
+           ("t" . treemacs-select-window)
            :map treemacs-mode-map
            ([C-tab] . aorst/treemacs-expand-all-projects)
            ("<drag-mouse-1>" . ignore)
@@ -1981,9 +1967,7 @@ A package for editing markdown files.
 [[https://toml.io/en/][TOML]] Language support.
 
 #+begin_src emacs-lisp
-  (use-package toml-mode
-    :bind (:map toml-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+  (use-package toml-mode)
 #+end_src
 
 *** Geiser
@@ -2006,8 +1990,6 @@ Emacs lisp mode tweaks.
     :commands aorst/emacs-lisp-indent-function
     :hook ((emacs-lisp-mode . eldoc-mode)
            (emacs-lisp-mode . aorst/emacs-lisp-setup))
-    :bind (:map emacs-lisp-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
     :config
     (defun aorst/emacs-lisp-indent-function (indent-point state)
       "A replacement for `lisp-indent-function'.
@@ -2068,7 +2050,6 @@ It supports compile-time macro system, and full Lua compatibility.
 #+begin_src emacs-lisp
   (use-package fennel-mode
     :bind (:map fennel-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)
            ("C-c C-k" . aorst/eval-each-sexp)
            ("M-." . xref-find-definitions)
            ("M-," . xref-pop-marker-stack)
@@ -2124,8 +2105,6 @@ It supports compile-time macro system, and full Lua compatibility.
              clojurec-mode
              clojurescript-mode)
             . aorst/clojure-mode-setup))
-    :bind (:map clojure-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
     :config
     (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
     (defun org-babel-execute:clojure (body params)
@@ -2234,9 +2213,7 @@ Some configurations for shell script modes.
 #+begin_src emacs-lisp
   (use-package sh-script
     :straight nil
-    :hook (sh-mode . flycheck-mode)
-    :bind (:map sh-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+    :hook (sh-mode . flycheck-mode))
 #+end_src
 
 *** Perl
@@ -2245,9 +2222,7 @@ Perl related configurations.
 #+begin_src emacs-lisp
   (use-package perl-mode
     :straight nil
-    :hook ((perl-mode . flycheck-mode))
-    :bind (:map perl-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer)))
+    :hook ((perl-mode . flycheck-mode)))
 #+end_src
 
 *** Lua
@@ -2255,8 +2230,6 @@ Lua support, mainly to view what [[*Fennel][Fennel]] compiler produces.
 
 #+begin_src emacs-lisp
   (use-package lua-mode
-    :bind (:map lua-mode-map
-           ("C-c C-M-f" . aorst/indent-buffer))
     :hook (lua-mode . flycheck-mode)
     :custom (lua-indent-level 2))
 #+end_src
@@ -2745,8 +2718,9 @@ This package provides multiple cursors functionality to Emacs.
     :commands (mc/cycle-backward
                mc/cycle-forward)
     :bind (("S-<mouse-1>" . mc/add-cursor-on-click)
-           ("C-c m" . hydrant/mc/body)
            ("M-n" . mc/mark-next-like-this-symbol)
+           :map mode-specific-map
+           ("m" . hydrant/mc/body)
            :map mc/keymap
            ("<return>" . nil)
            ("C-s" . phi-search)
@@ -2794,7 +2768,8 @@ Expand or reduce region semantically.
 
 #+begin_src emacs-lisp
   (use-package expand-region
-    :bind (("C-c e" . hydrant/er/body))
+    :bind (:map mode-specific-map
+           ("e" . hydrant/er/body))
     :requires hydra
     :config
     (defun aorst/er-exit ()
