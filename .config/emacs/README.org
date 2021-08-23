@@ -408,6 +408,8 @@ Configurations for inbuilt =simple.el= module.
       (when (display-graphic-p)
         (setq cursor-type (if overwrite-mode 'box 'bar))))
     :init
+    (column-number-mode 1)
+    (line-number-mode 1)
     (transient-mark-mode -1))
 #+end_src
 
@@ -733,7 +735,7 @@ For variable pitched fonts DejaVu font is used if available.
       (all-the-icons-install-fonts t)))
 #+end_src
 
-*** Solaire Mode
+*** COMMENT Solaire Mode
 This package helps distinguishing buffers that have a file opened, and buffers that are for utilities like file the filetree.
 It uses  =aorst/real-buffer-p= as =solaire-mode-real-buffer-fn=.
 
@@ -821,19 +823,14 @@ Mode-line is displayed at the bottom of each buffer, and shows necessary informa
 There are several packages that can make the mode-line appear differently, but most will reuse mode-line settings.
 
 #+begin_src emacs-lisp
-  (setq-default column-number-mode t
-                line-number-mode t
-                size-indication-mode nil
-                mode-line-position nil
-                mode-line-percent-position nil
-                mode-line-in-non-selected-windows nil)
+  (setq mode-line-percent-position nil)
 
   (dolist (face '(mode-line mode-line-inactive))
     (set-face-attribute face nil
                         :box nil))
 #+end_src
 
-**** Mode-line segments
+**** COMMENT Mode-line segments
 Most of these segments are based on [[https://github.com/seagle0128/doom-modeline][DOOM Modeline]].
 
 ***** Buffer name
@@ -1210,7 +1207,7 @@ Mode line segment for Flymake.
   (add-hook 'flymake-mode-hook #'aorst/flymake-mode-line-update)
 #+end_src
 
-**** Mini Modeline
+**** COMMENT Mini Modeline
 A package that displays mode-line in the echo area.
 
 #+begin_src emacs-lisp
@@ -1303,7 +1300,7 @@ Display buffer name in the titlebar.
                             "%b — Emacs"))))
 #+end_src
 
-*** Treemacs
+*** COMMENT Treemacs
 File explorer that is displayed in the same frame, unlike inbuilt Speedbar.
 
 #+begin_src emacs-lisp
@@ -1659,7 +1656,7 @@ This package makes files with identical names more distinguishable by adding dir
     :custom (uniquify-buffer-name-style 'forward))
 #+end_src
 
-*** Tabline
+*** COMMENT Tabline
 Starting with Emacs 27 native tab support is present, however the default appearance is not great.
 Tab closing semantic is also not very useful defaulting to bury buffer.
 
@@ -1817,6 +1814,14 @@ Tab closing semantic is also not very useful defaulting to bury buffer.
   ;;       (when (> diff 0)
   ;;         (scroll-down diff))))
     )
+#+end_src
+
+*** Minions
+Hide those minor modes.
+
+#+begin_src emacs-lisp
+  (use-package minions
+    :config (minions-mode))
 #+end_src
 
 ** Languages
@@ -2296,12 +2301,12 @@ This package provides a bridge to =libvterm= to display terminal as Emacs buffer
   (setq use-package-hook-name-suffix "-functions")
   (use-package vterm
     :if (bound-and-true-p module-file-suffix)
-    :bind (("C-`" . aorst/vterm-toggle)
-           ("C-t" . aorst/vterm-focus)
+    :bind (;; ("C-`" . aorst/vterm-toggle)
+           ;; ("C-t" . aorst/vterm-focus)
            :map vterm-mode-map
            ("<insert>" . ignore)
            ("<f2>" . ignore))
-    :hook (vterm-exit . aorst/kill-vterm)
+    ;; :hook (vterm-exit . aorst/kill-vterm)
     :custom (vterm-always-compile-module t)
     :config
     (defun aorst/vterm-toggle (&optional arg)
@@ -2827,6 +2832,7 @@ LSP client for Emacs.
     ;; UI
     (lsp-enable-links nil)
     (lsp-headerline-breadcrumb-enable nil)
+    (lsp-modeline-code-actions-enable nil)
     ;; semantic code features
     (lsp-enable-folding nil)
     (lsp-enable-indentation nil)

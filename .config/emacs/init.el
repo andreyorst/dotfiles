@@ -183,6 +183,8 @@ for stopping scroll from going beyond longest line.  Based on
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'box 'bar))))
   :init
+  (column-number-mode 1)
+  (line-number-mode 1)
   (transient-mark-mode -1))
 
 (setq-default truncate-lines t)
@@ -388,13 +390,6 @@ Used in various places to avoid getting wrong line height when
   (when (not (aorst/font-installed-p "all-the-icons"))
     (all-the-icons-install-fonts t)))
 
-(use-package solaire-mode
-  :commands (solaire-global-mode)
-  :custom
-  (solaire-mode-real-buffer-fn #'aorst/real-buffer-p)
-  :init
-  (solaire-global-mode 1))
-
 (defcustom aorst--dark-theme 'doom-spacegrey
   "Dark theme to use."
   :tag "Dark theme"
@@ -454,354 +449,11 @@ Used in various places to avoid getting wrong line height when
 
 (setq-default custom-safe-themes t)
 
-(setq-default column-number-mode t
-              line-number-mode t
-              size-indication-mode nil
-              mode-line-position nil
-              mode-line-percent-position nil
-              mode-line-in-non-selected-windows nil)
+(setq mode-line-percent-position nil)
 
 (dolist (face '(mode-line mode-line-inactive))
   (set-face-attribute face nil
                       :box nil))
-
-(defvar-local aorst--mode-line-buffer-name "")
-(defvar-local aorst--modeline-project-cache nil)
-
-(defun aorst/mode-line-update-buffer-name (&rest _)
-  (setq aorst--mode-line-buffer-name
-        (if-let ((name (buffer-file-name)))
-            (concat
-             "  "
-             (if-let ((project (or aorst--modeline-project-cache (project-current))))
-                 (progn (setq-local aorst--modeline-project-cache project)
-                        (string-trim-left (abbreviate-file-name name)
-                                          (car (project-roots project))))
-               (abbreviate-file-name name)))
-          "")))
-
-(add-hook 'find-file-hook #'aorst/mode-line-update-buffer-name)
-(add-hook 'after-change-major-mode-hook #'aorst/mode-line-update-buffer-name)
-(add-hook 'clone-indirect-buffer-hook #'aorst/mode-line-update-buffer-name)
-(advice-add #'not-modified :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'rename-buffer :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'set-visited-file-name :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'pop-to-buffer :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'undo :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'undo-tree-undo-1 :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'undo-tree-redo-1 :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'fill-paragraph :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'popup-create :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'popup-delete :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'org-edit-src-save :after #'aorst/mode-line-update-buffer-name)
-(advice-add #'symbol-overlay-rename :after #'aorst/mode-line-update-buffer-name)
-
-(defsubst aorst/mode-line-buffer-state ()
-  (concat (if (and buffer-file-name (buffer-modified-p))
-              (concat "  " (propertize (if (char-displayable-p ?💾) "💾" "*"
-                                           'help-echo (concat (buffer-name) " has unsaved changes"))))
-            "")
-          (if (or (buffer-narrowed-p)
-                  (and (bound-and-true-p fancy-narrow-mode)
-                       (fancy-narrow-active-p))
-                  (bound-and-true-p dired-narrow-mode))
-              (concat "  " (propertize (if (char-displayable-p ?↕) "↕" "><"
-                                           'help-echo (concat (buffer-name) " is narrowed"))))
-            "")
-          (if (and buffer-read-only
-                   (not (memq major-mode '(vterm-mode
-                                           treemacs-mode
-                                           xref--xref-buffer-mode
-                                           magit-status-mode))))
-              (concat "  " (propertize
-                            (if (char-displayable-p ?🔒) "🔒" "RO")
-                            'help-echo "Make file writable"
-                            'local-map (doto (make-sparse-keymap)
-                                         (define-key [mode-line mouse-1] 'mode-line-toggle-read-only))))
-            "")))
-
-(defsubst aorst/mode-line-buffer-encoding ()
-  (concat
-   "  "
-   (propertize
-    (let ((sys (coding-system-plist buffer-file-coding-system)))
-      (if (memq (plist-get sys :category)
-                '(coding-category-undecided coding-category-utf-8))
-          "UTF-8"
-        (upcase (symbol-name (plist-get sys :name)))))
-    'help-echo 'mode-line-mule-info-help-echo
-    'local-map mode-line-coding-system-map)))
-
-(defsubst aorst/mode-line-line-column ()
-  (concat
-   "  "
-   (propertize
-    "%C:%l"
-    'help-echo "goto line"
-    'local-map (doto (make-sparse-keymap)
-                 (define-key [mode-line mouse-1] #'goto-line)))))
-
-(defsubst aorst/mode-line-line-encoding ()
-  (if-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
-                  (0 "LF")
-                  (1 "CRLF")
-                  (2 "CR")
-                  (_ nil))))
-      (concat
-       "  "
-       (propertize
-        eol
-        'help-echo (format "Line ending style: %s"
-                           (pcase eol
-                             ("LF" "Unix style LF")
-                             ("CRLF" "DOS style CRLF")
-                             ("CR" "Mac style CR")
-                             (_ "Undecided")))
-        'local-map (doto (make-sparse-keymap)
-                     (define-key [mode-line mouse-1] 'mode-line-change-eol))))
-    ""))
-
-(defsubst aorst/mode-line-input-method ()
-  (if current-input-method
-      (concat
-       "  "
-       (propertize
-        current-input-method-title
-        'help-echo (concat
-                    "Current input method: "
-                    current-input-method
-                    "\nmouse-2: Disable input method\nmouse-3: Describe current input method")
-        'local-map mode-line-input-method-map))
-    ""))
-
-(defvar-local aorst--mode-line--current-major-mode nil)
-
-(defvar-local aorst--mode-line--indent-var nil
-  "Holds variable that is used for setting indent offset in current major mode.
- Used for both checking if we need to do meaningful work in
- `aorst/mode-line-indent-mode', and for getting updated value.")
-
-(defvar-local aorst--mode-line--indent-var-value nil
-  "Holds indent offset value, that was gathered before.
- Used to check if we need to preform meaningful work in
- `aorst/mode-line-indent-mode'.")
-
-(defvar-local aorst--mode-line--indent-mode-string "")
-
-(defun aorst/mode-line-indent-mode ()
-  "Compute mode-line string with current indent mode.
- Does heavy work only if major-mode has changed since last call,
- or if current indent offset has changed since last call, or if
- there's no previous result of this function stored."
-  (unless (and (eq major-mode aorst--mode-line--current-major-mode)
-               (eq aorst--mode-line--indent-var-value
-                   (symbol-value aorst--mode-line--indent-var))
-               aorst--mode-line--indent-mode-string)
-    (setq-local aorst--mode-line--current-major-mode major-mode)
-    (setq-local aorst--mode-line--indent-var (aorst/mode-line--get-indent-var))
-    (setq-local aorst--mode-line--indent-var-value (symbol-value aorst--mode-line--indent-var))
-    (let ((indent-mode-str (concat (when (and (not indent-tabs-mode)
-                                              aorst--mode-line--indent-var-value)
-                                     (format "%d " aorst--mode-line--indent-var-value))
-                                   (if indent-tabs-mode "Tabs" "Spaces"))))
-      (setq-local aorst--mode-line--indent-mode-string
-                  (concat
-                   "  "
-                   (propertize
-                    indent-mode-str
-                    'help-echo (concat "Indent mode: "
-                                       indent-mode-str
-                                       (when aorst--mode-line--indent-var
-                                         (format "\nindent var: %S" aorst--mode-line--indent-var))
-                                       "\nmouse-1: toggle indent-"
-                                       (if indent-tabs-mode "spaces" "tabs")
-                                       "-mode")
-                    'local-map (doto (make-sparse-keymap)
-                                 (define-key [mode-line mouse-1] 'aorst/toggle-indent-mode)))))))
-  aorst--mode-line--indent-mode-string)
-
-(defun aorst/mode-line--get-indent-var ()
-  "Get variable that holds indent offset for current major mode.
- Uses `editorconfig-indentation-alist' variable as a source for
- all relationshipts between major modes and their respective
- offset variables."
-  (when (boundp 'editorconfig-indentation-alist)
-    (car (assoc-default
-          major-mode
-          editorconfig-indentation-alist
-          (lambda (car key)
-            (provided-mode-derived-p key car))))))
-
-(defun aorst/toggle-indent-mode ()
-  "Toggle `indent-tabs-mode' on and off."
-  (interactive)
-  (setq-local indent-tabs-mode (not indent-tabs-mode)))
-
-(defvar-local aorst--mode-line-structural "")
-
-(defun aorst/mode-line-structural (&rest _)
-  (setq aorst--mode-line-structural
-        (if-let ((structural
-                  (cond ((bound-and-true-p parinfer-rust-mode)
-                         (propertize (concat "Parinfer" (pcase parinfer-rust--mode
-                                                          ("smart" "/s")
-                                                          ("indent" "/i")
-                                                          ("paren" "/p")
-                                                          (_ "")))
-                                     'help-echo (concat "Parinfer " parinfer-rust--mode
-                                                        " mode is enabled for current buffer\nmouse-1: toggle Parinfer mode")
-                                     'local-map (doto (make-sparse-keymap)
-                                                  (define-key [mode-line mouse-1] #'parinfer-rust-toggle-paren-mode))))
-                        ((bound-and-true-p paredit-mode)
-                         (propertize "Paredit" 'help-echo "Paredit mode is enabled for current buffer"))
-                        ((bound-and-true-p smartparens-strict-mode)
-                         (propertize "SP/s" 'help-echo "Smartparens strict mode is enabled for current buffer"))
-                        ((bound-and-true-p smartparens-mode)
-                         (propertize "SP" 'help-echo "Smartparens mode is enabled for current buffer"))
-                        ((bound-and-true-p lispy-mode)
-                         (propertize "Lispy" 'help-echo "Lispy mode is enabled for current buffer"))
-                        ((bound-and-true-p electric-pair-mode)
-                         (propertize "EPM" 'help-echo "Electric Pair mode is enabled for current buffer")))))
-            (concat "  " structural)
-          "")))
-
-(add-hook 'parinfer-rust-mode-hook #'aorst/mode-line-structural)
-(add-variable-watcher 'parinfer-rust--mode #'aorst/mode-line-structural)
-(add-hook 'paredit-mode-hook #'aorst/mode-line-structural)
-(add-hook 'smartparens-mode-hook #'aorst/mode-line-structural)
-(add-hook 'smartparens-strict-mode-hook #'aorst/mode-line-structural)
-(add-hook 'lispy-mode-hook #'aorst/mode-line-structural)
-(add-hook 'electric-pair-mode-hook #'aorst/mode-line-structural)
-
-(defsubst aorst/mode-line-mode-name ()
-  (concat
-   "  "
-   (propertize
-    (format-mode-line mode-name)
-    'help-echo (format "Major mode: %s" (format-mode-line mode-name)))))
-
-(defsubst aorst/mode-line-git-branch ()
-  (if (and vc-mode buffer-file-name)
-      (let* ((str (when vc-display-status
-                    (substring
-                     vc-mode
-                     (+ (if (eq (vc-backend buffer-file-name) 'Hg) 2 3)
-                        2)))))
-        (when str
-          (concat (if (char-displayable-p ?) "   " "  @") str)))
-    ""))
-
-(defvar-local aorst--mode-line-lsp "")
-
-(defun aorst/mode-line-update-lsp (&rest _)
-  (setq aorst--mode-line-lsp
-        (concat "  "
-                (if-let ((workspaces (lsp-workspaces)))
-                    (propertize "LSP" 'help-echo "LSP Connected")
-                  (propertize "LSP" 'help-echo "LSP Disconnected")))))
-
-(add-hook 'lsp-before-initialize-hook #'aorst/mode-line-update-lsp)
-(add-hook 'lsp-after-initialize-hook #'aorst/mode-line-update-lsp)
-(add-hook 'lsp-after-uninitialized-functions #'aorst/mode-line-update-lsp)
-(add-hook 'lsp-before-open-hook #'aorst/mode-line-update-lsp)
-(add-hook 'lsp-after-open-hook #'aorst/mode-line-update-lsp)
-
-(defvar-local aorst--mode-line-flycheck "")
-
-(defun aorst/mode-line-update-flycheck (&rest _)
-  (setq aorst--mode-line-flycheck
-        (if (bound-and-true-p flycheck-mode)
-            (concat
-             "  "
-             (pcase flycheck-last-status-change
-               (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
-               (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
-               (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
-               (`errored (propertize "!" 'help-echo "Flycheck: error"))
-               (`finished
-                (let-alist (flycheck-count-errors flycheck-current-errors)
-                  (propertize (format "%s/%s" (or .error 0) (or .warning 0))
-                              'help-echo (if (or .error .warning)
-                                             (concat "Flycheck: "
-                                                     (when .error (format "%d errors%s" .error (if .warning ", " "")))
-                                                     (when .warning (format "%d warnings" .warning))
-                                                     "\nmouse-1: list errors")
-                                           "Flycheck: no errors or warnings")
-                              'local-map 'flycheck-error-list-mode-line-map)))
-               (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
-               (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))
-          "")))
-
-(add-hook 'flycheck-status-changed-functions #'aorst/mode-line-update-flycheck)
-(add-hook 'flycheck-mode-hook #'aorst/mode-line-update-flycheck)
-
-(defvar-local aorst--mode-line-flymake "")
-
-(defun aorst/flymake-mode-line-update (&rest _)
-  (when (bound-and-true-p flymake-mode)
-    (let* ((known (hash-table-keys flymake--backend-state))
-           (running (flymake-running-backends))
-           (disabled (flymake-disabled-backends))
-           (reported (flymake-reporting-backends))
-           (all-disabled (and disabled (null running)))
-           (some-waiting (cl-set-difference running reported)))
-      (setq aorst--mode-line-flymake
-            (concat
-             "  "
-             (cond (some-waiting (propertize "*/*" 'help-echo "Flymake: running"))
-                   ((null known) (propertize "?"   'help-echo "Flymake: no info"))
-                   (all-disabled (propertize "-"   'help-echo "Flymake: disabled"))
-                   (t (let ((.error 0) (.warning 0))
-                        (progn
-                          (cl-loop with warning-level = (warning-numeric-level :warning)
-                                   with note-level = (warning-numeric-level :debug)
-                                   for state being the hash-values of flymake--backend-state
-                                   do (cl-loop with diags = (flymake--backend-state-diags state)
-                                               for diag in diags do
-                                               (let ((severity (flymake--lookup-type-property
-                                                                (flymake--diag-type diag) 'severity
-                                                                (warning-numeric-level :error))))
-                                                 (cond ((> severity warning-level) (cl-incf .error))
-                                                       ((> severity note-level)    (cl-incf .warning))))))
-                          (propertize (format "%s/%s" (or .error 0) (or .warning 0))
-                                      'help-echo (if (or .error .warning)
-                                                     (concat "Flymake: "
-                                                             (when .error (format "%d errors%s" .error (if .warning ", " "")))
-                                                             (when .warning (format "%d warnings" .warning)))
-                                                   "Flymake: no errors or warnings")))))))))))
-
-(advice-add #'flymake--handle-report :after #'aorst/flymake-mode-line-update)
-(add-hook 'flymake-mode-hook #'aorst/flymake-mode-line-update)
-
-(use-package mini-modeline
-  :hook ((aorst--theme-change . aorst/mini-modeline-setup-faces)
-         (after-init . mini-modeline-mode)
-         (isearch-mode . aorst/mini-modeline-isearch)
-         (isearch-mode-end . aorst/mini-modeline-isearch-end))
-  :custom
-  (mini-modeline-right-padding 2)
-  (mini-modeline-display-gui-line nil)
-  (mini-modeline-l-format
-   '(:eval (string-trim-left (eval mode-line-l-format))))
-  (mini-modeline-r-format
-   '(:eval (eval mode-line-r-format)))
-  :config
-  (defvar aorst--mini-modeline-isearch-delay (* 60 60 1000)
-    "Delay echo area update to keep the isearch prompt.")
-  (defun aorst/mini-modeline-isearch ()
-    (setq mini-modeline-echo-duration aorst--mini-modeline-isearch-delay))
-  (defvar aorst--mini-modeline-echo-delay mini-modeline-echo-duration
-    "Delay echo area update to keep the isearch prompt.")
-  (defun aorst/mini-modeline-isearch-end ()
-    (setq mini-modeline-echo-duration aorst--mini-modeline-echo-delay))
-  (defun aorst/mini-modeline-setup-faces ()
-    "Setup mini-modeline face."
-    (setq mini-modeline-face-attr
-          (plist-put mini-modeline-face-attr :background
-                     (if (facep 'solaire-minibuffer-face)
-                         (face-attribute 'solaire-mode-line-face :background)
-                       (face-attribute 'mode-line :background)))))
-  (aorst/mini-modeline-setup-faces))
 
 (defvar mode-line-l-format 'aorst--mode-line-buffer-name)
 (defvar mode-line-r-format
@@ -851,262 +503,9 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                             "Emacs"
                           "%b — Emacs"))))
 
-(use-package treemacs
-  :when window-system
-  :commands (treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-load-theme)
-  :bind (:map mode-specific-map
-         ("t" . treemacs-select-window)
-         :map treemacs-mode-map
-         ([C-tab] . aorst/treemacs-expand-all-projects)
-         ("<drag-mouse-1>" . ignore)
-         ("q" . nil))
-  :hook ((after-init . aorst/treemacs-after-init-setup)
-         (treemacs-mode . aorst/after-treemacs-setup)
-         (treemacs-switch-workspace . aorst/treemacs-expand-all-projects)
-         (treemacs-switch-workspace . treemacs-set-fallback-workspace)
-         (treemacs-mode . aorst/treemacs-setup-title)
-         (aorst--theme-change . aorst/treemacs-setup-title)
-         (aorst--theme-change . aorst/treemacs-setup-faces)
-         (aorst--theme-change . aorst/treemacs-variable-pitch-labels))
-  :custom-face
-  (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
-  (treemacs-git-ignored-face ((t (:inherit (shadow)))))
-  :custom
-  (treemacs-width 32)
-  (treemacs-is-never-other-window t)
-  (treemacs-space-between-root-nodes nil)
-  (treemacs-indentation 2)
-  :config
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode 1)
-  (defun aorst/treemacs-setup-faces ()
-    (set-face-attribute 'treemacs-root-face nil
-                        :foreground nil
-                        :underline nil
-                        :inherit 'treemacs-directory-face
-                        :height 1.0
-                        :weight 'normal))
-  (aorst/treemacs-setup-faces)
-  :init
-  (defun aorst/treemacs-expand-all-projects (&optional _)
-    "Expand all projects."
-    (interactive)
-    (save-excursion
-      (treemacs--forget-last-highlight)
-      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
-        (-when-let (pos (treemacs-project->position project))
-          (when (eq 'root-node-closed (treemacs-button-get pos :state))
-            (goto-char pos)
-            (treemacs--expand-root-node pos)))))
-    (treemacs--maybe-recenter 'on-distance))
-  (defun aorst/treemacs-variable-pitch-labels (&rest _)
-    (dolist (face '(treemacs-file-face
-                    treemacs-tags-face
-                    treemacs-directory-face
-                    treemacs-directory-collapsed-face
-                    treemacs-term-node-face
-                    treemacs-help-title-face
-                    treemacs-help-column-face
-                    treemacs-git-added-face
-                    treemacs-git-ignored-face
-                    treemacs-git-renamed-face
-                    treemacs-git-conflict-face
-                    treemacs-git-modified-face
-                    treemacs-git-unmodified-face
-                    treemacs-git-untracked-face
-                    treemacs-root-unreadable-face
-                    treemacs-root-remote-face
-                    treemacs-root-remote-unreadable-face
-                    treemacs-root-remote-disconnected-face
-                    treemacs-fringe-indicator-face
-                    treemacs-on-failure-pulse-face
-                    treemacs-on-success-pulse-face))
-      (let* ((faces (face-attribute face :inherit nil))
-             (faces (if (listp faces) faces (list faces))))
-        (unless (memq 'variable-pitch faces)
-          (set-face-attribute
-           face nil :inherit
-           `(variable-pitch ,@(delq 'unspecified faces)))))))
-  (defun aorst/treemacs-after-init-setup ()
-    "Set treemacs theme, open treemacs, and expand all projects."
-    (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
-    (treemacs-load-theme "Atom")
-    (treemacs)
-    (treemacs-fringe-indicator-mode -1)
-    (aorst/treemacs-expand-all-projects)
-    (windmove-right))
-  (defun aorst/after-treemacs-setup ()
-    "Set treemacs buffer common settings."
-    (setq tab-width 1
-          mode-line-format nil
-          line-spacing 5)
-    (setq-local scroll-step 1)
-    (setq-local scroll-conservatively 10000)
-    (setq-local scroll-margin 0)
-    (set-window-fringes nil 1 1 nil)
-    (aorst/treemacs-variable-pitch-labels))
-  (define-advice treemacs-select-window (:after () aorst:treemacs-setup-fringes)
-    "Set treemacs buffer fringes."
-    (set-window-fringes nil 1 1 t))
-  (define-advice treemacs-root-down (:after () aorst:treemacs-root-down)
-    "Open all projects on root down"
-    (aorst/treemacs-expand-all-projects))
-  (defun aorst/treemacs-setup-title ()
-    (when-let ((treemacs-buffer (treemacs-get-local-buffer)))
-      (with-current-buffer treemacs-buffer
-        (let ((bg (if (and (facep 'solaire-default-face)
-                           (not (eq (face-attribute 'solaire-default-face :background)
-                                    'unspecified)))
-                      (face-attribute 'solaire-default-face :background)
-                    (face-attribute 'default :background)))
-              (fg (face-attribute 'default :foreground)))
-          (face-remap-add-relative 'header-line
-                                   :background bg
-                                   :foreground fg
-                                   :box (list :line-width (/ aorst--line-pixel-height 4) :color bg)))
-        (setq header-line-format
-              '((:eval
-                 (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
-                        (extra-align (+ (/ (length text) 2) 1))
-                        (width (- (/ (window-width) 2) extra-align)))
-                   (concat (make-string width ?\s) text)))))))))
-
-(use-package treemacs-magit
-  :after magit)
-
 (use-package uniquify
   :straight nil
   :custom (uniquify-buffer-name-style 'forward))
-
-(use-package tab-line
-  :straight nil
-  :when window-system
-  :hook ((after-init . global-tab-line-mode)
-         (aorst--theme-change . aorst/tabline-setup-faces))
-  :config
-  (defun tab-line-close-tab (&optional e)
-    "Close the selected tab.
-
-If tab is presented in another window, close the tab by using
-`bury-buffer` function.  If tab is unique to all existing
-windows, kill the buffer with `kill-buffer` function.  Lastly, if
-no tabs left in the window, it is deleted with `delete-window`
-function."
-    (interactive "e")
-    (let* ((posnp (event-start e))
-           (window (posn-window posnp))
-           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-      (with-selected-window window
-        (let ((tab-list (tab-line-tabs-window-buffers))
-              (buffer-list (flatten-list
-                            (seq-reduce (lambda (list window)
-                                          (select-window window t)
-                                          (cons (tab-line-tabs-window-buffers) list))
-                                        (window-list) nil))))
-          (select-window window)
-          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-              (progn
-                (if (eq buffer (current-buffer))
-                    (bury-buffer)
-                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
-                (unless (cdr tab-list)
-                  (ignore-errors (delete-window window))))
-            (and (kill-buffer buffer)
-                 (unless (cdr tab-list)
-                   (ignore-errors (delete-window window)))))))))
-
-
-  (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
-    "Create name for tab with padding and truncation.
-
-If buffer name is shorter than `tab-line-tab-max-width' it gets
-centered with spaces, otherwise it is truncated, to preserve
-equal width for all tabs.  This function also tries to fit as
-many tabs in window as possible, so if there are no room for tabs
-with maximum width, it calculates new width for each tab and
-truncates text if needed.  Minimal width can be set with
-`tab-line-tab-min-width' variable."
-    (with-current-buffer buffer
-      (let ((buffer (string-trim (buffer-name)))
-            (right-pad (if tab-line-close-button-show "" " ")))
-        (propertize (concat " " buffer right-pad)
-                    'help-echo (when-let ((name (buffer-file-name)))
-                                 (abbreviate-file-name name))))))
-
-
-  (setq tab-line-close-button-show t
-        tab-line-new-button-show nil
-        tab-line-separator ""
-        tab-line-tab-name-function #'aorst/tab-line-name-buffer
-        tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                          'keymap tab-line-right-map
-                                          'mouse-face 'tab-line-highlight
-                                          'help-echo "Click to scroll right")
-        tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                         'keymap tab-line-left-map
-                                         'mouse-face 'tab-line-highlight
-                                         'help-echo "Click to scroll left")
-        tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
-                                          'keymap tab-line-tab-close-map
-                                          'mouse-face 'tab-line-close-highlight
-                                          'help-echo "Click to close tab")
-        tab-line-exclude-modes '(ediff-mode
-                                 process-menu-mode
-                                 term-mode
-                                 vterm-mode
-                                 treemacs-mode
-                                 imenu-list-major-mode))
-
-
-  (defun aorst/tabline-setup-faces ()
-    (let ((bg (face-attribute 'default :background))
-          (fg (face-attribute 'default :foreground))
-          (dark-fg (face-attribute 'shadow :foreground))
-          (overline (face-attribute 'font-lock-keyword-face :foreground))
-          (base (if (and (facep 'solaire-default-face)
-                         (not (eq (face-attribute 'solaire-default-face :background)
-                                  'unspecified)))
-                    (face-attribute 'solaire-default-face :background)
-                  (face-attribute 'mode-line :background)))
-          (box-width (/ aorst--line-pixel-height 5)))
-      (when (facep 'tab-line-tab-special)
-        (set-face-attribute 'tab-line-tab-special nil
-                            :slant 'normal))
-      (set-face-attribute 'tab-line nil
-                          :background base
-                          :foreground dark-fg
-                          :height 1.0
-                          :inherit nil
-                          :overline base
-                          :box (when (> box-width 0)
-                                 (list :line-width -1 :color base)))
-      (set-face-attribute 'tab-line-tab nil
-                          :foreground dark-fg
-                          :background bg
-                          :inherit nil
-                          :box (when (> box-width 0)
-                                 (list :line-width box-width :color bg)))
-      (set-face-attribute 'tab-line-tab-inactive nil
-                          :foreground dark-fg
-                          :background base
-                          :inherit nil
-                          :box (when (> box-width 0)
-                                 (list :line-width box-width :color base)))
-      (set-face-attribute 'tab-line-tab-current nil
-                          :foreground fg
-                          :background bg
-                          :inherit nil
-                          :overline overline
-                          :box (when (> box-width 0)
-                                 (list :line-width box-width :color bg)))))
-
-  (aorst/tabline-setup-faces)
-
-  (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
-    (select-window (posn-window (event-start e)))))
 
 (use-package display-line-numbers
   :straight nil
@@ -1128,6 +527,9 @@ truncates text if needed.  Minimal width can be set with
 ;;       (when (> diff 0)
 ;;         (scroll-down diff))))
   )
+
+(use-package minions
+  :config (minions-mode))
 
 (use-package org
   :straight (:type built-in)
@@ -1458,12 +860,12 @@ appended."
 (setq use-package-hook-name-suffix "-functions")
 (use-package vterm
   :if (bound-and-true-p module-file-suffix)
-  :bind (("C-`" . aorst/vterm-toggle)
-         ("C-t" . aorst/vterm-focus)
+  :bind (;; ("C-`" . aorst/vterm-toggle)
+         ;; ("C-t" . aorst/vterm-focus)
          :map vterm-mode-map
          ("<insert>" . ignore)
          ("<f2>" . ignore))
-  :hook (vterm-exit . aorst/kill-vterm)
+  ;; :hook (vterm-exit . aorst/kill-vterm)
   :custom (vterm-always-compile-module t)
   :config
   (defun aorst/vterm-toggle (&optional arg)
@@ -1883,6 +1285,7 @@ appended."
   ;; UI
   (lsp-enable-links nil)
   (lsp-headerline-breadcrumb-enable nil)
+  (lsp-modeline-code-actions-enable nil)
   ;; semantic code features
   (lsp-enable-folding nil)
   (lsp-enable-indentation nil)
