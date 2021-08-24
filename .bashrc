@@ -36,6 +36,25 @@ export HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 PS1="\[\e[0;31m\]┌─╼[\[\e[m\]\w\[\e[0;31m\]] \$TIME_PS1\$SSH_PS1\$CONTAINER_PS1\$GIT_PS1
 \$(if [ \$? -eq 0 ]; then echo \"\[\e[0;31m\]└────╼\"; else echo \"\[\e[0;31m\]└╼\"; fi) \[\e[m\]"
 
+if [ -n "$VTERM" ]; then
+    vterm_printf(){
+        if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
+            # Tell tmux to pass the escape sequences through
+            printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+        elif [ "${TERM%%-*}" = "screen" ]; then
+            # GNU screen (screen, screen-256color, screen-256color-bce)
+            printf "\eP\e]%s\007\e\\" "$1"
+        else
+            printf "\e]%s\e\\" "$1"
+        fi
+    }
+
+    vterm_prompt_end(){
+        vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
+    }
+    PS1=$PS1'\[$(vterm_prompt_end)\]'
+fi
+
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -n; time_ps1; git_ps1; ssh_ps1; container_ps1"
 
 function time_ps1() {
@@ -82,6 +101,6 @@ function container_ps1() {
 }
 
 # Start TMUX session automatically
-if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ]; then
+if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ] && [ -z "$VTERM" ]; then
     tmux
 fi

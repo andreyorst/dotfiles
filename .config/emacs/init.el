@@ -366,7 +366,7 @@ Used in various places to avoid getting wrong line height when
   (setq-default tooltip-y-offset aorst--line-pixel-height)
   (setq-default tooltip-frame-parameters
                 `((name . "tooltip")
-                  (internal-border-width . ,(/ aorst--line-pixel-height 2))
+                  (internal-border-width . 2)
                   (border-width . 1)
                   (no-special-glyphs . t)))
   (scroll-bar-mode -1)
@@ -390,7 +390,7 @@ Used in various places to avoid getting wrong line height when
   (when (not (aorst/font-installed-p "all-the-icons"))
     (all-the-icons-install-fonts t)))
 
-(defcustom aorst--dark-theme 'doom-spacegrey
+(defcustom aorst--dark-theme 'doom-miramare
   "Dark theme to use."
   :tag "Dark theme"
   :type 'symbol
@@ -857,65 +857,14 @@ appended."
   :straight nil
   :custom (doc-view-resolution 192))
 
-(setq use-package-hook-name-suffix "-functions")
 (use-package vterm
   :if (bound-and-true-p module-file-suffix)
-  :bind (;; ("C-`" . aorst/vterm-toggle)
-         ;; ("C-t" . aorst/vterm-focus)
-         :map vterm-mode-map
+  :bind (:map vterm-mode-map
          ("<insert>" . ignore)
          ("<f2>" . ignore))
-  ;; :hook (vterm-exit . aorst/kill-vterm)
-  :custom (vterm-always-compile-module t)
-  :config
-  (defun aorst/vterm-toggle (&optional arg)
-    "Toggle `vterm' window on and off with the same command."
-    (interactive "P")
-    (let* ((directory (if default-directory
-                          default-directory
-                        (expand-file-name "~/")))
-           (bufname " *vterm*")
-           (window (get-buffer-window bufname)))
-      (if window
-          (ignore-errors (delete-window window))
-        (if (window-dedicated-p)
-            (let ((windows (seq-drop-while #'window-dedicated-p (window-list))))
-              (when (not (null windows))
-                (select-window (car windows)))))
-        (let* ((win-side (unless (string= (buffer-name) " *Install vterm* ")
-                           (if (symbolp arg)
-                               (cons (split-window-below (floor (* (window-height) 0.65))) 'bot)
-                             (cons (split-window-right) 'right))))
-               (window (car win-side))
-               (side (cdr win-side)))
-          (when window
-            (select-window window))
-          (cond ((get-buffer bufname)
-                 (switch-to-buffer bufname)
-                 ;; for `bury-buffer' to work we need a non-hidden buffer
-                 (rename-buffer "*vterm*"))
-                (t (let ((default-directory directory))
-                     (vterm "*vterm*"))))
-          (when (bound-and-true-p global-tab-line-mode)
-            (previous-buffer)
-            (bury-buffer))
-          (rename-buffer " *vterm*")
-          (set-window-dedicated-p window t)
-          (set-window-parameter window 'no-delete-other-windows t)
-          (when side
-            (set-window-parameter window 'window-side side))
-          (set-window-parameter window 'no-other-window t)))))
-  (defun aorst/vterm-focus (&optional arg)
-    "Focus `vterm' or open one if there's none."
-    (interactive "P")
-    (let ((window (get-buffer-window " *vterm*")))
-      (if window
-          (select-window window)
-        (aorst/vterm-toggle arg))))
-  (defun aorst/kill-vterm (buf &optional event)
-    "Kill the `*vterm*' buffer after shell exits."
-    (when buf (kill-buffer buf))))
-(setq use-package-hook-name-suffix "-hook")
+  :custom
+  (vterm-always-compile-module t)
+  (vterm-environment '("VTERM=1")))
 
 (use-package editorconfig
   :config (editorconfig-mode 1))
@@ -1510,6 +1459,11 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package vlf-setup
   :straight vlf
   :custom (vlf-tune-enabled nil))
+
+(use-package dired
+  :straight nil
+  :custom
+  (dired-listing-switches "-al --group-directories-first"))
 
 (provide 'init)
 ;;; init.el ends here

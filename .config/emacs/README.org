@@ -690,7 +690,7 @@ Scrollbars and toolbar are disabled.
     (setq-default tooltip-y-offset aorst--line-pixel-height)
     (setq-default tooltip-frame-parameters
                   `((name . "tooltip")
-                    (internal-border-width . ,(/ aorst--line-pixel-height 2))
+                    (internal-border-width . 2)
                     (border-width . 1)
                     (no-special-glyphs . t)))
     (scroll-bar-mode -1)
@@ -753,7 +753,7 @@ It uses  =aorst/real-buffer-p= as =solaire-mode-real-buffer-fn=.
 Provided themes define colors for pretty much every popular Emacs package, which helps make Emacs look very consistent.
 
 #+begin_src emacs-lisp
-  (defcustom aorst--dark-theme 'doom-spacegrey
+  (defcustom aorst--dark-theme 'doom-miramare
     "Dark theme to use."
     :tag "Dark theme"
     :type 'symbol
@@ -1427,7 +1427,7 @@ File explorer that is displayed in the same frame, unlike inbuilt Speedbar.
                      (concat (make-string width ?\s) text)))))))))
 #+end_src
 
-**** Treemacs Magit
+**** COMMENT Treemacs Magit
 Package for Treemacs and Magit integration.
 
 #+begin_src emacs-lisp
@@ -1435,7 +1435,7 @@ Package for Treemacs and Magit integration.
     :after magit)
 #+end_src
 
-**** Treemacs Atom theme
+**** COMMENT Treemacs Atom theme
 An Atom inspired theme for Treemacs, that is tangled to a separate file.
 
 #+begin_src emacs-lisp :tangle ./treemacs-atom-theme.el
@@ -2298,65 +2298,14 @@ Default resolution is too low:
 This package provides a bridge to =libvterm= to display terminal as Emacs buffer.
 
 #+begin_src emacs-lisp
-  (setq use-package-hook-name-suffix "-functions")
   (use-package vterm
     :if (bound-and-true-p module-file-suffix)
-    :bind (;; ("C-`" . aorst/vterm-toggle)
-           ;; ("C-t" . aorst/vterm-focus)
-           :map vterm-mode-map
+    :bind (:map vterm-mode-map
            ("<insert>" . ignore)
            ("<f2>" . ignore))
-    ;; :hook (vterm-exit . aorst/kill-vterm)
-    :custom (vterm-always-compile-module t)
-    :config
-    (defun aorst/vterm-toggle (&optional arg)
-      "Toggle `vterm' window on and off with the same command."
-      (interactive "P")
-      (let* ((directory (if default-directory
-                            default-directory
-                          (expand-file-name "~/")))
-             (bufname " *vterm*")
-             (window (get-buffer-window bufname)))
-        (if window
-            (ignore-errors (delete-window window))
-          (if (window-dedicated-p)
-              (let ((windows (seq-drop-while #'window-dedicated-p (window-list))))
-                (when (not (null windows))
-                  (select-window (car windows)))))
-          (let* ((win-side (unless (string= (buffer-name) " *Install vterm* ")
-                             (if (symbolp arg)
-                                 (cons (split-window-below (floor (* (window-height) 0.65))) 'bot)
-                               (cons (split-window-right) 'right))))
-                 (window (car win-side))
-                 (side (cdr win-side)))
-            (when window
-              (select-window window))
-            (cond ((get-buffer bufname)
-                   (switch-to-buffer bufname)
-                   ;; for `bury-buffer' to work we need a non-hidden buffer
-                   (rename-buffer "*vterm*"))
-                  (t (let ((default-directory directory))
-                       (vterm "*vterm*"))))
-            (when (bound-and-true-p global-tab-line-mode)
-              (previous-buffer)
-              (bury-buffer))
-            (rename-buffer " *vterm*")
-            (set-window-dedicated-p window t)
-            (set-window-parameter window 'no-delete-other-windows t)
-            (when side
-              (set-window-parameter window 'window-side side))
-            (set-window-parameter window 'no-other-window t)))))
-    (defun aorst/vterm-focus (&optional arg)
-      "Focus `vterm' or open one if there's none."
-      (interactive "P")
-      (let ((window (get-buffer-window " *vterm*")))
-        (if window
-            (select-window window)
-          (aorst/vterm-toggle arg))))
-    (defun aorst/kill-vterm (buf &optional event)
-      "Kill the `*vterm*' buffer after shell exits."
-      (when buf (kill-buffer buf))))
-  (setq use-package-hook-name-suffix "-hook")
+    :custom
+    (vterm-always-compile-module t)
+    (vterm-environment '("VTERM=1")))
 #+end_src
 
 *** EditorConfig
@@ -3208,6 +3157,13 @@ Emacs minor mode that allows viewing, editing, searching and comparing large fil
     :custom (vlf-tune-enabled nil))
 #+end_src
 
+*** Dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :straight nil
+    :custom
+    (dired-listing-switches "-al --group-directories-first"))
+#+end_src
 ** =(provide 'init)=
 This concludes the =init.el= file.
 
