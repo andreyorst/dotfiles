@@ -228,20 +228,6 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :custom (comint-scroll-show-maximum-output nil))
 
-(defun aorst/real-buffer-p (&optional buffer)
-  "Determines whether BUFFER is real."
-  (not (or (string-match-p
-            (regexp-opt '("*Treemacs"
-                          "*vterm*"
-                          " *Minibuf"
-                          " *Echo Area"
-                          "*Process List*"
-                          "*Ediff"
-                          " *LV*"
-                          "*Ilist*"))
-            (buffer-name buffer))
-           (minibufferp))))
-
 (define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
   "Quit in current context.
 
@@ -320,20 +306,6 @@ Depends on `doom-blend'."
                           :extend t
                           :inverse-video t))))
 
-(defmacro doto (x &rest forms)
-  "Evaluates x then calls all of the functions with the value of
-x supplied at the front of the given arguments.  The forms are
-evaluated in order.  Returns x."
-  (declare (indent defun))
-  (let ((gx (gensym)))
-    `(let ((,gx ,x))
-       ,@(mapcar (lambda (f)
-                   (if (listp f)
-                       `(,(car f) ,gx ,@(cdr f))
-                     `(,f ,gx)))
-                 forms)
-       ,gx)))
-
 (defun aorst/minibuffer-defer-garbage-collection ()
   "Defer garbage collection for minibuffer"
   (setq gc-cons-threshold most-positive-fixnum))
@@ -390,7 +362,7 @@ Used in various places to avoid getting wrong line height when
   (when (not (aorst/font-installed-p "all-the-icons"))
     (all-the-icons-install-fonts t)))
 
-(defcustom aorst--dark-theme 'doom-miramare
+(defcustom aorst--dark-theme 'doom-spacegrey
   "Dark theme to use."
   :tag "Dark theme"
   :type 'symbol
@@ -411,7 +383,7 @@ Used in various places to avoid getting wrong line height when
   (highlight ((t (:foreground unspecified
                   :distant-foreground unspecified
                   :background unspecified))))
-  (org-block ((t (:extend t :background unspecified :inherit hl-line))))
+  (org-block ((t (:extend t))))
   (org-block-begin-line ((t (:slant unspecified
                              :weight normal
                              :background unspecified
@@ -480,7 +452,7 @@ Used in various places to avoid getting wrong line height when
   (window-divider-default-right-width 1)
   (window-divider-default-places t)
   :config
-  (window-divider-mode t)
+  ;; (window-divider-mode t)
   (defun aorst/window-divider-setup-faces ()
     (let* ((color (face-attribute 'default :background))
            (color (if (fboundp #'doom-darken)
