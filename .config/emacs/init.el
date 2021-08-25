@@ -427,22 +427,6 @@ Used in various places to avoid getting wrong line height when
   (set-face-attribute face nil
                       :box nil))
 
-(defvar mode-line-l-format 'aorst--mode-line-buffer-name)
-(defvar mode-line-r-format
-  '(concat
-    (aorst/mode-line-buffer-state)
-    (aorst/mode-line-line-column)
-    (aorst/mode-line-input-method)
-    (aorst/mode-line-line-encoding)
-    (aorst/mode-line-buffer-encoding)
-    (aorst/mode-line-indent-mode)
-    (aorst/mode-line-mode-name)
-    (aorst/mode-line-git-branch)
-    aorst--mode-line-lsp
-    aorst--mode-line-flymake
-    aorst--mode-line-flycheck
-    aorst--mode-line-structural))
-
 (use-package frame
   :straight nil
   :when window-system
@@ -501,7 +485,10 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   )
 
 (use-package minions
-  :config (minions-mode))
+  :custom
+  (minions-direct '(flycheck-mode))
+  :config
+  (minions-mode))
 
 (use-package org
   :straight (:type built-in)
@@ -934,6 +921,30 @@ appended."
       :fringe-bitmap 'flycheck-question-mark
       :fringe-face 'flycheck-fringe-info
       :error-list-face 'flycheck-error-list-info))
+  (define-advice flycheck-mode-line-status-text (:override (&optional status)
+                                                 aorst:flycheck-mode-line-indicator)
+    "Get a text describing STATUS for use in the mode line.
+
+STATUS defaults to `flycheck-last-status-change' if omitted or
+nil."
+    (let ((text (pcase (or status flycheck-last-status-change)
+                  (`not-checked "-/-")
+                  (`no-checker "-")
+                  (`running "*/*")
+                  (`errored "!")
+                  (`finished
+                   (let-alist (flycheck-count-errors flycheck-current-errors)
+                     (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                                 'help-echo (if (or .error .warning)
+                                                (concat "Flycheck: "
+                                                        (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                        (when .warning (format "%d warnings" .warning))
+                                                        "\nmouse-1: list errors")
+                                              "Flycheck: no errors or warnings")
+                                 'local-map 'flycheck-error-list-mode-line-map)))
+                  (`interrupted ".")
+                  (`suspicious "?"))))
+      (concat " " flycheck-mode-line-prefix ":" text)))
   (define-advice flycheck-may-use-echo-area-p (:override () aorst:flycheck-no-echo-or-buffer)
     nil))
 
@@ -1186,9 +1197,10 @@ appended."
            c-mode
            c++-mode
            elixir-mode
-           clojure-mode
-           clojurec-mode
-           clojurescript-mode)
+           ;; clojure-mode
+           ;; clojurec-mode
+           ;; clojurescript-mode
+           )
           . aorst/setup-lsp)
          (lsp-mode . yas-minor-mode))
   :custom-face
