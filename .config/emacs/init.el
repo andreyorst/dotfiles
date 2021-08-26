@@ -379,31 +379,14 @@ Used in various places to avoid getting wrong line height when
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :custom-face
-  (fringe    ((t (:background nil))))
+  (fringe ((t (:background nil))))
   (highlight ((t (:foreground unspecified
                   :distant-foreground unspecified
                   :background unspecified))))
-  (org-block ((t (:extend t))))
-  (org-block-begin-line ((t (:slant unspecified
-                             :weight normal
-                             :background unspecified
-                             :inherit org-block
-                             :extend t))))
-  (org-block-end-line   ((t (:background unspecified
-                             :inherit org-block-begin-line
-                             :extend t))))
-  (secondary-selection  ((t (:foreground unspecified
-                             :background unspecified
-                             :inherit region
-                             :extend t))))
-  (org-level-2 ((t (:inherit outline-3))))
-  (org-level-3 ((t (:inherit outline-4))))
-  (org-level-4 ((t (:inherit outline-2))))
-  (org-level-5 ((t (:inherit outline-1))))
-  (org-level-6 ((t (:inherit outline-3))))
-  (org-level-7 ((t (:inherit outline-4))))
-  (org-level-8 ((t (:inherit outline-2))))
-  (org-drawer ((t (:foreground nil :inherit shadow))))
+  (secondary-selection ((t (:foreground unspecified
+                          :background unspecified
+                          :inherit region
+                          :extend t))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
   (if (aorst/dark-mode-p)
@@ -497,6 +480,19 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   :bind (:map org-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines)
          ("C-c l" . org-store-link))
+  :custom-face
+  (org-block ((t (:extend t))))
+  (org-block-begin-line ((t (:slant unspecified
+                             :weight normal
+                             :background unspecified
+                             :inherit org-block
+                             :extend t))))
+  (org-block-end-line ((t (:slant unspecified
+                           :weight normal
+                           :background unspecified
+                           :inherit org-block-begin-line
+                           :extend t))))
+  (org-drawer ((t (:foreground nil :inherit shadow))))
   :custom
   (org-startup-with-inline-images nil)
   (org-tags-column -120)
