@@ -685,17 +685,6 @@ For variable pitched fonts DejaVu font is used if available.
     (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 #+end_src
 
-*** Icons
-=all-the-icons= package provides icons for Emacs via custom fonts.
-
-#+begin_src emacs-lisp
-  (use-package all-the-icons
-    :when (window-system)
-    :config
-    (when (not (aorst/font-installed-p "all-the-icons"))
-      (all-the-icons-install-fonts t)))
-#+end_src
-
 *** Theme
 =doom-themes= package is a theme collection, originally developed for [[https://github.com/hlissner/doom-emacs][DOOM Emacs]].
 Provided themes define colors for pretty much every popular Emacs package, which helps make Emacs look very consistent.
@@ -2021,6 +2010,8 @@ Settings to =recentf= mode.
 #+begin_src emacs-lisp
   (use-package recentf
     :straight nil
+    :custom
+    (recentf-max-menu-items 50)
     :config
     (add-to-list 'recentf-exclude "\\.gpg\\")
     (recentf-mode))
@@ -2062,23 +2053,9 @@ Some tweaks to inbuilt parenthesis highlighting mode.
   (use-package paren
     :straight nil
     :hook (prog-mode . show-paren-mode)
-    :custom (show-paren-delay 0))
-#+end_src
-
-*** Xref
-Workaround for a problem with Treemacs and marker stack: [[https://github.com/Alexander-Miller/treemacs/issues/734][Alexander-Miller/treemacs#734]].
-
-#+begin_src emacs-lisp
-  (use-package xref
-    :straight nil
-    :config
-    (when (featurep 'treemacs)
-      (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
-        (let ((m (or m (point-marker))))
-          (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
-            (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
-              (setf m (point-marker))))
-          (funcall fn m)))))
+    :custom
+    (show-paren-delay 0)
+    (show-paren-when-point-in-periphery t))
 #+end_src
 
 *** VC mode
@@ -2088,19 +2065,6 @@ Tweaks for inbuilt VC mode.
   (use-package vc-hooks
     :straight nil
     :custom (vc-follow-symlinks t))
-#+end_src
-
-*** Quail
-Hide quail buffers from buffer menu.
-
-#+begin_src emacs-lisp
-  (use-package quail
-    :straight nil
-    :config
-    (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
-      (with-current-buffer quail-completion-buf
-        (when (string= "*Quail Completions*" (buffer-name))
-          (rename-buffer " *Quail Completions*")))))
 #+end_src
 
 *** ISAYT
@@ -2138,18 +2102,6 @@ Highlight =TODO= markers in files.
 #+begin_src emacs-lisp
   (use-package hl-todo
     :hook (prog-mode . hl-todo-mode))
-#+end_src
-
-*** Jdecomp
-Java bytecode decompiler support for viewing =.class= files.
-
-#+begin_src emacs-lisp
-  (use-package jdecomp
-    :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
-    :hook (archive-mode . jdecomp-mode)
-    :custom
-    (jdecomp-decompiler-type 'fernflower)
-    (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 #+end_src
 
 *** Compile
@@ -2209,15 +2161,6 @@ Eshell is a shell implemented in Emacs Lisp, that (in theory) works the same acr
   (use-package esh-mode
     :straight nil
     :custom (eshell-scroll-show-maximum-output nil))
-#+end_src
-
-*** VLF
-Emacs minor mode that allows viewing, editing, searching and comparing large files in batches, trading memory for processor time.
-
-#+begin_src emacs-lisp
-  (use-package vlf-setup
-    :straight vlf
-    :custom (vlf-tune-enabled nil))
 #+end_src
 
 *** Dired

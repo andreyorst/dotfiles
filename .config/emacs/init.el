@@ -356,12 +356,6 @@ Used in various places to avoid getting wrong line height when
 (when (aorst/font-installed-p "DejaVu Sans")
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
-(use-package all-the-icons
-  :when (window-system)
-  :config
-  (when (not (aorst/font-installed-p "all-the-icons"))
-    (all-the-icons-install-fonts t)))
-
 (defcustom aorst--dark-theme 'doom-spacegrey
   "Dark theme to use."
   :tag "Dark theme"
@@ -1324,6 +1318,8 @@ nil."
 
 (use-package recentf
   :straight nil
+  :custom
+  (recentf-max-menu-items 50)
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\")
   (recentf-mode))
@@ -1344,30 +1340,13 @@ nil."
 (use-package paren
   :straight nil
   :hook (prog-mode . show-paren-mode)
-  :custom (show-paren-delay 0))
-
-(use-package xref
-  :straight nil
-  :config
-  (when (featurep 'treemacs)
-    (define-advice xref-push-marker-stack (:around (fn &optional m) aorst:remove-treemacs-from-xref-marker-stack)
-      (let ((m (or m (point-marker))))
-        (when (buffer-local-value 'treemacs--in-this-buffer (marker-buffer m))
-          (with-current-buffer (window-buffer (next-window (selected-window) nil nil))
-            (setf m (point-marker))))
-        (funcall fn m)))))
+  :custom
+  (show-paren-delay 0)
+  (show-paren-when-point-in-periphery t))
 
 (use-package vc-hooks
   :straight nil
   :custom (vc-follow-symlinks t))
-
-(use-package quail
-  :straight nil
-  :config
-  (define-advice quail-setup-completion-buf (:after () aorst:hide-quail-buffer)
-    (with-current-buffer quail-completion-buf
-      (when (string= "*Quail Completions*" (buffer-name))
-        (rename-buffer " *Quail Completions*")))))
 
 (use-package isayt
   :straight (:host gitlab
@@ -1385,13 +1364,6 @@ nil."
 
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode))
-
-(use-package jdecomp
-  :when (file-exists-p (expand-file-name "~/.local/bin/fernflower.jar"))
-  :hook (archive-mode . jdecomp-mode)
-  :custom
-  (jdecomp-decompiler-type 'fernflower)
-  (jdecomp-decompiler-paths '((fernflower . "~/.local/bin/fernflower.jar"))))
 
 (defmacro aorst/add-compilation-error-syntax (name regexp file line &optional col level)
   "Register new compilation error syntax.
@@ -1435,10 +1407,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package esh-mode
   :straight nil
   :custom (eshell-scroll-show-maximum-output nil))
-
-(use-package vlf-setup
-  :straight vlf
-  :custom (vlf-tune-enabled nil))
 
 (use-package dired
   :straight nil
