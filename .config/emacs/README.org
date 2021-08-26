@@ -319,10 +319,6 @@ Also advising =scroll-left= to prevent over-scrolling past the visible part of t
                   hscroll-step 1
                   hscroll-margin 1
                   scroll-margin 1
-                  ;; scroll-step 1
-                  ;; scroll-conservatively 101
-                  ;; scroll-up-aggressively 0.01
-                  ;; scroll-down-aggressively 0.01
                   scroll-preserve-screen-position nil)
     (unless (display-graphic-p)
       (xterm-mouse-mode t)))
@@ -406,7 +402,7 @@ Configurations for inbuilt =simple.el= module.
     :config
     (defun aorst/overwrite-set-cursor-shape ()
       (when (display-graphic-p)
-        (setq cursor-type (if overwrite-mode 'box 'bar))))
+        (setq cursor-type (if overwrite-mode 'box '(bar . 1)))))
     :init
     (column-number-mode 1)
     (line-number-mode 1)
@@ -426,7 +422,6 @@ Disables line wrapping.
 
 *** Minibuffer
 Disabling clicks in minibuffer, to prevent opening =*Messages*= buffer.
-Additionally, enabling =flex= matching in completion engine, and tweaking faces.
 
 #+begin_src emacs-lisp
   (use-package minibuffer
@@ -727,13 +722,14 @@ It is useful to update some faces that are out of scope of current theme or dyna
 
 #+begin_src emacs-lisp
   (defvar aorst--theme-change-hook nil
-    "Hook run after a color theme is loaded using `load-theme'.")
+    "Hook run after a color theme is changed with `load-theme' or `disable-theme'.")
 
-  (define-advice load-theme (:after (&rest _) aorst:setup-theme)
+  (defun aorst/run-theme-change-hooks (&rest _)
+    "Run theme change hooks."
     (run-hooks 'aorst--theme-change-hook))
 
-  (define-advice disable-theme (:after (&rest _) aorst:setup-theme)
-    (run-hooks 'aorst--theme-change-hook))
+  (advice-add 'load-theme :after #'aorst/run-theme-change-hooks)
+  (advice-add 'disable-theme :after #'aorst/run-theme-change-hooks)
 
   (setq-default custom-safe-themes t)
 #+end_src
@@ -748,30 +744,6 @@ There are several packages that can make the mode-line appear differently, but m
   (dolist (face '(mode-line mode-line-inactive))
     (set-face-attribute face nil
                         :box nil))
-#+end_src
-
-*** Frame
-Calculate window divider colors based on window background color.
-
-#+begin_src emacs-lisp
-  (use-package frame
-    :straight nil
-    :when window-system
-    :hook (aorst--theme-change . aorst/window-divider-setup-faces)
-    :custom
-    (window-divider-default-bottom-width 1)
-    (window-divider-default-right-width 1)
-    (window-divider-default-places t)
-    :config
-    ;; (window-divider-mode t)
-    (defun aorst/window-divider-setup-faces ()
-      (let* ((color (face-attribute 'default :background))
-             (color (if (fboundp #'doom-darken)
-                        (if (aorst/dark-mode-p)
-                            (doom-darken color 0.2)
-                          (doom-darken color 0.1)))))
-        (set-face-attribute 'window-divider nil :foreground color)))
-    (aorst/window-divider-setup-faces))
 #+end_src
 
 *** Title
@@ -807,24 +779,10 @@ This package makes files with identical names more distinguishable by adding dir
 #+begin_src emacs-lisp
   (use-package display-line-numbers
     :straight nil
-    ;; :hook (prog-mode . display-line-numbers-mode)
     :custom
     (display-line-numbers-width 4)
     (display-line-numbers-grow-only t)
-    (display-line-numbers-width-start t)
-    :config
-    ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
-  ;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
-
-  ;; This advice recalculates the amount of lines needed to scroll to
-  ;; ensure `scroll-margin' preserved."
-  ;;     (apply f args)
-  ;;     (let ((diff (- scroll-margin
-  ;;                    (- (line-number-at-pos (point))
-  ;;                       (line-number-at-pos (window-start))))))
-  ;;       (when (> diff 0)
-  ;;         (scroll-down diff))))
-    )
+    (display-line-numbers-width-start t))
 #+end_src
 
 *** Minions
@@ -904,7 +862,6 @@ Org Mode is a great mode for taking notes, managing to-do lists, writing books, 
       (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background))))
 #+end_src
 
-**** OX Hugo
 Support for using Org export feature with [[https://gohugo.io/][Hugo]] static site generator.
 
 #+begin_src emacs-lisp
@@ -912,7 +869,6 @@ Support for using Org export feature with [[https://gohugo.io/][Hugo]] static si
     :after ox)
 #+end_src
 
-**** OX LaTeX
 Support of exporting to LaTeX.
 
 #+begin_src emacs-lisp
@@ -921,7 +877,6 @@ Support of exporting to LaTeX.
     :after ox)
 #+end_src
 
-**** Org Tempo
 Org previously had an inbuilt snippets that started with =<= followed by a letter which expand to various blocks, like source code blocks, quote blocks e.t.c.
 It was externalized into separate package in more recent Org mode versions.
 
@@ -934,7 +889,7 @@ It was externalized into separate package in more recent Org mode versions.
 #+end_src
 
 *** Prog Mode
-This isn't really a configuration of Prog Mode itself, but some hooks that change how programming related modes behave.
+This isn't really a configuration of Prog Mode itself, but some things that change how programming related modes behave.
 
 #+begin_src emacs-lisp
   (use-package prog-mode
@@ -1026,7 +981,7 @@ Emacs lisp mode tweaks.
     (defun aorst/emacs-lisp-indent-function (indent-point state)
       "A replacement for `lisp-indent-function'.
   Indents plists more sensibly. Adapted from DOOM Emacs:
-  https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a485253/modules/lang/emacs-lisp/autoload.el#L91"
+  https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/autoload.el#L110"
       (let ((normal-indent (current-column))
             (orig-point (point))
             target)
@@ -1076,8 +1031,9 @@ Emacs lisp mode tweaks.
 #+end_src
 
 *** Fennel
-Fennel is a lisp dialect, that is being compiled to Lua, which means that it can run anywhere, where Lua can.
-It supports compile-time macro system, and full Lua compatibility.
+Fennel is sort of a lisp dialect, that is being compiled to Lua, which means that it can run anywhere, where Lua can.
+It supports compile-time macro system, and has a full Lua compatibility.
+Lua runtime itself is very lisp-like so putting an S-expression based syntax on it feels very natural.
 
 #+begin_src emacs-lisp
   (use-package fennel-mode

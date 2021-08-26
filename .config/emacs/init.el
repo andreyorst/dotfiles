@@ -129,10 +129,6 @@ for stopping scroll from going beyond longest line.  Based on
                 hscroll-step 1
                 hscroll-margin 1
                 scroll-margin 1
-                ;; scroll-step 1
-                ;; scroll-conservatively 101
-                ;; scroll-up-aggressively 0.01
-                ;; scroll-down-aggressively 0.01
                 scroll-preserve-screen-position nil)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
@@ -181,7 +177,7 @@ for stopping scroll from going beyond longest line.  Based on
   :config
   (defun aorst/overwrite-set-cursor-shape ()
     (when (display-graphic-p)
-      (setq cursor-type (if overwrite-mode 'box 'bar))))
+      (setq cursor-type (if overwrite-mode 'box '(bar . 1)))))
   :init
   (column-number-mode 1)
   (line-number-mode 1)
@@ -388,13 +384,14 @@ Used in various places to avoid getting wrong line height when
     (load-theme aorst--light-theme t)))
 
 (defvar aorst--theme-change-hook nil
-  "Hook run after a color theme is loaded using `load-theme'.")
+  "Hook run after a color theme is changed with `load-theme' or `disable-theme'.")
 
-(define-advice load-theme (:after (&rest _) aorst:setup-theme)
+(defun aorst/run-theme-change-hooks (&rest _)
+  "Run theme change hooks."
   (run-hooks 'aorst--theme-change-hook))
 
-(define-advice disable-theme (:after (&rest _) aorst:setup-theme)
-  (run-hooks 'aorst--theme-change-hook))
+(advice-add 'load-theme :after #'aorst/run-theme-change-hooks)
+(advice-add 'disable-theme :after #'aorst/run-theme-change-hooks)
 
 (setq-default custom-safe-themes t)
 
@@ -403,25 +400,6 @@ Used in various places to avoid getting wrong line height when
 (dolist (face '(mode-line mode-line-inactive))
   (set-face-attribute face nil
                       :box nil))
-
-(use-package frame
-  :straight nil
-  :when window-system
-  :hook (aorst--theme-change . aorst/window-divider-setup-faces)
-  :custom
-  (window-divider-default-bottom-width 1)
-  (window-divider-default-right-width 1)
-  (window-divider-default-places t)
-  :config
-  ;; (window-divider-mode t)
-  (defun aorst/window-divider-setup-faces ()
-    (let* ((color (face-attribute 'default :background))
-           (color (if (fboundp #'doom-darken)
-                      (if (aorst/dark-mode-p)
-                          (doom-darken color 0.2)
-                        (doom-darken color 0.1)))))
-      (set-face-attribute 'window-divider nil :foreground color)))
-  (aorst/window-divider-setup-faces))
 
 (defcustom aorst--title-show-bufname t
   "Whether to include bufname to titlebar.
@@ -442,24 +420,10 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 
 (use-package display-line-numbers
   :straight nil
-  ;; :hook (prog-mode . display-line-numbers-mode)
   :custom
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t)
-  :config
-  ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
-;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
-
-;; This advice recalculates the amount of lines needed to scroll to
-;; ensure `scroll-margin' preserved."
-;;     (apply f args)
-;;     (let ((diff (- scroll-margin
-;;                    (- (line-number-at-pos (point))
-;;                       (line-number-at-pos (window-start))))))
-;;       (when (> diff 0)
-;;         (scroll-down diff))))
-  )
+  (display-line-numbers-width-start t))
 
 (use-package minions
   :custom
@@ -597,7 +561,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (defun aorst/emacs-lisp-indent-function (indent-point state)
     "A replacement for `lisp-indent-function'.
 Indents plists more sensibly. Adapted from DOOM Emacs:
-https://github.com/hlissner/doom-emacs/blob/b03fdabe4fa8a07a7bd74cd02d9413339a485253/modules/lang/emacs-lisp/autoload.el#L91"
+https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/autoload.el#L110"
     (let ((normal-indent (current-column))
           (orig-point (point))
           target)
