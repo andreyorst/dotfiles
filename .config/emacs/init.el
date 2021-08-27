@@ -84,7 +84,7 @@
   (defun aorst/truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
 Returns t if any line exceeds right border of the window.  Used
-for stopping scroll from going beyond longest line.  Based on
+for stopping scroll from going beyond the longest line.  Based on
 `so-long-detected-long-line-p'."
     (save-excursion
       (goto-char (point-min))
@@ -97,7 +97,7 @@ for stopping scroll from going beyond longest line.  Based on
               ;; Because of that we have to recompute correct `window-hscroll' by multiplying
               ;; it with a non-scaled value, and divide with scaled width value, and round it
               ;; to upper boundary.  Since there's no way to get unscaled value, we have to
-              ;; get width of a face that is not scaled by `text-scale-mode', such as
+              ;; get a width of a face that is not scaled by `text-scale-mode', such as
               ;; `window-divider' face.
               (ceiling (/ (* (window-hscroll) (window-font-width nil 'window-divider))
                           (float (window-font-width)))))
@@ -121,8 +121,8 @@ for stopping scroll from going beyond longest line.  Based on
               (throw 'excessive t)))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
     (when (and truncate-lines
-               (aorst/truncated-lines-p)
-               (not (memq major-mode '(vterm-mode term-mode))))
+               (not (memq major-mode '(vterm-mode term-mode)))
+               (aorst/truncated-lines-p))
       (funcall foo arg set-minimum)))
   (setq-default auto-window-vscroll nil
                 mouse-highlight nil
@@ -153,13 +153,8 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :no-require t
   :custom
-  (initial-major-mode 'lisp-interaction-mode)
+  (initial-major-mode 'fundamental)
   (initial-scratch-message ""))
-
-(use-package delsel
-  :straight nil
-  :init
-  (delete-selection-mode t))
 
 (use-package simple
   :straight nil
@@ -171,7 +166,7 @@ for stopping scroll from going beyond longest line.  Based on
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . aorst/overwrite-set-cursor-shape))
   :custom
-  (yank-excluded-properties t "Disable all text properties when yanking.")
+  (yank-excluded-properties t)
   (blink-matching-delay 0)
   (blink-matching-paren t)
   :config
@@ -181,7 +176,28 @@ for stopping scroll from going beyond longest line.  Based on
   :init
   (column-number-mode 1)
   (line-number-mode 1)
-  (transient-mark-mode -1))
+  (transient-mark-mode -1)
+  (define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
+    "Quit in current context.
+
+When there is an active minibuffer and we are not inside it close
+it.  When we are inside the minibuffer use the regular
+`minibuffer-keyboard-quit' which quits any active region before
+exiting.  When there is no minibuffer `keyboard-quit' unless we
+are defining or executing a macro."
+    (cond ((active-minibuffer-window)
+           (if (minibufferp)
+               (minibuffer-keyboard-quit)
+             (abort-recursive-edit)))
+          (t
+           (unless (or defining-kbd-macro
+                       executing-kbd-macro)
+             (funcall quit))))))
+
+(use-package delsel
+  :straight nil
+  :init
+  (delete-selection-mode t))
 
 (setq-default truncate-lines t)
 (setq-default bidi-paragraph-direction 'left-to-right)
@@ -195,10 +211,10 @@ for stopping scroll from going beyond longest line.  Based on
          ("<mouse-1>" . ignore))
   :custom
   (completion-styles '(partial-completion basic))
-  (completion-flex-nospace t)
   (read-buffer-completion-ignore-case t)
   (read-file-name-completion-ignore-case t)
-  :custom-face (completions-first-difference ((t (:inherit unspecified)))))
+  :custom-face
+  (completions-first-difference ((t (:inherit unspecified)))))
 
 (defun aorst/formfeed-line ()
   "Display the formfeed ^L char as comment or as continuous line."
@@ -224,23 +240,6 @@ for stopping scroll from going beyond longest line.  Based on
   :straight nil
   :custom (comint-scroll-show-maximum-output nil))
 
-(define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
-  "Quit in current context.
-
-When there is an active minibuffer and we are not inside it close
-it.  When we are inside the minibuffer use the regular
-`minibuffer-keyboard-quit' which quits any active region before
-exiting.  When there is no minibuffer `keyboard-quit' unless we
-are defining or executing a macro."
-  (cond ((active-minibuffer-window)
-         (if (minibufferp)
-             (minibuffer-keyboard-quit)
-           (abort-recursive-edit)))
-        (t
-         (unless (or defining-kbd-macro
-                     executing-kbd-macro)
-           (funcall quit)))))
-
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
@@ -249,7 +248,7 @@ are defining or executing a macro."
   "Split current paragraph into lines with one sentence each."
   (interactive)
   (save-excursion
-    (let ((fill-column (point-max)))
+    (let ((fill-column most-positive-fixnum))
       (fill-paragraph))
     (let ((auto-fill-p auto-fill-function)
           (end (progn (end-of-line) (backward-sentence) (point))))
@@ -1145,85 +1144,6 @@ nil."
     ("g" ignore :exit t)
     ("q" ignore :exit t)
     ("C-g" aorst/er-exit :exit t)))
-
-(use-package lsp-mode
-  :hook (((rust-mode
-           c-mode
-           c++-mode
-           elixir-mode
-           ;; clojure-mode
-           ;; clojurec-mode
-           ;; clojurescript-mode
-           )
-          . aorst/setup-lsp)
-         (lsp-mode . yas-minor-mode))
-  :custom-face
-  (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
-  :custom
-  ;; general settings
-  (lsp-keymap-prefix "C-c l")
-  (lsp-completion-provider :capf)
-  (lsp-diagnostics-provider :auto)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-log-io nil)
-  (lsp-keep-workspace-alive nil)
-  ;; DAP
-  (lsp-enable-dap-auto-configure nil)
-  ;; UI
-  (lsp-enable-links nil)
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-modeline-code-actions-enable nil)
-  ;; semantic code features
-  (lsp-enable-folding nil)
-  (lsp-enable-indentation nil)
-  (lsp-enable-semantic-highlighting nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-  ;; completion
-  (lsp-completion-show-kind nil)
-  ;; lens
-  (lsp-lens-enable t)
-  (lsp-lens-place-position 'end-of-line)
-  ;; rust
-  (lsp-rust-clippy-preference "on")
-  (lsp-rust-server 'rust-analyzer)
-  :config
-  (defun aorst/setup-lsp ()
-    (when (memq major-mode '(clojure-mode
-                             clojurec-mode
-                             clojurescript-mode))
-      (setq-local lsp-diagnostics-provider :none))
-    (lsp)))
-
-(use-package lsp-ui
-  :after lsp-mode
-  :commands lsp-ui-mode
-  :bind (:map lsp-ui-mode-map
-         ("M-." . lsp-ui-peek-find-definitions)
-         ("M-S-." . lsp-ui-peek-find-references))
-  :custom
-  (lsp-ui-doc-border (face-attribute 'window-divider :foreground))
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-imenu-enable t)
-  (lsp-ui-doc-delay 2 "higher than eldoc delay")
-  (lsp-ui-doc-max-width 1000)
-  (lsp-ui-doc-show-with-cursor nil)
-  (lsp-ui-doc-show-with-mouse t)
-  (lsp-ui-doc-position 'at-point)
-  (lsp-ui-doc-enhanced-markdown nil)
-  :custom-face
-  (lsp-ui-peek-highlight ((t (:foreground unspecified
-                              :background unspecified
-                              :box unspecified
-                              :inherit lsp-face-highlight-textual))))
-  :config
-  (lsp-ui-mode))
-
-(use-package lsp-java
-  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
-  :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
 (use-package project
   :straight nil

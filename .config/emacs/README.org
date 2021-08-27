@@ -9,8 +9,8 @@
 This is a GNU Emacs configuration file, written as an Org document.
 It is meant to be placed in the =user-emacs-directory=, and compiled with =org-babel-tangle=.
 As a result =init.el= and =early-init.el= files are created, located in the same directory as this file, as well as some other files across the system.
-You can review such files by searching for =:tangle= in this file.
-Both =init.el= and =early-init.el= are default to the read only mode, thus only this file needs to be edited, and is automatically tangled on save.
+You can review which files are created by searching for =:tangle= entries in this document.
+Both =init.el= and =early-init.el= are in read only mode by default, and only this file is meant for editing, and the changes are automatically tangled on save.
 
 * =early-init.el=
 :properties:
@@ -170,7 +170,7 @@ A macro for managing installed packages, and encapsulating their configurations.
 
 *** Custom File and Disabled Commands
 Emacs customization system writes to =init.el= by default which is not great when using tangle approach.
-To preserve custom modifications it is moved to separate file.
+To preserve custom modifications it is moved to a separate file.
 
 #+begin_src emacs-lisp
   (use-package cus-edit
@@ -274,7 +274,7 @@ Also advising =scroll-left= to prevent over-scrolling past the visible part of t
     (defun aorst/truncated-lines-p ()
       "Non-nil if any line is longer than `window-width' + `window-hscroll'.
   Returns t if any line exceeds right border of the window.  Used
-  for stopping scroll from going beyond longest line.  Based on
+  for stopping scroll from going beyond the longest line.  Based on
   `so-long-detected-long-line-p'."
       (save-excursion
         (goto-char (point-min))
@@ -287,7 +287,7 @@ Also advising =scroll-left= to prevent over-scrolling past the visible part of t
                 ;; Because of that we have to recompute correct `window-hscroll' by multiplying
                 ;; it with a non-scaled value, and divide with scaled width value, and round it
                 ;; to upper boundary.  Since there's no way to get unscaled value, we have to
-                ;; get width of a face that is not scaled by `text-scale-mode', such as
+                ;; get a width of a face that is not scaled by `text-scale-mode', such as
                 ;; `window-divider' face.
                 (ceiling (/ (* (window-hscroll) (window-font-width nil 'window-divider))
                             (float (window-font-width)))))
@@ -311,8 +311,8 @@ Also advising =scroll-left= to prevent over-scrolling past the visible part of t
                 (throw 'excessive t)))))))
     (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
       (when (and truncate-lines
-                 (aorst/truncated-lines-p)
-                 (not (memq major-mode '(vterm-mode term-mode))))
+                 (not (memq major-mode '(vterm-mode term-mode)))
+                 (aorst/truncated-lines-p))
         (funcall foo arg set-minimum)))
     (setq-default auto-window-vscroll nil
                   mouse-highlight nil
@@ -368,22 +368,14 @@ Lisp interaction mode adds a bit of startup time, and is rarely needed.
     :straight nil
     :no-require t
     :custom
-    (initial-major-mode 'lisp-interaction-mode)
+    (initial-major-mode 'fundamental)
     (initial-scratch-message ""))
 #+end_src
 
-*** Selection
-Delete selection by typing.
-
-#+begin_src emacs-lisp
-  (use-package delsel
-    :straight nil
-    :init
-    (delete-selection-mode t))
-#+end_src
-
-*** Default Bindings
+*** Simple
 Configurations for inbuilt =simple.el= module.
+=Zap-up-to-char= and =zap-to-char= are swapped because of personal preference.
+This also changes =C-g= to quit current action regardless of active window.
 
 #+begin_src emacs-lisp
   (use-package simple
@@ -396,7 +388,7 @@ Configurations for inbuilt =simple.el= module.
     :hook ((before-save . delete-trailing-whitespace)
            (overwrite-mode . aorst/overwrite-set-cursor-shape))
     :custom
-    (yank-excluded-properties t "Disable all text properties when yanking.")
+    (yank-excluded-properties t)
     (blink-matching-delay 0)
     (blink-matching-paren t)
     :config
@@ -406,7 +398,33 @@ Configurations for inbuilt =simple.el= module.
     :init
     (column-number-mode 1)
     (line-number-mode 1)
-    (transient-mark-mode -1))
+    (transient-mark-mode -1)
+    (define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
+      "Quit in current context.
+
+  When there is an active minibuffer and we are not inside it close
+  it.  When we are inside the minibuffer use the regular
+  `minibuffer-keyboard-quit' which quits any active region before
+  exiting.  When there is no minibuffer `keyboard-quit' unless we
+  are defining or executing a macro."
+      (cond ((active-minibuffer-window)
+             (if (minibufferp)
+                 (minibuffer-keyboard-quit)
+               (abort-recursive-edit)))
+            (t
+             (unless (or defining-kbd-macro
+                         executing-kbd-macro)
+               (funcall quit))))))
+#+end_src
+
+*** Selection
+Delete selection by typing.
+
+#+begin_src emacs-lisp
+  (use-package delsel
+    :straight nil
+    :init
+    (delete-selection-mode t))
 #+end_src
 
 *** Line truncation
@@ -430,10 +448,10 @@ Disabling clicks in minibuffer, to prevent opening =*Messages*= buffer.
            ("<mouse-1>" . ignore))
     :custom
     (completion-styles '(partial-completion basic))
-    (completion-flex-nospace t)
     (read-buffer-completion-ignore-case t)
     (read-file-name-completion-ignore-case t)
-    :custom-face (completions-first-difference ((t (:inherit unspecified)))))
+    :custom-face
+    (completions-first-difference ((t (:inherit unspecified)))))
 #+end_src
 
 *** Form feed
@@ -479,28 +497,6 @@ Prevent automatic recentering when using inferior buffers.
 This section describes additional functions for internal use in configurations of various packages, that are general enough.
 All functions and variables are prefixed with =aorst/= and =aorst--= respectively to prevent conflicts.
 
-*** =escape=
-Changes =C-g= to quit current action regardless of active window.
-
-#+begin_src emacs-lisp
-  (define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
-    "Quit in current context.
-
-  When there is an active minibuffer and we are not inside it close
-  it.  When we are inside the minibuffer use the regular
-  `minibuffer-keyboard-quit' which quits any active region before
-  exiting.  When there is no minibuffer `keyboard-quit' unless we
-  are defining or executing a macro."
-    (cond ((active-minibuffer-window)
-           (if (minibufferp)
-               (minibuffer-keyboard-quit)
-             (abort-recursive-edit)))
-          (t
-           (unless (or defining-kbd-macro
-                       executing-kbd-macro)
-             (funcall quit)))))
-#+end_src
-
 *** =font-installed-p=
 Checks if font is available on the system.
 
@@ -518,7 +514,7 @@ Format paragraph by following one sentence per line style of editing.
     "Split current paragraph into lines with one sentence each."
     (interactive)
     (save-excursion
-      (let ((fill-column (point-max)))
+      (let ((fill-column most-positive-fixnum))
         (fill-paragraph))
       (let ((auto-fill-p auto-fill-function)
             (end (progn (end-of-line) (backward-sentence) (point))))
@@ -1104,7 +1100,6 @@ Lua runtime itself is very lisp-like so putting an S-expression based syntax on 
       (flycheck-mode)))
 #+end_src
 
-**** CIDER
 IDE for Clojure and ClojureScript.
 
 #+begin_src emacs-lisp
@@ -1145,7 +1140,6 @@ IDE for Clojure and ClojureScript.
       (format "%s\n> " namespace)))
 #+end_src
 
-**** flycheck-clj-kondo
 [[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flycheck-clj-kondo= is a backend for =flycheck=, that makes these two things understand each other.
 
 #+begin_src emacs-lisp
@@ -1153,7 +1147,6 @@ IDE for Clojure and ClojureScript.
     :when (executable-find "clj-kondo"))
 #+end_src
 
-**** clj-refactor
 =clj-refactor= provides refactoring support for Clojure projects.
 It complements the refactoring functionality from =clojure-mode= and CIDER.
 
@@ -1510,7 +1503,7 @@ Structural editing similar to Paredit.
 #+end_src
 
 *** Vertico
-Vertical completion UI for minibuffer.
+Vertical completion UI for the minibuffer.
 
 #+begin_src emacs-lisp
   (use-package vertico
@@ -1756,7 +1749,7 @@ Expand or reduce region semantically.
       ("C-g" aorst/er-exit :exit t)))
 #+end_src
 
-*** LSP
+*** COMMENT LSP
 Packages providing integration with Language Server Protocol.
 
 **** LSP Mode
@@ -1766,12 +1759,7 @@ LSP client for Emacs.
   (use-package lsp-mode
     :hook (((rust-mode
              c-mode
-             c++-mode
-             elixir-mode
-             ;; clojure-mode
-             ;; clojurec-mode
-             ;; clojurescript-mode
-             )
+             c++-mode)
             . aorst/setup-lsp)
            (lsp-mode . yas-minor-mode))
     :custom-face
