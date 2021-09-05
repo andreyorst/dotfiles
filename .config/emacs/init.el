@@ -1028,7 +1028,6 @@ nil."
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode)
          (aorst--theme-change . aorst/magit-setup-diff-faces))
-  :bind (("<f12>" . magit-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
