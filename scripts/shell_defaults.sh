@@ -58,7 +58,8 @@ HISTFILESIZE=10000000
 shopt -s histappend
 
 emacsupdate() {
-    emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(progn (straight-pull-all) (straight-rebuild-all))';
+    emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(straight-pull-all)';
+    emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(straight-rebuild-all)';
 }
 
 # create dir and cd into it

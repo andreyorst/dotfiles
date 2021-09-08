@@ -66,5 +66,7 @@
 
 (setq package-enable-at-startup nil)
 
+(setq load-prefer-newer noninteractive)
+
 (provide 'early-init)
 ;;; early-init.el ends here

@@ -153,7 +153,7 @@ for stopping scroll from going beyond the longest line.  Based on
   :straight nil
   :no-require t
   :custom
-  (initial-major-mode 'fundamental)
+  (initial-major-mode 'fundamental-mode)
   (initial-scratch-message ""))
 
 (use-package simple
@@ -426,7 +426,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 
 (use-package minions
   :custom
-  (minions-direct '(flycheck-mode))
+  (minions-direct '(flycheck-mode flymake-mode))
   :config
   (minions-mode))
 
@@ -690,7 +690,7 @@ for module name."
   (cider-save-file-on-load nil)
   (cider-inspector-fill-frame nil)
   (cider-auto-select-error-buffer t)
-  (cider-eval-spinner nil)
+  (cider-eval-spinner t)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   :config
   (setq cider-jdk-src-paths nil)
@@ -714,6 +714,7 @@ appended."
          (cider-mode . yas-minor-mode))
   :custom
   (cljr-suppress-no-project-warning t)
+  (cljr-suppress-middleware-warnings t)
   (cljr-warn-on-eval nil))
 
 (use-package sly
@@ -1143,6 +1144,41 @@ nil."
     ("g" ignore :exit t)
     ("q" ignore :exit t)
     ("C-g" aorst/er-exit :exit t)))
+
+(use-package eglot
+  :hook (((c-mode
+           c++-mode
+           clojure-mode
+           clojurec-mode
+           clojurescript-mode)
+          . eglot-ensure)
+         (eglot-managed-mode . aorst/eglot-setup))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-events-buffer-size 0)
+  (eglot-send-changes-idle-time 1)
+  (eglot-ignored-server-capabilities '(:hoverProvider
+                                       :signatureHelpProvider
+                                       :documentHighlightProvider
+                                       :codeLensProvider
+                                       :documentFormattingProvider
+                                       :documentRangeFormattingProvider
+                                       :documentOnTypeFormattingProvider
+                                       :documentLinkProvider
+                                       :colorProvider
+                                       :foldingRangeProvider))
+  :config
+  (defun aorst/eglot-setup ()
+    "Eglot mode setup."
+    (when (featurep 'yasnippet)
+      (yas-minor-mode 1))
+    (when (featurep 'flycheck)
+      (flycheck-mode -1)))
+  (when-let (server (executable-find "clojure-lsp"))
+    (add-to-list 'eglot-server-programs `((clojure-mode
+                                           clojurec-mode
+                                           clojurescript-mode)
+                                          . (,server)))))
 
 (use-package project
   :straight nil

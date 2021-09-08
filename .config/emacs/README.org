@@ -118,6 +118,14 @@ It can install packages from Git repositories listed on ELPA, MELPA, and directl
   (setq package-enable-at-startup nil)
 #+end_src
 
+** Loading of elisp files
+Prefer loading newer files to the byte-compiled ones that have older time-stamp when running non-interactively to prevent the use of stale byte-code.
+Saves us a little IO time to skip the mtime checks on every *.elc file.
+
+#+begin_src emacs-lisp
+  (setq load-prefer-newer noninteractive)
+#+end_src
+
 ** =(provide 'early-init)=
 This concludes the =early-init.el= file.
 
@@ -368,7 +376,7 @@ Lisp interaction mode adds a bit of startup time, and is rarely needed.
     :straight nil
     :no-require t
     :custom
-    (initial-major-mode 'fundamental)
+    (initial-major-mode 'fundamental-mode)
     (initial-scratch-message ""))
 #+end_src
 
@@ -787,7 +795,7 @@ Hide those minor modes.
 #+begin_src emacs-lisp
   (use-package minions
     :custom
-    (minions-direct '(flycheck-mode))
+    (minions-direct '(flycheck-mode flymake-mode))
     :config
     (minions-mode))
 #+end_src
@@ -1123,7 +1131,7 @@ IDE for Clojure and ClojureScript.
     (cider-save-file-on-load nil)
     (cider-inspector-fill-frame nil)
     (cider-auto-select-error-buffer t)
-    (cider-eval-spinner nil)
+    (cider-eval-spinner t)
     (cider-repl-prompt-function #'cider-repl-prompt-newline)
     :config
     (setq cider-jdk-src-paths nil)
@@ -1156,6 +1164,7 @@ It complements the refactoring functionality from =clojure-mode= and CIDER.
            (cider-mode . yas-minor-mode))
     :custom
     (cljr-suppress-no-project-warning t)
+    (cljr-suppress-middleware-warnings t)
     (cljr-warn-on-eval nil))
 #+end_src
 
@@ -1756,13 +1765,13 @@ LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :hook (((rust-mode
-             c-mode
-             c++-mode)
-            . aorst/setup-lsp)
+    :hook (((c-mode
+             c++-mode
+             clojure-mode
+             clojurec-mode
+             clojurescript-mode)
+            . lsp)
            (lsp-mode . yas-minor-mode))
-    :custom-face
-    (lsp-modeline-code-actions-face ((t (:inherit mode-line))))
     :custom
     ;; general settings
     (lsp-keymap-prefix "C-c l")
@@ -1788,48 +1797,7 @@ LSP client for Emacs.
     (lsp-completion-show-kind nil)
     ;; lens
     (lsp-lens-enable t)
-    (lsp-lens-place-position 'end-of-line)
-    ;; rust
-    (lsp-rust-clippy-preference "on")
-    (lsp-rust-server 'rust-analyzer)
-    :config
-    (defun aorst/setup-lsp ()
-      (when (memq major-mode '(clojure-mode
-                               clojurec-mode
-                               clojurescript-mode))
-        (setq-local lsp-diagnostics-provider :none))
-      (lsp)))
-#+end_src
-
-**** LSP UI
-User interface package for LSP.
-This package provides documentation popup, definitions in split-view, imenu list, e.t.c.
-
-#+begin_src emacs-lisp
-  (use-package lsp-ui
-    :after lsp-mode
-    :commands lsp-ui-mode
-    :bind (:map lsp-ui-mode-map
-           ("M-." . lsp-ui-peek-find-definitions)
-           ("M-S-." . lsp-ui-peek-find-references))
-    :custom
-    (lsp-ui-doc-border (face-attribute 'window-divider :foreground))
-    (lsp-ui-sideline-enable nil)
-    (lsp-ui-doc-enable nil)
-    (lsp-ui-imenu-enable t)
-    (lsp-ui-doc-delay 2 "higher than eldoc delay")
-    (lsp-ui-doc-max-width 1000)
-    (lsp-ui-doc-show-with-cursor nil)
-    (lsp-ui-doc-show-with-mouse t)
-    (lsp-ui-doc-position 'at-point)
-    (lsp-ui-doc-enhanced-markdown nil)
-    :custom-face
-    (lsp-ui-peek-highlight ((t (:foreground unspecified
-                                :background unspecified
-                                :box unspecified
-                                :inherit lsp-face-highlight-textual))))
-    :config
-    (lsp-ui-mode))
+    (lsp-lens-place-position 'end-of-line))
 #+end_src
 
 **** LSP Java
@@ -1840,6 +1808,46 @@ Note that path to java may differ on different systems.
   (use-package lsp-java
     :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
     :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
+#+end_src
+
+*** Eglot
+LSP client for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :hook (((c-mode
+             c++-mode
+             clojure-mode
+             clojurec-mode
+             clojurescript-mode)
+            . eglot-ensure)
+           (eglot-managed-mode . aorst/eglot-setup))
+    :custom
+    (eglot-autoshutdown t)
+    (eglot-events-buffer-size 0)
+    (eglot-send-changes-idle-time 1)
+    (eglot-ignored-server-capabilities '(:hoverProvider
+                                         :signatureHelpProvider
+                                         :documentHighlightProvider
+                                         :codeLensProvider
+                                         :documentFormattingProvider
+                                         :documentRangeFormattingProvider
+                                         :documentOnTypeFormattingProvider
+                                         :documentLinkProvider
+                                         :colorProvider
+                                         :foldingRangeProvider))
+    :config
+    (defun aorst/eglot-setup ()
+      "Eglot mode setup."
+      (when (featurep 'yasnippet)
+        (yas-minor-mode 1))
+      (when (featurep 'flycheck)
+        (flycheck-mode -1)))
+    (when-let (server (executable-find "clojure-lsp"))
+      (add-to-list 'eglot-server-programs `((clojure-mode
+                                             clojurec-mode
+                                             clojurescript-mode)
+                                            . (,server)))))
 #+end_src
 
 *** Project
