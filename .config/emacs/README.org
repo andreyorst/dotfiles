@@ -120,7 +120,7 @@ It can install packages from Git repositories listed on ELPA, MELPA, and directl
 
 ** Loading of elisp files
 Prefer loading newer files to the byte-compiled ones that have older time-stamp when running non-interactively to prevent the use of stale byte-code.
-Saves us a little IO time to skip the mtime checks on every *.elc file.
+Saves us a little IO time to skip the mtime checks on every =*.elc= file.
 
 #+begin_src emacs-lisp
   (setq load-prefer-newer noninteractive)
@@ -448,6 +448,7 @@ Disables line wrapping.
 
 *** Minibuffer
 Disabling clicks in minibuffer, to prevent opening =*Messages*= buffer.
+Also changing completion styles for a more fast completion feedback, with the downside of a bit more strict matching.
 
 #+begin_src emacs-lisp
   (use-package minibuffer
@@ -490,15 +491,6 @@ Binding for =bury-buffer= command.
   (use-package window
     :straight nil
     :bind ("C-x C-b" . bury-buffer))
-#+end_src
-
-*** Comint
-Prevent automatic recentering when using inferior buffers.
-
-#+begin_src emacs-lisp
-  (use-package comint
-    :straight nil
-    :custom (comint-scroll-show-maximum-output nil))
 #+end_src
 
 ** Functions
@@ -546,12 +538,13 @@ Shorter predicate for dark mode check:
 #+begin_src emacs-lisp
   (defun aorst/dark-mode-p ()
     "Check if frame is dark or not."
-    (if window-system
+    (if (and window-system
+             (executable-find "gsettings"))
         (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
-          (shell-command-to-string)
-          (string-trim-right)
+          shell-command-to-string
+          string-trim-right
           (string-suffix-p "-dark'"))
-        (eq 'dark (frame-parameter nil 'background-mode))))
+      (eq 'dark (frame-parameter nil 'background-mode))))
 #+end_src
 
 *** =create-accent-face=
@@ -1757,7 +1750,7 @@ Expand or reduce region semantically.
       ("C-g" aorst/er-exit :exit t)))
 #+end_src
 
-*** COMMENT LSP
+*** LSP
 Packages providing integration with Language Server Protocol.
 
 **** LSP Mode
@@ -1765,6 +1758,7 @@ LSP client for Emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :requires yasnippet
     :hook (((c-mode
              c++-mode
              clojure-mode
@@ -1780,6 +1774,7 @@ LSP client for Emacs.
     (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
     (lsp-log-io nil)
     (lsp-keep-workspace-alive nil)
+    (lsp-idle-delay 0.05)
     ;; DAP
     (lsp-enable-dap-auto-configure nil)
     ;; UI
@@ -1806,48 +1801,9 @@ Note that path to java may differ on different systems.
 
 #+begin_src emacs-lisp
   (use-package lsp-java
+    :requires lsp-mode
     :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
     :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
-#+end_src
-
-*** Eglot
-LSP client for Emacs.
-
-#+begin_src emacs-lisp
-  (use-package eglot
-    :hook (((c-mode
-             c++-mode
-             clojure-mode
-             clojurec-mode
-             clojurescript-mode)
-            . eglot-ensure)
-           (eglot-managed-mode . aorst/eglot-setup))
-    :custom
-    (eglot-autoshutdown t)
-    (eglot-events-buffer-size 0)
-    (eglot-send-changes-idle-time 1)
-    (eglot-ignored-server-capabilities '(:hoverProvider
-                                         :signatureHelpProvider
-                                         :documentHighlightProvider
-                                         :codeLensProvider
-                                         :documentFormattingProvider
-                                         :documentRangeFormattingProvider
-                                         :documentOnTypeFormattingProvider
-                                         :documentLinkProvider
-                                         :colorProvider
-                                         :foldingRangeProvider))
-    :config
-    (defun aorst/eglot-setup ()
-      "Eglot mode setup."
-      (when (featurep 'yasnippet)
-        (yas-minor-mode 1))
-      (when (featurep 'flycheck)
-        (flycheck-mode -1)))
-    (when-let (server (executable-find "clojure-lsp"))
-      (add-to-list 'eglot-server-programs `((clojure-mode
-                                             clojurec-mode
-                                             clojurescript-mode)
-                                            . (,server)))))
 #+end_src
 
 *** Project
@@ -1888,15 +1844,16 @@ Clients will connect to this server to reuse frame.
       (server-start)))
 #+end_src
 
-We need the =.desktop= file that uses the advantage of possibly running server:
+**** Desktop launcher
+We need the =.desktop= file that uses the advantage of a possibly running server:
 
-#+begin_src conf-desktop :tangle "~/.local/share/applications/emacs.desktop" :mkdirp yes
+#+begin_src conf-desktop # :tangle "~/.local/share/applications/emacs.desktop" :mkdirp yes
   [Desktop Entry]
   Name=Emacs
   GenericName=Text Editor
   Comment=Edit text
   MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-  Exec=sh -c "if [ \\$# -gt 0 ]; then exec emacsclient -a emacs -n --display=\\"\\$DISPLAY\\" \\"\\$@\\"; else exec emacs; fi" dummy %F
+  Exec=sh -c "if [ -n \\"\\$*\\" ]; then exec emacsclient -a emacs -n \\"\\$@\\"; else exec emacs; fi" dummy %F
   Icon=emacs
   Type=Application
   Terminal=false
@@ -1904,7 +1861,6 @@ We need the =.desktop= file that uses the advantage of possibly running server:
   StartupNotify=true
   StartupWMClass=Emacs
   Keywords=Text;Editor;
-  Actions=new-window;new-instance;
 #+end_src
 
 This will allow us to open files with =emacs-launcher=, and it will automatically reuse existing window if present.
@@ -2122,6 +2078,15 @@ Dired settings.
     :straight nil
     :custom
     (dired-listing-switches "-al --group-directories-first"))
+#+end_src
+
+*** Comint
+Prevent automatic recentering when using inferior buffers.
+
+#+begin_src emacs-lisp
+  (use-package comint
+    :straight nil
+    :custom (comint-scroll-show-maximum-output nil))
 #+end_src
 
 ** =(provide 'init)=

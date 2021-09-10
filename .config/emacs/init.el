@@ -236,10 +236,6 @@ are defining or executing a macro."
   :straight nil
   :bind ("C-x C-b" . bury-buffer))
 
-(use-package comint
-  :straight nil
-  :custom (comint-scroll-show-maximum-output nil))
-
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
@@ -267,12 +263,13 @@ are defining or executing a macro."
 
 (defun aorst/dark-mode-p ()
   "Check if frame is dark or not."
-  (if window-system
+  (if (and window-system
+           (executable-find "gsettings"))
       (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
-        (shell-command-to-string)
-        (string-trim-right)
+        shell-command-to-string
+        string-trim-right
         (string-suffix-p "-dark'"))
-      (eq 'dark (frame-parameter nil 'background-mode))))
+    (eq 'dark (frame-parameter nil 'background-mode))))
 
 (defun aorst/create-accent-face (face ref-face)
   "Set FACE background to accent color by blending REF-FACE foreground and background.
@@ -1145,40 +1142,47 @@ nil."
     ("q" ignore :exit t)
     ("C-g" aorst/er-exit :exit t)))
 
-(use-package eglot
+(use-package lsp-mode
+  :requires yasnippet
   :hook (((c-mode
            c++-mode
            clojure-mode
            clojurec-mode
            clojurescript-mode)
-          . eglot-ensure)
-         (eglot-managed-mode . aorst/eglot-setup))
+          . lsp)
+         (lsp-mode . yas-minor-mode))
   :custom
-  (eglot-autoshutdown t)
-  (eglot-events-buffer-size 0)
-  (eglot-send-changes-idle-time 1)
-  (eglot-ignored-server-capabilities '(:hoverProvider
-                                       :signatureHelpProvider
-                                       :documentHighlightProvider
-                                       :codeLensProvider
-                                       :documentFormattingProvider
-                                       :documentRangeFormattingProvider
-                                       :documentOnTypeFormattingProvider
-                                       :documentLinkProvider
-                                       :colorProvider
-                                       :foldingRangeProvider))
-  :config
-  (defun aorst/eglot-setup ()
-    "Eglot mode setup."
-    (when (featurep 'yasnippet)
-      (yas-minor-mode 1))
-    (when (featurep 'flycheck)
-      (flycheck-mode -1)))
-  (when-let (server (executable-find "clojure-lsp"))
-    (add-to-list 'eglot-server-programs `((clojure-mode
-                                           clojurec-mode
-                                           clojurescript-mode)
-                                          . (,server)))))
+  ;; general settings
+  (lsp-keymap-prefix "C-c l")
+  (lsp-completion-provider :capf)
+  (lsp-diagnostics-provider :auto)
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-log-io nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-idle-delay 0.05)
+  ;; DAP
+  (lsp-enable-dap-auto-configure nil)
+  ;; UI
+  (lsp-enable-links nil)
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-modeline-code-actions-enable nil)
+  ;; semantic code features
+  (lsp-enable-folding nil)
+  (lsp-enable-indentation nil)
+  (lsp-enable-semantic-highlighting nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-text-document-color nil)
+  ;; completion
+  (lsp-completion-show-kind nil)
+  ;; lens
+  (lsp-lens-enable t)
+  (lsp-lens-place-position 'end-of-line))
+
+(use-package lsp-java
+  :requires lsp-mode
+  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
+  :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
 (use-package project
   :straight nil
@@ -1331,6 +1335,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :straight nil
   :custom
   (dired-listing-switches "-al --group-directories-first"))
+
+(use-package comint
+  :straight nil
+  :custom (comint-scroll-show-maximum-output nil))
 
 (provide 'init)
 ;;; init.el ends here
