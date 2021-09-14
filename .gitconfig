@@ -18,3 +18,5 @@
         smtpserverport = 587
 [include]
 	path = .gitconfig.local
+[init]
+	defaultBranch = main
