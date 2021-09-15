@@ -759,6 +759,8 @@ appended."
 (use-package csv-mode
   :custom (csv-align-max-width 80))
 
+(use-package erlang)
+
 (use-package help
   :straight nil
   :custom (help-window-select t))
@@ -1339,6 +1341,18 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package comint
   :straight nil
   :custom (comint-scroll-show-maximum-output nil))
+
+(use-package rect
+  :straight nil
+  :bind (("C-x r C-y" . aorst/yank-rectangle-add-lines))
+  :config
+  (defun aorst/yank-rectangle-add-lines ()
+    (interactive "*")
+    (when (use-region-p)
+      (delete-region (region-beginning) (region-end)))
+    (save-restriction
+      (narrow-to-region (point) (point))
+      (yank-rectangle))))
 
 (provide 'init)
 ;;; init.el ends here

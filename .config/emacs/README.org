@@ -1251,6 +1251,13 @@ A mode for viewing and editing char separated value files.
     :custom (csv-align-max-width 80))
 #+end_src
 
+*** Erlang
+Support for Erlang language.
+
+#+begin_src emacs-lisp
+  (use-package erlang)
+#+end_src
+
 ** Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 
@@ -2087,6 +2094,23 @@ Prevent automatic recentering when using inferior buffers.
   (use-package comint
     :straight nil
     :custom (comint-scroll-show-maximum-output nil))
+#+end_src
+
+*** Rect
+Additional functions for rectangle manipulation.
+
+#+begin_src emacs-lisp
+  (use-package rect
+    :straight nil
+    :bind (("C-x r C-y" . aorst/yank-rectangle-add-lines))
+    :config
+    (defun aorst/yank-rectangle-add-lines ()
+      (interactive "*")
+      (when (use-region-p)
+        (delete-region (region-beginning) (region-end)))
+      (save-restriction
+        (narrow-to-region (point) (point))
+        (yank-rectangle))))
 #+end_src
 
 ** =(provide 'init)=
