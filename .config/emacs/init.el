@@ -1192,6 +1192,8 @@ nil."
 
 (use-package project
   :straight nil
+  :custom
+  (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :config
   (defvar aorst--project-root-markers
     '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
@@ -1209,7 +1211,15 @@ nil."
      (t (aorst/project-find-root
          (file-name-directory
           (directory-file-name path))))))
-  (add-to-list 'project-find-functions #'aorst/project-find-root))
+  (add-to-list 'project-find-functions #'aorst/project-find-root)
+  (define-advice project-compile (:around (fn &rest args)
+                                  aorst:save-only-project-buffers)
+    "Only ask to save project related buffers."
+    (let* ((project-buffers
+            (project-buffers (project-current)))
+           (compilation-save-buffers-predicate
+            (lambda () (memq (current-buffer) project-buffers))))
+      (apply fn args))))
 
 (use-package server
   :straight nil
