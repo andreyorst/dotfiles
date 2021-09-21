@@ -1262,6 +1262,13 @@ Support for Erlang language.
   (use-package erlang)
 #+end_src
 
+*** Elixir
+Support for Elixir language.
+
+#+begin_src emacs-lisp
+  (use-package elixir-mode)
+#+end_src
+
 ** Tools
 Additional packages that change how Emacs works, providing more comfortable user experience.
 

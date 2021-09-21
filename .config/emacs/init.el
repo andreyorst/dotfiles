@@ -765,6 +765,8 @@ appended."
 
 (use-package erlang)
 
+(use-package elixir-mode)
+
 (use-package help
   :straight nil
   :custom (help-window-select t))
