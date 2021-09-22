@@ -1370,5 +1370,17 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (narrow-to-region (point) (point))
       (yank-rectangle))))
 
+(defvar fernflower-path
+    (file-truename "~/.local/lib/java-decompiler.jar")
+    "Path to the fernflower library.")
+
+(use-package jdecomp
+  :when (file-exists-p fernflower-path)
+  :hook (archive-mode . jdecomp-mode)
+  :custom
+  (jdecomp-decompiler-type 'fernflower)
+  (jdecomp-decompiler-paths
+   `((fernflower . ,fernflower-path))))
+
 (provide 'init)
 ;;; init.el ends here

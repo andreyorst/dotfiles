@@ -2134,6 +2134,23 @@ Additional functions for rectangle manipulation.
         (yank-rectangle))))
 #+end_src
 
+*** JDecomp
+Package for automatic decompiling of Java bytecode files.
+
+#+begin_src emacs-lisp
+  (defvar fernflower-path
+      (file-truename "~/.local/lib/java-decompiler.jar")
+      "Path to the fernflower library.")
+
+  (use-package jdecomp
+    :when (file-exists-p fernflower-path)
+    :hook (archive-mode . jdecomp-mode)
+    :custom
+    (jdecomp-decompiler-type 'fernflower)
+    (jdecomp-decompiler-paths
+     `((fernflower . ,fernflower-path))))
+#+end_src
+
 ** =(provide 'init)=
 This concludes the =init.el= file.
 
