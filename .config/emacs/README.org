@@ -402,7 +402,7 @@ This also changes =C-g= to quit current action regardless of active window.
     :config
     (defun aorst/overwrite-set-cursor-shape ()
       (when (display-graphic-p)
-        (setq cursor-type (if overwrite-mode 'box '(bar . 1)))))
+        (setq cursor-type (if overwrite-mode 'box '(bar . 2)))))
     :init
     (column-number-mode 1)
     (line-number-mode 1)
@@ -665,7 +665,7 @@ When using graphical Emacs, a more traditional bar cursor is used, and shown onl
 
 #+begin_src emacs-lisp
   (when window-system
-    (setq-default cursor-type '(bar . 1)
+    (setq-default cursor-type '(bar . 2)
                   cursor-in-non-selected-windows nil))
 #+end_src
 

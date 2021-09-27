@@ -172,7 +172,7 @@ for stopping scroll from going beyond the longest line.  Based on
   :config
   (defun aorst/overwrite-set-cursor-shape ()
     (when (display-graphic-p)
-      (setq cursor-type (if overwrite-mode 'box '(bar . 1)))))
+      (setq cursor-type (if overwrite-mode 'box '(bar . 2)))))
   :init
   (column-number-mode 1)
   (line-number-mode 1)
@@ -341,7 +341,7 @@ Used in various places to avoid getting wrong line height when
   (tool-bar-mode -1))
 
 (when window-system
-  (setq-default cursor-type '(bar . 1)
+  (setq-default cursor-type '(bar . 2)
                 cursor-in-non-selected-windows nil))
 
 (cond ((aorst/font-installed-p "JetBrainsMono")
