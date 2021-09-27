@@ -126,9 +126,6 @@ plug "andreyorst/kaktree" defer kaktree %{
         set-option global kaktree_dir_icon_open  '▾ 🗁 '
         set-option global kaktree_dir_icon_close '▸ 🗀 '
         set-option global kaktree_file_icon      '⠀⠀🖺'
-        # set-option global kaktree_dir_icon_open  ''
-        # set-option global kaktree_dir_icon_close ''
-        # set-option global kaktree_file_icon      ''
     } %{
         set-option global kaktree_split vertical
         set-option global kaktree_size 30%

@@ -606,7 +606,6 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
 (use-package fennel-mode
-  :hook (fennel-repl-mode . aorst/fennel-repl-setup)
   :bind (:map fennel-mode-map
          ("C-c C-k" . aorst/eval-each-sexp)
          ("M-." . xref-find-definitions)
@@ -617,9 +616,6 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
   (put 'global 'fennel-indent-function 1)
   (put 'local 'fennel-indent-function 1)
   (put 'var 'fennel-indent-function 1)
-  (defun aorst/fennel-repl-setup ()
-    "Settings for Fennel REPL."
-    (electric-indent-local-mode -1))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body params)
     "Evaluate a block of Fennel code with Babel."
@@ -652,9 +648,7 @@ for module name."
       (ignore-errors
         (when window
           (delete-window window)))
-      (kill-buffer fennel-repl--buffer)))
-  (define-advice fennel-repl (:after (&rest _) aorst:fennel-repl-indent-function)
-    (setq-local lisp-indent-function 'fennel-indent-function)))
+      (kill-buffer fennel-repl--buffer))))
 
 (use-package clojure-mode
   :hook (((clojure-mode

@@ -102,6 +102,7 @@
         sp-kill-word
         sp-remove-active-pair-overlay
         sp-splice-sexp-killing-backward
+        sp-wrap-round
         upcase-region
         yaml-electric-backspace
         zap-up-to-char
