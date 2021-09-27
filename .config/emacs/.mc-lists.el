@@ -131,6 +131,7 @@
         hydrant/er/lambda-G-and-exit
         hydrant/iedit/aorst/iedit-to-mc-hydrant-and-exit
         hydrant/mc/body
+        hydrant/mc/keyboard-quit-and-exit
         hydrant/mc/mc/cycle-backward
         hydrant/mc/mc/cycle-forward
         hydrant/mc/mc/edit-ends-of-lines
