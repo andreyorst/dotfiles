@@ -15,10 +15,13 @@ done
 PATH="$HOME/.dotfiles/scripts:$PATH"
 PATH="$HOME/.local/bin:$PATH"
 
-export PATH
+# Rebar3
+[ -d "$HOME/.cache/rebar3" ] && PATH="$HOME/.cache/rebar3/bin:$PATH"
 
 # Lua related stuff
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
+
+export PATH
 
 for path in "$HOME"/.local/share/lua/*; do
     LUA_PATH="$path/?.lua;$LUA_PATH"
