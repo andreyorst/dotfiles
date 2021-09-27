@@ -364,7 +364,7 @@ Used in various places to avoid getting wrong line height when
   :type 'symbol
   :group 'local-config)
 
-(defcustom aorst--termux-theme 'doom-one
+(defcustom aorst--termux-theme 'doom-molokai
   "Theme to use in Termux."
   :tag "Termux theme"
   :type 'symbol

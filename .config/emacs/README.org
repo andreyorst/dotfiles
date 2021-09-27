@@ -704,7 +704,7 @@ Provided themes define colors for pretty much every popular Emacs package, which
     :type 'symbol
     :group 'local-config)
 
-  (defcustom aorst--termux-theme 'doom-one
+  (defcustom aorst--termux-theme 'doom-molokai
     "Theme to use in Termux."
     :tag "Termux theme"
     :type 'symbol
