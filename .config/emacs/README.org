@@ -547,6 +547,16 @@ Shorter predicate for dark mode check:
       (eq 'dark (frame-parameter nil 'background-mode))))
 #+end_src
 
+*** =termuxp=
+[[https://termux.com/][Termux]] is an Android terminal emulator and Linux environment app that works directly with no rooting or setup required.
+Emacs runs well in Termux, though some features may be missing, due to older version.
+
+#+begin_src emacs-lisp
+  (defun aorst/termuxp ()
+    "Detect if Emacs is running in Termux."
+    (executable-find "termux-info"))
+#+end_src
+
 *** =create-accent-face=
 Creates a slight variation of a face, by blending =ref-face= background color with foreground color.
 It is used to create refine faces for diffs.
@@ -694,6 +704,12 @@ Provided themes define colors for pretty much every popular Emacs package, which
     :type 'symbol
     :group 'local-config)
 
+  (defcustom aorst--termux-theme 'doom-one
+    "Theme to use in Termux."
+    :tag "Termux theme"
+    :type 'symbol
+    :group 'local-config)
+
   (use-package doom-themes
     :custom
     (doom-themes-enable-bold t)
@@ -704,14 +720,17 @@ Provided themes define colors for pretty much every popular Emacs package, which
                     :distant-foreground unspecified
                     :background unspecified))))
     (secondary-selection ((t (:foreground unspecified
-                            :background unspecified
-                            :inherit region
-                            :extend t))))
+                              :background unspecified
+                              :inherit region
+                              :extend t))))
     (font-lock-comment-face ((t (:background unspecified))))
     :config
-    (if (aorst/dark-mode-p)
-        (load-theme aorst--dark-theme t)
-      (load-theme aorst--light-theme t)))
+    (cond ((aorst/termuxp)
+           (load-theme aorst--termux-theme t))
+          ((aorst/dark-mode-p)
+           (load-theme aorst--dark-theme t))
+          (t
+           (load-theme aorst--light-theme t))))
 #+end_src
 
 The following code specifies hooks that will run via advice, which in turn runs after =load-theme= function.

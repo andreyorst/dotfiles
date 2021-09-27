@@ -271,6 +271,10 @@ are defining or executing a macro."
         (string-suffix-p "-dark'"))
     (eq 'dark (frame-parameter nil 'background-mode))))
 
+(defun aorst/termuxp ()
+  "Detect if Emacs is running in Termux."
+  (executable-find "termux-info"))
+
 (defun aorst/create-accent-face (face ref-face)
   "Set FACE background to accent color by blending REF-FACE foreground and background.
 Depends on `doom-blend'."
@@ -360,6 +364,12 @@ Used in various places to avoid getting wrong line height when
   :type 'symbol
   :group 'local-config)
 
+(defcustom aorst--termux-theme 'doom-one
+  "Theme to use in Termux."
+  :tag "Termux theme"
+  :type 'symbol
+  :group 'local-config)
+
 (use-package doom-themes
   :custom
   (doom-themes-enable-bold t)
@@ -370,14 +380,17 @@ Used in various places to avoid getting wrong line height when
                   :distant-foreground unspecified
                   :background unspecified))))
   (secondary-selection ((t (:foreground unspecified
-                          :background unspecified
-                          :inherit region
-                          :extend t))))
+                            :background unspecified
+                            :inherit region
+                            :extend t))))
   (font-lock-comment-face ((t (:background unspecified))))
   :config
-  (if (aorst/dark-mode-p)
-      (load-theme aorst--dark-theme t)
-    (load-theme aorst--light-theme t)))
+  (cond ((aorst/termuxp)
+         (load-theme aorst--termux-theme t))
+        ((aorst/dark-mode-p)
+         (load-theme aorst--dark-theme t))
+        (t
+         (load-theme aorst--light-theme t))))
 
 (defvar aorst--theme-change-hook nil
   "Hook run after a color theme is changed with `load-theme' or `disable-theme'.")
