@@ -2090,7 +2090,8 @@ Tweaks to inbuilt =compile.el= mode.
       ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
       (1 "src/%s" "test/%s") 2)
     (aorst/add-compilation-error-syntax lua-stacktrace
-      "^[[:space:]]+\\([^:]+\\):\\([0-9]+\\):[[:space:]]+in"
+      "\\(?:^[[:space:]]+\\([^
+  :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
       1 2))
 #+end_src
 

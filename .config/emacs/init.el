@@ -1347,7 +1347,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
     ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
     (1 "src/%s" "test/%s") 2)
   (aorst/add-compilation-error-syntax lua-stacktrace
-    "^[[:space:]]+\\([^:]+\\):\\([0-9]+\\):[[:space:]]+in"
+    "\\(?:^[[:space:]]+\\([^
+:]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
     1 2))
 
 (use-package isearch
