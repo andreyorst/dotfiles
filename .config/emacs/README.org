@@ -875,7 +875,11 @@ Org Mode is a great mode for taking notes, managing to-do lists, writing books, 
       (let ((org-src-preserve-indentation t))
         (apply f args)))
     (defun aorst/org-setup-faces ()
-      (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background))))
+      (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background)))
+    (defun org-babel-edit-prep:emacs-lisp (_info)
+      "Setup Emacs Lisp buffer for Org Babel."
+      (setq lexical-binding t)
+      (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 #+end_src
 
 Support for using Org export feature with [[https://gohugo.io/][Hugo]] static site generator.
@@ -1039,11 +1043,7 @@ Emacs lisp mode tweaks.
                         (funcall method indent-point state))))))))
     (defun aorst/emacs-lisp-setup ()
       (setq-local lisp-indent-function
-                  #'aorst/emacs-lisp-indent-function))
-    (defun org-babel-edit-prep:emacs-lisp (_info)
-      "Setup Emacs Lisp buffer for Org Babel."
-      (setq lexical-binding t)
-      (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
+                  #'aorst/emacs-lisp-indent-function)))
 #+end_src
 
 *** Fennel

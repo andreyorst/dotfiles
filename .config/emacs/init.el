@@ -496,7 +496,11 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     (let ((org-src-preserve-indentation t))
       (apply f args)))
   (defun aorst/org-setup-faces ()
-    (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background))))
+    (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background)))
+  (defun org-babel-edit-prep:emacs-lisp (_info)
+    "Setup Emacs Lisp buffer for Org Babel."
+    (setq lexical-binding t)
+    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
 (use-package ox-hugo
   :after ox)
@@ -612,11 +616,7 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
                       (funcall method indent-point state))))))))
   (defun aorst/emacs-lisp-setup ()
     (setq-local lisp-indent-function
-                #'aorst/emacs-lisp-indent-function))
-  (defun org-babel-edit-prep:emacs-lisp (_info)
-    "Setup Emacs Lisp buffer for Org Babel."
-    (setq lexical-binding t)
-    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
+                #'aorst/emacs-lisp-indent-function)))
 
 (use-package fennel-mode
   :bind (:map fennel-mode-map
