@@ -1201,6 +1201,8 @@ nil."
 
 (use-package project
   :straight nil
+  :bind (:map project-prefix-map
+         ("s" . aorst/project-save-some-buffers))
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :config
@@ -1228,7 +1230,16 @@ nil."
             (project-buffers (project-current)))
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
-      (apply fn args))))
+      (apply fn args)))
+  (defun aorst/project-save-some-buffers (&optional arg)
+    "Save some modified file-visiting buffers in current project.
+
+Optional argument ARG (interactively, prefix argument) non-nil
+means save all with no questions."
+    (interactive "P")
+    (let* ((project-buffers (project-buffers (project-current)))
+           (pred (lambda () (memq (current-buffer) project-buffers))))
+      (save-some-buffers arg pred))))
 
 (use-package server
   :straight nil
