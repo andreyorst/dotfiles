@@ -947,7 +947,6 @@ nil."
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
   (sp-highlight-wrap-tag-overlay nil)
-  (sp-wrap-respect-direction t)
   (sp-show-pair-delay 0)
   (sp-echo-match-when-invisible nil)
   :config
@@ -961,15 +960,7 @@ nil."
     (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1))
-  (defun aorst/wrap-fix-cursor-position (_ action _)
-    "Set cursor position inside expression when wrapping."
-    (when (and (eq action 'wrap)
-               (eq (point)
-                   (marker-position (sp-get sp-last-wrapped-region :beg))))
-      (goto-char (sp-get sp-last-wrapped-region :beg-in))))
-  (dolist (paren '("(" "[" "{"))
-    (sp-pair paren nil :post-handlers '(:add aorst/wrap-fix-cursor-position))))
+    (smartparens-strict-mode 1)))
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
