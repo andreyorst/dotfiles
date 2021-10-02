@@ -442,8 +442,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 
 (use-package org
   :straight (:type built-in)
-  :hook (((org-capture-mode org-src-mode) . aorst/discard-history)
-         (aorst--theme-change . aorst/org-setup-faces))
+  :hook ((org-capture-mode org-src-mode) . aorst/discard-history)
   :bind (:map org-mode-map
          ("M-Q" . aorst/split-pararagraph-into-lines)
          ("C-c l" . org-store-link))
@@ -464,17 +463,15 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (org-startup-with-inline-images nil)
   (org-tags-column -120)
   (org-startup-folded 'content)
-  (org-hide-emphasis-markers t)
+  (org-hide-emphasis-markers nil)
   (org-adapt-indentation nil)
-  (org-hide-leading-stars t)
+  (org-hide-leading-stars nil)
   (org-highlight-latex-and-related '(latex))
   (org-preview-latex-default-process 'dvisvgm)
   (org-src-fontify-natively t)
   (org-preview-latex-image-directory ".ltximg/")
   (org-confirm-babel-evaluate nil)
-  (org-imenu-depth 8)
-  (org-log-done t)
-  (org-agenda-files '("~/Tasks"))
+  (org-log-done 'time)
   (org-image-actual-width nil)
   :config
   (setq org-format-latex-options
@@ -495,8 +492,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (define-advice org-cycle (:around (f &rest args) aorst:org-cycle)
     (let ((org-src-preserve-indentation t))
       (apply f args)))
-  (defun aorst/org-setup-faces ()
-    (set-face-attribute 'org-hide nil :foreground (face-attribute 'default :background)))
   (defun org-babel-edit-prep:emacs-lisp (_info)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)
@@ -1191,7 +1186,6 @@ nil."
   :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
 (use-package project
-  :straight nil
   :bind (:map project-prefix-map
          ("s" . aorst/project-save-some-buffers))
   :custom
