@@ -1061,6 +1061,8 @@ Lua runtime itself is very lisp-like so putting an S-expression based syntax on 
     (defvar org-babel-default-header-args:fennel '((:results . "silent")))
     (defun org-babel-execute:fennel (body params)
       "Evaluate a block of Fennel code with Babel."
+      (unless (bufferp fennel-repl--buffer)
+        (fennel-repl nil))
       (let ((inferior-lisp-buffer fennel-repl--buffer))
         (lisp-eval-string body)))
     (defun aorst/eval-each-sexp (&optional arg)
@@ -1226,7 +1228,13 @@ Lua support, mainly to view what [[*Fennel][Fennel]] compiler produces.
 #+begin_src emacs-lisp
   (use-package lua-mode
     :hook (lua-mode . flycheck-mode)
-    :custom (lua-indent-level 2))
+    :custom (lua-indent-level 2)
+    :config
+    (defvar org-babel-default-header-args:lua '((:results . "silent")))
+    (defun org-babel-execute:lua (body params)
+      "Evaluate a block of Lua code with Babel."
+      (lua-get-create-process)
+      (lua-send-string body)))
 #+end_src
 
 *** CSS
