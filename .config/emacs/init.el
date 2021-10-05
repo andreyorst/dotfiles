@@ -697,6 +697,7 @@ for module name."
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner t)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
+  (nrepl-use-ssh-fallback-for-remote-hosts t)
   :config
   (setq cider-jdk-src-paths nil)
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
