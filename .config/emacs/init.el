@@ -1032,6 +1032,20 @@ nil."
 
 (use-package yasnippet)
 
+(use-package smerge-mode
+  :straight nil
+  :hook (aorst--theme-change . #'aorst/smerge-setup-faces)
+  :custom
+  (defun aorst/smerge-setup-faces ()
+    (set-face-attribute 'smerge-markers nil
+                        :background 'unspecified
+                        :distant-foreground 'unspecified
+                        :weight 'unspecified
+                        :foreground 'unspecified
+                        :inverse-video 'unspecified
+                        :extend 'unspecified
+                        :inherit 'shadow)))
+
 (use-package with-editor)
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode)
@@ -1047,6 +1061,7 @@ nil."
     (set-face-attribute 'diff-removed nil :foreground nil :background nil :inherit 'magit-diff-removed)
     (set-face-attribute 'smerge-lower nil :foreground nil :background nil :inherit 'magit-diff-added)
     (set-face-attribute 'smerge-upper nil :foreground nil :background nil :inherit 'magit-diff-removed)
+    (set-face-attribute 'smerge-markers nil :inherit 'magit-diff-conflict-heading)
     (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
                               (diff-refine-removed magit-diff-removed-highlight)
                               (smerge-refined-added magit-diff-added-highlight)
@@ -1340,6 +1355,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (aorst/add-compilation-error-syntax kaocha-fail
     ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
     (1 "src/%s" "test/%s") 2)
+  (aorst/add-compilation-error-syntax lein-reflection-warning
+    "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
+    (1 "src/%s" "test/%s") 2 3)
   (aorst/add-compilation-error-syntax lua-stacktrace
     "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
