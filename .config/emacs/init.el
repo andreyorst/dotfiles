@@ -1361,6 +1361,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (aorst/add-compilation-error-syntax lua-stacktrace
     "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
+    1 2)
+  (aorst/add-compilation-error-syntax fennel-compile-error
+    "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
     1 2))
 
 (use-package isearch

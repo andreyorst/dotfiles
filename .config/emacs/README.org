@@ -2109,6 +2109,9 @@ Tweaks to inbuilt =compile.el= mode.
     (aorst/add-compilation-error-syntax lua-stacktrace
       "\\(?:^[[:space:]]+\\([^
   :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
+      1 2)
+    (aorst/add-compilation-error-syntax fennel-compile-error
+      "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
       1 2))
 #+end_src
 
