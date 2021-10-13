@@ -1153,7 +1153,7 @@ IDE for Clojure and ClojureScript.
     (defun cider-repl-prompt-newline (namespace)
       "Return a prompt string that mentions NAMESPACE with newline
   appended."
-      (format "%s\n> " namespace)))
+      (format "%s\n" namespace)))
 #+end_src
 
 [[https://github.com/borkdude/clj-kondo][clj-kondo]] is a static analyzer for Clojure(Script), and =flycheck-clj-kondo= is a backend for =flycheck=, that makes these two things understand each other.
@@ -2103,8 +2103,11 @@ Tweaks to inbuilt =compile.el= mode.
     (aorst/add-compilation-error-syntax kaocha-fail
       ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
       (1 "src/%s" "test/%s") 2)
-    (aorst/add-compilation-error-syntax lein-reflection-warning
+    (aorst/add-compilation-error-syntax clojure-reflection-warning
       "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
+      (1 "src/%s" "test/%s") 2 3)
+    (aorst/add-compilation-error-syntax clojure-syntax-error
+      "^Syntax error macroexpanding at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)).$"
       (1 "src/%s" "test/%s") 2 3)
     (aorst/add-compilation-error-syntax lua-stacktrace
       "\\(?:^[[:space:]]+\\([^

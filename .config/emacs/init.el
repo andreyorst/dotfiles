@@ -710,7 +710,7 @@ for module name."
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with newline
 appended."
-    (format "%s\n> " namespace)))
+    (format "%s\n" namespace)))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
@@ -1355,8 +1355,11 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (aorst/add-compilation-error-syntax kaocha-fail
     ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
     (1 "src/%s" "test/%s") 2)
-  (aorst/add-compilation-error-syntax lein-reflection-warning
+  (aorst/add-compilation-error-syntax clojure-reflection-warning
     "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
+    (1 "src/%s" "test/%s") 2 3)
+  (aorst/add-compilation-error-syntax clojure-syntax-error
+    "^Syntax error macroexpanding at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)).$"
     (1 "src/%s" "test/%s") 2 3)
   (aorst/add-compilation-error-syntax lua-stacktrace
     "\\(?:^[[:space:]]+\\([^
