@@ -493,6 +493,20 @@ Binding for =bury-buffer= command.
     :bind ("C-x C-b" . bury-buffer))
 #+end_src
 
+*** Frame
+Tweaks for frame behaviors.
+
+#+begin_src emacs-lisp
+  (use-package frame
+    :straight nil
+    :config
+    (define-advice toggle-frame-fullscreen (:before (&optional frame) aorst:hide-menubar)
+      "Hide menu-bar when FRAME goes full screen."
+      (set-frame-parameter
+       nil 'menu-bar-lines
+       (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0))))
+#+end_src
+
 ** Functions
 This section describes additional functions for internal use in configurations of various packages, that are general enough.
 All functions and variables are prefixed with =aorst/= and =aorst--= respectively to prevent conflicts.

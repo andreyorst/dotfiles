@@ -236,6 +236,15 @@ are defining or executing a macro."
   :straight nil
   :bind ("C-x C-b" . bury-buffer))
 
+(use-package frame
+  :straight nil
+  :config
+  (define-advice toggle-frame-fullscreen (:before (&optional frame) aorst:hide-menubar)
+    "Hide menu-bar when FRAME goes full screen."
+    (set-frame-parameter
+     nil 'menu-bar-lines
+     (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0))))
+
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
