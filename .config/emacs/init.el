@@ -238,12 +238,20 @@ are defining or executing a macro."
 
 (use-package frame
   :straight nil
+  :requires seq
   :config
   (define-advice toggle-frame-fullscreen (:before (&optional frame) aorst:hide-menubar)
     "Hide menu-bar when FRAME goes full screen."
     (set-frame-parameter
      nil 'menu-bar-lines
-     (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0))))
+     (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0)))
+  (define-advice switch-to-buffer-other-frame (:around (fn buffer-or-name &optional norecord)
+                                               aorst:clone-frame-parameters)
+    "Clone fame parameters when switching to other frame."
+    (let* ((default-frame-alist
+             (seq-remove (lambda (elem) (eq (car elem) 'name))
+                         (frame-parameters (selected-frame)))))
+      (funcall-interactively fn buffer-or-name norecord))))
 
 (defun aorst/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
