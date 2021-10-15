@@ -292,33 +292,6 @@ are defining or executing a macro."
   "Detect if Emacs is running in Termux."
   (executable-find "termux-info"))
 
-(defun aorst/create-accent-face (face ref-face)
-  "Set FACE background to accent color by blending REF-FACE foreground and background.
-Depends on `doom-blend'."
-  (let ((fg (face-attribute ref-face :foreground nil t))
-        (bg (face-attribute ref-face :background nil t)))
-    (if (and (stringp fg)
-             (stringp bg)
-             (fboundp #'doom-blend))
-        (set-face-attribute face nil
-                            :foreground fg
-                            :distant-foreground fg
-                            :weight 'bold
-                            :background (if (aorst/dark-mode-p)
-                                            (doom-blend bg fg 0.8)
-                                          (doom-blend bg fg 0.9))
-                            :inherit nil
-                            :extend t
-                            :inverse-video nil)
-      (set-face-attribute face nil
-                          :foreground nil
-                          :distant-foreground nil
-                          :background nil
-                          :weight 'bold
-                          :inherit ref-face
-                          :extend t
-                          :inverse-video t))))
-
 (defun aorst/minibuffer-defer-garbage-collection ()
   "Defer garbage collection for minibuffer"
   (setq gc-cons-threshold most-positive-fixnum))
@@ -387,24 +360,7 @@ Used in various places to avoid getting wrong line height when
   :type 'symbol
   :group 'local-config)
 
-(unless (featurep 'modus-themes)
-  (use-package modus-themes))
-
 (use-package modus-themes
-  :straight nil
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
-  :custom-face
-  (fringe ((t (:background nil))))
-  (highlight ((t (:foreground unspecified
-                  :distant-foreground unspecified
-                  :background unspecified))))
-  (secondary-selection ((t (:foreground unspecified
-                            :background unspecified
-                            :inherit region
-                            :extend t))))
-  (font-lock-comment-face ((t (:background unspecified))))
   :config
   (cond ((aorst/termuxp)
          (load-theme aorst--termux-theme t))
@@ -426,10 +382,6 @@ Used in various places to avoid getting wrong line height when
 (setq-default custom-safe-themes t)
 
 (setq mode-line-percent-position nil)
-
-(dolist (face '(mode-line mode-line-inactive))
-  (set-face-attribute face nil
-                      :box nil))
 
 (defcustom aorst--title-show-bufname t
   "Whether to include bufname to titlebar.
@@ -989,18 +941,8 @@ nil."
 
 (use-package vertico
   :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection)
-         (aorst--theme-change . aorst/vertico-setup-faces))
-  :init (vertico-mode)
-  (defun aorst/vertico-setup-faces ()
-    (let ((mode-line-color (face-attribute 'mode-line :background)))
-      (when (fboundp #'doom-darken)
-        (set-face-attribute
-         'vertico-current nil
-         :background (if (aorst/dark-mode-p)
-                         (doom-lighten mode-line-color 0.2)
-                       (doom-darken mode-line-color 0.1))))))
-  (aorst/vertico-setup-faces))
+         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
+  :init (vertico-mode))
 
 (use-package marginalia
   :init (marginalia-mode))
@@ -1053,42 +995,13 @@ nil."
 
 (use-package yasnippet)
 
-(use-package smerge-mode
-  :straight nil
-  :hook (aorst--theme-change . #'aorst/smerge-setup-faces)
-  :custom
-  (defun aorst/smerge-setup-faces ()
-    (set-face-attribute 'smerge-markers nil
-                        :background 'unspecified
-                        :distant-foreground 'unspecified
-                        :weight 'unspecified
-                        :foreground 'unspecified
-                        :inverse-video 'unspecified
-                        :extend 'unspecified
-                        :inherit 'shadow)))
-
 (use-package with-editor)
 (use-package magit
-  :hook ((git-commit-mode . flyspell-mode)
-         (aorst--theme-change . aorst/magit-setup-diff-faces))
+  :hook ((git-commit-mode . flyspell-mode))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all)
-  :config
-  (advice-add 'magit-set-header-line-format :override #'ignore)
-  (defun aorst/magit-setup-diff-faces ()
-    (set-face-attribute 'diff-added nil :foreground nil :background nil :inherit 'magit-diff-added)
-    (set-face-attribute 'diff-removed nil :foreground nil :background nil :inherit 'magit-diff-removed)
-    (set-face-attribute 'smerge-lower nil :foreground nil :background nil :inherit 'magit-diff-added)
-    (set-face-attribute 'smerge-upper nil :foreground nil :background nil :inherit 'magit-diff-removed)
-    (set-face-attribute 'smerge-markers nil :inherit 'magit-diff-conflict-heading)
-    (dolist (face-reference '((diff-refine-added magit-diff-added-highlight)
-                              (diff-refine-removed magit-diff-removed-highlight)
-                              (smerge-refined-added magit-diff-added-highlight)
-                              (smerge-refined-removed magit-diff-removed-highlight)))
-      (apply #'aorst/create-accent-face face-reference)))
-  (aorst/magit-setup-diff-faces))
+  (magit-diff-refine-hunk 'all))
 
 (use-package magit-todos
   :after magit
