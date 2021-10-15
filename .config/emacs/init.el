@@ -369,25 +369,29 @@ Used in various places to avoid getting wrong line height when
 (when (aorst/font-installed-p "DejaVu Sans")
   (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
 
-(defcustom aorst--dark-theme 'doom-spacegrey
+(defcustom aorst--dark-theme 'modus-vivendi
   "Dark theme to use."
   :tag "Dark theme"
   :type 'symbol
   :group 'local-config)
 
-(defcustom aorst--light-theme 'doom-one-light
+(defcustom aorst--light-theme 'modus-operandi
   "Light theme to use."
   :tag "Light theme"
   :type 'symbol
   :group 'local-config)
 
-(defcustom aorst--termux-theme 'doom-molokai
+(defcustom aorst--termux-theme 'modus-vivendi
   "Theme to use in Termux."
   :tag "Termux theme"
   :type 'symbol
   :group 'local-config)
 
-(use-package doom-themes
+(unless (featurep 'modus-themes)
+  (use-package modus-themes))
+
+(use-package modus-themes
+  :straight nil
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
