@@ -158,3 +158,5 @@ sepcat() {
 # curl-cp - copy files with curl utility.
 # Handy when you want to see the progress.
 ccp() { eval curl -o "$2" FILE://"$1"; }
+
+tunnel() { ssh -N -L "$1":localhost:"$1" "$2" & }
