@@ -24,14 +24,15 @@
   :custom (custom-file (expand-file-name "custom.el" user-emacs-directory))
   :init (load custom-file :noerror))
 
-(defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
-  "File to store disabled commands, that were enabled permamently.")
-
-(define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
-  (let ((user-init-file aorst--disabled-commands))
-    (funcall foo command)))
-
-(load aorst--disabled-commands :noerror)
+(use-package novice
+  :straight nil
+  :init
+  (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
+    "File to store disabled commands, that were enabled permamently.")
+  (define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
+    (let ((user-init-file aorst--disabled-commands))
+      (funcall foo command)))
+  (load aorst--disabled-commands :noerror))
 
 (defgroup local-config nil
   "Customization group for local settings."
@@ -143,11 +144,11 @@ for stopping scroll from going beyond the longest line.  Based on
   :straight nil
   :no-require t
   :custom
-  (default-input-method 'russian-computer))
-
-(prefer-coding-system 'utf-8)
-(when (display-graphic-p)
-  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+  (default-input-method 'russian-computer)
+  :init
+  (prefer-coding-system 'utf-8)
+  (when (display-graphic-p)
+    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
 
 (use-package startup
   :straight nil
@@ -291,15 +292,6 @@ are defining or executing a macro."
 (defun aorst/termuxp ()
   "Detect if Emacs is running in Termux."
   (executable-find "termux-info"))
-
-(defun aorst/minibuffer-defer-garbage-collection ()
-  "Defer garbage collection for minibuffer"
-  (setq gc-cons-threshold most-positive-fixnum))
-
-(defun aorst/minibuffer-restore-garbage-collection ()
-  "Resotre garbage collection settings."
-  (run-at-time
-   1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
 
 (use-package startup
   :straight nil
@@ -943,8 +935,6 @@ nil."
     (smartparens-strict-mode 1)))
 
 (use-package vertico
-  :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-         (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
   :init (vertico-mode))
 
 (use-package marginalia

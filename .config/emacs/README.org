@@ -190,14 +190,15 @@ To preserve custom modifications it is moved to a separate file.
 Same thing with disabled commands.
 
 #+begin_src emacs-lisp
-  (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
-    "File to store disabled commands, that were enabled permamently.")
-
-  (define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
-    (let ((user-init-file aorst--disabled-commands))
-      (funcall foo command)))
-
-  (load aorst--disabled-commands :noerror)
+  (use-package novice
+    :straight nil
+    :init
+    (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
+      "File to store disabled commands, that were enabled permamently.")
+    (define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
+      (let ((user-init-file aorst--disabled-commands))
+        (funcall foo command)))
+    (load aorst--disabled-commands :noerror))
 #+end_src
 
 *** Personal custom group
@@ -356,16 +357,11 @@ This configures two keyboard layouts: =qwerty= and =йцукен=, which can be 
     :straight nil
     :no-require t
     :custom
-    (default-input-method 'russian-computer))
-#+end_src
-
-*** UTF8
-=UTF8= should be preferred.
-
-#+begin_src emacs-lisp
-  (prefer-coding-system 'utf-8)
-  (when (display-graphic-p)
-    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+    (default-input-method 'russian-computer)
+    :init
+    (prefer-coding-system 'utf-8)
+    (when (display-graphic-p)
+      (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
 #+end_src
 
 *** Default Major Mode
@@ -577,20 +573,6 @@ Emacs runs well in Termux, though some features may be missing, due to older ver
   (defun aorst/termuxp ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
-#+end_src
-
-*** =minibuffer-defer-garbage-collection=
-When minibuffer pops up, the garbage collection is deferred for more optimal filtering performance.
-
-#+begin_src emacs-lisp
-  (defun aorst/minibuffer-defer-garbage-collection ()
-    "Defer garbage collection for minibuffer"
-    (setq gc-cons-threshold most-positive-fixnum))
-
-  (defun aorst/minibuffer-restore-garbage-collection ()
-    "Resotre garbage collection settings."
-    (run-at-time
-     1 nil (lambda () (setq gc-cons-threshold aorst--gc-cons-threshold))))
 #+end_src
 
 ** User Interface
@@ -1508,8 +1490,6 @@ Vertical completion UI for the minibuffer.
 
 #+begin_src emacs-lisp
   (use-package vertico
-    :hook ((minibuffer-setup . aorst/minibuffer-defer-garbage-collection)
-           (minibuffer-exit . aorst/minibuffer-restore-garbage-collection))
     :init (vertico-mode))
 #+end_src
 
