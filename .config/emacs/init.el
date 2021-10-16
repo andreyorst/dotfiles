@@ -361,6 +361,9 @@ Used in various places to avoid getting wrong line height when
   :group 'local-config)
 
 (use-package modus-themes
+  :custom-face
+  (mode-line ((t (:box unspecified))))
+  (mode-line-inactive ((t (:box unspecified))))
   :config
   (cond ((aorst/termuxp)
          (load-theme aorst--termux-theme t))
