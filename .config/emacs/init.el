@@ -668,7 +668,6 @@ for module name."
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
                        (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/lib/src.zip")
                        (file-expand-wildcards "~/.clojure/clojure-*-sources.jar")))
-
     (when (file-exists-p src)
       (unless (memq src cider-jdk-src-paths)
         (add-to-list 'cider-jdk-src-paths src t))))
