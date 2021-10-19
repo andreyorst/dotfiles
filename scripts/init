@@ -12,7 +12,7 @@
         fi
     done
 
-    for dir in ".config" ".local/bin"; do
+    for dir in ".config" ".local/bin" ".local/share/applications"; do
         mkdir -p "$HOME/$dir"
         cd "$HOME/$dir" || exit
         shopt -s dotglob
