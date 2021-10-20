@@ -1033,6 +1033,7 @@ nil."
   ;; UI
   (lsp-enable-links nil)
   (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
   (lsp-modeline-code-actions-enable nil)
   ;; semantic code features
   (lsp-enable-folding nil)
@@ -1051,6 +1052,14 @@ nil."
   :requires lsp-mode
   :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
   :custom (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
+
+(use-package treemacs
+  :custom
+  (treemacs-no-png-images t))
+
+(use-package lsp-treemacs
+  :custom
+  (lsp-treemacs-theme "Iconless"))
 
 (use-package project
   :bind (:map project-prefix-map
