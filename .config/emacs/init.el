@@ -579,12 +579,13 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
                 #'aorst/emacs-lisp-indent-function)))
 
 (use-package fennel-mode
+  :straight (:host gitlab
+             :repo "technomancy/fennel-mode"
+             :branch "prog-mode")
   :bind (:map fennel-mode-map
          ("C-c C-k" . aorst/eval-each-sexp)
          ("M-." . xref-find-definitions)
-         ("M-," . xref-pop-marker-stack)
-         :map fennel-repl-mode-map
-         ("C-c C-q" . aorst/quit-fennel-repl))
+         ("M-," . xref-pop-marker-stack))
   :config
   (put 'global 'fennel-indent-function 1)
   (put 'local 'fennel-indent-function 1)
@@ -614,16 +615,7 @@ for module name."
         (switch-to-lisp t))
       (if (equal arg '(4))
           (funcall-interactively 'fennel-reload nil)
-        (funcall-interactively 'fennel-reload t))))
-  (defun aorst/quit-fennel-repl ()
-    (interactive)
-    (let ((window (get-buffer-window fennel-repl--buffer))
-          (kill-buffer-query-functions
-           (delq 'process-kill-buffer-query-function kill-buffer-query-functions)))
-      (ignore-errors
-        (when window
-          (delete-window window)))
-      (kill-buffer fennel-repl--buffer))))
+        (funcall-interactively 'fennel-reload t)))))
 
 (use-package clojure-mode
   :hook (((clojure-mode
@@ -689,19 +681,7 @@ appended."
 
 (use-package sly
   :custom (inferior-lisp-program "sbcl")
-  :config
-  ;; workaround https://gitlab.com/technomancy/fennel-mode/issues/11
-  ;; Sly author claims that this is `fennel-mode' problem, as
-  ;; `lisp-mode' is meant strictly for Common Lisp.
-  (defun aorst/sly-ignore-fennel (f &rest args)
-    "Prevent sly functions from running in `fennel-mode'."
-    (unless (or (eq major-mode 'fennel-mode)
-                (eq major-mode 'fennel-repl-mode))
-      (apply f args)))
-  (dolist (f '(sly-mode
-               sly-editing-mode))
-    (advice-add f :around #'aorst/sly-ignore-fennel))
-  (add-hook 'fennel-mode (lambda () (sly-symbol-completion-mode -1))))
+  :config (sly-symbol-completion-mode -1))
 
 (use-package yaml-mode
   :custom (yaml-indent-offset 4))
