@@ -6,23 +6,27 @@ There also is a configurations for [Kakoune][2], and some time ago there was a c
 The structure of this repository is pretty simple.
 Each directory that is named along with default system name contains files that should be copied or sym-linked to corresponding system directory.
 All hidden files at the root of the repository should be copied of sym-linked to home directory.
-I should really write a script this does it automatically, but for now here's a mapping diagram:
+
+There's a script that automatically links all needed files to their destinations, though you might want to edit it not to link files in `.local/bin`.
+
+The basic layout as follows:
 
 ```
-.dotfiles               ~> /home/$USER
-├── .bashrc             ~> ├── .bashrc
-├── .config/*           ~> ├── .config/
-├── .config/emacs       ~> ├── .emacs.d (for pre Emacs 27 users)
-├── .local/bin/*        ~> ├── .local/bin
-├── c_project_template     │
-├── .editorconfig       ~> ├── .editorconfig
-├── .git/                  │
-├── .gitignore             │
-├── .gitconfig          ~> ├── .gitconfig
-├── .inputrc            ~> ├── .inputrc
-├── README.md              │
-├── scripts                │
-└── .tmux.conf          ~> └── .tmux.conf
+.dotfiles                        ~> /home/$USER
+├── .bashrc                      ~> ├── .bashrc
+├── .config/*                    ~> ├── .config/
+├── .config/emacs                ~> ├── .emacs.d (for pre Emacs 27 users)
+├── .local/bin/*                 ~> ├── .local/bin
+├── .local/share/applications/*  ~> ├── .local/share/applications
+├── c_project_template              │
+├── .editorconfig                ~> ├── .editorconfig
+├── .git/                           │
+├── .gitignore                      │
+├── .gitconfig                   ~> ├── .gitconfig
+├── .inputrc                     ~> ├── .inputrc
+├── README.md                       │
+├── scripts                         │
+└── .tmux.conf                   ~> └── .tmux.conf
 ```
 
 These directories and files should be excluded from copying or sym-linking:
