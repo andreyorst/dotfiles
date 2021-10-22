@@ -361,7 +361,9 @@ Used in various places to avoid getting wrong line height when
   (modus-themes-org-blocks 'gray-background)
   (modus-themes-syntax '(alt-syntax green-strings))
   (modus-themes-operandi-color-overrides '((bg-main . "#fcfcfc") (fg-main . "#101010")))
-  (modus-themes-vivendi-color-overrides '((bg-main . "#1d1d1d") (fg-main . "#e5e6e7")))
+  (modus-themes-vivendi-color-overrides (if (aorst/termuxp)
+                                            '((fg-main . "#e5e6e7"))
+                                          '((bg-main . "#1d1d1d") (fg-main . "#e5e6e7"))))
   :config
   (cond ((aorst/termuxp)
          (load-theme aorst--termux-theme t))

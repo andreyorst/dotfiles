@@ -21,7 +21,7 @@ alias lispwrap="rlwrap -r -q'\"' -b \"(){}[],^%#@\\\";:'\""
 # Edit things in apropriate environment
 alias tmuxconf="\$EDITOR ~/.tmux.conf"
 alias kakconf="kak ~/.dotfiles/.config/kak/kakrc"
-alias emacsconf="emacs ~/.dotfiles/.config/emacs/README.org"
+alias emacsconf="emacs ~/.dotfiles/.config/emacs/init.el"
 
 if [ -n "$(command -v dash)" ]; then
     KAKOUNE_POSIX_SHELL="$(command -v dash)"
