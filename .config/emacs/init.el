@@ -12,6 +12,11 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
+(defgroup local-config ()
+  "Customization group for local settings."
+  :prefix "local-config-"
+  :group 'emacs)
+
 (require 'straight)
 (straight-use-package 'use-package)
 (defvar straight-use-package-by-default)
@@ -28,14 +33,10 @@
   :init
   (defvar aorst--disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
     "File to store disabled commands, that were enabled permamently.")
-  (define-advice enable-command (:around (foo command) aorst:put-in-custom-file)
+  (define-advice enable-command (:around (foo command))
     (let ((user-init-file aorst--disabled-commands))
       (funcall foo command)))
   (load aorst--disabled-commands :noerror))
-
-(defgroup local-config nil
-  "Customization group for local settings."
-  :prefix "local-config-")
 
 (use-package startup
   :straight nil
@@ -70,7 +71,6 @@
 
 (use-package mwheel
   :straight nil
-  :demand
   :bind (("S-<down-mouse-1>" . nil)
          ("S-<mouse-3>" . nil)
          ("<mouse-4>" . mwheel-scroll)
@@ -79,7 +79,7 @@
   (mouse-wheel-flip-direction t)
   (mouse-wheel-tilt-scroll t)
   (mouse-wheel-progressive-speed nil)
-  :config
+  :init
   (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu)
   (defun aorst/truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
@@ -119,7 +119,7 @@ for stopping scroll from going beyond the longest line.  Based on
                         (and (eobp) (<= (- (point) start)
                                         threshold)))
               (throw 'excessive t)))))))
-  (define-advice scroll-left (:around (foo &optional arg set-minimum) aorst:scroll-left)
+  (define-advice scroll-left (:around (foo &optional arg set-minimum))
     (when (and truncate-lines
                (not (memq major-mode '(vterm-mode term-mode)))
                (aorst/truncated-lines-p))
@@ -177,7 +177,8 @@ for stopping scroll from going beyond the longest line.  Based on
   (column-number-mode 1)
   (line-number-mode 1)
   (transient-mark-mode -1)
-  (define-advice keyboard-quit (:around (quit) aorst:keyboard-quit)
+  (define-advice keyboard-quit
+      (:around (quit))
     "Quit in current context.
 
 When there is an active minibuffer and we are not inside it close
@@ -240,13 +241,14 @@ are defining or executing a macro."
   :straight nil
   :requires seq
   :config
-  (define-advice toggle-frame-fullscreen (:before (&optional frame) aorst:hide-menubar)
+  (define-advice toggle-frame-fullscreen
+      (:before (&optional frame))
     "Hide menu-bar when FRAME goes full screen."
     (set-frame-parameter
      nil 'menu-bar-lines
      (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0)))
-  (define-advice switch-to-buffer-other-frame (:around (fn buffer-or-name &optional norecord)
-                                               aorst:clone-frame-parameters)
+  (define-advice switch-to-buffer-other-frame
+      (:around (fn buffer-or-name &optional norecord))
     "Clone fame parameters when switching to other frame."
     (let* ((default-frame-alist
              (seq-remove (lambda (elem) (eq (car elem) 'name))
@@ -355,6 +357,11 @@ Used in various places to avoid getting wrong line height when
   :custom-face
   (mode-line ((t (:box unspecified))))
   (mode-line-inactive ((t (:box unspecified))))
+  :custom
+  (modus-themes-org-blocks 'gray-background)
+  (modus-themes-syntax '(alt-syntax green-strings))
+  (modus-themes-operandi-color-overrides '((bg-main . "#fcfcfc") (fg-main . "#101010")))
+  (modus-themes-vivendi-color-overrides '((bg-main . "#1d1d1d") (fg-main . "#e5e6e7")))
   :config
   (cond ((aorst/termuxp)
          (load-theme aorst--termux-theme t))
@@ -402,10 +409,9 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (display-line-numbers-width-start t))
 
 (use-package minions
-  :custom
-  (minions-direct '(flycheck-mode flymake-mode))
-  :config
-  (minions-mode))
+  :commands minions-mode
+  :custom (minions-direct '(flycheck-mode flymake-mode))
+  :init (minions-mode))
 
 (use-package org
   :straight (:type built-in)
@@ -453,10 +459,10 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
-  (define-advice org-return (:around (f &rest args) aorst:org-return)
+  (define-advice org-return (:around (f &rest args))
     (let ((org-src-preserve-indentation t))
       (apply f args)))
-  (define-advice org-cycle (:around (f &rest args) aorst:org-cycle)
+  (define-advice org-cycle (:around (f &rest args))
     (let ((org-src-preserve-indentation t))
       (apply f args)))
   (defun org-babel-edit-prep:emacs-lisp (_info)
@@ -680,6 +686,7 @@ appended."
   (cljr-warn-on-eval nil))
 
 (use-package sly
+  :commands sly-symbol-completion-mode
   :custom (inferior-lisp-program "sbcl")
   :config (sly-symbol-completion-mode -1))
 
@@ -695,6 +702,7 @@ appended."
   :hook ((perl-mode . flycheck-mode)))
 
 (use-package lua-mode
+  :commands (lua-get-create-process lua-send-string)
   :hook (lua-mode . flycheck-mode)
   :custom (lua-indent-level 2)
   :config
@@ -740,7 +748,8 @@ appended."
   (vterm-environment '("VTERM=1")))
 
 (use-package editorconfig
-  :config (editorconfig-mode 1))
+  :commands editorconfig-mode
+  :init (editorconfig-mode 1))
 
 (use-package flymake
   :straight nil
@@ -755,89 +764,39 @@ appended."
          (prog-mode . flyspell-prog-mode)))
 
 (use-package flycheck
+  :defines (flymake-error-bitmap
+            flymake-warning-bitmap
+            flymake-note-bitmap)
+  :commands (flycheck-define-error-level)
+  :functions (flycheck-count-errors)
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
   (flycheck-emacs-lisp-load-path 'inherit)
   :config
-  (when (fboundp #'define-fringe-bitmap)
-    (define-fringe-bitmap 'flycheck-double-exclamation-mark
-      (vector #b00000000
-              #b00000000
-              #b00000000
-              #b01100110
-              #b01100110
-              #b01100110
-              #b01100110
-              #b01100110
-              #b01100110
-              #b01100110
-              #b01100110
-              #b00000000
-              #b01100110
-              #b01100110
-              #b00000000
-              #b00000000
-              #b00000000))
-    (define-fringe-bitmap 'flycheck-exclamation-mark
-      (vector #b00000000
-              #b00000000
-              #b00000000
-              #b00011000
-              #b00011000
-              #b00011000
-              #b00011000
-              #b00011000
-              #b00011000
-              #b00011000
-              #b00011000
-              #b00000000
-              #b00011000
-              #b00011000
-              #b00000000
-              #b00000000
-              #b00000000))
-    (define-fringe-bitmap 'flycheck-question-mark
-      (vector #b00000000
-              #b00000000
-              #b00000000
-              #b00111100
-              #b01100110
-              #b01100110
-              #b01100110
-              #b00000110
-              #b00001100
-              #b00011000
-              #b00011000
-              #b00000000
-              #b00011000
-              #b00011000
-              #b00000000
-              #b00000000
-              #b00000000))
-    (flycheck-define-error-level 'error
-      :severity 100
-      :compilation-level 2
-      :overlay-category 'flycheck-error-overlay
-      :fringe-bitmap 'flycheck-double-exclamation-mark
-      :fringe-face 'flycheck-fringe-error
-      :error-list-face 'flycheck-error-list-error)
-    (flycheck-define-error-level 'warning
-      :severity 10
-      :compilation-level 1
-      :overlay-category 'flycheck-warning-overlay
-      :fringe-bitmap 'flycheck-exclamation-mark
-      :fringe-face 'flycheck-fringe-warning
-      :error-list-face 'flycheck-error-list-warning)
-    (flycheck-define-error-level 'info
-      :severity -10
-      :compilation-level 0
-      :overlay-category 'flycheck-info-overlay
-      :fringe-bitmap 'flycheck-question-mark
-      :fringe-face 'flycheck-fringe-info
-      :error-list-face 'flycheck-error-list-info))
-  (define-advice flycheck-mode-line-status-text (:override (&optional status)
-                                                 aorst:flycheck-mode-line-indicator)
+  (flycheck-define-error-level 'error
+    :severity 100
+    :compilation-level 2
+    :overlay-category 'flycheck-error-overlay
+    :fringe-bitmap flymake-error-bitmap
+    :fringe-face 'flycheck-fringe-error
+    :error-list-face 'flycheck-error-list-error)
+  (flycheck-define-error-level 'warning
+    :severity 10
+    :compilation-level 1
+    :overlay-category 'flycheck-warning-overlay
+    :fringe-bitmap flymake-warning-bitmap
+    :fringe-face 'flycheck-fringe-warning
+    :error-list-face 'flycheck-error-list-warning)
+  (flycheck-define-error-level 'info
+    :severity -10
+    :compilation-level 0
+    :overlay-category 'flycheck-info-overlay
+    :fringe-bitmap flymake-note-bitmap
+    :fringe-face 'flycheck-fringe-info
+    :error-list-face 'flycheck-error-list-info)
+  (define-advice flycheck-mode-line-status-text
+      (:override (&optional status))
     "Get a text describing STATUS for use in the mode line.
 
 STATUS defaults to `flycheck-last-status-change' if omitted or
@@ -849,18 +808,12 @@ nil."
                   (`errored "!")
                   (`finished
                    (let-alist (flycheck-count-errors flycheck-current-errors)
-                     (propertize (format "%s/%s" (or .error 0) (or .warning 0))
-                                 'help-echo (if (or .error .warning)
-                                                (concat "Flycheck: "
-                                                        (when .error (format "%d errors%s" .error (if .warning ", " "")))
-                                                        (when .warning (format "%d warnings" .warning))
-                                                        "\nmouse-1: list errors")
-                                              "Flycheck: no errors or warnings")
-                                 'local-map 'flycheck-error-list-mode-line-map)))
+                     (propertize (format "%s/%s" (or .error 0) (or .warning 0)))))
                   (`interrupted ".")
                   (`suspicious "?"))))
       (concat " " flycheck-mode-line-prefix ":" text)))
-  (define-advice flycheck-may-use-echo-area-p (:override () aorst:flycheck-no-echo-or-buffer)
+  (define-advice flycheck-may-use-echo-area-p
+      (:override ())
     nil))
 
 (use-package flycheck-package
@@ -868,6 +821,7 @@ nil."
          (emacs-lisp-mode . flycheck-package-setup)))
 
 (use-package smartparens
+  :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
   :hook (((clojure-mode
            emacs-lisp-mode
            common-lisp-mode
@@ -910,15 +864,17 @@ nil."
     (smartparens-strict-mode 1)))
 
 (use-package vertico
+  :commands vertico-mode
   :init (vertico-mode))
 
 (use-package marginalia
+  :commands marginalia-mode
   :init (marginalia-mode))
 
 (use-package consult
+  :commands consult-completion-in-region
   :bind (("C-x C-r" . consult-recent-file))
-  :init
-  (setq completion-in-region-function #'consult-completion-in-region))
+  :init (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package company
   :bind (:map company-mode-map
@@ -954,6 +910,7 @@ nil."
   (company-quickhelp-use-propertized-text t))
 
 (use-package undo-tree
+  :commands global-undo-tree-mode
   :custom
   (undo-tree-visualizer-relative-timestamps nil)
   (undo-tree-visualizer-timestamps nil)
@@ -971,14 +928,15 @@ nil."
   (magit-diff-refine-hunk 'all))
 
 (use-package magit-todos
+  :commands magit-todos-mode
   :after magit
+  :custom (magit-todos-nice (when (executable-find "nice")
+                              magit-todos-nice)
+                            "avoid breaking Magit on systems that don't have `nice'")
   :init
-  ;; don't break Magit on systems that don't have `nice'
-  (unless (executable-find "nice")
-    (setq magit-todos-nice nil))
-  :config
   (let ((inhibit-message t))
     (magit-todos-mode 1))
+  :config
   (transient-append-suffix 'magit-status-jump '(0 0 -1)
     '("T " "Todos" magit-todos-jump-to-todos)))
 
@@ -1042,6 +1000,9 @@ nil."
   (lsp-treemacs-theme "Iconless"))
 
 (use-package project
+  :functions (aorst/project-root-p
+              aorst/project-find-root)
+  :commands (project-buffers project-compile)
   :bind (:map project-prefix-map
          ("s" . aorst/project-save-some-buffers))
   :custom
@@ -1064,11 +1025,9 @@ nil."
          (file-name-directory
           (directory-file-name path))))))
   (add-to-list 'project-find-functions #'aorst/project-find-root)
-  (define-advice project-compile (:around (fn &rest args)
-                                  aorst:save-only-project-buffers)
+  (define-advice project-compile (:around (fn &rest args))
     "Only ask to save project related buffers."
-    (let* ((project-buffers
-            (project-buffers (project-current)))
+    (let* ((project-buffers (project-buffers (project-current)))
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
       (apply fn args)))
@@ -1125,17 +1084,20 @@ means save all with no questions."
   (recentf-mode))
 
 (use-package dumb-jump
+  :commands dumb-jump-xref-activate
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'completing-read)
-  :config
+  :init
   (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package which-key
-  :config (which-key-mode t))
+  :commands which-key-mode
+  :init (which-key-mode t))
 
 (use-package gcmh
-  :config (gcmh-mode t))
+  :commands gcmh-mode
+  :init (gcmh-mode t))
 
 (use-package paren
   :straight nil
