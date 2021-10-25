@@ -601,10 +601,11 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body _params)
     "Evaluate a block of Fennel code with Babel."
-    (unless (bufferp fennel-repl--buffer)
-      (fennel-repl nil))
-    (let ((inferior-lisp-buffer fennel-repl--buffer))
-      (lisp-eval-string body)))
+    (save-window-excursion
+      (unless (bufferp fennel-repl--buffer)
+        (fennel-repl nil))
+      (let ((inferior-lisp-buffer fennel-repl--buffer))
+        (lisp-eval-string body))))
   (defun aorst/eval-each-sexp (&optional arg)
     "Evaluate each s-expression in the buffer consequentially.
 If prefix ARG specified, call `fennel-reload' function.  If
