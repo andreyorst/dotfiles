@@ -347,30 +347,27 @@ Used in various places to avoid getting wrong line height when
   :type 'symbol
   :group 'local-config)
 
-(defcustom aorst--termux-theme 'modus-vivendi
-  "Theme to use in Termux."
-  :tag "Termux theme"
-  :type 'symbol
-  :group 'local-config)
-
 (use-package modus-themes
   :custom-face
+  ;; The `modus-themes-mode-line' custom doesn't allow disabling box
+  ;; effect, only recolors it, so it is disabled via custom.
   (mode-line ((t (:box unspecified))))
   (mode-line-inactive ((t (:box unspecified))))
   :custom
   (modus-themes-org-blocks 'gray-background)
   (modus-themes-syntax '(alt-syntax green-strings))
-  (modus-themes-operandi-color-overrides '((bg-main . "#fcfcfc") (fg-main . "#101010")))
+  (modus-themes-region '(bg-only no-extend))
+  (modus-themes-operandi-color-overrides '((bg-main . "#fcfbfa") (fg-main . "#202020")))
   (modus-themes-vivendi-color-overrides (if (aorst/termuxp)
-                                            '((fg-main . "#e5e6e7"))
-                                          '((bg-main . "#1d1d1d") (fg-main . "#e5e6e7"))))
-  :config
+                                            '((bg-main . "#000000") (fg-main . "#e5e6e7"))
+                                          '((bg-main . "#252423") (fg-main . "#dedddc"))))
+  (modus-themes-completions 'opinionated)
+  :init
   (cond ((aorst/termuxp)
-         (load-theme aorst--termux-theme t))
+         (load-theme aorst--dark-theme t))
         ((aorst/dark-mode-p)
          (load-theme aorst--dark-theme t))
-        (t
-         (load-theme aorst--light-theme t))))
+        (t (load-theme aorst--light-theme t))))
 
 (defvar aorst--theme-change-hook nil
   "Hook run after a color theme is changed with `load-theme' or `disable-theme'.")
@@ -824,6 +821,9 @@ nil."
          (emacs-lisp-mode . flycheck-package-setup)))
 
 (use-package smartparens
+  ;; `smartparens-strict-mode' is automatically enabled only in Lisp
+  ;; modes.  Other modes use `smartparens-mode' because strictness may
+  ;; be a problem there.
   :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
   :hook (((clojure-mode
            emacs-lisp-mode
@@ -854,10 +854,10 @@ nil."
   (sp-show-pair-delay 0)
   (sp-echo-match-when-invisible nil)
   :config
+  (add-to-list 'sp-lisp-modes 'fennel-mode t)
   (require 'smartparens-config)
   (sp-use-paredit-bindings)
-  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before config
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
+  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before :config
   (defun aorst/minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
     (setq-local comment-start ";")
@@ -933,9 +933,9 @@ nil."
 (use-package magit-todos
   :commands magit-todos-mode
   :after magit
-  :custom (magit-todos-nice (when (executable-find "nice")
-                              magit-todos-nice)
-                            "avoid breaking Magit on systems that don't have `nice'")
+  :custom
+  (magit-todos-nice (when (executable-find "nice") t)
+                    "avoid breaking Magit on systems that don't have `nice'")
   :init
   (let ((inhibit-message t))
     (magit-todos-mode 1))
