@@ -532,13 +532,16 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (geiser-default-implementation 'guile))
 
 (use-package eros
+  :straight (:host github
+             :repo "andreyorst/eros"
+             :branch "general-purpose-api")
   :hook ((emacs-lisp-mode . eros-mode)
          (fennel-mode . aorst/enable-fennel-eros))
   :config
   (defun aorst/enable-fennel-eros ()
     "Enable mappings for evaluation overlays in fennel-mode."
     (local-set-key (kbd "C-M-x") #'aorst/fennel-eval-defun)
-    (local-set-key fennel-mode-map (kbd "C-x C-e") #'aorst/fennel-eval-last-sexp))
+    (local-set-key (kbd "C-x C-e") #'aorst/fennel-eval-last-sexp))
   (defun aorst/fennel-eval-to-string (sexp)
     "Send SEXP to the inferior lisp process, return result as a string."
     (condition-case nil
@@ -568,27 +571,20 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                                contents)))
               (message "%s" contents)
               contents)))
-        (error nil)))
-  (defun aorst/eros-eval-fennel-overlay (value point)
-    "Make overlay for VALUE at POINT.
-Adjusted for Fennel, where all evaluation results are seen as
-strings."
-    (eros--make-result-overlay (format "%s" value)
-      :where point
-      :duration eros-eval-result-duration))
+      (error "nil")))
   (defun aorst/fennel-eval-last-sexp ()
     "Eval last s-expression and display the result in an overlay."
     (interactive)
     (when (inferior-lisp-proc)
       (let ((sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
-        (aorst/eros-eval-fennel-overlay
+        (eros-eval-overlay
          (aorst/fennel-eval-to-string (thing-at-point 'sexp t))
          (point)))))
   (defun aorst/fennel-eval-defun ()
     "Eval defun and display the result in an overlay."
     (interactive)
     (when (inferior-lisp-proc)
-      (aorst/eros-eval-fennel-overlay
+      (eros-eval-overlay
        (aorst/fennel-eval-to-string (thing-at-point 'defun t))
        (save-excursion (end-of-defun) (point))))))
 
