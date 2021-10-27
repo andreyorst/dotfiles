@@ -531,6 +531,67 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
 
+(use-package eros
+  :hook ((emacs-lisp-mode . eros-mode)
+         (fennel-mode . aorst/enable-fennel-eros))
+  :config
+  (defun aorst/enable-fennel-eros ()
+    "Enable mappings for evaluation overlays in fennel-mode."
+    (local-set-key (kbd "C-M-x") #'aorst/fennel-eval-defun)
+    (local-set-key fennel-mode-map (kbd "C-x C-e") #'aorst/fennel-eval-last-sexp))
+  (defun aorst/fennel-eval-to-string (sexp)
+    "Send SEXP to the inferior lisp process, return result as a string."
+    (condition-case nil
+        (let ((sexp (string-trim (substring-no-properties sexp)))
+              (buf (get-buffer-create "*fennel-eval*"))
+              (prompt inferior-lisp-prompt)
+              (proc (inferior-lisp-proc)))
+          (with-current-buffer buf
+            (erase-buffer)
+            (let ((comint-prompt-regexp prompt))
+              (comint-redirect-send-command-to-process sexp buf proc t t))
+            (accept-process-output proc)
+            (ignore-errors ; apply font-locking if the result is balanced
+              (setq-local delay-mode-hooks t)
+              (setq delayed-mode-hooks nil)
+              (check-parens)
+              (fennel-mode)
+              (font-lock-fontify-region (point-min) (point-max)))
+            (let* ((contents (thread-last
+                               (buffer-string)
+                               (replace-regexp-in-string "^ +" "")
+                               (string-replace "\n" " ")
+                               (string-replace "\t" ", ")
+                               string-trim))
+                   (contents (if (string-empty-p contents)
+                                 "#<no values>"
+                               contents)))
+              (message "%s" contents)
+              contents)))
+        (error nil)))
+  (defun aorst/eros-eval-fennel-overlay (value point)
+    "Make overlay for VALUE at POINT.
+Adjusted for Fennel, where all evaluation results are seen as
+strings."
+    (eros--make-result-overlay (format "%s" value)
+      :where point
+      :duration eros-eval-result-duration))
+  (defun aorst/fennel-eval-last-sexp ()
+    "Eval last s-expression and display the result in an overlay."
+    (interactive)
+    (when (inferior-lisp-proc)
+      (let ((sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
+        (aorst/eros-eval-fennel-overlay
+         (aorst/fennel-eval-to-string (thing-at-point 'sexp t))
+         (point)))))
+  (defun aorst/fennel-eval-defun ()
+    "Eval defun and display the result in an overlay."
+    (interactive)
+    (when (inferior-lisp-proc)
+      (aorst/eros-eval-fennel-overlay
+       (aorst/fennel-eval-to-string (thing-at-point 'defun t))
+       (save-excursion (end-of-defun) (point))))))
+
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
@@ -584,9 +645,6 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
                 #'aorst/emacs-lisp-indent-function)))
 
 (use-package fennel-mode
-  :straight (:host gitlab
-             :repo "technomancy/fennel-mode"
-             :branch "prog-mode")
   :bind (:map fennel-mode-map
          ("C-c C-k" . aorst/eval-each-sexp)
          ("M-." . xref-find-definitions)
@@ -659,7 +717,6 @@ for module name."
   (cider-inspector-fill-frame nil)
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner t)
-  (cider-repl-prompt-function #'cider-repl-prompt-newline)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
   :config
   (setq cider-jdk-src-paths nil)
@@ -668,11 +725,7 @@ for module name."
                        (file-expand-wildcards "~/.clojure/clojure-*-sources.jar")))
     (when (file-exists-p src)
       (unless (memq src cider-jdk-src-paths)
-        (add-to-list 'cider-jdk-src-paths src t))))
-  (defun cider-repl-prompt-newline (namespace)
-    "Return a prompt string that mentions NAMESPACE with newline
-appended."
-    (format "%s\n" namespace)))
+        (add-to-list 'cider-jdk-src-paths src t)))))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
