@@ -1,4 +1,4 @@
-;;; early-init.el --- Early initialization -*- lexical-binding: t; no-byte-compile: t -*-
+;;; early-init.el --- Early initialization -*- lexical-binding: t; -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration

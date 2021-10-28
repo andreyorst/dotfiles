@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t;  no-byte-compile: t -*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
@@ -9,19 +9,160 @@
 
 ;;; Code:
 
+;;; early-init.el support for older Emacs
+
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
+
+;;; Local config custom group
 
 (defgroup local-config ()
   "Customization group for local settings."
   :prefix "local-config-"
   :group 'emacs)
 
+(defcustom aorst--title-show-bufname t
+  "Whether to include bufname to titlebar.
+Bufname is not necessary on GNOME, but may be useful in other DEs."
+  :type 'boolean
+  :group 'local-config)
+
+(defcustom aorst--dark-theme 'modus-vivendi
+  "Dark theme to use."
+  :tag "Dark theme"
+  :type 'symbol
+  :group 'local-config)
+
+(defcustom aorst--light-theme 'modus-operandi
+  "Light theme to use."
+  :tag "Light theme"
+  :type 'symbol
+  :group 'local-config)
+
+;;; C source code variables
+
+(setq-default
+ indent-tabs-mode nil
+ truncate-lines t
+ bidi-paragraph-direction 'left-to-right
+ frame-title-format
+ '(:eval (let ((match (string-match "[ *]" (buffer-name))))
+           (if (or (and match (= match 0))
+                   (not aorst--title-show-bufname))
+               "Emacs"
+             "%b — Emacs")))
+ auto-window-vscroll nil
+ mouse-highlight nil
+ hscroll-step 1
+ hscroll-margin 1
+ scroll-margin 1
+ scroll-preserve-screen-position nil)
+
+(when (window-system)
+  (setq-default
+   x-gtk-use-system-tooltips nil
+   cursor-type 'box
+   cursor-in-non-selected-windows nil))
+
+(setq
+ ring-bell-function 'ignore
+ mode-line-percent-position nil)
+
+(when (version<= "27.1" emacs-version)
+  (setq bidi-inhibit-bpa t))
+
+;;; Functions
+
+(defun aorst/font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (find-font (font-spec :name font-name)))
+
+(defun aorst/split-pararagraph-into-lines ()
+  "Split current paragraph into lines with one sentence each."
+  (interactive)
+  (save-excursion
+    (let ((fill-column most-positive-fixnum))
+      (fill-paragraph))
+    (let ((auto-fill-p auto-fill-function)
+          (end (progn (end-of-line) (backward-sentence) (point))))
+      (back-to-indentation)
+      (unless (= (point) end)
+        (auto-fill-mode -1)
+        (while (< (point) end)
+          (forward-sentence)
+          (delete-horizontal-space)
+          (newline-and-indent))
+        (deactivate-mark)
+        (when auto-fill-p
+          (auto-fill-mode t))
+        (when (looking-at "^$")
+          (backward-delete-char 1))))))
+
+(defun aorst/dark-mode-p ()
+  "Check if frame is dark or not."
+  (if (and (window-system)
+           (executable-find "gsettings"))
+      (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
+        shell-command-to-string
+        string-trim-right
+        (string-suffix-p "-dark'"))
+    (eq 'dark (frame-parameter nil 'background-mode))))
+
+(defun aorst/termuxp ()
+  "Detect if Emacs is running in Termux."
+  (executable-find "termux-info"))
+
+(defun aorst/formfeed-line ()
+  "Display the formfeed ^L char as comment or as continuous line."
+  (unless buffer-display-table
+    (setq buffer-display-table (make-display-table)))
+  (aset buffer-display-table ?\^L
+        (vconcat (make-list (or fill-column 70)
+                            (make-glyph-code
+                             (string-to-char (or comment-start "-"))
+                             'shadow)))))
+
+(defmacro aorst/add-compilation-error-syntax (name regexp file line &optional col level)
+  "Register new compilation error syntax.
+
+Add NAME symbol to `compilation-error-regexp-alist', and then add
+REGEXP FILE LINE and optional COL LEVEL info to
+`compilation-error-regexp-alist-alist'."
+  (declare (indent 1))
+  `(progn (add-to-list 'compilation-error-regexp-alist ',name)
+          (add-to-list 'compilation-error-regexp-alist-alist
+                       '(,name ,regexp ,file ,line ,col ,level))))
+
+;;; Formfeed
+
+(dolist (mode-hook '(help-mode-hook
+                     org-mode-hook
+                     outline-mode-hook
+                     prog-mode-hook))
+  (add-hook mode-hook #'aorst/formfeed-line))
+
+;;; Font
+
+(cond ((aorst/font-installed-p "JetBrainsMono")
+       (set-face-attribute 'default nil :font "JetBrainsMono 10"))
+      ((aorst/font-installed-p "Source Code Pro")
+       (set-face-attribute 'default nil :font "Source Code Pro 10")))
+
+(when (aorst/font-installed-p "DejaVu Sans")
+  (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
+
+;;; straight.el
+
 (require 'straight)
+
+;;; use-package
+
 (straight-use-package 'use-package)
 (defvar straight-use-package-by-default)
 (setq straight-use-package-by-default t)
 (require 'use-package)
+
+;;; Package configurations
 
 (use-package cus-edit
   :straight nil
@@ -44,8 +185,6 @@
   :custom
   (user-mail-address "andreyorst@gmail.com")
   (user-full-name "Andrey Listopadov"))
-
-(setq ring-bell-function 'ignore)
 
 (use-package files
   :straight nil
@@ -124,16 +263,8 @@ for stopping scroll from going beyond the longest line.  Based on
                (not (memq major-mode '(vterm-mode term-mode)))
                (aorst/truncated-lines-p))
       (funcall foo arg set-minimum)))
-  (setq-default auto-window-vscroll nil
-                mouse-highlight nil
-                hscroll-step 1
-                hscroll-margin 1
-                scroll-margin 1
-                scroll-preserve-screen-position nil)
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
-
-(setq-default indent-tabs-mode nil)
 
 (use-package savehist
   :straight nil
@@ -145,9 +276,12 @@ for stopping scroll from going beyond the longest line.  Based on
   :custom
   (default-input-method 'russian-computer)
   :init
-  (prefer-coding-system 'utf-8)
-  (when (display-graphic-p)
-    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
+  (prefer-coding-system 'utf-8))
+
+(use-package select
+  :straight nil
+  :when (display-graphic-p)
+  :custom (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
 (use-package startup
   :straight nil
@@ -200,12 +334,6 @@ are defining or executing a macro."
   :init
   (delete-selection-mode t))
 
-(setq-default truncate-lines t)
-(setq-default bidi-paragraph-direction 'left-to-right)
-
-(when (version<= "27.1" emacs-version)
-  (setq bidi-inhibit-bpa t))
-
 (use-package minibuffer
   :straight nil
   :bind (:map minibuffer-inactive-mode-map
@@ -216,22 +344,6 @@ are defining or executing a macro."
   (read-file-name-completion-ignore-case t)
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
-
-(defun aorst/formfeed-line ()
-  "Display the formfeed ^L char as comment or as continuous line."
-  (unless buffer-display-table
-    (setq buffer-display-table (make-display-table)))
-  (aset buffer-display-table ?\^L
-        (vconcat (make-list (or fill-column 70)
-                            (make-glyph-code
-                             (string-to-char (or comment-start "-"))
-                             'shadow)))))
-
-(dolist (mode-hook '(help-mode-hook
-                     org-mode-hook
-                     outline-mode-hook
-                     prog-mode-hook))
-  (add-hook mode-hook #'aorst/formfeed-line))
 
 (use-package window
   :straight nil
@@ -255,45 +367,6 @@ are defining or executing a macro."
                          (frame-parameters (selected-frame)))))
       (funcall-interactively fn buffer-or-name norecord))))
 
-(defun aorst/font-installed-p (font-name)
-  "Check if font with FONT-NAME is available."
-  (find-font (font-spec :name font-name)))
-
-(defun aorst/split-pararagraph-into-lines ()
-  "Split current paragraph into lines with one sentence each."
-  (interactive)
-  (save-excursion
-    (let ((fill-column most-positive-fixnum))
-      (fill-paragraph))
-    (let ((auto-fill-p auto-fill-function)
-          (end (progn (end-of-line) (backward-sentence) (point))))
-      (back-to-indentation)
-      (unless (= (point) end)
-        (auto-fill-mode -1)
-        (while (< (point) end)
-          (forward-sentence)
-          (delete-horizontal-space)
-          (newline-and-indent))
-        (deactivate-mark)
-        (when auto-fill-p
-          (auto-fill-mode t))
-        (when (looking-at "^$")
-          (backward-delete-char 1))))))
-
-(defun aorst/dark-mode-p ()
-  "Check if frame is dark or not."
-  (if (and window-system
-           (executable-find "gsettings"))
-      (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
-        shell-command-to-string
-        string-trim-right
-        (string-suffix-p "-dark'"))
-    (eq 'dark (frame-parameter nil 'background-mode))))
-
-(defun aorst/termuxp ()
-  "Detect if Emacs is running in Termux."
-  (executable-find "termux-info"))
-
 (use-package startup
   :straight nil
   :no-require t
@@ -311,41 +384,26 @@ are defining or executing a macro."
 Used in various places to avoid getting wrong line height when
 `text-scale-mode' is active.")
 
-(when window-system
-  (setq-default x-gtk-use-system-tooltips nil)
-  (setq-default tooltip-x-offset 0)
-  (setq-default tooltip-y-offset aorst--line-pixel-height)
-  (setq-default tooltip-frame-parameters
-                `((name . "tooltip")
-                  (internal-border-width . 2)
-                  (border-width . 1)
-                  (no-special-glyphs . t)))
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1))
+(use-package tooltip
+  :straight nil
+  :when (window-system)
+  :custom
+  (tooltip-x-offset 0)
+  (tooltip-y-offset aorst--line-pixel-height)
+  (tooltip-frame-parameters `((name . "tooltip")
+                              (internal-border-width . 2)
+                              (border-width . 1)
+                              (no-special-glyphs . t))))
 
-(when window-system
-  (setq-default cursor-type 'box
-                cursor-in-non-selected-windows nil))
+(use-package tool-bar
+  :straight nil
+  :when (window-system)
+  :init (tool-bar-mode -1))
 
-(cond ((aorst/font-installed-p "JetBrainsMono")
-       (set-face-attribute 'default nil :font "JetBrainsMono 10"))
-      ((aorst/font-installed-p "Source Code Pro")
-       (set-face-attribute 'default nil :font "Source Code Pro 10")))
-
-(when (aorst/font-installed-p "DejaVu Sans")
-  (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
-
-(defcustom aorst--dark-theme 'modus-vivendi
-  "Dark theme to use."
-  :tag "Dark theme"
-  :type 'symbol
-  :group 'local-config)
-
-(defcustom aorst--light-theme 'modus-operandi
-  "Light theme to use."
-  :tag "Light theme"
-  :type 'symbol
-  :group 'local-config)
+(use-package scroll-bar
+  :straight nil
+  :when (window-system)
+  :init (scroll-bar-mode -1))
 
 (use-package modus-themes
   :custom-face
@@ -369,32 +427,9 @@ Used in various places to avoid getting wrong line height when
          (load-theme aorst--dark-theme t))
         (t (load-theme aorst--light-theme t))))
 
-(defvar aorst--theme-change-hook nil
-  "Hook run after a color theme is changed with `load-theme' or `disable-theme'.")
-
-(defun aorst/run-theme-change-hooks (&rest _)
-  "Run theme change hooks."
-  (run-hooks 'aorst--theme-change-hook))
-
-(advice-add 'load-theme :after #'aorst/run-theme-change-hooks)
-(advice-add 'disable-theme :after #'aorst/run-theme-change-hooks)
-
-(setq-default custom-safe-themes t)
-
-(setq mode-line-percent-position nil)
-
-(defcustom aorst--title-show-bufname t
-  "Whether to include bufname to titlebar.
-Bufname is not necessary on GNOME, but may be useful in other DEs."
-  :type 'boolean
-  :group 'local-config)
-
-(setq-default frame-title-format
-              '(:eval (let ((match (string-match "[ *]" (buffer-name))))
-                        (if (or (and match (= match 0))
-                                (not aorst--title-show-bufname))
-                            "Emacs"
-                          "%b — Emacs"))))
+(use-package custom
+  :straight nil
+  :custom (custom-safe-themes t))
 
 (use-package uniquify
   :straight nil
@@ -446,14 +481,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (org-log-done 'time)
   (org-image-actual-width nil)
   :config
-  (setq org-format-latex-options
-        (plist-put org-format-latex-options
-                   :scale
-                   (if (executable-find "gsettings")
-                       (string-to-number
-                        (shell-command-to-string
-                         "gsettings get org.gnome.desktop.interface text-scaling-factor"))
-                     1.0)))
   (defun aorst/discard-history ()
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
@@ -464,7 +491,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (define-advice org-cycle (:around (f &rest args))
     (let ((org-src-preserve-indentation t))
       (apply f args)))
-  (defun org-babel-edit-prep:emacs-lisp (_info)
+  (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
@@ -481,20 +508,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     :straight nil
     :defines org-version
     :unless (version<= org-version "9.1.9")))
-
-(use-package prog-mode
-  :straight nil
-  :bind (:map prog-mode-map
-         ("M-q" . aorst/indent-or-fill-sexp))
-  :config
-  (defun aorst/indent-or-fill-sexp ()
-    "Indent s-expression or fill string/comment."
-    (interactive)
-    (let ((ppss (syntax-ppss)))
-      (if (or (nth 3 ppss)
-              (nth 4 ppss))
-          (fill-paragraph)
-        (indent-sexp)))))
 
 (use-package cc-mode
   :straight nil
@@ -578,7 +591,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     (when (inferior-lisp-proc)
       (let ((sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
         (eros-eval-overlay
-         (aorst/fennel-eval-to-string (thing-at-point 'sexp t))
+         (aorst/fennel-eval-to-string sexp)
          (point)))))
   (defun aorst/fennel-eval-defun ()
     "Eval defun and display the result in an overlay."
@@ -593,6 +606,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . aorst/emacs-lisp-setup))
   :config
+  (defvar calculate-lisp-indent-last-sexp)
   (defun aorst/emacs-lisp-indent-function (indent-point state)
     "A replacement for `lisp-indent-function'.
 Indents plists more sensibly. Adapted from DOOM Emacs:
@@ -641,6 +655,7 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
                 #'aorst/emacs-lisp-indent-function)))
 
 (use-package fennel-mode
+  :commands (fennel-repl lisp-eval-string lisp-eval-last-sexp switch-to-lisp)
   :bind (:map fennel-mode-map
          ("C-c C-k" . aorst/eval-each-sexp)
          ("M-." . xref-find-definitions)
@@ -726,9 +741,11 @@ for module name."
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
 
+(use-package yasnippet)
+
 (use-package clj-refactor
-  :hook ((cider-mode . clj-refactor-mode)
-         (cider-mode . yas-minor-mode))
+  :hook ((clj-refactor-mode . yas-minor-mode)
+         (cider-mode . clj-refactor-mode))
   :custom
   (cljr-suppress-no-project-warning t)
   (cljr-suppress-middleware-warnings t)
@@ -774,10 +791,6 @@ for module name."
 
 (use-package csv-mode
   :custom (csv-align-max-width 80))
-
-(use-package erlang)
-
-(use-package elixir-mode)
 
 (use-package help
   :straight nil
@@ -894,6 +907,7 @@ nil."
          (prog-mode . smartparens-mode))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
+         ("M-q" . aorst/indent-or-fill-sexp)
          :map smartparens-strict-mode-map
          (";" . sp-comment))
   :custom
@@ -913,7 +927,15 @@ nil."
     (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1)))
+    (smartparens-strict-mode 1))
+  (defun aorst/indent-or-fill-sexp ()
+    "Indent s-expression or fill string/comment."
+    (interactive)
+    (let ((ppss (syntax-ppss)))
+      (if (or (nth 3 ppss)
+              (nth 4 ppss))
+          (fill-paragraph)
+        (indent-sexp)))))
 
 (use-package vertico
   :commands vertico-mode
@@ -925,7 +947,9 @@ nil."
 
 (use-package consult
   :commands consult-completion-in-region
+  :requires seq
   :bind (("C-x C-r" . consult-recent-file))
+  :config (setq consult-preview-excluded-hooks (seq-union consult-preview-excluded-hooks '(lsp)))
   :init (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package company
@@ -968,8 +992,6 @@ nil."
   (undo-tree-visualizer-timestamps nil)
   (undo-tree-auto-save-history nil)
   :init (global-undo-tree-mode 1))
-
-(use-package yasnippet)
 
 (use-package with-editor)
 (use-package magit
@@ -1178,17 +1200,6 @@ means save all with no questions."
 
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode))
-
-(defmacro aorst/add-compilation-error-syntax (name regexp file line &optional col level)
-  "Register new compilation error syntax.
-
-Add NAME symbol to `compilation-error-regexp-alist', and then add
-REGEXP FILE LINE and optional COL LEVEL info to
-`compilation-error-regexp-alist-alist'."
-  (declare (indent 1))
-  `(progn (add-to-list 'compilation-error-regexp-alist ',name)
-          (add-to-list 'compilation-error-regexp-alist-alist
-                       '(,name ,regexp ,file ,line ,col ,level))))
 
 (use-package compile
   :straight nil
