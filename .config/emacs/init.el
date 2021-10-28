@@ -14,155 +14,158 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
-;;; Local config custom group
-
-(defgroup local-config ()
-  "Customization group for local settings."
-  :prefix "local-config-"
-  :group 'emacs)
-
-(defcustom aorst--title-show-bufname t
-  "Whether to include bufname to titlebar.
-Bufname is not necessary on GNOME, but may be useful in other DEs."
-  :type 'boolean
-  :group 'local-config)
-
-(defcustom aorst--dark-theme 'modus-vivendi
-  "Dark theme to use."
-  :tag "Dark theme"
-  :type 'symbol
-  :group 'local-config)
-
-(defcustom aorst--light-theme 'modus-operandi
-  "Light theme to use."
-  :tag "Light theme"
-  :type 'symbol
-  :group 'local-config)
-
-;;; C source code variables
-
-(setq-default
- indent-tabs-mode nil
- truncate-lines t
- bidi-paragraph-direction 'left-to-right
- frame-title-format
- '(:eval (let ((match (string-match "[ *]" (buffer-name))))
-           (if (or (and match (= match 0))
-                   (not aorst--title-show-bufname))
-               "Emacs"
-             "%b — Emacs")))
- auto-window-vscroll nil
- mouse-highlight nil
- hscroll-step 1
- hscroll-margin 1
- scroll-margin 1
- scroll-preserve-screen-position nil)
-
-(when (window-system)
-  (setq-default
-   x-gtk-use-system-tooltips nil
-   cursor-type 'box
-   cursor-in-non-selected-windows nil))
-
-(setq
- ring-bell-function 'ignore
- mode-line-percent-position nil)
-
-(when (version<= "27.1" emacs-version)
-  (setq bidi-inhibit-bpa t))
-
-;;; Functions
-
-(defun aorst/font-installed-p (font-name)
-  "Check if font with FONT-NAME is available."
-  (find-font (font-spec :name font-name)))
-
-(defun aorst/split-pararagraph-into-lines ()
-  "Split current paragraph into lines with one sentence each."
-  (interactive)
-  (save-excursion
-    (let ((fill-column most-positive-fixnum))
-      (fill-paragraph))
-    (let ((auto-fill-p auto-fill-function)
-          (end (progn (end-of-line) (backward-sentence) (point))))
-      (back-to-indentation)
-      (unless (= (point) end)
-        (auto-fill-mode -1)
-        (while (< (point) end)
-          (forward-sentence)
-          (delete-horizontal-space)
-          (newline-and-indent))
-        (deactivate-mark)
-        (when auto-fill-p
-          (auto-fill-mode t))
-        (when (looking-at "^$")
-          (backward-delete-char 1))))))
-
-(defun aorst/dark-mode-p ()
-  "Check if frame is dark or not."
-  (if (and (window-system)
-           (executable-find "gsettings"))
-      (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
-        shell-command-to-string
-        string-trim-right
-        (string-suffix-p "-dark'"))
-    (eq 'dark (frame-parameter nil 'background-mode))))
-
-(defun aorst/termuxp ()
-  "Detect if Emacs is running in Termux."
-  (executable-find "termux-info"))
-
-(defun aorst/formfeed-line ()
-  "Display the formfeed ^L char as comment or as continuous line."
-  (unless buffer-display-table
-    (setq buffer-display-table (make-display-table)))
-  (aset buffer-display-table ?\^L
-        (vconcat (make-list (or fill-column 70)
-                            (make-glyph-code
-                             (string-to-char (or comment-start "-"))
-                             'shadow)))))
-
-(defmacro aorst/add-compilation-error-syntax (name regexp file line &optional col level)
-  "Register new compilation error syntax.
-
-Add NAME symbol to `compilation-error-regexp-alist', and then add
-REGEXP FILE LINE and optional COL LEVEL info to
-`compilation-error-regexp-alist-alist'."
-  (declare (indent 1))
-  `(progn (add-to-list 'compilation-error-regexp-alist ',name)
-          (add-to-list 'compilation-error-regexp-alist-alist
-                       '(,name ,regexp ,file ,line ,col ,level))))
-
-;;; Formfeed
-
-(dolist (mode-hook '(help-mode-hook
-                     org-mode-hook
-                     outline-mode-hook
-                     prog-mode-hook))
-  (add-hook mode-hook #'aorst/formfeed-line))
-
-;;; Font
-
-(cond ((aorst/font-installed-p "JetBrainsMono")
-       (set-face-attribute 'default nil :font "JetBrainsMono 10"))
-      ((aorst/font-installed-p "Source Code Pro")
-       (set-face-attribute 'default nil :font "Source Code Pro 10")))
-
-(when (aorst/font-installed-p "DejaVu Sans")
-  (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
-
-;;; straight.el
-
-(require 'straight)
-
 ;;; use-package
 
+(require 'straight)
 (straight-use-package 'use-package)
 (defvar straight-use-package-by-default)
 (setq straight-use-package-by-default t)
 (require 'use-package)
 
 ;;; Package configurations
+
+(use-package local-config
+  :straight nil
+  :preface
+  (defgroup local-config ()
+    "Customization group for local settings."
+    :prefix "local-config-"
+    :group 'emacs)
+  (defcustom aorst-title-show-bufname t
+    "Whether to include bufname to titlebar.
+Bufname is not necessary on GNOME, but may be useful in other DEs."
+    :type 'boolean
+    :group 'local-config)
+  (defcustom aorst-dark-theme 'modus-vivendi
+    "Dark theme to use."
+    :tag "Dark theme"
+    :type 'symbol
+    :group 'local-config)
+  (defcustom aorst-light-theme 'modus-operandi
+    "Light theme to use."
+    :tag "Light theme"
+    :type 'symbol
+    :group 'local-config)
+  (defcustom aorst-line-pixel-height (line-pixel-height)
+    "Line height in pixels.
+Used in various places to avoid getting wrong line height when
+`text-scale-mode' is active."
+    :tag "Line pixel height"
+    :type 'number
+    :group 'local-config)
+  (provide 'local-config))
+
+(use-package defaults
+  :straight nil
+  :preface
+  (setq-default
+   indent-tabs-mode nil
+   truncate-lines t
+   bidi-paragraph-direction 'left-to-right
+   frame-title-format
+   '(:eval (if (or (eq (string-match "[ *]" (buffer-name)) 0)
+                   (not aorst-title-show-bufname))
+               "Emacs"
+             (if (buffer-modified-p)
+                 "%b* — Emacs"
+               "%b — Emacs")))
+   auto-window-vscroll nil
+   mouse-highlight nil
+   hscroll-step 1
+   hscroll-margin 1
+   scroll-margin 1
+   scroll-preserve-screen-position nil)
+  (when (window-system)
+    (setq-default
+     x-gtk-use-system-tooltips nil
+     cursor-type 'box
+     cursor-in-non-selected-windows nil))
+  (setq
+   ring-bell-function 'ignore
+   mode-line-percent-position nil)
+  (when (version<= "27.1" emacs-version)
+    (setq bidi-inhibit-bpa t))
+  (provide 'defaults))
+
+(use-package functions
+  :straight nil
+  :preface
+  (defun aorst/split-pararagraph-into-lines ()
+    "Split current paragraph into lines with one sentence each."
+    (interactive)
+    (save-excursion
+      (let ((fill-column most-positive-fixnum))
+        (fill-paragraph))
+      (let ((auto-fill-p auto-fill-function)
+            (end (progn (end-of-line) (backward-sentence) (point))))
+        (back-to-indentation)
+        (unless (= (point) end)
+          (auto-fill-mode -1)
+          (while (< (point) end)
+            (forward-sentence)
+            (delete-horizontal-space)
+            (newline-and-indent))
+          (deactivate-mark)
+          (when auto-fill-p
+            (auto-fill-mode t))
+          (when (looking-at "^$")
+            (backward-delete-char 1))))))
+  (defun aorst/dark-mode-p ()
+    "Check if frame is dark or not."
+    (if (and (window-system)
+             (executable-find "gsettings"))
+        (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
+                     shell-command-to-string
+                     string-trim-right
+                     (string-suffix-p "-dark'"))
+      (eq 'dark (frame-parameter nil 'background-mode))))
+  (defun aorst/termuxp ()
+    "Detect if Emacs is running in Termux."
+    (executable-find "termux-info"))
+  (defmacro aorst/add-compilation-error-syntax (name regexp file line &optional col level)
+    "Register new compilation error syntax.
+
+Add NAME symbol to `compilation-error-regexp-alist', and then add
+REGEXP FILE LINE and optional COL LEVEL info to
+`compilation-error-regexp-alist-alist'."
+    (declare (indent 1))
+    `(progn (add-to-list 'compilation-error-regexp-alist ',name)
+            (add-to-list 'compilation-error-regexp-alist-alist
+                         '(,name ,regexp ,file ,line ,col ,level))))
+  (provide 'functions))
+
+(use-package formfeed
+  :straight nil
+  :preface
+  (defun aorst/formfeed-line ()
+    "Display the formfeed ^L char as comment or as continuous line."
+    (unless buffer-display-table
+      (setq buffer-display-table (make-display-table)))
+    (aset buffer-display-table ?\^L
+          (vconcat (make-list (or fill-column 70)
+                              (make-glyph-code
+                               (string-to-char (or comment-start "-"))
+                               'shadow)))))
+  (dolist (mode-hook '(help-mode-hook
+                       org-mode-hook
+                       outline-mode-hook
+                       prog-mode-hook))
+    (add-hook mode-hook #'aorst/formfeed-line))
+  (provide 'formfeed))
+
+(use-package font
+  :straight nil
+  :preface
+  (defun aorst/font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (find-font (font-spec :name font-name)))
+  (cond ((aorst/font-installed-p "JetBrainsMono")
+         (set-face-attribute 'default nil :font "JetBrainsMono 10"))
+        ((aorst/font-installed-p "Source Code Pro")
+         (set-face-attribute 'default nil :font "Source Code Pro 10")))
+  (when (aorst/font-installed-p "DejaVu Sans")
+    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10"))
+  (provide 'font))
 
 (use-package cus-edit
   :straight nil
@@ -249,15 +252,15 @@ for stopping scroll from going beyond the longest line.  Based on
              (threshold (+ window-width hscroll-offset line-number-width -2)))
         (catch 'excessive
           (while (not (eobp))
-            (setq start (point))
-            (save-restriction
-              (narrow-to-region start (min (+ start 1 threshold)
-                                           (point-max)))
-              (forward-line 1))
-            (unless (or (bolp)
-                        (and (eobp) (<= (- (point) start)
-                                        threshold)))
-              (throw 'excessive t)))))))
+            (let ((start (point)))
+              (save-restriction
+                (narrow-to-region start (min (+ start 1 threshold)
+                                             (point-max)))
+                (forward-line 1))
+              (unless (or (bolp)
+                          (and (eobp) (<= (- (point) start)
+                                          threshold)))
+                (throw 'excessive t))))))))
   (define-advice scroll-left (:around (foo &optional arg set-minimum))
     (when (and truncate-lines
                (not (memq major-mode '(vterm-mode term-mode)))
@@ -379,17 +382,12 @@ are defining or executing a macro."
   :config
   (menu-bar-mode -1))
 
-(defvar aorst--line-pixel-height (line-pixel-height)
-  "Line height in pixels.
-Used in various places to avoid getting wrong line height when
-`text-scale-mode' is active.")
-
 (use-package tooltip
   :straight nil
   :when (window-system)
   :custom
   (tooltip-x-offset 0)
-  (tooltip-y-offset aorst--line-pixel-height)
+  (tooltip-y-offset aorst-line-pixel-height)
   (tooltip-frame-parameters `((name . "tooltip")
                               (internal-border-width . 2)
                               (border-width . 1)
@@ -406,6 +404,9 @@ Used in various places to avoid getting wrong line height when
   :init (scroll-bar-mode -1))
 
 (use-package modus-themes
+  :requires (functions local-config)
+  :functions (aorst/dark-mode-p aorst/termuxp)
+  :defines (aorst-dark-theme aorst-light-theme)
   :custom-face
   ;; The `modus-themes-mode-line' custom doesn't allow disabling box
   ;; effect, only recolors it, so it is disabled via custom.
@@ -422,10 +423,10 @@ Used in various places to avoid getting wrong line height when
   (modus-themes-completions 'opinionated)
   :init
   (cond ((aorst/termuxp)
-         (load-theme aorst--dark-theme t))
+         (load-theme aorst-dark-theme t))
         ((aorst/dark-mode-p)
-         (load-theme aorst--dark-theme t))
-        (t (load-theme aorst--light-theme t))))
+         (load-theme aorst-dark-theme t))
+        (t (load-theme aorst-light-theme t))))
 
 (use-package custom
   :straight nil
@@ -550,6 +551,8 @@ Used in various places to avoid getting wrong line height when
              :branch "general-purpose-api")
   :hook ((emacs-lisp-mode . eros-mode)
          (fennel-mode . aorst/enable-fennel-eros))
+  :defines inferior-lisp-prompt
+  :functions inferior-lisp-proc
   :config
   (defun aorst/enable-fennel-eros ()
     "Enable mappings for evaluation overlays in fennel-mode."
@@ -977,7 +980,7 @@ nil."
   (company-backends '(company-capf company-files company-dabbrev-code))
   (company-tooltip-minimum-width 30)
   (company-tooltip-maximum-width 120)
-  (company-icon-size aorst--line-pixel-height))
+  (company-icon-size aorst-line-pixel-height))
 
 (use-package company-quickhelp
   :hook (company-mode . company-quickhelp-mode)
@@ -994,6 +997,7 @@ nil."
   :init (global-undo-tree-mode 1))
 
 (use-package with-editor)
+
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode))
   :custom
