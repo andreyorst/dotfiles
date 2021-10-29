@@ -773,6 +773,59 @@ for module name."
     (modify-syntax-entry ?# "w")
     (flycheck-mode)))
 
+
+(use-package inf-clojure
+  :straight nil
+  :requires (inf-lisp clojure-mode)
+  :preface
+  (require 'inf-lisp)
+  (require 'clojure-mode)
+
+  (defvar inf-clojure-program "clojure"
+    "Path to the program used by `inf-clojure'")
+
+  (defun inf-clojure-indent-on-newline ()
+    (interactive)
+    (let electric-indent-mode
+      (newline-and-indent)))
+
+  (defun inf-clojure (&optional arg)
+    "Run an inferior instance of `inf-clojure' inside Emacs."
+    (interactive "p")
+    (let ((buffer (comint-check-proc "inf-clojure")))
+      (pop-to-buffer-same-window
+       (if (or buffer (not (derived-mode-p 'inf-clojure-mode))
+               (comint-check-proc (current-buffer)))
+           (get-buffer-create (or buffer "*inf-clojure*"))
+         (current-buffer)))
+      ;; create the comint process if there is no buffer.
+      (unless buffer
+        (let* ((cmd (or (and (not (eq arg 1)) (read-from-minibuffer "Command: "))
+                        inf-clojure-program))
+               (cmdlist (split-string-shell-command cmd)))
+          (apply 'make-comint-in-buffer "inf-clojure" buffer
+                 (car cmdlist) nil (cdr cmdlist))
+          (inf-clojure-mode)))))
+
+  (define-derived-mode inf-clojure-mode inferior-lisp-mode "Inferior Clojure"
+    "Major mode for `inf-clojure'.
+
+\\<inf-clojure-mode-map>"
+    (set (make-local-variable 'font-lock-defaults) '(clojure-font-lock-keywords t))
+    (set (make-local-variable 'inferior-lisp-prompt) "^[^>]+>>")
+    (set (make-local-variable 'lisp-indent-function) 'clojure-indent-function)
+    (set (make-local-variable 'lisp-doc-string-elt-property) 'clojure-doc-string-elt)
+    (set (make-local-variable 'comment-end) "")
+    (clojure-font-lock-setup)
+    (make-local-variable 'completion-at-point-functions)
+    (set-syntax-table clojure-mode-syntax-table)
+    (add-hook 'paredit-mode-hook #'fennel-repl-paredit-setup nil t))
+
+  (define-key inf-clojure-mode-map "C-j" 'inf-clojure-indent-on-newline)
+
+  (provide 'inf-clojure))
+
+
 (use-package cider
   :hook ((cider-repl-mode cider-mode) . eldoc-mode)
   :bind (:map cider-repl-mode-map
