@@ -11,9 +11,13 @@
 
 ;;; early-init.el support for older Emacs
 
+
+;;; Early init support for older Emacs
+
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
+
 ;;; use-package
 
 (require 'straight)
@@ -22,7 +26,8 @@
 (setq straight-use-package-by-default t)
 (require 'use-package)
 
-;;; Package configurations
+
+;;; Local config and personal functions
 
 (use-package local-config
   :straight nil
@@ -54,38 +59,6 @@ Used in various places to avoid getting wrong line height when
     :type 'number
     :group 'local-config)
   (provide 'local-config))
-
-(use-package defaults
-  :straight nil
-  :preface
-  (setq-default
-   indent-tabs-mode nil
-   truncate-lines t
-   bidi-paragraph-direction 'left-to-right
-   frame-title-format
-   '(:eval (if (or (eq (string-match "[ *]" (buffer-name)) 0)
-                   (not aorst-title-show-bufname))
-               "Emacs"
-             (if (buffer-modified-p)
-                 "%b* — Emacs"
-               "%b — Emacs")))
-   auto-window-vscroll nil
-   mouse-highlight nil
-   hscroll-step 1
-   hscroll-margin 1
-   scroll-margin 1
-   scroll-preserve-screen-position nil)
-  (when (window-system)
-    (setq-default
-     x-gtk-use-system-tooltips nil
-     cursor-type 'box
-     cursor-in-non-selected-windows nil))
-  (setq
-   ring-bell-function 'ignore
-   mode-line-percent-position nil)
-  (when (version<= "27.1" emacs-version)
-    (setq bidi-inhibit-bpa t))
-  (provide 'defaults))
 
 (use-package functions
   :straight nil
@@ -134,24 +107,40 @@ REGEXP FILE LINE and optional COL LEVEL info to
                          '(,name ,regexp ,file ,line ,col ,level))))
   (provide 'functions))
 
-(use-package formfeed
+
+;;; Inbuilt stuff
+
+(use-package defaults
   :straight nil
   :preface
-  (defun aorst/formfeed-line ()
-    "Display the formfeed ^L char as comment or as continuous line."
-    (unless buffer-display-table
-      (setq buffer-display-table (make-display-table)))
-    (aset buffer-display-table ?\^L
-          (vconcat (make-list (or fill-column 70)
-                              (make-glyph-code
-                               (string-to-char (or comment-start "-"))
-                               'shadow)))))
-  (dolist (mode-hook '(help-mode-hook
-                       org-mode-hook
-                       outline-mode-hook
-                       prog-mode-hook))
-    (add-hook mode-hook #'aorst/formfeed-line))
-  (provide 'formfeed))
+  (setq-default
+   indent-tabs-mode nil
+   truncate-lines t
+   bidi-paragraph-direction 'left-to-right
+   frame-title-format
+   '(:eval (if (or (eq (string-match "[ *]" (buffer-name)) 0)
+                   (not aorst-title-show-bufname))
+               "Emacs"
+             (if (buffer-modified-p)
+                 "%b* — Emacs"
+               "%b — Emacs")))
+   auto-window-vscroll nil
+   mouse-highlight nil
+   hscroll-step 1
+   hscroll-margin 1
+   scroll-margin 1
+   scroll-preserve-screen-position nil)
+  (when (window-system)
+    (setq-default
+     x-gtk-use-system-tooltips nil
+     cursor-type 'box
+     cursor-in-non-selected-windows nil))
+  (setq
+   ring-bell-function 'ignore
+   mode-line-percent-position nil)
+  (when (version<= "27.1" emacs-version)
+    (setq bidi-inhibit-bpa t))
+  (provide 'defaults))
 
 (use-package font
   :straight nil
@@ -348,6 +337,9 @@ are defining or executing a macro."
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
+
+;;; UI
+
 (use-package window
   :straight nil
   :bind ("C-x C-b" . bury-buffer))
@@ -412,11 +404,12 @@ are defining or executing a macro."
   ;; effect, only recolors it, so it is disabled via custom.
   (mode-line ((t (:box unspecified))))
   (mode-line-inactive ((t (:box unspecified))))
+  (font-lock-doc-face ((t (:foreground nil :inherit font-lock-comment-face))))
   :custom
-  (modus-themes-org-blocks 'gray-background)
-  (modus-themes-syntax '(alt-syntax green-strings))
+  (modus-themes-org-blocks nil)
+  (modus-themes-syntax '(faint alt-syntax))
   (modus-themes-region '(bg-only no-extend))
-  (modus-themes-operandi-color-overrides '((bg-main . "#fcfbfa") (fg-main . "#202020")))
+  (modus-themes-operandi-color-overrides '((bg-main . "#fcfbfa") (fg-main . "#101010")))
   (modus-themes-vivendi-color-overrides (if (aorst/termuxp)
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
                                           '((bg-main . "#252423") (fg-main . "#dedddc"))))
@@ -447,6 +440,76 @@ are defining or executing a macro."
   :commands minions-mode
   :custom (minions-direct '(flycheck-mode flymake-mode))
   :init (minions-mode))
+
+(use-package vertico
+  :commands vertico-mode
+  :init (vertico-mode))
+
+(use-package marginalia
+  :commands marginalia-mode
+  :init (marginalia-mode))
+
+(use-package consult
+  :commands consult-completion-in-region
+  :requires seq
+  :bind (("C-x C-r" . consult-recent-file))
+  :config (setq consult-preview-excluded-hooks (seq-union consult-preview-excluded-hooks '(lsp)))
+  :init (setq completion-in-region-function #'consult-completion-in-region))
+
+(use-package company
+  :bind (:map company-mode-map
+         ([remap completion-at-point] . company-complete)
+         ("M-/" . company-complete)
+         :map company-active-map
+         ("TAB" . company-complete-common-or-cycle)
+         ("<tab>" . company-complete-common-or-cycle)
+         ("<S-Tab>" . company-select-previous)
+         ("<backtab>" . company-select-previous)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous)
+         ("C-d" . company-show-doc-buffer)
+         ("M-." . company-show-location))
+  :hook (after-init . global-company-mode)
+  :custom
+  (company-idle-delay 0)
+  (company-require-match 'never)
+  (company-minimum-prefix-length 2)
+  (company-tooltip-align-annotations t)
+  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                       company-preview-frontend
+                       company-echo-metadata-frontend))
+  (company-backends '(company-capf company-files company-dabbrev-code))
+  (company-tooltip-minimum-width 30)
+  (company-tooltip-maximum-width 120)
+  (company-icon-size aorst-line-pixel-height))
+
+(use-package company-quickhelp
+  :hook (company-mode . company-quickhelp-mode)
+  :custom
+  (company-quickhelp-max-lines 13)
+  (company-quickhelp-use-propertized-text t))
+
+(use-package formfeed
+  :straight nil
+  :preface
+  (defun aorst/formfeed-line ()
+    "Display the formfeed ^L char as comment or as continuous line."
+    (unless buffer-display-table
+      (setq buffer-display-table (make-display-table)))
+    (aset buffer-display-table ?\^L
+          (vconcat (make-list (or fill-column 70)
+                              (make-glyph-code
+                               (string-to-char (or comment-start "-"))
+                               'shadow)))))
+  (dolist (mode-hook '(help-mode-hook
+                       org-mode-hook
+                       outline-mode-hook
+                       prog-mode-hook))
+    (add-hook mode-hook #'aorst/formfeed-line))
+  (provide 'formfeed))
+
+
+;;; Languages
 
 (use-package org
   :straight (:type built-in)
@@ -795,6 +858,9 @@ for module name."
 (use-package csv-mode
   :custom (csv-align-max-width 80))
 
+
+;;; Tools
+
 (use-package help
   :straight nil
   :custom (help-window-select t))
@@ -939,54 +1005,6 @@ nil."
               (nth 4 ppss))
           (fill-paragraph)
         (indent-sexp)))))
-
-(use-package vertico
-  :commands vertico-mode
-  :init (vertico-mode))
-
-(use-package marginalia
-  :commands marginalia-mode
-  :init (marginalia-mode))
-
-(use-package consult
-  :commands consult-completion-in-region
-  :requires seq
-  :bind (("C-x C-r" . consult-recent-file))
-  :config (setq consult-preview-excluded-hooks (seq-union consult-preview-excluded-hooks '(lsp)))
-  :init (setq completion-in-region-function #'consult-completion-in-region))
-
-(use-package company
-  :bind (:map company-mode-map
-         ([remap completion-at-point] . company-complete)
-         ("M-/" . company-complete)
-         :map company-active-map
-         ("TAB" . company-complete-common-or-cycle)
-         ("<tab>" . company-complete-common-or-cycle)
-         ("<S-Tab>" . company-select-previous)
-         ("<backtab>" . company-select-previous)
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous)
-         ("C-d" . company-show-doc-buffer)
-         ("M-." . company-show-location))
-  :hook (after-init . global-company-mode)
-  :custom
-  (company-idle-delay 0)
-  (company-require-match 'never)
-  (company-minimum-prefix-length 2)
-  (company-tooltip-align-annotations t)
-  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-                       company-preview-frontend
-                       company-echo-metadata-frontend))
-  (company-backends '(company-capf company-files company-dabbrev-code))
-  (company-tooltip-minimum-width 30)
-  (company-tooltip-maximum-width 120)
-  (company-icon-size aorst-line-pixel-height))
-
-(use-package company-quickhelp
-  :hook (company-mode . company-quickhelp-mode)
-  :custom
-  (company-quickhelp-max-lines 13)
-  (company-quickhelp-use-propertized-text t))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
