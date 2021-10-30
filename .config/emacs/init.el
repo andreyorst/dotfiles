@@ -904,7 +904,10 @@ for module name."
       (unless buffer
         (let* ((cmd (or (and (not (eq arg 1)) (read-from-minibuffer "Command: "))
                         inf-clojure-program))
-               (cmdlist (split-string-shell-command cmd)))
+               (cmdlist (if (fboundp #'split-string-shell-command)
+                            (split-string-shell-command cmd)
+                          ;; NOTE: Less accurate, may be problematic
+                          (split-string cmd))))
           (apply 'make-comint-in-buffer "inf-clojure" buffer
                  (car cmdlist) nil (cdr cmdlist))
           (inf-clojure-mode)))))
