@@ -883,8 +883,22 @@ for module name."
   (require 'inf-lisp)
   (require 'clojure-mode)
 
-  (defvar inf-clojure-program "clojure"
-    "Path to the program used by `inf-clojure'")
+  (defgroup inf-clojure ()
+    "Support for interacting with Clojure via inferior process."
+    :prefix "inf-clojure-"
+    :group 'languages)
+
+  (defcustom inf-clojure-program "clojure"
+    "Path to the program used by `inf-clojure'"
+    :tag "Clojure CLI"
+    :type 'string
+    :group 'inf-clojure)
+
+  (defcustom inf-clojure-prompt "^[^>]+>>"
+    "Prompt regex for inferior Clojure."
+    :tag "Prompt regexp"
+    :type 'string
+    :group 'inf-clojure)
 
   (defun inf-clojure-indent-on-newline ()
     (interactive)
@@ -900,7 +914,6 @@ for module name."
                (comint-check-proc (current-buffer)))
            (get-buffer-create (or buffer "*inf-clojure*"))
          (current-buffer)))
-      ;; create the comint process if there is no buffer.
       (unless buffer
         (let* ((cmd (or (and (not (eq arg 1)) (read-from-minibuffer "Command: "))
                         inf-clojure-program))
@@ -917,7 +930,7 @@ for module name."
 
 \\<inf-clojure-mode-map>"
     (set (make-local-variable 'font-lock-defaults) '(clojure-font-lock-keywords t))
-    (set (make-local-variable 'inferior-lisp-prompt) "^[^>]+>>")
+    (set (make-local-variable 'inferior-lisp-prompt) inf-clojure-prompt)
     (set (make-local-variable 'lisp-indent-function) 'clojure-indent-function)
     (set (make-local-variable 'lisp-doc-string-elt-property) 'clojure-doc-string-elt)
     (set (make-local-variable 'comment-end) "")
@@ -929,7 +942,6 @@ for module name."
   (define-key inf-clojure-mode-map "C-j" 'inf-clojure-indent-on-newline)
 
   (provide 'inf-clojure))
-
 
 (use-package cider
   :hook ((cider-repl-mode cider-mode) . eldoc-mode)
