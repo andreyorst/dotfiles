@@ -697,14 +697,6 @@ are defining or executing a macro."
   (markdown-list-item-bullets '("-")))
 
 
-(use-package rust-mode
-  :bind (:map rust-mode-map
-         ("C-c C-M-f" . rust-format-buffer)))
-
-
-(use-package toml-mode)
-
-
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
   :custom
@@ -1000,9 +992,6 @@ for module name."
   :when (executable-find "clj-kondo"))
 
 
-(use-package yasnippet)
-
-
 (use-package clj-refactor
   :hook ((clj-refactor-mode . yas-minor-mode)
          (cider-mode . clj-refactor-mode))
@@ -1036,11 +1025,6 @@ for module name."
   :hook (sh-mode . flycheck-mode))
 
 
-(use-package perl-mode
-  :straight nil
-  :hook ((perl-mode . flycheck-mode)))
-
-
 (use-package lua-mode
   :commands (lua-get-create-process lua-send-string)
   :hook (lua-mode . flycheck-mode)
@@ -1065,9 +1049,6 @@ for module name."
   :hook (json-mode . flycheck-mode)
   :custom
   (js-indent-level 2))
-
-
-(use-package scala-mode)
 
 
 (use-package csv-mode
@@ -1234,9 +1215,6 @@ nil."
   (global-undo-tree-mode 1))
 
 
-(use-package with-editor)
-
-
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode))
   :custom
@@ -1269,7 +1247,6 @@ nil."
 
 
 (use-package lsp-mode
-  :requires yasnippet
   :hook (((c-mode
            c++-mode
            clojure-mode
@@ -1384,24 +1361,12 @@ means save all with no questions."
     (server-start)))
 
 
-(use-package edit-indirect
-  :hook ((edit-indirect-after-creation . aorst/edit-indirect-header-line-setup))
-  :bind (:map edit-indirect-mode-map
-         ("C-c C-c" . edit-indirect-commit)
-         ("C-c C-k" . edit-indirect-abort)
-         ("C-c '" . nil))
-  :config
-  (defun aorst/edit-indirect-header-line-setup ()
-    (setq-local
-     header-line-format
-     (substitute-command-keys
-      "\\<edit-indirect-mode-map>Edit, then exit with `\\[edit-indirect-commit]' or abort with `\\[edit-indirect-abort]'"))))
-
-
 (use-package separedit
   :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
   :bind (:map prog-mode-map
          ("C-c '" . separedit)
+         :map separedit-mode-map
+         ("C-c C-c" . separedit-commit)
          :map edit-indirect-mode-map
          ("C-c '" . separedit))
   :custom
@@ -1411,7 +1376,7 @@ means save all with no questions."
     (setq-local
      header-line-format
      (substitute-command-keys
-      "\\<edit-indirect-mode-map>Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
+      "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
 
 (use-package recentf
