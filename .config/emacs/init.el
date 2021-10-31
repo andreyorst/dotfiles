@@ -120,6 +120,21 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (provide 'functions))
 
 
+(use-package common-lisp-modes-mode
+  :straight nil
+  :preface
+  (define-minor-mode common-lisp-modes-mode
+    "Mode for enabling all modes that are common for lisps.
+
+For reference, this is not a common-lisp modes mode, but a common
+lisp-modes mode.
+
+\\<common-lisp-modes-mode-map>"
+    :lighter " clmm")
+
+  (provide 'common-lisp-modes-mode))
+
+
 
 ;;; Inbuilt stuff
 
@@ -763,6 +778,7 @@ are defining or executing a macro."
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
+         (emacs-lisp-mode . common-lisp-modes-mode)
          (emacs-lisp-mode . aorst/emacs-lisp-setup))
   :config
   (defvar calculate-lisp-indent-last-sexp)
@@ -818,6 +834,7 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
 
 (use-package fennel-mode
   :commands (fennel-repl lisp-eval-string lisp-eval-last-sexp switch-to-lisp)
+  :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind (:map fennel-mode-map
          ("C-c C-k" . aorst/eval-each-sexp)
          ("M-." . xref-find-definitions)
@@ -859,10 +876,10 @@ for module name."
 
 
 (use-package clojure-mode
-  :hook (((clojure-mode
-           clojurec-mode
-           clojurescript-mode)
-          . aorst/clojure-mode-setup))
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . aorst/clojure-mode-setup)
   :config
   (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
 
@@ -873,12 +890,14 @@ for module name."
   (defun aorst/clojure-mode-setup ()
     "Setup Clojure buffer."
     (modify-syntax-entry ?# "w")
+    (common-lisp-modes-mode)
     (flycheck-mode)))
 
 
 (use-package inf-clojure
   :straight nil
   :requires (inf-lisp clojure-mode)
+  :hook (inf-clojure-mode . common-lisp-modes-mode)
   :preface
   (require 'inf-lisp)
   (require 'clojure-mode)
@@ -944,7 +963,8 @@ for module name."
   (provide 'inf-clojure))
 
 (use-package cider
-  :hook ((cider-repl-mode cider-mode) . eldoc-mode)
+  :hook (((cider-repl-mode cider-mode) . eldoc-mode)
+         (cider-repl-mode . common-lisp-modes-mode))
   :bind (:map cider-repl-mode-map
          ("C-c C-o" . cider-repl-clear-buffer))
   :custom-face
@@ -992,8 +1012,14 @@ for module name."
   (cljr-warn-on-eval nil))
 
 
+(use-package lisp-mode
+  :straight nil
+  :hook (lisp-mode . common-lisp-modes-mode))
+
+
 (use-package sly
   :commands sly-symbol-completion-mode
+  :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :custom
   (inferior-lisp-program "sbcl")
   :config
@@ -1156,28 +1182,11 @@ nil."
 
 
 (use-package smartparens
-  ;; `smartparens-strict-mode' is automatically enabled only in Lisp
-  ;; modes.  Other modes use `smartparens-mode' because strictness may
-  ;; be a problem there.
   :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
-  :hook (((clojure-mode
-           emacs-lisp-mode
-           common-lisp-mode
-           scheme-mode
-           lisp-mode
-           racket-mode
-           fennel-mode
-           cider-repl-mode
-           racket-repl-mode
-           geiser-repl-mode
-           inferior-lisp-mode
-           inferior-emacs-lisp-mode
-           sly-mrepl-mode)
-          . smartparens-strict-mode)
+  :hook (((common-lisp-modes-mode prog-mode) . smartparens-strict-mode)
          ((eval-expression-minibuffer-setup
            lisp-data-mode)
-          . aorst/minibuffer-enable-sp)
-         (prog-mode . smartparens-mode))
+          . aorst/minibuffer-enable-sp))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
          ("M-q" . aorst/indent-or-fill-sexp)
@@ -1453,7 +1462,7 @@ means save all with no questions."
   :straight (:host gitlab
              :repo "andreyorst/isayt.el"
              :branch "main")
-  :hook ((paredit-mode smartparens-strict-mode) . isayt-mode))
+  :hook (common-lisp-modes-mode . isayt-mode))
 
 
 (use-package eldoc
@@ -1568,9 +1577,8 @@ means save all with no questions."
     "Path to the FernFlower library."))
 
 
-(use-package iedit
-  :custom
-  (iedit-toggle-key-default nil))
+(use-package lisp-butt-mode
+  :hook (common-lisp-modes-mode . lisp-butt-mode))
 
 
 (provide 'init)
