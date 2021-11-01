@@ -954,6 +954,7 @@ for module name."
 
   (provide 'inf-clojure))
 
+
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode))
