@@ -17,7 +17,6 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
-
 
 ;;; use-package
 
@@ -26,7 +25,6 @@
 (defvar straight-use-package-by-default)
 (setq straight-use-package-by-default t)
 (require 'use-package)
-
 
 
 ;;; Local config and personal functions
@@ -66,7 +64,6 @@ Used in various places to avoid getting wrong line height when
     :group 'local-config)
 
   (provide 'local-config))
-
 
 (use-package functions
   :straight nil
@@ -117,8 +114,16 @@ REGEXP FILE LINE and optional COL LEVEL info to
             (add-to-list 'compilation-error-regexp-alist-alist
                          '(,name ,regexp ,file ,line ,col ,level))))
 
-  (provide 'functions))
+  (defun aorst/indent-or-fill-sexp ()
+    "Indent s-expression or fill string/comment."
+    (interactive)
+    (let ((ppss (syntax-ppss)))
+      (if (or (nth 3 ppss)
+              (nth 4 ppss))
+          (fill-paragraph)
+        (indent-sexp))))
 
+  (provide 'functions))
 
 (use-package common-lisp-modes-mode
   :straight nil
@@ -133,7 +138,6 @@ lisp-modes mode.
     :lighter " clmm")
 
   (provide 'common-lisp-modes-mode))
-
 
 
 ;;; Inbuilt stuff
@@ -174,7 +178,6 @@ lisp-modes mode.
 
   (provide 'defaults))
 
-
 (use-package font
   :straight nil
   :preface
@@ -192,14 +195,12 @@ lisp-modes mode.
 
   (provide 'font))
 
-
 (use-package cus-edit
   :straight nil
   :custom
   (custom-file (expand-file-name "custom.el" user-emacs-directory))
   :init
   (load custom-file :noerror))
-
 
 (use-package novice
   :straight nil
@@ -213,14 +214,12 @@ lisp-modes mode.
 
   (load aorst--disabled-commands :noerror))
 
-
 (use-package startup
   :straight nil
   :no-require t
   :custom
   (user-mail-address "andreyorst@gmail.com")
   (user-full-name "Andrey Listopadov"))
-
 
 (use-package files
   :straight nil
@@ -238,13 +237,11 @@ lisp-modes mode.
     (unless (file-exists-p auto-save-dir)
       (make-directory auto-save-dir t))))
 
-
 (use-package subr
   :straight nil
   :no-require t
   :init
   (fset 'yes-or-no-p 'y-or-n-p))
-
 
 (use-package mwheel
   :straight nil
@@ -307,12 +304,10 @@ for stopping scroll from going beyond the longest line.  Based on
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
-
 (use-package savehist
   :straight nil
   :config
   (savehist-mode 1))
-
 
 (use-package mule-cmds
   :straight nil
@@ -322,13 +317,11 @@ for stopping scroll from going beyond the longest line.  Based on
   :init
   (prefer-coding-system 'utf-8))
 
-
 (use-package select
   :straight nil
   :when (display-graphic-p)
   :custom
   (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-
 
 (use-package startup
   :straight nil
@@ -336,7 +329,6 @@ for stopping scroll from going beyond the longest line.  Based on
   :custom
   (initial-major-mode 'fundamental-mode)
   (initial-scratch-message ""))
-
 
 (use-package simple
   :straight nil
@@ -378,12 +370,10 @@ are defining or executing a macro."
                        executing-kbd-macro)
              (funcall quit))))))
 
-
 (use-package delsel
   :straight nil
   :init
   (delete-selection-mode t))
-
 
 (use-package minibuffer
   :straight nil
@@ -396,14 +386,12 @@ are defining or executing a macro."
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
-
 
 ;;; UI
 
 (use-package window
   :straight nil
   :bind ("C-x C-b" . bury-buffer))
-
 
 (use-package frame
   :straight nil
@@ -424,20 +412,17 @@ are defining or executing a macro."
                          (frame-parameters (selected-frame)))))
       (funcall-interactively fn buffer-or-name norecord))))
 
-
 (use-package startup
   :straight nil
   :no-require t
   :custom
   (inhibit-splash-screen t))
 
-
 (use-package menu-bar
   :straight nil
   :unless (display-graphic-p)
   :config
   (menu-bar-mode -1))
-
 
 (use-package tooltip
   :straight nil
@@ -450,20 +435,17 @@ are defining or executing a macro."
                               (border-width . 1)
                               (no-special-glyphs . t))))
 
-
 (use-package tool-bar
   :straight nil
   :when (window-system)
   :init
   (tool-bar-mode -1))
 
-
 (use-package scroll-bar
   :straight nil
   :when (window-system)
   :init
   (scroll-bar-mode -1))
-
 
 (use-package modus-themes
   :requires (functions local-config)
@@ -491,18 +473,15 @@ are defining or executing a macro."
          (load-theme aorst-dark-theme t))
         (t (load-theme aorst-light-theme t))))
 
-
 (use-package custom
   :straight nil
   :custom
   (custom-safe-themes t))
 
-
 (use-package uniquify
   :straight nil
   :custom
   (uniquify-buffer-name-style 'forward))
-
 
 (use-package display-line-numbers
   :straight nil
@@ -511,7 +490,6 @@ are defining or executing a macro."
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
 
-
 (use-package minions
   :commands minions-mode
   :custom
@@ -519,28 +497,23 @@ are defining or executing a macro."
   :init
   (minions-mode))
 
-
 (use-package vertico
   :commands vertico-mode
   :init
   (vertico-mode))
-
 
 (use-package marginalia
   :commands marginalia-mode
   :init
   (marginalia-mode))
 
-
 (use-package consult
   :commands consult-completion-in-region
-  :requires seq
   :bind (("C-x C-r" . consult-recent-file))
-  :config
-  (setq consult-preview-excluded-hooks (seq-union consult-preview-excluded-hooks '(lsp)))
+  :custom
+  (consult-preview-key nil)
   :init
   (setq completion-in-region-function #'consult-completion-in-region))
-
 
 (use-package company
   :bind (:map company-mode-map
@@ -569,13 +542,11 @@ are defining or executing a macro."
   (company-tooltip-maximum-width 120)
   (company-icon-size aorst-line-pixel-height))
 
-
 (use-package company-quickhelp
   :hook (company-mode . company-quickhelp-mode)
   :custom
   (company-quickhelp-max-lines 13)
   (company-quickhelp-use-propertized-text t))
-
 
 (use-package formfeed
   :straight nil
@@ -597,7 +568,6 @@ are defining or executing a macro."
     (add-hook mode-hook #'aorst/formfeed-line))
 
   (provide 'formfeed))
-
 
 
 ;;; Languages
@@ -654,22 +624,18 @@ are defining or executing a macro."
     (setq lexical-binding t)
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
 
-
 (use-package ox-hugo
   :after ox)
-
 
 (use-package ox-latex
   :straight nil
   :after ox)
-
 
 (with-eval-after-load 'org
   (use-package org-tempo
     :straight nil
     :defines org-version
     :unless (version<= org-version "9.1.9")))
-
 
 (use-package cc-mode
   :straight nil
@@ -683,7 +649,6 @@ are defining or executing a macro."
           comment-end ""
           tab-width 4)))
 
-
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -696,13 +661,11 @@ are defining or executing a macro."
   (markdown-hr-display-char nil)
   (markdown-list-item-bullets '("-")))
 
-
 (use-package geiser
   :hook (scheme-mode . geiser-mode)
   :custom
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
-
 
 (use-package eros
   :straight (:host github
@@ -766,7 +729,6 @@ are defining or executing a macro."
        (aorst/fennel-eval-to-string (thing-at-point 'defun t))
        (save-excursion (end-of-defun) (point))))))
 
-
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
@@ -823,7 +785,6 @@ https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/aut
     (setq-local lisp-indent-function
                 #'aorst/emacs-lisp-indent-function)))
 
-
 (use-package fennel-mode
   :commands (fennel-repl lisp-eval-string lisp-eval-last-sexp switch-to-lisp)
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
@@ -866,7 +827,6 @@ for module name."
           (funcall-interactively 'fennel-reload nil)
         (funcall-interactively 'fennel-reload t)))))
 
-
 (use-package clojure-mode
   :hook ((clojure-mode
           clojurec-mode
@@ -881,17 +841,17 @@ for module name."
 
   (defun aorst/clojure-mode-setup ()
     "Setup Clojure buffer."
-    (modify-syntax-entry ?# "w")
+    ;; (modify-syntax-entry ?# "w")
     (common-lisp-modes-mode)
     (flycheck-mode)))
-
 
 (use-package inf-clojure
   :straight nil
   :requires (inf-lisp clojure-mode)
-  :hook (inf-clojure-mode . common-lisp-modes-mode)
+  :hook ((inf-clojure-mode . common-lisp-modes-mode))
   :preface
   (require 'inf-lisp)
+  (require 'comint)
   (require 'clojure-mode)
 
   (defgroup inf-clojure ()
@@ -905,7 +865,7 @@ for module name."
     :type 'string
     :group 'inf-clojure)
 
-  (defcustom inf-clojure-prompt "^[^>]+>>"
+  (defcustom inf-clojure-prompt "^[^=]+=> "
     "Prompt regex for inferior Clojure."
     :tag "Prompt regexp"
     :type 'string
@@ -940,20 +900,20 @@ for module name."
     "Major mode for `inf-clojure'.
 
 \\<inf-clojure-mode-map>"
-    (set (make-local-variable 'font-lock-defaults) '(clojure-font-lock-keywords t))
-    (set (make-local-variable 'inferior-lisp-prompt) inf-clojure-prompt)
-    (set (make-local-variable 'lisp-indent-function) 'clojure-indent-function)
-    (set (make-local-variable 'lisp-doc-string-elt-property) 'clojure-doc-string-elt)
-    (set (make-local-variable 'comment-end) "")
+    (setq-local font-lock-defaults '(clojure-font-lock-keywords t))
+    (setq-local inferior-lisp-prompt inf-clojure-prompt)
+    (setq-local lisp-indent-function 'clojure-indent-function)
+    (setq-local lisp-doc-string-elt-property 'clojure-doc-string-elt)
+    (setq-local comint-prompt-read-only t)
+    (setq-local comment-end "")
     (clojure-font-lock-setup)
     (make-local-variable 'completion-at-point-functions)
     (set-syntax-table clojure-mode-syntax-table)
-    (add-hook 'paredit-mode-hook #'fennel-repl-paredit-setup nil t))
+    (add-hook 'paredit-mode-hook #'clojure-paredit-setup nil t))
 
   (define-key inf-clojure-mode-map "C-j" 'inf-clojure-indent-on-newline)
 
   (provide 'inf-clojure))
-
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
@@ -988,10 +948,8 @@ for module name."
       (unless (memq src cider-jdk-src-paths)
         (add-to-list 'cider-jdk-src-paths src t)))))
 
-
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
-
 
 (use-package clj-refactor
   :hook ((clj-refactor-mode . yas-minor-mode)
@@ -1001,11 +959,9 @@ for module name."
   (cljr-suppress-middleware-warnings t)
   (cljr-warn-on-eval nil))
 
-
 (use-package lisp-mode
   :straight nil
   :hook (lisp-mode . common-lisp-modes-mode))
-
 
 (use-package sly
   :commands sly-symbol-completion-mode
@@ -1015,16 +971,13 @@ for module name."
   :config
   (sly-symbol-completion-mode -1))
 
-
 (use-package yaml-mode
   :custom
   (yaml-indent-offset 4))
 
-
 (use-package sh-script
   :straight nil
   :hook (sh-mode . flycheck-mode))
-
 
 (use-package lua-mode
   :commands (lua-get-create-process lua-send-string)
@@ -1039,23 +992,19 @@ for module name."
     (lua-get-create-process)
     (lua-send-string body)))
 
-
 (use-package css-mode
   :straight nil
   :custom
   (css-indent-offset 2))
-
 
 (use-package json-mode
   :hook (json-mode . flycheck-mode)
   :custom
   (js-indent-level 2))
 
-
 (use-package csv-mode
   :custom
   (csv-align-max-width 80))
-
 
 
 ;;; Tools
@@ -1065,12 +1014,10 @@ for module name."
   :custom
   (help-window-select t))
 
-
 (use-package doc-view
   :straight nil
   :custom
   (doc-view-resolution 192))
-
 
 (use-package vterm
   :if (bound-and-true-p module-file-suffix)
@@ -1081,18 +1028,15 @@ for module name."
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1")))
 
-
 (use-package editorconfig
   :commands editorconfig-mode
   :init
   (editorconfig-mode 1))
 
-
 (use-package flymake
   :straight nil
   :custom
   (flymake-fringe-indicator-position 'right-fringe))
-
 
 (use-package flyspell
   :when (or (executable-find "ispell")
@@ -1100,7 +1044,6 @@ for module name."
             (executable-find "hunspell"))
   :hook (((org-mode git-commit-mode markdown-mode) . flyspell-mode)
          (prog-mode . flyspell-prog-mode)))
-
 
 (use-package flycheck
   :defines (flymake-error-bitmap
@@ -1157,15 +1100,17 @@ nil."
   (define-advice flycheck-may-use-echo-area-p (:override ())
     nil))
 
-
 (use-package flycheck-package
   :hook ((emacs-lisp-mode . flycheck-mode)
          (emacs-lisp-mode . flycheck-package-setup)))
 
-
 (use-package smartparens
   :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
-  :hook (((common-lisp-modes-mode prog-mode) . smartparens-strict-mode)
+  :hook (((common-lisp-modes-mode
+           prog-mode
+           reb-mode
+           reb-lisp-mode)
+          . smartparens-strict-mode)
          ((eval-expression-minibuffer-setup
            lisp-data-mode)
           . aorst/minibuffer-enable-sp))
@@ -1181,8 +1126,6 @@ nil."
   (sp-show-pair-delay 0)
   (sp-echo-match-when-invisible nil)
   :config
-  (add-to-list 'sp-lisp-modes 'fennel-mode t)
-
   (require 'smartparens-config)
 
   (sp-use-paredit-bindings)
@@ -1194,17 +1137,7 @@ nil."
     (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
     (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1))
-
-  (defun aorst/indent-or-fill-sexp ()
-    "Indent s-expression or fill string/comment."
-    (interactive)
-    (let ((ppss (syntax-ppss)))
-      (if (or (nth 3 ppss)
-              (nth 4 ppss))
-          (fill-paragraph)
-        (indent-sexp)))))
-
+    (smartparens-strict-mode 1)))
 
 (use-package undo-tree
   :commands global-undo-tree-mode
@@ -1215,14 +1148,12 @@ nil."
   :init
   (global-undo-tree-mode 1))
 
-
 (use-package magit
   :hook ((git-commit-mode . flyspell-mode))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all))
-
 
 (use-package magit-todos
   :commands magit-todos-mode
@@ -1237,7 +1168,6 @@ nil."
   (transient-append-suffix 'magit-status-jump '(0 0 -1)
     '("T " "Todos" magit-todos-jump-to-todos)))
 
-
 (use-package ediff
   :straight nil
   :hook (ediff-prepare-buffer . outline-show-all)
@@ -1245,7 +1175,6 @@ nil."
   (advice-add 'ediff-window-display-p :override #'ignore)
   :custom
   (ediff-split-window-function 'split-window-horizontally))
-
 
 (use-package lsp-mode
   :hook (((c-mode
@@ -1289,23 +1218,19 @@ nil."
   (lsp-lens-enable t)
   (lsp-lens-place-position 'end-of-line))
 
-
 (use-package lsp-java
   :requires lsp-mode
   :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
   :custom
   (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
-
 (use-package treemacs
   :custom
   (treemacs-no-png-images t))
 
-
 (use-package lsp-treemacs
   :custom
   (lsp-treemacs-theme "Iconless"))
-
 
 (use-package project
   :functions (aorst/project-root-p
@@ -1354,13 +1279,11 @@ means save all with no questions."
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (save-some-buffers arg pred))))
 
-
 (use-package server
   :straight nil
   :config
   (unless (server-running-p)
     (server-start)))
-
 
 (use-package separedit
   :hook (separedit-buffer-creation . aorst/separedit-header-line-setup)
@@ -1379,7 +1302,6 @@ means save all with no questions."
      (substitute-command-keys
       "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
 
-
 (use-package recentf
   :straight nil
   :custom
@@ -1387,7 +1309,6 @@ means save all with no questions."
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\")
   (recentf-mode))
-
 
 (use-package dumb-jump
   :commands dumb-jump-xref-activate
@@ -1397,18 +1318,15 @@ means save all with no questions."
   :init
   (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
-
 (use-package which-key
   :commands which-key-mode
   :init
   (which-key-mode t))
 
-
 (use-package gcmh
   :commands gcmh-mode
   :init
   (gcmh-mode t))
-
 
 (use-package paren
   :straight nil
@@ -1417,12 +1335,10 @@ means save all with no questions."
   (show-paren-delay 0)
   (show-paren-when-point-in-periphery t))
 
-
 (use-package vc-hooks
   :straight nil
   :custom
   (vc-follow-symlinks t))
-
 
 (use-package isayt
   :straight (:host gitlab
@@ -1430,21 +1346,17 @@ means save all with no questions."
              :branch "main")
   :hook (common-lisp-modes-mode . isayt-mode))
 
-
 (use-package eldoc
   :straight nil
   :custom
   (eldoc-echo-area-use-multiline-p nil))
 
-
 (use-package autorevert
   :straight nil
   :hook (after-init . global-auto-revert-mode))
 
-
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode))
-
 
 (use-package compile
   :straight nil
@@ -1476,7 +1388,6 @@ means save all with no questions."
     "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
     1 2))
 
-
 (use-package isearch
   :straight nil
   :bind (:map isearch-mode-map
@@ -1490,24 +1401,20 @@ means save all with no questions."
     (isearch-edit-string)
     (backward-char n)))
 
-
 (use-package esh-mode
   :straight nil
   :custom
   (eshell-scroll-show-maximum-output nil))
-
 
 (use-package dired
   :straight nil
   :custom
   (dired-listing-switches "-al --group-directories-first"))
 
-
 (use-package comint
   :straight nil
   :custom
   (comint-scroll-show-maximum-output nil))
-
 
 (use-package rect
   :straight nil
@@ -1520,7 +1427,6 @@ means save all with no questions."
     (save-restriction
       (narrow-to-region (point) (point))
       (yank-rectangle))))
-
 
 (use-package jdecomp
   :hook (archive-mode . jdecomp-mode)
@@ -1541,11 +1447,6 @@ means save all with no questions."
   (defvar aorst--fernflower-path
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
-
-
-(use-package lisp-butt-mode
-  :hook (common-lisp-modes-mode . lisp-butt-mode))
-
 
 (provide 'init)
 ;;; init.el ends here
