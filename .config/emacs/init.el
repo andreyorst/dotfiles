@@ -41,6 +41,7 @@
     "Whether to include bufname to titlebar.
 Bufname is not necessary on GNOME, but may be useful in other DEs."
     :type 'boolean
+    :tag "Show buffer name in title"
     :group 'local-config)
 
   (defcustom aorst-dark-theme 'modus-vivendi
@@ -121,7 +122,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (if (or (nth 3 ppss)
               (nth 4 ppss))
           (fill-paragraph)
-        (indent-sexp))))
+        (let ((region (save-excursion
+                        (mark-sexp)
+                        (cons (point) (mark)))))
+          (indent-region (car region) (cdr region))))))
 
   (provide 'functions))
 
