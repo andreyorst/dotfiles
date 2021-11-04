@@ -114,10 +114,9 @@ lisp-modes mode.
       (if (or (nth 3 ppss)
               (nth 4 ppss))
           (fill-paragraph)
-        (let ((region (save-excursion
-                        (mark-sexp)
-                        (cons (point) (mark)))))
-          (indent-region (car region) (cdr region))))))
+        (save-excursion
+          (mark-sexp)
+          (indent-region (point) (mark))))))
 
   (provide 'common-lisp-modes-mode))
 
@@ -1110,8 +1109,7 @@ nil."
           . minibuffer-enable-sp))
   :bind (:map smartparens-mode-map
          ("C-M-q" . sp-indent-defun)
-
-         :map smartparens-strict-mode-map
+         :map common-lisp-modes-mode-map
          (";" . sp-comment))
   :custom
   (sp-highlight-pair-overlay nil)
