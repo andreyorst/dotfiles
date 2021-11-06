@@ -964,6 +964,9 @@ for module name."
   :config
   (sly-symbol-completion-mode -1))
 
+(use-package racket-mode
+  :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
+
 (use-package yaml-mode
   :custom
   (yaml-indent-offset 4))
