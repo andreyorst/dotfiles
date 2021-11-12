@@ -963,6 +963,9 @@ for module name."
   :custom
   (inferior-lisp-program "sbcl")
   :config
+  (define-advice sly-completing-read (:around (fn &rest args))
+    (let ((icomplete-mode t))
+      (apply fn args)))
   (sly-symbol-completion-mode -1))
 
 (use-package racket-mode
