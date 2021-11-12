@@ -953,19 +953,19 @@ for module name."
   (cljr-suppress-middleware-warnings t)
   (cljr-warn-on-eval nil))
 
+(use-package inf-lisp
+  :custom (inferior-lisp-program "sbcl"))
+
 (use-package lisp-mode
   :straight nil
   :hook (lisp-mode . common-lisp-modes-mode))
 
 (use-package sly
-  :commands sly-symbol-completion-mode
+  :commands (sly-symbol-completion-mode sly-completing-read)
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
-  :custom
-  (inferior-lisp-program "sbcl")
   :config
-  (define-advice sly-completing-read (:around (fn &rest args))
-    (let ((icomplete-mode t))
-      (apply fn args)))
+  (when (fboundp #'sly-completing-read)
+    (fset 'sly-completing-read 'completing-read))
   (sly-symbol-completion-mode -1))
 
 (use-package racket-mode
