@@ -152,7 +152,8 @@ lisp-modes mode.
 
   (setq
    ring-bell-function 'ignore
-   mode-line-percent-position nil)
+   mode-line-percent-position nil
+   enable-recursive-minibuffers t)
 
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
