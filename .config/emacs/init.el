@@ -1,3 +1,4 @@
+
 ;;; init.el --- Main configuration file -*- lexical-binding: t; -*-
 
 ;; Author: Andrey Listopadov
@@ -487,6 +488,8 @@ are defining or executing a macro."
 
 (use-package vertico
   :commands vertico-mode
+  :bind (:map vertico-map
+         ("M-RET" . vertico-exit-input))
   :init
   (vertico-mode))
 
@@ -962,7 +965,15 @@ for module name."
   :straight nil
   :hook (lisp-mode . common-lisp-modes-mode))
 
+(use-package inf-lisp
+  :straight nil
+  :hook (inferior-lisp-mode . common-lisp-modes-mode)
+  :custom
+  (inferior-lisp-program (cond ((executable-find "sbcl") "sbcl")
+                               ((executable-find "ecl") "ecl"))))
+
 (use-package sly
+  :after inf-lisp
   :commands (sly-symbol-completion-mode sly-completing-read)
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :config
