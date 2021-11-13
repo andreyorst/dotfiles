@@ -497,7 +497,10 @@ are defining or executing a macro."
 
 (use-package consult
   :commands consult-completion-in-region
-  :bind (("C-x C-r" . consult-recent-file))
+  :bind (("C-c c r" . consult-recent-file)
+         ("C-c c o" . consult-outline)
+         ("C-c c i" . consult-imenu)
+         ("C-c c g" . consult-grep))
   :custom
   (consult-preview-key nil)
   :init
@@ -1099,6 +1102,7 @@ nil."
 
 (use-package smartparens
   :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
+  :defines common-lisp-modes-mode-map
   :hook (((common-lisp-modes-mode
            prog-mode
            reb-mode
