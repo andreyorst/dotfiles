@@ -497,10 +497,16 @@ are defining or executing a macro."
 
 (use-package consult
   :commands consult-completion-in-region
-  :bind (("C-c c r" . consult-recent-file)
-         ("C-c c o" . consult-outline)
-         ("C-c c i" . consult-imenu)
-         ("C-c c g" . consult-grep))
+  :preface
+  (defvar consult-prefix-map (make-sparse-keymap))
+  (fset 'consult-prefix-map consult-prefix-map)
+  :bind (:map ctl-x-map
+         ("c" . consult-prefix-map)
+         :map consult-prefix-map
+         ("r" . consult-recent-file)
+         ("o" . consult-outline)
+         ("i" . consult-imenu)
+         ("g" . consult-grep))
   :custom
   (consult-preview-key nil)
   :init
