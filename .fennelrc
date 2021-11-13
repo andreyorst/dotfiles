@@ -1,6 +1,11 @@
 ;; -*- mode: fennel -*-
 (local opts ...)
 
+;; Load REPL specific functions
+(local fennel (require :fennel))
+(pcall fennel.dofile (.. (os.getenv :HOME) "/.prelude.fnl"))
+
+;; Prompt tweaks for non-interactive processes
 (local prompts
   (if (= (os.getenv :TERM) :dumb)
       {:indent "" :in-stack "" :top ">> "} ; disable nested expression prompts
