@@ -1254,6 +1254,8 @@ nil."
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :config
+  (unless (boundp 'project-switch-commands)
+    (defvar project-switch-commands nil))
   (defvar project-root-markers
     '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
     "Files or directories that indicate the root of a project.")
