@@ -305,13 +305,6 @@ for stopping scroll from going beyond the longest line.  Based on
   :custom
   (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
-(use-package startup
-  :straight nil
-  :no-require t
-  :custom
-  (initial-major-mode 'fundamental-mode)
-  (initial-scratch-message ""))
-
 (use-package simple
   :straight nil
   :bind (("M-z" . zap-up-to-char)
