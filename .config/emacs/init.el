@@ -1,16 +1,13 @@
-
 ;;; init.el --- Main configuration file -*- lexical-binding: t; -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
-;; Homepage: https://gitlab.com/andreyorst/dotfiles/-/tree/master/.config/emacs
+;; Homepage: https://gitlab.com/andreyorst/dotfiles/
 
 ;;; Commentary:
 ;; Emacs config.
 
 ;;; Code:
-
-;;; early-init.el support for older Emacs
 
 
 ;;; Early init support for older Emacs
@@ -319,6 +316,7 @@ for stopping scroll from going beyond the longest line.  Based on
   (yank-excluded-properties t)
   (blink-matching-delay 0)
   (blink-matching-paren t)
+  (copy-region-blink-delay 0)
   :init
   (column-number-mode 1)
   (line-number-mode 1)
@@ -365,10 +363,6 @@ are defining or executing a macro."
 
 ;;; UI
 
-(use-package window
-  :straight nil
-  :bind ("C-x C-b" . bury-buffer))
-
 (use-package frame
   :straight nil
   :requires seq
@@ -410,18 +404,6 @@ are defining or executing a macro."
                               (internal-border-width . 2)
                               (border-width . 1)
                               (no-special-glyphs . t))))
-
-(use-package tool-bar
-  :straight nil
-  :when (window-system)
-  :init
-  (tool-bar-mode -1))
-
-(use-package scroll-bar
-  :straight nil
-  :when (window-system)
-  :init
-  (scroll-bar-mode -1))
 
 (use-package modus-themes
   :requires (functions local-config)
@@ -1113,9 +1095,7 @@ nil."
   (define-advice flycheck-may-use-echo-area-p (:override ())
     nil))
 
-(use-package flycheck-package
-  :hook ((emacs-lisp-mode . flycheck-mode)
-         (emacs-lisp-mode . flycheck-package-setup)))
+(use-package flycheck-package)
 
 (use-package smartparens
   :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
@@ -1212,14 +1192,14 @@ nil."
 
   ;; UI
   (lsp-enable-links nil)
-  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable t)
   (lsp-headerline-breadcrumb-icons-enable nil)
   (lsp-modeline-code-actions-enable nil)
 
   ;; semantic code features
   (lsp-enable-folding nil)
   (lsp-enable-indentation nil)
-  (lsp-enable-semantic-highlighting nil)
+  (lsp-semantic-tokens-enable nil)
   (lsp-enable-symbol-highlighting nil)
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-text-document-color nil)
