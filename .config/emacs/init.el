@@ -1243,11 +1243,13 @@ means save all with no questions."
 
 (use-package dumb-jump
   :commands dumb-jump-xref-activate
+  :hook (prog-mode . dumb-jump-add-xref-backend)
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'completing-read)
-  :init
-  (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
+  :config
+  (defun dumb-jump-add-xref-backend ()
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t t)))
 
 (use-package which-key
   :commands which-key-mode
