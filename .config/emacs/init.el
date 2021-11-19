@@ -9,13 +9,11 @@
 
 ;;; Code:
 
-
 ;;; Early init support for older Emacs
 
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
-
 ;;; use-package
 
 (require 'straight)
@@ -24,7 +22,6 @@
 (setq straight-use-package-by-default t)
 (require 'use-package)
 
-
 ;;; Local config and personal functions
 
 (use-package local-config
@@ -118,7 +115,6 @@ lisp-modes mode.
 
   (provide 'common-lisp-modes-mode))
 
-
 ;;; Inbuilt stuff
 
 (use-package defaults
@@ -354,13 +350,12 @@ are defining or executing a macro."
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore))
   :custom
-  (completion-styles '(partial-completion basic))
+  (completion-styles '(basic partial-completion flex))
   (read-buffer-completion-ignore-case t)
   (read-file-name-completion-ignore-case t)
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
-
 ;;; UI
 
 (use-package frame
@@ -550,7 +545,6 @@ are defining or executing a macro."
                        prog-mode-hook))
     (add-hook mode-hook #'formfeed-make-display-line)))
 
-
 ;;; Languages
 
 (use-package org
@@ -647,68 +641,6 @@ are defining or executing a macro."
   :custom
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
-
-(use-package eros
-  :straight (:host github
-             :repo "andreyorst/eros"
-             :branch "general-purpose-api")
-  :hook ((emacs-lisp-mode . eros-mode)
-         (fennel-mode . enable-fennel-eros))
-  :defines inferior-lisp-prompt
-  :functions inferior-lisp-proc
-  :config
-  (defun enable-fennel-eros ()
-    "Enable mappings for evaluation overlays in fennel-mode."
-    (local-set-key (kbd "C-M-x") #'fennel-eval-defun)
-    (local-set-key (kbd "C-x C-e") #'fennel-eval-last-sexp))
-
-  (defun fennel-eval-to-string (sexp)
-    "Send SEXP to the inferior lisp process, return result as a string."
-    (condition-case nil
-        (let ((sexp (string-trim (substring-no-properties sexp)))
-              (buf (get-buffer-create "*fennel-eval*"))
-              (prompt inferior-lisp-prompt)
-              (proc (inferior-lisp-proc)))
-          (with-current-buffer buf
-            (erase-buffer)
-            (let ((comint-prompt-regexp prompt))
-              (comint-redirect-send-command-to-process sexp buf proc t t))
-            (accept-process-output proc)
-            (ignore-errors ; apply font-locking if the result is balanced
-              (setq-local delay-mode-hooks t)
-              (setq delayed-mode-hooks nil)
-              (check-parens)
-              (fennel-mode)
-              (font-lock-fontify-region (point-min) (point-max)))
-            (let* ((contents (thread-last
-                               (buffer-string)
-                               (replace-regexp-in-string "^ +" "")
-                               (string-replace "\n" " ")
-                               (string-replace "\t" ", ")
-                               string-trim))
-                   (contents (if (string-empty-p contents)
-                                 "#<no values>"
-                               contents)))
-              (message "%s" contents)
-              contents)))
-      (error "nil")))
-
-  (defun fennel-eval-last-sexp ()
-    "Eval last s-expression and display the result in an overlay."
-    (interactive)
-    (when (inferior-lisp-proc)
-      (let ((sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
-        (eros-eval-overlay
-         (fennel-eval-to-string sexp)
-         (point)))))
-
-  (defun fennel-eval-defun ()
-    "Eval defun and display the result in an overlay."
-    (interactive)
-    (when (inferior-lisp-proc)
-      (eros-eval-overlay
-       (fennel-eval-to-string (thing-at-point 'defun t))
-       (save-excursion (end-of-defun) (point))))))
 
 (use-package elisp-mode
   :straight nil
@@ -919,6 +851,7 @@ for module name."
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
+  (cider-repl-prompt-function #'cider-repl-prompt-newline)
   :config
   (setq cider-jdk-src-paths nil)
 
@@ -927,7 +860,11 @@ for module name."
                        (file-expand-wildcards "~/.clojure/clojure-*-sources.jar")))
     (when (file-exists-p src)
       (unless (memq src cider-jdk-src-paths)
-        (add-to-list 'cider-jdk-src-paths src t)))))
+        (add-to-list 'cider-jdk-src-paths src t))))
+
+  (defun cider-repl-prompt-newline (namespace)
+    "Return a prompt string that mentions NAMESPACE and a newline after it."
+    (format "%s\n" namespace)))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
@@ -1001,7 +938,6 @@ for module name."
   :custom
   (csv-align-max-width 80))
 
-
 ;;; Tools
 
 (use-package help
@@ -1192,7 +1128,7 @@ nil."
 
   ;; UI
   (lsp-enable-links nil)
-  (lsp-headerline-breadcrumb-enable t)
+  (lsp-headerline-breadcrumb-enable nil)
   (lsp-headerline-breadcrumb-icons-enable nil)
   (lsp-modeline-code-actions-enable nil)
 
@@ -1450,6 +1386,68 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (defvar fernflower-path
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
+
+(use-package eros
+  :straight (:host github
+             :repo "andreyorst/eros"
+             :branch "general-purpose-api")
+  :hook ((emacs-lisp-mode . eros-mode)
+         (fennel-mode . enable-fennel-eros))
+  :defines inferior-lisp-prompt
+  :functions inferior-lisp-proc
+  :config
+  (defun enable-fennel-eros ()
+    "Enable mappings for evaluation overlays in fennel-mode."
+    (local-set-key (kbd "C-M-x") #'fennel-eval-defun)
+    (local-set-key (kbd "C-x C-e") #'fennel-eval-last-sexp))
+
+  (defun fennel-eval-to-string (sexp)
+    "Send SEXP to the inferior lisp process, return result as a string."
+    (condition-case nil
+        (let ((sexp (string-trim (substring-no-properties sexp)))
+              (buf (get-buffer-create "*fennel-eval*"))
+              (prompt inferior-lisp-prompt)
+              (proc (inferior-lisp-proc)))
+          (with-current-buffer buf
+            (erase-buffer)
+            (let ((comint-prompt-regexp prompt))
+              (comint-redirect-send-command-to-process sexp buf proc t t))
+            (accept-process-output proc)
+            (ignore-errors ; apply font-locking if the result is balanced
+              (setq-local delay-mode-hooks t)
+              (setq delayed-mode-hooks nil)
+              (check-parens)
+              (fennel-mode)
+              (font-lock-fontify-region (point-min) (point-max)))
+            (let* ((contents (thread-last
+                               (buffer-string)
+                               (replace-regexp-in-string "^ +" "")
+                               (string-replace "\n" " ")
+                               (string-replace "\t" ", ")
+                               string-trim))
+                   (contents (if (string-empty-p contents)
+                                 "#<no values>"
+                               contents)))
+              (message "%s" contents)
+              contents)))
+      (error "nil")))
+
+  (defun fennel-eval-last-sexp ()
+    "Eval last s-expression and display the result in an overlay."
+    (interactive)
+    (when (inferior-lisp-proc)
+      (let ((sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
+        (eros-eval-overlay
+         (fennel-eval-to-string sexp)
+         (point)))))
+
+  (defun fennel-eval-defun ()
+    "Eval defun and display the result in an overlay."
+    (interactive)
+    (when (inferior-lisp-proc)
+      (eros-eval-overlay
+       (fennel-eval-to-string (thing-at-point 'defun t))
+       (save-excursion (end-of-defun) (point))))))
 
 (provide 'init)
 ;;; init.el ends here
