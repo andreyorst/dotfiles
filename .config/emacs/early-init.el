@@ -2,28 +2,26 @@
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
-;; Homepage: https://gitlab.com/andreyorst/dotfiles/-/tree/master/.config/emacs
+;; Homepage: https://gitlab.com/andreyorst/dotfiles
 
 ;;; Commentary:
-;; Emacs config.
+;; Emacs early initialization configuration.
 
 ;;; Code:
 
-(defvar aorst--gc-cons-threshold gc-cons-threshold)
-(defvar aorst--gc-cons-percentage gc-cons-percentage)
-(defvar aorst--file-name-handler-alist file-name-handler-alist)
+(defvar restore-gc-cons-threshold gc-cons-threshold)
+(defvar restore-gc-cons-percentage gc-cons-percentage)
+(defvar restore-file-name-handler-alist file-name-handler-alist)
 
-(setq-default gc-cons-threshold 402653184
-              gc-cons-percentage 0.6
-              file-name-handler-alist nil)
+(setq gc-cons-threshold most-positive-fixnum)
 
-(defun aorst/restore-defaults-after-init ()
-  "Restore default values after initialization."
-  (setq-default gc-cons-threshold aorst--gc-cons-threshold
-                gc-cons-percentage aorst--gc-cons-percentage
-                file-name-handler-alist aorst--file-name-handler-alist))
-
-(add-hook 'after-init-hook #'aorst/restore-defaults-after-init)
+(unless (or (daemonp) noninteractive)
+  (setq-default file-name-handler-alist nil)
+  (defun restore-file-handler-alist ()
+    (setq file-name-handler-alist
+          (delete-dups (append file-name-handler-alist
+                               restore-file-name-handler-alist))))
+  (add-hook 'emacs-startup-hook #'restore-file-handler-alist 101))
 
 (setq read-process-output-max (* 1024 1024 4) ; 4mb
       inhibit-compacting-font-caches t
@@ -34,6 +32,15 @@
   (setq native-comp-deferred-compilation t)
   (defvar native-comp-async-report-warnings-errors)
   (setq native-comp-async-report-warnings-errors nil))
+
+(unless (or (daemonp) noninteractive)
+  (setq-default inhibit-redisplay t
+                inhibit-message t)
+  (add-hook 'window-setup-hook
+            (lambda ()
+              (setq-default inhibit-redisplay nil
+                            inhibit-message nil)
+              (redisplay))))
 
 (setq-default initial-frame-alist '((width . 170)
                                     (height . 56)
