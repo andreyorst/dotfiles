@@ -1,4 +1,4 @@
-# -*- mode: conf -*-
+# -*- mode: conf-unix -*-
 $include /etc/inputrc
 "\e[A": history-search-backward
 "\e[B": history-search-forward
@@ -11,6 +11,7 @@ set visible-stats on
 set blink-matching-paren on
 "\e[Z": menu-complete-backward
 Tab: menu-complete
-"\C-\M-b": vi-match
-"\C-\M-f": vi-match
 set enable-bracketed-paste on
+# Emacs-like C-M-f and C-M-b
+"\e\C-f": vi-match
+"\e\C-b": vi-match
