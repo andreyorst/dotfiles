@@ -85,6 +85,30 @@ Used in various places to avoid getting wrong line height when
           (when (looking-at "^$")
             (backward-delete-char 1))))))
 
+  (defun getpasswd (service)
+    (interactive "sservice: ")
+    (let* ((command (format "getpasswd -p %s" service))
+           (result (string-trim (shell-command-to-string command))))
+      (unless (string-match-p "^.*not found" result)
+        (let ((password (replace-regexp-in-string "^[^:]+: " "" result)))
+          (if (not (or executing-kbd-macro noninteractive))
+              (progn (message "password for %s saved in the kill ring" service)
+                     (kill-new password))
+            password)))))
+
+  (defun genpasswd (&optional length allowed)
+    (interactive "slength: \nsallowed chars: ")
+    (let* ((command (format "genpasswd %s %s"
+                            (if (and (stringp length)) length "")
+                            (if (and (stringp allowed) (not (string-empty-p allowed)))
+                                (format "-a %s" allowed)
+                              "")))
+           (password (string-trim (shell-command-to-string command))))
+      (if (not (or executing-kbd-macro noninteractive))
+          (progn (message "password is saved in the kill ring")
+                 (kill-new password))
+        password)))
+
   (provide 'functions))
 
 (use-package common-lisp-modes-mode
@@ -350,7 +374,7 @@ are defining or executing a macro."
   :bind (:map minibuffer-inactive-mode-map
          ("<mouse-1>" . ignore))
   :custom
-  (completion-styles '(basic partial-completion flex))
+  (completion-styles '(partial-completion basic))
   (read-buffer-completion-ignore-case t)
   (read-file-name-completion-ignore-case t)
   :custom-face
@@ -459,7 +483,7 @@ are defining or executing a macro."
 (use-package minions
   :commands minions-mode
   :custom
-  (minions-direct '(flycheck-mode flymake-mode))
+  (minions-prominent-modes '(flycheck-mode flymake-mode))
   :init
   (minions-mode))
 
@@ -1450,6 +1474,17 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (eros-eval-overlay
        (fennel-eval-to-string (thing-at-point 'defun t))
        (save-excursion (end-of-defun) (point))))))
+
+(use-package erc
+  :custom
+  (erc-nick '("andreyorst" "aorst"))
+  (erc-autojoin-channels-alist '(("libera.chat" "#clojure" "#fennel" "#lua" "#lisp" "#erlang" "#elixir" "#emacs")))
+  (erc-log-insert-log-on-open t)
+  (erc-nick-uniquifier "_erc")
+  (erc-user-full-name user-full-name)
+  (erc-log-mode t)
+  :config
+  (setq erc-password (getpasswd "libera.chat")))
 
 (provide 'init)
 ;;; init.el ends here
