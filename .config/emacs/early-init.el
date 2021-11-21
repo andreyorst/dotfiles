@@ -9,23 +9,40 @@
 
 ;;; Code:
 
-(defvar restore-gc-cons-threshold gc-cons-threshold)
-(defvar restore-gc-cons-percentage gc-cons-percentage)
-(defvar restore-file-name-handler-alist file-name-handler-alist)
+(setq
+ gc-cons-threshold most-positive-fixnum
+ read-process-output-max (* 1024 1024 4) ; 4mb
+ inhibit-compacting-font-caches t
+ message-log-max 16384
+ package-enable-at-startup nil
+ load-prefer-newer noninteractive)
 
-(setq gc-cons-threshold most-positive-fixnum)
+(setq-default
+ initial-frame-alist '((width . 170)
+                       (height . 56)
+                       (tool-bar-lines . 0)
+                       (bottom-divider-width . 0)
+                       (right-divider-width . 1))
+ default-frame-alist initial-frame-alist
+ frame-inhibit-implied-resize t
+ x-gtk-resize-child-frames 'resize-mode
+ fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
 
 (unless (or (daemonp) noninteractive)
-  (setq-default file-name-handler-alist nil)
-  (defun restore-file-handler-alist ()
-    (setq file-name-handler-alist
-          (delete-dups (append file-name-handler-alist
-                               restore-file-name-handler-alist))))
-  (add-hook 'emacs-startup-hook #'restore-file-handler-alist 101))
+  (let ((restore-file-name-handler-alist file-name-handler-alist))
+    (setq-default file-name-handler-alist nil)
+    (defun restore-file-handler-alist ()
+      (setq file-name-handler-alist
+            (delete-dups (append file-name-handler-alist
+                                 restore-file-name-handler-alist)))))
 
-(setq read-process-output-max (* 1024 1024 4) ; 4mb
-      inhibit-compacting-font-caches t
-      message-log-max 16384)
+  (add-hook 'emacs-startup-hook #'restore-file-handler-alist 101)
+
+  (when (fboundp #'tool-bar-mode)
+    (tool-bar-mode -1))
+
+  (when (fboundp #'scroll-bar-mode)
+    (scroll-bar-mode -1)))
 
 (when (featurep 'native-compile)
   (defvar native-comp-deferred-compilation)
@@ -42,15 +59,7 @@
                             inhibit-message nil)
               (redisplay))))
 
-(setq-default initial-frame-alist '((width . 170)
-                                    (height . 56)
-                                    (tool-bar-lines . 0)
-                                    (bottom-divider-width . 0)
-                                    (right-divider-width . 1))
-              default-frame-alist initial-frame-alist
-              frame-inhibit-implied-resize t
-              x-gtk-resize-child-frames 'resize-mode
-              fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
+;;; Straight
 
 (defvar straight-process-buffer)
 (setq-default straight-process-buffer " *straight-process*")
@@ -70,16 +79,6 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-
-(setq package-enable-at-startup nil)
-
-(setq load-prefer-newer noninteractive)
-
-(when (fboundp #'tool-bar-mode)
-  (tool-bar-mode -1))
-
-(when (fboundp #'scroll-bar-mode)
-  (scroll-bar-mode -1))
 
 (provide 'early-init)
 ;;; early-init.el ends here
