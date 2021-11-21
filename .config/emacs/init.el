@@ -1413,68 +1413,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
 
-(use-package eros
-  :straight (:host github
-             :repo "andreyorst/eros"
-             :branch "general-purpose-api")
-  :hook ((emacs-lisp-mode . eros-mode)
-         (fennel-mode . enable-fennel-eros))
-  :defines inferior-lisp-prompt
-  :functions inferior-lisp-proc
-  :config
-  (defun enable-fennel-eros ()
-    "Enable mappings for evaluation overlays in fennel-mode."
-    (local-set-key (kbd "C-M-x") #'fennel-eval-defun)
-    (local-set-key (kbd "C-x C-e") #'fennel-eval-last-sexp))
-
-  (defun fennel-eval-to-string (sexp)
-    "Send SEXP to the inferior lisp process, return result as a string."
-    (condition-case nil
-        (let ((sexp (string-trim (substring-no-properties sexp)))
-              (buf (get-buffer-create "*fennel-eval*"))
-              (prompt inferior-lisp-prompt)
-              (proc (inferior-lisp-proc)))
-          (with-current-buffer buf
-            (erase-buffer)
-            (let ((comint-prompt-regexp prompt))
-              (comint-redirect-send-command-to-process sexp buf proc t t))
-            (accept-process-output proc)
-            (ignore-errors ; apply font-locking if the result is balanced
-              (setq-local delay-mode-hooks t)
-              (setq delayed-mode-hooks nil)
-              (check-parens)
-              (fennel-mode)
-              (font-lock-fontify-region (point-min) (point-max)))
-            (let* ((contents (thread-last
-                               (buffer-string)
-                               (replace-regexp-in-string "^ +" "")
-                               (string-replace "\n" " ")
-                               (string-replace "\t" ", ")
-                               string-trim))
-                   (contents (if (string-empty-p contents)
-                                 "#<no values>"
-                               contents)))
-              (message "%s" contents)
-              contents)))
-      (error "nil")))
-
-  (defun fennel-eval-last-sexp ()
-    "Eval last s-expression and display the result in an overlay."
-    (interactive)
-    (when (inferior-lisp-proc)
-      (let ((sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
-        (eros-eval-overlay
-         (fennel-eval-to-string sexp)
-         (point)))))
-
-  (defun fennel-eval-defun ()
-    "Eval defun and display the result in an overlay."
-    (interactive)
-    (when (inferior-lisp-proc)
-      (eros-eval-overlay
-       (fennel-eval-to-string (thing-at-point 'defun t))
-       (save-excursion (end-of-defun) (point))))))
-
 (use-package erc
   :straight nil
   :defer
