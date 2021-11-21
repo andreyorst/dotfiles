@@ -1476,6 +1476,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
        (save-excursion (end-of-defun) (point))))))
 
 (use-package erc
+  :straight nil
+  :defer
   :custom
   (erc-nick '("andreyorst" "aorst"))
   (erc-autojoin-channels-alist '(("libera.chat" "#clojure" "#fennel" "#lua" "#lisp" "#erlang" "#elixir" "#emacs")))
