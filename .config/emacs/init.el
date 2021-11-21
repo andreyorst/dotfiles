@@ -962,6 +962,10 @@ for module name."
   :custom
   (csv-align-max-width 80))
 
+(use-package erlang)
+
+(use-package elixir-mode)
+
 ;;; Tools
 
 (use-package help
