@@ -109,6 +109,8 @@ Used in various places to avoid getting wrong line height when
                  (kill-new password))
         password)))
 
+  (defmacro comment (&rest _))
+
   (provide 'functions))
 
 (use-package common-lisp-modes-mode
@@ -920,8 +922,6 @@ for module name."
   :commands (sly-symbol-completion-mode sly-completing-read)
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :config
-  (when (fboundp #'sly-completing-read)
-    (fset 'sly-completing-read 'completing-read))
   (sly-symbol-completion-mode -1))
 
 (use-package racket-mode
