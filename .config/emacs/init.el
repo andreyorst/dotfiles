@@ -766,6 +766,62 @@ for module name."
           (funcall-interactively 'fennel-reload nil)
         (funcall-interactively 'fennel-reload t)))))
 
+(use-package fennel-scratch
+  :straight nil
+  :hook (fennel-interaction-mode . common-lisp-modes-mode)
+  :preface
+  (require 'fennel-mode)
+
+  (defvar fennel-scratch-mode-map
+    (let ((map (make-sparse-keymap)))
+      (set-keymap-parent map fennel-mode-map)
+      (define-key map "\C-j" 'fennel-eval-print-last-sexp)
+      map)
+    "Keymap for Lisp Interaction mode.
+All commands in `lisp-mode-shared-map' are inherited by this map.")
+
+  (defun fennel-scratch ()
+    (interactive)
+    (set-buffer (fennel-scratch-buffer))
+    (unless (eq (current-buffer) (window-buffer))
+      (pop-to-buffer (current-buffer) t)))
+
+  (defun fennel-scratch-buffer ()
+    "Return the scratch buffer, create it if necessary."
+    (or (get-buffer "*fennel-scratch*")
+        (with-current-buffer (get-buffer-create "*fennel-scratch*")
+          (prog1 (current-buffer)
+	    (fennel-mode)
+	    (use-local-map fennel-scratch-mode-map)
+	    (fennel-repl--start)))))
+
+  (defun fennel-eval-to-string (sexp)
+    "Send SEXP to the inferior lisp process, return result as a string."
+    (let ((sexp (string-trim (substring-no-properties sexp)))
+          (buf (get-buffer-create "*fennel-eval*"))
+          (prompt inferior-lisp-prompt)
+          (proc (inferior-lisp-proc)))
+      (with-current-buffer buf
+        (erase-buffer)
+        (let ((comint-prompt-regexp prompt))
+          (comint-redirect-send-command-to-process sexp buf proc t t))
+        (accept-process-output proc)
+        (let ((contents (string-trim (buffer-string))))
+          (unless (string-empty-p contents)
+            contents)))))
+
+  (defun fennel-eval-print-last-sexp ()
+    "Eval last s-expression and display the result in an overlay."
+    (interactive)
+    (when (inferior-lisp-proc)
+      (let ((standard-output (current-buffer))
+            (sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
+        (terpri)
+        (insert (fennel-eval-to-string sexp))
+        (terpri))))
+
+  (provide 'fennel-scratch))
+
 (use-package clojure-mode
   :hook ((clojure-mode
           clojurec-mode
