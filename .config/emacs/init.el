@@ -777,10 +777,11 @@ for module name."
       (set-keymap-parent map fennel-mode-map)
       (define-key map "\C-j" 'fennel-eval-print-last-sexp)
       map)
-    "Keymap for Lisp Interaction mode.
-All commands in `lisp-mode-shared-map' are inherited by this map.")
+    "Keymap for *fennel-scratch* buffer.
+All commands in `fennel-mode-map' are inherited by this map.")
 
   (defun fennel-scratch ()
+    "Create or open an existing scratch buffer for Fennel evaluation."
     (interactive)
     (set-buffer (fennel-scratch-buffer))
     (unless (eq (current-buffer) (window-buffer))
@@ -813,12 +814,11 @@ All commands in `lisp-mode-shared-map' are inherited by this map.")
   (defun fennel-eval-print-last-sexp ()
     "Eval last s-expression and display the result in an overlay."
     (interactive)
-    (when (inferior-lisp-proc)
-      (let ((standard-output (current-buffer))
-            (sexp (buffer-substring (save-excursion (backward-sexp) (point)) (point))))
-        (terpri)
-        (insert (fennel-eval-to-string sexp))
-        (terpri))))
+    (let ((sexp (buffer-substring (save-excursion
+                                    (backward-sexp)
+                                    (point))
+                                  (point))))
+      (insert "\n" (fennel-eval-to-string sexp) "\n")))
 
   (provide 'fennel-scratch))
 
