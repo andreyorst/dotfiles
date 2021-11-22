@@ -772,6 +772,16 @@ for module name."
   :preface
   (require 'fennel-mode)
 
+  (defcustom fennel-scratch-message (purecopy "\
+;; This buffer is for Fennel evaluation.
+;; Use \\[fennel-eval-print-last-sexp] after the expression to evaluate it and insert the result.
+
+")
+    "Initial documentation displayed in *scratch* buffer at startup.
+If this is nil, no message will be displayed."
+    :type '(choice (text :tag "Message")
+		   (const :tag "none" nil)))
+
   (defvar fennel-scratch-mode-map
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map fennel-mode-map)
@@ -780,21 +790,23 @@ for module name."
     "Keymap for *fennel-scratch* buffer.
 All commands in `fennel-mode-map' are inherited by this map.")
 
-  (defun fennel-scratch ()
+  (defun fennel-scratch (&optional ask-for-command?)
     "Create or open an existing scratch buffer for Fennel evaluation."
-    (interactive)
-    (set-buffer (fennel-scratch-buffer))
+    (interactive "P")
+    (set-buffer (fennel-scratch-buffer ask-for-command?))
     (unless (eq (current-buffer) (window-buffer))
       (pop-to-buffer (current-buffer) t)))
 
-  (defun fennel-scratch-buffer ()
+  (defun fennel-scratch-buffer (ask-for-command?)
     "Return the scratch buffer, create it if necessary."
     (or (get-buffer "*fennel-scratch*")
         (with-current-buffer (get-buffer-create "*fennel-scratch*")
           (prog1 (current-buffer)
 	    (fennel-mode)
 	    (use-local-map fennel-scratch-mode-map)
-	    (fennel-repl--start)))))
+            (when fennel-scratch-message
+              (insert (substitute-command-keys fennel-scratch-message)))
+	    (fennel-repl--start ask-for-command?)))))
 
   (defun fennel-eval-to-string (sexp)
     "Send SEXP to the inferior lisp process, return result as a string."
