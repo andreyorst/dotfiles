@@ -64,14 +64,14 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-# if file was not specified or not found continuously ask for
-# vile via user input.
-while [ -z "$file" ] || [ ! -e "$file" ]; do
-    [ -n "$file" ] && printf "No such file '%s'\n" "$file" >&2
-    printf "Please specify a file: " >&2
-    read -r file
-    file=$(echo file | sed "s/~/$HOME/")
-done
+
+if [ -n "$file" ] && [ ! -e "$file" ]; then
+    printf "Password file is not found\n" >&2
+    exit 1
+elif [ -z "$file" ]; then
+    printf "Please specify a password file.\nSee -help for more info" >&2
+    exit 1
+fi
 
 eval "set -- $args"
 if [ $# -lt 1 ]; then
