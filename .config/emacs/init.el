@@ -111,6 +111,18 @@ Used in various places to avoid getting wrong line height when
                  (kill-new password))
         password)))
 
+  (defun indirect-narrow-to-defun ()
+    (interactive)
+    (clone-indirect-buffer (buffer-name) t t)
+    (narrow-to-defun))
+
+  (defun indirect-narrow-to-region ()
+    (interactive)
+    (let ((beg (mark))
+          (end (point)))
+      (clone-indirect-buffer (buffer-name) t t)
+      (narrow-to-region beg end)))
+
   (defmacro comment (&rest _))
 
   (provide 'functions))
