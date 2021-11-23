@@ -1017,10 +1017,10 @@ for module name."
             (executable-find "hunspell"))
   :hook (((org-mode git-commit-mode markdown-mode) . flyspell-mode)
          (prog-mode . flyspell-prog-mode-maybe))
-  :custom
+  :config
   (defun flyspell-prog-mode-maybe ()
     (unless (memq major-mode '(lisp-interaction-mode))
-      (flyspel-prog-mode))))
+      (flyspell-prog-mode))))
 
 (use-package flycheck
   :defines (flymake-error-bitmap
