@@ -904,7 +904,13 @@ for module name."
 
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE and a newline after it."
-    (format "%s\n" namespace)))
+    (format "%s\n> " namespace))
+
+  (defun cider-repl-break-long-prompt (namespace)
+    "Return a prompt string that mentions NAMESPACE and a newline after it."
+    (if (> (length namespace) 42)
+        (format "%s\n> " namespace)
+      (format "%s> " namespace))))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
