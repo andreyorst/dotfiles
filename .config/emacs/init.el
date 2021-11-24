@@ -1254,7 +1254,7 @@ means save all with no questions."
     (interactive "P")
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
-      (save-some-buffers arg pred))))
+      (funcall-interactively #'save-some-buffers arg pred))))
 
 (use-package server
   :straight nil
