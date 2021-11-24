@@ -1439,14 +1439,17 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :straight nil
   :defer
   :custom
-  (erc-nick '("andreyorst" "aorst"))
+  (erc-nick '("andreyorst_erc" "aorst_erc"))
+  (erc-port 6667)
+  (erc-server "irc.libera.chat")
   (erc-autojoin-channels-alist '(("libera.chat" "#clojure" "#fennel" "#lua" "#lisp" "#erlang" "#elixir" "#emacs")))
   (erc-log-insert-log-on-open t)
-  (erc-nick-uniquifier "_erc")
+  (erc-nick-uniquifier "_")
   (erc-user-full-name user-full-name)
   (erc-log-mode t)
   :config
-  (setq erc-password (getpasswd "libera.chat")))
+  ;; (setq erc-password (getpasswd "libera.chat"))
+  )
 
 (provide 'init)
 ;;; init.el ends here
