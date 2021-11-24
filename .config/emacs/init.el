@@ -554,7 +554,7 @@ are defining or executing a macro."
   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                        company-preview-frontend
                        company-echo-metadata-frontend))
-  (company-backends '(company-capf company-files company-dabbrev-code))
+  (company-backends '((company-capf company-dabbrev-code) company-files))
   (company-tooltip-minimum-width 30)
   (company-tooltip-maximum-width 120)
   (company-icon-size local-config-line-pixel-height))
