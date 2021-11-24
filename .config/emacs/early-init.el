@@ -50,15 +50,6 @@
   (defvar native-comp-async-report-warnings-errors)
   (setq native-comp-async-report-warnings-errors nil))
 
-(unless (or (daemonp) noninteractive)
-  (setq-default inhibit-redisplay t
-                inhibit-message t)
-  (add-hook 'window-setup-hook
-            (lambda ()
-              (setq-default inhibit-redisplay nil
-                            inhibit-message nil)
-              (redisplay))))
-
 ;;; Straight
 
 (defvar straight-process-buffer)
