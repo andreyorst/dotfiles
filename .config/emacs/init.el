@@ -396,6 +396,12 @@ are defining or executing a macro."
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
+(use-package bindings
+  :straight nil
+  :bind (:map narrow-map
+         ("i d" . indirect-narrow-to-defun)
+         ("i n" . indirect-narrow-to-region)))
+
 ;;; UI
 
 (use-package frame
@@ -1453,6 +1459,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (erc-nick-uniquifier "_")
   (erc-user-full-name user-full-name)
   (erc-log-mode t)
+  (erc-join-buffer 'bury)
   :config
   ;; (setq erc-password (getpasswd "libera.chat"))
   )
