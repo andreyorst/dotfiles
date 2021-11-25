@@ -1199,19 +1199,8 @@ nil."
   (lsp-enable-text-document-color nil)
 
   ;; completion
-  (lsp-completion-show-kind nil))
-
-(use-package lsp-lens
-  :straight nil
-  :defer
-  :custom
-  (lsp-lens-enable t)
-  (lsp-lens-place-position 'end-of-line)
-  :config
-  (define-advice widen (:after (&rest _))
-    (lsp-lens-refresh t))
-  (define-advice narrow-to-region (:after (&rest _))
-    (lsp-lens-refresh t)))
+  (lsp-completion-show-kind nil)
+  (lsp-enable-snippet nil))
 
 (use-package lsp-java
   :requires lsp-mode
