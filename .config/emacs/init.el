@@ -398,7 +398,9 @@ are defining or executing a macro."
 
 (use-package bindings
   :straight nil
-  :bind (:map narrow-map
+  :bind (:map ctl-x-map
+         ("C-d" . dired-jump)
+         :map narrow-map
          ("i d" . indirect-narrow-to-defun)
          ("i n" . indirect-narrow-to-region)))
 
@@ -1128,6 +1130,8 @@ nil."
 
 (use-package undo-tree
   :commands global-undo-tree-mode
+  :bind (("C-z" . #'undo-tree-undo)
+         ("C-S-z" . #'undo-tree-redo))
   :custom
   (undo-tree-visualizer-relative-timestamps nil)
   (undo-tree-visualizer-timestamps nil)
@@ -1227,9 +1231,12 @@ nil."
   :config
   (unless (boundp 'project-switch-commands)
     (defvar project-switch-commands nil))
-  (defvar project-root-markers
+
+  (defcustom project-root-markers
     '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
-    "Files or directories that indicate the root of a project.")
+    "Files or directories that indicate the root of a project."
+    :type '(repeat string)
+    :group 'project)
 
   (defun project-root-p (path)
     "Check if current PATH has any of project root markers."
@@ -1248,12 +1255,12 @@ nil."
 
   (add-to-list 'project-find-functions #'project-find-root)
 
-  (define-advice project-compile (:around (fn &rest args))
+  (define-advice project-compile (:around (fn))
     "Only ask to save project related buffers."
     (let* ((project-buffers (project-buffers (project-current)))
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
-      (apply fn args)))
+      (funcall fn)))
 
   (defun project-save-some-buffers (&optional arg)
     "Save some modified file-visiting buffers in current project.
@@ -1291,7 +1298,7 @@ means save all with no questions."
 (use-package recentf
   :straight nil
   :custom
-  (recentf-max-menu-items 50)
+  (recentf-max-menu-items 100)
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\")
   (recentf-mode))
@@ -1304,7 +1311,7 @@ means save all with no questions."
   (dumb-jump-selector 'completing-read)
   :config
   (defun dumb-jump-add-xref-backend ()
-    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t t)))
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)))
 
 (use-package which-key
   :commands which-key-mode
