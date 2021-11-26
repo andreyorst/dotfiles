@@ -1411,6 +1411,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package dired
   :straight nil
+  :bind (:map dired-mode-map
+         ("<backspace>" . dired-up-directory))
   :custom
   (dired-listing-switches "-al --group-directories-first"))
 
