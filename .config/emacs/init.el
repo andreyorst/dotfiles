@@ -899,7 +899,7 @@ for module name."
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
-  (cider-repl-prompt-function #'cider-repl-prompt-newline)
+  (cider-repl-prompt-function #'cider-repl-break-long-prompt)
   :config
   (setq cider-jdk-src-paths nil)
 
