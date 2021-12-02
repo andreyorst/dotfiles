@@ -1301,6 +1301,9 @@ means save all with no questions."
   (recentf-max-menu-items 100)
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\")
+  (dolist (dir (list (expand-file-name ".cache/" user-emacs-directory)
+                     (expand-file-name "workspace/.cache/" user-emacs-directory)))
+    (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*")))
   (recentf-mode))
 
 (use-package dumb-jump
@@ -1469,6 +1472,11 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :config
   ;; (setq erc-password (getpasswd "libera.chat"))
   )
+
+(use-package aoc
+  :straight (:host github
+             :repo "pkulev/aoc.el"
+             :branch "main"))
 
 (provide 'init)
 ;;; init.el ends here
