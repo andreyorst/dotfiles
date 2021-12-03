@@ -174,8 +174,8 @@ lisp-modes mode.
    auto-window-vscroll nil
    mouse-highlight nil
    hscroll-step 1
-   hscroll-margin 1
-   scroll-margin 1
+   hscroll-margin 0
+   scroll-margin 0
    scroll-preserve-screen-position nil)
 
   (when (window-system)
@@ -592,6 +592,13 @@ are defining or executing a macro."
                        outline-mode-hook
                        prog-mode-hook))
     (add-hook mode-hook #'formfeed-make-display-line)))
+
+(use-package pixel-scroll
+  :straight nil
+  :when (featurep 'xinput2)
+  :config
+  (when (fboundp #'pixel-scroll-precision-mode)
+    (pixel-scroll-precision-mode 1)))
 
 ;;; Languages
 
@@ -1330,8 +1337,8 @@ means save all with no questions."
   :straight nil
   :hook (prog-mode . show-paren-mode)
   :custom
-  (show-paren-delay 0)
-  (show-paren-when-point-in-periphery t))
+  (show-paren-delay 0.125)
+  (show-paren-when-point-in-periphery nil))
 
 (use-package vc-hooks
   :straight nil
