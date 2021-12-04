@@ -697,6 +697,8 @@ are defining or executing a macro."
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
 
+(use-package geiser-guile)
+
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
