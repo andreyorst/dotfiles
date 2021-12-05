@@ -174,8 +174,8 @@ lisp-modes mode.
    auto-window-vscroll nil
    mouse-highlight nil
    hscroll-step 1
-   hscroll-margin 0
-   scroll-margin 0
+   hscroll-margin 1
+   scroll-margin 1
    scroll-preserve-screen-position nil)
 
   (when (window-system)
