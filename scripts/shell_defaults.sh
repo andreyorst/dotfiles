@@ -18,11 +18,6 @@ alias lispwrap="rlwrap -r -q'\"' -b \"(){}[],^%#@\\\";:'\""
 
 [ -n "$(command -v tmux)" ] && alias tmux="tmux new-session -d -s \>_ 2>/dev/null; tmux new-session -t \>_ \; set-option destroy-unattached"
 
-# Edit things in apropriate environment
-alias tmuxconf="\$EDITOR ~/.tmux.conf"
-alias kakconf="kak ~/.dotfiles/.config/kak/kakrc"
-alias emacsconf="emacs ~/.dotfiles/.config/emacs/init.el"
-
 if [ -n "$(command -v dash)" ]; then
     KAKOUNE_POSIX_SHELL="$(command -v dash)"
     export KAKOUNE_POSIX_SHELL
@@ -30,16 +25,9 @@ fi
 
 alias less="less --tabs 3 -RF"
 
-if [ -n "$(command -v exa)" ]; then
-    alias ls="exa"
-    alias la="exa -la"
-    alias l="exa -l"
-    alias ll="exa -l"
-else
-    alias ll="ls -l"
-    alias l="ls -l"
-    alias la="ls -la"
-fi
+alias ll="ls -l"
+alias l="ls -l"
+alias la="ls -la"
 
 if [ -n "$(command -v emacs)" ]; then
     export EDITOR="command emacs -nw"
@@ -56,11 +44,6 @@ HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 HISTSIZE=100000
 HISTFILESIZE=10000000
 shopt -s histappend
-
-emacsupdate() {
-    emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(straight-pull-all)';
-    emacs --batch --load ~/.dotfiles/.config/emacs/init.el --eval '(straight-rebuild-all)';
-}
 
 # create dir and cd into it
 mkcd() { mkdir -p "$1" && cd "$1" || return $?; }
@@ -159,4 +142,4 @@ sepcat() {
 # Handy when you want to see the progress.
 ccp() { eval curl -o "$2" FILE://"$1"; }
 
-tunnel() { ssh -N -L "$1":localhost:"$1" "$2" & }
+ssh-tunnel() { ssh -N -L "$1":localhost:"$1" "$2" & }

@@ -2,7 +2,7 @@
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
-;; Homepage: https://gitlab.com/andreyorst/dotfiles/
+;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
 ;; Emacs config.
@@ -51,13 +51,10 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     :type 'symbol
     :group 'local-config)
 
-  (defcustom local-config-line-pixel-height (line-pixel-height)
+  (defvar local-config-line-pixel-height (line-pixel-height)
     "Line height in pixels.
 Used in various places to avoid getting wrong line height when
-`text-scale-mode' is active."
-    :tag "Line pixel height"
-    :type 'number
-    :group 'local-config)
+`text-scale-mode' is active.")
 
   (provide 'local-config))
 
@@ -85,32 +82,6 @@ Used in various places to avoid getting wrong line height when
           (when (looking-at "^$")
             (backward-delete-char 1))))))
 
-  (defun getpasswd (service)
-    (interactive "sservice: ")
-    (let* ((command (format "getpasswd -p %s" service))
-           (result (string-trim (shell-command-to-string command))))
-      (if (string-match-p "^.*not found" result)
-          (when (not (or executing-kbd-macro noninteractive))
-            (message "password for %s is not found" service))
-        (let ((password (replace-regexp-in-string "^[^:]+: " "" result)))
-          (if (not (or executing-kbd-macro noninteractive))
-              (progn (message "password for %s saved in the kill ring" service)
-                     (kill-new password))
-            password)))))
-
-  (defun genpasswd (&optional length allowed)
-    (interactive "slength: \nsallowed chars: ")
-    (let* ((command (format "genpasswd %s %s"
-                            (if (and (stringp length)) length "")
-                            (if (and (stringp allowed) (not (string-empty-p allowed)))
-                                (format "-a %s" allowed)
-                              "")))
-           (password (string-trim (shell-command-to-string command))))
-      (if (not (or executing-kbd-macro noninteractive))
-          (progn (message "password is saved in the kill ring")
-                 (kill-new password))
-        password)))
-
   (defun indirect-narrow-to-defun ()
     (interactive)
     (clone-indirect-buffer (buffer-name) t t)
@@ -123,14 +94,15 @@ Used in various places to avoid getting wrong line height when
       (clone-indirect-buffer (buffer-name) t t)
       (narrow-to-region beg end)))
 
-  (defmacro comment (&rest _))
+  (defmacro comment (&rest _)
+    nil)
 
   (provide 'functions))
 
 (use-package common-lisp-modes-mode
   :straight nil
-  :bind (:map common-lisp-modes-mode-map
-         ("M-q" . common-lisp-modes-indent-or-fill-sexp))
+  :bind ( :map common-lisp-modes-mode-map
+          ("M-q" . common-lisp-modes-indent-or-fill-sexp))
   :preface
   (define-minor-mode common-lisp-modes-mode
     "Mode for enabling all modes that are common for lisps.
@@ -187,7 +159,8 @@ lisp-modes mode.
   (setq
    ring-bell-function 'ignore
    mode-line-percent-position nil
-   enable-recursive-minibuffers t)
+   enable-recursive-minibuffers t
+   mode-line-compact t)
 
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
@@ -387,8 +360,8 @@ are defining or executing a macro."
 
 (use-package minibuffer
   :straight nil
-  :bind (:map minibuffer-inactive-mode-map
-         ("<mouse-1>" . ignore))
+  :bind ( :map minibuffer-inactive-mode-map
+          ("<mouse-1>" . ignore))
   :custom
   (completion-styles '(partial-completion basic))
   (read-buffer-completion-ignore-case t)
@@ -398,11 +371,11 @@ are defining or executing a macro."
 
 (use-package bindings
   :straight nil
-  :bind (:map ctl-x-map
-         ("C-d" . dired-jump)
-         :map narrow-map
-         ("i d" . indirect-narrow-to-defun)
-         ("i n" . indirect-narrow-to-region)))
+  :bind ( :map ctl-x-map
+          ("C-d" . dired-jump)
+          :map narrow-map
+          ("i d" . indirect-narrow-to-defun)
+          ("i n" . indirect-narrow-to-region)))
 
 ;;; UI
 
@@ -421,8 +394,8 @@ are defining or executing a macro."
       (:around (fn buffer-or-name &optional norecord))
     "Clone fame parameters when switching to other frame."
     (let* ((default-frame-alist
-             (seq-remove (lambda (elem) (eq (car elem) 'name))
-                         (frame-parameters (selected-frame)))))
+            (seq-remove (lambda (elem) (eq (car elem) 'name))
+                        (frame-parameters (selected-frame)))))
       (funcall-interactively fn buffer-or-name norecord))))
 
 (use-package startup
@@ -513,8 +486,8 @@ are defining or executing a macro."
 
 (use-package vertico
   :commands vertico-mode
-  :bind (:map vertico-map
-         ("M-RET" . vertico-exit-input))
+  :bind ( :map vertico-map
+          ("M-RET" . vertico-exit-input))
   :init
   (vertico-mode))
 
@@ -528,31 +501,31 @@ are defining or executing a macro."
   :preface
   (defvar consult-prefix-map (make-sparse-keymap))
   (fset 'consult-prefix-map consult-prefix-map)
-  :bind (:map ctl-x-map
-         ("c" . consult-prefix-map)
-         :map consult-prefix-map
-         ("r" . consult-recent-file)
-         ("o" . consult-outline)
-         ("i" . consult-imenu)
-         ("g" . consult-grep))
+  :bind ( :map ctl-x-map
+          ("c" . consult-prefix-map)
+          :map consult-prefix-map
+          ("r" . consult-recent-file)
+          ("o" . consult-outline)
+          ("i" . consult-imenu)
+          ("g" . consult-grep))
   :custom
   (consult-preview-key nil)
   :init
   (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package company
-  :bind (:map company-mode-map
-         ([remap completion-at-point] . company-complete)
-         ("M-/" . company-complete)
-         :map company-active-map
-         ("TAB" . company-complete-common-or-cycle)
-         ("<tab>" . company-complete-common-or-cycle)
-         ("<S-Tab>" . company-select-previous)
-         ("<backtab>" . company-select-previous)
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous)
-         ("C-d" . company-show-doc-buffer)
-         ("M-." . company-show-location))
+  :bind ( :map company-mode-map
+          ([remap completion-at-point] . company-complete)
+          ("M-/" . company-complete)
+          :map company-active-map
+          ("TAB" . company-complete-common-or-cycle)
+          ("<tab>" . company-complete-common-or-cycle)
+          ("<S-Tab>" . company-select-previous)
+          ("<backtab>" . company-select-previous)
+          ("C-n" . company-select-next)
+          ("C-p" . company-select-previous)
+          ("C-d" . company-show-doc-buffer)
+          ("M-." . company-show-location))
   :hook (after-init . global-company-mode)
   :custom
   (company-idle-delay 0)
@@ -605,21 +578,21 @@ are defining or executing a macro."
 (use-package org
   :straight (:type built-in)
   :hook ((org-capture-mode org-src-mode) . discard-history)
-  :bind (:map org-mode-map
-         ("M-Q" . split-pararagraph-into-lines)
-         ("C-c l" . org-store-link))
+  :bind ( :map org-mode-map
+          ("M-Q" . split-pararagraph-into-lines)
+          ("C-c l" . org-store-link))
   :custom-face
   (org-block ((t (:extend t))))
-  (org-block-begin-line ((t (:slant unspecified
-                             :weight normal
-                             :background unspecified
-                             :inherit org-block
-                             :extend t))))
-  (org-block-end-line ((t (:slant unspecified
-                           :weight normal
-                           :background unspecified
-                           :inherit org-block-begin-line
-                           :extend t))))
+  (org-block-begin-line ((t ( :slant unspecified
+                              :weight normal
+                              :background unspecified
+                              :inherit org-block
+                              :extend t))))
+  (org-block-end-line ((t ( :slant unspecified
+                            :weight normal
+                            :background unspecified
+                            :inherit org-block-begin-line
+                            :extend t))))
   (org-drawer ((t (:foreground nil :inherit shadow))))
   :custom
   (org-startup-with-inline-images nil)
@@ -683,8 +656,8 @@ are defining or executing a macro."
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :bind (:map markdown-mode-map
-         ("M-Q" . split-pararagraph-into-lines))
+  :bind ( :map markdown-mode-map
+          ("M-Q" . split-pararagraph-into-lines))
   :custom
   (markdown-fontify-code-blocks-natively t)
   (markdown-command "pandoc")
@@ -702,66 +675,15 @@ are defining or executing a macro."
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
-         (emacs-lisp-mode . common-lisp-modes-mode)
-         (emacs-lisp-mode . emacs-lisp-setup))
-  :config
-  (defvar calculate-lisp-indent-last-sexp)
-
-  (defun emacs-lisp-indent-function (indent-point state)
-    "A replacement for `lisp-indent-function'.
-Indents plists more sensibly. Adapted from DOOM Emacs:
-https://github.com/hlissner/doom-emacs/blob/bf8495b4/modules/lang/emacs-lisp/autoload.el#L110"
-    (let ((normal-indent (current-column))
-          (orig-point (point))
-          target)
-      (goto-char (1+ (elt state 1)))
-      (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
-      (cond ((and (elt state 2)
-                  (or (not (looking-at-p "\\sw\\|\\s_"))
-                      (eq (char-after) ?:)))
-             (unless (> (save-excursion (forward-line 1) (point))
-                        calculate-lisp-indent-last-sexp)
-               (goto-char calculate-lisp-indent-last-sexp)
-               (beginning-of-line)
-               (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t))
-             (backward-prefix-chars)
-             (current-column))
-            ((and (save-excursion
-                    (goto-char indent-point)
-                    (skip-syntax-forward " ")
-                    (not (eq (char-after) ?:)))
-                  (save-excursion
-                    (goto-char orig-point)
-                    (and (eq (char-after) ?:)
-                         (eq (char-before) ?\()
-                         (setq target (current-column)))))
-             (save-excursion
-               (move-to-column target t)
-               target))
-            ((let* ((function (buffer-substring (point) (progn (forward-sexp 1) (point))))
-                    (method (or (function-get (intern-soft function) 'lisp-indent-function)
-                                (get (intern-soft function) 'lisp-indent-hook))))
-               (cond ((or (eq method 'defun)
-                          (and (null method)
-                               (> (length function) 3)
-                               (string-match-p "\\`def" function)))
-                      (lisp-indent-defform state indent-point))
-                     ((integerp method)
-                      (lisp-indent-specform method state indent-point normal-indent))
-                     (method
-                      (funcall method indent-point state))))))))
-
-  (defun emacs-lisp-setup ()
-    (setq-local lisp-indent-function
-                #'emacs-lisp-indent-function)))
+         (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
   :commands (fennel-repl lisp-eval-string lisp-eval-last-sexp switch-to-lisp)
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
-  :bind (:map fennel-mode-map
-         ("C-c C-k" . eval-each-sexp)
-         ("M-." . xref-find-definitions)
-         ("M-," . xref-pop-marker-stack))
+  :bind ( :map fennel-mode-map
+          ("C-c C-k" . eval-each-sexp)
+          ("M-." . xref-find-definitions)
+          ("M-," . xref-pop-marker-stack))
   :config
   (put 'global 'fennel-indent-function 1)
   (put 'local 'fennel-indent-function 1)
@@ -888,8 +810,8 @@ for module name."
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode))
-  :bind (:map cider-repl-mode-map
-         ("C-c C-o" . cider-repl-clear-buffer))
+  :bind ( :map cider-repl-mode-map
+          ("C-c C-o" . cider-repl-clear-buffer))
   :custom-face
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   (cider-error-highlight-face ((t (:inherit flymake-error))))
@@ -1017,9 +939,9 @@ for module name."
 
 (use-package vterm
   :if (bound-and-true-p module-file-suffix)
-  :bind (:map vterm-mode-map
-         ("<insert>" . ignore)
-         ("<f2>" . ignore))
+  :bind ( :map vterm-mode-map
+          ("<insert>" . ignore)
+          ("<f2>" . ignore))
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1")))
@@ -1113,10 +1035,10 @@ nil."
          ((eval-expression-minibuffer-setup
            lisp-data-mode)
           . minibuffer-enable-sp))
-  :bind (:map smartparens-mode-map
-         ("C-M-q" . sp-indent-defun)
-         :map common-lisp-modes-mode-map
-         (";" . sp-comment))
+  :bind ( :map smartparens-mode-map
+          ("C-M-q" . sp-indent-defun)
+          :map common-lisp-modes-mode-map
+          (";" . sp-comment))
   :custom
   (sp-highlight-pair-overlay nil)
   (sp-highlight-wrap-overlay nil)
@@ -1176,65 +1098,12 @@ nil."
   :custom
   (ediff-split-window-function 'split-window-horizontally))
 
-(use-package lsp-mode
-  :hook (((c-mode
-           c++-mode
-           clojure-mode
-           clojurec-mode
-           clojurescript-mode)
-          . lsp)
-         (lsp-mode . yas-minor-mode))
-  :custom
-  ;; general settings
-  (lsp-keymap-prefix "C-c l")
-  (lsp-completion-provider :capf)
-  (lsp-diagnostics-provider :auto)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-log-io nil)
-  (lsp-keep-workspace-alive nil)
-  (lsp-idle-delay 0.05)
-
-  ;; DAP
-  (lsp-enable-dap-auto-configure nil)
-
-  ;; UI
-  (lsp-enable-links nil)
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-headerline-breadcrumb-icons-enable nil)
-  (lsp-modeline-code-actions-enable nil)
-
-  ;; semantic code features
-  (lsp-enable-folding nil)
-  (lsp-enable-indentation nil)
-  (lsp-semantic-tokens-enable nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-
-  ;; completion
-  (lsp-completion-show-kind nil)
-  (lsp-enable-snippet nil))
-
-(use-package lsp-java
-  :requires lsp-mode
-  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
-  :custom
-  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
-
-(use-package treemacs
-  :custom
-  (treemacs-no-png-images t))
-
-(use-package lsp-treemacs
-  :custom
-  (lsp-treemacs-theme "Iconless"))
-
 (use-package project
   :functions (project-root-p
               project-find-root)
   :commands (project-buffers project-compile)
-  :bind (:map project-prefix-map
-         ("s" . project-save-some-buffers))
+  :bind ( :map project-prefix-map
+          ("s" . project-save-some-buffers))
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :config
@@ -1289,14 +1158,14 @@ means save all with no questions."
 
 (use-package separedit
   :hook (separedit-buffer-creation . separedit-header-line-setup)
-  :bind (:map prog-mode-map
-         ("C-c '" . separedit)
-         :map separedit-mode-map
-         ("C-c C-c" . separedit-commit)
-         :map edit-indirect-mode-map
-         ("C-c '" . separedit))
+  :bind ( :map prog-mode-map
+          ("C-c '" . separedit)
+          :map separedit-mode-map
+          ("C-c C-c" . separedit-commit)
+          :map edit-indirect-mode-map
+          ("C-c '" . separedit))
   :custom
-  (separedit-default-mode 'gfm-mode)
+  (separedit-default-mode 'markdown-mode)
   :config
   (defun separedit-header-line-setup ()
     (setq-local
@@ -1337,10 +1206,7 @@ means save all with no questions."
 
 (use-package paren
   :straight nil
-  :hook (prog-mode . show-paren-mode)
-  :custom
-  (show-paren-delay 0.125)
-  (show-paren-when-point-in-periphery nil))
+  :hook (prog-mode . show-paren-mode))
 
 (use-package vc-hooks
   :straight nil
@@ -1348,9 +1214,9 @@ means save all with no questions."
   (vc-follow-symlinks t))
 
 (use-package isayt
-  :straight (:host gitlab
-             :repo "andreyorst/isayt.el"
-             :branch "main")
+  :straight ( :host gitlab
+              :repo "andreyorst/isayt.el"
+              :branch "main")
   :hook (common-lisp-modes-mode . isayt-mode))
 
 (use-package eldoc
@@ -1408,13 +1274,13 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package isearch
   :straight nil
-  :bind (:map isearch-mode-map
-         ("<backspace>" . isearch-del-char)
-         ("<left>" . isearch-edit-string)
-         ("<right>" . isearch-edit-string)
-         :map minibuffer-local-isearch-map
-         ("<left>" . backward-char)
-         ("<right>" . forward-char)))
+  :bind ( :map isearch-mode-map
+          ("<backspace>" . isearch-del-char)
+          ("<left>" . isearch-edit-string)
+          ("<right>" . isearch-edit-string)
+          :map minibuffer-local-isearch-map
+          ("<left>" . backward-char)
+          ("<right>" . forward-char)))
 
 (use-package esh-mode
   :straight nil
@@ -1423,8 +1289,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package dired
   :straight nil
-  :bind (:map dired-mode-map
-         ("<backspace>" . dired-up-directory))
+  :bind ( :map dired-mode-map
+          ("<backspace>" . dired-up-directory))
   :custom
   (dired-listing-switches "-al --group-directories-first"))
 
@@ -1483,9 +1349,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   )
 
 (use-package aoc
-  :straight (:host github
-             :repo "pkulev/aoc.el"
-             :branch "main"))
+  :straight ( :host github
+              :repo "pkulev/aoc.el"
+              :branch "main"))
 
 (provide 'init)
 ;;; init.el ends here

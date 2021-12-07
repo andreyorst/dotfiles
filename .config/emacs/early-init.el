@@ -2,7 +2,7 @@
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
-;; Homepage: https://gitlab.com/andreyorst/dotfiles
+;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
 ;; Emacs early initialization configuration.
