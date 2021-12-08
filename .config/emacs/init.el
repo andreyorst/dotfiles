@@ -160,7 +160,7 @@ lisp-modes mode.
    ring-bell-function 'ignore
    mode-line-percent-position nil
    enable-recursive-minibuffers t
-   mode-line-compact t)
+   mode-line-compact 'long)
 
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
@@ -737,63 +737,61 @@ for module name."
     (common-lisp-modes-mode)
     (flycheck-mode)))
 
-(use-package inf-clojure
+(use-package inferior-clojure
   :straight nil
   :requires (inf-lisp clojure-mode)
-  :hook ((inf-clojure-mode . common-lisp-modes-mode))
+  :hook ((inferior-clojure-mode . common-lisp-modes-mode))
   :preface
   (require 'inf-lisp)
   (require 'comint)
   (require 'clojure-mode)
 
-  (defgroup inf-clojure ()
+  (defgroup inferior-clojure ()
     "Support for interacting with Clojure via inferior process."
-    :prefix "inf-clojure-"
+    :prefix "inferior-clojure-"
     :group 'languages)
 
-  (defcustom inf-clojure-program "clojure"
-    "Path to the program used by `inf-clojure'"
+  (defcustom inferior-clojure-program "clojure"
+    "Path to the program used by `inferior-clojure'"
     :tag "Clojure CLI"
     :type 'string
-    :group 'inf-clojure)
+    :group 'inferior-clojure)
 
-  (defcustom inf-clojure-prompt "^[^=]+=> "
+  (defcustom inferior-clojure-prompt "^[^=]+=> "
     "Prompt regex for inferior Clojure."
     :tag "Prompt regexp"
     :type 'string
-    :group 'inf-clojure)
+    :group 'inferior-clojure)
 
-  (defun inf-clojure-indent-on-newline ()
+  (defun inferior-clojure-indent-on-newline ()
     (interactive)
     (let (electric-indent-mode)
       (newline-and-indent)))
 
-  (defun inf-clojure (&optional arg)
-    "Run an inferior instance of `inf-clojure' inside Emacs."
-    (interactive "p")
-    (let ((buffer (comint-check-proc "inf-clojure")))
-      (pop-to-buffer-same-window
-       (if (or buffer (not (derived-mode-p 'inf-clojure-mode))
-               (comint-check-proc (current-buffer)))
-           (get-buffer-create (or buffer "*inf-clojure*"))
-         (current-buffer)))
-      (unless buffer
-        (let* ((cmd (or (and (not (eq arg 1)) (read-from-minibuffer "Command: "))
-                        inf-clojure-program))
-               (cmdlist (if (fboundp #'split-string-shell-command)
-                            (split-string-shell-command cmd)
-                          ;; NOTE: Less accurate, may be problematic
-                          (split-string cmd))))
-          (apply 'make-comint-in-buffer "inf-clojure" buffer
-                 (car cmdlist) nil (cdr cmdlist))
-          (inf-clojure-mode)))))
+  (defun inferior-clojure (cmd)
+    "Run an inferior instance of `inferior-clojure' inside Emacs."
+    (interactive (list (if current-prefix-arg
+			   (read-string "Run Clojure: " inferior-clojure-program)
+		         inferior-clojure-program)))
+    (if (not (comint-check-proc "*inferior-clojure*"))
+        (let ((cmdlist (if (fboundp #'split-string-shell-command)
+                           (split-string-shell-command cmd)
+                         ;; NOTE: Less accurate, may be problematic
+                         (split-string cmd))))
+	  (set-buffer (apply (function make-comint)
+			     "inferior-clojure" (car cmdlist) nil (cdr cmdlist)))
+	  (inferior-clojure-mode)))
+    (setq inferior-lisp-buffer "*inferior-clojure*")
+    (pop-to-buffer-same-window "*inferior-clojure*"))
 
-  (define-derived-mode inf-clojure-mode inferior-lisp-mode "Inferior Clojure"
-    "Major mode for `inf-clojure'.
+  (defalias 'run-clojure 'inferior-clojure)
 
-\\<inf-clojure-mode-map>"
+  (define-derived-mode inferior-clojure-mode inferior-lisp-mode "Inferior Clojure"
+    "Major mode for `inferior-clojure'.
+
+\\<inferior-clojure-mode-map>"
     (setq-local font-lock-defaults '(clojure-font-lock-keywords t))
-    (setq-local inferior-lisp-prompt inf-clojure-prompt)
+    (setq-local inferior-lisp-prompt inferior-clojure-prompt)
     (setq-local lisp-indent-function 'clojure-indent-function)
     (setq-local lisp-doc-string-elt-property 'clojure-doc-string-elt)
     (setq-local comint-prompt-read-only t)
@@ -803,15 +801,15 @@ for module name."
     (set-syntax-table clojure-mode-syntax-table)
     (add-hook 'paredit-mode-hook #'clojure-paredit-setup nil t))
 
-  (define-key inf-clojure-mode-map (kbd "C-j") 'inf-clojure-indent-on-newline)
+  (define-key inferior-clojure-mode-map (kbd "C-j") 'inferior-clojure-indent-on-newline)
 
-  (provide 'inf-clojure))
+  (provide 'inferior-clojure))
 
 (use-package cider
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode))
   :bind ( :map cider-repl-mode-map
-          ("C-c C-o" . cider-repl-clear-buffer))
+          ("C-c C-S-o" . cider-repl-clear-buffer))
   :custom-face
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   (cider-error-highlight-face ((t (:inherit flymake-error))))
@@ -941,10 +939,17 @@ for module name."
   :if (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
-          ("<f2>" . ignore))
+          ("<f2>" . ignore)
+          :map project-prefix-map
+          ("t" . vterm-project-dir))
   :custom
   (vterm-always-compile-module t)
-  (vterm-environment '("VTERM=1")))
+  (vterm-environment '("VTERM=1"))
+  :config
+  (defun vterm-project-dir (&optional arg)
+    (interactive "P")
+    (let ((default-directory (project-root (project-current t))))
+      (funcall-interactively #'vterm arg))))
 
 (use-package editorconfig
   :commands editorconfig-mode
@@ -1330,23 +1335,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (defvar fernflower-path
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
-
-(use-package erc
-  :straight nil
-  :defer
-  :custom
-  (erc-nick '("andreyorst_erc" "aorst_erc"))
-  (erc-port 6667)
-  (erc-server "irc.libera.chat")
-  (erc-autojoin-channels-alist '(("libera.chat" "#clojure" "#fennel" "#lua" "#lisp" "#erlang" "#elixir" "#emacs")))
-  (erc-log-insert-log-on-open t)
-  (erc-nick-uniquifier "_")
-  (erc-user-full-name user-full-name)
-  (erc-log-mode t)
-  (erc-join-buffer 'bury)
-  :config
-  ;; (setq erc-password (getpasswd "libera.chat"))
-  )
 
 (use-package aoc
   :straight ( :host github
