@@ -513,38 +513,80 @@ are defining or executing a macro."
   :init
   (setq completion-in-region-function #'consult-completion-in-region))
 
-(use-package company
-  :bind ( :map company-mode-map
-          ([remap completion-at-point] . company-complete)
-          ("M-/" . company-complete)
-          :map company-active-map
-          ("TAB" . company-complete-common-or-cycle)
-          ("<tab>" . company-complete-common-or-cycle)
-          ("<S-Tab>" . company-select-previous)
-          ("<backtab>" . company-select-previous)
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)
-          ("C-d" . company-show-doc-buffer)
-          ("M-." . company-show-location))
-  :hook (after-init . global-company-mode)
-  :custom
-  (company-idle-delay 0)
-  (company-require-match 'never)
-  (company-minimum-prefix-length 2)
-  (company-tooltip-align-annotations t)
-  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-                       company-preview-frontend
-                       company-echo-metadata-frontend))
-  (company-backends '((company-capf company-dabbrev-code) company-files))
-  (company-tooltip-minimum-width 30)
-  (company-tooltip-maximum-width 120)
-  (company-icon-size local-config-line-pixel-height))
+;; (use-package company
+;;   :bind ( :map company-mode-map
+;;           ([remap completion-at-point] . company-complete)
+;;           ("M-/" . company-complete)
+;;           :map company-active-map
+;;           ("TAB" . company-complete-common-or-cycle)
+;;           ("<tab>" . company-complete-common-or-cycle)
+;;           ("<S-Tab>" . company-select-previous)
+;;           ("<backtab>" . company-select-previous)
+;;           ("C-n" . company-select-next)
+;;           ("C-p" . company-select-previous)
+;;           ("C-d" . company-show-doc-buffer)
+;;           ("M-." . company-show-location))
+;;   :hook (after-init . global-company-mode)
+;;   :custom
+;;   (company-idle-delay 0)
+;;   (company-require-match 'never)
+;;   (company-minimum-prefix-length 2)
+;;   (company-tooltip-align-annotations t)
+;;   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+;;                        company-preview-frontend
+;;                        company-echo-metadata-frontend))
+;;   (company-backends '((company-capf company-dabbrev-code) company-files))
+;;   (company-tooltip-minimum-width 30)
+;;   (company-tooltip-maximum-width 120)
+;;   (company-icon-size local-config-line-pixel-height))
 
-(use-package company-quickhelp
-  :hook (company-mode . company-quickhelp-mode)
+;; (use-package company-quickhelp
+;;   :hook (company-mode . company-quickhelp-mode)
+;;   :custom
+;;   (company-quickhelp-max-lines 13)
+;;   (company-quickhelp-use-propertized-text t))
+
+(use-package corfu
+  ;; Optional customizations
+  :bind ( :map corfu-map
+          ("TAB" . corfu-next)
+          ([tab] . corfu-next)
+          ("S-TAB" . corfu-previous)
+          ([backtab] . corfu-previous)
+          ([remap completion-at-point] . corfu-complete)
+          ("RET" . corfu-complete-and-quit))
   :custom
-  (company-quickhelp-max-lines 13)
-  (company-quickhelp-use-propertized-text t))
+  (corfu-cycle t)
+  (corfu-auto t)
+  (corfu-auto-prefix 1)
+  (corfu-auto-delay 0.01)
+  (corfu-preselect-first nil)
+  (corfu-preselect-first t)
+  (corfu-scroll-margin 4)
+  (corfu-quit-no-match t)
+  (corfu-quit-at-boundary t)
+  (corfu-max-width 42)
+  (corfu-min-width 42)
+  (corfu-count 9)
+  :config
+  (defun corfu-complete-and-quit ()
+    (interactive)
+    (corfu-complete)
+    (corfu-quit))
+  :init
+  (corfu-global-mode))
+
+(use-package kind-icon
+  :after corfu
+  :custom
+  (kind-icon-default-face 'corfu-default)
+  (kind-icon-use-icons nil)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file t))
 
 (use-package formfeed
   :straight nil
