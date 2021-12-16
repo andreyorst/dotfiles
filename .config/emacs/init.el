@@ -562,7 +562,6 @@ are defining or executing a macro."
   (corfu-auto t)
   (corfu-auto-prefix 1)
   (corfu-auto-delay 0.01)
-  (corfu-preselect-first nil)
   (corfu-preselect-first t)
   (corfu-scroll-margin 4)
   (corfu-quit-no-match t)
