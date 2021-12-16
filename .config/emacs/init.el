@@ -547,7 +547,9 @@ are defining or executing a macro."
 ;;   (company-quickhelp-use-propertized-text t))
 
 (use-package corfu
-  ;; Optional customizations
+  :straight ( :host github
+              :repo "minad/corfu"
+              :branch "main")
   :bind ( :map corfu-map
           ("TAB" . corfu-next)
           ([tab] . corfu-next)
@@ -565,9 +567,12 @@ are defining or executing a macro."
   (corfu-scroll-margin 4)
   (corfu-quit-no-match t)
   (corfu-quit-at-boundary t)
-  (corfu-max-width 42)
+  (corfu-max-width 100)
   (corfu-min-width 42)
   (corfu-count 9)
+  ;; should be configured in the `indent' package,but `indent.el'
+  ;; doesn't provide `indent'.
+  (tab-always-indent 'complete)
   :config
   (defun corfu-complete-and-quit ()
     (interactive)
@@ -576,13 +581,16 @@ are defining or executing a macro."
   :init
   (corfu-global-mode))
 
-(use-package kind-icon
-  :after corfu
-  :custom
-  (kind-icon-default-face 'corfu-default)
-  (kind-icon-use-icons nil)
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+;; (use-package kind-icon
+;;   :straight ( :host github
+;;               :repo "jdtsmith/kind-icon"
+;;               :branch "main")
+;;   :after corfu
+;;   :custom
+;;   (kind-icon-default-face 'corfu-default)
+;;   (kind-icon-use-icons nil)
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package cape
   :init
