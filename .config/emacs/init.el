@@ -177,12 +177,12 @@ lisp-modes mode.
   (provide 'font)
   :config
   (cond ((font-installed-p "JetBrainsMono")
-         (set-face-attribute 'default nil :font "JetBrainsMono 10"))
+         (set-face-attribute 'default nil :font "JetBrainsMono 12"))
         ((font-installed-p "Source Code Pro")
-         (set-face-attribute 'default nil :font "Source Code Pro 10")))
+         (set-face-attribute 'default nil :font "Source Code Pro 12")))
 
   (when (font-installed-p "DejaVu Sans")
-    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 10")))
+    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 12")))
 
 (use-package cus-edit
   :straight nil
@@ -617,7 +617,8 @@ are defining or executing a macro."
 
 (use-package pixel-scroll
   :straight nil
-  :when (featurep 'xinput2)
+  :when (or (featurep 'xinput2)
+            (featurep 'pgtk))
   :config
   (when (fboundp #'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode 1)))
