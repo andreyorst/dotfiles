@@ -177,12 +177,12 @@ lisp-modes mode.
   (provide 'font)
   :config
   (cond ((font-installed-p "JetBrainsMono")
-         (set-face-attribute 'default nil :font "JetBrainsMono 12"))
+         (set-face-attribute 'default nil :font "JetBrainsMono"))
         ((font-installed-p "Source Code Pro")
-         (set-face-attribute 'default nil :font "Source Code Pro 12")))
+         (set-face-attribute 'default nil :font "Source Code Pro")))
 
   (when (font-installed-p "DejaVu Sans")
-    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans 12")))
+    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans")))
 
 (use-package cus-edit
   :straight nil
