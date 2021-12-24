@@ -159,8 +159,7 @@ lisp-modes mode.
   (setq
    ring-bell-function 'ignore
    mode-line-percent-position nil
-   enable-recursive-minibuffers t
-   mode-line-compact 'long)
+   enable-recursive-minibuffers t)
 
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
@@ -879,6 +878,7 @@ for module name."
   (cider-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
   (cider-repl-prompt-function #'cider-repl-break-long-prompt)
+  (cider-enrich-classpath t)
   :config
   (setq cider-jdk-src-paths nil)
 
