@@ -99,6 +99,19 @@ Used in various places to avoid getting wrong line height when
 
   (provide 'functions))
 
+(use-package kmacro
+  :straight nil
+  :config
+  (defun block-undo (fn &rest args)
+    (let ((marker (prepare-change-group)))
+      (unwind-protect (apply fn args)
+        (undo-amalgamate-change-group marker))))
+
+  (dolist (f '(kmacro-call-macro
+               kmacro-exec-ring-item
+               apply-macro-to-region-lines))
+    (advice-add f :around #'block-undo)))
+
 (use-package common-lisp-modes-mode
   :straight nil
   :bind ( :map common-lisp-modes-mode-map
