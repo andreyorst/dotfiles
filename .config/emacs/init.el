@@ -31,31 +31,28 @@
     "Customization group for local settings."
     :prefix "local-config-"
     :group 'emacs)
-
   (defcustom local-config-title-show-bufname t
     "Whether to include bufname to titlebar.
+
 Bufname is not necessary on GNOME, but may be useful in other DEs."
     :type 'boolean
     :tag "Title bufname"
     :group 'local-config)
-
   (defcustom local-config-dark-theme 'modus-vivendi
     "Dark theme to use."
     :tag "Dark theme"
     :type 'symbol
     :group 'local-config)
-
   (defcustom local-config-light-theme 'modus-operandi
     "Light theme to use."
     :tag "Light theme"
     :type 'symbol
     :group 'local-config)
-
   (defvar local-config-line-pixel-height (line-pixel-height)
     "Line height in pixels.
+
 Used in various places to avoid getting wrong line height when
 `text-scale-mode' is active.")
-
   (provide 'local-config))
 
 (use-package functions
@@ -81,22 +78,18 @@ Used in various places to avoid getting wrong line height when
             (auto-fill-mode t))
           (when (looking-at "^$")
             (backward-delete-char 1))))))
-
   (defun indirect-narrow-to-defun ()
     (interactive)
     (clone-indirect-buffer (buffer-name) t t)
     (narrow-to-defun))
-
   (defun indirect-narrow-to-region ()
     (interactive)
     (let ((beg (mark))
           (end (point)))
       (clone-indirect-buffer (buffer-name) t t)
       (narrow-to-region beg end)))
-
   (defmacro comment (&rest _)
     nil)
-
   (provide 'functions))
 
 (use-package kmacro
@@ -106,7 +99,6 @@ Used in various places to avoid getting wrong line height when
     (let ((marker (prepare-change-group)))
       (unwind-protect (apply fn args)
         (undo-amalgamate-change-group marker))))
-
   (dolist (f '(kmacro-call-macro
                kmacro-exec-ring-item
                apply-macro-to-region-lines))
@@ -126,7 +118,6 @@ lisp-modes mode.
 \\<common-lisp-modes-mode-map>"
     :lighter " clmm"
     :keymap (make-sparse-keymap))
-
   (defun common-lisp-modes-indent-or-fill-sexp ()
     "Indent s-expression or fill string/comment."
     (interactive)
@@ -137,7 +128,6 @@ lisp-modes mode.
         (save-excursion
           (mark-sexp)
           (indent-region (point) (mark))))))
-
   (provide 'common-lisp-modes-mode))
 
 ;;; Inbuilt stuff
@@ -162,21 +152,17 @@ lisp-modes mode.
    hscroll-margin 1
    scroll-margin 1
    scroll-preserve-screen-position nil)
-
   (when (window-system)
     (setq-default
      x-gtk-use-system-tooltips nil
      cursor-type 'box
      cursor-in-non-selected-windows nil))
-
   (setq
    ring-bell-function 'ignore
    mode-line-percent-position nil
    enable-recursive-minibuffers t)
-
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
-
   (provide 'defaults))
 
 (use-package font
@@ -185,14 +171,12 @@ lisp-modes mode.
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
     (find-font (font-spec :name font-name)))
-
   (provide 'font)
   :config
   (cond ((font-installed-p "JetBrainsMono")
          (set-face-attribute 'default nil :font "JetBrainsMono"))
         ((font-installed-p "Source Code Pro")
          (set-face-attribute 'default nil :font "Source Code Pro")))
-
   (when (font-installed-p "DejaVu Sans")
     (set-face-attribute 'variable-pitch nil :font "DejaVu Sans")))
 
@@ -208,11 +192,9 @@ lisp-modes mode.
   :init
   (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
     "File to store disabled commands, that were enabled permamently.")
-
   (define-advice enable-command (:around (foo command))
     (let ((user-init-file disabled-commands))
       (funcall foo command)))
-
   (load disabled-commands :noerror))
 
 (use-package startup
@@ -256,9 +238,9 @@ lisp-modes mode.
   (mouse-wheel-progressive-speed nil)
   :init
   (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu)
-
   (defun truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
+
 Returns t if any line exceeds right border of the window.  Used
 for stopping scroll from going beyond the longest line.  Based on
 `so-long-detected-long-line-p'."
@@ -295,13 +277,11 @@ for stopping scroll from going beyond the longest line.  Based on
                           (and (eobp) (<= (- (point) start)
                                           threshold)))
                 (throw 'excessive t))))))))
-
   (define-advice scroll-left (:around (foo &optional arg set-minimum))
     (when (and truncate-lines
                (not (memq major-mode '(vterm-mode term-mode)))
                (truncated-lines-p))
       (funcall foo arg set-minimum)))
-
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
@@ -329,8 +309,7 @@ for stopping scroll from going beyond the longest line.  Based on
   :bind (("M-z" . zap-up-to-char)
          ("M-S-z" . zap-to-char)
          ("C-x k" . kill-this-buffer)
-         ("C-h C-f" . describe-face)
-         ("<f2>" . ignore))
+         ("C-h C-f" . describe-face))
   :hook ((before-save . delete-trailing-whitespace)
          (overwrite-mode . overwrite-set-cursor-shape))
   :custom
@@ -342,11 +321,9 @@ for stopping scroll from going beyond the longest line.  Based on
   (column-number-mode 1)
   (line-number-mode 1)
   (transient-mark-mode -1)
-
   (defun overwrite-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
-
   (define-advice keyboard-quit
       (:around (quit))
     "Quit in current context.
@@ -401,7 +378,6 @@ are defining or executing a macro."
     (set-frame-parameter
      nil 'menu-bar-lines
      (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0)))
-
   (define-advice switch-to-buffer-other-frame
       (:around (fn buffer-or-name &optional norecord))
     "Clone fame parameters when switching to other frame."
@@ -456,7 +432,6 @@ are defining or executing a macro."
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
-
   (defun gnome-dark-mode-enabled-p ()
     "Check if frame is dark or not."
     (if (executable-find "gsettings")
@@ -465,7 +440,6 @@ are defining or executing a macro."
                      string-trim-right
                      (string-suffix-p "-dark'"))
       (eq 'dark (frame-parameter nil 'background-mode))))
-
   (cond ((in-termux-p)
          (load-theme local-config-dark-theme t))
         ((gnome-dark-mode-enabled-p)
@@ -571,7 +545,7 @@ are defining or executing a macro."
           ("RET" . corfu-complete-and-quit))
   :custom
   (corfu-cycle t)
-  (corfu-auto t)
+  (corfu-auto nil)
   (corfu-auto-prefix 1)
   (corfu-auto-delay 0.01)
   (corfu-preselect-first t)
@@ -675,15 +649,12 @@ are defining or executing a macro."
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
-
   (define-advice org-return (:around (f &rest args))
     (let ((org-src-preserve-indentation t))
       (apply f args)))
-
   (define-advice org-cycle (:around (f &rest args))
     (let ((org-src-preserve-indentation t))
       (apply f args)))
-
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)
@@ -750,9 +721,7 @@ are defining or executing a macro."
   (put 'global 'fennel-indent-function 1)
   (put 'local 'fennel-indent-function 1)
   (put 'var 'fennel-indent-function 1)
-
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
-
   (defun org-babel-execute:fennel (body _params)
     "Evaluate a block of Fennel code with Babel."
     (save-window-excursion
@@ -760,7 +729,6 @@ are defining or executing a macro."
         (fennel-repl nil))
       (let ((inferior-lisp-buffer fennel-repl--buffer))
         (lisp-eval-string body))))
-
   (defun eval-each-sexp (&optional arg)
     "Evaluate each s-expression in the buffer consequentially.
 If prefix ARG specified, call `fennel-reload' function.  If
@@ -788,48 +756,49 @@ for module name."
          . clojure-mode-setup)
   :config
   (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
-
   (defun org-babel-execute:clojure (body params)
     "Evaluate a block of Clojure code with Babel."
     (lisp-eval-string body))
-
+  (defun clojure-set-compile-command ()
+    (let ((project-dir (clojure-project-dir)))
+      (cond ((and (file-exists-p "project.clj")
+                  (executable-find "lein"))
+             (setq-local compile-command "lein "))
+            ((and (file-exists-p "project.clj")
+                  (executable-find "clojure"))
+             (setq-local compile-command "clojure ")))))
   (defun clojure-mode-setup ()
     "Setup Clojure buffer."
-    ;; (modify-syntax-entry ?# "w")
     (common-lisp-modes-mode)
+    (clojure-set-compile-command)
     (flycheck-mode)))
 
 (use-package inferior-clojure
   :straight nil
-  :requires (inf-lisp clojure-mode)
+  :requires (inf-lisp comint clojure-mode)
   :hook ((inferior-clojure-mode . common-lisp-modes-mode))
   :preface
   (require 'inf-lisp)
   (require 'comint)
   (require 'clojure-mode)
-
   (defgroup inferior-clojure ()
     "Support for interacting with Clojure via inferior process."
     :prefix "inferior-clojure-"
     :group 'languages)
-
   (defcustom inferior-clojure-program "clojure"
     "Path to the program used by `inferior-clojure'"
     :tag "Clojure CLI"
     :type 'string
     :group 'inferior-clojure)
-
   (defcustom inferior-clojure-prompt "^[^=]+=> "
     "Prompt regex for inferior Clojure."
     :tag "Prompt regexp"
     :type 'string
     :group 'inferior-clojure)
-
   (defun inferior-clojure-indent-on-newline ()
     (interactive)
     (let (electric-indent-mode)
       (newline-and-indent)))
-
   (defun inferior-clojure (cmd)
     "Run an inferior instance of `inferior-clojure' inside Emacs."
     (interactive (list (if current-prefix-arg
@@ -845,9 +814,7 @@ for module name."
 	  (inferior-clojure-mode)))
     (setq inferior-lisp-buffer "*inferior-clojure*")
     (pop-to-buffer-same-window "*inferior-clojure*"))
-
   (defalias 'run-clojure 'inferior-clojure)
-
   (define-derived-mode inferior-clojure-mode inferior-lisp-mode "Inferior Clojure"
     "Major mode for `inferior-clojure'.
 
@@ -862,9 +829,7 @@ for module name."
     (make-local-variable 'completion-at-point-functions)
     (set-syntax-table clojure-mode-syntax-table)
     (add-hook 'paredit-mode-hook #'clojure-paredit-setup nil t))
-
   (define-key inferior-clojure-mode-map (kbd "C-j") 'inferior-clojure-indent-on-newline)
-
   (provide 'inferior-clojure))
 
 (use-package cider
@@ -890,27 +855,15 @@ for module name."
   (cider-auto-select-error-buffer t)
   (cider-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
-  (cider-repl-prompt-function #'cider-repl-break-long-prompt)
   (cider-enrich-classpath t)
   :config
   (setq cider-jdk-src-paths nil)
-
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
                        (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/lib/src.zip")
                        (file-expand-wildcards "~/.clojure/clojure-*-sources.jar")))
     (when (file-exists-p src)
       (unless (memq src cider-jdk-src-paths)
-        (add-to-list 'cider-jdk-src-paths src t))))
-
-  (defun cider-repl-prompt-newline (namespace)
-    "Return a prompt string that mentions NAMESPACE and a newline after it."
-    (format "%s\n> " namespace))
-
-  (defun cider-repl-break-long-prompt (namespace)
-    "Return a prompt string that mentions NAMESPACE and a newline after it."
-    (if (> (length namespace) 42)
-        (format "%s\n> " namespace)
-      (format "%s> " namespace))))
+        (add-to-list 'cider-jdk-src-paths src t)))))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
@@ -962,7 +915,6 @@ for module name."
   (lua-indent-level 2)
   :config
   (defvar org-babel-default-header-args:lua '((:results . "silent")))
-
   (defun org-babel-execute:lua (body _)
     "Evaluate a block of Lua code with Babel."
     (lua-get-create-process)
@@ -1053,7 +1005,6 @@ for module name."
     :fringe-bitmap flymake-error-bitmap
     :fringe-face 'flycheck-fringe-error
     :error-list-face 'flycheck-error-list-error)
-
   (flycheck-define-error-level 'warning
     :severity 10
     :compilation-level 1
@@ -1061,7 +1012,6 @@ for module name."
     :fringe-bitmap flymake-warning-bitmap
     :fringe-face 'flycheck-fringe-warning
     :error-list-face 'flycheck-error-list-warning)
-
   (flycheck-define-error-level 'info
     :severity -10
     :compilation-level 0
@@ -1069,7 +1019,6 @@ for module name."
     :fringe-bitmap flymake-note-bitmap
     :fringe-face 'flycheck-fringe-info
     :error-list-face 'flycheck-error-list-info)
-
   (define-advice flycheck-mode-line-status-text (:override (&optional status))
     "Get a text describing STATUS for use in the mode line.
 
@@ -1086,7 +1035,6 @@ nil."
                   (`interrupted ".")
                   (`suspicious "?"))))
       (concat " " flycheck-mode-line-prefix ":" text)))
-
   (define-advice flycheck-may-use-echo-area-p (:override ())
     nil))
 
@@ -1115,10 +1063,8 @@ nil."
   (sp-echo-match-when-invisible nil)
   :config
   (require 'smartparens-config)
-
   (sp-use-paredit-bindings)
   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before :config
-
   (defun minibuffer-enable-sp ()
     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
     (setq-local comment-start ";")
@@ -1177,19 +1123,16 @@ nil."
   :config
   (unless (boundp 'project-switch-commands)
     (defvar project-switch-commands nil))
-
   (defcustom project-root-markers
     '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
-
   (defun project-root-p (path)
     "Check if current PATH has any of project root markers."
     (memq t (mapcar (lambda (file)
                       (file-exists-p (concat path file)))
                     project-root-markers)))
-
   (defun project-find-root (path)
     "Recursive search in PATH for root markers."
     (cond
@@ -1198,16 +1141,13 @@ nil."
      (t (project-find-root
          (file-name-directory
           (directory-file-name path))))))
-
   (add-to-list 'project-find-functions #'project-find-root)
-
   (define-advice project-compile (:around (fn))
     "Only ask to save project related buffers."
     (let* ((project-buffers (project-buffers (project-current)))
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
       (funcall fn)))
-
   (defun project-save-some-buffers (&optional arg)
     "Save some modified file-visiting buffers in current project.
 
@@ -1314,28 +1254,22 @@ REGEXP FILE LINE and optional COL LEVEL info to
     `(progn (add-to-list 'compilation-error-regexp-alist ',name)
             (add-to-list 'compilation-error-regexp-alist-alist
                          '(,name ,regexp ,file ,line ,col ,level))))
-
   (compile-add-error-syntax kaocha-tap
     "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
     (1 "src/%s" "test/%s") 2)
-
   (compile-add-error-syntax kaocha-fail
     ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
     (1 "src/%s" "test/%s") 2)
-
   (compile-add-error-syntax clojure-reflection-warning
     "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
     (1 "src/%s" "test/%s") 2 3)
-
   (compile-add-error-syntax clojure-syntax-error
     "^Syntax error macroexpanding at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)).$"
     (1 "src/%s" "test/%s") 2 3)
-
   (compile-add-error-syntax lua-stacktrace
     "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
     1 2)
-
   (compile-add-error-syntax fennel-compile-error
     "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
     1 2))
@@ -1394,7 +1328,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (defvar cfr-path
     (file-truename "~/.local/lib/cfr.jar")
     "Path to the cfr Java decompiler library.")
-
   (defvar fernflower-path
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
