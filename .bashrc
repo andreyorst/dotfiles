@@ -103,3 +103,5 @@ function container_pc {
         CONTAINER_PC=
     fi
 }
+
+export XCURSOR_SIZE=24
