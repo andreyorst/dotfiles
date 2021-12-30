@@ -32,9 +32,9 @@
     :prefix "local-config-"
     :group 'emacs)
   (defcustom local-config-title-show-bufname t
-    "Whether to include bufname to titlebar.
+    "Whether to include bufname in the title bar.
 
-Bufname is not necessary on GNOME, but may be useful in other DEs."
+Bufname is not necessary on GNOME but may be useful in other DEs."
     :type 'boolean
     :tag "Title bufname"
     :group 'local-config)
@@ -59,7 +59,7 @@ Used in various places to avoid getting wrong line height when
   :straight nil
   :preface
   (defun split-pararagraph-into-lines ()
-    "Split current paragraph into lines with one sentence each."
+    "Split the current paragraph into lines with one sentence each."
     (interactive)
     (save-excursion
       (let ((fill-column most-positive-fixnum))
@@ -169,7 +169,7 @@ lisp-modes mode.
   :straight nil
   :preface
   (defun font-installed-p (font-name)
-    "Check if font with FONT-NAME is available."
+    "Check if a font with FONT-NAME is available."
     (find-font (font-spec :name font-name)))
   (provide 'font)
   :config
@@ -191,7 +191,7 @@ lisp-modes mode.
   :straight nil
   :init
   (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
-    "File to store disabled commands, that were enabled permamently.")
+    "File to store disabled commands, that were enabled permanently.")
   (define-advice enable-command (:around (foo command))
     (let ((user-init-file disabled-commands))
       (funcall foo command)))
@@ -241,9 +241,9 @@ lisp-modes mode.
   (defun truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
 
-Returns t if any line exceeds right border of the window.  Used
-for stopping scroll from going beyond the longest line.  Based on
-`so-long-detected-long-line-p'."
+Returns t if any line exceeds the right border of the window.
+Used for stopping scroll from going beyond the longest line.
+Based on `so-long-detected-long-line-p'."
     (save-excursion
       (goto-char (point-min))
       (let* ((window-width
@@ -251,11 +251,12 @@ for stopping scroll from going beyond the longest line.  Based on
               ;; `text-scale-mode' font width.
               (/ (window-body-width nil t) (window-font-width)))
              (hscroll-offset
-              ;; `window-hscroll' returns columns that are not affected by `text-scale-mode'.
-              ;; Because of that we have to recompute correct `window-hscroll' by multiplying
-              ;; it with a non-scaled value, and divide with scaled width value, and round it
-              ;; to upper boundary.  Since there's no way to get unscaled value, we have to
-              ;; get a width of a face that is not scaled by `text-scale-mode', such as
+              ;; `window-hscroll' returns columns that are not affected by
+              ;; `text-scale-mode'.  Because of that, we have to recompute the correct
+              ;; `window-hscroll' by multiplying it with a non-scaled value and
+              ;; dividing it with a scaled width value, rounding it to the upper
+              ;; boundary.  Since there's no way to get unscaled value, we have to get
+              ;; a width of a face that is not scaled by `text-scale-mode', such as
               ;; `window-divider' face.
               (ceiling (/ (* (window-hscroll) (window-font-width nil 'window-divider))
                           (float (window-font-width)))))
@@ -324,23 +325,21 @@ for stopping scroll from going beyond the longest line.  Based on
   (defun overwrite-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
-  (define-advice keyboard-quit
-      (:around (quit))
-    "Quit in current context.
+  (define-advice keyboard-quit (:around (quit))
+    "Quit the current context.
 
 When there is an active minibuffer and we are not inside it close
 it.  When we are inside the minibuffer use the regular
 `minibuffer-keyboard-quit' which quits any active region before
 exiting.  When there is no minibuffer `keyboard-quit' unless we
 are defining or executing a macro."
-    (cond ((active-minibuffer-window)
-           (if (minibufferp)
-               (minibuffer-keyboard-quit)
-             (abort-recursive-edit)))
-          (t
-           (unless (or defining-kbd-macro
-                       executing-kbd-macro)
-             (funcall quit))))))
+    (if (active-minibuffer-window)
+        (if (minibufferp)
+            (minibuffer-keyboard-quit)
+          (abort-recursive-edit))
+      (unless (or defining-kbd-macro
+                  executing-kbd-macro)
+        (funcall-interactively quit)))))
 
 (use-package delsel
   :straight nil
@@ -374,13 +373,13 @@ are defining or executing a macro."
   :config
   (define-advice toggle-frame-fullscreen
       (:before (&optional frame))
-    "Hide menu-bar when FRAME goes full screen."
+    "Hide menu bar when FRAME goes full screen."
     (set-frame-parameter
      nil 'menu-bar-lines
      (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0)))
   (define-advice switch-to-buffer-other-frame
       (:around (fn buffer-or-name &optional norecord))
-    "Clone fame parameters when switching to other frame."
+    "Clone fame parameters when switching to another frame."
     (let* ((default-frame-alist
             (seq-remove (lambda (elem) (eq (car elem) 'name))
                         (frame-parameters (selected-frame)))))
@@ -499,39 +498,6 @@ are defining or executing a macro."
   :init
   (setq completion-in-region-function #'consult-completion-in-region))
 
-;; (use-package company
-;;   :bind ( :map company-mode-map
-;;           ([remap completion-at-point] . company-complete)
-;;           ("M-/" . company-complete)
-;;           :map company-active-map
-;;           ("TAB" . company-complete-common-or-cycle)
-;;           ("<tab>" . company-complete-common-or-cycle)
-;;           ("<S-Tab>" . company-select-previous)
-;;           ("<backtab>" . company-select-previous)
-;;           ("C-n" . company-select-next)
-;;           ("C-p" . company-select-previous)
-;;           ("C-d" . company-show-doc-buffer)
-;;           ("M-." . company-show-location))
-;;   :hook (after-init . global-company-mode)
-;;   :custom
-;;   (company-idle-delay 0)
-;;   (company-require-match 'never)
-;;   (company-minimum-prefix-length 2)
-;;   (company-tooltip-align-annotations t)
-;;   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-;;                        company-preview-frontend
-;;                        company-echo-metadata-frontend))
-;;   (company-backends '((company-capf company-dabbrev-code) company-files))
-;;   (company-tooltip-minimum-width 30)
-;;   (company-tooltip-maximum-width 120)
-;;   (company-icon-size local-config-line-pixel-height))
-
-;; (use-package company-quickhelp
-;;   :hook (company-mode . company-quickhelp-mode)
-;;   :custom
-;;   (company-quickhelp-max-lines 13)
-;;   (company-quickhelp-use-propertized-text t))
-
 (use-package corfu
   :straight ( :host github
               :repo "minad/corfu"
@@ -545,9 +511,9 @@ are defining or executing a macro."
           ("RET" . corfu-complete-and-quit))
   :custom
   (corfu-cycle t)
-  (corfu-auto nil)
-  (corfu-auto-prefix 1)
-  (corfu-auto-delay 0.01)
+  ;; (corfu-auto nil)
+  ;; (corfu-auto-prefix 1)
+  ;; (corfu-auto-delay 0.01)
   (corfu-preselect-first t)
   (corfu-scroll-margin 4)
   (corfu-quit-no-match t)
@@ -566,26 +532,11 @@ are defining or executing a macro."
   :init
   (corfu-global-mode))
 
-;; (use-package kind-icon
-;;   :straight ( :host github
-;;               :repo "jdtsmith/kind-icon"
-;;               :branch "main")
-;;   :after corfu
-;;   :custom
-;;   (kind-icon-default-face 'corfu-default)
-;;   (kind-icon-use-icons nil)
-;;   :config
-;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
-(use-package cape
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-file t))
-
 (use-package formfeed
   :straight nil
   :preface
   (defun formfeed-make-display-line ()
-    "Display the formfeed ^L char as comment or as continuous line."
+    "Display the formfeed ^L char as a comment or as a continuous line."
     (unless buffer-display-table
       (setq buffer-display-table (make-display-table)))
     (aset buffer-display-table ?\^L
@@ -607,6 +558,7 @@ are defining or executing a macro."
             (featurep 'pgtk))
   :config
   (when (fboundp #'pixel-scroll-precision-mode)
+    (setq-default scroll-margin 0)
     (pixel-scroll-precision-mode 1)))
 
 ;;; Languages
@@ -731,9 +683,10 @@ are defining or executing a macro."
         (lisp-eval-string body))))
   (defun eval-each-sexp (&optional arg)
     "Evaluate each s-expression in the buffer consequentially.
+
 If prefix ARG specified, call `fennel-reload' function.  If
 double prefix ARG specified call `fennel-reload' function and ask
-for module name."
+for the module name."
     (interactive "P")
     (if (symbolp arg)
         (save-excursion
@@ -754,6 +707,7 @@ for module name."
           clojurec-mode
           clojurescript-mode)
          . clojure-mode-setup)
+  :commands clojure-project-dir
   :config
   (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
   (defun org-babel-execute:clojure (body params)
@@ -761,10 +715,10 @@ for module name."
     (lisp-eval-string body))
   (defun clojure-set-compile-command ()
     (let ((project-dir (clojure-project-dir)))
-      (cond ((and (file-exists-p "project.clj")
+      (cond ((and (file-exists-p (expand-file-name "project.clj" project-dir))
                   (executable-find "lein"))
              (setq-local compile-command "lein "))
-            ((and (file-exists-p "project.clj")
+            ((and (file-exists-p (expand-file-name "deps.edn" project-dir))
                   (executable-find "clojure"))
              (setq-local compile-command "clojure ")))))
   (defun clojure-mode-setup ()
@@ -782,7 +736,7 @@ for module name."
   (require 'comint)
   (require 'clojure-mode)
   (defgroup inferior-clojure ()
-    "Support for interacting with Clojure via inferior process."
+    "Support for interacting with Clojure via an inferior process."
     :prefix "inferior-clojure-"
     :group 'languages)
   (defcustom inferior-clojure-program "clojure"
@@ -957,6 +911,8 @@ for module name."
           ("<f2>" . ignore)
           :map project-prefix-map
           ("t" . vterm-project-dir))
+  :requires project
+  :commands (vterm project-root)
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
@@ -967,7 +923,7 @@ for module name."
       (funcall-interactively #'vterm arg))))
 
 (use-package editorconfig
-  :commands editorconfig-mode
+  :commands (editorconfig-mode)
   :init
   (editorconfig-mode 1))
 
@@ -1074,7 +1030,7 @@ nil."
     (smartparens-strict-mode 1)))
 
 (use-package undo-tree
-  :commands global-undo-tree-mode
+  :commands (global-undo-tree-mode undo-tree-undo undo-tree-redo)
   :bind (("C-z" . #'undo-tree-undo)
          ("C-S-z" . #'undo-tree-redo))
   :custom
@@ -1120,16 +1076,17 @@ nil."
           ("s" . project-save-some-buffers))
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
-  :config
-  (unless (boundp 'project-switch-commands)
-    (defvar project-switch-commands nil))
+  :preface
   (defcustom project-root-markers
     '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
+  :config
+  (unless (boundp 'project-switch-commands)
+    (defvar project-switch-commands nil))
   (defun project-root-p (path)
-    "Check if current PATH has any of project root markers."
+    "Check if the current PATH has any of the project root markers."
     (memq t (mapcar (lambda (file)
                       (file-exists-p (concat path file)))
                     project-root-markers)))
@@ -1143,13 +1100,13 @@ nil."
           (directory-file-name path))))))
   (add-to-list 'project-find-functions #'project-find-root)
   (define-advice project-compile (:around (fn))
-    "Only ask to save project related buffers."
+    "Only ask to save project-related buffers."
     (let* ((project-buffers (project-buffers (project-current)))
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
       (funcall fn)))
   (defun project-save-some-buffers (&optional arg)
-    "Save some modified file-visiting buffers in current project.
+    "Save some modified file-visiting buffers in the current project.
 
 Optional argument ARG (interactively, prefix argument) non-nil
 means save all with no questions."
@@ -1337,5 +1294,17 @@ REGEXP FILE LINE and optional COL LEVEL info to
               :repo "pkulev/aoc.el"
               :branch "main"))
 
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+
 (provide 'init)
 ;;; init.el ends here
+
+;; LocalWords:  init Bufname DEs config bufname Andrey Listopadov el
+;; LocalWords:  clmm JetBrainsMono DejaVu unscaled minibuffer UI gtk
+;; LocalWords:  tooltip Termux gsettings termux RET minad corfu ltximg
+;; LocalWords:  formfeed src linux README md pandoc ARG Clojure clj ok
+;; LocalWords:  lein clojure CLI kondo sbcl ecl Lua VTERM ispell Magit
+;; LocalWords:  aspell hunspell Todos toml json txt edn deps gpg isayt
+;; LocalWords:  workspace andreyorst macroexpanding cfr decompiler aoc
+;; LocalWords:  FernFlower pkulev LocalWords
