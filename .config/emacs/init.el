@@ -415,8 +415,8 @@ are defining or executing a macro."
   :functions (gnome-dark-mode-enabled-p in-termux-p)
   :defines (local-config-dark-theme local-config-light-theme)
   :custom-face
-  ;; The `modus-themes-mode-line' custom doesn't allow disabling box
-  ;; effect, only recolors it, so it is disabled via custom.
+  ;; The `modus-themes-mode-line' custom doesn't allow to disable the box
+  ;; effect only recolors it, so it is disabled via custom.
   (mode-line ((t (:box unspecified))))
   (mode-line-inactive ((t (:box unspecified))))
   (font-lock-doc-face ((t (:foreground nil :inherit font-lock-comment-face))))
@@ -513,9 +513,6 @@ are defining or executing a macro."
           ("RET" . corfu-complete-and-quit))
   :custom
   (corfu-cycle t)
-  ;; (corfu-auto nil)
-  ;; (corfu-auto-prefix 1)
-  ;; (corfu-auto-delay 0.01)
   (corfu-preselect-first t)
   (corfu-scroll-margin 4)
   (corfu-quit-no-match t)
