@@ -14,13 +14,15 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init" user-emacs-directory)))
 
-;;; use-package
+;;; use-package and straight.el
 
 (require 'straight)
 (straight-use-package 'use-package)
-(defvar straight-use-package-by-default)
-(setq straight-use-package-by-default t)
 (require 'use-package)
+
+(use-package straight
+  :custom
+  (straight-use-package-by-default t))
 
 ;;; Local config and personal functions
 
@@ -321,7 +323,7 @@ Based on `so-long-detected-long-line-p'."
   :init
   (column-number-mode 1)
   (line-number-mode 1)
-  (transient-mark-mode -1)
+  ;; (transient-mark-mode -1)
   (defun overwrite-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
@@ -1296,6 +1298,24 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
+
+(use-package phi-search)
+(use-package region-bindings-mode
+  :config
+  (region-bindings-mode-enable))
+
+(use-package multiple-cursors
+  :bind
+  (("S-<mouse-1>" . mc/add-cursor-on-click)
+   :map mc/keymap
+   ("<return>" . nil)
+   ("C-s" . phi-search)
+   ("C-r" . phi-search-backward)
+   ("C-&" . mc/vertical-align-with-space)
+   :map region-bindings-mode-map
+   ("a" . mc/mark-all-like-this)
+   ("n" . mc/mark-next-like-this)
+   ("p" . mc/mark-previous-like-this)))
 
 (provide 'init)
 ;;; init.el ends here
