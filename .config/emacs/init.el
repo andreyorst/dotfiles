@@ -323,7 +323,7 @@ Based on `so-long-detected-long-line-p'."
   :init
   (column-number-mode 1)
   (line-number-mode 1)
-  ;; (transient-mark-mode -1)
+  (transient-mark-mode -1)
   (defun overwrite-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
@@ -1310,9 +1310,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("C-r" . phi-search-backward)
    ("C-&" . mc/vertical-align-with-space)
    :map region-bindings-mode-map
-   ("a" . mc/mark-all-like-this)
-   ("n" . mc/mark-next-like-this)
-   ("p" . mc/mark-previous-like-this)))
+   ("M-a" . mc/mark-all-like-this)
+   ("M-n" . mc/mark-next-like-this)
+   ("M-p" . mc/mark-previous-like-this)))
 
 (provide 'init)
 ;;; init.el ends here
