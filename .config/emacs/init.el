@@ -686,20 +686,18 @@ are defining or executing a macro."
 If prefix ARG specified, call `fennel-reload' function.  If
 double prefix ARG specified call `fennel-reload' function and ask
 for the module name."
-    (interactive "P")
-    (if (symbolp arg)
-        (save-excursion
-          (save-restriction
-            (goto-char (point-min))
-            (while (save-excursion
-                     (search-forward-regexp "[^[:space:]]." nil t))
-              (forward-sexp)
-              (lisp-eval-last-sexp))))
-      (when fennel-mode-switch-to-repl-after-reload
-        (switch-to-lisp t))
-      (if (equal arg '(4))
-          (funcall-interactively 'fennel-reload nil)
-        (funcall-interactively 'fennel-reload t)))))
+    (interactive)
+    (save-excursion
+      (save-restriction
+        (goto-char (point-min))
+        (while (save-excursion
+                 (search-forward-regexp "[^[:space:]]." nil t))
+          (forward-sexp)
+          (when (and (not (nth 4 (syntax-ppss)))
+                     (looking-back "."))
+            (lisp-eval-last-sexp)))))
+    (when fennel-mode-switch-to-repl-after-reload
+      (switch-to-lisp t))))
 
 (use-package clojure-mode
   :hook ((clojure-mode
@@ -1255,7 +1253,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package comint
   :straight nil
   :custom
-  (comint-scroll-show-maximum-output nil))
+  (comint-scroll-show-maximum-output nil)
+  (comint-highlight-input nil))
 
 (use-package rect
   :straight nil
@@ -1297,9 +1296,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :bind ("C-=" . er/expand-region))
 
 (use-package phi-search)
-(use-package region-bindings-mode
-  :config
-  (region-bindings-mode-enable))
 
 (use-package multiple-cursors
   :bind
@@ -1308,11 +1304,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("<return>" . nil)
    ("C-s" . phi-search)
    ("C-r" . phi-search-backward)
-   ("C-&" . mc/vertical-align-with-space)
-   :map region-bindings-mode-map
-   ("M-a" . mc/mark-all-like-this)
-   ("M-n" . mc/mark-next-like-this)
-   ("M-p" . mc/mark-previous-like-this)))
+   ("C-&" . mc/vertical-align-with-space)))
 
 (provide 'init)
 ;;; init.el ends here
