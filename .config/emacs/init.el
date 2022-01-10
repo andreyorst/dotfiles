@@ -152,7 +152,7 @@ lisp-modes mode.
    mouse-highlight nil
    hscroll-step 1
    hscroll-margin 1
-   scroll-margin 1
+   scroll-margin 0
    scroll-preserve-screen-position nil)
   (when (window-system)
     (setq-default
@@ -478,6 +478,17 @@ are defining or executing a macro."
   :init
   (vertico-mode))
 
+(use-package vertico-directory
+  :after vertico
+  :straight nil
+  :load-path "straight/repos/vertico/extensions/"
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
 (use-package marginalia
   :commands marginalia-mode
   :init
@@ -530,6 +541,17 @@ are defining or executing a macro."
     (corfu-quit))
   :init
   (corfu-global-mode))
+
+(use-package orderless
+  :config
+  (add-to-list 'completion-styles 'orderless))
+
+(use-package cape
+  :hook (prog-mode . enable-cape)
+  :config
+  (defun enable-cape ()
+    (add-hook 'completion-at-point-functions #'cape-dabbrev 90 t)
+    (add-hook 'completion-at-point-functions #'cape-file 90 t)))
 
 (use-package formfeed
   :straight nil
@@ -1269,7 +1291,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (yank-rectangle))))
 
 (use-package jdecomp
-  :hook (archive-mode . jdecomp-mode)
   :mode ("\\.class\\'" . jdecomp-mode)
   :custom
   (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
