@@ -235,7 +235,7 @@ lisp-modes mode.
          ("<mouse-4>" . mwheel-scroll)
          ("<mouse-5>" . mwheel-scroll))
   :custom
-  (mouse-wheel-flip-direction t)
+  (mouse-wheel-flip-direction (not (featurep 'pgtk)))
   (mouse-wheel-tilt-scroll t)
   (mouse-wheel-progressive-speed nil)
   :init
