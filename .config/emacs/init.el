@@ -1217,6 +1217,7 @@ means save all with no questions."
 
 (use-package compile
   :straight nil
+  :hook (compilation-filter . ansi-color-compilation-filter)
   :custom
   (compilation-scroll-output 'first-error)
   :config
