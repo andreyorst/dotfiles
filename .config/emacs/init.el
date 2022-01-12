@@ -153,7 +153,8 @@ lisp-modes mode.
    hscroll-step 1
    hscroll-margin 1
    scroll-margin 0
-   scroll-preserve-screen-position nil)
+   scroll-preserve-screen-position nil
+   scroll-conservatively 101)
   (when (window-system)
     (setq-default
      x-gtk-use-system-tooltips nil
@@ -547,7 +548,7 @@ are defining or executing a macro."
   (add-to-list 'completion-styles 'orderless))
 
 (use-package cape
-  :hook (prog-mode . enable-cape)
+  :hook ((prog-mode cider-mode) . enable-cape)
   :config
   (defun enable-cape ()
     (add-hook 'completion-at-point-functions #'cape-dabbrev 90 t)
@@ -617,6 +618,7 @@ are defining or executing a macro."
   (org-confirm-babel-evaluate nil)
   (org-log-done 'time)
   (org-image-actual-width nil)
+  (org-edit-src-content-indentation 0)
   :config
   (defun discard-history ()
     "Discard undo history of org src and capture blocks."
@@ -1271,7 +1273,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :bind ( :map dired-mode-map
           ("<backspace>" . dired-up-directory))
   :custom
-  (dired-listing-switches "-al --group-directories-first"))
+  (dired-listing-switches "-lAX --group-directories-first"))
 
 (use-package comint
   :straight nil
