@@ -504,10 +504,10 @@ are defining or executing a macro."
   :after vertico
   :straight nil
   :load-path "straight/repos/vertico/extensions/"
-  :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
+  :bind ( :map vertico-map
+          ("RET" . vertico-directory-enter)
+          ("DEL" . vertico-directory-delete-char)
+          ("M-DEL" . vertico-directory-delete-word))
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
@@ -570,6 +570,7 @@ are defining or executing a macro."
 
 (use-package cape
   :hook ((prog-mode cider-mode) . enable-cape)
+  :commands (cape-dabbrev cape-file)
   :config
   (defun enable-cape ()
     (add-hook 'completion-at-point-functions #'cape-dabbrev 90 t)
@@ -688,7 +689,7 @@ are defining or executing a macro."
         (fennel-repl nil))
       (let ((inferior-lisp-buffer fennel-repl--buffer))
         (lisp-eval-string body))))
-  (defun eval-each-sexp (&optional arg)
+  (defun eval-each-sexp ()
     "Evaluate each s-expression in the buffer consequentially.
 
 If prefix ARG specified, call `fennel-reload' function.  If
@@ -702,7 +703,7 @@ for the module name."
                  (search-forward-regexp "[^[:space:]]." nil t))
           (forward-sexp)
           (when (and (not (nth 4 (syntax-ppss)))
-                     (looking-back "."))
+                     (looking-back "." 1))
             (lisp-eval-last-sexp)))))
     (when fennel-mode-switch-to-repl-after-reload
       (switch-to-lisp t))))
@@ -713,6 +714,7 @@ for the module name."
           clojurescript-mode)
          . clojure-mode-setup)
   :commands clojure-project-dir
+  :functions clojure-set-compile-command
   :config
   (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
   (defun org-babel-execute:clojure (body params)
@@ -1031,8 +1033,8 @@ nil."
 
 (use-package undo-tree
   :commands (global-undo-tree-mode undo-tree-undo undo-tree-redo)
-  :bind (("C-z" . #'undo-tree-undo)
-         ("C-S-z" . #'undo-tree-redo))
+  :bind (("C-z" . undo-tree-undo)
+         ("C-S-z" . undo-tree-redo))
   :custom
   (undo-tree-visualizer-relative-timestamps nil)
   (undo-tree-visualizer-timestamps nil)
@@ -1290,24 +1292,52 @@ REGEXP FILE LINE and optional COL LEVEL info to
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
 
-(use-package aoc
-  :straight ( :host github
-              :repo "pkulev/aoc.el"
-              :branch "main"))
-
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
 (use-package phi-search)
 
+(use-package region-bindings
+  :straight nil
+  :preface
+  (define-minor-mode region-bindings-mode
+    "Minor mode for mapping commands while region is active.
+
+\\<region-bindings-mode-map>"
+    :lighter " rbm"
+    :group 'convenience
+    :keymap (make-sparse-keymap))
+  (defun region-bindings-mode--toggle (_ val _ _)
+    (if val
+        (region-bindings-mode 1)
+      (region-bindings-mode -1)))
+  (defun region-bindings-mode-enable ()
+    "Enable region bindings mode."
+    (interactive)
+    (add-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle))
+  (defun region-bindings-mode-disable ()
+    "Disable region bindings mode."
+    (interactive)
+    (remove-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle)
+    (region-bindings-mode -1))
+  (provide 'region-bindings)
+  :config
+  (region-bindings-mode-enable))
+
 (use-package multiple-cursors
+  :defines region-bindings-mode-map
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map mc/keymap
    ("<return>" . nil)
    ("C-s" . phi-search)
    ("C-r" . phi-search-backward)
-   ("C-&" . mc/vertical-align-with-space)))
+   ("C-&" . mc/vertical-align-with-space)
+   :map region-bindings-mode-map
+   ("n" . mc/mark-next-like-this)
+   ("p" . mc/mark-previous-like-this)
+   ("a" . mc/mark-all-like-this)
+   ("s" . mc/mark-all-in-region-regexp)))
 
 (provide 'init)
 ;;; init.el ends here
