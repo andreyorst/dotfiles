@@ -416,10 +416,6 @@ are defining or executing a macro."
   :functions (gnome-dark-mode-enabled-p in-termux-p)
   :defines (local-config-dark-theme local-config-light-theme)
   :custom-face
-  ;; The `modus-themes-mode-line' custom doesn't allow to disable the box
-  ;; effect only recolors it, so it is disabled via custom.
-  (mode-line ((t (:box unspecified))))
-  (mode-line-inactive ((t (:box unspecified))))
   (font-lock-doc-face ((t (:foreground nil :inherit font-lock-comment-face))))
   :custom
   (modus-themes-org-blocks nil)
@@ -430,6 +426,7 @@ are defining or executing a macro."
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
                                           '((bg-main . "#252423") (fg-main . "#dedddc"))))
   (modus-themes-completions 'opinionated)
+  (modus-themes-mode-line '(moody borderless))
   :init
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
@@ -464,13 +461,6 @@ are defining or executing a macro."
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
-
-(use-package minions
-  :commands minions-mode
-  :custom
-  (minions-prominent-modes '(flycheck-mode flymake-mode))
-  :init
-  (minions-mode))
 
 (use-package vertico
   :commands vertico-mode
@@ -943,11 +933,6 @@ for the module name."
     (let ((default-directory (project-root (project-current t))))
       (funcall-interactively #'vterm arg))))
 
-(use-package editorconfig
-  :commands (editorconfig-mode)
-  :init
-  (editorconfig-mode 1))
-
 (use-package flymake
   :straight nil
   :custom
@@ -957,12 +942,7 @@ for the module name."
   :when (or (executable-find "ispell")
             (executable-find "aspell")
             (executable-find "hunspell"))
-  :hook (((org-mode git-commit-mode markdown-mode) . flyspell-mode)
-         (prog-mode . flyspell-prog-mode-maybe))
-  :config
-  (defun flyspell-prog-mode-maybe ()
-    (unless (memq major-mode '(lisp-interaction-mode))
-      (flyspell-prog-mode))))
+  :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
 
 (use-package flycheck
   :defines (flymake-error-bitmap
@@ -1001,17 +981,17 @@ for the module name."
 
 STATUS defaults to `flycheck-last-status-change' if omitted or
 nil."
-    (let ((text (pcase (or status flycheck-last-status-change)
-                  (`not-checked "-/-")
-                  (`no-checker "-")
-                  (`running "*/*")
-                  (`errored "!")
-                  (`finished
-                   (let-alist (flycheck-count-errors flycheck-current-errors)
-                     (propertize (format "%s/%s" (or .error 0) (or .warning 0)))))
-                  (`interrupted ".")
-                  (`suspicious "?"))))
-      (concat " " flycheck-mode-line-prefix ":" text)))
+    (concat " " flycheck-mode-line-prefix ":"
+            (pcase (or status flycheck-last-status-change)
+              (`not-checked "-/-")
+              (`no-checker "-")
+              (`running "*/*")
+              (`errored "!")
+              (`finished
+               (let-alist (flycheck-count-errors flycheck-current-errors)
+                 (format "%s/%s" (or .error 0) (or .warning 0))))
+              (`interrupted ".")
+              (`suspicious "?"))))
   (define-advice flycheck-may-use-echo-area-p (:override ())
     nil))
 
