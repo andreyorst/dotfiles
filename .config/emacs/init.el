@@ -132,6 +132,37 @@ lisp-modes mode.
           (indent-region (point) (mark))))))
   (provide 'common-lisp-modes-mode))
 
+(use-package region-bindings
+  :straight nil
+  :bind ( :map region-bindings-mode-map
+          ("q" . region-bindings-mode-off))
+  :preface
+  (define-minor-mode region-bindings-mode
+    "Minor mode for mapping commands while region is active.
+
+\\<region-bindings-mode-map>"
+    :lighter " rbm"
+    :group 'convenience
+    :keymap (make-sparse-keymap))
+  (defun region-bindings-mode--toggle (_ val _ _)
+    (region-bindings-mode (if val 1 -1)))
+  (defun region-bindings-mode-off ()
+    "Turn off bindings while keeping the region active."
+    (interactive)
+    (region-bindings-mode -1))
+  (defun region-bindings-mode-enable ()
+    "Enable region bindings mode."
+    (interactive)
+    (add-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle))
+  (defun region-bindings-mode-disable ()
+    "Disable region bindings mode."
+    (interactive)
+    (remove-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle)
+    (region-bindings-mode -1))
+  (provide 'region-bindings)
+  :init
+  (region-bindings-mode-enable))
+
 ;;; Inbuilt stuff
 
 (use-package defaults
@@ -1296,33 +1327,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :bind ("C-=" . er/expand-region))
 
 (use-package phi-search)
-
-(use-package region-bindings
-  :straight nil
-  :preface
-  (define-minor-mode region-bindings-mode
-    "Minor mode for mapping commands while region is active.
-
-\\<region-bindings-mode-map>"
-    :lighter " rbm"
-    :group 'convenience
-    :keymap (make-sparse-keymap))
-  (defun region-bindings-mode--toggle (_ val _ _)
-    (if val
-        (region-bindings-mode 1)
-      (region-bindings-mode -1)))
-  (defun region-bindings-mode-enable ()
-    "Enable region bindings mode."
-    (interactive)
-    (add-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle))
-  (defun region-bindings-mode-disable ()
-    "Disable region bindings mode."
-    (interactive)
-    (remove-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle)
-    (region-bindings-mode -1))
-  (provide 'region-bindings)
-  :config
-  (region-bindings-mode-enable))
 
 (use-package multiple-cursors
   :defines region-bindings-mode-map
