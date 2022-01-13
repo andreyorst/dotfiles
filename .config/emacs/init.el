@@ -462,6 +462,37 @@ are defining or executing a macro."
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
 
+(use-package formfeed
+  :straight nil
+  :preface
+  (defun formfeed-make-display-line ()
+    "Display the formfeed ^L char as a comment or as a continuous line."
+    (unless buffer-display-table
+      (setq buffer-display-table (make-display-table)))
+    (aset buffer-display-table ?\^L
+          (vconcat (make-list (or fill-column 70)
+                              (make-glyph-code
+                               (string-to-char (or comment-start "-"))
+                               'shadow)))))
+  (provide 'formfeed)
+  :init
+  (dolist (mode-hook '(help-mode-hook
+                       org-mode-hook
+                       outline-mode-hook
+                       prog-mode-hook))
+    (add-hook mode-hook #'formfeed-make-display-line)))
+
+(use-package pixel-scroll
+  :straight nil
+  :when (or (featurep 'xinput2)
+            (featurep 'pgtk))
+  :config
+  (when (fboundp #'pixel-scroll-precision-mode)
+    (setq-default scroll-margin 0)
+    (pixel-scroll-precision-mode 1)))
+
+;;; Completion
+
 (use-package vertico
   :commands vertico-mode
   :bind ( :map vertico-map
@@ -544,36 +575,7 @@ are defining or executing a macro."
     (add-hook 'completion-at-point-functions #'cape-dabbrev 90 t)
     (add-hook 'completion-at-point-functions #'cape-file 90 t)))
 
-(use-package formfeed
-  :straight nil
-  :preface
-  (defun formfeed-make-display-line ()
-    "Display the formfeed ^L char as a comment or as a continuous line."
-    (unless buffer-display-table
-      (setq buffer-display-table (make-display-table)))
-    (aset buffer-display-table ?\^L
-          (vconcat (make-list (or fill-column 70)
-                              (make-glyph-code
-                               (string-to-char (or comment-start "-"))
-                               'shadow)))))
-  (provide 'formfeed)
-  :init
-  (dolist (mode-hook '(help-mode-hook
-                       org-mode-hook
-                       outline-mode-hook
-                       prog-mode-hook))
-    (add-hook mode-hook #'formfeed-make-display-line)))
-
-(use-package pixel-scroll
-  :straight nil
-  :when (or (featurep 'xinput2)
-            (featurep 'pgtk))
-  :config
-  (when (fboundp #'pixel-scroll-precision-mode)
-    (setq-default scroll-margin 0)
-    (pixel-scroll-precision-mode 1)))
-
-;;; Languages
+;;;; Language packages
 
 (use-package org
   :straight (:type built-in)
@@ -661,14 +663,6 @@ are defining or executing a macro."
   (markdown-command "pandoc")
   (markdown-hr-display-char nil)
   (markdown-list-item-bullets '("-")))
-
-(use-package geiser
-  :hook (scheme-mode . geiser-mode)
-  :custom
-  (geiser-active-implementations '(guile))
-  (geiser-default-implementation 'guile))
-
-(use-package geiser-guile)
 
 (use-package elisp-mode
   :straight nil
@@ -841,9 +835,6 @@ for the module name."
   (cljr-suppress-middleware-warnings t)
   (cljr-warn-on-eval nil))
 
-(use-package inf-lisp
-  :custom (inferior-lisp-program "sbcl"))
-
 (use-package lisp-mode
   :straight nil
   :hook (lisp-mode . common-lisp-modes-mode))
@@ -861,6 +852,14 @@ for the module name."
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :config
   (sly-symbol-completion-mode -1))
+
+(use-package geiser
+  :hook (scheme-mode . geiser-mode)
+  :custom
+  (geiser-active-implementations '(guile))
+  (geiser-default-implementation 'guile))
+
+(use-package geiser-guile)
 
 (use-package racket-mode
   :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
