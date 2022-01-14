@@ -24,6 +24,8 @@
   :custom
   (straight-use-package-by-default t))
 
+(use-package delight)
+
 ;;; Local config and personal functions
 
 (use-package local-config
@@ -106,7 +108,8 @@ Used in various places to avoid getting wrong line height when
                apply-macro-to-region-lines))
     (advice-add f :around #'block-undo)))
 
-(use-package common-lisp-modes-mode
+(use-package common-lisp-modes
+  :delight
   :straight nil
   :bind ( :map common-lisp-modes-mode-map
           ("M-q" . common-lisp-modes-indent-or-fill-sexp))
@@ -130,12 +133,15 @@ lisp-modes mode.
         (save-excursion
           (mark-sexp)
           (indent-region (point) (mark))))))
-  (provide 'common-lisp-modes-mode))
+  (provide 'common-lisp-modes))
 
 (use-package region-bindings
   :straight nil
   :bind ( :map region-bindings-mode-map
-          ("q" . region-bindings-disable))
+          ("q" . region-bindings-disable)
+          ("r" . replace-string)
+          ("R" . replace-regexp)
+          ("h" . (lambda () (interactive) )))
   :preface
   (define-minor-mode region-bindings-mode
     "Minor mode for mapping commands while region is active.
@@ -144,22 +150,27 @@ lisp-modes mode.
     :lighter " rbm"
     :group 'convenience
     :keymap (make-sparse-keymap))
-  (defun region-bindings--toggle (_ val _ _)
-    "Watcher for the `transient-mark-mode' variable."
-    (region-bindings-mode (if val 1 -1)))
-  (defun region-bindings-disable ()
+  (defun region-bindings-disable (&optional force)
     "Turn off bindings temporarely while keeping the region active.
 Bindings will be enabled next time region is highlighted."
     (interactive)
     (region-bindings-mode -1))
+  (defun region-bindings--enable (&optional no-tmm)
+    "Enable bindings temporarely while keeping the region active."
+    (interactive)
+    (when (or transient-mark-mode
+              (eq #'mouse-set-region this-command))
+      (region-bindings-mode 1)))
   (defun region-bindings-mode-enable ()
-    "Enable region bindings mode."
+    "Enable region bindings for all buffers."
     (interactive)
-    (add-variable-watcher 'transient-mark-mode #'region-bindings--toggle))
+    (advice-add 'activate-mark :after #'region-bindings--enable)
+    (advice-add 'deactivate-mark :after #'region-bindings-disable))
   (defun region-bindings-mode-disable ()
-    "Disable region bindings mode."
+    "Disable region bindings."
     (interactive)
-    (remove-variable-watcher 'transient-mark-mode #'region-bindings--toggle)
+    (advice-remove 'activate-mark #'region-bindings--enable)
+    (advice-remove 'deactivate-mark #'region-bindings-disable)
     (region-bindings-mode -1))
   (provide 'region-bindings)
   :init
@@ -827,6 +838,7 @@ for the module name."
   (provide 'inferior-clojure))
 
 (use-package cider
+  :delight " cider"
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode))
   :bind ( :map cider-repl-mode-map
@@ -863,6 +875,7 @@ for the module name."
   :when (executable-find "clj-kondo"))
 
 (use-package clj-refactor
+  :delight clj-refactor-mode
   :hook ((clj-refactor-mode . yas-minor-mode)
          (cider-mode . clj-refactor-mode))
   :custom
@@ -1065,6 +1078,7 @@ nil."
     (smartparens-strict-mode 1)))
 
 (use-package undo-tree
+  :delight undo-tree-mode
   :commands (global-undo-tree-mode undo-tree-undo undo-tree-redo)
   :bind (("C-z" . undo-tree-undo)
          ("C-S-z" . undo-tree-redo))
@@ -1195,11 +1209,13 @@ means save all with no questions."
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)))
 
 (use-package which-key
+  :delight which-key-mode
   :commands which-key-mode
   :init
   (which-key-mode t))
 
 (use-package gcmh
+  :delight gcmh-mode
   :commands gcmh-mode
   :init
   (gcmh-mode t))
@@ -1214,12 +1230,14 @@ means save all with no questions."
   (vc-follow-symlinks t))
 
 (use-package isayt
+  :delight isayt-mode
   :straight ( :host gitlab
               :repo "andreyorst/isayt.el"
               :branch "main")
   :hook (common-lisp-modes-mode . isayt-mode))
 
 (use-package eldoc
+  :delight eldoc-mode
   :straight nil
   :custom
   (eldoc-echo-area-use-multiline-p nil))
@@ -1298,7 +1316,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package rect
   :straight nil
   :bind (("C-x r C-y" . rectangle-yank-add-lines))
-  :config
+  :preface
   (defun rectangle-yank-add-lines ()
     (interactive "*")
     (when (use-region-p)
@@ -1344,6 +1362,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("p" . mc/mark-previous-like-this)
    ("a" . mc/mark-all-like-this)
    ("s" . mc/mark-all-in-region-regexp)))
+
+(use-package yasnippet
+  :delight yas-minor-mode)
 
 (provide 'init)
 ;;; init.el ends here
