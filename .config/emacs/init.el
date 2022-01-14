@@ -135,7 +135,7 @@ lisp-modes mode.
 (use-package region-bindings
   :straight nil
   :bind ( :map region-bindings-mode-map
-          ("q" . region-bindings-mode-off))
+          ("q" . region-bindings-disable))
   :preface
   (define-minor-mode region-bindings-mode
     "Minor mode for mapping commands while region is active.
@@ -144,20 +144,22 @@ lisp-modes mode.
     :lighter " rbm"
     :group 'convenience
     :keymap (make-sparse-keymap))
-  (defun region-bindings-mode--toggle (_ val _ _)
+  (defun region-bindings--toggle (_ val _ _)
+    "Watcher for the `transient-mark-mode' variable."
     (region-bindings-mode (if val 1 -1)))
-  (defun region-bindings-mode-off ()
-    "Turn off bindings while keeping the region active."
+  (defun region-bindings-disable ()
+    "Turn off bindings temporarely while keeping the region active.
+Bindings will be enabled next time region is highlighted."
     (interactive)
     (region-bindings-mode -1))
   (defun region-bindings-mode-enable ()
     "Enable region bindings mode."
     (interactive)
-    (add-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle))
+    (add-variable-watcher 'transient-mark-mode #'region-bindings--toggle))
   (defun region-bindings-mode-disable ()
     "Disable region bindings mode."
     (interactive)
-    (remove-variable-watcher 'transient-mark-mode #'region-bindings-mode--toggle)
+    (remove-variable-watcher 'transient-mark-mode #'region-bindings--toggle)
     (region-bindings-mode -1))
   (provide 'region-bindings)
   :init
