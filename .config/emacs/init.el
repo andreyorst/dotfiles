@@ -155,7 +155,7 @@ lisp-modes mode.
 Bindings will be enabled next time region is highlighted."
     (interactive)
     (region-bindings-mode -1))
-  (defun region-bindings--enable (&optional no-tmm)
+  (defun region-bindings-enable ()
     "Enable bindings temporarely while keeping the region active."
     (interactive)
     (when (or transient-mark-mode
@@ -164,13 +164,13 @@ Bindings will be enabled next time region is highlighted."
   (defun region-bindings-mode-enable ()
     "Enable region bindings for all buffers."
     (interactive)
-    (advice-add 'activate-mark :after #'region-bindings--enable)
-    (advice-add 'deactivate-mark :after #'region-bindings-disable))
+    (add-hook 'activate-mark-hook #'region-bindings-enable)
+    (add-hook 'deactivate-mark-hook #'region-bindings-disable))
   (defun region-bindings-mode-disable ()
     "Disable region bindings."
     (interactive)
-    (advice-remove 'activate-mark #'region-bindings--enable)
-    (advice-remove 'deactivate-mark #'region-bindings-disable)
+    (remove-hook 'activate-mark-hook #'region-bindings-enable)
+    (remove-hook 'deactivate-mark-hook #'region-bindings-disable)
     (region-bindings-mode -1))
   (provide 'region-bindings)
   :init
