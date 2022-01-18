@@ -284,7 +284,9 @@ Bindings will be enabled next time region is highlighted."
   (mouse-wheel-tilt-scroll t)
   (mouse-wheel-progressive-speed nil)
   :init
-  (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu)
+  (if (fboundp #'context-menu-mode)
+      (context-menu-mode 1)
+    (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
   (defun truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
 
