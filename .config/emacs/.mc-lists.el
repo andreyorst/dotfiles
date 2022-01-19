@@ -121,6 +121,7 @@
         counsel-find-file
         count-lines-page
         dabbrev-expand
+        describe-variable
         god-local-mode
         hydra--digit-argument
         hydra--universal-argument

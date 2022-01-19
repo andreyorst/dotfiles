@@ -1352,6 +1352,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package multiple-cursors
   :defines region-bindings-mode-map
+  :hook (multiple-cursors-mode . multiple-cursors-ensure-tmm)
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map mc/keymap
@@ -1363,7 +1364,12 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("n" . mc/mark-next-like-this)
    ("p" . mc/mark-previous-like-this)
    ("a" . mc/mark-all-like-this)
-   ("s" . mc/mark-all-in-region-regexp)))
+   ("s" . mc/mark-all-in-region-regexp))
+  :config
+  (defun multiple-cursors-ensure-tmm ()
+    (if multiple-cursors-mode
+        (transient-mark-mode 1)
+      (transient-mark-mode -1))))
 
 (use-package yasnippet
   :delight yas-minor-mode)
