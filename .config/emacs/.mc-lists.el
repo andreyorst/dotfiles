@@ -105,6 +105,7 @@
         sp-splice-sexp-killing-backward
         sp-wrap-round
         upcase-region
+        wdired--self-insert
         yaml-electric-backspace
         zap-up-to-char
         ))
