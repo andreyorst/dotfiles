@@ -463,6 +463,8 @@ are defining or executing a macro."
   :defines (local-config-dark-theme local-config-light-theme)
   :custom-face
   (font-lock-doc-face ((t (:foreground nil :inherit font-lock-comment-face))))
+  (line-number ((t (:foreground nil :background nil :inherit shadow))))
+  (line-number-current-line ((t (:foreground nil :weight bold :background nil :inherit hl-line))))
   :custom
   (modus-themes-org-blocks nil)
   (modus-themes-syntax '(faint alt-syntax))
@@ -503,6 +505,7 @@ are defining or executing a macro."
 
 (use-package display-line-numbers
   :straight nil
+  :hook (prog-mode . display-line-numbers-mode)
   :custom
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
@@ -536,6 +539,9 @@ are defining or executing a macro."
   (when (fboundp #'pixel-scroll-precision-mode)
     (setq-default scroll-margin 0)
     (pixel-scroll-precision-mode 1)))
+
+(use-package hl-line
+  :hook (prog-mode . hl-line-mode))
 
 ;;; Completion
 
@@ -599,8 +605,8 @@ are defining or executing a macro."
   (corfu-max-width 100)
   (corfu-min-width 42)
   (corfu-count 9)
-  ;; should be configured in the `indent' package,but `indent.el'
-  ;; doesn't provide `indent'.
+  ;; should be configured in the `indent' package, but `indent.el'
+  ;; doesn't provide the `indent' feature.
   (tab-always-indent 'complete)
   :config
   (defun corfu-complete-and-quit ()
@@ -609,6 +615,26 @@ are defining or executing a macro."
     (corfu-quit))
   :init
   (corfu-global-mode))
+
+(use-package corfu-doc
+  :straight ( :host github
+              :repo "galeo/corfu-doc"
+              :branch "main")
+  :hook (corfu-mode . corfu-doc-mode)
+  :custom
+  (corfu-doc-delay 1.25)
+  (corfu-doc-max-height 20)
+  (corfu-doc-max-width 84))
+
+(use-package kind-icon
+  :after corfu
+  :straight ( :host github
+              :repo "jdtsmith/kind-icon"
+              :branch "main")
+  :custom
+  (kind-icon-use-icons nil)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package orderless
   :config
@@ -1373,6 +1399,16 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package yasnippet
   :delight yas-minor-mode)
+
+(use-package profiler
+  :bind ("<f2>" . profiler-start-or-report)
+  :init
+  (defun profiler-start-or-report ()
+    (interactive)
+    (if (not (profiler-cpu-running-p))
+        (profiler-start 'cpu)
+      (profiler-report)
+      (profiler-cpu-stop))))
 
 (provide 'init)
 ;;; init.el ends here

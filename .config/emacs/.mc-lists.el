@@ -101,6 +101,7 @@
         sp-kill-region
         sp-kill-word
         sp-remove-active-pair-overlay
+        sp-rewrap-sexp
         sp-splice-sexp-killing-backward
         sp-wrap-round
         upcase-region
