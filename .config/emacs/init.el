@@ -505,7 +505,6 @@ are defining or executing a macro."
 
 (use-package display-line-numbers
   :straight nil
-  :hook (prog-mode . display-line-numbers-mode)
   :custom
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
@@ -539,9 +538,6 @@ are defining or executing a macro."
   (when (fboundp #'pixel-scroll-precision-mode)
     (setq-default scroll-margin 0)
     (pixel-scroll-precision-mode 1)))
-
-(use-package hl-line
-  :hook (prog-mode . hl-line-mode))
 
 ;;; Completion
 
@@ -641,12 +637,8 @@ are defining or executing a macro."
   (add-to-list 'completion-styles 'orderless))
 
 (use-package cape
-  :hook ((prog-mode cider-mode) . enable-cape)
-  :commands (cape-dabbrev cape-file)
   :config
-  (defun enable-cape ()
-    (add-hook 'completion-at-point-functions #'cape-dabbrev 90 t)
-    (add-hook 'completion-at-point-functions #'cape-file 90 t)))
+  (setq completion-at-point-functions '(cape-file)))
 
 ;;;; Language packages
 
