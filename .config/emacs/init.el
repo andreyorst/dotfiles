@@ -1110,7 +1110,7 @@ nil."
   (global-undo-tree-mode 1))
 
 (use-package magit
-  :hook ((git-commit-mode . flyspell-mode))
+  :hook (git-commit-mode . flyspell-mode)
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
