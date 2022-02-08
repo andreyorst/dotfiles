@@ -397,6 +397,7 @@ are defining or executing a macro."
 
 (use-package minibuffer
   :straight nil
+  :hook (eval-expression-minibuffer-setup . common-lisp-modes-mode)
   :bind ( :map minibuffer-inactive-mode-map
           ("<mouse-1>" . ignore))
   :custom
@@ -591,7 +592,8 @@ are defining or executing a macro."
           ("S-TAB" . corfu-previous)
           ([backtab] . corfu-previous)
           ([remap completion-at-point] . corfu-complete)
-          ("RET" . corfu-complete-and-quit))
+          ("RET" . corfu-complete-and-quit)
+          ("<return>" . corfu-complete-and-quit))
   :custom
   (corfu-cycle t)
   (corfu-preselect-first t)
@@ -616,21 +618,14 @@ are defining or executing a macro."
   :straight ( :host github
               :repo "galeo/corfu-doc"
               :branch "main")
+  :bind ( :map corfu-map
+          ("M-p" . corfu-doc-scroll-down)
+          ("M-n" . corfu-doc-scroll-up))
   :hook (corfu-mode . corfu-doc-mode)
   :custom
   (corfu-doc-delay 1.25)
   (corfu-doc-max-height 20)
   (corfu-doc-max-width 84))
-
-(use-package kind-icon
-  :after corfu
-  :straight ( :host github
-              :repo "jdtsmith/kind-icon"
-              :branch "main")
-  :custom
-  (kind-icon-use-icons nil)
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package orderless
   :config
@@ -638,7 +633,7 @@ are defining or executing a macro."
 
 (use-package cape
   :config
-  (setq completion-at-point-functions '(cape-file)))
+  (setq completion-at-point-functions '(cape-file cape-dabbrev)))
 
 ;;;; Language packages
 
@@ -735,16 +730,17 @@ are defining or executing a macro."
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
-  :commands (fennel-repl lisp-eval-string lisp-eval-last-sexp switch-to-lisp)
+  :commands (fennel-repl)
+  :requires (inf-lisp)
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("C-c C-k" . eval-each-sexp)
           ("M-." . xref-find-definitions)
           ("M-," . xref-pop-marker-stack))
   :config
-  (put 'global 'fennel-indent-function 1)
-  (put 'local 'fennel-indent-function 1)
-  (put 'var 'fennel-indent-function 1)
+  (require 'inf-lisp)
+  (dolist (sym '(global local var))
+    (put sym 'fennel-indent-function 1))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
   (defun org-babel-execute:fennel (body _params)
     "Evaluate a block of Fennel code with Babel."
@@ -1220,13 +1216,11 @@ means save all with no questions."
 
 (use-package dumb-jump
   :commands dumb-jump-xref-activate
-  :hook (prog-mode . dumb-jump-add-xref-backend)
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'completing-read)
-  :config
-  (defun dumb-jump-add-xref-backend ()
-    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)))
+  :init
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package which-key
   :delight which-key-mode
@@ -1271,10 +1265,11 @@ means save all with no questions."
 
 (use-package compile
   :straight nil
-  :hook (compilation-filter . ansi-color-compilation-filter)
   :custom
   (compilation-scroll-output 'first-error)
   :config
+  (when (fboundp #'ansi-color-compilation-filter)
+    (add-hook 'compilation-filter #'ansi-color-compilation-filter))
   (defmacro compile-add-error-syntax (name regexp file line &optional col level)
     "Register new compilation error syntax.
 
@@ -1394,6 +1389,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package profiler
   :bind ("<f2>" . profiler-start-or-report)
+  :commands (profiler-report)
   :init
   (defun profiler-start-or-report ()
     (interactive)
