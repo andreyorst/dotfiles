@@ -56,6 +56,7 @@
         markdown-electric-backquote
         markdown-enter-key
         markdown-outdent-or-delete
+        mc/vertical-align-with-space
         my/select-line
         my/smart-move-beginning-of-line
         org-beginning-of-line
