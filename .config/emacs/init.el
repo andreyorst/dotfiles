@@ -1415,6 +1415,53 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (profiler-report)
       (profiler-cpu-stop))))
 
+(use-package lsp-mode
+  :hook ((c-mode
+          c++-mode
+          java-mode)
+         . lsp)
+  :custom
+  ;; general settings
+  (lsp-keymap-prefix "C-c l")
+  (lsp-diagnostics-provider :auto)
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-log-io nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-idle-delay 0.05)
+  ;; DAP
+  (lsp-enable-dap-auto-configure nil)
+  ;; UI
+  (lsp-enable-links nil)
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-lens-enable nil)
+  ;; semantic code features
+  (lsp-enable-folding nil)
+  (lsp-enable-indentation nil)
+  (lsp-semantic-tokens-enable nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-text-document-color nil)
+  ;; completion
+  (lsp-completion-provider :none)
+  (lsp-completion-show-kind nil)
+  (lsp-enable-snippet nil))
+
+(use-package lsp-java
+  :requires lsp-mode
+  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
+  :custom
+  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
+
+(use-package treemacs
+  :custom
+  (treemacs-no-png-images t))
+
+(use-package lsp-treemacs
+  :custom
+  (lsp-treemacs-theme "Iconless"))
+
 (provide 'init)
 ;;; init.el ends here
 
