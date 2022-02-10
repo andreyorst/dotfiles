@@ -92,6 +92,21 @@ Used in various places to avoid getting wrong line height when
           (end (point)))
       (clone-indirect-buffer (buffer-name) t t)
       (narrow-to-region beg end)))
+  (defun narrow-next-page ()
+    "Narrow to the next page."
+    (interactive)
+    (widen)
+    (unless (looking-at "")
+      (forward-page))
+    (narrow-to-page))
+  (defun narrow-prev-page ()
+    "Narrow to the previous page."
+    (interactive)
+    (widen)
+    (unless (looking-at "")
+      (backward-page))
+    (backward-page)
+    (narrow-to-page))
   (defmacro comment (&rest _)
     nil)
   (provide 'functions))
@@ -413,7 +428,9 @@ are defining or executing a macro."
           ("C-d" . dired-jump)
           :map narrow-map
           ("i d" . indirect-narrow-to-defun)
-          ("i n" . indirect-narrow-to-region)))
+          ("i n" . indirect-narrow-to-region)
+          ("]" . narrow-next-page)
+          ("[" . narrow-prev-page)))
 
 ;;; UI
 
