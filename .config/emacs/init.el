@@ -109,6 +109,17 @@ Used in various places to avoid getting wrong line height when
     (narrow-to-page))
   (defmacro comment (&rest _)
     nil)
+  (defun in-termux-p ()
+    "Detect if Emacs is running in Termux."
+    (executable-find "termux-info"))
+  (defun gnome-dark-mode-enabled-p ()
+    "Check if frame is dark or not."
+    (if (executable-find "gsettings")
+        (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
+                     shell-command-to-string
+                     string-trim-right
+                     (string-suffix-p "-dark'"))
+      (eq 'dark (frame-parameter nil 'background-mode))))
   (provide 'functions))
 
 (use-package kmacro
@@ -475,6 +486,24 @@ are defining or executing a macro."
                               (border-width . 1)
                               (no-special-glyphs . t))))
 
+(use-package dbus
+  :straight nil
+  :requires (functions local-config)
+  :config
+  (defun gtk-theme-changed (path _ _)
+    "DBus handler to detect when the GTK theme has changed."
+    (when (string-equal path "/org/gnome/desktop/interface/gtk-theme")
+      (if (gnome-dark-mode-enabled-p)
+          (load-theme local-config-dark-theme t)
+        (load-theme local-config-light-theme t))))
+  (dbus-register-signal
+   :session
+   "ca.desrt.dconf"
+   "/ca/desrt/dconf/Writer/user"
+   "ca.desrt.dconf.Writer"
+   "Notify"
+   #'gtk-theme-changed))
+
 (use-package modus-themes
   :requires (functions local-config)
   :functions (gnome-dark-mode-enabled-p in-termux-p)
@@ -490,21 +519,10 @@ are defining or executing a macro."
   (modus-themes-operandi-color-overrides '((bg-main . "#fcfbfa") (fg-main . "#101010")))
   (modus-themes-vivendi-color-overrides (if (in-termux-p)
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
-                                          '((bg-main . "#252423") (fg-main . "#dedddc"))))
+                                          '((bg-main . "#1E1E1E") (fg-main . "#dedddc"))))
   (modus-themes-completions 'opinionated)
   (modus-themes-mode-line '(moody borderless))
   :init
-  (defun in-termux-p ()
-    "Detect if Emacs is running in Termux."
-    (executable-find "termux-info"))
-  (defun gnome-dark-mode-enabled-p ()
-    "Check if frame is dark or not."
-    (if (executable-find "gsettings")
-        (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
-                     shell-command-to-string
-                     string-trim-right
-                     (string-suffix-p "-dark'"))
-      (eq 'dark (frame-parameter nil 'background-mode))))
   (cond ((in-termux-p)
          (load-theme local-config-dark-theme t))
         ((gnome-dark-mode-enabled-p)
@@ -646,7 +664,7 @@ are defining or executing a macro."
 
 (use-package orderless
   :config
-  (add-to-list 'completion-styles 'orderless))
+  (add-to-list 'completion-styles 'orderless t))
 
 (use-package cape
   :config
@@ -1134,7 +1152,7 @@ nil."
   :after magit
   :custom
   (magit-todos-nice (when (executable-find "nice") t)
-                    "avoid breaking Magit on systems that don't have `nice'")
+                    "avoid breaking Magit on systems that don't have `nice'.")
   :init
   (let ((inhibit-message t))
     (magit-todos-mode 1))
@@ -1421,29 +1439,24 @@ REGEXP FILE LINE and optional COL LEVEL info to
           java-mode)
          . lsp)
   :custom
-  ;; general settings
   (lsp-keymap-prefix "C-c l")
   (lsp-diagnostics-provider :auto)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
   (lsp-log-io nil)
   (lsp-keep-workspace-alive nil)
   (lsp-idle-delay 0.05)
-  ;; DAP
   (lsp-enable-dap-auto-configure nil)
-  ;; UI
   (lsp-enable-links nil)
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-headerline-breadcrumb-icons-enable nil)
   (lsp-modeline-code-actions-enable nil)
   (lsp-lens-enable nil)
-  ;; semantic code features
   (lsp-enable-folding nil)
   (lsp-enable-indentation nil)
   (lsp-semantic-tokens-enable nil)
   (lsp-enable-symbol-highlighting nil)
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-text-document-color nil)
-  ;; completion
   (lsp-completion-provider :none)
   (lsp-completion-show-kind nil)
   (lsp-enable-snippet nil))
