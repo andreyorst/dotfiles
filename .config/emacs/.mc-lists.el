@@ -63,6 +63,7 @@
         org-ctrl-c-ctrl-c
         org-cycle
         org-delete-char
+        org-delete-indentation
         org-end-of-line
         org-fill-paragraph
         org-force-self-insert
