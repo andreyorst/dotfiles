@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t; -*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
@@ -506,8 +506,6 @@ are defining or executing a macro."
 
 (use-package modus-themes
   :requires (functions local-config)
-  :functions (gnome-dark-mode-enabled-p in-termux-p)
-  :defines (local-config-dark-theme local-config-light-theme)
   :custom-face
   (font-lock-doc-face ((t (:foreground nil :inherit font-lock-comment-face))))
   (line-number ((t (:foreground nil :background nil :inherit shadow))))
@@ -578,7 +576,6 @@ are defining or executing a macro."
 ;;; Completion
 
 (use-package vertico
-  :commands vertico-mode
   :bind ( :map vertico-map
           ("M-RET" . vertico-exit-input))
   :init
@@ -596,12 +593,10 @@ are defining or executing a macro."
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package marginalia
-  :commands marginalia-mode
   :init
   (marginalia-mode))
 
 (use-package consult
-  :commands consult-completion-in-region
   :preface
   (defvar consult-prefix-map (make-sparse-keymap))
   (fset 'consult-prefix-map consult-prefix-map)
@@ -732,7 +727,6 @@ are defining or executing a macro."
 (with-eval-after-load 'org
   (use-package org-tempo
     :straight nil
-    :defines org-version
     :unless (version<= org-version "9.1.9")))
 
 (use-package cc-mode
@@ -765,15 +759,12 @@ are defining or executing a macro."
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
-  :commands (fennel-repl)
-  :requires (inf-lisp)
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("C-c C-k" . eval-each-sexp)
           ("M-." . xref-find-definitions)
           ("M-," . xref-pop-marker-stack))
   :config
-  (require 'inf-lisp)
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
@@ -784,6 +775,7 @@ are defining or executing a macro."
         (fennel-repl nil))
       (let ((inferior-lisp-buffer fennel-repl--buffer))
         (lisp-eval-string body))))
+  :init
   (defun eval-each-sexp ()
     "Evaluate each s-expression in the buffer consequentially.
 
@@ -808,8 +800,6 @@ for the module name."
           clojurec-mode
           clojurescript-mode)
          . clojure-mode-setup)
-  :commands clojure-project-dir
-  :functions clojure-set-compile-command
   :config
   (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
   (defun org-babel-execute:clojure (body params)
@@ -947,7 +937,6 @@ for the module name."
 
 (use-package sly
   :after inf-lisp
-  :commands (sly-symbol-completion-mode sly-completing-read)
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :config
   (sly-symbol-completion-mode -1))
@@ -972,7 +961,6 @@ for the module name."
   :hook (sh-mode . flycheck-mode))
 
 (use-package lua-mode
-  :commands (lua-get-create-process lua-send-string)
   :hook (lua-mode . flycheck-mode)
   :custom
   (lua-indent-level 2)
@@ -1021,7 +1009,6 @@ for the module name."
           :map project-prefix-map
           ("t" . vterm-project-dir))
   :requires project
-  :commands (vterm project-root)
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
@@ -1043,11 +1030,6 @@ for the module name."
   :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
 
 (use-package flycheck
-  :defines (flymake-error-bitmap
-            flymake-warning-bitmap
-            flymake-note-bitmap)
-  :commands (flycheck-define-error-level)
-  :functions (flycheck-count-errors)
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
@@ -1096,8 +1078,6 @@ nil."
 (use-package flycheck-package)
 
 (use-package smartparens
-  :commands (sp-use-paredit-bindings sp-local-pair sp-update-local-pairs)
-  :defines common-lisp-modes-mode-map
   :hook (((common-lisp-modes-mode
            prog-mode
            reb-mode
@@ -1130,7 +1110,6 @@ nil."
 
 (use-package undo-tree
   :delight undo-tree-mode
-  :commands (global-undo-tree-mode undo-tree-undo undo-tree-redo)
   :bind (("C-z" . undo-tree-undo)
          ("C-S-z" . undo-tree-redo))
   :custom
@@ -1148,7 +1127,6 @@ nil."
   (magit-diff-refine-hunk 'all))
 
 (use-package magit-todos
-  :commands magit-todos-mode
   :after magit
   :custom
   (magit-todos-nice (when (executable-find "nice") t)
@@ -1169,9 +1147,6 @@ nil."
   (ediff-split-window-function 'split-window-horizontally))
 
 (use-package project
-  :functions (project-root-p
-              project-find-root)
-  :commands (project-buffers project-compile)
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
   :custom
@@ -1250,7 +1225,6 @@ means save all with no questions."
   (recentf-mode))
 
 (use-package dumb-jump
-  :commands dumb-jump-xref-activate
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'completing-read)
@@ -1259,13 +1233,11 @@ means save all with no questions."
 
 (use-package which-key
   :delight which-key-mode
-  :commands which-key-mode
   :init
   (which-key-mode t))
 
 (use-package gcmh
   :delight gcmh-mode
-  :commands gcmh-mode
   :init
   (gcmh-mode t))
 
@@ -1399,7 +1371,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package phi-search)
 
 (use-package multiple-cursors
-  :defines region-bindings-mode-map
   :hook (multiple-cursors-mode . multiple-cursors-ensure-tmm)
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
@@ -1424,7 +1395,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package profiler
   :bind ("<f2>" . profiler-start-or-report)
-  :commands (profiler-report)
   :init
   (defun profiler-start-or-report ()
     (interactive)
