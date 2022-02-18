@@ -203,53 +203,63 @@ Bindings will be enabled next time region is highlighted."
   :init
   (region-bindings-mode-enable))
 
-;; (use-package structural-mode
-;;   :straight nil
-;;   :preface
-;;   (defun structural-beginning-of-sexp ()
-;;     (condition-case _
-;;         (if (nth 3 (syntax-ppss))
-;;             (save-match-data
-;;               (search-backward "\"")
-;;               (forward-char))
-;;           (while t (forward-sexp -1)))
-;;       (error)))
-;;   (defun structural--matching-delim (char)
-;;     (cond ((= char 40) 41)
-;;           ((= char 91) 93)
-;;           ((= char 123) 125)
-;;           ((= char 34) 34)))
-;;   (defun structural-forward-slurp ()
-;;     (interactive)
-;;     (condition-case _
-;;         (save-excursion
-;;           (structural-beginning-of-sexp)
-;;           (let ((delim (char-before)))
-;;             (forward-char -1)
-;;             (forward-sexp)
-;;             (let ((p (point)))
-;;               (forward-sexp)
-;;               (insert (structural--matching-delim delim))
-;;               (goto-char p)
-;;               (delete-char -1)))
-;;           (provide 'structural-mode))
-;;       (error)))
-;;   (defun structural-backward-slurp ()
-;;     (interactive)
-;;     (condition-case _
-;;         (save-excursion
-;;           (structural-beginning-of-sexp)
-;;           (let ((delim (char-before)))
-;;             (forward-char -1)
-;;             (forward-sexp)
-;;             (delete-char -1)
-;;             (let ((p (point)))
-;;               (forward-sexp -2)
-;;               (forward-sexp 1))
-;;             (insert (structural--matching-delim delim)))
-;;           (provide 'structural-mode))
-;;       (error)))
-;;   (provide 'structural-mode))
+(use-package structural-mode
+  :straight nil
+  :hook common-lisp-modes-mode
+  :bind ( :map structural-mode-map
+               ("M-<right>" . structural-forward-slurp)
+               ("M-<left>" . structural-backward-slurp))
+  :preface
+  (defun structural-beginning-of-sexp ()
+    (condition-case _
+        (if (nth 3 (syntax-ppss))
+            (save-match-data
+              (search-backward "\"")
+              (forward-char))
+          (while t (forward-sexp -1)))
+      (error)))
+  (defun structural--matching-delim (char)
+    (cond ((= char 40) 41)
+          ((= char 91) 93)
+          ((= char 123) 125)
+          ((= char 34) 34)))
+  (defun structural-forward-slurp (&optional n)
+    (interactive "p")
+    (condition-case e
+        (save-excursion
+          (structural-beginning-of-sexp)
+          (let ((delim (char-before)))
+            (forward-char -1)
+            (forward-sexp)
+            (let ((p (point)))
+              (forward-sexp n)
+              (insert (structural--matching-delim delim))
+              (goto-char p)
+              (delete-char -1)))
+          (provide 'structural-mode))
+      (error (message "%s" (cadr e)))))
+  (defun structural-backward-slurp (&optional n)
+    (interactive)
+    (condition-case e
+        (save-excursion
+          (structural-beginning-of-sexp)
+          (let ((delim (char-before)))
+            (forward-char -1)
+            (forward-sexp)
+            (delete-char -1)
+            (condition-case e
+                  (progn
+                    (forward-sexp -2)
+                    (forward-sexp 1))
+                (error (message "%s" (cadr e))))
+            (insert (structural--matching-delim delim))))
+      (error (message "%s" (cadr e)))))
+  (define-minor-mode structural-mode
+    "Simple structural editing mode."
+    :lighter " (λ)"
+    :group 'editing
+    :keymap (make-sparse-keymap))
+  (provide 'structural-mode))
 
 ;;; Inbuilt stuff
 
@@ -535,8 +545,10 @@ are defining or executing a macro."
                               (border-width . 1)
                               (no-special-glyphs . t))))
 
+
 (use-package dbus
   :straight nil
+  :when window-system
   :requires (functions local-config)
   :config
   (defun gtk-theme-changed (path _ _)
