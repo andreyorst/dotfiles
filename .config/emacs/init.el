@@ -138,7 +138,8 @@ Used in various places to avoid getting wrong line height when
   :delight
   :straight nil
   :bind ( :map common-lisp-modes-mode-map
-          ("M-q" . common-lisp-modes-indent-or-fill-sexp))
+          ("M-q" . common-lisp-modes-indent-or-fill-sexp)
+          ("M-<up>" . raise-sexp))
   :preface
   (define-minor-mode common-lisp-modes-mode
     "Mode for enabling all modes that are common for lisps.
@@ -201,6 +202,54 @@ Bindings will be enabled next time region is highlighted."
   (provide 'region-bindings)
   :init
   (region-bindings-mode-enable))
+
+;; (use-package structural-mode
+;;   :straight nil
+;;   :preface
+;;   (defun structural-beginning-of-sexp ()
+;;     (condition-case _
+;;         (if (nth 3 (syntax-ppss))
+;;             (save-match-data
+;;               (search-backward "\"")
+;;               (forward-char))
+;;           (while t (forward-sexp -1)))
+;;       (error)))
+;;   (defun structural--matching-delim (char)
+;;     (cond ((= char 40) 41)
+;;           ((= char 91) 93)
+;;           ((= char 123) 125)
+;;           ((= char 34) 34)))
+;;   (defun structural-forward-slurp ()
+;;     (interactive)
+;;     (condition-case _
+;;         (save-excursion
+;;           (structural-beginning-of-sexp)
+;;           (let ((delim (char-before)))
+;;             (forward-char -1)
+;;             (forward-sexp)
+;;             (let ((p (point)))
+;;               (forward-sexp)
+;;               (insert (structural--matching-delim delim))
+;;               (goto-char p)
+;;               (delete-char -1)))
+;;           (provide 'structural-mode))
+;;       (error)))
+;;   (defun structural-backward-slurp ()
+;;     (interactive)
+;;     (condition-case _
+;;         (save-excursion
+;;           (structural-beginning-of-sexp)
+;;           (let ((delim (char-before)))
+;;             (forward-char -1)
+;;             (forward-sexp)
+;;             (delete-char -1)
+;;             (let ((p (point)))
+;;               (forward-sexp -2)
+;;               (forward-sexp 1))
+;;             (insert (structural--matching-delim delim)))
+;;           (provide 'structural-mode))
+;;       (error)))
+;;   (provide 'structural-mode))
 
 ;;; Inbuilt stuff
 
@@ -1077,36 +1126,36 @@ nil."
 
 (use-package flycheck-package)
 
-(use-package smartparens
-  :hook (((common-lisp-modes-mode
-           prog-mode
-           reb-mode
-           reb-lisp-mode)
-          . smartparens-strict-mode)
-         ((eval-expression-minibuffer-setup
-           lisp-data-mode)
-          . minibuffer-enable-sp))
-  :bind ( :map smartparens-mode-map
-          ("C-M-q" . sp-indent-defun)
-          :map common-lisp-modes-mode-map
-          (";" . sp-comment))
-  :custom
-  (sp-highlight-pair-overlay nil)
-  (sp-highlight-wrap-overlay nil)
-  (sp-highlight-wrap-tag-overlay nil)
-  (sp-show-pair-delay 0)
-  (sp-echo-match-when-invisible nil)
-  :config
-  (require 'smartparens-config)
-  (sp-use-paredit-bindings)
-  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before :config
-  (defun minibuffer-enable-sp ()
-    "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
-    (setq-local comment-start ";")
-    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-    (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1)))
+;; (use-package smartparens
+;;   :hook (((common-lisp-modes-mode
+;;            prog-mode
+;;            reb-mode
+;;            reb-lisp-mode)
+;;           . smartparens-strict-mode)
+;;          ((eval-expression-minibuffer-setup
+;;            lisp-data-mode)
+;;           . minibuffer-enable-sp))
+;;   :bind ( :map smartparens-mode-map
+;;           ("C-M-q" . sp-indent-defun)
+;;           :map common-lisp-modes-mode-map
+;;           (";" . sp-comment))
+;;   :custom
+;;   (sp-highlight-pair-overlay nil)
+;;   (sp-highlight-wrap-overlay nil)
+;;   (sp-highlight-wrap-tag-overlay nil)
+;;   (sp-show-pair-delay 0)
+;;   (sp-echo-match-when-invisible nil)
+;;   :config
+;;   (require 'smartparens-config)
+;;   (sp-use-paredit-bindings)
+;;   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before :config
+;;   (defun minibuffer-enable-sp ()
+;;     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
+;;     (setq-local comment-start ";")
+;;     (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+;;     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+;;     (sp-update-local-pairs 'minibuffer-pairs)
+;;     (smartparens-strict-mode 1)))
 
 (use-package undo-tree
   :delight undo-tree-mode
@@ -1250,12 +1299,12 @@ means save all with no questions."
   :custom
   (vc-follow-symlinks t))
 
-(use-package isayt
-  :delight isayt-mode
-  :straight ( :host gitlab
-              :repo "andreyorst/isayt.el"
-              :branch "main")
-  :hook (common-lisp-modes-mode . isayt-mode))
+;; (use-package isayt
+;;   :delight isayt-mode
+;;   :straight ( :host gitlab
+;;               :repo "andreyorst/isayt.el"
+;;               :branch "main")
+;;   :hook (common-lisp-modes-mode . isayt-mode))
 
 (use-package eldoc
   :delight eldoc-mode
