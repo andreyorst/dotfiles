@@ -500,7 +500,9 @@ are defining or executing a macro."
           ("i d" . indirect-narrow-to-defun)
           ("i n" . indirect-narrow-to-region)
           ("]" . narrow-next-page)
-          ("[" . narrow-prev-page)))
+          ("[" . narrow-prev-page))
+  :init
+  (setq mode-line-end-spaces nil))
 
 ;;; UI
 
