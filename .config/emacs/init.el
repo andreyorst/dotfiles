@@ -164,7 +164,7 @@ lisp-modes mode.
   (provide 'common-lisp-modes)
   :init
   (defun setup-before-save-hooks ()
-    (add-hook 'before-save-hook #'check-parens nil 'local))))
+    (add-hook 'local-write-file-hooks #'check-parens)))
 
 (use-package region-bindings
   :straight nil
