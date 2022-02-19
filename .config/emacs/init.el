@@ -137,6 +137,7 @@ Used in various places to avoid getting wrong line height when
 (use-package common-lisp-modes
   :delight
   :straight nil
+  :hook (common-lisp-modes-mode . setup-before-save-hooks)
   :bind ( :map common-lisp-modes-mode-map
           ("M-q" . common-lisp-modes-indent-or-fill-sexp)
           ("M-<up>" . raise-sexp))
@@ -160,7 +161,10 @@ lisp-modes mode.
         (save-excursion
           (mark-sexp)
           (indent-region (point) (mark))))))
-  (provide 'common-lisp-modes))
+  (provide 'common-lisp-modes)
+  :init
+  (defun setup-before-save-hooks ()
+    (add-hook 'before-save-hook #'check-parens nil 'local))))
 
 (use-package region-bindings
   :straight nil
