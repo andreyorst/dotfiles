@@ -215,7 +215,7 @@ Bindings will be enabled next time region is highlighted."
           ("M-<left>" . structural-backward-slurp)
           ("M-r" . structural-rewrap-sexp))
   :preface
-  (defun structural-beginning-of-sexp ()
+  (defun structural--beginning-of-sexp ()
     (condition-case _
         (if (nth 3 (syntax-ppss))
             (save-match-data
@@ -223,6 +223,13 @@ Bindings will be enabled next time region is highlighted."
               (forward-char))
           (while t (forward-sexp -1)))
       (error)))
+  (defun structural--sexp-bounds ()
+    (save-excursion
+      (structural--beginning-of-sexp)
+      (forward-char -1)
+      (let ((start (point)))
+        (forward-sexp)
+        (cons start (point)))))
   (defun structural--matching-delim (char)
     (cond ((= char 40) 41)
           ((= char 91) 93)
@@ -234,62 +241,65 @@ Bindings will be enabled next time region is highlighted."
     (interactive "p")
     (condition-case e
         (save-excursion
-          (structural-beginning-of-sexp)
-          (let ((delim (char-before)))
-            (forward-char -1)
-            (forward-sexp)
-            (let ((p (point)))
-              (forward-sexp n)
-              (insert (structural--matching-delim delim))
-              (goto-char p)
-              (delete-char -1)))
+          (let* ((bounds (structural--sexp-bounds))
+                 (start (car bounds))
+                 (end (cdr bounds))
+                 (delim (char-after start)))
+            (goto-char end)
+            (forward-sexp n)
+            (insert (structural--matching-delim delim))
+            (goto-char end)
+            (delete-char -1))
           (provide 'structural-mode))
       (error (message "%s" (cadr e)))))
   (defun structural-backward-slurp (&optional n)
-    (interactive)
+    (interactive "p")
     (condition-case e
         (save-excursion
-          (structural-beginning-of-sexp)
-          (let ((delim (char-before)))
-            (forward-char -1)
-            (forward-sexp)
+          (let* ((bounds (structural--sexp-bounds))
+                 (start (car bounds))
+                 (end (cdr bounds))
+                 (delim (char-after start)))
+            (goto-char end)
             (delete-char -1)
             (condition-case e
-                  (progn
-                    (forward-sexp -2)
-                    (forward-sexp 1))
-                (error (message "%s" (cadr e))))
+                (progn
+                  (forward-sexp -1)
+                  (forward-sexp (- n))
+                  (forward-sexp 1))
+              (error (message "%s" (cadr e))))
             (insert (structural--matching-delim delim))))
       (error (message "%s" (cadr e)))))
   (defun structural-rewrap-sexp (with)
-    (interactive (list (read-key "enter pair")))
+    (interactive (list (read-key "enter new delimiter")))
     (condition-case e
-        (save-excursion
-          (structural-beginning-of-sexp)
-          (forward-char -1)
-          (let ((close (structural--matching-delim with))
-                (start (point))
-                (current (char-after)))
-            (forward-sexp)
-            (let ((end (point)))
-              (cond ((and (= with 34) (not (= current 34)))
-                     (let ((escaped (buffer-substring-no-properties (1+ start) (1- end))))
-                       (delete-region start end)
-                       (insert (format "%S" escaped))
-                       (error nil)))
-                    ((and (= current 34) (not (= with 34)))
-                     (let ((unescaped (replace-regexp-in-string
-                                       "\\\\\\(.\\|\n\\)" "\\1"
-                                       (buffer-substring-no-properties (1+ start) (1- end)))))
-                       (delete-region start end)
-                       (insert (format "%c%s%c" with unescaped close))
-                       (error nil))))
-              (goto-char start)
-              (delete-char 1)
-              (insert-char with)
-              (goto-char end)
-              (delete-char -1)
-              (insert-char close))))
+        (let* ((bounds (structural--sexp-bounds))
+               (start (car bounds))
+               (end (cdr bounds))
+               (open (char-after start))
+               (close (structural--matching-delim with)))
+          (save-excursion
+            (cond ((and (= with 34) (not (= open 34))) ; rewrap non-string with double quote
+                   (replace-region-contents
+                    start end
+                    (lambda ()
+                      (format "%S" (buffer-substring-no-properties (1+ start) (1- end))))))
+                  ((and (= open 34) (not (= with 34))) ; rewrap a string with non quotes
+                   (replace-region-contents
+                    start end
+                    (lambda ()
+                      (format "%c%s%c"
+                              with
+                              (replace-regexp-in-string
+                               "\\\\\\(.\\|\n\\)" "\\1"
+                               (buffer-substring-no-properties (1+ start) (1- end)))
+                              close))))
+                  (t (goto-char start)
+                     (delete-char 1)
+                     (insert-char with)
+                     (goto-char end)
+                     (delete-char -1)
+                     (insert-char close)))))
       (error (message "%s" (cadr e)))))
   (define-minor-mode structural-mode
     "Simple structural editing mode."
