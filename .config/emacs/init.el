@@ -207,8 +207,9 @@ Bindings will be enabled next time region is highlighted."
   :straight nil
   :hook common-lisp-modes-mode
   :bind ( :map structural-mode-map
-               ("M-<right>" . structural-forward-slurp)
-               ("M-<left>" . structural-backward-slurp))
+          ("M-<right>" . structural-forward-slurp)
+          ("M-<left>" . structural-backward-slurp)
+          ("M-r" . structural-rewrap-sexp))
   :preface
   (defun structural-beginning-of-sexp ()
     (condition-case _
@@ -222,7 +223,9 @@ Bindings will be enabled next time region is highlighted."
     (cond ((= char 40) 41)
           ((= char 91) 93)
           ((= char 123) 125)
-          ((= char 34) 34)))
+          ((= char 34) 34)
+          (t (user-error "no matching character for %s"
+                         (char-to-string char)))))
   (defun structural-forward-slurp (&optional n)
     (interactive "p")
     (condition-case e
@@ -253,6 +256,36 @@ Bindings will be enabled next time region is highlighted."
                     (forward-sexp 1))
                 (error (message "%s" (cadr e))))
             (insert (structural--matching-delim delim))))
+      (error (message "%s" (cadr e)))))
+  (defun structural-rewrap-sexp (with)
+    (interactive (list (read-key "enter pair")))
+    (condition-case e
+        (save-excursion
+          (structural-beginning-of-sexp)
+          (forward-char -1)
+          (let ((close (structural--matching-delim with))
+                (start (point))
+                (current (char-after)))
+            (forward-sexp)
+            (let ((end (point)))
+              (cond ((and (= with 34) (not (= current 34)))
+                     (let ((escaped (buffer-substring-no-properties (1+ start) (1- end))))
+                       (delete-region start end)
+                       (insert (format "%S" escaped))
+                       (error nil)))
+                    ((and (= current 34) (not (= with 34)))
+                     (let ((unescaped (replace-regexp-in-string
+                                       "\\\\\\(.\\|\n\\)" "\\1"
+                                       (buffer-substring-no-properties (1+ start) (1- end)))))
+                       (delete-region start end)
+                       (insert (format "%c%s%c" with unescaped close))
+                       (error nil))))
+              (goto-char start)
+              (delete-char 1)
+              (insert-char with)
+              (goto-char end)
+              (delete-char -1)
+              (insert-char close))))
       (error (message "%s" (cadr e)))))
   (define-minor-mode structural-mode
     "Simple structural editing mode."
