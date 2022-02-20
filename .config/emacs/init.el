@@ -211,11 +211,15 @@ Bindings will be enabled next time region is highlighted."
   :straight nil
   :hook common-lisp-modes-mode
   :bind ( :map structural-mode-map
-          ("M-<right>" . structural-forward-slurp)
-          ("M-<left>" . structural-backward-slurp)
+          ("C-<right>" . structural-forward-slurp)
+          ("C-<left>" . structural-forward-barf)
           ("M-r" . structural-rewrap-sexp))
   :preface
   (defun structural--beginning-of-sexp ()
+    "Move point after the opening delimiter.
+
+In:  (foo █bar)
+Out: (█foo bar)"
     (condition-case _
         (if (nth 3 (syntax-ppss))
             (save-match-data
@@ -252,7 +256,7 @@ Bindings will be enabled next time region is highlighted."
             (delete-char -1))
           (provide 'structural-mode))
       (error (message "%s" (cadr e)))))
-  (defun structural-backward-slurp (&optional n)
+  (defun structural-forward-barf (&optional n)
     (interactive "p")
     (condition-case e
         (save-excursion
@@ -279,27 +283,31 @@ Bindings will be enabled next time region is highlighted."
                (open (char-after start))
                (close (structural--matching-delim with)))
           (save-excursion
-            (cond ((and (= with 34) (not (= open 34))) ; rewrap non-string with double quote
-                   (replace-region-contents
-                    start end
-                    (lambda ()
-                      (format "%S" (buffer-substring-no-properties (1+ start) (1- end))))))
-                  ((and (= open 34) (not (= with 34))) ; rewrap a string with non quotes
-                   (replace-region-contents
-                    start end
-                    (lambda ()
-                      (format "%c%s%c"
-                              with
-                              (replace-regexp-in-string
-                               "\\\\\\(.\\|\n\\)" "\\1"
-                               (buffer-substring-no-properties (1+ start) (1- end)))
-                              close))))
-                  (t (goto-char start)
-                     (delete-char 1)
-                     (insert-char with)
-                     (goto-char end)
-                     (delete-char -1)
-                     (insert-char close)))))
+            (cond
+             ;; rewrap a non-string with double quotes, escape everything
+             ((and (= with 34) (not (= open 34)))
+              (replace-region-contents
+               start end
+               (lambda ()
+                 (format "%S" (buffer-substring-no-properties (1+ start) (1- end))))))
+             ;; rewrap a string with non quotes, unescape everything
+             ((and (= open 34) (not (= with 34)))
+              (replace-region-contents
+               start end
+               (lambda ()
+                 (format "%c%s%c"
+                         with
+                         (replace-regexp-in-string
+                          "\\\\\\(.\\|\n\\)" "\\1"
+                          (buffer-substring-no-properties (1+ start) (1- end)))
+                         close))))
+             ;; general case with arbitrary parentheses
+             (t (goto-char start)
+                (delete-char 1)
+                (insert-char with)
+                (goto-char end)
+                (delete-char -1)
+                (insert-char close)))))
       (error (message "%s" (cadr e)))))
   (define-minor-mode structural-mode
     "Simple structural editing mode."
