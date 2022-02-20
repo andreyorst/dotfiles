@@ -228,6 +228,7 @@ Out: (█foo bar)"
           (while t (forward-sexp -1)))
       (error)))
   (defun structural--sexp-bounds ()
+    "Return a cons cell with positions at the start and end of expression."
     (save-excursion
       (structural--beginning-of-sexp)
       (forward-char -1)
@@ -235,6 +236,7 @@ Out: (█foo bar)"
         (forward-sexp)
         (cons start (point)))))
   (defun structural--matching-delim (char)
+    "Return matching delimiter for CHAR."
     (cond ((= char 40) 41)
           ((= char 91) 93)
           ((= char 123) 125)
@@ -242,6 +244,10 @@ Out: (█foo bar)"
           (t (user-error "no matching character for %s"
                          (char-to-string char)))))
   (defun structural-forward-slurp (&optional n)
+    "Move closing delimiter N expressions forward.
+
+In:  (foo █bar) baz
+Out: (foo █bar baz)"
     (interactive "p")
     (condition-case e
         (save-excursion
@@ -257,6 +263,10 @@ Out: (█foo bar)"
           (provide 'structural-mode))
       (error (message "%s" (cadr e)))))
   (defun structural-forward-barf (&optional n)
+    "Move closing delimiter N expressions forward.
+
+In:  (foo █bar baz)
+Out: (foo █bar) baz"
     (interactive "p")
     (condition-case e
         (save-excursion
@@ -275,6 +285,9 @@ Out: (█foo bar)"
             (insert (structural--matching-delim delim))))
       (error (message "%s" (cadr e)))))
   (defun structural-rewrap-sexp (with)
+    "Rewrap expression WITH a new delimiter.
+
+Tries to (un)escape strings when (un)wrapping with quotes."
     (interactive (list (read-key "enter new delimiter")))
     (condition-case e
         (let* ((bounds (structural--sexp-bounds))
@@ -310,7 +323,9 @@ Out: (█foo bar)"
                 (insert-char close)))))
       (error (message "%s" (cadr e)))))
   (define-minor-mode structural-mode
-    "Simple structural editing mode."
+    "Simple structural editing mode.
+
+\\<structural-mode-map>"
     :lighter " (λ)"
     :group 'editing
     :keymap (make-sparse-keymap))
