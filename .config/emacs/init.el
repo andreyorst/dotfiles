@@ -215,34 +215,36 @@ Bindings will be enabled next time region is highlighted."
           ("C-<left>" . structural-forward-barf)
           ("M-r" . structural-rewrap-sexp))
   :preface
-  (defun structural--beginning-of-sexp ()
-    "Move point after the opening delimiter.
-
-In:  (foo █bar)
-Out: (█foo bar)"
-    (condition-case _
-        (if (nth 3 (syntax-ppss))
-            (save-match-data
-              (search-backward "\"")
-              (forward-char))
-          (while t (forward-sexp -1)))
-      (error)))
+  (defcustom structural-pair-alist
+    '((?\" . ?\")
+      (?\( . ?\))
+      (?\[ . ?\])
+      (?\{ . ?\}))
+    "Alist of pair characters."
+    :group 'structural-mode
+    :type '(alist :key-type character :value-type character))
   (defun structural--sexp-bounds ()
     "Return a cons cell with positions at the start and end of expression."
     (save-excursion
-      (structural--beginning-of-sexp)
+      (condition-case _
+          (if (nth 3 (syntax-ppss))
+              (save-match-data
+                (search-backward "\"")
+                (forward-char))
+            (while t (forward-sexp -1)))
+        (error))
       (forward-char -1)
       (let ((start (point)))
         (forward-sexp)
         (cons start (point)))))
   (defun structural--matching-delim (char)
     "Return matching delimiter for CHAR."
-    (cond ((= char 40) 41)
-          ((= char 91) 93)
-          ((= char 123) 125)
-          ((= char 34) 34)
-          (t (user-error "no matching character for %s"
-                         (char-to-string char)))))
+    (if-let ((pair (assoc char structural-pair-alist)))
+        (cdr pair)
+      (if-let ((pair (rassoc char structural-pair-alist)))
+          (car pair)
+        (user-error "no matching character for %s"
+                    (char-to-string char)))))
   (defun structural-forward-slurp (&optional n)
     "Move closing delimiter N expressions forward.
 
@@ -298,29 +300,24 @@ Tries to (un)escape strings when (un)wrapping with quotes."
           (save-excursion
             (cond
              ;; rewrap a non-string with double quotes, escape everything
-             ((and (= with 34) (not (= open 34)))
-              (replace-region-contents
-               start end
-               (lambda ()
-                 (format "%S" (buffer-substring-no-properties (1+ start) (1- end))))))
+             ((and (= with ?\") (not (= open ?\")))
+              (let ((escaped (buffer-substring-no-properties (1+ start) (1- end))))
+                (delete-region start end)
+                (insert (format "%S" escaped))))
              ;; rewrap a string with non quotes, unescape everything
-             ((and (= open 34) (not (= with 34)))
-              (replace-region-contents
-               start end
-               (lambda ()
-                 (format "%c%s%c"
-                         with
-                         (replace-regexp-in-string
-                          "\\\\\\(.\\|\n\\)" "\\1"
-                          (buffer-substring-no-properties (1+ start) (1- end)))
-                         close))))
-             ;; general case with arbitrary parentheses
-             (t (goto-char start)
-                (delete-char 1)
-                (insert-char with)
-                (goto-char end)
-                (delete-char -1)
-                (insert-char close)))))
+             ((and (= open ?\") (not (= with ?\")))
+              (let ((unescaped (replace-regexp-in-string
+                                "\\\\\\(.\\|\n\\)" "\\1"
+                                (buffer-substring-no-properties (1+ start) (1- end)))))
+                (delete-region start end)
+                (insert (format "%c%s%c" with unescaped close)))
+              ;; general case with arbitrary parentheses
+              (t (goto-char start)
+                 (delete-char 1)
+                 (insert-char with)
+                 (goto-char end)
+                 (delete-char -1)
+                 (insert-char close))))))
       (error (message "%s" (cadr e)))))
   (define-minor-mode structural-mode
     "Simple structural editing mode.
