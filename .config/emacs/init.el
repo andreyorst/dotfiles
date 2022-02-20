@@ -171,8 +171,7 @@ lisp-modes mode.
   :bind ( :map region-bindings-mode-map
           ("q" . region-bindings-disable)
           ("r" . replace-string)
-          ("R" . replace-regexp)
-          ("h" . (lambda () (interactive) )))
+          ("R" . replace-regexp))
   :preface
   (define-minor-mode region-bindings-mode
     "Minor mode for mapping commands while region is active.
