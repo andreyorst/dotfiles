@@ -226,14 +226,7 @@ Bindings will be enabled next time region is highlighted."
   (defun structural--sexp-bounds ()
     "Return a cons cell with positions at the start and end of expression."
     (save-excursion
-      (condition-case _
-          (if (nth 3 (syntax-ppss))
-              (save-match-data
-                (search-backward "\"")
-                (forward-char))
-            (while t (forward-sexp -1)))
-        (error))
-      (forward-char -1)
+      (up-list -1 'escape-strings 'no-syntax-crossing)
       (let ((start (point)))
         (forward-sexp)
         (cons start (point)))))
@@ -286,8 +279,8 @@ Out: (foo █bar) baz"
               (error (message "%s" (cadr e))))
             (insert (structural--matching-delim delim))))
       (error (message "%s" (cadr e)))))
-  (defun structural-rewrap-sexp (with)
-    "Rewrap expression WITH a new delimiter.
+  (defun structural-rewrap-sexp (delimiter)
+    "Rewrap expression with a new DELIMITER.
 
 Tries to (un)escape strings when (un)wrapping with quotes."
     (interactive (list (read-key "enter new delimiter")))
@@ -296,25 +289,25 @@ Tries to (un)escape strings when (un)wrapping with quotes."
                (start (car bounds))
                (end (cdr bounds))
                (open (char-after start))
-               (close (structural--matching-delim with)))
+               (close (structural--matching-delim delimiter)))
           (save-excursion
             (cond
              ;; rewrap a non-string with double quotes, escape everything
-             ((and (= with ?\") (not (= open ?\")))
+             ((and (= delimiter ?\") (not (= open ?\")))
               (let ((escaped (buffer-substring-no-properties (1+ start) (1- end))))
                 (delete-region start end)
                 (insert (format "%S" escaped))))
              ;; rewrap a string with non quotes, unescape everything
-             ((and (= open ?\") (not (= with ?\")))
+             ((and (= open ?\") (not (= delimiter ?\")))
               (let ((unescaped (replace-regexp-in-string
                                 "\\\\\\(.\\|\n\\)" "\\1"
                                 (buffer-substring-no-properties (1+ start) (1- end)))))
                 (delete-region start end)
-                (insert (format "%c%s%c" with unescaped close)))
+                (insert (format "%c%s%c" delimiter unescaped close)))
               ;; general case with arbitrary parentheses
               (t (goto-char start)
                  (delete-char 1)
-                 (insert-char with)
+                 (insert-char delimiter)
                  (goto-char end)
                  (delete-char -1)
                  (insert-char close))))))
