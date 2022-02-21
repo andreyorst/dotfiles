@@ -809,12 +809,8 @@ are defining or executing a macro."
                             :extend t))))
   (org-drawer ((t (:foreground nil :inherit shadow))))
   :custom
-  (org-startup-with-inline-images nil)
   (org-tags-column -120)
   (org-startup-folded 'content)
-  (org-hide-emphasis-markers nil)
-  (org-adapt-indentation nil)
-  (org-hide-leading-stars nil)
   (org-highlight-latex-and-related '(latex))
   (org-preview-latex-default-process 'dvisvgm)
   (org-src-fontify-natively t)
