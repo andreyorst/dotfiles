@@ -91,6 +91,7 @@
         parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        region-bindings-disable
         save-some-buffers
         sp-backward-delete-char
         sp-backward-kill-word
