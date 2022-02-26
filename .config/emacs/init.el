@@ -137,10 +137,8 @@ Used in various places to avoid getting wrong line height when
 (use-package common-lisp-modes
   :delight
   :straight nil
-  :hook (common-lisp-modes-mode . setup-before-save-hooks)
   :bind ( :map common-lisp-modes-mode-map
-          ("M-q" . common-lisp-modes-indent-or-fill-sexp)
-          ("M-<up>" . raise-sexp))
+          ("M-q" . common-lisp-modes-indent-or-fill-sexp))
   :preface
   (define-minor-mode common-lisp-modes-mode
     "Mode for enabling all modes that are common for lisps.
@@ -161,10 +159,7 @@ lisp-modes mode.
         (save-excursion
           (mark-sexp)
           (indent-region (point) (mark))))))
-  (provide 'common-lisp-modes)
-  :init
-  (defun setup-before-save-hooks ()
-    (add-hook 'local-write-file-hooks #'check-parens)))
+  (provide 'common-lisp-modes))
 
 (use-package region-bindings
   :straight nil
@@ -205,120 +200,6 @@ Bindings will be enabled next time region is highlighted."
   (provide 'region-bindings)
   :init
   (region-bindings-mode-enable))
-
-(use-package structural-mode
-  :straight nil
-  :hook common-lisp-modes-mode
-  :bind ( :map structural-mode-map
-          ("C-<right>" . structural-forward-slurp)
-          ("C-<left>" . structural-forward-barf)
-          ("M-r" . structural-rewrap-sexp))
-  :preface
-  (defcustom structural-pair-alist
-    '((?\" . ?\")
-      (?\( . ?\))
-      (?\[ . ?\])
-      (?\{ . ?\}))
-    "Alist of pair characters."
-    :group 'structural-mode
-    :type '(alist :key-type character :value-type character))
-  (defun structural--sexp-bounds ()
-    "Return a cons cell with positions at the start and end of expression."
-    (save-excursion
-      (up-list -1 'escape-strings 'no-syntax-crossing)
-      (let ((start (point)))
-        (forward-sexp)
-        (cons start (point)))))
-  (defun structural--matching-delim (char)
-    "Return matching delimiter for CHAR."
-    (if-let ((pair (assoc char structural-pair-alist)))
-        (cdr pair)
-      (if-let ((pair (rassoc char structural-pair-alist)))
-          (car pair)
-        (user-error "no matching character for %s"
-                    (char-to-string char)))))
-  (defun structural-forward-slurp (&optional n)
-    "Move closing delimiter N expressions forward.
-
-In:  (foo █bar) baz
-Out: (foo █bar baz)"
-    (interactive "p")
-    (condition-case e
-        (save-excursion
-          (let* ((bounds (structural--sexp-bounds))
-                 (start (car bounds))
-                 (end (cdr bounds))
-                 (delim (char-after start)))
-            (goto-char end)
-            (forward-sexp n)
-            (insert (structural--matching-delim delim))
-            (goto-char end)
-            (delete-char -1))
-          (provide 'structural-mode))
-      (error (message "%s" (cadr e)))))
-  (defun structural-forward-barf (&optional n)
-    "Move closing delimiter N expressions forward.
-
-In:  (foo █bar baz)
-Out: (foo █bar) baz"
-    (interactive "p")
-    (condition-case e
-        (save-excursion
-          (let* ((bounds (structural--sexp-bounds))
-                 (start (car bounds))
-                 (end (cdr bounds))
-                 (delim (char-after start)))
-            (goto-char end)
-            (delete-char -1)
-            (condition-case e
-                (progn
-                  (forward-sexp -1)
-                  (forward-sexp (- n))
-                  (forward-sexp 1))
-              (error (message "%s" (cadr e))))
-            (insert (structural--matching-delim delim))))
-      (error (message "%s" (cadr e)))))
-  (defun structural-rewrap-sexp (delimiter)
-    "Rewrap expression with a new DELIMITER.
-
-Tries to (un)escape strings when (un)wrapping with quotes."
-    (interactive (list (read-key "enter new delimiter")))
-    (condition-case e
-        (let* ((bounds (structural--sexp-bounds))
-               (start (car bounds))
-               (end (cdr bounds))
-               (open (char-after start))
-               (close (structural--matching-delim delimiter)))
-          (save-excursion
-            (cond
-             ;; rewrap a non-string with double quotes, escape everything
-             ((and (= delimiter ?\") (not (= open ?\")))
-              (let ((escaped (buffer-substring-no-properties (1+ start) (1- end))))
-                (delete-region start end)
-                (insert (format "%S" escaped))))
-             ;; rewrap a string with non quotes, unescape everything
-             ((and (= open ?\") (not (= delimiter ?\")))
-              (let ((unescaped (replace-regexp-in-string
-                                "\\\\\\(.\\|\n\\)" "\\1"
-                                (buffer-substring-no-properties (1+ start) (1- end)))))
-                (delete-region start end)
-                (insert (format "%c%s%c" delimiter unescaped close)))
-              ;; general case with arbitrary parentheses
-              (t (goto-char start)
-                 (delete-char 1)
-                 (insert-char delimiter)
-                 (goto-char end)
-                 (delete-char -1)
-                 (insert-char close))))))
-      (error (message "%s" (cadr e)))))
-  (define-minor-mode structural-mode
-    "Simple structural editing mode.
-
-\\<structural-mode-map>"
-    :lighter " (λ)"
-    :group 'editing
-    :keymap (make-sparse-keymap))
-  (provide 'structural-mode))
 
 ;;; Inbuilt stuff
 
@@ -639,8 +520,9 @@ are defining or executing a macro."
   (modus-themes-operandi-color-overrides '((bg-main . "#fcfbfa") (fg-main . "#101010")))
   (modus-themes-vivendi-color-overrides (if (in-termux-p)
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
-                                          '((bg-main . "#1E1E1E") (fg-main . "#dedddc"))))
-  (modus-themes-completions 'opinionated)
+                                          '((bg-main . "#1e1e1e") (fg-main . "#dedddc"))))
+  (modus-themes-completions '((matches . (intense bold))
+                              (selection . (intense))))
   (modus-themes-mode-line '(moody borderless))
   :init
   (cond ((in-termux-p)
@@ -1044,7 +926,7 @@ for the module name."
 
 (use-package lisp-mode
   :straight nil
-  :hook (lisp-mode . common-lisp-modes-mode))
+  :hook ((lisp-mode lisp-data-mode) . common-lisp-modes-mode))
 
 (use-package inf-lisp
   :straight nil
@@ -1195,36 +1077,29 @@ nil."
 
 (use-package flycheck-package)
 
-;; (use-package smartparens
-;;   :hook (((common-lisp-modes-mode
-;;            prog-mode
-;;            reb-mode
-;;            reb-lisp-mode)
-;;           . smartparens-strict-mode)
-;;          ((eval-expression-minibuffer-setup
-;;            lisp-data-mode)
-;;           . minibuffer-enable-sp))
-;;   :bind ( :map smartparens-mode-map
-;;           ("C-M-q" . sp-indent-defun)
-;;           :map common-lisp-modes-mode-map
-;;           (";" . sp-comment))
-;;   :custom
-;;   (sp-highlight-pair-overlay nil)
-;;   (sp-highlight-wrap-overlay nil)
-;;   (sp-highlight-wrap-tag-overlay nil)
-;;   (sp-show-pair-delay 0)
-;;   (sp-echo-match-when-invisible nil)
-;;   :config
-;;   (require 'smartparens-config)
-;;   (sp-use-paredit-bindings)
-;;   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp) ; needs to be set manually, because :bind section runs before :config
-;;   (defun minibuffer-enable-sp ()
-;;     "Enable `smartparens-strict-mode' in the minibuffer, during `eval-expression'."
-;;     (setq-local comment-start ";")
-;;     (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-;;     (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-;;     (sp-update-local-pairs 'minibuffer-pairs)
-;;     (smartparens-strict-mode 1)))
+(use-package smartparens
+  :hook ((common-lisp-modes-mode . smartparens-strict-mode)
+         (eval-expression-minibuffer-setup . minibuffer-enable-sp))
+  :bind ( :map common-lisp-modes-mode-map
+          (";" . sp-comment))
+  :custom
+  (sp-highlight-pair-overlay nil)
+  (sp-highlight-wrap-overlay nil)
+  (sp-highlight-wrap-tag-overlay nil)
+  (sp-echo-match-when-invisible nil)
+  :config
+  (add-to-list 'sp-lisp-modes 'lisp-data-mode t)
+  (require 'smartparens-config)
+  (sp-use-paredit-bindings)
+  ;; needs to be set manually, because :bind section runs before :config
+  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp)
+  (defun minibuffer-enable-sp ()
+    "Enable `smartparens-strict-mode' during `eval-expression'."
+    (setq-local comment-start ";")
+    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
+    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
+    (sp-update-local-pairs 'minibuffer-pairs)
+    (smartparens-strict-mode 1)))
 
 (use-package undo-tree
   :delight undo-tree-mode
@@ -1565,12 +1440,3 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (provide 'init)
 ;;; init.el ends here
-
-;; LocalWords:  init Bufname DEs config bufname Andrey Listopadov el
-;; LocalWords:  clmm JetBrainsMono DejaVu unscaled minibuffer UI gtk
-;; LocalWords:  tooltip Termux gsettings termux RET minad corfu ltximg
-;; LocalWords:  formfeed src linux README md pandoc ARG Clojure clj ok
-;; LocalWords:  lein clojure CLI kondo sbcl ecl Lua VTERM ispell Magit
-;; LocalWords:  aspell hunspell Todos toml json txt edn deps gpg isayt
-;; LocalWords:  workspace andreyorst macroexpanding cfr decompiler aoc
-;; LocalWords:  FernFlower pkulev LocalWords
