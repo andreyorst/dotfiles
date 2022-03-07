@@ -759,6 +759,7 @@ are defining or executing a macro."
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
+  :straight (:host nil :repo "https://git.sr.ht/~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("C-c C-k" . eval-each-sexp)
