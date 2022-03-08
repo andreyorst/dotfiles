@@ -1244,12 +1244,12 @@ means save all with no questions."
   :custom
   (vc-follow-symlinks t))
 
-;; (use-package isayt
-;;   :delight isayt-mode
-;;   :straight ( :host gitlab
-;;               :repo "andreyorst/isayt.el"
-;;               :branch "main")
-;;   :hook (common-lisp-modes-mode . isayt-mode))
+(use-package isayt
+  :delight isayt-mode
+  :straight ( :host gitlab
+              :repo "andreyorst/isayt.el"
+              :branch "main")
+  :hook (common-lisp-modes-mode . isayt-mode))
 
 (use-package eldoc
   :delight eldoc-mode
