@@ -1379,7 +1379,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("n" . mc/mark-next-like-this)
    ("p" . mc/mark-previous-like-this)
    ("a" . mc/mark-all-like-this)
-   ("s" . mc/mark-all-in-region-regexp))
+   ("s" . mc/mark-all-in-region-regexp)
+   ("l" . mc/edit-lines))
   :config
   (defun multiple-cursors-ensure-tmm ()
     (if multiple-cursors-mode
