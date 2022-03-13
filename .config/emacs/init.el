@@ -517,7 +517,7 @@ are defining or executing a macro."
   (modus-themes-org-blocks nil)
   (modus-themes-syntax '(faint alt-syntax))
   (modus-themes-region '(bg-only no-extend))
-  (modus-themes-operandi-color-overrides '((bg-main . "#fcfbfa") (fg-main . "#101010")))
+  (modus-themes-operandi-color-overrides '((bg-main . "#faf8f5") (fg-main . "#101010")))
   (modus-themes-vivendi-color-overrides (if (in-termux-p)
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
                                           '((bg-main . "#1e1e1e") (fg-main . "#dedddc"))))
@@ -989,6 +989,8 @@ for the module name."
 (use-package erlang)
 
 (use-package elixir-mode)
+
+(use-package zig-mode)
 
 ;;; Tools
 
