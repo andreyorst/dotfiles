@@ -107,8 +107,6 @@ Used in various places to avoid getting wrong line height when
       (backward-page))
     (backward-page)
     (narrow-to-page))
-  (defmacro comment (&rest _)
-    nil)
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
@@ -211,7 +209,7 @@ Bindings will be enabled next time region is highlighted."
    truncate-lines t
    bidi-paragraph-direction 'left-to-right
    frame-title-format
-   '(:eval (if (or (eq (string-match "[ *]" (buffer-name)) 0)
+   '(:eval (if (or (string-match "^[ *]" (buffer-name))
                    (not local-config-title-show-bufname))
                "Emacs"
              (if (buffer-modified-p)
@@ -487,7 +485,6 @@ are defining or executing a macro."
                               (border-width . 1)
                               (no-special-glyphs . t))))
 
-
 (use-package dbus
   :straight nil
   :when window-system
@@ -661,10 +658,6 @@ are defining or executing a macro."
   (corfu-doc-max-height 20)
   (corfu-doc-max-width 84))
 
-(use-package orderless
-  :config
-  (add-to-list 'completion-styles 'orderless t))
-
 (use-package cape
   :config
   (setq completion-at-point-functions '(cape-file cape-dabbrev)))
@@ -714,8 +707,7 @@ are defining or executing a macro."
       (apply f args)))
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
-    (setq lexical-binding t)
-    (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))))
+    (setq lexical-binding t)))
 
 (use-package ox-hugo
   :after ox)
@@ -816,9 +808,9 @@ for the module name."
              (setq-local compile-command "clojure ")))))
   (defun clojure-mode-setup ()
     "Setup Clojure buffer."
-    (common-lisp-modes-mode)
-    (clojure-set-compile-command)
-    (flycheck-mode)))
+    (common-lisp-modes-mode 1)
+    (flymake-mode 1)
+    (clojure-set-compile-command)))
 
 (use-package inferior-clojure
   :straight nil
@@ -913,8 +905,12 @@ for the module name."
       (unless (memq src cider-jdk-src-paths)
         (add-to-list 'cider-jdk-src-paths src t)))))
 
-(use-package flycheck-clj-kondo
-  :when (executable-find "clj-kondo"))
+(use-package flymake-kondor
+  :when (executable-find "clj-kondo")
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . flymake-kondor-setup))
 
 (use-package clj-refactor
   :delight clj-refactor-mode
@@ -958,11 +954,14 @@ for the module name."
   (yaml-indent-offset 4))
 
 (use-package sh-script
-  :straight nil
-  :hook (sh-mode . flycheck-mode))
+  :hook (sh-mode . flymake-mode)
+  :straight nil)
+
+(use-package flymake-shellcheck
+  :hook (sh-mode . flymake-shellcheck-load))
 
 (use-package lua-mode
-  :hook (lua-mode . flycheck-mode)
+  :hook (lua-mode . flymake-mode)
   :custom
   (lua-indent-level 2)
   :config
@@ -972,15 +971,21 @@ for the module name."
     (lua-get-create-process)
     (lua-send-string body)))
 
+(use-package flymake-lua
+  :hook (lua-mode . flymake-lua-load))
+
 (use-package css-mode
   :straight nil
   :custom
   (css-indent-offset 2))
 
 (use-package json-mode
-  :hook (json-mode . flycheck-mode)
+  :hook (json-mode . flymake-mode)
   :custom
   (js-indent-level 2))
+
+(use-package flymake-json
+  :hook (json-mode . flymake-json-load))
 
 (use-package csv-mode
   :custom
@@ -1023,6 +1028,15 @@ for the module name."
 
 (use-package flymake
   :straight nil
+  :preface
+  (defvar flymake-prefix-map (make-sparse-keymap))
+  (fset 'flymake-prefix-map flymake-prefix-map)
+  :bind ( :map ctl-x-map
+          ("!" . flymake-prefix-map)
+          :map flymake-prefix-map
+          ("l" . flymake-show-buffer-diagnostics)
+          ("n" . #'flymake-goto-next-error)
+          ("p" . #'flymake-goto-prev-error))
   :custom
   (flymake-fringe-indicator-position 'right-fringe))
 
@@ -1032,57 +1046,8 @@ for the module name."
             (executable-find "hunspell"))
   :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
 
-(use-package flycheck
-  :custom
-  (flycheck-indication-mode 'right-fringe)
-  (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
-  (flycheck-emacs-lisp-load-path 'inherit)
-  :config
-  (flycheck-define-error-level 'error
-    :severity 100
-    :compilation-level 2
-    :overlay-category 'flycheck-error-overlay
-    :fringe-bitmap flymake-error-bitmap
-    :fringe-face 'flycheck-fringe-error
-    :error-list-face 'flycheck-error-list-error)
-  (flycheck-define-error-level 'warning
-    :severity 10
-    :compilation-level 1
-    :overlay-category 'flycheck-warning-overlay
-    :fringe-bitmap flymake-warning-bitmap
-    :fringe-face 'flycheck-fringe-warning
-    :error-list-face 'flycheck-error-list-warning)
-  (flycheck-define-error-level 'info
-    :severity -10
-    :compilation-level 0
-    :overlay-category 'flycheck-info-overlay
-    :fringe-bitmap flymake-note-bitmap
-    :fringe-face 'flycheck-fringe-info
-    :error-list-face 'flycheck-error-list-info)
-  (define-advice flycheck-mode-line-status-text (:override (&optional status))
-    "Get a text describing STATUS for use in the mode line.
-
-STATUS defaults to `flycheck-last-status-change' if omitted or
-nil."
-    (concat " " flycheck-mode-line-prefix ":"
-            (pcase (or status flycheck-last-status-change)
-              (`not-checked "-/-")
-              (`no-checker "-")
-              (`running "*/*")
-              (`errored "!")
-              (`finished
-               (let-alist (flycheck-count-errors flycheck-current-errors)
-                 (format "%s/%s" (or .error 0) (or .warning 0))))
-              (`interrupted ".")
-              (`suspicious "?"))))
-  (define-advice flycheck-may-use-echo-area-p (:override ())
-    nil))
-
-(use-package flycheck-package)
-
 (use-package smartparens
-  :hook ((common-lisp-modes-mode . smartparens-strict-mode)
-         (eval-expression-minibuffer-setup . minibuffer-enable-sp))
+  :hook ((common-lisp-modes-mode . smartparens-strict-mode))
   :bind ( :map common-lisp-modes-mode-map
           (";" . sp-comment))
   :custom
@@ -1091,18 +1056,15 @@ nil."
   (sp-highlight-wrap-tag-overlay nil)
   (sp-echo-match-when-invisible nil)
   :config
-  (add-to-list 'sp-lisp-modes 'lisp-data-mode t)
-  (require 'smartparens-config)
+  (dolist (mode '(lisp-data-mode minibuffer-mode))
+    (add-to-list 'sp-lisp-modes mode t)))
+
+(use-package smartparens-config
+  :straight nil
+  :config
   (sp-use-paredit-bindings)
   ;; needs to be set manually, because :bind section runs before :config
-  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp)
-  (defun minibuffer-enable-sp ()
-    "Enable `smartparens-strict-mode' during `eval-expression'."
-    (setq-local comment-start ";")
-    (sp-local-pair 'minibuffer-pairs "'" nil :actions nil)
-    (sp-local-pair 'minibuffer-pairs "`" nil :actions nil)
-    (sp-update-local-pairs 'minibuffer-pairs)
-    (smartparens-strict-mode 1)))
+  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp))
 
 (use-package undo-tree
   :delight undo-tree-mode
@@ -1400,47 +1362,18 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (profiler-report)
       (profiler-cpu-stop))))
 
-(use-package lsp-mode
-  :hook ((c-mode
-          c++-mode
-          java-mode)
-         . lsp)
+(use-package eglot
+  :hook ((clojure-mode . eglot-ensure))
   :custom
-  (lsp-keymap-prefix "C-c l")
-  (lsp-diagnostics-provider :auto)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-log-io nil)
-  (lsp-keep-workspace-alive nil)
-  (lsp-idle-delay 0.05)
-  (lsp-enable-dap-auto-configure nil)
-  (lsp-enable-links nil)
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-headerline-breadcrumb-icons-enable nil)
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-lens-enable nil)
-  (lsp-enable-folding nil)
-  (lsp-enable-indentation nil)
-  (lsp-semantic-tokens-enable nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-  (lsp-completion-provider :none)
-  (lsp-completion-show-kind nil)
-  (lsp-enable-snippet nil))
-
-(use-package lsp-java
-  :requires lsp-mode
-  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
-  :custom
-  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
-
-(use-package treemacs
-  :custom
-  (treemacs-no-png-images t))
-
-(use-package lsp-treemacs
-  :custom
-  (lsp-treemacs-theme "Iconless"))
+  (eglot-autoshutdown t)
+  (eglot-ignored-server-capabilities
+   '(:documentHighlightProvider
+     :documentFormattingProvider
+     :documentRangeFormattingProvider
+     :documentOnTypeFormattingProvider
+     :documentLinkProvider
+     :colorProvider
+     :foldingRangeProvider)))
 
 (provide 'init)
 ;;; init.el ends here
