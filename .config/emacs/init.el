@@ -751,10 +751,9 @@ are defining or executing a macro."
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
-  :straight (:host nil :repo "https://git.sr.ht/~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
-          ("C-c C-k" . eval-each-sexp)
+          ("C-c C-k" . lisp-eval-each-sexp)
           ("M-." . xref-find-definitions)
           ("M-," . xref-pop-marker-stack))
   :config
@@ -767,26 +766,7 @@ are defining or executing a macro."
       (unless (bufferp fennel-repl--buffer)
         (fennel-repl nil))
       (let ((inferior-lisp-buffer fennel-repl--buffer))
-        (lisp-eval-string body))))
-  :init
-  (defun eval-each-sexp ()
-    "Evaluate each s-expression in the buffer consequentially.
-
-If prefix ARG specified, call `fennel-reload' function.  If
-double prefix ARG specified call `fennel-reload' function and ask
-for the module name."
-    (interactive)
-    (save-excursion
-      (save-restriction
-        (goto-char (point-min))
-        (while (save-excursion
-                 (search-forward-regexp "[^[:space:]]." nil t))
-          (forward-sexp)
-          (when (and (not (nth 4 (syntax-ppss)))
-                     (looking-back "." 1))
-            (lisp-eval-last-sexp)))))
-    (when fennel-mode-switch-to-repl-after-reload
-      (switch-to-lisp t))))
+        (lisp-eval-string body)))))
 
 (use-package clojure-mode
   :hook ((clojure-mode
@@ -930,7 +910,20 @@ for the module name."
   :hook (inferior-lisp-mode . common-lisp-modes-mode)
   :custom
   (inferior-lisp-program (cond ((executable-find "sbcl") "sbcl")
-                               ((executable-find "ecl") "ecl"))))
+                               ((executable-find "ecl") "ecl")))
+  :init
+  (defun lisp-eval-each-sexp ()
+    "Evaluate each s-expression in the buffer consequentially."
+    (interactive)
+    (save-excursion
+      (save-restriction
+        (goto-char (point-min))
+        (while (save-excursion
+                 (search-forward-regexp "[^[:space:]]." nil t))
+          (forward-sexp)
+          (when (and (not (nth 4 (syntax-ppss)))
+                     (looking-back "." 1))
+            (lisp-eval-last-sexp)))))))
 
 (use-package sly
   :after inf-lisp
@@ -1342,7 +1335,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("p" . mc/mark-previous-like-this)
    ("a" . mc/mark-all-like-this)
    ("s" . mc/mark-all-in-region-regexp)
-   ("l" . mc/edit-lines))
+   ("l" . mc/edit-ends-of-lines))
   :config
   (defun multiple-cursors-ensure-tmm ()
     (if multiple-cursors-mode
