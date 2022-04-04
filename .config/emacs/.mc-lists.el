@@ -107,6 +107,7 @@
         sp-rewrap-sexp
         sp-splice-sexp-killing-backward
         sp-wrap-round
+        transpose-sexps
         upcase-region
         wdired--self-insert
         yaml-electric-backspace
