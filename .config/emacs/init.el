@@ -876,6 +876,7 @@ are defining or executing a macro."
   (cider-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
   (cider-enrich-classpath t)
+  (cider-repl-history-file (expand-file-name "~/.cider-history"))
   :config
   (setq cider-jdk-src-paths nil)
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
@@ -1376,6 +1377,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
      :documentLinkProvider
      :colorProvider
      :foldingRangeProvider)))
+
+(use-package hideshow
+  :straight nil
+  :hook (prog-mode . hs-minor-mode))
 
 (provide 'init)
 ;;; init.el ends here
