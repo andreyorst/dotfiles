@@ -1059,16 +1059,25 @@ are defining or executing a macro."
   ;; needs to be set manually, because :bind section runs before :config
   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp))
 
-(use-package undo-tree
-  :delight undo-tree-mode
-  :bind (("C-z" . undo-tree-undo)
-         ("C-S-z" . undo-tree-redo))
+;; (use-package undo-tree
+;;   :delight undo-tree-mode
+;;   :bind (("C-z" . undo-tree-undo)
+;;          ("C-S-z" . undo-tree-redo))
+;;   :custom
+;;   (undo-tree-visualizer-relative-timestamps nil)
+;;   (undo-tree-visualizer-timestamps nil)
+;;   (undo-tree-auto-save-history nil)
+;;   :init
+;;   (global-undo-tree-mode 1))
+
+(use-package vundo
+  :straight ( :host github
+              :repo "casouri/vundo"
+              :branch "master")
+  :bind (("C-c u" . vundo))
   :custom
-  (undo-tree-visualizer-relative-timestamps nil)
-  (undo-tree-visualizer-timestamps nil)
-  (undo-tree-auto-save-history nil)
-  :init
-  (global-undo-tree-mode 1))
+  (vundo-roll-back-on-quit nil)
+  (vundo--window-max-height 10))
 
 (use-package magit
   :hook (git-commit-mode . flyspell-mode)
