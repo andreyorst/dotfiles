@@ -1365,22 +1365,66 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (profiler-report)
       (profiler-cpu-stop))))
 
-(use-package eglot
-  :hook ((clojure-mode . eglot-ensure))
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-ignored-server-capabilities
-   '(:documentHighlightProvider
-     :documentFormattingProvider
-     :documentRangeFormattingProvider
-     :documentOnTypeFormattingProvider
-     :documentLinkProvider
-     :colorProvider
-     :foldingRangeProvider)))
-
 (use-package hideshow
   :straight nil
   :hook (prog-mode . hs-minor-mode))
+
+;;; Mail
+
+(use-package message
+  :straight nil
+  :custom
+  (message-kill-buffer-on-exit t))
+
+(use-package mu4e
+  :straight nil
+  :load-path "/usr/share/emacs/site-lisp/mu4e/"
+  :when (executable-find "mu")
+  :custom
+  (mu4e-completing-read-function #'completing-read)
+  (mu4e-get-mail-command "mbsync -a")
+  (mu4e-change-filenames-when-moving t)
+  (mu4e-attachment-dir (expand-file-name "~/Downloads"))
+  (mu4e-sent-messages-behavior 'delete)
+  (mail-user-agent 'mu4e-user-agent)
+  (mu4e-view-show-images nil)
+  (mu4e-view-show-addresses t)
+  :config
+  (load (expand-file-name "mail-addresses.el" user-emacs-directory))
+  (defun make-mu4e-context-matcher (match-str)
+    (lambda (msg)
+      (when msg
+        (string-prefix-p match-str (mu4e-message-field msg :maildir)))))
+  (cl-defun make-context (&key name dir-name address smtp-name
+                               smtp-server signature (port 587))
+    (make-mu4e-context
+     :name name
+     :match-func (make-mu4e-context-matcher dir-name)
+     :vars `((mu4e-sent-folder . ,(format "%s/Sent Mail" dir-name))
+             (mu4e-drafts-folder . ,(format "%s/Drafts" dir-name))
+             (mu4e-trash-folder . ,(format "%s/Trash" dir-name))
+             (mu4e-refile-folder . ,(format "%s/Archive" dir-name))
+             (mu4e-compose-signature . ,signature)
+
+             (user-mail-address . ,address)
+
+             (smtpmail-smtp-user . ,smtp-name)
+             (smtpmail-local-domain . ,smtp-server)
+             (smtpmail-smtp-server . ,smtp-server)
+             (smtpmail-smtp-service . ,port)
+
+             (send-mail-function . smtpmail-send-it))))
+  (defun make-mu4e-contexts (addresses)
+    (mapcar (lambda (params)
+              (apply 'make-context params))
+            addresses))
+  (let ((addresses (mapcar #'cadr mail-addresses)))
+    (setq mu4e-contexts (make-mu4e-contexts mail-addresses)
+          user-mail-address (car addresses)
+          mu4e-personal-addresses addresses)))
+
+(use-package smtpmail
+  :straight nil)
 
 (provide 'init)
 ;;; init.el ends here
