@@ -1390,38 +1390,43 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (mu4e-view-show-images nil)
   (mu4e-view-show-addresses t)
   :config
-  (load (expand-file-name "mail-addresses.el" user-emacs-directory))
+  (define-advice mu4e-get-maildirs (:around (fn))
+    "Filters maildirs for current active context based on maildir prefix."
+    (let* ((context-vars (mu4e-context-vars (mu4e-context-current)))
+           (current-maildir (alist-get 'mu4e-maildir-context context-vars)))
+      (if current-maildir
+          (cl-remove-if-not (lambda (maildir)
+                              (string-prefix-p current-maildir maildir))
+                            (funcall fn))
+        (funcall fn))))
   (defun make-mu4e-context-matcher (match-str)
     (lambda (msg)
       (when msg
         (string-prefix-p match-str (mu4e-message-field msg :maildir)))))
-  (cl-defun make-context (&key name dir-name address smtp-name
-                               smtp-server signature (port 587))
+  (defun make-context (ctx)
     (make-mu4e-context
-     :name name
-     :match-func (make-mu4e-context-matcher dir-name)
-     :vars `((mu4e-sent-folder . ,(format "%s/Sent Mail" dir-name))
-             (mu4e-drafts-folder . ,(format "%s/Drafts" dir-name))
-             (mu4e-trash-folder . ,(format "%s/Trash" dir-name))
-             (mu4e-refile-folder . ,(format "%s/Archive" dir-name))
-             (mu4e-compose-signature . ,signature)
+     :name (plist-get ctx :name)
+     :match-func (make-mu4e-context-matcher (plist-get ctx :inbox))
+     :vars `((mu4e-sent-folder . ,(plist-get ctx :sent))
+             (mu4e-drafts-folder . ,(plist-get ctx :drafts))
+             (mu4e-trash-folder . ,(plist-get ctx :trash))
+             (mu4e-refile-folder . ,(plist-get ctx :refile))
+             (mu4e-compose-signature . ,(plist-get ctx :signature))
+             (mu4e-maildir-context . ,(plist-get ctx :inbox))
 
-             (user-mail-address . ,address)
+             (user-mail-address . ,(plist-get ctx :address))
 
-             (smtpmail-smtp-user . ,smtp-name)
-             (smtpmail-local-domain . ,smtp-server)
-             (smtpmail-smtp-server . ,smtp-server)
-             (smtpmail-smtp-service . ,port)
+             (smtpmail-smtp-user . ,(plist-get ctx :smtp-name))
+             (smtpmail-local-domain . ,(plist-get ctx :smtp-server))
+             (smtpmail-smtp-server . ,(plist-get ctx :smtp-server))
+             (smtpmail-smtp-service . ,(plist-get ctx :port))
 
              (send-mail-function . smtpmail-send-it))))
-  (defun make-mu4e-contexts (addresses)
-    (mapcar (lambda (params)
-              (apply 'make-context params))
-            addresses))
-  (let ((addresses (mapcar #'cadr mail-addresses)))
-    (setq mu4e-contexts (make-mu4e-contexts mail-addresses)
-          user-mail-address (car addresses)
-          mu4e-personal-addresses addresses)))
+  (when (load (expand-file-name "mail-contexts.el" user-emacs-directory) 'noerror)
+    (setq mu4e-contexts (mapcar #'make-context mail-contexts)
+          user-mail-address (plist-get (car mail-contexts) :address)
+          mu4e-personal-addresses (mapcar (lambda (ctx) (plist-get ctx :address))
+                                          mail-contexts))))
 
 (use-package smtpmail
   :straight nil)
