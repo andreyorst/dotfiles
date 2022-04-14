@@ -18,12 +18,12 @@
  load-prefer-newer noninteractive)
 
 (setq-default
- initial-frame-alist '((width . 170)
+ default-frame-alist '((width . 170)
                        (height . 56)
                        (tool-bar-lines . 0)
                        (bottom-divider-width . 0)
                        (right-divider-width . 1))
- default-frame-alist initial-frame-alist
+ initial-frame-alist initial-frame-alist
  frame-inhibit-implied-resize t
  x-gtk-resize-child-frames 'resize-mode
  fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))

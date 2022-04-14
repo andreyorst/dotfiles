@@ -514,13 +514,13 @@ are defining or executing a macro."
   (modus-themes-org-blocks nil)
   (modus-themes-syntax '(faint alt-syntax))
   (modus-themes-region '(bg-only no-extend))
-  (modus-themes-operandi-color-overrides '((bg-main . "#faf8f5") (fg-main . "#101010")))
+  (modus-themes-operandi-color-overrides '((bg-main . "#faf8f5") (fg-main . "#151515")))
   (modus-themes-vivendi-color-overrides (if (in-termux-p)
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
-                                          '((bg-main . "#1e1e1e") (fg-main . "#dedddc"))))
+                                          '((bg-main . "#1a1a1a") (fg-main . "#dbdbdb"))))
   (modus-themes-completions '((matches . (intense bold))
                               (selection . (intense))))
-  (modus-themes-mode-line '(moody borderless))
+  (modus-themes-mode-line '(borderless))
   :init
   (cond ((in-termux-p)
          (load-theme local-config-dark-theme t))
@@ -590,7 +590,6 @@ are defining or executing a macro."
           ("RET" . vertico-directory-enter)
           ("DEL" . vertico-directory-delete-char)
           ("M-DEL" . vertico-directory-delete-word))
-  ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package marginalia
@@ -1404,24 +1403,24 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (when msg
         (string-prefix-p match-str (mu4e-message-field msg :maildir)))))
   (defun make-context (ctx)
-    (make-mu4e-context
-     :name (plist-get ctx :name)
-     :match-func (make-mu4e-context-matcher (plist-get ctx :inbox))
-     :vars `((mu4e-sent-folder . ,(plist-get ctx :sent))
-             (mu4e-drafts-folder . ,(plist-get ctx :drafts))
-             (mu4e-trash-folder . ,(plist-get ctx :trash))
-             (mu4e-refile-folder . ,(plist-get ctx :refile))
-             (mu4e-compose-signature . ,(plist-get ctx :signature))
-             (mu4e-maildir-context . ,(plist-get ctx :inbox))
+    (let ((inbox (plist-get ctx :inbox)))
+      (make-mu4e-context
+       :name (plist-get ctx :name)
+       :match-func (make-mu4e-context-matcher inbox)
+       :vars `((mu4e-sent-folder . ,(format "%s/Sent" inbox))
+               (mu4e-drafts-folder . ,(format "%s/Drafts" inbox))
+               (mu4e-trash-folder . ,(format "%s/Trash" inbox))
+               (mu4e-refile-folder . ,(format "%s/Archive" inbox))
+               (mu4e-compose-signature . ,(cl-getf ctx :signature user-full-name))
+               (mu4e-maildir-context . ,inbox)
 
-             (user-mail-address . ,(plist-get ctx :address))
+               (smtpmail-smtp-user . ,(plist-get ctx :smtp-name))
+               (smtpmail-local-domain . ,(plist-get ctx :smtp-server))
+               (smtpmail-smtp-server . ,(plist-get ctx :smtp-server))
+               (smtpmail-smtp-service . ,(plist-get ctx :port))
 
-             (smtpmail-smtp-user . ,(plist-get ctx :smtp-name))
-             (smtpmail-local-domain . ,(plist-get ctx :smtp-server))
-             (smtpmail-smtp-server . ,(plist-get ctx :smtp-server))
-             (smtpmail-smtp-service . ,(plist-get ctx :port))
-
-             (send-mail-function . smtpmail-send-it))))
+               (user-mail-address . ,(plist-get ctx :address))
+               (send-mail-function . smtpmail-send-it)))))
   (when (load (expand-file-name "mail-contexts.el" user-emacs-directory) 'noerror)
     (setq mu4e-contexts (mapcar #'make-context mail-contexts)
           user-mail-address (plist-get (car mail-contexts) :address)
