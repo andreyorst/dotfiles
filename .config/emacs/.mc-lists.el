@@ -197,6 +197,7 @@
         undo-tree-visualize
         vterm--self-insert
         vterm-clear
+        vterm-project-dir
         vterm-send-C-a
         vterm-send-C-c
         vterm-send-backspace
