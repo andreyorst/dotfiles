@@ -1191,10 +1191,10 @@ means save all with no questions."
   :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(use-package which-key
-  :delight which-key-mode
-  :init
-  (which-key-mode t))
+;; (use-package which-key
+;;   :delight which-key-mode
+;;   :init
+;;   (which-key-mode t))
 
 (use-package gcmh
   :delight gcmh-mode
