@@ -430,6 +430,13 @@ are defining or executing a macro."
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
+(use-package orderless
+  :custom
+  (completion-category-overrides
+   '((buffer (styles orderless))
+     (file (styles orderless))
+     (project-file (styles orderless)))))
+
 (use-package bindings
   :straight nil
   :bind ( :map ctl-x-map

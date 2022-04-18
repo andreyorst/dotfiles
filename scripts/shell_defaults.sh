@@ -143,3 +143,7 @@ sepcat() {
 ccp() { eval curl -o "$2" FILE://"$1"; }
 
 ssh-tunnel() { ssh -N -L "$1":localhost:"$1" "$2" & }
+
+fix-imap-utf7() {
+    echo "$1" | sed 's/&\([^-]\)/+\1/g;s/&-/&/g;s/,/\//g' | iconv -f UTF7 -t UTF8
+}
