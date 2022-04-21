@@ -666,12 +666,6 @@ are defining or executing a macro."
   (corfu-doc-max-height 20)
   (corfu-doc-max-width 84))
 
-(use-package popon
-  :straight ( :repo "https://codeberg.org/akib/emacs-popon" :branch "master"))
-
-(use-package corfu-popup
-  :straight ( :repo "https://codeberg.org/akib/emacs-corfu-popup" :branch "master"))
-
 (use-package cape
   :config
   (setq completion-at-point-functions
