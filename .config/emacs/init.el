@@ -454,6 +454,8 @@ are defining or executing a macro."
 (use-package frame
   :straight nil
   :requires seq
+  :bind (("C-z" . ignore)
+         ("C-x C-z" . ignore))
   :config
   (define-advice toggle-frame-fullscreen
       (:before (&optional frame))
@@ -664,9 +666,16 @@ are defining or executing a macro."
   (corfu-doc-max-height 20)
   (corfu-doc-max-width 84))
 
+(use-package popon
+  :straight ( :repo "https://codeberg.org/akib/emacs-popon" :branch "master"))
+
+(use-package corfu-popup
+  :straight ( :repo "https://codeberg.org/akib/emacs-corfu-popup" :branch "master"))
+
 (use-package cape
   :config
-  (setq completion-at-point-functions '(cape-file cape-dabbrev)))
+  (setq completion-at-point-functions
+        '(cape-file cape-dabbrev)))
 
 ;;;; Language packages
 
@@ -795,7 +804,7 @@ are defining or executing a macro."
   (defun clojure-mode-setup ()
     "Setup Clojure buffer."
     (common-lisp-modes-mode 1)
-    (flymake-mode 1)
+    (flycheck-mode 1)
     (clojure-set-compile-command)))
 
 (use-package inferior-clojure
@@ -892,12 +901,8 @@ are defining or executing a macro."
       (unless (memq src cider-jdk-src-paths)
         (add-to-list 'cider-jdk-src-paths src t)))))
 
-(use-package flymake-kondor
-  :when (executable-find "clj-kondo")
-  :hook ((clojure-mode
-          clojurec-mode
-          clojurescript-mode)
-         . flymake-kondor-setup))
+(use-package flycheck-clj-kondo
+  :when (executable-find "clj-kondo"))
 
 (use-package clj-refactor
   :delight clj-refactor-mode
@@ -954,14 +959,11 @@ are defining or executing a macro."
   (yaml-indent-offset 4))
 
 (use-package sh-script
-  :hook (sh-mode . flymake-mode)
+  :hook (sh-mode . flycheck-mode)
   :straight nil)
 
-(use-package flymake-shellcheck
-  :hook (sh-mode . flymake-shellcheck-load))
-
 (use-package lua-mode
-  :hook (lua-mode . flymake-mode)
+  :hook (lua-mode . flycheck-mode)
   :custom
   (lua-indent-level 2)
   :config
@@ -971,21 +973,15 @@ are defining or executing a macro."
     (lua-get-create-process)
     (lua-send-string body)))
 
-(use-package flymake-lua
-  :hook (lua-mode . flymake-lua-load))
-
 (use-package css-mode
   :straight nil
   :custom
   (css-indent-offset 2))
 
 (use-package json-mode
-  :hook (json-mode . flymake-mode)
+  :hook (json-mode . flycheck-mode)
   :custom
   (js-indent-level 2))
-
-(use-package flymake-json
-  :hook (json-mode . flymake-json-load))
 
 (use-package csv-mode
   :custom
@@ -1292,9 +1288,14 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package dired
   :straight nil
   :bind ( :map dired-mode-map
-          ("<backspace>" . dired-up-directory))
+          ("<backspace>" . dired-up-directory)
+          ("~" . dired-home-directory))
   :custom
-  (dired-listing-switches "-lAX --group-directories-first"))
+  (dired-listing-switches "-lAX --group-directories-first")
+  :config
+  (defun dired-home-directory ()
+    (interactive)
+    (dired (expand-file-name "~/"))))
 
 (use-package comint
   :straight nil
@@ -1374,6 +1375,97 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package hideshow
   :straight nil
   :hook (prog-mode . hs-minor-mode))
+
+(use-package flycheck
+  :custom
+  (flycheck-indication-mode 'right-fringe)
+  (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
+  (flycheck-emacs-lisp-load-path 'inherit)
+  :config
+  (require 'flymake)
+  (flycheck-define-error-level 'error
+    :severity 100
+    :compilation-level 2
+    :overlay-category 'flycheck-error-overlay
+    :fringe-bitmap flymake-error-bitmap
+    :fringe-face 'flycheck-fringe-error
+    :error-list-face 'flycheck-error-list-error)
+  (flycheck-define-error-level 'warning
+    :severity 10
+    :compilation-level 1
+    :overlay-category 'flycheck-warning-overlay
+    :fringe-bitmap flymake-warning-bitmap
+    :fringe-face 'flycheck-fringe-warning
+    :error-list-face 'flycheck-error-list-warning)
+  (flycheck-define-error-level 'info
+    :severity -10
+    :compilation-level 0
+    :overlay-category 'flycheck-info-overlay
+    :fringe-bitmap flymake-note-bitmap
+    :fringe-face 'flycheck-fringe-info
+    :error-list-face 'flycheck-error-list-info)
+  ;; (define-advice flycheck-mode-line-status-text (:override (&optional status))
+  ;;     "Get a text describing STATUS for use in the mode line.
+  ;; STATUS defaults to `flycheck-last-status-change' if omitted or
+  ;; nil."
+  ;;     (concat " " flycheck-mode-line-prefix ":"
+  ;;             (pcase (or status flycheck-last-status-change)
+  ;;               (`not-checked "-/-")
+  ;;               (`no-checker "-")
+  ;;               (`running "*/*")
+  ;;               (`errored "!")
+  ;;               (`finished
+  ;;                (let-alist (flycheck-count-errors flycheck-current-errors)
+  ;;                  (format "%s/%s" (or .error 0) (or .warning 0))))
+  ;;               (`interrupted ".")
+  ;;               (`suspicious "?"))))
+  (define-advice flycheck-may-use-echo-area-p (:override ())
+    nil))
+
+(use-package flycheck-package)
+
+(use-package treemacs
+  :custom
+  (treemacs-no-png-images t))
+
+(use-package lsp-mode
+  :custom
+  (lsp-auto-fonfigure nil)
+  (lsp-keymap-prefix "C-c l")
+  (lsp-diagnostics-provider :auto)
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-log-io nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-idle-delay 0.05)
+  (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-links nil)
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-enable nil)
+  (lsp-modeline-workspace-status-enable nil)
+  (lsp-lens-enable nil)
+  (lsp-enable-folding nil)
+  (lsp-enable-indentation nil)
+  (lsp-semantic-tokens-enable nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-text-document-color nil)
+  (lsp-completion-provider :none)
+  (lsp-completion-enable nil)
+  (lsp-completion-show-kind nil)
+  (lsp-enable-snippet nil))
+
+(use-package lsp-treemacs
+  :custom
+  (lsp-treemacs-theme "Iconless"))
+
+(use-package lsp-java
+  :requires lsp-mode
+  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
+  :hook (java-mode . lsp)
+  :custom
+  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
 
 ;;; Mail
 
