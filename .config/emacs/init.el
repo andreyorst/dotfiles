@@ -1482,6 +1482,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (mu4e-view-show-images nil)
   (mu4e-view-show-addresses t)
   :config
+  (when (featurep 'orderless)
+    (define-advice mu4e-ask-maildir (:around (fn prompt))
+      (let ((completion-styles (append completion-styles '(orderless))))
+        (funcall fn prompt))))
   (define-advice mu4e-get-maildirs (:around (fn))
     "Filters maildirs for current active context based on maildir prefix."
     (let* ((context-vars (mu4e-context-vars (mu4e-context-current)))
