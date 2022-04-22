@@ -1423,6 +1423,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (treemacs-no-png-images t))
 
 (use-package lsp-mode
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . lsp)
   :custom
   (lsp-auto-fonfigure nil)
   (lsp-keymap-prefix "C-c l")
