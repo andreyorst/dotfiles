@@ -524,7 +524,7 @@ are defining or executing a macro."
   (modus-themes-org-blocks nil)
   (modus-themes-syntax '(faint alt-syntax))
   (modus-themes-region '(bg-only no-extend))
-  (modus-themes-operandi-color-overrides '((bg-main . "#faf8f5") (fg-main . "#151515")))
+  (modus-themes-operandi-color-overrides '((bg-main . "#fcfaf8") (fg-main . "#151515")))
   (modus-themes-vivendi-color-overrides (if (in-termux-p)
                                             '((bg-main . "#000000") (fg-main . "#e5e6e7"))
                                           '((bg-main . "#1a1a1a") (fg-main . "#dbdbdb"))))
