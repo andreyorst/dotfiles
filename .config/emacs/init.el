@@ -758,6 +758,7 @@ are defining or executing a macro."
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
+         (emacs-lisp-mode . flycheck-mode)
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
@@ -1399,25 +1400,26 @@ REGEXP FILE LINE and optional COL LEVEL info to
     :fringe-bitmap flymake-note-bitmap
     :fringe-face 'flycheck-fringe-info
     :error-list-face 'flycheck-error-list-info)
-  ;; (define-advice flycheck-mode-line-status-text (:override (&optional status))
-  ;;     "Get a text describing STATUS for use in the mode line.
-  ;; STATUS defaults to `flycheck-last-status-change' if omitted or
-  ;; nil."
-  ;;     (concat " " flycheck-mode-line-prefix ":"
-  ;;             (pcase (or status flycheck-last-status-change)
-  ;;               (`not-checked "-/-")
-  ;;               (`no-checker "-")
-  ;;               (`running "*/*")
-  ;;               (`errored "!")
-  ;;               (`finished
-  ;;                (let-alist (flycheck-count-errors flycheck-current-errors)
-  ;;                  (format "%s/%s" (or .error 0) (or .warning 0))))
-  ;;               (`interrupted ".")
-  ;;               (`suspicious "?"))))
+  (define-advice flycheck-mode-line-status-text (:override (&optional status))
+    "Get a text describing STATUS for use in the mode line.
+  STATUS defaults to `flycheck-last-status-change' if omitted or
+  nil."
+    (concat " " flycheck-mode-line-prefix ":"
+            (pcase (or status flycheck-last-status-change)
+              (`not-checked "-/-")
+              (`no-checker "-")
+              (`running "*/*")
+              (`errored "!")
+              (`finished
+               (let-alist (flycheck-count-errors flycheck-current-errors)
+                 (format "%s/%s" (or .error 0) (or .warning 0))))
+              (`interrupted ".")
+              (`suspicious "?"))))
   (define-advice flycheck-may-use-echo-area-p (:override ())
     nil))
 
-(use-package flycheck-package)
+(use-package flycheck-package
+  :hook (emacs-lisp-mode . flycheck-package-setup))
 
 (use-package treemacs
   :custom
