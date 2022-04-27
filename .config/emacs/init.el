@@ -62,6 +62,7 @@ Used in various places to avoid getting wrong line height when
 (use-package functions
   :straight nil
   :preface
+  (require 'subr-x)
   (defun split-pararagraph-into-lines ()
     "Split the current paragraph into lines with one sentence each."
     (interactive)
