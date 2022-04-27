@@ -1166,6 +1166,8 @@ means save all with no questions."
   :custom
   (separedit-default-mode 'markdown-mode)
   :config
+  (nconc (assoc '(";+") separedit-comment-delimiter-alist)
+         '(clojure-mode clojurec-mode clojure-script-mode))
   (defun separedit-header-line-setup ()
     (setq-local
      header-line-format
