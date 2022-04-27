@@ -1337,7 +1337,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package phi-search)
 
 (use-package multiple-cursors
-  :hook (multiple-cursors-mode . multiple-cursors-ensure-tmm)
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map mc/keymap
@@ -1352,10 +1351,13 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("s" . mc/mark-all-in-region-regexp)
    ("l" . mc/edit-ends-of-lines))
   :config
-  (defun multiple-cursors-ensure-tmm ()
-    (if multiple-cursors-mode
-        (transient-mark-mode 1)
-      (transient-mark-mode -1))))
+  (define-advice mc/make-region-overlay-between-point-and-mark (:override ())
+    "Create overlay to look like active region."
+    (let ((overlay (make-overlay (mark) (point) nil nil t)))
+      (when transient-mark-mode
+        (overlay-put overlay 'face 'mc/region-face)
+        (overlay-put overlay 'type 'additional-region))
+      overlay)))
 
 (use-package yasnippet
   :delight yas-minor-mode)
