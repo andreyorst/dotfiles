@@ -652,7 +652,7 @@ are defining or executing a macro."
     (corfu-complete)
     (corfu-quit))
   :init
-  (corfu-global-mode))
+  (global-corfu-mode))
 
 (use-package corfu-doc
   :straight ( :host github
@@ -663,7 +663,7 @@ are defining or executing a macro."
           ("M-n" . corfu-doc-scroll-up))
   :hook (corfu-mode . corfu-doc-mode)
   :custom
-  (corfu-doc-delay 1.25)
+  (corfu-doc-delay 2)
   (corfu-doc-max-height 20)
   (corfu-doc-max-width 84))
 
