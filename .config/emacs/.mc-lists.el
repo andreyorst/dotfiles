@@ -31,6 +31,7 @@
         counsel-M-x
         default-indent-new-line
         delete-indentation
+        dired-flag-file-deletion
         downcase-region
         electric-newline-and-maybe-indent
         end-of-buffer
