@@ -222,7 +222,9 @@ Bindings will be enabled next time region is highlighted."
    hscroll-margin 1
    scroll-margin 0
    scroll-preserve-screen-position nil
-   scroll-conservatively 101)
+   scroll-conservatively 101
+   frame-resize-pixelwise window-system
+   window-resize-pixelwise window-system)
   (when (window-system)
     (setq-default
      x-gtk-use-system-tooltips nil
@@ -338,8 +340,8 @@ Based on `so-long-detected-long-line-p'."
               (if (bound-and-true-p display-line-numbers-mode)
                   (- display-line-numbers-width)
                 0))
-             ;; subtracting 2 for extra space in case some calculations were imprecise
-             (threshold (+ window-width hscroll-offset line-number-width -2)))
+             (threshold (+ window-width hscroll-offset line-number-width
+                           -2)))   ; compensate imprecise calculations
         (catch 'excessive
           (while (not (eobp))
             (let ((start (point)))
