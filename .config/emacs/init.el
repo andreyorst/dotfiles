@@ -550,10 +550,14 @@ are defining or executing a macro."
 
 (use-package display-line-numbers
   :straight nil
+  :hook (display-line-numbers-mode . toggle-hl-line)
   :custom
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t))
+  (display-line-numbers-width-start t)
+  :config
+  (defun toggle-hl-line ()
+    (hl-line-mode (if display-line-numbers-mode 1 -1))))
 
 (use-package formfeed
   :straight nil
