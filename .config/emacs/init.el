@@ -764,8 +764,12 @@ are defining or executing a macro."
 (use-package elisp-mode
   :straight nil
   :hook ((emacs-lisp-mode . eldoc-mode)
-         (emacs-lisp-mode . flycheck-mode)
-         (emacs-lisp-mode . common-lisp-modes-mode)))
+         (emacs-lisp-mode . elisp-flycheck-maybe)
+         (emacs-lisp-mode . common-lisp-modes-mode))
+  :config
+  (defun elisp-flycheck-maybe ()
+    (unless (string= "*scratch*" (buffer-name))
+      (flycheck-mode 1))))
 
 (use-package fennel-mode
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
@@ -894,6 +898,7 @@ are defining or executing a macro."
   (nrepl-use-ssh-fallback-for-remote-hosts t)
   (cider-enrich-classpath t)
   (cider-repl-history-file (expand-file-name "~/.cider-history"))
+  (cider-clojure-cli-global-options "-J-XX:-OmitStackTraceInFastThrow")
   :config
   (setq cider-jdk-src-paths nil)
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
@@ -1487,6 +1492,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (mail-user-agent 'mu4e-user-agent)
   (mu4e-view-show-images nil)
   (mu4e-view-show-addresses t)
+  (mu4e-context-policy 'pick-first)
   :config
   (when (featurep 'orderless)
     (define-advice mu4e-ask-maildir (:around (fn prompt))
