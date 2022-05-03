@@ -41,15 +41,6 @@
         goto-line
         hs-toggle-hiding
         hydra--negative-argument
-        hydrant/er/aorst/er-exit-and-exit
-        hydrant/er/er/contract-region
-        hydrant/er/er/expand-region
-        hydrant/er/er/mark-inside-pairs
-        hydrant/er/er/mark-inside-quotes
-        hydrant/er/er/mark-outside-pairs
-        hydrant/er/er/mark-outside-quotes
-        hydrant/er/er/mark-paragraph
-        hydrant/mc/mc/keyboard-quit-and-exit
         indent-for-tab-command
         indent-sexp
         kill-region
@@ -132,30 +123,6 @@
         god-local-mode
         hydra--digit-argument
         hydra--universal-argument
-        hydrant/-digit-argument
-        hydrant/-negative-argument
-        hydrant/er/body
-        hydrant/er/ignore-and-exit
-        hydrant/er/lambda-G-and-exit
-        hydrant/iedit/aorst/iedit-to-mc-hydrant-and-exit
-        hydrant/mc/body
-        hydrant/mc/keyboard-quit-and-exit
-        hydrant/mc/mc/cycle-backward
-        hydrant/mc/mc/cycle-forward
-        hydrant/mc/mc/edit-ends-of-lines
-        hydrant/mc/mc/insert-numbers
-        hydrant/mc/mc/mark-all-in-region-regexp
-        hydrant/mc/mc/mark-next-like-this-symbol
-        hydrant/mc/mc/mark-next-like-this-word
-        hydrant/mc/mc/mark-next-like-this-word-and-exit
-        hydrant/mc/mc/mark-next-lines
-        hydrant/mc/mc/mark-previous-like-this-word
-        hydrant/mc/mc/remove-current-cursor
-        hydrant/mc/mc/remove-cursors-on-blank-lines
-        hydrant/mc/mc/remove-duplicated-cursors
-        hydrant/mc/mc/remove-duplicated-cursors-and-exit
-        hydrant/mc/mc/vertical-align-with-space
-        hydrant/outline-menu/ignore-and-exit
         iedit-next-occurrence
         iedit-switch-to-mc-mode
         ignore
