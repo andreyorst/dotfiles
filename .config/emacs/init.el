@@ -899,6 +899,8 @@ are defining or executing a macro."
   (cider-enrich-classpath t)
   (cider-repl-history-file (expand-file-name "~/.cider-history"))
   (cider-clojure-cli-global-options "-J-XX:-OmitStackTraceInFastThrow")
+  (cider-use-tooltips nil)
+  (cider-connection-message-fn #'cider-random-tip)
   :config
   (setq cider-jdk-src-paths nil)
   (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
