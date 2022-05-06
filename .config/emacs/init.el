@@ -1114,7 +1114,7 @@ are defining or executing a macro."
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :preface
   (defcustom project-root-markers
-    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn")
+    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn" "shadow-cljs.edn")
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
