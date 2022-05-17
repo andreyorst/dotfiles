@@ -119,6 +119,9 @@ Used in various places to avoid getting wrong line height when
                      string-trim-right
                      (string-suffix-p "-dark'"))
       (eq 'dark (frame-parameter nil 'background-mode))))
+  (defun edit-init-file ()
+    (interactive)
+    (find-file (expand-file-name "init.el" user-emacs-directory)))
   (provide 'functions))
 
 (use-package kmacro
@@ -996,7 +999,10 @@ are defining or executing a macro."
   :custom
   (csv-align-max-width 80))
 
-(use-package erlang)
+(use-package erlang
+  :straight nil
+  :load-path "/usr/share/emacs/site-lisp/erlang/"
+  :when (executable-find "erlang"))
 
 (use-package elixir-mode)
 
@@ -1180,6 +1186,7 @@ means save all with no questions."
   :straight nil
   :custom
   (recentf-max-menu-items 100)
+  (recentf-max-saved-items 100)
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\")
   (dolist (dir (list (expand-file-name ".cache/" user-emacs-directory)
