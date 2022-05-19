@@ -903,15 +903,7 @@ are defining or executing a macro."
   (cider-repl-history-file (expand-file-name "~/.cider-history"))
   (cider-clojure-cli-global-options "-J-XX:-OmitStackTraceInFastThrow")
   (cider-use-tooltips nil)
-  (cider-connection-message-fn #'cider-random-tip)
-  :config
-  (setq cider-jdk-src-paths nil)
-  (dolist (src (append (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/src.zip")
-                       (file-expand-wildcards "/usr/lib/jvm/java-*-openjdk/lib/src.zip")
-                       (file-expand-wildcards "~/.clojure/clojure-*-sources.jar")))
-    (when (file-exists-p src)
-      (unless (memq src cider-jdk-src-paths)
-        (add-to-list 'cider-jdk-src-paths src t)))))
+  (cider-connection-message-fn #'cider-random-tip))
 
 (use-package flycheck-clj-kondo
   :when (executable-find "clj-kondo"))
