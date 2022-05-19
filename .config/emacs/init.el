@@ -399,7 +399,7 @@ Based on `so-long-detected-long-line-p'."
   :init
   (column-number-mode 1)
   (line-number-mode 1)
-  (transient-mark-mode -1)
+  ;; (transient-mark-mode -1)
   (defun overwrite-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
@@ -897,7 +897,7 @@ are defining or executing a macro."
   (cider-save-file-on-load nil)
   (cider-inspector-fill-frame nil)
   (cider-auto-select-error-buffer t)
-  (cider-eval-spinner t)
+  (cider-show-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
   (cider-enrich-classpath t)
   (cider-repl-history-file (expand-file-name "~/.cider-history"))
@@ -1007,6 +1007,8 @@ are defining or executing a macro."
 (use-package elixir-mode)
 
 (use-package zig-mode)
+
+(use-package scala-mode)
 
 ;;; Tools
 
@@ -1200,11 +1202,6 @@ means save all with no questions."
   (dumb-jump-selector 'completing-read)
   :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-
-;; (use-package which-key
-;;   :delight which-key-mode
-;;   :init
-;;   (which-key-mode t))
 
 (use-package gcmh
   :delight gcmh-mode
@@ -1444,31 +1441,45 @@ REGEXP FILE LINE and optional COL LEVEL info to
           clojurescript-mode)
          . lsp)
   :custom
-  (lsp-auto-fonfigure nil)
   (lsp-keymap-prefix "C-c l")
   (lsp-diagnostics-provider :auto)
+  (lsp-completion-provider :none)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
   (lsp-log-io nil)
   (lsp-keep-workspace-alive nil)
   (lsp-idle-delay 0.05)
+  ;; core
+  (lsp-auto-fonfigure nil)
+  (lsp-eldoc-enable-hover nil)
   (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-file-watchers nil)
+  (lsp-enable-folding nil)
+  (lsp-enable-imenu nil)
+  (lsp-enable-indentation nil)
   (lsp-enable-links nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-suggest-server-download nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-text-document-color nil)
+  (lsp-enable-xref nil)
+  ;; completion
+  (lsp-completion-enable nil)
+  (lsp-completion-enable-additional-text-edit nil)
+  (lsp-enable-snippet nil)
+  (lsp-completion-show-kind nil)
+  ;; headerline
   (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
   (lsp-headerline-breadcrumb-icons-enable nil)
+  ;; modeline
   (lsp-modeline-code-actions-enable nil)
   (lsp-modeline-diagnostics-enable nil)
   (lsp-modeline-workspace-status-enable nil)
+  ;; lens
   (lsp-lens-enable nil)
-  (lsp-enable-folding nil)
-  (lsp-enable-indentation nil)
-  (lsp-semantic-tokens-enable nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-  (lsp-completion-provider :none)
-  (lsp-completion-enable nil)
-  (lsp-completion-show-kind nil)
-  (lsp-enable-snippet nil))
+  ;; semantic
+  (lsp-semantic-tokens-enable nil))
 
 (use-package lsp-treemacs
   :custom
@@ -1480,6 +1491,11 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :hook (java-mode . lsp)
   :custom
   (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
+
+(use-package lsp-metals
+  :hook (scala-mode . lsp)
+  :custom
+  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off")))
 
 ;;; Mail
 
