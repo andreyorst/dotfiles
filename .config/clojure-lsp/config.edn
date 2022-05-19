@@ -1,8 +1,9 @@
-{:use-metadata-for-privacy? true
- :keep-require-at-start? false
- :show-docs-arity-on-same-line? true
- :text-document-sync-kind :full
+{:hover {:arity-on-same-line? true
+         :clojuredocs false}
  :semantic-tokens? false
+ :use-metadata-for-privacy? true
+ :copy-kondo-configs? true
+ :text-document-sync-kind :full
  :auto-add-ns-to-new-files? false
- :lint-project-files-after-startup? true
+ :lint-project-files-after-startup? false
  :dependency-scheme "jar"}
