@@ -99,6 +99,7 @@
         sp-rewrap-sexp
         sp-splice-sexp-killing-backward
         sp-wrap-round
+        switch-to-buffer
         transpose-sexps
         upcase-region
         wdired--self-insert
