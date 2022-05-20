@@ -388,9 +388,10 @@ Based on `so-long-detected-long-line-p'."
   :bind (("M-z" . zap-up-to-char)
          ("M-S-z" . zap-to-char)
          ("C-x k" . kill-this-buffer)
-         ("C-h C-f" . describe-face))
+         ("C-h C-f" . describe-face)
+         ([remap undo] . undo-only))
   :hook ((before-save . delete-trailing-whitespace)
-         (overwrite-mode . overwrite-set-cursor-shape))
+         (overwrite-mode . overwrite-mode-set-cursor-shape))
   :custom
   (yank-excluded-properties t)
   (blink-matching-delay 0)
@@ -399,8 +400,7 @@ Based on `so-long-detected-long-line-p'."
   :init
   (column-number-mode 1)
   (line-number-mode 1)
-  ;; (transient-mark-mode -1)
-  (defun overwrite-set-cursor-shape ()
+  (defun overwrite-mode-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
   (define-advice keyboard-quit (:around (quit))
