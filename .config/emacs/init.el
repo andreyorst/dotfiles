@@ -1441,6 +1441,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (lsp-keep-workspace-alive nil)
   (lsp-idle-delay 0.05)
   ;; core
+  (lsp-enable-xref t)
   (lsp-auto-fonfigure nil)
   (lsp-eldoc-enable-hover nil)
   (lsp-enable-dap-auto-configure nil)
@@ -1453,7 +1454,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (lsp-enable-suggest-server-download nil)
   (lsp-enable-symbol-highlighting nil)
   (lsp-enable-text-document-color nil)
-  (lsp-enable-xref nil)
   ;; completion
   (lsp-completion-enable nil)
   (lsp-completion-enable-additional-text-edit nil)
