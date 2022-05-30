@@ -90,6 +90,7 @@
         sp-backward-sexp
         sp-comment
         sp-delete-char
+        sp-forward-barf-sexp
         sp-forward-sexp
         sp-forward-slurp-sexp
         sp-kill-hybrid-sexp
