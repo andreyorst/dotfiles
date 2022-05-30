@@ -876,7 +876,7 @@ are defining or executing a macro."
   (provide 'inferior-clojure))
 
 (use-package cider
-  :delight " cider"
+  :delight " CIDER"
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode))
   :bind ( :map cider-repl-mode-map
@@ -1372,7 +1372,20 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package hideshow
   :straight nil
-  :hook (prog-mode . hs-minor-mode))
+  :hook (prog-mode . hs-minor-mode)
+  :config
+  (define-advice hs-toggle-hiding (:around (fn &optional e))
+    (when-let* ((cursor-pos (mouse-position))
+                (line (cddr cursor-pos))
+                (col  (cadr cursor-pos))
+                (p (save-excursion
+                     (goto-char (window-start))
+                     (forward-line line)
+                     (if (> (- (line-end-position) (line-beginning-position)) col)
+                         (progn  (move-to-column col) (1- (point)))
+                       nil))))
+      (goto-char p))
+    (funcall fn)))
 
 (use-package flycheck
   :custom
