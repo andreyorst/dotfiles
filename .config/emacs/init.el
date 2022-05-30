@@ -1338,7 +1338,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map mc/keymap
-   ("<return>" . nil)
    ("C-s" . phi-search)
    ("C-r" . phi-search-backward)
    ("C-&" . mc/vertical-align-with-space)
@@ -1349,6 +1348,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("s" . mc/mark-all-in-region-regexp)
    ("l" . mc/edit-ends-of-lines))
   :config
+  (define-key mc/keymap (kbd "<return>") nil)
   (define-advice mc/make-region-overlay-between-point-and-mark (:override ())
     "Create overlay to look like active region."
     (let ((overlay (make-overlay (mark) (point) nil nil t)))
