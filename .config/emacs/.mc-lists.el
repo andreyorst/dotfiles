@@ -122,12 +122,14 @@
         count-lines-page
         dabbrev-expand
         describe-variable
+        dired-up-directory
         god-local-mode
         hydra--digit-argument
         hydra--universal-argument
         iedit-next-occurrence
         iedit-switch-to-mc-mode
         ignore
+        imenu
         isearch-abort
         isearch-delete-char
         isearch-exit
