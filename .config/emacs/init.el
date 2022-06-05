@@ -780,6 +780,8 @@ are defining or executing a macro."
           ("C-c C-k" . lisp-eval-each-sexp)
           ("M-." . xref-find-definitions)
           ("M-," . xref-pop-marker-stack))
+  :custom
+  (fennel-eldoc-fontify-markdown t)
   :config
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
@@ -994,7 +996,7 @@ are defining or executing a macro."
 (use-package erlang
   :straight nil
   :load-path "/usr/share/emacs/site-lisp/erlang/"
-  :when (executable-find "erlang"))
+  :when (executable-find "erl"))
 
 (use-package elixir-mode)
 
@@ -1170,6 +1172,9 @@ means save all with no questions."
   :config
   (nconc (assoc '(";+") separedit-comment-delimiter-alist)
          '(clojure-mode clojurec-mode clojure-script-mode))
+  (define-advice separedit--point-at-comment (:around (&rest args))
+    (unless (apply 'separedit--point-at-string (cdr args))
+      (apply args)))
   (defun separedit-header-line-setup ()
     (setq-local
      header-line-format
