@@ -268,7 +268,7 @@ Bindings will be enabled next time region is highlighted."
   :init
   (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
     "File to store disabled commands, that were enabled permanently.")
-  (define-advice enable-command (:around (foo command))
+  (define-advice enable-command (:around (foo command) use-disabled-file)
     (let ((user-init-file disabled-commands))
       (funcall foo command)))
   (load disabled-commands :noerror))
@@ -356,7 +356,7 @@ Based on `so-long-detected-long-line-p'."
                           (and (eobp) (<= (- (point) start)
                                           threshold)))
                 (throw 'excessive t))))))))
-  (define-advice scroll-left (:around (foo &optional arg set-minimum))
+  (define-advice scroll-left (:around (foo &optional arg set-minimum) prevent-overscroll)
     (when (and truncate-lines
                (not (memq major-mode '(vterm-mode term-mode)))
                (truncated-lines-p))
@@ -403,7 +403,7 @@ Based on `so-long-detected-long-line-p'."
   (defun overwrite-mode-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
-  (define-advice keyboard-quit (:around (quit))
+  (define-advice keyboard-quit (:around (quit) quit-current-context)
     "Quit the current context.
 
 When there is an active minibuffer and we are not inside it close
@@ -464,13 +464,13 @@ are defining or executing a macro."
          ("C-x C-z" . ignore))
   :config
   (define-advice toggle-frame-fullscreen
-      (:before (&optional frame))
+      (:before (&optional frame) hide-menu-bar)
     "Hide menu bar when FRAME goes full screen."
     (set-frame-parameter
      nil 'menu-bar-lines
      (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0)))
   (define-advice switch-to-buffer-other-frame
-      (:around (fn buffer-or-name &optional norecord))
+      (:around (fn buffer-or-name &optional norecord) clone-frame-parameters)
     "Clone fame parameters when switching to another frame."
     (let* ((default-frame-alist
             (seq-remove (lambda (elem) (eq (car elem) 'name))
@@ -718,10 +718,10 @@ are defining or executing a macro."
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
-  (define-advice org-return (:around (f &rest args))
+  (define-advice org-return (:around (f &rest args) preserve-indentation)
     (let ((org-src-preserve-indentation t))
       (apply f args)))
-  (define-advice org-cycle (:around (f &rest args))
+  (define-advice org-cycle (:around (f &rest args) preserve-indentation)
     (let ((org-src-preserve-indentation t))
       (apply f args)))
   (defun org-babel-edit-prep:emacs-lisp (_)
@@ -1137,7 +1137,7 @@ are defining or executing a macro."
          (file-name-directory
           (directory-file-name path))))))
   (add-to-list 'project-find-functions #'project-find-root)
-  (define-advice project-compile (:around (fn))
+  (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
     (let* ((project-buffers (project-buffers (project-current)))
            (compilation-save-buffers-predicate
@@ -1172,7 +1172,8 @@ means save all with no questions."
   :config
   (nconc (assoc '(";+") separedit-comment-delimiter-alist)
          '(clojure-mode clojurec-mode clojure-script-mode))
-  (define-advice separedit--point-at-comment (:around (&rest args))
+  (define-advice separedit--point-at-comment (:around (&rest args)
+                                                      handle-docstring-comment-face)
     (unless (apply 'separedit--point-at-string (cdr args))
       (apply args)))
   (defun separedit-header-line-setup ()
@@ -1353,14 +1354,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("s" . mc/mark-all-in-region-regexp)
    ("l" . mc/edit-ends-of-lines))
   :config
-  (define-key mc/keymap (kbd "<return>") nil)
-  (define-advice mc/make-region-overlay-between-point-and-mark (:override ())
-    "Create overlay to look like active region."
-    (let ((overlay (make-overlay (mark) (point) nil nil t)))
-      (when transient-mark-mode
-        (overlay-put overlay 'face 'mc/region-face)
-        (overlay-put overlay 'type 'additional-region))
-      overlay)))
+  (define-key mc/keymap (kbd "<return>") nil))
 
 (use-package yasnippet
   :delight yas-minor-mode)
@@ -1379,17 +1373,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :straight nil
   :hook (prog-mode . hs-minor-mode)
   :config
-  (define-advice hs-toggle-hiding (:around (fn &optional e))
-    (when-let* ((cursor-pos (mouse-position))
-                (line (cddr cursor-pos))
-                (col  (cadr cursor-pos))
-                (p (save-excursion
-                     (goto-char (window-start))
-                     (forward-line line)
-                     (if (> (- (line-end-position) (line-beginning-position)) col)
-                         (progn  (move-to-column col) (1- (point)))
-                       nil))))
-      (goto-char p))
+  (define-advice hs-toggle-hiding (:around (fn &optional e) move-point-to-mouse)
+    "Move point to the location of the mouse pointer."
+    (mouse-set-point last-input-event)
     (funcall fn)))
 
 (use-package flycheck
@@ -1420,7 +1406,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
     :fringe-bitmap flymake-note-bitmap
     :fringe-face 'flycheck-fringe-info
     :error-list-face 'flycheck-error-list-info)
-  (define-advice flycheck-mode-line-status-text (:override (&optional status))
+  (define-advice flycheck-mode-line-status-text (:override (&optional status) change-style)
     "Get a text describing STATUS for use in the mode line.
   STATUS defaults to `flycheck-last-status-change' if omitted or
   nil."
@@ -1435,7 +1421,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
                  (format "%s/%s" (or .error 0) (or .warning 0))))
               (`interrupted ".")
               (`suspicious "?"))))
-  (define-advice flycheck-may-use-echo-area-p (:override ())
+  (define-advice flycheck-may-use-echo-area-p (:override () never-echo)
     nil))
 
 (use-package flycheck-package
@@ -1530,10 +1516,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (mu4e-context-policy 'pick-first)
   :config
   (when (featurep 'orderless)
-    (define-advice mu4e-ask-maildir (:around (fn prompt))
+    (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
       (let ((completion-styles (append completion-styles '(orderless))))
         (funcall fn prompt))))
-  (define-advice mu4e-get-maildirs (:around (fn))
+  (define-advice mu4e-get-maildirs (:around (fn) filter-maildirs-based-on-context)
     "Filters maildirs for current active context based on maildir prefix."
     (let* ((context-vars (mu4e-context-vars (mu4e-context-current)))
            (current-maildir (alist-get 'mu4e-maildir-context context-vars)))
