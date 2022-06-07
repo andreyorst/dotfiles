@@ -1514,6 +1514,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (mu4e-view-show-images nil)
   (mu4e-view-show-addresses t)
   (mu4e-context-policy 'pick-first)
+  (mu4e-update-interval (* 30 60))
   :config
   (when (featurep 'orderless)
     (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
