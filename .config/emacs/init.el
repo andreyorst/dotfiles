@@ -783,6 +783,33 @@ are defining or executing a macro."
   :custom
   (fennel-eldoc-fontify-markdown t)
   :config
+  (defvar fennel-mode-font-lock-dynamically t)
+  (defvar-local fennel-mode--dynamic-font-lock-keywords nil)
+  (defun fennel-mode--resolve-module-symbols (module)
+    (when module
+      (condition-case nil
+          (let ((proc (inferior-lisp-proc))
+                (command (format ",apropos %s\n" module))
+                (buffer (get-buffer-create (format "*%s-module-keywords*" module))))
+            (comint-redirect-send-command-to-process
+             command buffer proc nil t)
+            (with-current-buffer buffer
+              (accept-process-output proc 0.01)
+              (mapcar (lambda (s) (replace-regexp-in-string "^.*[.]" "" s))
+                      (split-string (buffer-substring-no-properties (point-min) (point-max)) "[\t]" t))))
+        (error nil))))
+  (defun fennel-mode-refresh-dynamic-font-lock ()
+    "Ensure that the current buffer has up-to-date font-lock rules."
+    (interactive)
+    (when (and fennel-mode-font-lock-dynamically
+               font-lock-mode)
+      (font-lock-remove-keywords nil fennel-mode--dynamic-font-lock-keywords)
+      (when-let* ((module fennel-module-name)
+                  (symbols (fennel-mode--resolve-module-symbols module)))
+        (setq-local fennel-mode--dynamic-font-lock-keywords
+                    (fennel-mode--compile-font-lock-keywords symbols))
+        (font-lock-add-keywords nil fennel-mode--dynamic-font-lock-keywords 'end))
+      (font-lock-flush)))
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
