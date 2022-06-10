@@ -158,6 +158,8 @@
         parinfer-mouse-drag-region
         parinfer-toggle-mode
         phi-search
+        pixel-scroll-precision
+        pixel-scroll-start-momentum
         rust-format-buffer
         tab-line-select-tab
         term-line-mode
