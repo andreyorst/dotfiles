@@ -111,17 +111,24 @@ Used in various places to avoid getting wrong line height when
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
-  (defun gnome-dark-mode-enabled-p ()
-    "Check if frame is dark or not."
-    (if (executable-find "gsettings")
-        (thread-last "gsettings get org.gnome.desktop.interface gtk-theme"
-                     shell-command-to-string
-                     string-trim-right
-                     (string-suffix-p "-dark'"))
+  (defun dark-mode-enabled-p ()
+    "Check if dark mode is enabled."
+    (if (featurep 'dbus)
+        (equal '1 (caar (dbus-call-method
+                         :session
+                         "org.freedesktop.portal.Desktop"
+                         "/org/freedesktop/portal/desktop"
+                         "org.freedesktop.portal.Settings"
+                         "Read"
+                         "org.freedesktop.appearance"
+                         "color-scheme")))
       (eq 'dark (frame-parameter nil 'background-mode))))
   (defun edit-init-file ()
     (interactive)
     (find-file (expand-file-name "init.el" user-emacs-directory)))
+  (defun edit-early-init-file ()
+    (interactive)
+    (find-file (expand-file-name "early-init.el" user-emacs-directory)))
   (provide 'functions))
 
 (use-package kmacro
@@ -505,19 +512,19 @@ are defining or executing a macro."
   :when window-system
   :requires (functions local-config)
   :config
-  (defun gtk-theme-changed (path _ _)
-    "DBus handler to detect when the GTK theme has changed."
-    (when (string-equal path "/org/gnome/desktop/interface/gtk-theme")
-      (if (gnome-dark-mode-enabled-p)
+  (defun color-scheme-changed (path var value)
+    "DBus handler to detect when the color-scheme has changed."
+    (when (and (string-equal path "org.freedesktop.appearance")
+               (string-equal var "color-scheme"))
+      (if (equal (car value) '1)
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
-  (dbus-register-signal
-   :session
-   "ca.desrt.dconf"
-   "/ca/desrt/dconf/Writer/user"
-   "ca.desrt.dconf.Writer"
-   "Notify"
-   #'gtk-theme-changed))
+  (dbus-register-signal :session
+                        "org.freedesktop.portal.Desktop"
+                        "/org/freedesktop/portal/desktop"
+                        "org.freedesktop.portal.Settings"
+                        "SettingChanged"
+                        #'color-scheme-changed))
 
 (use-package modus-themes
   :requires (functions local-config)
@@ -539,7 +546,7 @@ are defining or executing a macro."
   :init
   (cond ((in-termux-p)
          (load-theme local-config-dark-theme t))
-        ((gnome-dark-mode-enabled-p)
+        ((dark-mode-enabled-p)
          (load-theme local-config-dark-theme t))
         (t (load-theme local-config-light-theme t))))
 
@@ -777,39 +784,12 @@ are defining or executing a macro."
 (use-package fennel-mode
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
-          ("C-c C-k" . lisp-eval-each-sexp)
+          ;; ("C-c C-k" . lisp-eval-each-sexp)
           ("M-." . xref-find-definitions)
           ("M-," . xref-pop-marker-stack))
   :custom
   (fennel-eldoc-fontify-markdown t)
   :config
-  (defvar fennel-mode-font-lock-dynamically t)
-  (defvar-local fennel-mode--dynamic-font-lock-keywords nil)
-  (defun fennel-mode--resolve-module-symbols (module)
-    (when module
-      (condition-case nil
-          (let ((proc (inferior-lisp-proc))
-                (command (format ",apropos %s\n" module))
-                (buffer (get-buffer-create (format "*%s-module-keywords*" module))))
-            (comint-redirect-send-command-to-process
-             command buffer proc nil t)
-            (with-current-buffer buffer
-              (accept-process-output proc 0.01)
-              (mapcar (lambda (s) (replace-regexp-in-string "^.*[.]" "" s))
-                      (split-string (buffer-substring-no-properties (point-min) (point-max)) "[\t]" t))))
-        (error nil))))
-  (defun fennel-mode-refresh-dynamic-font-lock ()
-    "Ensure that the current buffer has up-to-date font-lock rules."
-    (interactive)
-    (when (and fennel-mode-font-lock-dynamically
-               font-lock-mode)
-      (font-lock-remove-keywords nil fennel-mode--dynamic-font-lock-keywords)
-      (when-let* ((module fennel-module-name)
-                  (symbols (fennel-mode--resolve-module-symbols module)))
-        (setq-local fennel-mode--dynamic-font-lock-keywords
-                    (fennel-mode--compile-font-lock-keywords symbols))
-        (font-lock-add-keywords nil fennel-mode--dynamic-font-lock-keywords 'end))
-      (font-lock-flush)))
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
   (defvar org-babel-default-header-args:fennel '((:results . "silent")))
