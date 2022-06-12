@@ -784,7 +784,6 @@ are defining or executing a macro."
 (use-package fennel-mode
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
-          ;; ("C-c C-k" . lisp-eval-each-sexp)
           ("M-." . xref-find-definitions)
           ("M-," . xref-pop-marker-stack))
   :custom
@@ -824,65 +823,6 @@ are defining or executing a macro."
     (common-lisp-modes-mode 1)
     (flycheck-mode 1)
     (clojure-set-compile-command)))
-
-(use-package inferior-clojure
-  :straight nil
-  :requires (inf-lisp comint clojure-mode)
-  :hook ((inferior-clojure-mode . common-lisp-modes-mode))
-  :preface
-  (require 'inf-lisp)
-  (require 'comint)
-  (require 'clojure-mode)
-  (defgroup inferior-clojure ()
-    "Support for interacting with Clojure via an inferior process."
-    :prefix "inferior-clojure-"
-    :group 'languages)
-  (defcustom inferior-clojure-program "clojure"
-    "Path to the program used by `inferior-clojure'"
-    :tag "Clojure CLI"
-    :type 'string
-    :group 'inferior-clojure)
-  (defcustom inferior-clojure-prompt "^[^=]+=> "
-    "Prompt regex for inferior Clojure."
-    :tag "Prompt regexp"
-    :type 'string
-    :group 'inferior-clojure)
-  (defun inferior-clojure-indent-on-newline ()
-    (interactive)
-    (let (electric-indent-mode)
-      (newline-and-indent)))
-  (defun inferior-clojure (cmd)
-    "Run an inferior instance of `inferior-clojure' inside Emacs."
-    (interactive (list (if current-prefix-arg
-			   (read-string "Run Clojure: " inferior-clojure-program)
-		         inferior-clojure-program)))
-    (if (not (comint-check-proc "*inferior-clojure*"))
-        (let ((cmdlist (if (fboundp #'split-string-shell-command)
-                           (split-string-shell-command cmd)
-                         ;; NOTE: Less accurate, may be problematic
-                         (split-string cmd))))
-	  (set-buffer (apply (function make-comint)
-			     "inferior-clojure" (car cmdlist) nil (cdr cmdlist)))
-	  (inferior-clojure-mode)))
-    (setq inferior-lisp-buffer "*inferior-clojure*")
-    (pop-to-buffer-same-window "*inferior-clojure*"))
-  (defalias 'run-clojure 'inferior-clojure)
-  (define-derived-mode inferior-clojure-mode inferior-lisp-mode "Inferior Clojure"
-    "Major mode for `inferior-clojure'.
-
-\\<inferior-clojure-mode-map>"
-    (setq-local font-lock-defaults '(clojure-font-lock-keywords t))
-    (setq-local inferior-lisp-prompt inferior-clojure-prompt)
-    (setq-local lisp-indent-function 'clojure-indent-function)
-    (setq-local lisp-doc-string-elt-property 'clojure-doc-string-elt)
-    (setq-local comint-prompt-read-only t)
-    (setq-local comment-end "")
-    (clojure-font-lock-setup)
-    (make-local-variable 'completion-at-point-functions)
-    (set-syntax-table clojure-mode-syntax-table)
-    (add-hook 'paredit-mode-hook #'clojure-paredit-setup nil t))
-  (define-key inferior-clojure-mode-map (kbd "C-j") 'inferior-clojure-indent-on-newline)
-  (provide 'inferior-clojure))
 
 (use-package cider
   :delight " CIDER"
@@ -1499,6 +1439,11 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :hook (scala-mode . lsp)
   :custom
   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off")))
+
+(use-package langtool
+  :when (file-exists-p (expand-file-name "~/.local/lib/languagetool-commandline.jar"))
+  :custom
+  (langtool-language-tool-jar (expand-file-name "~/.local/lib/languagetool-commandline.jar")))
 
 ;;; Mail
 
