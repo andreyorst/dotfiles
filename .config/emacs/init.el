@@ -1445,8 +1445,12 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :custom
   (langtool-language-tool-jar (expand-file-name "~/.local/lib/LanguageTool-5.7-stable/languagetool-commandline.jar"))
   :config
-  (define-advice langtool-check-buffer (:before (&optional lang) fix-narrowing)
-    (mark-whole-buffer)))
+  (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
+    (save-mark-and-excursion
+      (unless (use-region-p)
+        (let ((inhibit-message t))
+          (mark-whole-buffer)))
+      (funcall fn lang))))
 
 ;;; Mail
 
