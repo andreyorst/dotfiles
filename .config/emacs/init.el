@@ -1441,9 +1441,12 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off")))
 
 (use-package langtool
-  :when (file-exists-p (expand-file-name "~/.local/lib/languagetool-commandline.jar"))
+  :when (file-exists-p (expand-file-name "~/.local/lib/LanguageTool-5.7-stable/languagetool-commandline.jar"))
   :custom
-  (langtool-language-tool-jar (expand-file-name "~/.local/lib/languagetool-commandline.jar")))
+  (langtool-language-tool-jar (expand-file-name "~/.local/lib/LanguageTool-5.7-stable/languagetool-commandline.jar"))
+  :config
+  (define-advice langtool-check-buffer (:before (&optional lang) fix-narrowing)
+    (mark-whole-buffer)))
 
 ;;; Mail
 
