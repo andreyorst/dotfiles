@@ -1,0 +1,9 @@
+#!/bin/sh
+
+make clean \
+    && ./autogen.sh \
+    && ./configure --without-compress-install --with-native-compilation --with-pgtk --with-mailutils --prefix="$HOME"/.local \
+    && make -j$(($(nproc)/2)) \
+    && make uninstall \
+    && make install \
+    && init emacs
