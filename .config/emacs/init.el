@@ -363,11 +363,10 @@ Based on `so-long-detected-long-line-p'."
                           (and (eobp) (<= (- (point) start)
                                           threshold)))
                 (throw 'excessive t))))))))
-  (define-advice scroll-left (:around (foo &optional arg set-minimum) prevent-overscroll)
-    (when (and truncate-lines
-               (not (memq major-mode '(vterm-mode term-mode)))
-               (truncated-lines-p))
-      (funcall foo arg set-minimum)))
+  (define-advice scroll-left (:before-while (&rest _) prevent-overscroll)
+    (and truncate-lines
+         (not (memq major-mode '(vterm-mode term-mode)))
+         (truncated-lines-p)))
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
@@ -1119,10 +1118,10 @@ means save all with no questions."
   :config
   (nconc (assoc '(";+") separedit-comment-delimiter-alist)
          '(clojure-mode clojurec-mode clojure-script-mode))
-  (define-advice separedit--point-at-comment (:around (&rest args)
-                                                      handle-docstring-comment-face)
-    (unless (apply 'separedit--point-at-string (cdr args))
-      (apply args)))
+  (define-advice separedit--point-at-comment (:before-while
+                                              (&rest args)
+                                              handle-docstring-comment-face)
+    (not (apply 'separedit--point-at-string (cdr args))))
   (defun separedit-header-line-setup ()
     (setq-local
      header-line-format
@@ -1320,10 +1319,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :straight nil
   :hook (prog-mode . hs-minor-mode)
   :config
-  (define-advice hs-toggle-hiding (:around (fn &optional e) move-point-to-mouse)
+  (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
-    (mouse-set-point last-input-event)
-    (funcall fn)))
+    (mouse-set-point last-input-event)))
 
 (use-package flycheck
   :custom
