@@ -149,5 +149,5 @@ fix-imap-utf7() {
 }
 
 rebuild-emacs () {
-    cd ~/Git/emacs && toolbox run -c emacs sh ~/.dotfiles/scripts/rebuild_emacs
+    sh ~/.dotfiles/scripts/rebuild_emacs
 }
