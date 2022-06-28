@@ -1457,6 +1457,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :custom
   (message-kill-buffer-on-exit t))
 
+(use-package smtpmail
+  :straight nil)
+
 (use-package mu4e
   :straight nil
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -1515,8 +1518,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
           mu4e-personal-addresses (mapcar (lambda (ctx) (plist-get ctx :address))
                                           mail-contexts))))
 
-(use-package smtpmail
-  :straight nil)
+(use-package message-view-patch
+  :when (executable-find "mu")
+  :hook (mu4e-view-mode . message-view-patch-highlight))
 
 (provide 'init)
 ;;; init.el ends here
