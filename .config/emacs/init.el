@@ -1520,7 +1520,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package message-view-patch
   :when (executable-find "mu")
-  :hook (mu4e-view-mode . message-view-patch-highlight))
+  :hook (gnus-part-display-hook . message-view-patch-highlight))
 
 (provide 'init)
 ;;; init.el ends here
