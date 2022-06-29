@@ -865,6 +865,9 @@ are defining or executing a macro."
   (cljr-suppress-middleware-warnings t)
   (cljr-warn-on-eval nil))
 
+(use-package clj-decompiler
+  :hook (cider-mode . clj-decompiler-setup))
+
 (use-package lisp-mode
   :straight nil
   :hook ((lisp-mode lisp-data-mode) . common-lisp-modes-mode))
