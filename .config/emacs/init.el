@@ -1080,7 +1080,8 @@ are defining or executing a macro."
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :preface
   (defcustom project-root-markers
-    '("Cargo.toml" "compile_commands.json" "compile_flags.txt" "project.clj" ".git" "deps.edn" "shadow-cljs.edn")
+    '("Cargo.toml" "compile_commands.json" "compile_flags.txt"
+      "project.clj" ".git" "deps.edn" "shadow-cljs.edn")
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
@@ -1093,13 +1094,13 @@ are defining or executing a macro."
                       (file-exists-p (concat path file)))
                     project-root-markers)))
   (defun project-find-root (path)
-    "Recursive search in PATH for root markers."
-    (cond
-     ((project-root-p path) (cons 'transient path))
-     ((equal "/" path) nil)
-     (t (project-find-root
-         (file-name-directory
-          (directory-file-name path))))))
+    "Search up the PATH for `project-root-markers'."
+    (let ((path (expand-file-name path)))
+      (catch 'found
+        (while (not (equal "/" path))
+          (if (not (project-root-p path))
+              (setq path (file-name-directory (directory-file-name path)))
+            (throw 'found (cons 'transient path)))))))
   (add-to-list 'project-find-functions #'project-find-root)
   (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
@@ -1107,6 +1108,14 @@ are defining or executing a macro."
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
       (funcall fn)))
+  (define-advice recompile (:around (fn &optional edit-command) save-project-buffers)
+    "Only ask to save project-related buffers if inside of a project."
+    (if (project-current)
+        (let* ((project-buffers (project-buffers (project-current)))
+               (compilation-save-buffers-predicate
+                (lambda () (memq (current-buffer) project-buffers))))
+          (funcall fn edit-command))
+      (funcall fn edit-command)))
   (defun project-save-some-buffers (&optional arg)
     "Save some modified file-visiting buffers in the current project.
 
