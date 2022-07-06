@@ -105,7 +105,3 @@ function container_pc {
 }
 
 export XCURSOR_SIZE=24
-
-if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ] && [ -z "$VTERM" ]; then
-    tmux
-fi
