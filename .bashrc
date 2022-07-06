@@ -106,11 +106,6 @@ function container_pc {
 
 export XCURSOR_SIZE=24
 
-# Tmux
-if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ]; then
+if [ -n "$(command -v tmux)" ] && [ -z "$TMUX" ] && [ -z "$VTERM" ]; then
     tmux
-fi
-
-if [ -n "$TMUX" ] && [ -n "$(command -v weechat)" ] && [ -z "$(pgrep weechat)" ]; then
-    weechat
 fi
