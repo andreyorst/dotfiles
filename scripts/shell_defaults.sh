@@ -23,7 +23,7 @@ if [ -n "$(command -v dash)" ]; then
     export KAKOUNE_POSIX_SHELL
 fi
 
-alias less="less --tabs 3 -RF"
+less() { command less --tabs 3 -RF "$@" || command less -RF "$@"; }
 
 alias ll="ls -l"
 alias l="ls -l"
