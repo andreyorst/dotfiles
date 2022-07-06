@@ -752,7 +752,8 @@ are defining or executing a macro."
       (flycheck-mode 1))))
 
 (use-package fennel-mode
-  :straight t
+  :straight ( :branch "dynamic-font-lock"
+              :repo "git@git.sr.ht:~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
