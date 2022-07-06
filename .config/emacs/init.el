@@ -993,8 +993,11 @@ are defining or executing a macro."
   :config
   (defun vterm-project-dir (&optional arg)
     (interactive "P")
-    (let ((default-directory (project-root (project-current t))))
-      (funcall-interactively #'vterm arg))))
+    (let* ((default-directory (project-root (project-current t)))
+           (name (project-prefixed-buffer-name "vterm")))
+      (if (and (not current-prefix-arg) (get-buffer name))
+          (switch-to-buffer name)
+        (funcall-interactively #'vterm name)))))
 
 (use-package flymake
   :preface
