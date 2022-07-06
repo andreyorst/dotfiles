@@ -828,11 +828,15 @@ are defining or executing a macro."
   (cider-clojure-cli-global-options "-J-XX:-OmitStackTraceInFastThrow")
   (cider-use-tooltips nil)
   (cider-connection-message-fn #'cider-random-tip)
+  (cider-repl-prompt-function #'cider-repl-prompt-newline)
   :config
   (defun cider-disable-linting ()
     "Disable linting integrations for current buffer."
     (when flycheck-mode (flycheck-mode -1))
-    (when flymake-mode (flymake-mode -1))))
+    (when flymake-mode (flymake-mode -1)))
+  (defun cider-repl-prompt-newline (namespace)
+    "Return a prompt string that mentions NAMESPACE with a newline."
+    (format "%s\n> " namespace)))
 
 (use-package flycheck-clj-kondo
   :straight t
