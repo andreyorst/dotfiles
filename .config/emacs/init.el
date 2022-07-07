@@ -1349,6 +1349,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package lsp-mode
   :straight t
+  :hook (lsp-mode . lsp-diagnostics-mode)
   :custom
   (lsp-keymap-prefix "C-c l")
   (lsp-diagnostics-provider :flymake)
