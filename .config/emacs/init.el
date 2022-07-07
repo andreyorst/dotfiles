@@ -125,6 +125,28 @@ Used in various places to avoid getting wrong line height when
   (defun edit-early-init-file ()
     (interactive)
     (find-file (expand-file-name "early-init.el" user-emacs-directory)))
+  (defun clj-kondo-install (&optional install-dir)
+    "Install clj-kondo using official installation script."
+    (interactive (list (if current-prefix-arg
+			   (read-string "Install dir: " install-dir)
+		         (expand-file-name "~/.local/bin"))))
+    (let ((inhibit-message t)
+          (tmp (make-temp-file "clj-kondo-install-"))
+          (platform (cond ((string-equal system-type "darwin") "macos")
+                          ((string-equal system-type "gnu/linux") "linux"))))
+      (if (url-copy-file "https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/resources/CLJ_KONDO_RELEASED_VERSION" tmp t)
+          (let* ((version (with-temp-buffer
+                            (insert-file-contents tmp)
+                            (string-trim (buffer-string))))
+                 (url (format "https://github.com/clj-kondo/clj-kondo/releases/download/v%s/clj-kondo-%s-%s-amd64.zip" version version platform))
+                 (target (expand-file-name (format "%s/clj-kondo-%s.zip" install-dir version))))
+            (if (url-copy-file url target t)
+                (if (shell-command (format "unzip -qqo %s -d %s" target install-dir))
+                    (let (inhibit-message)
+                      (message "Installed clj-kondo v%s to %s" version install-dir))
+                  (user-error "Unable to unzip %s" target))
+              (user-error "Unable to download clj-kondo-%s-%s-amd64.zip" version platform)))
+        (user-error "Unable to retrieve clj-kondo version"))))
   (provide 'functions))
 
 (use-package kmacro
@@ -524,10 +546,6 @@ are defining or executing a macro."
          (load-theme local-config-dark-theme t))
         (t (load-theme local-config-light-theme t))))
 
-(use-package custom
-  :custom
-  (custom-safe-themes t))
-
 (use-package uniquify
   :custom
   (uniquify-buffer-name-style 'forward))
@@ -744,12 +762,7 @@ are defining or executing a macro."
 
 (use-package elisp-mode
   :hook ((emacs-lisp-mode . eldoc-mode)
-         (emacs-lisp-mode . elisp-flycheck-maybe)
-         (emacs-lisp-mode . common-lisp-modes-mode))
-  :config
-  (defun elisp-flycheck-maybe ()
-    (unless (string= "*scratch*" (buffer-name))
-      (flycheck-mode 1))))
+         (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
   :straight ( :branch "dynamic-font-lock"
@@ -794,7 +807,6 @@ are defining or executing a macro."
   (defun clojure-mode-setup ()
     "Setup Clojure buffer."
     (common-lisp-modes-mode 1)
-    (flycheck-mode 1)
     (clojure-set-compile-command)))
 
 (use-package cider
@@ -837,32 +849,6 @@ are defining or executing a macro."
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with a newline."
     (format "%s\n> " namespace)))
-
-(use-package flycheck-clj-kondo
-  :straight t
-  :config
-  (defun clj-kondo-install (&optional install-dir)
-    "Install clj-kondo using official installation script."
-    (interactive (list (if current-prefix-arg
-			   (read-string "Install dir: " install-dir)
-		         (expand-file-name "~/.local/bin"))))
-    (let ((inhibit-message t)
-          (tmp (make-temp-file "clj-kondo-install-"))
-          (platform (cond ((string-equal system-type "darwin") "macos")
-                          ((string-equal system-type "gnu/linux") "linux"))))
-      (if (url-copy-file "https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/resources/CLJ_KONDO_RELEASED_VERSION" tmp t)
-          (let* ((version (with-temp-buffer
-                            (insert-file-contents tmp)
-                            (string-trim (buffer-string))))
-                 (url (format "https://github.com/clj-kondo/clj-kondo/releases/download/v%s/clj-kondo-%s-%s-amd64.zip" version version platform))
-                 (target (expand-file-name (format "%s/clj-kondo-%s.zip" install-dir version))))
-            (if (url-copy-file url target t)
-                (if (shell-command (format "unzip -qqo %s -d %s" target install-dir))
-                    (let (inhibit-message)
-                      (message "Installed clj-kondo v%s to %s" version install-dir))
-                  (user-error "Unable to unzip %s" target))
-              (user-error "Unable to download clj-kondo-%s-%s-amd64.zip" version platform)))
-        (user-error "Unable to retrieve clj-kondo version")))))
 
 (use-package clj-refactor
   :straight t
@@ -925,12 +911,8 @@ are defining or executing a macro."
   :custom
   (yaml-indent-offset 4))
 
-(use-package sh-script
-  :hook (sh-mode . flycheck-mode))
-
 (use-package lua-mode
   :straight t
-  :hook (lua-mode . flycheck-mode)
   :custom
   (lua-indent-level 2)
   :config
@@ -946,7 +928,6 @@ are defining or executing a macro."
 
 (use-package json-mode
   :straight t
-  :hook (json-mode . flycheck-mode)
   :custom
   (js-indent-level 2))
 
@@ -1354,52 +1335,19 @@ REGEXP FILE LINE and optional COL LEVEL info to
     "Move point to the location of the mouse pointer."
     (mouse-set-point last-input-event)))
 
-(use-package flycheck
-  :straight t
-  :custom
-  (flycheck-indication-mode 'right-fringe)
-  (flycheck-display-errors-delay 86400 "86400 seconds is 1 day")
-  (flycheck-emacs-lisp-load-path 'inherit)
-  :config
-  (require 'flymake)
-  (flycheck-define-error-level 'error
-    :severity 100
-    :compilation-level 2
-    :overlay-category 'flycheck-error-overlay
-    :fringe-bitmap flymake-error-bitmap
-    :fringe-face 'flycheck-fringe-error
-    :error-list-face 'flycheck-error-list-error)
-  (flycheck-define-error-level 'warning
-    :severity 10
-    :compilation-level 1
-    :overlay-category 'flycheck-warning-overlay
-    :fringe-bitmap flymake-warning-bitmap
-    :fringe-face 'flycheck-fringe-warning
-    :error-list-face 'flycheck-error-list-warning)
-  (flycheck-define-error-level 'info
-    :severity -10
-    :compilation-level 0
-    :overlay-category 'flycheck-info-overlay
-    :fringe-bitmap flymake-note-bitmap
-    :fringe-face 'flycheck-fringe-info
-    :error-list-face 'flycheck-error-list-info)
-  (define-advice flycheck-may-use-echo-area-p (:override () never-echo)
-    nil))
-
-(use-package flycheck-package
-  :straight t
-  :hook (emacs-lisp-mode . flycheck-package-setup))
-
 (use-package treemacs
   :straight t
   :custom
   (treemacs-no-png-images t))
 
+(use-package flymake
+  :straight t)
+
 (use-package lsp-mode
   :straight t
   :custom
   (lsp-keymap-prefix "C-c l")
-  (lsp-diagnostics-provider :auto)
+  (lsp-diagnostics-provider :flymake)
   (lsp-completion-provider :none)
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
   (lsp-log-io nil)
