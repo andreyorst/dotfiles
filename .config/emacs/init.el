@@ -766,7 +766,7 @@ are defining or executing a macro."
 
 (use-package fennel-mode
   :straight ( :branch "dynamic-font-lock"
-              :repo "git@git.sr.ht:~technomancy/fennel-mode")
+              :repo "https://git.sr.ht/~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
@@ -976,13 +976,17 @@ are defining or executing a macro."
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
   :config
-  (defun vterm-project-dir (&optional arg)
-    (interactive "P")
-    (let* ((default-directory (project-root (project-current t)))
-           (name (project-prefixed-buffer-name "vterm")))
-      (if (and (not current-prefix-arg) (get-buffer name))
-          (switch-to-buffer name)
-        (funcall-interactively #'vterm name)))))
+(defun vterm-project-dir (&optional arg)
+  "Launch vterm in current project.
+
+Opens an existing vterm buffer for a project if present, unless
+the prefix argument ARG is supplied."
+  (interactive "P")
+  (let* ((default-directory (project-root (project-current t)))
+         (name (project-prefixed-buffer-name "vterm")))
+    (if (and (not current-prefix-arg) (get-buffer name))
+        (switch-to-buffer name)
+      (funcall-interactively #'vterm name)))))
 
 (use-package flymake
   :preface
