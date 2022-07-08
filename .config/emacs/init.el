@@ -32,13 +32,6 @@
     "Customization group for local settings."
     :prefix "local-config-"
     :group 'emacs)
-  (defcustom local-config-title-show-bufname t
-    "Whether to include bufname in the title bar.
-
-Bufname is not necessary on GNOME but may be useful in other DEs."
-    :type 'boolean
-    :tag "Title bufname"
-    :group 'local-config)
   (defcustom local-config-dark-theme 'modus-vivendi
     "Dark theme to use."
     :tag "Dark theme"
@@ -48,6 +41,18 @@ Bufname is not necessary on GNOME but may be useful in other DEs."
     "Light theme to use."
     :tag "Light theme"
     :type 'symbol
+    :group 'local-config)
+  (defcustom openjdk-11-path
+    "/usr/lib/jvm/java-11-openjdk/bin/java"
+    "Path to OpenJDK 11 installation"
+    :type 'string
+    :tag "OpenJDK 11 Path"
+    :group 'local-config)
+  (defcustom langtool-installation-dir
+    "~/.local/lib/LanguageTool-5.7-stable"
+    "Path to the local installation of langtool."
+    :type 'string
+    :tag "Langtool installation directory"
     :group 'local-config)
   (defvar local-config-line-pixel-height (line-pixel-height)
     "Line height in pixels.
@@ -126,7 +131,7 @@ Used in various places to avoid getting wrong line height when
     (interactive)
     (find-file (expand-file-name "early-init.el" user-emacs-directory)))
   (defun clj-kondo-install (&optional install-dir)
-    "Install clj-kondo using official installation script."
+    "Install clj-kondo using steps from the official installation script."
     (interactive (list (if current-prefix-arg
 			   (read-string "Install dir: " install-dir)
 		         (expand-file-name "~/.local/bin"))))
@@ -233,13 +238,7 @@ Bindings will be enabled next time region is highlighted."
    indent-tabs-mode nil
    truncate-lines t
    bidi-paragraph-direction 'left-to-right
-   frame-title-format
-   '(:eval (if (or (string-match "^[ *]" (buffer-name))
-                   (not local-config-title-show-bufname))
-               "Emacs"
-             (if (buffer-modified-p)
-                 "%b* — Emacs"
-               "%b — Emacs")))
+   frame-title-format "Emacs"
    auto-window-vscroll nil
    mouse-highlight nil
    hscroll-step 1
@@ -248,7 +247,17 @@ Bindings will be enabled next time region is highlighted."
    scroll-preserve-screen-position nil
    scroll-conservatively 101
    frame-resize-pixelwise window-system
-   window-resize-pixelwise window-system)
+   window-resize-pixelwise window-system
+   mode-line-format (list " "
+                          '(:eval (if-let ((name (buffer-file-name))) (abbreviate-file-name name) (buffer-name)))
+                          '(:eval (if (and (buffer-file-name) (buffer-modified-p)) "*" ""))
+                          '(:eval (if current-input-method-title (concat " " current-input-method-title) ""))
+                          (propertize " %l:%c")
+                          '(vc-mode vc-mode)
+                          " "
+                          mode-line-modes
+                          " "
+                          mode-line-misc-info))
   (when (window-system)
     (setq-default
      x-gtk-use-system-tooltips nil
@@ -869,6 +878,8 @@ are defining or executing a macro."
 
 (use-package inf-lisp
   :hook (inferior-lisp-mode . common-lisp-modes-mode)
+  :bind ( :map common-lisp-modes-mode-map
+          ("C-M-k" . lisp-eval-each-sexp))
   :custom
   (inferior-lisp-program (cond ((executable-find "sbcl") "sbcl")
                                ((executable-find "ecl") "ecl")))
@@ -1308,6 +1319,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("C-s" . phi-search)
    ("C-r" . phi-search-backward)
    ("C-&" . mc/vertical-align-with-space)
+   ("C-#" . mc/insert-numbers)
+   ("<return>" . nil)
    :map region-bindings-mode-map
    ("n" . mc/mark-next-like-this)
    ("p" . mc/mark-previous-like-this)
@@ -1407,10 +1420,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package lsp-java
   :straight t
   :requires lsp-mode
-  :when (file-exists-p "/usr/lib/jvm/java-11-openjdk/bin/java")
+  :when (file-exists-p openjdk-11-path)
   :hook (java-mode . lsp)
   :custom
-  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk/bin/java"))
+  (lsp-java-java-path openjdk-11-path))
 
 (use-package lsp-metals
   :straight t
@@ -1421,9 +1434,11 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package langtool
   :straight t
-  :when (file-exists-p (expand-file-name "~/.local/lib/LanguageTool-5.7-stable/languagetool-commandline.jar"))
+  :when (file-exists-p langtool-installation-dir)
   :custom
-  (langtool-language-tool-jar (expand-file-name "~/.local/lib/LanguageTool-5.7-stable/languagetool-commandline.jar"))
+  (langtool-language-tool-jar
+   (expand-file-name "languagetool-commandline.jar"
+                     langtool-installation-dir))
   :config
   (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
     (save-mark-and-excursion
