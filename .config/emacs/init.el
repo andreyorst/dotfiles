@@ -995,17 +995,17 @@ are defining or executing a macro."
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
   :config
-(defun vterm-project-dir (&optional arg)
-  "Launch vterm in current project.
+  (defun vterm-project-dir (&optional arg)
+    "Launch vterm in current project.
 
 Opens an existing vterm buffer for a project if present, unless
 the prefix argument ARG is supplied."
-  (interactive "P")
-  (let* ((default-directory (project-root (project-current t)))
-         (name (project-prefixed-buffer-name "vterm")))
-    (if (and (not current-prefix-arg) (get-buffer name))
-        (switch-to-buffer name)
-      (funcall-interactively #'vterm name)))))
+    (interactive "P")
+    (let* ((default-directory (project-root (project-current t)))
+           (name (project-prefixed-buffer-name "vterm")))
+      (if (and (not current-prefix-arg) (get-buffer name))
+          (switch-to-buffer name)
+        (funcall-interactively #'vterm name)))))
 
 (use-package flymake
   :preface
@@ -1225,6 +1225,8 @@ means save all with no questions."
 (use-package compile
   :custom
   (compilation-scroll-output 'first-error)
+  (compilation-error-regexp-alist nil)
+  (compilation-error-regexp-alist-alist nil)
   :config
   (when (fboundp #'ansi-color-compilation-filter)
     (add-hook 'compilation-filter #'ansi-color-compilation-filter))
@@ -1240,16 +1242,16 @@ REGEXP FILE LINE and optional COL LEVEL info to
                          '(,name ,regexp ,file ,line ,col ,level))))
   (compile-add-error-syntax kaocha-tap
     "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
-    (1 "src/%s" "test/%s") 2)
+    1 2)
   (compile-add-error-syntax kaocha-fail
     ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
-    (1 "src/%s" "test/%s") 2)
+    1 2)
   (compile-add-error-syntax clojure-reflection-warning
     "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
-    (1 "src/%s" "test/%s") 2 3)
+    1 2 3)
   (compile-add-error-syntax clojure-syntax-error
     "^Syntax error macroexpanding at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)).$"
-    (1 "src/%s" "test/%s") 2 3)
+    1 2 3)
   (compile-add-error-syntax lua-stacktrace
     "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
