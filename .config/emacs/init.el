@@ -133,12 +133,13 @@ Used in various places to avoid getting wrong line height when
   (defun clj-kondo-install (&optional install-dir)
     "Install clj-kondo using steps from the official installation script."
     (interactive (list (if current-prefix-arg
-			   (read-string "Install dir: " install-dir)
+			   (expand-file-name (read-string "Install dir: " default-directory))
 		         (expand-file-name "~/.local/bin"))))
     (let ((inhibit-message t)
           (tmp (make-temp-file "clj-kondo-install-"))
           (platform (cond ((string-equal system-type "darwin") "macos")
-                          ((string-equal system-type "gnu/linux") "linux"))))
+                          ((string-equal system-type "gnu/linux") "linux")
+                          (t (user-error "Unsupported platform %s" system-type)))))
       (if (url-copy-file "https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/resources/CLJ_KONDO_RELEASED_VERSION" tmp t)
           (let* ((version (with-temp-buffer
                             (insert-file-contents tmp)
@@ -1226,7 +1227,6 @@ means save all with no questions."
   :custom
   (compilation-scroll-output 'first-error)
   (compilation-error-regexp-alist nil)
-  (compilation-error-regexp-alist-alist nil)
   :config
   (when (fboundp #'ansi-color-compilation-filter)
     (add-hook 'compilation-filter #'ansi-color-compilation-filter))
