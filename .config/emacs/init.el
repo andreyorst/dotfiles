@@ -690,6 +690,29 @@ are defining or executing a macro."
   (corfu-doc-max-height 20)
   (corfu-doc-max-width 84))
 
+(use-package popon
+  :straight ( :type git
+              :repo "https://codeberg.org/akib/emacs-popon.git"
+              :branch "master")
+  :unless (display-graphic-p))
+
+(use-package corfu-terminal
+  :straight ( :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"
+              :branch "master")
+  :requires popon
+  :unless (display-graphic-p)
+  :config
+  (corfu-terminal-mode 1))
+
+(use-package corfu-doc-terminal
+  :straight ( :type git
+              :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git"
+              :branch "master")
+  :requires popon
+  :unless (display-graphic-p)
+  :config
+  (corfu-doc-terminal-mode 1))
+
 (use-package cape
   :straight t
   :config
