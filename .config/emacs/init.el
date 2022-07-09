@@ -249,10 +249,18 @@ Bindings will be enabled next time region is highlighted."
    frame-resize-pixelwise window-system
    window-resize-pixelwise window-system
    mode-line-format (list " "
-                          '(:eval (if-let ((name (buffer-file-name))) (abbreviate-file-name name) (buffer-name)))
-                          '(:eval (if (and (buffer-file-name) (buffer-modified-p)) "*" ""))
-                          '(:eval (if current-input-method-title (concat " " current-input-method-title) ""))
-                          (propertize " %l:%c")
+                          '(:eval (propertize (if-let ((name (buffer-file-name))) (abbreviate-file-name name) (buffer-name))
+                                              'face (when (and (buffer-file-name) (buffer-modified-p))
+                                                      'font-lock-builtin-face)))
+                          '(:eval (when current-input-method-title
+                                    (propertize (concat " " current-input-method-title)
+                                                'help-echo (concat "Input method: " current-input-method))))
+                          (propertize " %l:%c"
+                                      'help-echo "mouse-1: Goto line"
+                                      'mouse-face 'mode-line-highlight
+                                      'local-map (let ((map (make-sparse-keymap)))
+                                                   (define-key map [mode-line down-mouse-1] 'goto-line)
+                                                   map))
                           '(vc-mode vc-mode)
                           " "
                           mode-line-modes
@@ -1010,7 +1018,11 @@ the prefix argument ARG is supplied."
           ("n" . #'flymake-goto-next-error)
           ("p" . #'flymake-goto-prev-error))
   :custom
-  (flymake-fringe-indicator-position 'right-fringe))
+  (flymake-fringe-indicator-position 'right-fringe)
+  (flymake-mode-line-lighter "FlyM")
+  (flymake-mode-line-counter-format
+   '(":" flymake-mode-line-error-counter "/"
+     (:eval (flymake--mode-line-counter :warning 'no-space)))))
 
 (use-package flyspell
   :straight t
