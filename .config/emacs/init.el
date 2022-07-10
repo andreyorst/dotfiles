@@ -681,6 +681,7 @@ are defining or executing a macro."
   :straight ( :host github
               :repo "galeo/corfu-doc"
               :branch "main")
+  :when (display-graphic-p)
   :bind ( :map corfu-map
           ("M-p" . corfu-doc-scroll-down)
           ("M-n" . corfu-doc-scroll-up))
@@ -703,15 +704,6 @@ are defining or executing a macro."
   :unless (display-graphic-p)
   :config
   (corfu-terminal-mode 1))
-
-(use-package corfu-doc-terminal
-  :straight ( :type git
-              :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git"
-              :branch "master")
-  :requires popon
-  :unless (display-graphic-p)
-  :config
-  (corfu-doc-terminal-mode 1))
 
 (use-package cape
   :straight t
