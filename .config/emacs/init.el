@@ -758,12 +758,9 @@ are defining or executing a macro."
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)))
 
-(use-package ox-hugo
-  :straight t
-  :after ox)
+(use-package ox-hugo :straight t :after ox)
 
-(use-package ox-latex
-  :after ox)
+(use-package ox-latex :after ox)
 
 (with-eval-after-load 'org
   (use-package org-tempo
@@ -1386,8 +1383,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :custom
   (treemacs-no-png-images t))
 
-(use-package flymake
-  :straight t)
+(use-package flymake :straight t)
 
 (use-package lsp-mode
   :straight t
