@@ -253,15 +253,15 @@ Bindings will be enabled next time region is highlighted."
                           '(:eval (propertize (if-let ((name (buffer-file-name))) (abbreviate-file-name name) (buffer-name))
                                               'face (when (and (buffer-file-name) (buffer-modified-p))
                                                       'font-lock-builtin-face)))
-                          '(:eval (when current-input-method-title
-                                    (propertize (concat " " current-input-method-title)
-                                                'help-echo (concat "Input method: " current-input-method))))
                           (propertize " %l:%c"
                                       'help-echo "mouse-1: Goto line"
                                       'mouse-face 'mode-line-highlight
                                       'local-map (let ((map (make-sparse-keymap)))
                                                    (define-key map [mode-line down-mouse-1] 'goto-line)
                                                    map))
+                          '(:eval (when current-input-method-title
+                                    (propertize (concat " " current-input-method-title)
+                                                'help-echo (concat "Input method: " current-input-method))))
                           '(vc-mode vc-mode)
                           " "
                           mode-line-modes
@@ -1453,13 +1453,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :hook (java-mode . lsp)
   :custom
   (lsp-java-java-path openjdk-11-path))
-
-(use-package lsp-metals
-  :straight t
-  :requires lsp-mode
-  :hook (scala-mode . lsp)
-  :custom
-  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off")))
 
 (use-package langtool
   :straight t
