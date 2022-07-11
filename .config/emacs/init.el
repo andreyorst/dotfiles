@@ -874,8 +874,10 @@ are defining or executing a macro."
   :config
   (defun cider-disable-linting ()
     "Disable linting integrations for current buffer."
-    (when flycheck-mode (flycheck-mode -1))
-    (when flymake-mode (flymake-mode -1)))
+    (when (bound-and-true-p flycheck-mode)
+      (flycheck-mode -1))
+    (when (bound-and-true-p flymake-mode)
+      (flymake-mode -1)))
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with a newline."
     (format "%s\n> " namespace)))
