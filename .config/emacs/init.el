@@ -1312,25 +1312,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (narrow-to-region (point) (point))
       (yank-rectangle))))
 
-(use-package jdecomp
-  :straight t
-  :mode ("\\.class\\'" . jdecomp-mode)
-  :custom
-  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
-                                  'cfr)
-                                 ((file-exists-p fernflower-path)
-                                  'fernflower)
-                                 (t jdecomp-decompiler-type)))
-  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
-                              (fernflower . ,fernflower-path)))
-  :init
-  (defvar cfr-path
-    (file-truename "~/.local/lib/cfr.jar")
-    "Path to the cfr Java decompiler library.")
-  (defvar fernflower-path
-    (file-truename "~/.local/lib/fernflower.jar")
-    "Path to the FernFlower library."))
-
 (use-package expand-region
   :straight t
   :bind ("C-=" . er/expand-region))
@@ -1355,10 +1336,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("l" . mc/edit-ends-of-lines))
   :config
   (define-key mc/keymap (kbd "<return>") nil))
-
-(use-package yasnippet
-  :straight t
-  :delight yas-minor-mode)
 
 (use-package profiler
   :straight t
@@ -1449,6 +1426,25 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :hook (java-mode . lsp)
   :custom
   (lsp-java-java-path openjdk-11-path))
+
+(use-package jdecomp
+  :straight t
+  :mode ("\\.class\\'" . jdecomp-mode)
+  :custom
+  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
+                                  'cfr)
+                                 ((file-exists-p fernflower-path)
+                                  'fernflower)
+                                 (t jdecomp-decompiler-type)))
+  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
+                              (fernflower . ,fernflower-path)))
+  :init
+  (defvar cfr-path
+    (file-truename "~/.local/lib/cfr.jar")
+    "Path to the cfr Java decompiler library.")
+  (defvar fernflower-path
+    (file-truename "~/.local/lib/fernflower.jar")
+    "Path to the FernFlower library."))
 
 (use-package langtool
   :straight t
