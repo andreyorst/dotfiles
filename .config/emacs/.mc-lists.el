@@ -102,6 +102,7 @@
         sp-wrap-round
         switch-to-buffer
         transpose-sexps
+        transpose-words
         upcase-region
         wdired--self-insert
         yaml-electric-backspace
@@ -179,6 +180,7 @@
         vterm-send-return
         vterm-send-tab
         vterm-send-up
+        wdired-finish-edit
         wgrep-change-to-wgrep-mode
         wgrep-finish-edit
         xref-find-definitions
