@@ -248,25 +248,7 @@ Bindings will be enabled next time region is highlighted."
    scroll-preserve-screen-position nil
    scroll-conservatively 101
    frame-resize-pixelwise window-system
-   window-resize-pixelwise window-system
-   mode-line-format (list " "
-                          '(:eval (propertize (if-let ((name (buffer-file-name))) (abbreviate-file-name name) (buffer-name))
-                                              'face (when (and (buffer-file-name) (buffer-modified-p))
-                                                      'font-lock-builtin-face)))
-                          (propertize " %l:%c"
-                                      'help-echo "mouse-1: Goto line"
-                                      'mouse-face 'mode-line-highlight
-                                      'local-map (let ((map (make-sparse-keymap)))
-                                                   (define-key map [mode-line down-mouse-1] 'goto-line)
-                                                   map))
-                          '(:eval (when current-input-method-title
-                                    (propertize (concat " " current-input-method-title)
-                                                'help-echo (concat "Input method: " current-input-method))))
-                          '(vc-mode vc-mode)
-                          " "
-                          mode-line-modes
-                          " "
-                          mode-line-misc-info))
+   window-resize-pixelwise window-system)
   (when (window-system)
     (setq-default
      x-gtk-use-system-tooltips nil
@@ -279,6 +261,40 @@ Bindings will be enabled next time region is highlighted."
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
   (provide 'defaults))
+
+(use-package mode-line
+  :preface
+  (defvar mode-line-interactive-position
+    `(line-number-mode
+      (:propertize " %l:%c"
+                   help-echo "mouse-1: Goto line"
+                   mouse-face mode-line-highlight
+                   local-map ,(let ((map (make-sparse-keymap)))
+                                (define-key map [mode-line down-mouse-1] 'goto-line)
+                                map)))
+    "Mode line position with goto line binding.")
+  (put 'mode-line-interactive-position 'risky-local-variable t)
+  (defvar mode-line-buffer-file-name
+    '(:eval (propertize (if-let ((name (buffer-file-name)))
+                            (abbreviate-file-name name)
+                          (buffer-name))
+                        'face (when (and (buffer-file-name) (buffer-modified-p))
+                                'font-lock-builtin-face)))
+    "Show file name if buffer is visiting a file, otherwise show
+buffer name.  If file is modified, a `font-lock-builtin-face' is
+applied to the name.")
+  (put 'mode-line-buffer-file-name 'risky-local-variable t)
+  (defvar mode-line-input-method
+    '(:eval (when current-input-method-title
+              (propertize (concat " " current-input-method-title)
+                          'help-echo (concat "Input method: " current-input-method))))
+    "Display input method name in the modeline.")
+  (put 'mode-line-input-method 'risky-local-variable t)
+  (setq-default mode-line-format
+                '(" " mode-line-buffer-file-name mode-line-interactive-position
+                  mode-line-input-method (vc-mode vc-mode) " "
+                  mode-line-modes " " mode-line-misc-info))
+  (provide 'mode-line))
 
 (use-package font
   :preface
@@ -1352,6 +1368,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package hideshow
   :hook (prog-mode . hs-minor-mode)
+  :delight hs-minor-mode
   :config
   (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
@@ -1363,6 +1380,10 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (treemacs-no-png-images t))
 
 (use-package flymake :straight t)
+
+(use-package yasnippet
+  :straight t
+  :delight yas-minor-mode)
 
 (use-package lsp-mode
   :straight t
