@@ -774,6 +774,48 @@ are defining or executing a macro."
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)))
 
+(use-package blog
+  :preface
+  (defvar blog-capture-template
+    "#+hugo_base_dir: ../
+#+hugo_section: posts
+#+hugo_auto_set_lastmod: t
+#+options: tex:dvisvgm
+#+macro: kbd @@html:<kbd>$1</kbd>@@
+
+#+title: %(capitalize blog--current-post-name)
+#+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
+#+hugo_tags: %^{Tags}
+#+hugo_categories: %^{Categories}
+
+%?")
+  (defcustom blog-directory "~/blog"
+    "Location of the blog directory for org-capture."
+    :type 'string
+    :group 'blog)
+  (defvar blog--current-post-name nil
+    "Current post name for org-capture template.")
+  (defun blog-generate-file-name (&rest _)
+    (let ((title (read-string "Title: ")))
+      (setq blog--current-post-name title)
+      (find-file
+       (file-name-concat
+        (expand-file-name blog-directory)
+        "posts"
+        (format "%s-%s.org"
+                (format-time-string "%Y-%m-%d")
+                (downcase (replace-regexp-in-string " " "-" title)))))))
+  (provide 'blog))
+
+(use-package org-capture
+  :requires blog
+  :custom
+  (org-directory blog-directory)
+  (org-capture-templates `(("p" "Post" plain
+                            (function blog-generate-file-name)
+                            ,blog-capture-template
+                            :unnarrowed t))))
+
 (use-package ox-hugo :straight t :after ox)
 
 (use-package ox-latex :after ox)
@@ -1137,9 +1179,10 @@ the prefix argument ARG is supplied."
     (defvar project-switch-commands nil))
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
-    (memq t (mapcar (lambda (file)
-                      (file-exists-p (concat path file)))
-                    project-root-markers)))
+    (catch 'found
+      (dolist (marker project-root-markers)
+        (when (file-exists-p (concat path marker))
+          (throw 'found marker)))))
   (defun project-find-root (path)
     "Search up the PATH for `project-root-markers'."
     (let ((path (expand-file-name path)))
