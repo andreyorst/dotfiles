@@ -1486,7 +1486,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package lsp-java
   :straight t
   :requires lsp-mode
-  :when (file-exists-p openjdk-11-path)
+  :when (and openjdk-11-path
+             (file-exists-p openjdk-11-path))
   :hook (java-mode . lsp)
   :custom
   (lsp-java-java-path openjdk-11-path))
@@ -1512,7 +1513,8 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package langtool
   :straight t
-  :when (file-exists-p langtool-installation-dir)
+  :when (and langtool-installation-dir
+             (file-exists-p langtool-installation-dir))
   :custom
   (langtool-language-tool-jar
    (expand-file-name "languagetool-commandline.jar"
