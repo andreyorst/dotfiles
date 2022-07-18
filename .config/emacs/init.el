@@ -42,16 +42,16 @@
     :tag "Light theme"
     :type 'symbol
     :group 'local-config)
-  (defcustom openjdk-11-path
-    "/usr/lib/jvm/java-11-openjdk/bin/java"
+  (defcustom openjdk-11-path nil
     "Path to OpenJDK 11 installation"
-    :type 'string
+    :type '(choice (const :tag "not installed" nil)
+                   string)
     :tag "OpenJDK 11 Path"
     :group 'local-config)
-  (defcustom langtool-installation-dir
-    "~/.local/lib/LanguageTool-5.7-stable"
+  (defcustom langtool-installation-dir nil
     "Path to the local installation of langtool."
-    :type 'string
+    :type '(choice (const :tag "not installed" nil)
+                   string)
     :tag "Langtool installation directory"
     :group 'local-config)
   (defvar local-config-line-pixel-height (line-pixel-height)
@@ -1134,29 +1134,6 @@ the prefix argument ARG is supplied."
   (vundo-roll-back-on-quit nil)
   (vundo--window-max-height 10))
 
-(use-package magit
-  :straight t
-  :hook (git-commit-mode . flyspell-mode)
-  :bind ( :map project-prefix-map
-          ("m" . magit-status))
-  :custom
-  (magit-ediff-dwim-show-on-hunks t)
-  (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all))
-
-(use-package magit-todos
-  :straight t
-  :after magit
-  :custom
-  (magit-todos-nice (when (executable-find "nice") t)
-                    "avoid breaking Magit on systems that don't have `nice'.")
-  :init
-  (let ((inhibit-message t))
-    (magit-todos-mode 1))
-  :config
-  (transient-append-suffix 'magit-status-jump '(0 0 -1)
-    '("T " "Todos" magit-todos-jump-to-todos)))
-
 (use-package ediff
   :hook (ediff-prepare-buffer . outline-show-all)
   :config
@@ -1177,9 +1154,10 @@ the prefix argument ARG is supplied."
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
-  :config
+  :init
   (unless (boundp 'project-switch-commands)
     (defvar project-switch-commands nil))
+  :config
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
     (catch 'found
@@ -1218,6 +1196,27 @@ means save all with no questions."
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (funcall-interactively #'save-some-buffers arg pred))))
+
+(use-package magit
+  :straight t
+  :hook (git-commit-mode . flyspell-mode)
+  :bind ( :map project-prefix-map
+          ("m" . magit-project-status))
+  :custom
+  (magit-ediff-dwim-show-on-hunks t)
+  (magit-diff-refine-ignore-whitespace t)
+  (magit-diff-refine-hunk 'all)
+  :init
+  (add-to-list 'project-switch-commands
+               '(magit-project-status "Magit") t))
+
+(use-package magit-todos
+  :straight t
+  :after magit
+  :custom
+  (magit-todos-nice (and (executable-find "nice") t))
+  :config
+  (magit-todos-mode 1))
 
 (use-package server
   :config
