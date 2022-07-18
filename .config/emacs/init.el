@@ -1145,6 +1145,8 @@ the prefix argument ARG is supplied."
   :straight t
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
+  :preface
+  (defvar project-switch-commands)
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :preface
@@ -1154,10 +1156,9 @@ the prefix argument ARG is supplied."
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
-  :init
-  (unless (boundp 'project-switch-commands)
-    (defvar project-switch-commands nil))
   :config
+  (add-to-list 'project-switch-commands
+               '(project-switch-to-buffer "Switch buffer"))
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
     (catch 'found
