@@ -826,14 +826,15 @@ are defining or executing a macro."
 
 (use-package cc-mode
   :hook ((c-mode-common . cc-mode-setup))
+  :custom
+  (c-basic-offset 4)
+  (c-default-style "linux")
   :config
   (defun cc-mode-setup ()
     (c-set-offset 'case-label '+)
-    (setq c-basic-offset 4
-          c-default-style "linux"
-          comment-start "//"
-          comment-end ""
-          tab-width 4)))
+    (setq-local comment-start "//"
+                comment-end ""
+                tab-width 4)))
 
 (use-package markdown-mode
   :straight t
@@ -1136,6 +1137,8 @@ the prefix argument ARG is supplied."
 (use-package magit
   :straight t
   :hook (git-commit-mode . flyspell-mode)
+  :bind ( :map project-prefix-map
+          ("m" . magit-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
@@ -1235,15 +1238,11 @@ means save all with no questions."
   :config
   (nconc (assoc '(";+") separedit-comment-delimiter-alist)
          '(clojure-mode clojurec-mode clojure-script-mode))
-  (define-advice separedit--point-at-comment (:before-while
-                                              (&rest args)
-                                              handle-docstring-comment-face)
-    (not (apply 'separedit--point-at-string (cdr args))))
   (defun separedit-header-line-setup ()
     (setq-local
      header-line-format
      (substitute-command-keys
-      "Edit, then exit with `\\[separedit-commit]' or abort with `\\[edit-indirect-abort]'"))))
+      "Edit, then exit with `\\[separedit-commit]' or abort with \\<edit-indirect-mode-map>`\\[edit-indirect-abort]'"))))
 
 (use-package recentf
   :custom
