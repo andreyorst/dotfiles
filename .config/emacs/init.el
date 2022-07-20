@@ -1167,13 +1167,9 @@ the prefix argument ARG is supplied."
           (throw 'found marker)))))
   (defun project-find-root (path)
     "Search up the PATH for `project-root-markers'."
-    (let ((path (expand-file-name path)))
-      (catch 'found
-        (while (not (equal "/" path))
-          (if (not (project-root-p path))
-              (setq path (file-name-directory (directory-file-name path)))
-            (throw 'found (cons 'transient path)))))))
-  (add-to-list 'project-find-functions #'project-find-root)
+    (when-let ((root (locate-dominating-file path #'project-root-p)))
+      (cons 'transient (expand-file-name root))))
+  (add-to-list 'project-find-functions #'project-find-root-old)
   (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
     (let* ((project-buffers (project-buffers (project-current)))
