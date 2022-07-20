@@ -1056,31 +1056,6 @@ are defining or executing a macro."
   :custom
   (doc-view-resolution 192))
 
-(use-package vterm
-  :straight t
-  :if (bound-and-true-p module-file-suffix)
-  :bind ( :map vterm-mode-map
-          ("<insert>" . ignore)
-          ("<f2>" . ignore)
-          :map project-prefix-map
-          ("t" . vterm-project-dir))
-  :requires project
-  :custom
-  (vterm-always-compile-module t)
-  (vterm-environment '("VTERM=1"))
-  :config
-  (defun vterm-project-dir (&optional arg)
-    "Launch vterm in current project.
-
-Opens an existing vterm buffer for a project if present, unless
-the prefix argument ARG is supplied."
-    (interactive "P")
-    (let* ((default-directory (project-root (project-current t)))
-           (name (project-prefixed-buffer-name "vterm")))
-      (if (and (not current-prefix-arg) (get-buffer name))
-          (switch-to-buffer name)
-        (funcall-interactively #'vterm name)))))
-
 (use-package flymake
   :preface
   (defvar flymake-prefix-map (make-sparse-keymap))
@@ -1193,6 +1168,32 @@ means save all with no questions."
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (funcall-interactively #'save-some-buffers arg pred))))
+
+(use-package vterm
+  :straight t
+  :if (bound-and-true-p module-file-suffix)
+  :bind ( :map vterm-mode-map
+          ("<insert>" . ignore)
+          ("<f2>" . ignore)
+          :map project-prefix-map
+          ("t" . vterm-project-dir))
+  :requires project
+  :custom
+  (vterm-always-compile-module t)
+  (vterm-environment '("VTERM=1"))
+  :config
+  (defun vterm-project-dir (&optional arg)
+    "Launch vterm in current project.
+
+Opens an existing vterm buffer for a project if present, unless
+the prefix argument ARG is supplied."
+    (interactive "P")
+    (let* ((default-directory (project-root (project-current t)))
+           (name (project-prefixed-buffer-name "vterm")))
+      (if (and (not current-prefix-arg) (get-buffer name))
+          (switch-to-buffer name)
+        (funcall-interactively #'vterm name))))
+  (add-to-list 'project-switch-commands '(vterm-project-dir "vterm") t))
 
 (use-package magit
   :straight t
