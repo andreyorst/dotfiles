@@ -993,7 +993,9 @@ are defining or executing a macro."
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
 
-(use-package geiser-guile :straight t)
+(use-package geiser-guile
+  :straight t
+  :after geiser)
 
 (use-package racket-mode
   :straight t
@@ -1144,7 +1146,7 @@ are defining or executing a macro."
     "Search up the PATH for `project-root-markers'."
     (when-let ((root (locate-dominating-file path #'project-root-p)))
       (cons 'transient (expand-file-name root))))
-  (add-to-list 'project-find-functions #'project-find-root-old)
+  (add-to-list 'project-find-functions #'project-find-root)
   (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
     (let* ((project-buffers (project-buffers (project-current)))
@@ -1510,6 +1512,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package langtool
   :straight t
+  :defer t
   :when (and langtool-installation-dir
              (file-exists-p langtool-installation-dir))
   :custom
@@ -1535,6 +1538,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
   :when (executable-find "mu")
+  :defer t
   :custom
   (mu4e-completing-read-function #'completing-read)
   (mu4e-get-mail-command "mbsync -a")
