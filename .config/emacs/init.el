@@ -1376,6 +1376,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package multiple-cursors
   :straight t
+  :demand t
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map mc/keymap
@@ -1389,9 +1390,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
    ("p" . mc/mark-previous-like-this)
    ("a" . mc/mark-all-like-this)
    ("s" . mc/mark-all-in-region-regexp)
-   ("l" . mc/edit-ends-of-lines))
-  :config
-  (define-key mc/keymap (kbd "<return>") nil))
+   ("l" . mc/edit-ends-of-lines)))
 
 (use-package profiler
   :straight t
