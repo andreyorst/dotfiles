@@ -1512,7 +1512,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package langtool
   :straight t
-  :defer t
+  :commands langtool-check-buffer
   :when (and langtool-installation-dir
              (file-exists-p langtool-installation-dir))
   :custom
@@ -1538,7 +1538,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
   :when (executable-find "mu")
-  :defer t
+  :commands mu4e
   :custom
   (mu4e-completing-read-function #'completing-read)
   (mu4e-get-mail-command "mbsync -a")
