@@ -1339,7 +1339,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
           ("<right>" . isearch-edit-string)
           :map minibuffer-local-isearch-map
           ("<left>" . backward-char)
-          ("<right>" . forward-char)))
+          ("<right>" . forward-char))
+  :custom
+  (isearch-lazy-highlight nil))
 
 (use-package esh-mode
   :custom
