@@ -1123,7 +1123,8 @@ are defining or executing a macro."
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
   :preface
-  (defvar project-switch-commands)
+  (unless (boundp 'project-switch-commands)
+    (defvar project-switch-commands nil))
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :preface
