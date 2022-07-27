@@ -103,6 +103,7 @@
         switch-to-buffer
         transpose-sexps
         transpose-words
+        undo-only
         upcase-region
         wdired--self-insert
         yaml-electric-backspace
