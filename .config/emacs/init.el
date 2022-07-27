@@ -714,7 +714,8 @@ are defining or executing a macro."
   :unless (display-graphic-p))
 
 (use-package corfu-terminal
-  :straight ( :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"
+  :straight ( :type git
+              :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"
               :branch "master")
   :requires popon
   :unless (display-graphic-p)
@@ -816,7 +817,11 @@ are defining or executing a macro."
                             ,blog-capture-template
                             :unnarrowed t))))
 
-(use-package ox-hugo :straight t :after ox)
+(use-package ox-hugo
+  :straight ( :host github
+              :repo "kaushalmodi/ox-hugo"
+              :branch "main")
+  :after ox)
 
 (use-package ox-latex :after ox)
 
@@ -854,7 +859,8 @@ are defining or executing a macro."
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package fennel-mode
-  :straight ( :branch "dynamic-font-lock"
+  :straight ( :type git
+              :branch "dynamic-font-lock"
               :repo "https://git.sr.ht/~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
