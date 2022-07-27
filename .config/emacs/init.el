@@ -153,18 +153,12 @@ Used in various places to avoid getting wrong line height when
                   (user-error "Unable to unzip %s" target))
               (user-error "Unable to download clj-kondo-%s-%s-amd64.zip" version platform)))
         (user-error "Unable to retrieve clj-kondo version"))))
+  (defun memoize (fn)
+    (let ((memo (make-hash-table :test 'equal)))
+      (lambda (&rest args)
+        (let ((value (gethash args memo)))
+          (or value (puthash args (apply fn args) memo))))))
   (provide 'functions))
-
-(use-package kmacro
-  :config
-  (defun block-undo (fn &rest args)
-    (let ((marker (prepare-change-group)))
-      (unwind-protect (apply fn args)
-        (undo-amalgamate-change-group marker))))
-  (dolist (f '(kmacro-call-macro
-               kmacro-exec-ring-item
-               apply-macro-to-region-lines))
-    (advice-add f :around #'block-undo)))
 
 (use-package common-lisp-modes
   :delight  common-lisp-modes-mode
@@ -262,6 +256,17 @@ Bindings will be enabled next time region is highlighted."
     (setq bidi-inhibit-bpa t))
   (provide 'defaults))
 
+(use-package kmacro
+  :config
+  (defun block-undo (fn &rest args)
+    (let ((marker (prepare-change-group)))
+      (unwind-protect (apply fn args)
+        (undo-amalgamate-change-group marker))))
+  (dolist (f '(kmacro-call-macro
+               kmacro-exec-ring-item
+               apply-macro-to-region-lines))
+    (advice-add f :around #'block-undo)))
+
 (use-package mode-line
   :preface
   (defvar mode-line-interactive-position
@@ -274,9 +279,10 @@ Bindings will be enabled next time region is highlighted."
                                 map)))
     "Mode line position with goto line binding.")
   (put 'mode-line-interactive-position 'risky-local-variable t)
+  (fset 'abbreviate-file-name-memo (memoize #'abbreviate-file-name))
   (defvar mode-line-buffer-file-name
     '(:eval (propertize (if-let ((name (buffer-file-name)))
-                            (abbreviate-file-name name)
+                            (abbreviate-file-name-memo name)
                           (buffer-name))
                         'face (when (and (buffer-file-name) (buffer-modified-p))
                                 'font-lock-builtin-face)))
