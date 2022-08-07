@@ -866,12 +866,14 @@ are defining or executing a macro."
 
 (use-package fennel-mode
   :straight ( :type git
-              :branch "dynamic-font-lock"
+              :branch "main"
               :repo "https://git.sr.ht/~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
-          ("M-," . xref-pop-marker-stack))
+          ("M-," . xref-pop-marker-stack)
+          :map fennel-repl-mode-map
+          ("C-c C-o" . fennel-repl-delete-all-output))
   :custom
   (fennel-eldoc-fontify-markdown t)
   :config
@@ -884,7 +886,14 @@ are defining or executing a macro."
       (unless (bufferp fennel-repl--buffer)
         (fennel-repl nil))
       (let ((inferior-lisp-buffer fennel-repl--buffer))
-        (lisp-eval-string body)))))
+        (lisp-eval-string body))))
+  (defun fennel-repl-delete-all-output ()
+    (interactive)
+    (save-excursion
+      (goto-char (process-mark (get-buffer-process (current-buffer))))
+      (forward-line 0)
+      (let ((kill-ring nil))
+        (comint-kill-region (point) (point-min))))))
 
 (use-package clojure-mode
   :straight t
