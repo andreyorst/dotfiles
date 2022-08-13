@@ -791,7 +791,7 @@ are defining or executing a macro."
 #+macro: kbd @@html:<kbd>$1</kbd>@@
 
 #+title: %(capitalize blog--current-post-name)
-#+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
+#+date:
 #+hugo_tags: %^{Tags}
 #+hugo_categories: %^{Categories}
 
@@ -809,9 +809,28 @@ are defining or executing a macro."
        (file-name-concat
         (expand-file-name blog-directory)
         "posts"
-        (format "%s-%s.org"
-                (format-time-string "%Y-%m-%d")
+        (format "DRAFT-%s.org"
                 (downcase (replace-regexp-in-string " " "-" title)))))))
+  (defun blog-publish-file ()
+    "Add current date and time to the '#+date:' tag, and rename the
+currently visited file to include date before the filename."
+    (interactive)
+    (save-match-data
+      (let ((today (format-time-string "%Y-%m-%d"))
+            (now (format-time-string "%H:%M")))
+        (save-excursion
+          (goto-char (point-min))
+          (re-search-forward "^#\\+date:.*$")
+          (replace-match (format "#+date: %s %s" today now)))
+        (let* ((file-name (file-name-base (buffer-file-name)))
+               (file-name (cond ((string-match
+                                  "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
+                                  file-name)
+                                 (match-string 1 file-name))
+                                ((string-match "^DRAFT-\\(.*\\)$" file-name)
+                                 (match-string 1 file-name))
+                                (t file-name))))
+          (rename-visited-file (format "%s-%s.org" today file-name))))))
   (provide 'blog))
 
 (use-package org-capture
