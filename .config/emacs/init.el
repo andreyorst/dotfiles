@@ -1176,6 +1176,8 @@ are defining or executing a macro."
     :group 'project)
   :config
   (add-to-list 'project-switch-commands
+               '(project-dired "Dired"))
+  (add-to-list 'project-switch-commands
                '(project-switch-to-buffer "Switch buffer"))
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
