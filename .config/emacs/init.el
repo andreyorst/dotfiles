@@ -347,6 +347,7 @@ applied to the name.")
    `((".*" ,(expand-file-name ".cache/auto-save/" user-emacs-directory) t)))
   (auto-save-no-message t)
   (auto-save-interval 100)
+  (require-final-newline t)
   :config
   (let ((auto-save-dir (expand-file-name ".cache/auto-save/" user-emacs-directory)))
     (unless (file-exists-p auto-save-dir)
@@ -791,7 +792,7 @@ are defining or executing a macro."
 #+macro: kbd @@html:<kbd>$1</kbd>@@
 
 #+title: %(capitalize blog--current-post-name)
-#+date:
+#+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
 #+hugo_tags: %^{Tags}
 #+hugo_categories: %^{Categories}
 
@@ -809,11 +810,11 @@ are defining or executing a macro."
        (file-name-concat
         (expand-file-name blog-directory)
         "posts"
-        (format "DRAFT-%s.org"
+        (format "%s-%s.org"
+                (format-time-string "%Y-%m-%d")
                 (downcase (replace-regexp-in-string " " "-" title)))))))
   (defun blog-publish-file ()
-    "Add current date and time to the '#+date:' tag, and rename the
-currently visited file to include date before the filename."
+    "Update '#+date:' tag, and rename the currently visited file to include updated date."
     (interactive)
     (save-match-data
       (let ((today (format-time-string "%Y-%m-%d"))
@@ -822,15 +823,14 @@ currently visited file to include date before the filename."
           (goto-char (point-min))
           (re-search-forward "^#\\+date:.*$")
           (replace-match (format "#+date: %s %s" today now)))
-        (let* ((file-name (file-name-base (buffer-file-name)))
-               (file-name (cond ((string-match
-                                  "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
-                                  file-name)
-                                 (match-string 1 file-name))
-                                ((string-match "^DRAFT-\\(.*\\)$" file-name)
-                                 (match-string 1 file-name))
-                                (t file-name))))
-          (rename-visited-file (format "%s-%s.org" today file-name))))))
+        (let* ((file-name (file-name-base (buffer-file-name))))
+          (rename-visited-file
+           (format "%s-%s.org" today
+                   (if (string-match
+                        "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
+                        file-name)
+                       (match-string 1 file-name)
+                     file-name)))))))
   (provide 'blog))
 
 (use-package org-capture
