@@ -161,7 +161,7 @@ Used in various places to avoid getting wrong line height when
   (provide 'functions))
 
 (use-package common-lisp-modes
-  :delight  common-lisp-modes-mode
+  :delight common-lisp-modes-mode
   :bind ( :map common-lisp-modes-mode-map
           ("M-q" . common-lisp-modes-indent-or-fill-sexp))
   :preface
@@ -881,7 +881,17 @@ are defining or executing a macro."
 
 (use-package elisp-mode
   :hook ((emacs-lisp-mode . eldoc-mode)
-         (emacs-lisp-mode . common-lisp-modes-mode)))
+         (emacs-lisp-mode . common-lisp-modes-mode)
+         (emacs-lisp-mode . setup-imenu-use-package-support))
+  :config
+  (defun setup-imenu-use-package-support ()
+    "Add `use-package' support to `imenu'."
+    (add-to-list
+     'imenu-generic-expression
+     '("use-package"
+       "\\s(use-package[[:space:]]+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)"
+       1)
+     t)))
 
 (use-package fennel-mode
   :straight ( :type git
