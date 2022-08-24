@@ -259,6 +259,8 @@ Bindings will be enabled next time region is highlighted."
 (use-package messages
   :preface
   (provide 'messages)
+  :bind ( :map messages-buffer-mode-map
+          ("C-c C-o" . messages-clear-buffer))
   :config
   (define-advice message (:around (msg fmt &rest args) log-message-date)
     "Attach a timestamp to messages that go to the *Messages* buffer.
@@ -271,7 +273,12 @@ the timestamp in the echo area only."
         (apply msg fmt args)
       (apply msg (concat (format-time-string "[%FT%T.%3N] ") fmt) args)
       (let (message-log-max)
-        (apply msg fmt args)))))
+        (apply msg fmt args))))
+  (defun messages-clear-buffer ()
+    "Clear the *Messages* buffer."
+    (interactive)
+    (let ((inhibit-read-only t))
+      (delete-region (point-min) (point-max)))))
 
 (use-package kmacro
   :config
