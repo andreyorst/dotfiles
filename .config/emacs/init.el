@@ -12,7 +12,7 @@
 ;;; Early init support for older Emacs
 
 (unless (featurep 'early-init)
-  (load (expand-file-name "early-init" user-emacs-directory)))
+  (load (expand-file-name "early-init.el" user-emacs-directory)))
 
 ;;; use-package and straight.el
 
@@ -255,6 +255,23 @@ Bindings will be enabled next time region is highlighted."
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
   (provide 'defaults))
+
+(use-package messages
+  :preface
+  (provide 'messages)
+  :config
+  (define-advice message (:around (msg fmt &rest args) log-message-date)
+    "Attach a timestamp to messages that go to the *Messages* buffer.
+
+If `message-log-max' is nil just use the original MSG function
+with FMT and ARGS.  Otherwise call MSG with timestamp attached,
+and then set `message-log-max' so the message would be without
+the timestamp in the echo area only."
+    (if (not message-log-max)
+        (apply msg fmt args)
+      (apply msg (concat (format-time-string "[%FT%T.%3N] ") fmt) args)
+      (let (message-log-max)
+        (apply msg fmt args)))))
 
 (use-package kmacro
   :config
@@ -1490,7 +1507,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
   (lsp-log-io nil)
   (lsp-keep-workspace-alive nil)
-  (lsp-idle-delay 0.05)
+  (lsp-idle-delay 2)
   ;; core
   (lsp-enable-xref t)
   (lsp-auto-configure nil)
