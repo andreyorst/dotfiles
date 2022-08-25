@@ -269,11 +269,10 @@ If `message-log-max' is nil just use the original MSG function
 with FMT and ARGS.  Otherwise call MSG with timestamp attached,
 and then set `message-log-max' so the message would be without
 the timestamp in the echo area only."
-    (if (not message-log-max)
-        (apply msg fmt args)
-      (apply msg (concat (format-time-string "[%FT%T.%3N] ") fmt) args)
-      (let (message-log-max)
-        (apply msg fmt args))))
+    (when message-log-max
+      (apply msg (concat (format-time-string "[%FT%T.%3N] ") fmt) args))
+    (let (message-log-max)
+      (apply msg fmt args)))
   (defun messages-clear-buffer ()
     "Clear the *Messages* buffer."
     (interactive)
