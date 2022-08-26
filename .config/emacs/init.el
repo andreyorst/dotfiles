@@ -27,6 +27,7 @@
 ;;; Local config and personal functions
 
 (use-package local-config
+  :defer t
   :preface
   (defgroup local-config ()
     "Customization group for local settings."
@@ -62,6 +63,7 @@ Used in various places to avoid getting wrong line height when
   (provide 'local-config))
 
 (use-package functions
+  :defer t
   :preface
   (require 'subr-x)
   (defun split-pararagraph-into-lines ()
@@ -228,6 +230,7 @@ Bindings will be enabled next time region is highlighted."
 ;;; Inbuilt stuff
 
 (use-package defaults
+  :defer t
   :preface
   (setq-default
    indent-tabs-mode nil
@@ -280,6 +283,7 @@ the timestamp in the echo area only."
       (delete-region (point-min) (point-max)))))
 
 (use-package kmacro
+  :defer t
   :config
   (defun block-undo (fn &rest args)
     (let ((marker (prepare-change-group)))
@@ -291,6 +295,7 @@ the timestamp in the echo area only."
     (advice-add f :around #'block-undo)))
 
 (use-package mode-line
+  :defer t
   :preface
   (defvar mode-line-interactive-position
     `(line-number-mode
@@ -326,18 +331,19 @@ applied to the name.")
   (provide 'mode-line))
 
 (use-package font
+  :hook (after-init . setup-fonts)
   :preface
   (defun font-installed-p (font-name)
     "Check if a font with FONT-NAME is available."
     (find-font (font-spec :name font-name)))
-  (provide 'font)
-  :config
-  (cond ((font-installed-p "JetBrainsMono")
-         (set-face-attribute 'default nil :font "JetBrainsMono"))
-        ((font-installed-p "Source Code Pro")
-         (set-face-attribute 'default nil :font "Source Code Pro")))
-  (when (font-installed-p "DejaVu Sans")
-    (set-face-attribute 'variable-pitch nil :font "DejaVu Sans")))
+  (defun setup-fonts ()
+    (cond ((font-installed-p "JetBrainsMono")
+           (set-face-attribute 'default nil :font "JetBrainsMono"))
+          ((font-installed-p "Source Code Pro")
+           (set-face-attribute 'default nil :font "Source Code Pro")))
+    (when (font-installed-p "DejaVu Sans")
+      (set-face-attribute 'variable-pitch nil :font "DejaVu Sans")))
+  (provide 'font))
 
 (use-package cus-edit
   :custom
@@ -509,6 +515,7 @@ are defining or executing a macro."
 
 (use-package orderless
   :straight t
+  :defer t
   :custom
   (completion-category-overrides
    '((buffer (styles orderless))
@@ -671,7 +678,8 @@ are defining or executing a macro."
 
 (use-package marginalia
   :straight t
-  :init
+  :after vertico
+  :config
   (marginalia-mode))
 
 (use-package consult
@@ -741,14 +749,15 @@ are defining or executing a macro."
   :straight ( :type git
               :repo "https://codeberg.org/akib/emacs-popon.git"
               :branch "master")
+  :defer t
   :unless (display-graphic-p))
 
 (use-package corfu-terminal
   :straight ( :type git
               :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"
               :branch "master")
-  :requires popon
   :unless (display-graphic-p)
+  :after corfu
   :config
   (corfu-terminal-mode 1))
 
@@ -1076,11 +1085,13 @@ are defining or executing a macro."
 
 (use-package yaml-mode
   :straight t
+  :defer t
   :custom
   (yaml-indent-offset 4))
 
 (use-package lua-mode
   :straight t
+  :defer t
   :custom
   (lua-indent-level 2)
   :config
@@ -1091,28 +1102,36 @@ are defining or executing a macro."
     (lua-send-string body)))
 
 (use-package css-mode
+  :defer t
   :custom
   (css-indent-offset 2))
 
 (use-package json-mode
-  :straight t
+  :defer t
   :custom
   (js-indent-level 2))
 
 (use-package csv-mode
   :straight t
+  :defer t
   :custom
   (csv-align-max-width 80))
 
 (use-package erlang
   :load-path "/usr/share/emacs/site-lisp/erlang/"
-  :when (executable-find "erl"))
+  :mode ("\\.erl\\'" . erlang-mode))
 
-(use-package elixir-mode :straight t)
+(use-package elixir-mode
+  :straight t
+  :defer t)
 
-(use-package zig-mode :straight t)
+(use-package zig-mode
+  :straight t
+  :defer t)
 
-(use-package scala-mode :straight t)
+(use-package scala-mode
+  :straight t
+  :defer t)
 
 ;;; Tools
 
@@ -1170,9 +1189,11 @@ are defining or executing a macro."
     (add-to-list 'sp-lisp-modes mode t)))
 
 (use-package smartparens-config
+  :after smartparens
   :config
   (sp-use-paredit-bindings)
-  ;; needs to be set manually, because :bind section runs before :config
+  ;; needs to be set manually, because :bind section runs before
+  ;; :config which resets bindings with `sp-use-paredit-bindings'.
   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp))
 
 (use-package vundo
@@ -1320,6 +1341,7 @@ the prefix argument ARG is supplied."
       "Edit, then exit with `\\[separedit-commit]' or abort with \\<edit-indirect-mode-map>`\\[edit-indirect-abort]'"))))
 
 (use-package recentf
+  :hook (after-init . recentf-mode)
   :custom
   (recentf-max-menu-items 100)
   (recentf-max-saved-items 100)
@@ -1327,11 +1349,11 @@ the prefix argument ARG is supplied."
   (add-to-list 'recentf-exclude "\\.gpg\\")
   (dolist (dir (list (expand-file-name ".cache/" user-emacs-directory)
                      (expand-file-name "workspace/.cache/" user-emacs-directory)))
-    (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*")))
-  (recentf-mode))
+    (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*"))))
 
 (use-package dumb-jump
   :straight t
+  :defer t
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'completing-read)
@@ -1340,14 +1362,14 @@ the prefix argument ARG is supplied."
 
 (use-package gcmh
   :straight t
-  :delight gcmh-mode
-  :init
-  (gcmh-mode t))
+  :hook (after-init . gcmh-mode)
+  :delight gcmh-mode)
 
 (use-package paren
   :hook (prog-mode . show-paren-mode))
 
 (use-package vc-hooks
+  :defer t
   :custom
   (vc-follow-symlinks t))
 
@@ -1371,6 +1393,7 @@ the prefix argument ARG is supplied."
   :hook (prog-mode . hl-todo-mode))
 
 (use-package compile
+  :defer t
   :custom
   (compilation-scroll-output 'first-error)
   (compilation-error-regexp-alist nil)
@@ -1419,6 +1442,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (isearch-lazy-highlight nil))
 
 (use-package esh-mode
+  :defer t
   :custom
   (eshell-scroll-show-maximum-output nil))
 
@@ -1434,6 +1458,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
     (dired (expand-file-name "~/"))))
 
 (use-package comint
+  :defer t
   :custom
   (comint-scroll-show-maximum-output nil)
   (comint-highlight-input nil))
@@ -1453,7 +1478,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :straight t
   :bind ("C-=" . er/expand-region))
 
-(use-package phi-search :straight t)
+(use-package phi-search
+  :straight t
+  :defer t)
 
 (use-package multiple-cursors
   :straight t
@@ -1476,7 +1503,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package profiler
   :straight t
   :bind ("<f2>" . profiler-start-or-report)
-  :init
+  :preface
   (defun profiler-start-or-report ()
     (interactive)
     (if (not (profiler-cpu-running-p))
@@ -1494,13 +1521,17 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package treemacs
   :straight t
+  :defer t
   :custom
   (treemacs-no-png-images t))
 
-(use-package flymake :straight t)
+(use-package flymake
+  :straight t
+  :defer t)
 
 (use-package yasnippet
   :straight t
+  :defer t
   :delight yas-minor-mode)
 
 (use-package lsp-mode
@@ -1549,7 +1580,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package lsp-clojure
   :after lsp-mode
-  :demand
+  :demand t
   :hook ((clojure-mode
           clojurec-mode
           clojurescript-mode)
@@ -1557,6 +1588,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package lsp-treemacs
   :straight t
+  :defer t
   :custom
   (lsp-treemacs-theme "Iconless"))
 
@@ -1605,13 +1637,18 @@ REGEXP FILE LINE and optional COL LEVEL info to
           (mark-whole-buffer)))
       (funcall fn lang))))
 
+(use-package erc
+  :defer t)
+
 ;;; Mail
 
 (use-package message
+  :defer t
   :custom
   (message-kill-buffer-on-exit t))
 
-(use-package smtpmail)
+(use-package smtpmail
+  :defer t)
 
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -1673,8 +1710,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package message-view-patch
   :straight t
-  :when (executable-find "mu")
-  :hook (gnus-part-display-hook . message-view-patch-highlight))
+  :hook (gnus-part-display . message-view-patch-highlight))
 
 (provide 'init)
 ;;; init.el ends here
