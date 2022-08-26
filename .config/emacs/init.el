@@ -14,13 +14,7 @@
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init.el" user-emacs-directory)))
 
-;;; use-package and straight.el
-
-(require 'straight)
-(straight-use-package 'use-package)
-(require 'use-package)
-
-(use-package straight)
+;;; delight for all later minor mode packages
 
 (use-package delight :straight t)
 
@@ -929,6 +923,7 @@ are defining or executing a macro."
 
 (use-package fennel-mode
   :straight ( :type git
+              :host nil
               :branch "main"
               :repo "https://git.sr.ht/~technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
