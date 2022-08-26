@@ -944,8 +944,8 @@ are defining or executing a macro."
     (save-excursion
       (goto-char (process-mark (get-buffer-process (current-buffer))))
       (forward-line 0)
-      (let ((kill-ring nil))
-        (comint-kill-region (point) (point-min))))))
+      (let ((inhibit-read-only t))
+        (delete-region (point) (point-min))))))
 
 (use-package clojure-mode
   :straight t
