@@ -448,8 +448,7 @@ Based on `so-long-detected-long-line-p'."
     (xterm-mouse-mode t)))
 
 (use-package savehist
-  :config
-  (savehist-mode 1))
+  :hook (after-init . savehist-mode))
 
 (use-package mule-cmds
   :no-require t
@@ -459,6 +458,7 @@ Based on `so-long-detected-long-line-p'."
   (prefer-coding-system 'utf-8))
 
 (use-package select
+  :no-require t
   :when (display-graphic-p)
   :custom
   (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
@@ -499,8 +499,7 @@ are defining or executing a macro."
         (funcall-interactively quit)))))
 
 (use-package delsel
-  :init
-  (delete-selection-mode t))
+  :hook (after-init . delete-selection-mode))
 
 (use-package minibuffer
   :hook (eval-expression-minibuffer-setup . common-lisp-modes-mode)
@@ -618,6 +617,7 @@ are defining or executing a macro."
         (t (load-theme local-config-light-theme t))))
 
 (use-package uniquify
+  :defer t
   :custom
   (uniquify-buffer-name-style 'forward))
 
@@ -632,6 +632,11 @@ are defining or executing a macro."
     (hl-line-mode (if display-line-numbers-mode 1 -1))))
 
 (use-package formfeed
+  :hook ((help-mode
+          org-mode
+          outline-mode
+          prog-mode)
+         . formfeed-make-display-line)
   :preface
   (defun formfeed-make-display-line ()
     "Display the formfeed ^L char as a comment or as a continuous line."
@@ -642,21 +647,13 @@ are defining or executing a macro."
                               (make-glyph-code
                                (string-to-char (or comment-start "-"))
                                'shadow)))))
-  (provide 'formfeed)
-  :init
-  (dolist (mode-hook '(help-mode-hook
-                       org-mode-hook
-                       outline-mode-hook
-                       prog-mode-hook))
-    (add-hook mode-hook #'formfeed-make-display-line)))
+  (provide 'formfeed))
 
 (use-package pixel-scroll
-  :when (or (featurep 'xinput2)
-            (featurep 'pgtk))
-  :config
-  (when (fboundp #'pixel-scroll-precision-mode)
-    (setq-default scroll-margin 0)
-    (pixel-scroll-precision-mode 1)))
+  :when (fboundp #'pixel-scroll-precision-mode)
+  :hook (after-init . pixel-scroll-precision-mode)
+  :custom
+  (scroll-margin 0))
 
 ;;; Completion
 
@@ -763,6 +760,7 @@ are defining or executing a macro."
 
 (use-package cape
   :straight t
+  :after corfu
   :config
   (setq completion-at-point-functions
         '(cape-file cape-dabbrev)))
@@ -815,6 +813,9 @@ are defining or executing a macro."
     (setq lexical-binding t)))
 
 (use-package blog
+  :defer t
+  :commands (blog-publish-file
+             blog-generate-file-name)
   :preface
   (defvar blog-capture-template
     "#+hugo_base_dir: ../
@@ -866,7 +867,7 @@ are defining or executing a macro."
   (provide 'blog))
 
 (use-package org-capture
-  :requires blog
+  :defer t
   :custom
   (org-directory blog-directory)
   (org-capture-templates `(("p" "Post" plain
@@ -880,14 +881,15 @@ are defining or executing a macro."
               :branch "main")
   :after ox)
 
-(use-package ox-latex :after ox)
+(use-package ox-latex
+  :after ox)
 
 (with-eval-after-load 'org
   (use-package org-tempo
     :unless (version<= org-version "9.1.9")))
 
 (use-package cc-mode
-  :hook ((c-mode-common . cc-mode-setup))
+  :hook (c-mode-common . cc-mode-setup)
   :custom
   (c-basic-offset 4)
   (c-default-style "linux")
@@ -1068,6 +1070,9 @@ are defining or executing a macro."
   :config
   (sly-symbol-completion-mode -1))
 
+(use-package scheme
+  :hook (scheme-mode . common-lisp-modes-mode))
+
 (use-package geiser
   :straight t
   :hook (scheme-mode . geiser-mode)
@@ -1147,6 +1152,7 @@ are defining or executing a macro."
           ("k" . helpful-key)))
 
 (use-package doc-view
+  :defer t
   :custom
   (doc-view-resolution 192))
 
@@ -1214,11 +1220,9 @@ are defining or executing a macro."
 
 (use-package project
   :straight t
+  :demand t                     ; needed for `project-switch-commands'
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
-  :preface
-  (unless (boundp 'project-switch-commands)
-    (defvar project-switch-commands nil))
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :preface
@@ -1270,13 +1274,12 @@ means save all with no questions."
 
 (use-package vterm
   :straight t
-  :if (bound-and-true-p module-file-suffix)
+  :when (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
           ("<f2>" . ignore)
           :map project-prefix-map
           ("t" . vterm-project-dir))
-  :requires project
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
@@ -1292,7 +1295,9 @@ the prefix argument ARG is supplied."
       (if (and (not current-prefix-arg) (get-buffer name))
           (switch-to-buffer name)
         (funcall-interactively #'vterm name))))
-  (add-to-list 'project-switch-commands '(vterm-project-dir "vterm") t))
+  :init
+  (add-to-list 'project-switch-commands
+               '(vterm-project-dir "vterm") t))
 
 (use-package magit
   :straight t
@@ -1382,6 +1387,7 @@ the prefix argument ARG is supplied."
 
 (use-package eldoc
   :delight eldoc-mode
+  :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil))
 
@@ -1484,7 +1490,6 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package multiple-cursors
   :straight t
-  :demand t
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map mc/keymap
