@@ -1220,7 +1220,6 @@ are defining or executing a macro."
 
 (use-package project
   :straight t
-  :demand t                     ; needed for `project-switch-commands'
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
   :custom
@@ -1296,8 +1295,9 @@ the prefix argument ARG is supplied."
           (switch-to-buffer name)
         (funcall-interactively #'vterm name))))
   :init
-  (add-to-list 'project-switch-commands
-               '(vterm-project-dir "vterm") t))
+  (with-eval-after-load 'project
+    (add-to-list 'project-switch-commands
+                 '(vterm-project-dir "vterm") t)))
 
 (use-package magit
   :straight t
@@ -1309,8 +1309,9 @@ the prefix argument ARG is supplied."
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all)
   :init
-  (add-to-list 'project-switch-commands
-               '(magit-project-status "Magit") t))
+  (with-eval-after-load 'project
+    (add-to-list 'project-switch-commands
+                 '(magit-project-status "Magit") t)))
 
 (use-package magit-todos
   :straight t
