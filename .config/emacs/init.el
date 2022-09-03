@@ -1244,6 +1244,7 @@ are defining or executing a macro."
   (add-to-list 'project-find-functions #'project-find-root)
   (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
+    (defvar compilation-save-buffers-predicate)
     (let* ((project-buffers (project-buffers (project-current)))
            (compilation-save-buffers-predicate
             (lambda () (memq (current-buffer) project-buffers))))
