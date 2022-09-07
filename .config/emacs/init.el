@@ -1217,6 +1217,7 @@ are defining or executing a macro."
   :straight t
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
+  :commands (project-root)
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
   :preface
