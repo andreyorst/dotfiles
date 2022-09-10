@@ -183,6 +183,7 @@ lisp-modes mode.
   (provide 'common-lisp-modes))
 
 (use-package region-bindings
+  :hook (after-init . region-bindings-mode-enable)
   :bind ( :map region-bindings-mode-map
           ("q" . region-bindings-disable)
           ("r" . replace-string)
@@ -195,7 +196,7 @@ lisp-modes mode.
     :lighter " rbm"
     :group 'convenience
     :keymap (make-sparse-keymap))
-  (defun region-bindings-disable (&optional force)
+  (defun region-bindings-disable ()
     "Turn off bindings temporarely while keeping the region active.
 Bindings will be enabled next time region is highlighted."
     (interactive)
@@ -217,9 +218,7 @@ Bindings will be enabled next time region is highlighted."
     (remove-hook 'activate-mark-hook #'region-bindings-enable)
     (remove-hook 'deactivate-mark-hook #'region-bindings-disable)
     (region-bindings-mode -1))
-  (provide 'region-bindings)
-  :init
-  (region-bindings-mode-enable))
+  (provide 'region-bindings))
 
 ;;; Inbuilt stuff
 
@@ -589,9 +588,9 @@ are defining or executing a macro."
   :straight t
   :requires (functions local-config)
   :custom-face
-  (font-lock-doc-face ((t (:foreground nil :inherit font-lock-comment-face))))
-  (line-number ((t (:foreground nil :background nil :inherit shadow))))
-  (line-number-current-line ((t (:foreground nil :weight bold :background nil :inherit hl-line))))
+  (font-lock-doc-face ((t (:foreground unspecified :inherit font-lock-comment-face))))
+  (line-number ((t (:foreground unspecified :background unspecified :inherit shadow))))
+  (line-number-current-line ((t (:foreground unspecified :weight bold :background unspecified :inherit hl-line))))
   :custom
   (modus-themes-org-blocks nil)
   (modus-themes-syntax '(faint alt-syntax))
@@ -779,7 +778,7 @@ are defining or executing a macro."
                             :background unspecified
                             :inherit org-block-begin-line
                             :extend t))))
-  (org-drawer ((t (:foreground nil :inherit shadow))))
+  (org-drawer ((t (:foreground unspecified :inherit shadow))))
   :custom
   (org-tags-column -120)
   (org-startup-folded 'content)
@@ -823,7 +822,8 @@ are defining or executing a macro."
 #+hugo_tags: %^{Tags}
 #+hugo_categories: %^{Categories}
 
-%?")
+%?"
+    "Org-capture template for blog posts.")
   (defcustom blog-directory "~/blog"
     "Location of the blog directory for org-capture."
     :type 'string
@@ -841,7 +841,8 @@ are defining or executing a macro."
                 (format-time-string "%Y-%m-%d")
                 (downcase (replace-regexp-in-string " " "-" title)))))))
   (defun blog-publish-file ()
-    "Update '#+date:' tag, and rename the currently visited file to include updated date."
+    "Update '#+date:' tag, and rename the currently visited file.
+File name is updated to include the same date."
     (interactive)
     (save-match-data
       (let ((today (format-time-string "%Y-%m-%d"))
@@ -980,6 +981,7 @@ are defining or executing a macro."
 (use-package cider
   :straight t
   :delight " CIDER"
+  :functions flycheck-mode
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode)
          (cider-popup-buffer-mode . cider-disable-linting))
@@ -1280,11 +1282,11 @@ means save all with no questions."
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
   :config
-  (defun vterm-project-dir (&optional arg)
+  (defun vterm-project-dir (&optional _)
     "Launch vterm in current project.
 
 Opens an existing vterm buffer for a project if present, unless
-the prefix argument ARG is supplied."
+the prefix argument is supplied."
     (interactive "P")
     (let* ((default-directory (project-root (project-current t)))
            (name (project-prefixed-buffer-name "vterm")))
@@ -1625,7 +1627,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package langtool
   :straight t
-  :commands langtool-check-buffer
+  :commands (langtool-check-buffer langtool-check-buffer@fix-narrowing)
   :when (and langtool-installation-dir
              (file-exists-p langtool-installation-dir))
   :custom
@@ -1636,12 +1638,36 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
     (save-mark-and-excursion
       (unless (use-region-p)
-        (let ((inhibit-message t))
-          (mark-whole-buffer)))
+        (mark-whole-buffer))
       (funcall fn lang))))
+
+;;; Erc
 
 (use-package erc
   :defer t)
+
+(use-package erc-join
+  :after erc
+  :custom
+  (erc-autojoin-timing 'ident)
+  :config
+  (erc-autojoin-mode 1))
+
+(use-package erc-log
+  :after erc
+  :custom
+  (erc-enable-logging t)
+  (erc-log-channels-directory (expand-file-name ".erc" user-emacs-directory))
+  (erc-log-insert-log-on-open t)
+  :config
+  (erc-log-mode 1))
+
+(use-package erc-services
+  :after erc
+  :custom
+  (erc-prompt-for-nickserv-password nil)
+  :config
+  (erc-services-mode 1))
 
 ;;; Mail
 
