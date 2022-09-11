@@ -1644,7 +1644,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
 ;;; Erc
 
 (use-package erc
-  :defer t)
+  :defer t
+  :custom
+  (erc-hide-list '("JOIN" "PART" "QUIT")))
 
 (use-package erc-join
   :after erc
