@@ -1445,7 +1445,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
           ("<left>" . backward-char)
           ("<right>" . forward-char))
   :custom
-  (isearch-lazy-highlight nil))
+  (isearch-lazy-highlight t))
 
 (use-package esh-mode
   :defer t
@@ -1456,6 +1456,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   :bind ( :map dired-mode-map
           ("<backspace>" . dired-up-directory)
           ("~" . dired-home-directory))
+  :hook (dired-mode . dired-hide-details-mode)
   :custom
   (dired-listing-switches "-lAX --group-directories-first")
   :config
