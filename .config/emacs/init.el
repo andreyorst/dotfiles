@@ -317,9 +317,38 @@ applied to the name.")
                           'help-echo (concat "Input method: " current-input-method))))
     "Display input method name in the modeline.")
   (put 'mode-line-input-method 'risky-local-variable t)
+  (defvar mode-line-buffer-encoding
+    '(:eval (propertize
+             (let ((sys (coding-system-plist buffer-file-coding-system)))
+               (concat " " (if (memq (plist-get sys :category)
+                                     '(coding-category-undecided coding-category-utf-8))
+                               "UTF-8"
+                             (upcase (symbol-name (plist-get sys :name))))))
+             'help-echo 'mode-line-mule-info-help-echo
+             'local-map mode-line-coding-system-map)))
+  (put 'mode-line-buffer-encoding 'risky-local-variable t)
+  (defvar mode-line-line-encoding
+    '(:eval (when-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
+                              (0 "LF")
+                              (1 "CRLF")
+                              (2 "CR")
+                              (_ nil))))
+              (propertize
+               (concat " " eol)
+               'help-echo (format "Line ending style: %s"
+                                  (pcase eol
+                                    ("LF" "Unix style LF")
+                                    ("CRLF" "DOS style CRLF")
+                                    ("CR" "Mac style CR")
+                                    (_ "Undecided")))
+               'local-map (let ((map (make-sparse-keymap)))
+                            (define-key map [mode-line mouse-1] 'mode-line-change-eol)
+                            map)))))
+  (put 'mode-line-line-encoding 'risky-local-variable t)
   (setq-default mode-line-format
-                '(" " mode-line-buffer-file-name mode-line-interactive-position
-                  mode-line-input-method (vc-mode vc-mode) " "
+                '(" " mode-line-buffer-file-name mode-line-input-method
+                  mode-line-buffer-encoding mode-line-line-encoding
+                  mode-line-interactive-position (vc-mode vc-mode) " "
                   mode-line-modes " " mode-line-misc-info))
   (provide 'mode-line))
 
@@ -1063,7 +1092,6 @@ File name is updated to include the same date."
 
 (use-package sly
   :straight t
-  :after inf-lisp
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :config
   (sly-symbol-completion-mode -1))
@@ -1571,7 +1599,12 @@ returned is 'test', otherwise it's 'src'."
 
 (use-package lsp-mode
   :straight t
-  :hook (lsp-mode . lsp-diagnostics-mode)
+  :hook ((lsp-mode . lsp-diagnostics-mode)
+         ((clojure-mode
+           clojurec-mode
+           clojurescript-mode
+           java-mode)
+          . lsp))
   :custom
   (lsp-keymap-prefix "C-c l")
   (lsp-diagnostics-provider :flymake)
@@ -1614,12 +1647,8 @@ returned is 'test', otherwise it's 'src'."
   (lsp-semantic-tokens-enable nil))
 
 (use-package lsp-clojure
-  :after lsp-mode
   :demand t
-  :hook ((clojure-mode
-          clojurec-mode
-          clojurescript-mode)
-         . lsp))
+  :after lsp-mode)
 
 (use-package lsp-treemacs
   :straight t
@@ -1629,10 +1658,10 @@ returned is 'test', otherwise it's 'src'."
 
 (use-package lsp-java
   :straight t
-  :requires lsp-mode
+  :demand t
+  :after lsp-mode
   :when (and openjdk-11-path
              (file-exists-p openjdk-11-path))
-  :hook (java-mode . lsp)
   :custom
   (lsp-java-java-path openjdk-11-path))
 
