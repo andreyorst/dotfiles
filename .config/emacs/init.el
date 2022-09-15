@@ -469,12 +469,13 @@ Based on `so-long-detected-long-line-p'."
   (blink-matching-delay 0)
   (blink-matching-paren t)
   (copy-region-blink-delay 0)
-  :init
-  (column-number-mode 1)
-  (line-number-mode 1)
+  :config
   (defun overwrite-mode-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
+  :init
+  (column-number-mode 1)
+  (line-number-mode 1)
   (define-advice keyboard-quit (:around (quit) quit-current-context)
     "Quit the current context.
 
@@ -1046,7 +1047,7 @@ File name is updated to include the same date."
   :custom
   (inferior-lisp-program (cond ((executable-find "sbcl") "sbcl")
                                ((executable-find "ecl") "ecl")))
-  :init
+  :config
   (defun lisp-eval-each-sexp ()
     "Evaluate each s-expression in the buffer consequentially."
     (interactive)
@@ -1406,35 +1407,63 @@ the prefix argument is supplied."
   :config
   (when (fboundp #'ansi-color-compilation-filter)
     (add-hook 'compilation-filter #'ansi-color-compilation-filter))
-  (defmacro compile-add-error-syntax (name regexp file line &optional col level)
+  (defun compile-add-error-syntax (name regexp file line &optional col level)
     "Register new compilation error syntax.
 
 Add NAME symbol to `compilation-error-regexp-alist', and then add
 REGEXP FILE LINE and optional COL LEVEL info to
 `compilation-error-regexp-alist-alist'."
-    (declare (indent 1))
-    `(progn (add-to-list 'compilation-error-regexp-alist ',name)
-            (add-to-list 'compilation-error-regexp-alist-alist
-                         '(,name ,regexp ,file ,line ,col ,level))))
-  (compile-add-error-syntax kaocha-tap
-    "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
-    1 2)
-  (compile-add-error-syntax kaocha-fail
-    ".*FAIL in.*(\\([^:]*\\):\\([0-9]*\\))$"
-    1 2)
-  (compile-add-error-syntax clojure-reflection-warning
-    "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
-    1 2 3)
-  (compile-add-error-syntax clojure-syntax-error
-    "^Syntax error macroexpanding at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)).$"
-    1 2 3)
-  (compile-add-error-syntax lua-stacktrace
-    "\\(?:^[[:space:]]+\\([^
+    (add-to-list 'compilation-error-regexp-alist name)
+    (add-to-list 'compilation-error-regexp-alist-alist
+                 (list name regexp file line col level)))
+  (defun compile-clojure-filename-fn (regexp)
+    "Create a function that gets filename from the error message."
+    (lambda ()
+      "Get a filname from the error message and compute relative directory.
+
+If the filename ends with '_test.clj', the relative directory
+returned is 'test', otherwise it's 'src'."
+      (let* ((filename (save-match-data
+                         (re-search-backward regexp)
+                         (substring-no-properties (match-string 1))))
+             (dir (if (string-suffix-p "_test.clj" filename)
+                      "test"
+                    "src")))
+        (message "%S" (cons filename dir))
+        (cons filename dir))))
+  (compile-add-error-syntax
+   'kaocha-tap
+   "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
+   (compile-clojure-filename-fn "(\\([^(:]*\\):[0-9]*)")
+   2)
+  (compile-add-error-syntax
+   'clojure-fail
+   ".*\\(?:FAIL\\|ERROR\\) in.*(\\([^:]*\\):\\([0-9]*\\))$"
+   (compile-clojure-filename-fn "(\\([^:]*\\):[0-9]*)")
+   2)
+  (compile-add-error-syntax
+   'clojure-reflection-warning
+   "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
+   (compile-clojure-filename-fn
+    "^Reflection warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
+   2 3)
+  (compile-add-error-syntax
+   'clojure-syntax-error
+   "^Syntax error .* at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\))\.$"
+   (compile-clojure-filename-fn "(\\([^:]+\\):[0-9]+:[0-9]+)")
+   2 3)
+  (compile-add-error-syntax
+   'kaocha-unit-error
+   "^ERROR in unit (\\([^:]+\\):\\([0-9]+\\))$"
+   (compile-clojure-filename-fn "(\\([^:]+\\):[0-9]+)")
+   2)
+  (compile-add-error-syntax 'lua-stacktrace
+                            "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
-    1 2)
-  (compile-add-error-syntax fennel-compile-error
-    "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
-    1 2))
+                            1 2)
+  (compile-add-error-syntax 'fennel-compile-error
+                            "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
+                            1 2))
 
 (use-package isearch
   :bind ( :map isearch-mode-map
@@ -1685,6 +1714,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
   :when (executable-find "mu")
+  :defines mu4e-personal-addresses
   :commands mu4e
   :custom
   (mu4e-completing-read-function #'completing-read)
@@ -1698,6 +1728,7 @@ REGEXP FILE LINE and optional COL LEVEL info to
   (mu4e-context-policy 'pick-first)
   (mu4e-update-interval (* 30 60))
   :config
+  (defvar mail-contexts)
   (when (featurep 'orderless)
     (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
       (let ((completion-styles (append completion-styles '(orderless))))
