@@ -73,7 +73,6 @@
 
 (require 'straight)
 (straight-use-package 'use-package)
-(require 'use-package)
 
 (provide 'early-init)
 ;;; early-init.el ends here

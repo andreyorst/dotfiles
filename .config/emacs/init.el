@@ -9,16 +9,13 @@
 
 ;;; Code:
 
-;;; Early init support for older Emacs
-
 (unless (featurep 'early-init)
   (load (expand-file-name "early-init.el" user-emacs-directory)))
 
-;;; delight for all later minor mode packages
+(eval-when-compile
+  (require 'use-package))
 
 (use-package delight :straight t)
-
-;;; Local config and personal functions
 
 (use-package local-config
   :defer t
@@ -220,8 +217,6 @@ Bindings will be enabled next time region is highlighted."
     (region-bindings-mode -1))
   (provide 'region-bindings))
 
-;;; Inbuilt stuff
-
 (use-package defaults
   :defer t
   :preface
@@ -277,11 +272,12 @@ the timestamp in the echo area only."
 
 (use-package kmacro
   :defer t
-  :config
+  :preface
   (defun block-undo (fn &rest args)
     (let ((marker (prepare-change-group)))
       (unwind-protect (apply fn args)
         (undo-amalgamate-change-group marker))))
+  :config
   (dolist (f '(kmacro-call-macro
                kmacro-exec-ring-item
                apply-macro-to-region-lines))
@@ -418,10 +414,7 @@ applied to the name.")
   (mouse-wheel-flip-direction (not (featurep 'pgtk)))
   (mouse-wheel-tilt-scroll t)
   (mouse-wheel-progressive-speed nil)
-  :init
-  (if (fboundp #'context-menu-mode)
-      (context-menu-mode 1)
-    (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
+  :preface
   (defun truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
 
@@ -462,6 +455,10 @@ Based on `so-long-detected-long-line-p'."
                           (and (eobp) (<= (- (point) start)
                                           threshold)))
                 (throw 'excessive t))))))))
+  :init
+  (if (fboundp #'context-menu-mode)
+      (context-menu-mode 1)
+    (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
   (define-advice scroll-left (:before-while (&rest _) prevent-overscroll)
     (and truncate-lines
          (not (memq major-mode '(vterm-mode term-mode)))
@@ -502,9 +499,9 @@ Based on `so-long-detected-long-line-p'."
   (defun overwrite-mode-set-cursor-shape ()
     (when (display-graphic-p)
       (setq cursor-type (if overwrite-mode 'hollow 'box))))
-  :init
-  (column-number-mode 1)
-  (line-number-mode 1)
+  :preface
+  (unless (fboundp 'minibuffer-keyboard-quit)
+    (autoload #'minibuffer-keyboard-quit "delsel" nil t))
   (define-advice keyboard-quit (:around (quit) quit-current-context)
     "Quit the current context.
 
@@ -519,7 +516,10 @@ are defining or executing a macro."
           (abort-recursive-edit))
       (unless (or defining-kbd-macro
                   executing-kbd-macro)
-        (funcall-interactively quit)))))
+        (funcall-interactively quit))))
+  :init
+  (column-number-mode 1)
+  (line-number-mode 1))
 
 (use-package delsel
   :hook (after-init . delete-selection-mode))
@@ -554,8 +554,6 @@ are defining or executing a macro."
           ("[" . narrow-prev-page))
   :init
   (setq mode-line-end-spaces nil))
-
-;;; UI
 
 (use-package frame
   :requires seq
@@ -599,7 +597,8 @@ are defining or executing a macro."
 (use-package dbus
   :when window-system
   :requires (functions local-config)
-  :config
+  :commands (dbus-register-signal)
+  :preface
   (defun color-scheme-changed (path var value)
     "DBus handler to detect when the color-scheme has changed."
     (when (and (string-equal path "org.freedesktop.appearance")
@@ -607,6 +606,7 @@ are defining or executing a macro."
       (if (equal (car value) '1)
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
+  :config
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
                         "/org/freedesktop/portal/desktop"
@@ -677,8 +677,6 @@ are defining or executing a macro."
   :hook (after-init . pixel-scroll-precision-mode)
   :custom
   (scroll-margin 0))
-
-;;; Completion
 
 (use-package vertico
   :straight t
@@ -788,8 +786,6 @@ are defining or executing a macro."
   (setq completion-at-point-functions
         '(cape-file cape-dabbrev)))
 
-;;;; Language packages
-
 (use-package org
   :straight (:type built-in)
   :hook ((org-capture-mode org-src-mode) . discard-history)
@@ -809,6 +805,7 @@ are defining or executing a macro."
                             :inherit org-block-begin-line
                             :extend t))))
   (org-drawer ((t (:foreground unspecified :inherit shadow))))
+  :commands (org-return org-cycle)
   :custom
   (org-tags-column -120)
   (org-startup-folded 'content)
@@ -820,17 +817,18 @@ are defining or executing a macro."
   (org-log-done 'time)
   (org-image-actual-width nil)
   (org-edit-src-content-indentation 0)
-  :config
-  (defun discard-history ()
-    "Discard undo history of org src and capture blocks."
-    (setq buffer-undo-list nil)
-    (set-buffer-modified-p nil))
+  :preface
   (define-advice org-return (:around (f &rest args) preserve-indentation)
     (let ((org-src-preserve-indentation t))
       (apply f args)))
   (define-advice org-cycle (:around (f &rest args) preserve-indentation)
     (let ((org-src-preserve-indentation t))
       (apply f args)))
+  (defun discard-history ()
+    "Discard undo history of org src and capture blocks."
+    (setq buffer-undo-list nil)
+    (set-buffer-modified-p nil))
+  :config
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
     (setq lexical-binding t)))
@@ -960,22 +958,28 @@ File name is updated to include the same date."
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
-          ("M-," . xref-pop-marker-stack)
+          ("M-," . xref-go-back)
           :map fennel-repl-mode-map
           ("C-c C-o" . fennel-repl-delete-all-output))
+  :requires inf-lisp
   :custom
   (fennel-eldoc-fontify-markdown t)
+  :preface
+  (unless (fboundp 'lisp-eval-string)
+    (autoload #'lisp-eval-string "inf-lisp"))
   :config
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
-  (defvar org-babel-default-header-args:fennel '((:results . "silent")))
-  (defun org-babel-execute:fennel (body _params)
-    "Evaluate a block of Fennel code with Babel."
-    (save-window-excursion
-      (unless (bufferp fennel-repl--buffer)
-        (fennel-repl nil))
-      (let ((inferior-lisp-buffer fennel-repl--buffer))
-        (lisp-eval-string body))))
+  (with-eval-after-load 'org
+    (defvar org-babel-default-header-args:fennel
+      '((:results . "silent")))
+    (defun org-babel-execute:fennel (body _params)
+      "Evaluate a block of Fennel code with Babel."
+      (save-window-excursion
+        (unless (bufferp fennel-repl--buffer)
+          (fennel-repl nil))
+        (let ((inferior-lisp-buffer fennel-repl--buffer))
+          (lisp-eval-string body)))))
   (defun fennel-repl-delete-all-output ()
     (interactive)
     (save-excursion
@@ -990,11 +994,8 @@ File name is updated to include the same date."
           clojurec-mode
           clojurescript-mode)
          . clojure-mode-setup)
-  :config
-  (defvar org-babel-default-header-args:clojure '((:results . "silent")))'
-  (defun org-babel-execute:clojure (body params)
-    "Evaluate a block of Clojure code with Babel."
-    (lisp-eval-string body))
+  :commands (clojure-project-dir)
+  :preface
   (defun clojure-set-compile-command ()
     (let ((project-dir (clojure-project-dir)))
       (cond ((and (file-exists-p (expand-file-name "project.clj" project-dir))
@@ -1006,7 +1007,14 @@ File name is updated to include the same date."
   (defun clojure-mode-setup ()
     "Setup Clojure buffer."
     (common-lisp-modes-mode 1)
-    (clojure-set-compile-command)))
+    (clojure-set-compile-command))
+  :config
+  (with-eval-after-load 'org
+    (defvar org-babel-default-header-args:clojure
+      '((:results . "silent")))'
+    (defun org-babel-execute:clojure (body params)
+      "Evaluate a block of Clojure code with Babel."
+      (lisp-eval-string body))))
 
 (use-package cider
   :straight t
@@ -1073,6 +1081,7 @@ File name is updated to include the same date."
   :hook (inferior-lisp-mode . common-lisp-modes-mode)
   :bind ( :map common-lisp-modes-mode-map
           ("C-M-k" . lisp-eval-each-sexp))
+  :commands (lisp-eval-last-sexp)
   :custom
   (inferior-lisp-program (cond ((executable-find "sbcl") "sbcl")
                                ((executable-find "ecl") "ecl")))
@@ -1093,6 +1102,7 @@ File name is updated to include the same date."
 (use-package sly
   :straight t
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
+  :commands (sly-symbol-completion-mode)
   :config
   (sly-symbol-completion-mode -1))
 
@@ -1123,6 +1133,7 @@ File name is updated to include the same date."
 (use-package lua-mode
   :straight t
   :defer t
+  :commands (lua-get-create-process lua-send-string)
   :custom
   (lua-indent-level 2)
   :config
@@ -1164,8 +1175,6 @@ File name is updated to include the same date."
   :straight t
   :defer t)
 
-;;; Tools
-
 (use-package help
   :custom
   (help-window-select t))
@@ -1190,14 +1199,16 @@ File name is updated to include the same date."
           ("!" . flymake-prefix-map)
           :map flymake-prefix-map
           ("l" . flymake-show-buffer-diagnostics)
-          ("n" . #'flymake-goto-next-error)
-          ("p" . #'flymake-goto-prev-error))
+          ("n" . flymake-goto-next-error)
+          ("p" . flymake-goto-prev-error))
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   (flymake-mode-line-lighter "FlyM")
   (flymake-mode-line-counter-format
    '(":" flymake-mode-line-error-counter "/"
-     (:eval (flymake--mode-line-counter :warning 'no-space)))))
+     (:eval (flymake--mode-line-counter :warning 'no-space))))
+  :config
+  (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
 
 (use-package flyspell
   :straight t
@@ -1222,6 +1233,7 @@ File name is updated to include the same date."
 
 (use-package smartparens-config
   :after smartparens
+  :commands (sp-use-paredit-bindings)
   :config
   (sp-use-paredit-bindings)
   ;; needs to be set manually, because :bind section runs before
@@ -1258,11 +1270,7 @@ File name is updated to include the same date."
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
-  :config
-  (add-to-list 'project-switch-commands
-               '(project-dired "Dired"))
-  (add-to-list 'project-switch-commands
-               '(project-switch-to-buffer "Switch buffer"))
+  :preface
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
     (catch 'found
@@ -1273,7 +1281,15 @@ File name is updated to include the same date."
     "Search up the PATH for `project-root-markers'."
     (when-let ((root (locate-dominating-file path #'project-root-p)))
       (cons 'transient (expand-file-name root))))
-  (add-to-list 'project-find-functions #'project-find-root)
+  (defun project-save-some-buffers (&optional arg)
+    "Save some modified file-visiting buffers in the current project.
+
+Optional argument ARG (interactively, prefix argument) non-nil
+means save all with no questions."
+    (interactive "P")
+    (let* ((project-buffers (project-buffers (project-current)))
+           (pred (lambda () (memq (current-buffer) project-buffers))))
+      (funcall-interactively #'save-some-buffers arg pred)))
   (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
     (defvar compilation-save-buffers-predicate)
@@ -1289,18 +1305,16 @@ File name is updated to include the same date."
                 (lambda () (memq (current-buffer) project-buffers))))
           (funcall fn edit-command))
       (funcall fn edit-command)))
-  (defun project-save-some-buffers (&optional arg)
-    "Save some modified file-visiting buffers in the current project.
-
-Optional argument ARG (interactively, prefix argument) non-nil
-means save all with no questions."
-    (interactive "P")
-    (let* ((project-buffers (project-buffers (project-current)))
-           (pred (lambda () (memq (current-buffer) project-buffers))))
-      (funcall-interactively #'save-some-buffers arg pred))))
+  :config
+  (add-to-list 'project-switch-commands
+               '(project-dired "Dired"))
+  (add-to-list 'project-switch-commands
+               '(project-switch-to-buffer "Switch buffer"))
+  (add-to-list 'project-find-functions #'project-find-root))
 
 (use-package vterm
   :straight t
+  :after project
   :when (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
@@ -1310,6 +1324,9 @@ means save all with no questions."
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
+  :preface
+  (unless (fboundp 'project-prefixed-buffer-name)
+    (autoload #'project-prefixed-buffer-name "project"))
   :config
   (defun vterm-project-dir (&optional _)
     "Launch vterm in current project.
@@ -1350,7 +1367,8 @@ the prefix argument is supplied."
   (magit-todos-mode 1))
 
 (use-package server
-  :config
+  :commands (server-running-p)
+  :init
   (unless (server-running-p)
     (server-start)))
 
@@ -1431,10 +1449,8 @@ the prefix argument is supplied."
   :defer t
   :custom
   (compilation-scroll-output 'first-error)
-  (compilation-error-regexp-alist nil)
-  :config
-  (when (fboundp #'ansi-color-compilation-filter)
-    (add-hook 'compilation-filter #'ansi-color-compilation-filter))
+  ;; (compilation-error-regexp-alist nil)
+  :preface
   (defun compile-add-error-syntax (name regexp file line &optional col level)
     "Register new compilation error syntax.
 
@@ -1445,12 +1461,15 @@ REGEXP FILE LINE and optional COL LEVEL info to
     (add-to-list 'compilation-error-regexp-alist-alist
                  (list name regexp file line col level)))
   (defun compile-clojure-filename-fn (regexp)
-    "Create a function that gets filename from the error message."
+    "Create a function that gets filename from the error message.
+
+REGEX is a regular expression to extract filename from first
+group via backward search."
     (lambda ()
       "Get a filname from the error message and compute relative directory.
 
-If the filename ends with '_test.clj', the relative directory
-returned is 'test', otherwise it's 'src'."
+If the filename ends with _test.clj, the relative directory
+returned is test, otherwise it's src."
       (let* ((filename (save-match-data
                          (re-search-backward regexp)
                          (substring-no-properties (match-string 1))))
@@ -1459,6 +1478,9 @@ returned is 'test', otherwise it's 'src'."
                     "src")))
         (message "%S" (cons filename dir))
         (cons filename dir))))
+  :config
+  (when (fboundp #'ansi-color-compilation-filter)
+    (add-hook 'compilation-filter #'ansi-color-compilation-filter))
   (compile-add-error-syntax
    'kaocha-tap
    "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
@@ -1505,7 +1527,7 @@ returned is 'test', otherwise it's 'src'."
   (isearch-lazy-highlight t))
 
 (use-package esh-mode
-  :defer t
+  :hook (eshell-mode . common-lisp-modes-mode)
   :custom
   (eshell-scroll-show-maximum-output nil))
 
@@ -1566,6 +1588,7 @@ returned is 'test', otherwise it's 'src'."
 (use-package profiler
   :straight t
   :bind ("<f2>" . profiler-start-or-report)
+  :commands (profiler-report)
   :preface
   (defun profiler-start-or-report ()
     (interactive)
@@ -1697,10 +1720,10 @@ returned is 'test', otherwise it's 'src'."
   (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
     (save-mark-and-excursion
       (unless (use-region-p)
-        (mark-whole-buffer))
+        (push-mark)
+        (push-mark (point-max) nil t)
+        (goto-char (point-min)))
       (funcall fn lang))))
-
-;;; Erc
 
 (use-package erc
   :defer t
@@ -1709,6 +1732,7 @@ returned is 'test', otherwise it's 'src'."
 
 (use-package erc-join
   :after erc
+  :commands (erc-autojoin-mode)
   :custom
   (erc-autojoin-timing 'ident)
   :config
@@ -1716,6 +1740,7 @@ returned is 'test', otherwise it's 'src'."
 
 (use-package erc-log
   :after erc
+  :commands (erc-log-mode)
   :custom
   (erc-enable-logging t)
   (erc-log-channels-directory (expand-file-name ".erc" user-emacs-directory))
@@ -1725,12 +1750,11 @@ returned is 'test', otherwise it's 'src'."
 
 (use-package erc-services
   :after erc
+  :commands (erc-services-mode)
   :custom
   (erc-prompt-for-nickserv-password nil)
   :config
   (erc-services-mode 1))
-
-;;; Mail
 
 (use-package message
   :defer t
@@ -1744,7 +1768,8 @@ returned is 'test', otherwise it's 'src'."
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
   :when (executable-find "mu")
   :defines mu4e-personal-addresses
-  :commands mu4e
+  :commands (mu4e mu4e-ask-maildir make-mu4e-context mu4e-context-current mu4e-get-maildirs)
+  :requires seq
   :custom
   (mu4e-completing-read-function #'completing-read)
   (mu4e-get-mail-command "mbsync -a")
@@ -1756,21 +1781,8 @@ returned is 'test', otherwise it's 'src'."
   (mu4e-view-show-addresses t)
   (mu4e-context-policy 'pick-first)
   (mu4e-update-interval (* 30 60))
-  :config
+  :preface
   (defvar mail-contexts)
-  (when (featurep 'orderless)
-    (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
-      (let ((completion-styles (append completion-styles '(orderless))))
-        (funcall fn prompt))))
-  (define-advice mu4e-get-maildirs (:around (fn) filter-maildirs-based-on-context)
-    "Filters maildirs for current active context based on maildir prefix."
-    (let* ((context-vars (mu4e-context-vars (mu4e-context-current)))
-           (current-maildir (alist-get 'mu4e-maildir-context context-vars)))
-      (if current-maildir
-          (cl-remove-if-not (lambda (maildir)
-                              (string-prefix-p current-maildir maildir))
-                            (funcall fn))
-        (funcall fn))))
   (defun make-mu4e-context-matcher (match-str)
     (lambda (msg)
       (when msg
@@ -1784,7 +1796,7 @@ returned is 'test', otherwise it's 'src'."
                (mu4e-drafts-folder . ,(format "%s/Drafts" inbox))
                (mu4e-trash-folder . ,(format "%s/Trash" inbox))
                (mu4e-refile-folder . ,(format "%s/Archive" inbox))
-               (mu4e-compose-signature . ,(cl-getf ctx :signature user-full-name))
+               (mu4e-compose-signature . ,(or (plist-get ctx :signature) user-full-name))
                (mu4e-maildir-context . ,inbox)
 
                (smtpmail-smtp-user . ,(plist-get ctx :smtp-name))
@@ -1794,11 +1806,27 @@ returned is 'test', otherwise it's 'src'."
 
                (user-mail-address . ,(plist-get ctx :address))
                (send-mail-function . smtpmail-send-it)))))
+  (with-eval-after-load 'orderless
+    (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
+      (let ((completion-styles (append completion-styles '(orderless))))
+        (funcall fn prompt))))
+  (define-advice mu4e-get-maildirs (:around (fn) filter-maildirs-based-on-context)
+    "Filters maildirs for current active context based on maildir prefix."
+    (let* ((context-vars (mu4e-context-vars (mu4e-context-current)))
+           (current-maildir (alist-get 'mu4e-maildir-context context-vars)))
+      (if current-maildir
+          (seq-filter (lambda (maildir)
+                        (string-prefix-p current-maildir maildir))
+                      (funcall fn))
+        (funcall fn))))
+  :config
   (when (load (expand-file-name "mail-contexts.el" user-emacs-directory) 'noerror)
     (setq mu4e-contexts (mapcar #'make-context mail-contexts)
           user-mail-address (plist-get (car mail-contexts) :address)
           mu4e-personal-addresses (mapcar (lambda (ctx) (plist-get ctx :address))
                                           mail-contexts))))
+
+(with-eval-after-load 'mu4e)
 
 (use-package message-view-patch
   :straight t
