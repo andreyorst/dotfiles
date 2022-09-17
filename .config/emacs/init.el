@@ -606,7 +606,7 @@ are defining or executing a macro."
       (if (equal (car value) '1)
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
-  :config
+  :init
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
                         "/org/freedesktop/portal/desktop"
@@ -967,6 +967,13 @@ File name is updated to include the same date."
   :preface
   (unless (fboundp 'lisp-eval-string)
     (autoload #'lisp-eval-string "inf-lisp"))
+  (defun fennel-repl-delete-all-output ()
+    (interactive)
+    (save-excursion
+      (goto-char (process-mark (get-buffer-process (current-buffer))))
+      (forward-line 0)
+      (let ((inhibit-read-only t))
+        (delete-region (point) (point-min)))))
   :config
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
@@ -979,14 +986,7 @@ File name is updated to include the same date."
         (unless (bufferp fennel-repl--buffer)
           (fennel-repl nil))
         (let ((inferior-lisp-buffer fennel-repl--buffer))
-          (lisp-eval-string body)))))
-  (defun fennel-repl-delete-all-output ()
-    (interactive)
-    (save-excursion
-      (goto-char (process-mark (get-buffer-process (current-buffer))))
-      (forward-line 0)
-      (let ((inhibit-read-only t))
-        (delete-region (point) (point-min))))))
+          (lisp-eval-string body))))))
 
 (use-package clojure-mode
   :straight t
@@ -1132,7 +1132,6 @@ File name is updated to include the same date."
 
 (use-package lua-mode
   :straight t
-  :defer t
   :commands (lua-get-create-process lua-send-string)
   :custom
   (lua-indent-level 2)
@@ -1228,11 +1227,13 @@ File name is updated to include the same date."
   (sp-highlight-wrap-tag-overlay nil)
   (sp-echo-match-when-invisible nil)
   :config
+  (add-to-list 'sp-clojure-modes 'fennel-mode t)
   (dolist (mode '(lisp-data-mode minibuffer-mode))
     (add-to-list 'sp-lisp-modes mode t)))
 
 (use-package smartparens-config
   :after smartparens
+  :demand t
   :commands (sp-use-paredit-bindings)
   :config
   (sp-use-paredit-bindings)
