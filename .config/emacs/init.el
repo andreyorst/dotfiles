@@ -973,6 +973,11 @@ File name is updated to include the same date."
       (forward-line 0)
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
+  (defvar fennel-modes
+      '(fennel-mode fennel-repl-mode)
+      "List of Fennel-related modes")
+  (defvar fennel-prefix "\\(?:[@`'#~,_?^]+\\)"
+    "Prefix used in `sp-sexp-prefix' for Fennel modes.")
   :config
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
@@ -985,7 +990,15 @@ File name is updated to include the same date."
         (unless (bufferp fennel-repl--buffer)
           (fennel-repl nil))
         (let ((inferior-lisp-buffer fennel-repl--buffer))
-          (lisp-eval-string body))))))
+          (lisp-eval-string body)))))
+  (with-eval-after-load 'smartparens-config
+    (sp-with-modes fennel-modes
+      (sp-local-pair "`" "`"
+                     :when '(sp-in-string-p
+                             sp-in-comment-p)
+                     :unless '(sp-lisp-invalid-hyperlink-p)))
+    (dolist (mode fennel-modes)
+      (add-to-list 'sp-sexp-prefix `(,mode regexp ,fennel-prefix)))))
 
 (use-package clojure-mode
   :straight t
@@ -1226,7 +1239,6 @@ File name is updated to include the same date."
   (sp-highlight-wrap-tag-overlay nil)
   (sp-echo-match-when-invisible nil)
   :config
-  (add-to-list 'sp-clojure-modes 'fennel-mode t)
   (dolist (mode '(lisp-data-mode minibuffer-mode))
     (add-to-list 'sp-lisp-modes mode t)))
 
