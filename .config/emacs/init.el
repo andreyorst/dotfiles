@@ -961,7 +961,6 @@ File name is updated to include the same date."
           ("M-," . xref-go-back)
           :map fennel-repl-mode-map
           ("C-c C-o" . fennel-repl-delete-all-output))
-  :requires inf-lisp
   :custom
   (fennel-eldoc-fontify-markdown t)
   :preface
