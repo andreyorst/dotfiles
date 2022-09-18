@@ -105,18 +105,6 @@ Used in various places to avoid getting wrong line height when
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
-  (defun dark-mode-enabled-p ()
-    "Check if dark mode is enabled."
-    (if (featurep 'dbus)
-        (equal '1 (caar (dbus-call-method
-                         :session
-                         "org.freedesktop.portal.Desktop"
-                         "/org/freedesktop/portal/desktop"
-                         "org.freedesktop.portal.Settings"
-                         "Read"
-                         "org.freedesktop.appearance"
-                         "color-scheme")))
-      (eq 'dark (frame-parameter nil 'background-mode))))
   (defun edit-init-file ()
     (interactive)
     (find-file (expand-file-name "init.el" user-emacs-directory)))
@@ -597,7 +585,7 @@ are defining or executing a macro."
 (use-package dbus
   :when window-system
   :requires (functions local-config)
-  :commands (dbus-register-signal)
+  :commands (dbus-register-signal dbus-call-method)
   :preface
   (defun color-scheme-changed (path var value)
     "DBus handler to detect when the color-scheme has changed."
@@ -606,6 +594,16 @@ are defining or executing a macro."
       (if (equal (car value) '1)
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
+  (defun dark-mode-enabled-p ()
+    "Check if dark mode is enabled."
+    (equal '1 (caar (dbus-call-method
+                     :session
+                     "org.freedesktop.portal.Desktop"
+                     "/org/freedesktop/portal/desktop"
+                     "org.freedesktop.portal.Settings"
+                     "Read"
+                     "org.freedesktop.appearance"
+                     "color-scheme"))))
   :init
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
@@ -616,7 +614,7 @@ are defining or executing a macro."
 
 (use-package modus-themes
   :straight t
-  :requires (functions local-config)
+  :requires (dbus local-config)
   :custom-face
   (font-lock-doc-face ((t (:foreground unspecified :inherit font-lock-comment-face))))
   (line-number ((t (:foreground unspecified :background unspecified :inherit shadow))))
@@ -635,7 +633,8 @@ are defining or executing a macro."
   :init
   (cond ((in-termux-p)
          (load-theme local-config-dark-theme t))
-        ((dark-mode-enabled-p)
+        ((and (fboundp 'dark-mode-enabled-p)
+              (dark-mode-enabled-p))
          (load-theme local-config-dark-theme t))
         (t (load-theme local-config-light-theme t))))
 
@@ -1416,6 +1415,7 @@ the prefix argument is supplied."
 
 (use-package recentf
   :hook (after-init . recentf-mode)
+  :defines (recentf-exclude)
   :custom
   (recentf-max-menu-items 100)
   (recentf-max-saved-items 100)
@@ -1847,8 +1847,6 @@ returned is test, otherwise it's src."
           user-mail-address (plist-get (car mail-contexts) :address)
           mu4e-personal-addresses (mapcar (lambda (ctx) (plist-get ctx :address))
                                           mail-contexts))))
-
-(with-eval-after-load 'mu4e)
 
 (use-package message-view-patch
   :straight t
