@@ -870,7 +870,7 @@ are defining or executing a macro."
                 (downcase (replace-regexp-in-string " " "-" title)))))))
   (defun blog-publish-file ()
     "Update '#+date:' tag, and rename the currently visited file.
-File name is updated to include the same date."
+File name is updated to include the same date and current title."
     (interactive)
     (save-match-data
       (let ((today (format-time-string "%Y-%m-%d"))
@@ -879,14 +879,24 @@ File name is updated to include the same date."
           (goto-char (point-min))
           (re-search-forward "^#\\+date:.*$")
           (replace-match (format "#+date: %s %s" today now)))
-        (let* ((file-name (file-name-base (buffer-file-name))))
-          (rename-visited-file
-           (format "%s-%s.org" today
-                   (if (string-match
-                        "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
-                        file-name)
-                       (match-string 1 file-name)
-                     file-name)))))))
+        (let* ((file-name (save-excursion
+                            (goto-char (point-min))
+                            (re-search-forward "^#\\+title:[[:space:]]*\\(.*\\)$")
+                            (thread-last
+                              (match-string 1)
+                              (replace-regexp-in-string "[[:space:]]" "-")
+                              (replace-regexp-in-string "[^[:alnum:]-]" "")
+                              downcase))))
+          (condition-case nil
+              (rename-visited-file
+               (format "%s-%s.org" today
+                       (if (string-match
+                            "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
+                            file-name)
+                           (match-string 1 file-name)
+                         file-name)))
+            (file-already-exists nil))
+          (save-buffer)))))
   (provide 'blog))
 
 (use-package org-capture
