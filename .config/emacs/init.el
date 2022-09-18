@@ -1852,5 +1852,9 @@ returned is test, otherwise it's src."
   :straight t
   :hook (gnus-part-display . message-view-patch-highlight))
 
+(use-package password-store
+  :when (executable-find "pass")
+  :load-path "/usr/share/doc/pass/emacs/")
+
 (provide 'init)
 ;;; init.el ends here
