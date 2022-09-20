@@ -1559,7 +1559,7 @@ returned is test, otherwise it's src."
           ("~" . dired-home-directory))
   :hook (dired-mode . dired-hide-details-mode)
   :custom
-  (dired-listing-switches "-lAX --group-directories-first")
+  (dired-listing-switches "-lAXh --group-directories-first")
   :config
   (defun dired-home-directory ()
     (interactive)
@@ -1738,6 +1738,18 @@ returned is test, otherwise it's src."
   (langtool-language-tool-jar
    (expand-file-name "languagetool-commandline.jar"
                      langtool-installation-dir))
+  (langtool-java-user-arguments
+   (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
+                                        langtool-installation-dir)))
+     (list (concat "--languageModel " ngrams))))
+  (langtool-language-tool-server-jar
+   (expand-file-name "languagetool-server.jar"
+                     langtool-installation-dir))
+  (langtool-http-server-host "localhost")
+  (langtool-server-user-arguments
+   (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
+                                        langtool-installation-dir)))
+     (list (concat "--languageModel " ngrams))))
   :config
   (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
     (save-mark-and-excursion
@@ -1856,6 +1868,12 @@ returned is test, otherwise it's src."
   :when (executable-find "pass")
   :defer t
   :load-path "/usr/share/doc/pass/emacs/")
+
+(use-package aoc
+  :straight ( :host github
+              :repo "pkulev/aoc.el"
+              :branch "main")
+  :defer t)
 
 (provide 'init)
 ;;; init.el ends here
