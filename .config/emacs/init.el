@@ -1854,6 +1854,7 @@ returned is test, otherwise it's src."
 
 (use-package password-store
   :when (executable-find "pass")
+  :defer t
   :load-path "/usr/share/doc/pass/emacs/")
 
 (provide 'init)
