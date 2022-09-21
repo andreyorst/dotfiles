@@ -1028,14 +1028,7 @@ File name is updated to include the same date and current title."
   (defun clojure-mode-setup ()
     "Setup Clojure buffer."
     (common-lisp-modes-mode 1)
-    (clojure-set-compile-command))
-  :config
-  (with-eval-after-load 'org
-    (defvar org-babel-default-header-args:clojure
-      '((:results . "silent")))'
-    (defun org-babel-execute:clojure (body params)
-      "Evaluate a block of Clojure code with Babel."
-      (lisp-eval-string body))))
+    (clojure-set-compile-command)))
 
 (use-package cider
   :straight t
@@ -1079,7 +1072,21 @@ File name is updated to include the same date and current title."
       (flymake-mode -1)))
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with a newline."
-    (format "%s\n> " namespace)))
+    (format "%s\n> " namespace))
+  (with-eval-after-load 'org
+    (defun org-babel-execute:clojure (body params)
+      "Evaluate a block of Clojure code with Babel."
+      (if (cider-connected-p)
+          (let* (res
+                 (handler (lambda (_ value)
+                            (setq res value))))
+            (cider-interactive-eval body
+                                    (nrepl-make-response-handler
+                                     (current-buffer) handler handler handler ()))
+            (while (not res)
+              (sit-for 0.1))
+            res)
+        (error "CIDER is not connected")))))
 
 (use-package clj-refactor
   :straight t
@@ -1471,7 +1478,6 @@ the prefix argument is supplied."
   :defer t
   :custom
   (compilation-scroll-output 'first-error)
-  ;; (compilation-error-regexp-alist nil)
   :preface
   (defun compile-add-error-syntax (name regexp file line &optional col level)
     "Register new compilation error syntax.
