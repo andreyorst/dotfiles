@@ -884,7 +884,8 @@ File name is updated to include the same date and current title."
                             (thread-last
                               (match-string 1)
                               (replace-regexp-in-string "[[:space:]]" "-")
-                              (replace-regexp-in-string "[^[:alnum:]-]" "")
+                              (replace-regexp-in-string "-+" "-")
+                              (replace-regexp-in-string "[^[:alnum:]-]+" "")
                               downcase))))
           (condition-case nil
               (rename-visited-file
@@ -1075,33 +1076,32 @@ File name is updated to include the same date and current title."
     (format "%s\n> " namespace))
   (with-eval-after-load 'org
     (defun org-babel-execute:clojure (body params)
-      "Evaluate a block of Clojure code with Babel."
-      (message "%S" params)
-      (let* ((result-params (assq :result-params params))
-             (silent (member "silent" result-params)))
+      "Evaluate a block of Clojure code with Babel via CIDER."
+      (let* ((silent (member "silent" (assq :result-params params))))
         (if (cider-connected-p)
             (let* (res
                    (placeholder (md5 (number-to-string (random 10000000000))))
                    (handler (lambda (buffer value)
                               (let ((value (string-trim-right value)))
-                                (setq res value)
-                                (if silent
-                                    (message "=> %S" value)
-                                  (with-current-buffer buffer
-                                    (save-excursion
-                                      (save-restriction
-                                        (save-match-data
-                                          (widen)
-                                          (goto-char (point-min))
-                                          (when (search-forward placeholder nil t)
-                                            (replace-match (regexp-quote value) 'delimited)))))))))))
+                                (if org-export-current-backend
+                                    (setq res value)
+                                  (if silent
+                                      (message "=> %S" value)
+                                    (with-current-buffer buffer
+                                      (save-excursion
+                                        (save-restriction
+                                          (save-match-data
+                                            (widen)
+                                            (goto-char (point-min))
+                                            (when (search-forward placeholder nil t)
+                                              (replace-match (regexp-quote value) 'delimited))))))))))))
               (cider-interactive-eval
                (format "(do %s)" body)
                (nrepl-make-response-handler
                 (current-buffer) handler handler handler ()))
-              (if (and (not org-export-current-backend)
-                       (not silent))
-                  placeholder
+              (if (not org-export-current-backend)
+                  (unless silent
+                    placeholder)
                 (while (not res)
                   (sit-for 0.1))
                 res))
