@@ -1076,17 +1076,36 @@ File name is updated to include the same date and current title."
   (with-eval-after-load 'org
     (defun org-babel-execute:clojure (body params)
       "Evaluate a block of Clojure code with Babel."
-      (if (cider-connected-p)
-          (let* (res
-                 (handler (lambda (_ value)
-                            (setq res value))))
-            (cider-interactive-eval body
-                                    (nrepl-make-response-handler
-                                     (current-buffer) handler handler handler ()))
-            (while (not res)
-              (sit-for 0.1))
-            res)
-        (error "CIDER is not connected")))))
+      (message "%S" params)
+      (let* ((result-params (assq :result-params params))
+             (silent (member "silent" result-params)))
+        (if (cider-connected-p)
+            (let* (res
+                   (placeholder (md5 (number-to-string (random 10000000000))))
+                   (handler (lambda (buffer value)
+                              (let ((value (string-trim-right value)))
+                                (setq res value)
+                                (if silent
+                                    (message "=> %S" value)
+                                  (with-current-buffer buffer
+                                    (save-excursion
+                                      (save-restriction
+                                        (save-match-data
+                                          (widen)
+                                          (goto-char (point-min))
+                                          (when (search-forward placeholder nil t)
+                                            (replace-match (regexp-quote value) 'delimited)))))))))))
+              (cider-interactive-eval
+               (format "(do %s)" body)
+               (nrepl-make-response-handler
+                (current-buffer) handler handler handler ()))
+              (if (and (not org-export-current-backend)
+                       (not silent))
+                  placeholder
+                (while (not res)
+                  (sit-for 0.1))
+                res))
+          (error "CIDER is not connected"))))))
 
 (use-package clj-refactor
   :straight t
