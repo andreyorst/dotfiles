@@ -1075,37 +1075,9 @@ File name is updated to include the same date and current title."
     "Return a prompt string that mentions NAMESPACE with a newline."
     (format "%s\n> " namespace))
   (with-eval-after-load 'org
-    (defun org-babel-execute:clojure (body params)
-      "Evaluate a block of Clojure code with Babel via CIDER."
-      (let* ((silent (member "silent" (assq :result-params params))))
-        (if (cider-connected-p)
-            (let* (res
-                   (placeholder (md5 (number-to-string (random 10000000000))))
-                   (handler (lambda (buffer value)
-                              (let ((value (string-trim-right value)))
-                                (if org-export-current-backend
-                                    (setq res value)
-                                  (if silent
-                                      (message "=> %S" value)
-                                    (with-current-buffer buffer
-                                      (save-excursion
-                                        (save-restriction
-                                          (save-match-data
-                                            (widen)
-                                            (goto-char (point-min))
-                                            (when (search-forward placeholder nil t)
-                                              (replace-match (regexp-quote value) 'delimited))))))))))))
-              (cider-interactive-eval
-               (format "(do %s)" body)
-               (nrepl-make-response-handler
-                (current-buffer) handler handler handler ()))
-              (if (not org-export-current-backend)
-                  (unless silent
-                    placeholder)
-                (while (not res)
-                  (sit-for 0.1))
-                res))
-          (error "CIDER is not connected"))))))
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((clojure . t)))))
 
 (use-package clj-refactor
   :straight t
