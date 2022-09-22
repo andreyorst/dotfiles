@@ -207,6 +207,7 @@ Bindings will be enabled next time region is highlighted."
 
 (use-package defaults
   :defer t
+  :hook (focus-out . garbage-collect)
   :preface
   (setq-default
    indent-tabs-mode nil
@@ -830,7 +831,9 @@ are defining or executing a macro."
   :config
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
-    (setq lexical-binding t)))
+    (setq lexical-binding t))
+  (unless (version<= org-version "9.1.9")
+    (add-to-list 'org-modules 'org-tempo)))
 
 (use-package blog
   :defer t
@@ -917,10 +920,6 @@ File name is updated to include the same date and current title."
 (use-package ox-latex
   :after ox)
 
-(with-eval-after-load 'org
-  (use-package org-tempo
-    :unless (version<= org-version "9.1.9")))
-
 (use-package cc-mode
   :hook (c-mode-common . cc-mode-setup)
   :custom
@@ -984,23 +983,28 @@ File name is updated to include the same date and current title."
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
   (defvar fennel-modes
-      '(fennel-mode fennel-repl-mode)
-      "List of Fennel-related modes")
+    '(fennel-mode fennel-repl-mode)
+    "List of Fennel-related modes")
   (defvar fennel-prefix "\\(?:[@`'#~,_?^]+\\)"
     "Prefix used in `sp-sexp-prefix' for Fennel modes.")
   :config
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
   (with-eval-after-load 'org
-    (defvar org-babel-default-header-args:fennel
-      '((:results . "silent")))
-    (defun org-babel-execute:fennel (body _params)
+    (defvar org-babel-default-header-args:fennel nil)
+    (defvar org-babel-header-args:fennel nil)
+    (defun org-babel-execute:fennel (body _)
       "Evaluate a block of Fennel code with Babel."
-      (save-window-excursion
-        (unless (bufferp fennel-repl--buffer)
-          (fennel-repl nil))
-        (let ((inferior-lisp-buffer fennel-repl--buffer))
-          (lisp-eval-string body)))))
+      (condition-case nil (require 'fennel-scratch)
+        (error (user-error "fennel-scratch is unavailable")))
+      (unless (bufferp (get-buffer fennel-repl--buffer))
+        (fennel-repl nil))
+      (thread-last
+        body
+        fennel-scratch--eval-to-string
+        (replace-regexp-in-string fennel-mode-repl-prompt-regexp "")
+        (replace-regexp-in-string "^[[:space:]]+" "")
+        string-trim)))
   (with-eval-after-load 'smartparens-config
     (sp-with-modes fennel-modes
       (sp-local-pair "`" "`"
