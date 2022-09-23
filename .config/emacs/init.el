@@ -990,21 +990,6 @@ File name is updated to include the same date and current title."
   :config
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1))
-  (with-eval-after-load 'org
-    (defvar org-babel-default-header-args:fennel nil)
-    (defvar org-babel-header-args:fennel nil)
-    (defun org-babel-execute:fennel (body _)
-      "Evaluate a block of Fennel code with Babel."
-      (condition-case nil (require 'fennel-scratch)
-        (error (user-error "fennel-scratch is unavailable")))
-      (unless (bufferp (get-buffer fennel-repl--buffer))
-        (fennel-repl nil))
-      (thread-last
-        body
-        fennel-scratch--eval-to-string
-        (replace-regexp-in-string fennel-mode-repl-prompt-regexp "")
-        (replace-regexp-in-string "^[[:space:]]+" "")
-        string-trim)))
   (with-eval-after-load 'smartparens-config
     (sp-with-modes fennel-modes
       (sp-local-pair "`" "`"
@@ -1013,6 +998,16 @@ File name is updated to include the same date and current title."
                      :unless '(sp-lisp-invalid-hyperlink-p)))
     (dolist (mode fennel-modes)
       (add-to-list 'sp-sexp-prefix `(,mode regexp ,fennel-prefix)))))
+
+(use-package ob-fennel
+  :straight ( :host gitlab
+              :repo "andreyorst/ob-fennel"
+              :branch "main")
+  :after (org fennel-mode)
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((fennel . t))))
 
 (use-package clojure-mode
   :straight t
