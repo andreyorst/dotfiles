@@ -1862,7 +1862,9 @@ returned is test, otherwise it's src."
 
 (use-package password-store
   :when (executable-find "pass")
-  :defer t
+  :commands (password-store-copy
+             password-store-insert
+             password-store-generate)
   :load-path "/usr/share/doc/pass/emacs/")
 
 (use-package aoc
