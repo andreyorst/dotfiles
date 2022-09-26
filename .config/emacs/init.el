@@ -847,10 +847,11 @@ are defining or executing a macro."
 #+options: tex:dvisvgm
 #+macro: kbd @@html:<kbd>$1</kbd>@@
 
-#+title: %(capitalize blog--current-post-name)
+#+title: %(upcase-initials blog--current-post-name)
 #+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
 #+hugo_tags: %^{Tags}
 #+hugo_categories: %^{Categories}
+#+hugo_custom_front_matter: :license %(format \"%S\" blog-license)
 
 %?"
     "Org-capture template for blog posts.")
@@ -858,8 +859,19 @@ are defining or executing a macro."
     "Location of the blog directory for org-capture."
     :type 'string
     :group 'blog)
+  (defcustom blog-license ""
+    "Blog license string."
+    :type 'string
+    :group 'blog)
   (defvar blog--current-post-name nil
     "Current post name for org-capture template.")
+  (defun blog-title-to-fname (title)
+    (thread-last
+      title
+      (replace-regexp-in-string "[[:space:]]" "-")
+      (replace-regexp-in-string "-+" "-")
+      (replace-regexp-in-string "[^[:alnum:]-]+" "")
+      downcase))
   (defun blog-generate-file-name (&rest _)
     (let ((title (read-string "Title: ")))
       (setq blog--current-post-name title)
@@ -869,7 +881,7 @@ are defining or executing a macro."
         "posts"
         (format "%s-%s.org"
                 (format-time-string "%Y-%m-%d")
-                (downcase (replace-regexp-in-string " " "-" title)))))))
+                (blog-title-to-fname title))))))
   (defun blog-publish-file ()
     "Update '#+date:' tag, and rename the currently visited file.
 File name is updated to include the same date and current title."
@@ -884,12 +896,7 @@ File name is updated to include the same date and current title."
         (let* ((file-name (save-excursion
                             (goto-char (point-min))
                             (re-search-forward "^#\\+title:[[:space:]]*\\(.*\\)$")
-                            (thread-last
-                              (match-string 1)
-                              (replace-regexp-in-string "[[:space:]]" "-")
-                              (replace-regexp-in-string "-+" "-")
-                              (replace-regexp-in-string "[^[:alnum:]-]+" "")
-                              downcase))))
+                            (blog-title-to-fname (match-string 1)))))
           (condition-case nil
               (rename-visited-file
                (format "%s-%s.org" today
