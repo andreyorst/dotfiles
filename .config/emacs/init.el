@@ -615,7 +615,7 @@ are defining or executing a macro."
 
 (use-package modus-themes
   :straight t
-  :requires (dbus local-config)
+  :requires (local-config)
   :custom-face
   (font-lock-doc-face ((t (:foreground unspecified :inherit font-lock-comment-face))))
   (line-number ((t (:foreground unspecified :background unspecified :inherit shadow))))
@@ -1332,7 +1332,6 @@ means save all with no questions."
 
 (use-package vterm
   :straight t
-  :after project
   :when (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
