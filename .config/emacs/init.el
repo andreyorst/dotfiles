@@ -788,7 +788,8 @@ are defining or executing a macro."
 
 (use-package org
   :straight (:type built-in)
-  :hook ((org-capture-mode org-src-mode) . discard-history)
+  :hook (((org-capture-mode org-src-mode) . discard-history)
+         (org-babel-after-execute . org-redisplay-inline-images))
   :bind ( :map org-mode-map
           ("M-Q" . split-pararagraph-into-lines)
           ("C-c l" . org-store-link))
@@ -980,8 +981,6 @@ File name is updated to include the same date and current title."
   :custom
   (fennel-eldoc-fontify-markdown t)
   :preface
-  (unless (fboundp 'lisp-eval-string)
-    (autoload #'lisp-eval-string "inf-lisp"))
   (defun fennel-repl-delete-all-output ()
     (interactive)
     (save-excursion
@@ -989,22 +988,25 @@ File name is updated to include the same date and current title."
       (forward-line 0)
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
+  :config
+  (dolist (sym '(global local var))
+    (put sym 'fennel-indent-function 1)))
+
+(use-package fennel-mode
+  :no-require t
+  :after (smartparens-config fennel-mode)
+  :config
   (defvar fennel-modes
     '(fennel-mode fennel-repl-mode)
     "List of Fennel-related modes")
+  (sp-with-modes fennel-modes
+    (sp-local-pair "`" "`"
+                   :when '(sp-in-string-p sp-in-comment-p)
+                   :unless '(sp-lisp-invalid-hyperlink-p)))
   (defvar fennel-prefix "\\(?:[@`'#~,_?^]+\\)"
     "Prefix used in `sp-sexp-prefix' for Fennel modes.")
-  :config
-  (dolist (sym '(global local var))
-    (put sym 'fennel-indent-function 1))
-  (with-eval-after-load 'smartparens-config
-    (sp-with-modes fennel-modes
-      (sp-local-pair "`" "`"
-                     :when '(sp-in-string-p
-                             sp-in-comment-p)
-                     :unless '(sp-lisp-invalid-hyperlink-p)))
-    (dolist (mode fennel-modes)
-      (add-to-list 'sp-sexp-prefix `(,mode regexp ,fennel-prefix)))))
+  (dolist (mode fennel-modes)
+    (add-to-list 'sp-sexp-prefix `(,mode regexp ,fennel-prefix))))
 
 (use-package ob-fennel
   :straight ( :host gitlab
@@ -1079,11 +1081,15 @@ File name is updated to include the same date and current title."
       (flymake-mode -1)))
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with a newline."
-    (format "%s\n> " namespace))
-  (with-eval-after-load 'org
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((clojure . t)))))
+    (format "%s\n> " namespace)))
+
+(use-package cider
+  :no-require t
+  :after (org cider)
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((clojure . t))))
 
 (use-package clj-refactor
   :straight t
@@ -1351,7 +1357,6 @@ means save all with no questions."
   :preface
   (unless (fboundp 'project-prefixed-buffer-name)
     (autoload #'project-prefixed-buffer-name "project"))
-  :config
   (defun vterm-project-dir (&optional _)
     "Launch vterm in current project.
 
@@ -1362,11 +1367,14 @@ the prefix argument is supplied."
            (name (project-prefixed-buffer-name "vterm")))
       (if (and (not current-prefix-arg) (get-buffer name))
           (switch-to-buffer name)
-        (funcall-interactively #'vterm name))))
-  :init
-  (with-eval-after-load 'project
-    (add-to-list 'project-switch-commands
-                 '(vterm-project-dir "vterm") t)))
+        (funcall-interactively #'vterm name)))))
+
+(use-package vterm
+  :no-require t
+  :after (project vterm)
+  :config
+  (add-to-list 'project-switch-commands
+               '(vterm-project-dir "vterm") t))
 
 (use-package magit
   :straight t
@@ -1376,11 +1384,14 @@ the prefix argument is supplied."
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all)
-  :init
-  (with-eval-after-load 'project
-    (add-to-list 'project-switch-commands
-                 '(magit-project-status "Magit") t)))
+  (magit-diff-refine-hunk 'all))
+
+(use-package magit
+  :no-require
+  :after (project magit)
+  :config
+  (add-to-list 'project-switch-commands
+               '(magit-project-status "Magit") t))
 
 (use-package magit-todos
   :straight t
@@ -1842,10 +1853,6 @@ returned is test, otherwise it's src."
 
                (user-mail-address . ,(plist-get ctx :address))
                (send-mail-function . smtpmail-send-it)))))
-  (with-eval-after-load 'orderless
-    (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
-      (let ((completion-styles (append completion-styles '(orderless))))
-        (funcall fn prompt))))
   (define-advice mu4e-get-maildirs (:around (fn) filter-maildirs-based-on-context)
     "Filters maildirs for current active context based on maildir prefix."
     (let* ((context-vars (mu4e-context-vars (mu4e-context-current)))
@@ -1861,6 +1868,14 @@ returned is test, otherwise it's src."
           user-mail-address (plist-get (car mail-contexts) :address)
           mu4e-personal-addresses (mapcar (lambda (ctx) (plist-get ctx :address))
                                           mail-contexts))))
+
+(use-package mu4e
+  :no-require t
+  :after (orderless mu4e)
+  :config
+  (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
+    (let ((completion-styles (append completion-styles '(orderless))))
+      (funcall fn prompt))))
 
 (use-package message-view-patch
   :straight t
