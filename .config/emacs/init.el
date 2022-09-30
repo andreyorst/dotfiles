@@ -1485,6 +1485,7 @@ the prefix argument is supplied."
   :defer t
   :custom
   (compilation-scroll-output 'first-error)
+  (compilation-error-regexp-alist nil)
   :preface
   (defun compile-add-error-syntax (name regexp file line &optional col level)
     "Register new compilation error syntax.
