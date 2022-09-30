@@ -788,7 +788,8 @@ are defining or executing a macro."
 
 (use-package org
   :straight (:type built-in)
-  :hook (((org-capture-mode org-src-mode) . discard-history)
+  :hook ((org-mode . org-change-syntax-table)
+         ((org-capture-mode org-src-mode) . discard-history)
          (org-babel-after-execute . org-redisplay-inline-images))
   :bind ( :map org-mode-map
           ("M-Q" . split-pararagraph-into-lines)
@@ -829,6 +830,9 @@ are defining or executing a macro."
     "Discard undo history of org src and capture blocks."
     (setq buffer-undo-list nil)
     (set-buffer-modified-p nil))
+  (defun org-change-syntax-table ()
+    (modify-syntax-entry ?< "w")
+    (modify-syntax-entry ?> "w"))
   :config
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
