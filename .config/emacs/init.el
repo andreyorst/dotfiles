@@ -841,9 +841,9 @@ are defining or executing a macro."
     (add-to-list 'org-modules 'org-tempo)))
 
 (use-package blog
-  :defer t
   :commands (blog-publish-file
-             blog-generate-file-name)
+             blog-generate-file-name
+             blog-read-list-items)
   :preface
   (defvar blog-capture-template
     "#+hugo_base_dir: ../
@@ -854,12 +854,20 @@ are defining or executing a macro."
 
 #+title: %(upcase-initials blog--current-post-name)
 #+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
-#+hugo_tags: %^{Tags}
-#+hugo_categories: %^{Categories}
+#+hugo_tags: %(blog-read-list-items \"Select tags: \" 'blog-tags)
+#+hugo_categories: %(blog-read-list-items \"Select categories: \" 'blog-categories)
 #+hugo_custom_front_matter: :license %(format \"%S\" blog-license)
 
 %?"
     "Org-capture template for blog posts.")
+  (defcustom blog-tags nil
+    "A list of tags used for posts."
+    :type '(repeat string)
+    :group 'blog)
+  (defcustom blog-categories nil
+    "A list of tags used for posts."
+    :type '(repeat string)
+    :group 'blog)
   (defcustom blog-directory "~/blog"
     "Location of the blog directory for org-capture."
     :type 'string
@@ -870,6 +878,21 @@ are defining or executing a macro."
     :group 'blog)
   (defvar blog--current-post-name nil
     "Current post name for org-capture template.")
+  (defun blog-read-list-items (prompt var)
+    "Completing read items with the PROMPT from the VAR.
+
+VAR must be a quoted custom variable, which will be saved if new
+items were read by the `completing-read' function."
+    (let ((items (eval var)) item result)
+      (while (and (not (string-empty-p item))
+                  (not (null items)))
+        (setq item (string-trim (or (completing-read prompt items) "")))
+        (unless (string-empty-p item)
+          (push item result)
+          (setq items (remove item items))
+          (unless (memq item (eval var))
+            (customize-save-variable var (sort (cons item (eval var)) #'string<)))))
+      (string-join result " ")))
   (defun blog-title-to-fname (title)
     (thread-last
       title
@@ -1212,13 +1235,6 @@ File name is updated to include the same date and current title."
 (use-package help
   :custom
   (help-window-select t))
-
-(use-package helpful
-  :straight t
-  :bind ( :map help-map
-          ("f" . helpful-callable)
-          ("v" . helpful-variable)
-          ("k" . helpful-key)))
 
 (use-package doc-view
   :defer t
