@@ -1301,11 +1301,11 @@ File name is updated to include the same date and current title."
   (vundo--window-max-height 10))
 
 (use-package ediff
-  :hook (ediff-prepare-buffer . outline-show-all)
-  :config
-  (advice-add 'ediff-window-display-p :override #'ignore)
   :custom
-  (ediff-split-window-function 'split-window-horizontally))
+  (ediff-split-window-function 'split-window-horizontally)
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  :config
+  (advice-add 'ediff-window-display-p :override #'ignore))
 
 (use-package project
   :straight t
