@@ -1850,7 +1850,18 @@ returned is test, otherwise it's src."
   (mu4e-context-policy 'pick-first)
   (mu4e-update-interval (* 30 60))
   :preface
-  (defvar mail-contexts)
+  (defvar mail-contexts nil
+    "A list of plists with context related settings.
+
+     Each plist contains the following keywords:
+
+     - :inbox - directory for the mbsync inbox;
+     - :name - name of the inbox for mu4e to use as context name;
+     - :smtp-name - account email;
+     - :smtp-server - smtp server;
+     - :port - smtp server port;
+     - :address - account email;
+     - :signature - signature to use when composing emails.")
   (defun make-mu4e-context-matcher (match-str)
     (lambda (msg)
       (when msg
