@@ -1399,17 +1399,18 @@ the prefix argument is supplied."
 (use-package magit
   :straight t
   :hook (git-commit-mode . flyspell-mode)
-  :bind ( :map project-prefix-map
-          ("m" . magit-project-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all))
 
 (use-package magit
-  :no-require
-  :after (project magit)
-  :config
+  :after (project)
+  :no-require t
+  :commands (magit-project-status)
+  :bind ( :map project-prefix-map
+          ("m" . magit-project-status))
+  :init
   (add-to-list 'project-switch-commands
                '(magit-project-status "Magit") t))
 
