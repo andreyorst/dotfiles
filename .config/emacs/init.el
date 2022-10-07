@@ -1373,9 +1373,7 @@ means save all with no questions."
   :when (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
-          ("<f2>" . ignore)
-          :map project-prefix-map
-          ("t" . vterm-project-dir))
+          ("<f2>" . ignore))
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
@@ -1396,8 +1394,10 @@ the prefix argument is supplied."
 
 (use-package vterm
   :no-require t
-  :after (project vterm)
-  :config
+  :after (project)
+  :bind ( :map project-prefix-map
+          ("t" . vterm-project-dir))
+  :init
   (add-to-list 'project-switch-commands
                '(vterm-project-dir "vterm") t))
 
@@ -1412,7 +1412,6 @@ the prefix argument is supplied."
 (use-package magit
   :after (project)
   :no-require t
-  :commands (magit-project-status)
   :bind ( :map project-prefix-map
           ("m" . magit-project-status))
   :init
