@@ -1730,7 +1730,9 @@ returned is test, otherwise it's src."
   ;; lens
   (lsp-lens-enable nil)
   ;; semantic
-  (lsp-semantic-tokens-enable nil))
+  (lsp-semantic-tokens-enable nil)
+  :init
+  (setq lsp-use-plists t))
 
 (use-package lsp-clojure
   :demand t

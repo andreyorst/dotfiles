@@ -105,3 +105,4 @@ function container_pc {
 }
 
 export XCURSOR_SIZE=24
+export LSP_USE_PLISTS=true
