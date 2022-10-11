@@ -5,7 +5,7 @@ cd ~/Git/emacs && \
     && ./autogen.sh \
     && ./configure \
            --without-compress-install \
-           --with-native-compilation \
+           --with-native-compilation=aot \
            --with-pgtk \
            --with-mailutils \
            --prefix="$HOME"/.local \
