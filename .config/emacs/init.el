@@ -413,7 +413,7 @@ Based on `so-long-detected-long-line-p'."
     (let ((buffer (current-buffer))
           (tabwidth tab-width))
       (with-temp-buffer
-        (insert-buffer buffer)
+        (insert-buffer-substring buffer)
         (setq-local tab-width tabwidth)
         (untabify (point-min) (point-max))
         (goto-char (point-min))
@@ -1326,7 +1326,6 @@ File name is updated to include the same date and current title."
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
-  :preface
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
     (catch 'found
