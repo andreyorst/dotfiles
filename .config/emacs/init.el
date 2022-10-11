@@ -1639,9 +1639,12 @@ returned is test, otherwise it's src."
    ("C-#" . mc/insert-numbers)
    ("<return>" . nil)
    :map region-bindings-mode-map
-   ("n" . mc/mark-next-like-this)
-   ("p" . mc/mark-previous-like-this)
-   ("a" . mc/mark-all-like-this)
+   ("n" . mc/mark-next-symbol-like-this)
+   ("N" . mc/mark-next-like-this)
+   ("p" . mc/mark-previous-symbol-like-this)
+   ("P" . mc/mark-previous-like-this)
+   ("a" . mc/mark-all-symbols-like-this)
+   ("A" . mc/mark-all-like-this)
    ("s" . mc/mark-all-in-region-regexp)
    ("l" . mc/edit-ends-of-lines)))
 
