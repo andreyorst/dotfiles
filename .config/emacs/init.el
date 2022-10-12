@@ -889,8 +889,7 @@ are defining or executing a macro."
 VAR must be a quoted custom variable, which will be saved if new
 items were read by the `completing-read' function."
     (let ((items (eval var)) item result)
-      (while (and (not (string-empty-p item))
-                  (not (null items)))
+      (while (not (string-empty-p item))
         (setq item (string-trim (or (completing-read prompt items) "")))
         (unless (string-empty-p item)
           (push item result)
@@ -1674,10 +1673,6 @@ returned is test, otherwise it's src."
   :custom
   (treemacs-no-png-images t))
 
-(use-package flymake
-  :straight t
-  :defer t)
-
 (use-package yasnippet
   :straight t
   :defer t
@@ -1686,11 +1681,7 @@ returned is test, otherwise it's src."
 (use-package lsp-mode
   :straight t
   :hook ((lsp-mode . lsp-diagnostics-mode)
-         ((clojure-mode
-           clojurec-mode
-           clojurescript-mode
-           java-mode)
-          . lsp))
+         (lsp-mode . lsp-completion-mode))
   :custom
   (lsp-keymap-prefix "C-c l")
   (lsp-diagnostics-provider :flymake)
@@ -1714,7 +1705,7 @@ returned is test, otherwise it's src."
   (lsp-enable-symbol-highlighting nil)
   (lsp-enable-text-document-color nil)
   ;; completion
-  (lsp-completion-enable nil)
+  (lsp-completion-enable t)
   (lsp-completion-enable-additional-text-edit nil)
   (lsp-enable-snippet nil)
   (lsp-completion-show-kind nil)
@@ -1727,6 +1718,7 @@ returned is test, otherwise it's src."
   (lsp-modeline-code-actions-enable nil)
   (lsp-modeline-diagnostics-enable nil)
   (lsp-modeline-workspace-status-enable nil)
+  (lsp-signature-doc-lines 1)
   ;; lens
   (lsp-lens-enable nil)
   ;; semantic
@@ -1735,8 +1727,19 @@ returned is test, otherwise it's src."
   (setq lsp-use-plists t))
 
 (use-package lsp-clojure
+  :no-require t
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . lsp))
+
+(use-package lsp-clojure
   :demand t
-  :after lsp-mode)
+  :after lsp-mode
+  :hook (cider-mode . cider-toggle-lsp-completion-maybe)
+  :preface
+  (defun cider-toggle-lsp-completion-maybe ()
+    (lsp-completion-mode (if cider-mode -1 1))))
 
 (use-package lsp-treemacs
   :straight t
@@ -1752,6 +1755,10 @@ returned is test, otherwise it's src."
              (file-exists-p openjdk-11-path))
   :custom
   (lsp-java-java-path openjdk-11-path))
+
+(use-package lsp-java
+  :no-require t
+  :hook (java-mode . lsp))
 
 (use-package jdecomp
   :straight t
