@@ -1784,22 +1784,21 @@ returned is test, otherwise it's src."
   :commands (langtool-check-buffer langtool-check-buffer@fix-narrowing)
   :when (and langtool-installation-dir
              (file-exists-p langtool-installation-dir))
+  :preface
+  (defvar langtool-args
+    (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
+                                         langtool-installation-dir)))
+      (list (concat "--languageModel " ngrams))))
   :custom
   (langtool-language-tool-jar
    (expand-file-name "languagetool-commandline.jar"
                      langtool-installation-dir))
-  (langtool-java-user-arguments
-   (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
-                                        langtool-installation-dir)))
-     (list (concat "--languageModel " ngrams))))
+  (langtool-java-user-arguments langtool-args)
   (langtool-language-tool-server-jar
    (expand-file-name "languagetool-server.jar"
                      langtool-installation-dir))
   (langtool-http-server-host "localhost")
-  (langtool-server-user-arguments
-   (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
-                                        langtool-installation-dir)))
-     (list (concat "--languageModel " ngrams))))
+  (langtool-server-user-arguments langtool-args)
   :config
   (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
     (save-mark-and-excursion
