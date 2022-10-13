@@ -629,10 +629,6 @@ are defining or executing a macro."
   (modus-themes-org-blocks nil)
   (modus-themes-syntax '(faint alt-syntax))
   (modus-themes-region '(bg-only no-extend))
-  (modus-themes-operandi-color-overrides '((bg-main . "#fcfaf8") (fg-main . "#151515")))
-  (modus-themes-vivendi-color-overrides (if (in-termux-p)
-                                            '((bg-main . "#000000") (fg-main . "#e5e6e7"))
-                                          '((bg-main . "#1a1a1a") (fg-main . "#dbdbdb"))))
   (modus-themes-completions '((matches . (intense bold))
                               (selection . (intense))))
   (modus-themes-mode-line '(borderless))
@@ -1933,7 +1929,12 @@ returned is test, otherwise it's src."
   :commands (password-store-copy
              password-store-insert
              password-store-generate)
-  :load-path "/usr/share/doc/pass/emacs/")
+  :load-path "/usr/share/doc/pass/emacs/"
+  :config
+  (define-advice password-store--completing-read
+      (:around (fn &optional require-match) use-orderless)
+    (let ((completion-styles (append completion-styles '(orderless))))
+      (funcall fn require-match))))
 
 (use-package aoc
   :straight ( :host github
