@@ -9,9 +9,6 @@
 
 ;;; Code:
 
-(unless (featurep 'early-init)
-  (load (expand-file-name "early-init.el" user-emacs-directory)))
-
 (eval-when-compile
   (require 'use-package))
 
@@ -1593,6 +1590,7 @@ returned is test, otherwise it's src."
   :hook (dired-mode . dired-hide-details-mode)
   :custom
   (dired-listing-switches "-lAXh --group-directories-first")
+  (dired-kill-when-opening-new-dired-buffer t)
   :config
   (defun dired-home-directory ()
     (interactive)
