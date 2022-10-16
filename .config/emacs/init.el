@@ -850,7 +850,7 @@ are defining or executing a macro."
 #+options: tex:dvisvgm
 #+macro: kbd @@html:<kbd>$1</kbd>@@
 
-#+title: %(upcase-initials blog--current-post-name)
+#+title: %(format \"%s\" blog--current-post-name)
 #+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
 #+hugo_tags: %(blog-read-list-items \"Select tags: \" 'blog-tags)
 #+hugo_categories: %(blog-read-list-items \"Select categories: \" 'blog-categories)
@@ -1457,12 +1457,10 @@ the prefix argument is supplied."
 
 (use-package dumb-jump
   :straight t
-  :defer t
+  :hook (xref-backend-functions . dumb-jump-xref-activate)
   :custom
   (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'completing-read)
-  :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+  (dumb-jump-selector 'completing-read))
 
 (use-package gcmh
   :straight t
