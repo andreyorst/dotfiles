@@ -913,7 +913,7 @@ File name is updated to include the same date and current title."
     (interactive)
     (save-match-data
       (let ((today (format-time-string "%Y-%m-%d"))
-            (now (format-time-string "%H:%M")))
+            (now (format-time-string "%h %H:%M")))
         (save-excursion
           (goto-char (point-min))
           (re-search-forward "^#\\+date:.*$")
@@ -941,7 +941,9 @@ File name is updated to include the same date and current title."
   (org-capture-templates `(("p" "Post" plain
                             (function blog-generate-file-name)
                             ,blog-capture-template
-                            :unnarrowed t))))
+                            :unnarrowed t
+                            :jump-to-captured t
+                            :immediate-finish t))))
 
 (use-package ox-hugo
   :straight ( :host github
