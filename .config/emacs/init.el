@@ -941,7 +941,6 @@ File name is updated to include the same date and current title."
   (org-capture-templates `(("p" "Post" plain
                             (function blog-generate-file-name)
                             ,blog-capture-template
-                            :unnarrowed t
                             :jump-to-captured t
                             :immediate-finish t))))
 
@@ -1387,7 +1386,7 @@ the prefix argument is supplied."
 
 (use-package vterm
   :no-require t
-  :after (project)
+  :after project
   :bind ( :map project-prefix-map
           ("t" . vterm-project-dir))
   :init
@@ -1403,7 +1402,7 @@ the prefix argument is supplied."
   (magit-diff-refine-hunk 'all))
 
 (use-package magit
-  :after (project)
+  :after project
   :no-require t
   :bind ( :map project-prefix-map
           ("m" . magit-project-status))
@@ -1617,20 +1616,10 @@ returned is test, otherwise it's src."
   :straight t
   :bind ("C-=" . er/expand-region))
 
-(use-package phi-search
-  :straight t
-  :defer t)
-
 (use-package multiple-cursors
   :straight t
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
-   :map mc/keymap
-   ("C-s" . phi-search)
-   ("C-r" . phi-search-backward)
-   ("C-&" . mc/vertical-align-with-space)
-   ("C-#" . mc/insert-numbers)
-   ("<return>" . nil)
    :map region-bindings-mode-map
    ("n" . mc/mark-next-symbol-like-this)
    ("N" . mc/mark-next-like-this)
@@ -1640,6 +1629,17 @@ returned is test, otherwise it's src."
    ("A" . mc/mark-all-like-this)
    ("s" . mc/mark-all-in-region-regexp)
    ("l" . mc/edit-ends-of-lines)))
+
+(use-package multiple-cursors-core
+  :bind
+  (( :map mc/keymap
+     ("<return>" . nil)
+     ("C-&" . mc/vertical-align-with-space)
+     ("C-#" . mc/insert-numbers))))
+
+(use-package phi-search
+  :straight t
+  :defer t)
 
 (use-package profiler
   :straight t
