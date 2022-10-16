@@ -887,7 +887,7 @@ items were read by the `completing-read' function."
         (unless (string-empty-p item)
           (push item result)
           (setq items (remove item items))
-          (unless (memq item (eval var))
+          (unless (member item (eval var))
             (customize-save-variable var (sort (cons item (eval var)) #'string<)))))
       (string-join result " ")))
   (defun blog-title-to-fname (title)
