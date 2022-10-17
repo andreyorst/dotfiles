@@ -1458,10 +1458,12 @@ the prefix argument is supplied."
 
 (use-package dumb-jump
   :straight t
-  :hook (xref-backend-functions . dumb-jump-xref-activate)
+  :defer t
   :custom
   (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'completing-read))
+  (dumb-jump-selector 'completing-read)
+  :init
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package gcmh
   :straight t
