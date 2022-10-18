@@ -628,6 +628,8 @@ are defining or executing a macro."
   (modus-themes-region '(bg-only no-extend))
   (modus-themes-completions '((matches . (intense bold))
                               (selection . (intense))))
+  (modus-themes-operandi-color-overrides '((bg-main . "#fbfcfd")))
+  (modus-themes-vivendi-color-overrides `((bg-main . ,(if (in-termux-p) "#000000" "#181818"))))
   (modus-themes-mode-line '(borderless))
   :init
   (cond ((in-termux-p)
