@@ -52,6 +52,7 @@
         message-beginning-of-line
         my/select-line
         my/smart-move-beginning-of-line
+        nxml-electric-slash
         org-beginning-of-line
         org-ctrl-c-ctrl-c
         org-cycle
