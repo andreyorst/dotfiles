@@ -1367,7 +1367,9 @@ means save all with no questions."
   :when (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
-          ("<f2>" . ignore))
+          ("<f2>" . ignore)
+          :map project-prefix-map
+          ("t" . vterm-project-dir))
   :custom
   (vterm-always-compile-module t)
   (vterm-environment '("VTERM=1"))
@@ -1384,31 +1386,23 @@ the prefix argument is supplied."
            (name (project-prefixed-buffer-name "vterm")))
       (if (and (not current-prefix-arg) (get-buffer name))
           (switch-to-buffer name)
-        (funcall-interactively #'vterm name)))))
-
-(use-package vterm
-  :no-require t
-  :after project
-  :bind ( :map project-prefix-map
-          ("t" . vterm-project-dir))
-  :init
+        (funcall-interactively #'vterm name))))
+  :config
+  (require 'project)
   (add-to-list 'project-switch-commands
                '(vterm-project-dir "vterm") t))
 
 (use-package magit
   :straight t
   :hook (git-commit-mode . flyspell-mode)
+  :bind ( :map project-prefix-map
+          ("m" . magit-project-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all))
-
-(use-package magit
-  :after project
-  :no-require t
-  :bind ( :map project-prefix-map
-          ("m" . magit-project-status))
-  :init
+  (magit-diff-refine-hunk 'all)
+  :config
+  (require 'project)
   (add-to-list 'project-switch-commands
                '(magit-project-status "Magit") t))
 
