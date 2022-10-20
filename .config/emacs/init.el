@@ -1387,7 +1387,7 @@ the prefix argument is supplied."
       (if (and (not current-prefix-arg) (get-buffer name))
           (switch-to-buffer name)
         (funcall-interactively #'vterm name))))
-  :config
+  :init
   (require 'project)
   (add-to-list 'project-switch-commands
                '(vterm-project-dir "vterm") t))
@@ -1401,7 +1401,7 @@ the prefix argument is supplied."
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all)
-  :config
+  :init
   (require 'project)
   (add-to-list 'project-switch-commands
                '(magit-project-status "Magit") t))
@@ -1586,7 +1586,7 @@ returned is test, otherwise it's src."
           ("~" . dired-home-directory))
   :hook (dired-mode . dired-hide-details-mode)
   :custom
-  (dired-listing-switches "-lAXh --group-directories-first")
+  (dired-listing-switches "-lAXhv --group-directories-first")
   (dired-kill-when-opening-new-dired-buffer t)
   :config
   (defun dired-home-directory ()
@@ -1803,7 +1803,50 @@ returned is test, otherwise it's src."
 (use-package erc
   :defer t
   :custom
-  (erc-hide-list '("JOIN" "PART" "QUIT")))
+  (erc-hide-list '("JOIN" "PART" "QUIT"))
+  :preface
+  (defcustom erc-tunnel-conf nil
+    "Connection spec for IRC server behind an SSH tunnel.
+Can be used to connect to a bouncer running behind SSH.  A plist
+with the following keys:
+
+  :host - remote host.
+
+  :port - remote port.
+
+  :ssh-port - SSH port.
+              Optional, needed when SSH is running on a custom
+              port.
+
+The rest options for the tunnel are taken from ERC directly.  See
+the options: `erc-port' or `erc-default-port', and `erc-server'."
+    :tag "ERC tunnel configuration"
+    :type 'plist
+    :group 'erc)
+  (defun erc-setup-port-forwarding (conf)
+    "Setup a connection function based on plist CONF.
+Connection is specified by the keys :host, :port, and an optional
+:ssh-port. Returns a lambda which will call `start-process' with
+the generated command."
+    (when-let ((host (plist-get conf :host))
+               (port (plist-get conf :port)))
+      (let* ((name "erc-tunnel")
+             (buf (format " *%s-%s:%s*" name host port))
+             (cmd (format "ssh -L %s:%s:%s %s %s"
+                          (or erc-port erc-default-port)
+                          (or erc-server "localhost")
+                          port
+                          (if-let ((ssh-port (plist-get conf :ssh-port)))
+                              (format "-p %s" ssh-port)
+                            "")
+                          host)))
+        (lambda (&rest _)
+          (when (or (not (get-buffer buf))
+                    (not (get-buffer-process (get-buffer buf))))
+            (apply #'start-process name buf (split-string-shell-command cmd)))))))
+  :config
+  (when-let ((hook (erc-setup-port-forwarding erc-tunnel-conf)))
+    (add-hook 'erc-connect-pre-hook hook)))
 
 (use-package erc-join
   :after erc
