@@ -1,6 +1,5 @@
 # .dotfiles
 This repository is mostly for maintaining my [Emacs][1] configuration, although it includes some useful scripts and settings for different Linux related tools.
-There also is a configurations for [Kakoune][2], and some time ago there was a configuration for [NeoVim][3], which I no longer use, but configuration files still may be useful for someone else.
 
 ## Structure
 The structure of this repository is pretty simple.
