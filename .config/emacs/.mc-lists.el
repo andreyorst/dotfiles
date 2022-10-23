@@ -147,6 +147,7 @@
         magit-refresh-all
         magit-stage
         mark-whole-buffer
+        mc/mark-all-in-region-regexp
         minions-minor-modes-menu
         mouse-drag-mode-line
         mouse-drag-secondary
