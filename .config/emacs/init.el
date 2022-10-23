@@ -1848,32 +1848,6 @@ the generated command."
   (when-let ((hook (erc-setup-port-forwarding erc-tunnel-conf)))
     (add-hook 'erc-connect-pre-hook hook)))
 
-(use-package erc-join
-  :after erc
-  :commands (erc-autojoin-mode)
-  :custom
-  (erc-autojoin-timing 'ident)
-  :config
-  (erc-autojoin-mode 1))
-
-(use-package erc-log
-  :after erc
-  :commands (erc-log-mode)
-  :custom
-  (erc-enable-logging t)
-  (erc-log-channels-directory (expand-file-name ".erc" user-emacs-directory))
-  (erc-log-insert-log-on-open t)
-  :config
-  (erc-log-mode 1))
-
-(use-package erc-services
-  :after erc
-  :commands (erc-services-mode)
-  :custom
-  (erc-prompt-for-nickserv-password nil)
-  :config
-  (erc-services-mode 1))
-
 (use-package message
   :defer t
   :custom
