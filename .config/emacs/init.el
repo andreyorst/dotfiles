@@ -1587,7 +1587,6 @@ returned is test, otherwise it's src."
   :hook (dired-mode . dired-hide-details-mode)
   :custom
   (dired-listing-switches "-lAXhv --group-directories-first")
-  (dired-kill-when-opening-new-dired-buffer t)
   :config
   (defun dired-home-directory ()
     (interactive)
