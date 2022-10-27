@@ -120,6 +120,7 @@
         cider-debug-mode-send-reply
         cider-repl-previous-input
         cider-repl-return
+        cider-switch-to-repl-buffer
         clang-format-buffer
         counsel-describe-function
         counsel-find-file
@@ -165,6 +166,7 @@
         phi-search
         pixel-scroll-precision
         pixel-scroll-start-momentum
+        project-compile
         rust-format-buffer
         tab-line-select-tab
         term-line-mode
