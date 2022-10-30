@@ -1495,7 +1495,8 @@ the prefix argument is supplied."
   :hook (prog-mode . hl-todo-mode))
 
 (use-package compile
-  :defer t
+  :hook
+  (compilation-filter . ansi-color-compilation-filter)
   :custom
   (compilation-scroll-output 'first-error)
   (compilation-error-regexp-alist nil)
@@ -1561,8 +1562,8 @@ returned is test, otherwise it's src."
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
                             1 2)
   (compile-add-error-syntax 'fennel-compile-error
-                            "\\(?:^Compile error in[[:space:]]+\\([^:]+\\):\\([[:digit:]]+\\)$\\)"
-                            1 2))
+                            "^\\(?:Compile error in \\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\)?\\)$"
+                            1 2 3))
 
 (use-package isearch
   :bind ( :map isearch-mode-map
@@ -1822,6 +1823,11 @@ the options: `erc-port' or `erc-default-port', and `erc-server'."
     :tag "ERC tunnel configuration"
     :type 'plist
     :group 'erc)
+  (defcustom erc-pass ""
+    "Password to pass to the `erc' function."
+    :tag "ERC password for the bouncer"
+    :type 'string
+    :group 'erc)
   (defun erc-setup-port-forwarding (conf)
     "Setup a connection function based on plist CONF.
 Connection is specified by the keys :host, :port, and an optional
@@ -1843,6 +1849,13 @@ the generated command."
           (when (or (not (get-buffer buf))
                     (not (get-buffer-process (get-buffer buf))))
             (apply #'start-process name buf (split-string-shell-command cmd)))))))
+  (defun erc-connect ()
+    "Connect to the bouncer."
+    (interactive)
+    (erc :server (or erc-server (erc-compute-server))
+         :port (or erc-port erc-default-port)
+         :nick erc-nick
+         :password erc-pass))
   :config
   (when-let ((hook (erc-setup-port-forwarding erc-tunnel-conf)))
     (add-hook 'erc-connect-pre-hook hook)))
@@ -1939,6 +1952,7 @@ the generated command."
 (use-package password-store
   :when (executable-find "pass")
   :commands (password-store-copy
+             password-store-get
              password-store-insert
              password-store-generate)
   :load-path "/usr/share/doc/pass/emacs/"
