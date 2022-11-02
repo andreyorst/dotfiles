@@ -631,6 +631,7 @@ are defining or executing a macro."
   (modus-themes-operandi-color-overrides '((bg-main . "#fbfcfd")))
   (modus-themes-vivendi-color-overrides `((bg-main . ,(if (in-termux-p) "#000000" "#181818"))))
   (modus-themes-mode-line '(borderless))
+  (modus-themes-fringes nil)
   :init
   (cond ((in-termux-p)
          (load-theme local-config-dark-theme t))
@@ -1771,34 +1772,22 @@ returned is test, otherwise it's src."
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library."))
 
-(use-package langtool
+(use-package languagetool
   :straight t
-  :commands (langtool-check-buffer langtool-check-buffer@fix-narrowing)
   :when (and langtool-installation-dir
              (file-exists-p langtool-installation-dir))
+  :commands (languagetool-server-mode
+             languagetool-server-start)
   :preface
   (defvar langtool-args
     (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
                                          langtool-installation-dir)))
-      (list (concat "--languageModel " ngrams))))
+      (list (concat "--languagemodel " ngrams))))
   :custom
-  (langtool-language-tool-jar
-   (expand-file-name "languagetool-commandline.jar"
-                     langtool-installation-dir))
-  (langtool-java-user-arguments langtool-args)
-  (langtool-language-tool-server-jar
+  (languagetool-server-command
    (expand-file-name "languagetool-server.jar"
                      langtool-installation-dir))
-  (langtool-http-server-host "localhost")
-  (langtool-server-user-arguments langtool-args)
-  :config
-  (define-advice langtool-check-buffer (:around (fn &optional lang) fix-narrowing)
-    (save-mark-and-excursion
-      (unless (use-region-p)
-        (push-mark)
-        (push-mark (point-max) nil t)
-        (goto-char (point-min)))
-      (funcall fn lang))))
+  (languagetool-server-arguments langtool-args))
 
 (use-package erc
   :defer t
