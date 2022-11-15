@@ -52,7 +52,7 @@ function vterm_printf {
 }
 
 function vterm_prompt_end {
-    vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
+    vterm_printf "51;A$(pwd)"
 }
 
 if [ -n "$VTERM" ]; then

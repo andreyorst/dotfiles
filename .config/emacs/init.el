@@ -599,14 +599,16 @@ are defining or executing a macro."
         (load-theme local-config-light-theme t))))
   (defun dark-mode-enabled-p ()
     "Check if dark mode is enabled."
-    (equal '1 (caar (dbus-call-method
-                     :session
-                     "org.freedesktop.portal.Desktop"
-                     "/org/freedesktop/portal/desktop"
-                     "org.freedesktop.portal.Settings"
-                     "Read"
-                     "org.freedesktop.appearance"
-                     "color-scheme"))))
+    (equal '1 (caar (condition-case nil
+                        (dbus-call-method
+                         :session
+                         "org.freedesktop.portal.Desktop"
+                         "/org/freedesktop/portal/desktop"
+                         "org.freedesktop.portal.Settings"
+                         "Read"
+                         "org.freedesktop.appearance"
+                         "color-scheme")
+                      (error nil)))))
   :init
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
