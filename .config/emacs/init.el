@@ -949,6 +949,24 @@ File name is updated to include the same date and current title."
                             :jump-to-captured t
                             :immediate-finish t))))
 
+(use-package org-tree-slide
+  :straight t
+  :defer t
+  :custom
+  (org-tree-slide-slide-in-effect nil)
+  (org-tree-slide-never-touch-face t))
+
+(use-package org-modern
+  :straight t
+  :defer t
+  :hook (org-tree-slide-mode . org-modern-mode)
+  :custom-face
+  (org-modern-block-name ((t (:height 1.0))))
+  (org-modern-label ((t (:height 1.0))))
+  :custom
+  (org-modern-hide-stars t)
+  (org-modern-block-fringe nil))
+
 (use-package ox-hugo
   :straight ( :host github
               :repo "kaushalmodi/ox-hugo"
