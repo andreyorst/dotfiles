@@ -849,6 +849,13 @@ are defining or executing a macro."
   (unless (version<= org-version "9.1.9")
     (add-to-list 'org-modules 'org-tempo)))
 
+(use-package ob-shell
+  :after org
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t))))
+
 (use-package blog
   :commands (blog-publish-file
              blog-generate-file-name
