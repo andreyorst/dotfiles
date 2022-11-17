@@ -43,6 +43,12 @@
                    string)
     :tag "Langtool installation directory"
     :group 'local-config)
+  (defcustom langtool-ngrams-dir-name nil
+    "Path to the unzipped directory with ngram data for langtool."
+    :type '(choice (const :tag "not installed" nil)
+                   string)
+    :tag "Langtool ngrams installation directory"
+    :group 'local-config)
   (defvar local-config-line-pixel-height (line-pixel-height)
     "Line height in pixels.
 
@@ -1211,15 +1217,16 @@ File name is updated to include the same date and current title."
 
 (use-package lua-mode
   :straight t
-  :commands (lua-get-create-process lua-send-string)
+  :defer t
   :custom
-  (lua-indent-level 2)
+  (lua-indent-level 2))
+
+(use-package ob-lua
+  :after (org lua-mode)
   :config
-  (defvar org-babel-default-header-args:lua '((:results . "silent")))
-  (defun org-babel-execute:lua (body _)
-    "Evaluate a block of Lua code with Babel."
-    (lua-get-create-process)
-    (lua-send-string body)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lua . t))))
 
 (use-package css-mode
   :defer t
@@ -1776,6 +1783,13 @@ returned is test, otherwise it's src."
 (use-package jdecomp
   :straight t
   :mode ("\\.class\\'" . jdecomp-mode)
+  :preface
+  (defvar cfr-path
+    (file-truename "~/.local/lib/cfr.jar")
+    "Path to the cfr Java decompiler library.")
+  (defvar fernflower-path
+    (file-truename "~/.local/lib/fernflower.jar")
+    "Path to the FernFlower library.")
   :custom
   (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
                                   'cfr)
@@ -1783,14 +1797,7 @@ returned is test, otherwise it's src."
                                   'fernflower)
                                  (t jdecomp-decompiler-type)))
   (jdecomp-decompiler-paths `((cfr . ,cfr-path)
-                              (fernflower . ,fernflower-path)))
-  :init
-  (defvar cfr-path
-    (file-truename "~/.local/lib/cfr.jar")
-    "Path to the cfr Java decompiler library.")
-  (defvar fernflower-path
-    (file-truename "~/.local/lib/fernflower.jar")
-    "Path to the FernFlower library."))
+                              (fernflower . ,fernflower-path))))
 
 (use-package languagetool
   :straight t
@@ -1800,8 +1807,10 @@ returned is test, otherwise it's src."
              languagetool-server-start)
   :preface
   (defvar langtool-args
-    (when-let ((ngrams (expand-file-name "ngrams-en-20150817"
-                                         langtool-installation-dir)))
+    (when-let* ((ngrams (expand-file-name
+                         langtool-ngrams-dir-name
+                         langtool-installation-dir))
+                (ngrams (and (file-exists-p ngrams) ngrams)))
       (list (concat "--languagemodel " ngrams))))
   :custom
   (languagetool-server-command
