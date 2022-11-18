@@ -1787,6 +1787,26 @@ returned is test, otherwise it's src."
   :no-require t
   :hook (java-mode . lsp))
 
+;; (use-package eglot
+;;   :straight t
+;;   :hook (clojure-mode . eglot-ensure)
+;;   :custom
+;;   (eglot-autoshutdown t)
+;;   (eglot-extend-to-xref t)
+;;   (eglot-ignored-server-capabilities
+;;    '(:documentHighlightProvider
+;;      :documentFormattingProvider
+;;      :documentRangeFormattingProvider
+;;      :documentOnTypeFormattingProvider
+;;      :documentLinkProvider
+;;      :foldingRangeProvider)))
+
+;; (use-package jarchive
+;;   :straight t
+;;   :after eglot
+;;   :config
+;;   (jarchive-setup))
+
 (use-package jdecomp
   :straight t
   :mode ("\\.class\\'" . jdecomp-mode)
@@ -1814,9 +1834,11 @@ returned is test, otherwise it's src."
              languagetool-server-start)
   :preface
   (defvar langtool-args
-    (when-let* ((ngrams (expand-file-name
-                         langtool-ngrams-dir-name
-                         langtool-installation-dir))
+    (when-let* ((ngrams (and langtool-ngrams-dir-name
+                             langtool-installation-dir
+                             (expand-file-name
+                              langtool-ngrams-dir-name
+                              langtool-installation-dir)))
                 (ngrams (and (file-exists-p ngrams) ngrams)))
       (list (concat "--languagemodel " ngrams))))
   :custom
