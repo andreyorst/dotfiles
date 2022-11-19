@@ -1699,31 +1699,87 @@ returned is test, otherwise it's src."
   :defer t
   :delight yas-minor-mode)
 
-(use-package eglot
-  :bind
-  ( :map eglot-mode-map
-    ("M-/" . xref-find-references))
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-extend-to-xref t)
-  (eglot-ignored-server-capabilities
-   '(:documentHighlightProvider
-     :documentFormattingProvider
-     :documentRangeFormattingProvider
-     :documentOnTypeFormattingProvider
-     :documentLinkProvider
-     :foldingRangeProvider)))
-
-(use-package eglot
-  :when (executable-find "clojure-lsp")
-  :hook ((clojure-mode clojurec-mode clojurescript-mode)
-         . eglot-ensure))
-
-(use-package jarchive
+(use-package lsp-mode
   :straight t
-  :after eglot
-  :config
-  (jarchive-setup))
+  :hook ((lsp-mode . lsp-diagnostics-mode)
+         (lsp-mode . lsp-completion-mode))
+  :custom
+  (lsp-keymap-prefix "C-c l")
+  (lsp-diagnostics-provider :flymake)
+  (lsp-completion-provider :none)
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-log-io nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-idle-delay 2)
+  ;; core
+  (lsp-enable-xref t)
+  (lsp-auto-configure nil)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-file-watchers nil)
+  (lsp-enable-folding nil)
+  (lsp-enable-imenu nil)
+  (lsp-enable-indentation nil)
+  (lsp-enable-links nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-suggest-server-download nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-text-document-color nil)
+  ;; completion
+  (lsp-completion-enable t)
+  (lsp-completion-enable-additional-text-edit nil)
+  (lsp-enable-snippet nil)
+  (lsp-completion-show-kind nil)
+  ;; headerline
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  ;; modeline
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-enable nil)
+  (lsp-modeline-workspace-status-enable nil)
+  (lsp-signature-doc-lines 1)
+  ;; lens
+  (lsp-lens-enable nil)
+  ;; semantic
+  (lsp-semantic-tokens-enable nil)
+  :init
+  (setq lsp-use-plists t))
+
+(use-package lsp-clojure
+  :no-require t
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . lsp))
+
+(use-package lsp-clojure
+  :demand t
+  :after lsp-mode
+  :hook (cider-mode . cider-toggle-lsp-completion-maybe)
+  :preface
+  (defun cider-toggle-lsp-completion-maybe ()
+    (lsp-completion-mode (if cider-mode -1 1))))
+
+(use-package lsp-treemacs
+  :straight t
+  :defer t
+  :custom
+  (lsp-treemacs-theme "Iconless"))
+
+(use-package lsp-java
+  :straight t
+  :demand t
+  :after lsp-mode
+  :when (and openjdk-11-path
+             (file-exists-p openjdk-11-path))
+  :custom
+  (lsp-java-java-path openjdk-11-path))
+
+(use-package lsp-java
+  :no-require t
+  :hook (java-mode . lsp))
 
 (use-package jdecomp
   :straight t
