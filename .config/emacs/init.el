@@ -1694,18 +1694,15 @@ returned is test, otherwise it's src."
     "Move point to the location of the mouse pointer."
     (mouse-set-point last-input-event)))
 
-(use-package treemacs
-  :straight t
-  :defer t
-  :custom
-  (treemacs-no-png-images t))
-
 (use-package yasnippet
   :straight t
   :defer t
   :delight yas-minor-mode)
 
 (use-package eglot
+  :bind
+  ( :map eglot-mode-map
+    ("M-/" . xref-find-references))
   :custom
   (eglot-autoshutdown t)
   (eglot-extend-to-xref t)
