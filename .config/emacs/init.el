@@ -1397,6 +1397,32 @@ means save all with no questions."
                '(project-switch-to-buffer "Switch buffer"))
   (add-to-list 'project-find-functions #'project-find-root))
 
+(use-package toggle-test
+  :straight t
+  :after (project)
+  :bind ( :map project-prefix-map
+          ("T" . tgt-toggle))
+  :custom
+  (tgt-open-in-new-window nil)
+  :preface
+  (defun tgt-local-setup (&optional spec)
+    (lambda ()
+      (when-let ((project-root (project-root (project-current))))
+        (setq-local
+         tgt-projects
+         `(((:root-dir ,project-root)
+            (:src-dirs ,(or (plist-get spec :src-dirs) "src"))
+            (:test-dirs ,(or (plist-get spec :test-dirs) "test"))
+            (:test-suffixes ,(plist-get spec :suffixes))
+            (:test-prefixes ,(plist-get spec :prefixes))))))))
+  :init
+  (dolist (hook '(clojure-mode-hook
+                  clojurec-mode-hook
+                  clojurescript-mode-hook))
+    (add-hook hook (tgt-local-setup '(:suffixes "_test"))))
+  (add-hook 'fennel-mode-hook
+            (tgt-local-setup '(:test-dirs "tests" :suffixes "-test"))))
+
 (use-package vterm
   :straight t
   :when (bound-and-true-p module-file-suffix)
