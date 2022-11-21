@@ -537,9 +537,9 @@ are defining or executing a macro."
   :defer t
   :custom
   (completion-category-overrides
-   '((buffer (styles orderless))
-     (file (styles orderless))
-     (project-file (styles orderless)))))
+   '((buffer (styles basic orderless))
+     (file (styles basic orderless))
+     (project-file (styles basic orderless)))))
 
 (use-package bindings
   :bind ( :map ctl-x-map
