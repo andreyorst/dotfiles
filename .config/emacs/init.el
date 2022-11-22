@@ -756,21 +756,18 @@ are defining or executing a macro."
     (corfu-complete)
     (corfu-quit))
   :init
-  (global-corfu-mode))
+  (global-corfu-mode 1))
 
-(use-package corfu-doc
-  :straight ( :host github
-              :repo "galeo/corfu-doc"
-              :branch "main")
-  :when (display-graphic-p)
-  :bind ( :map corfu-map
-          ("M-p" . corfu-doc-scroll-down)
-          ("M-n" . corfu-doc-scroll-up))
-  :hook (corfu-mode . corfu-doc-mode)
-  :custom
-  (corfu-doc-delay 2)
-  (corfu-doc-max-height 20)
-  (corfu-doc-max-width 84))
+(use-package corfu-popupinfo
+  :after corfu
+  :load-path "straight/repos/corfu/extensions/"
+  :bind ( :map corfu-popupinfo-map
+          ("M-p" . corfu-popupinfo-scroll-down)
+          ("M-n" . corfu-popupinfo-scroll-up))
+  :custom-face
+  (corfu-popupinfo ((t :height 1.0)))
+  :config
+  (corfu-popupinfo-mode 1))
 
 (use-package popon
   :straight ( :type git
