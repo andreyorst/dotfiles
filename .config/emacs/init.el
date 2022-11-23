@@ -1131,6 +1131,7 @@ File name is updated to include the same date and current title."
   (cider-connection-message-fn #'cider-random-tip)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   :config
+  (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   (defun cider-disable-linting ()
     "Disable linting integrations for current buffer."
     (when (bound-and-true-p flycheck-mode)
