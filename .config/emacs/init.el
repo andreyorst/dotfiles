@@ -689,6 +689,7 @@ are defining or executing a macro."
 
 (use-package vertico
   :straight t
+  :load-path "straight/repos/vertico/extensions/"
   :bind ( :map vertico-map
           ("M-RET" . vertico-exit-input))
   :init
@@ -696,7 +697,6 @@ are defining or executing a macro."
 
 (use-package vertico-directory
   :after vertico
-  :load-path "straight/repos/vertico/extensions/"
   :bind ( :map vertico-map
           ("RET" . vertico-directory-enter)
           ("DEL" . vertico-directory-delete-char)
@@ -730,6 +730,7 @@ are defining or executing a macro."
   :straight ( :host github
               :repo "minad/corfu"
               :branch "main")
+  :load-path "straight/repos/corfu/extensions/"
   :bind ( :map corfu-map
           ("TAB" . corfu-next)
           ([tab] . corfu-next)
@@ -759,15 +760,12 @@ are defining or executing a macro."
   (global-corfu-mode 1))
 
 (use-package corfu-popupinfo
-  :after corfu
-  :load-path "straight/repos/corfu/extensions/"
   :bind ( :map corfu-popupinfo-map
           ("M-p" . corfu-popupinfo-scroll-down)
           ("M-n" . corfu-popupinfo-scroll-up))
+  :hook (corfu-mode . corfu-popupinfo-mode)
   :custom-face
-  (corfu-popupinfo ((t :height 1.0)))
-  :config
-  (corfu-popupinfo-mode 1))
+  (corfu-popupinfo ((t :height 1.0))))
 
 (use-package popon
   :straight ( :type git
