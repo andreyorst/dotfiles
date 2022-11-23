@@ -1405,7 +1405,8 @@ means save all with no questions."
   :preface
   (defun tgt-local-setup (&optional spec)
     (lambda ()
-      (when-let ((project-root (project-root (project-current))))
+      (when-let* ((root (project-current))
+                  (project-root (project-root root)))
         (setq-local
          tgt-projects
          `(((:root-dir ,project-root)
