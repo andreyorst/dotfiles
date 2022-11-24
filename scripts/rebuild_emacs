@@ -8,6 +8,7 @@ cd ~/Git/emacs && \
            --with-native-compilation=aot \
            --with-pgtk \
            --with-mailutils \
+           --with-tree-sitter=ifavailable \
            --prefix="$HOME"/.local \
     && make -j$(($(nproc)/2)) \
     && make uninstall \
