@@ -1586,7 +1586,7 @@ returned is test, otherwise it's src."
                     "src")))
         (message "%S" (cons filename dir))
         (cons filename dir))))
-  :config
+  :init
   (when (fboundp #'ansi-color-compilation-filter)
     (add-hook 'compilation-filter #'ansi-color-compilation-filter))
   (compile-add-error-syntax
