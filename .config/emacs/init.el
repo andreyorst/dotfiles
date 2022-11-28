@@ -1148,6 +1148,11 @@ File name is updated to include the same date and current title."
    'org-babel-load-languages
    '((clojure . t))))
 
+(use-package ob-clojure
+  :after (org cider)
+  :custom
+  (org-babel-clojure-backend 'cider))
+
 (use-package clj-refactor
   :straight t
   :delight clj-refactor-mode
