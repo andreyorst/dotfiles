@@ -28,6 +28,7 @@
         cider-repl-newline-and-indent
         cljr-slash
         comment-line
+        common-lisp-modes-indent-or-fill-sexp
         counsel-M-x
         default-indent-new-line
         delete-indentation
