@@ -214,6 +214,7 @@ Bindings will be enabled next time region is highlighted."
   :preface
   (setq-default
    indent-tabs-mode nil
+   load-prefer-newer t
    truncate-lines t
    bidi-paragraph-direction 'left-to-right
    frame-title-format "Emacs"
@@ -1299,29 +1300,79 @@ File name is updated to include the same date and current title."
             (executable-find "hunspell"))
   :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
 
-(use-package smartparens
-  :straight t
-  :hook ((common-lisp-modes-mode . smartparens-strict-mode))
-  :bind ( :map common-lisp-modes-mode-map
-          (";" . sp-comment))
-  :custom
-  (sp-highlight-pair-overlay nil)
-  (sp-highlight-wrap-overlay nil)
-  (sp-highlight-wrap-tag-overlay nil)
-  (sp-echo-match-when-invisible nil)
-  :config
-  (dolist (mode '(lisp-data-mode minibuffer-mode))
-    (add-to-list 'sp-lisp-modes mode t)))
+;; (use-package smartparens
+;;   :straight t
+;;   :hook ((common-lisp-modes-mode . smartparens-strict-mode))
+;;   :bind ( :map common-lisp-modes-mode-map
+;;           (";" . sp-comment))
+;;   :custom
+;;   (sp-highlight-pair-overlay nil)
+;;   (sp-highlight-wrap-overlay nil)
+;;   (sp-highlight-wrap-tag-overlay nil)
+;;   (sp-echo-match-when-invisible nil)
+;;   :config
+;;   (dolist (mode '(lisp-data-mode minibuffer-mode))
+;;     (add-to-list 'sp-lisp-modes mode t)))
 
-(use-package smartparens-config
-  :after smartparens
-  :demand t
-  :commands (sp-use-paredit-bindings)
+;; (use-package smartparens-config
+;;   :after smartparens
+;;   :demand t
+;;   :commands (sp-use-paredit-bindings)
+;;   :config
+;;   (sp-use-paredit-bindings)
+;;   ;; needs to be set manually, because :bind section runs before
+;;   ;; :config which resets bindings with `sp-use-paredit-bindings'.
+;;   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp))
+
+(use-package puni
+  :straight t
+  :hook (common-lisp-modes-mode . puni-mode)
+  :functions (puni-soft-delete-by-move)
+  ;; paredit-like keys
+  :bind ( :map puni-mode-map
+          ;; slurping & barfing
+          ("C-<left>" . puni-barf-forward)
+          ("C-}" . puni-barf-forward)
+          ("C-<right>" . puni-slurp-forward)
+          ("C-)" . puni-slurp-forward)
+          ("C-(" . puni-slurp-backward)
+          ("C-M-<left>" . puni-slurp-backward)
+          ("C-{" . puni-barf-backward)
+          ("C-M-<right>" . puni-barf-backward)
+          ;; depth chaning
+          ("M-r" . puni-raise)
+          ("M-s" . puni-splice)
+          ("M-<up>" . puni-splice-killing-backward)
+          ("M-<down>" . puni-splice-killing-forward)
+          ("M-(" . puni-wrap-round)
+          ("M-?" . puni-convolute)
+          ("M-S" . puni-split))
+  :preface
+  (defun puni-splice-killing-backward ()
+    "Splice the list the point is on by removing its delimiters, and
+also kill all S-expressions before the point in the current list."
+    (interactive)
+    (puni-soft-delete-by-move
+     #'puni-beginning-of-list-around-point)
+    (puni-splice))
+  (defun puni-splice-killing-forward ()
+    "Splice the list the point is on by removing its delimiters, and
+also kill all S-expressions after the point in the current list."
+    (interactive)
+    (puni-soft-delete-by-move
+     #'puni-end-of-list-around-point)
+    (puni-splice))
+  (autoload #'insert-parentheses "lisp")
+  (defun puni-wrap-round (&optional n)
+    (interactive "P")
+    (insert-parentheses (if n n 1)))
   :config
-  (sp-use-paredit-bindings)
-  ;; needs to be set manually, because :bind section runs before
-  ;; :config which resets bindings with `sp-use-paredit-bindings'.
-  (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp))
+  (define-advice puni-kill-line (:before (&rest _))
+    (when (looking-back "^[[:space:]]*")
+      (back-to-indentation))))
+
+(use-package elec-pair
+  :hook (common-lisp-modes-mode . electric-pair-mode))
 
 (use-package vundo
   :straight ( :host github
