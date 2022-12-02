@@ -1330,6 +1330,8 @@ File name is updated to include the same date and current title."
   :functions (puni-soft-delete-by-move)
   ;; paredit-like keys
   :bind ( :map puni-mode-map
+          ("C-M-f" . puni-forward-sexp-or-syntactic-forward)
+          ("C-M-b" . puni-backward-sexp-or-syntactic-backward)
           ;; slurping & barfing
           ("C-<left>" . puni-barf-forward)
           ("C-}" . puni-barf-forward)
@@ -1362,12 +1364,41 @@ also kill all S-expressions after the point in the current list."
     (puni-soft-delete-by-move
      #'puni-end-of-list-around-point)
     (puni-splice))
+  (defun puni-forward-sexp-or-syntactic-forward (&optional n)
+    "Go forward a sexp.
+This is the same as `puni-strict-forward-sexp', except that it
+jumps forward consecutive single-line comments, and will go over
+syntactic boundaries.
+
+With prefix argument N, go forward that many sexps.  Negative
+argument means go backward."
+    (interactive "^p")
+    (setq n (or n 1))
+    (if (< n 0) (puni-backward-sexp-or-syntactic-backward (- n))
+      (dotimes (_ n)
+        (or (puni-strict-forward-sexp 'skip-single-line-comments)
+            (puni-syntactic-forward-punct)))))
+  (defun puni-backward-sexp-or-syntactic-backward (&optional n)
+    "Go backward a sexp.
+This is the same as `puni-strict-backward-sexp', except that it
+jumps backward consecutive single-line comments, and will go over
+syntactic boundaries.
+
+With prefix argument N, go backward that many sexps.  Negative
+argument means go forward."
+    (interactive "^p")
+    (setq n (or n 1))
+    (if (< n 0) (puni-forward-sexp (- n))
+      (dotimes (_ n)
+        (or (puni-strict-backward-sexp 'skip-single-line-comments)
+            (puni-syntactic-backward-punct)))))
   (autoload #'insert-parentheses "lisp")
   (defun puni-wrap-round (&optional n)
     (interactive "P")
     (insert-parentheses (if n n 1)))
   :config
   (define-advice puni-kill-line (:before (&rest _))
+    "Go back to indentation before killing the line if it makes sense to."
     (when (looking-back "^[[:space:]]*")
       (back-to-indentation))))
 
