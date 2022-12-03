@@ -1300,30 +1300,6 @@ File name is updated to include the same date and current title."
             (executable-find "hunspell"))
   :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
 
-;; (use-package smartparens
-;;   :straight t
-;;   :hook ((common-lisp-modes-mode . smartparens-strict-mode))
-;;   :bind ( :map common-lisp-modes-mode-map
-;;           (";" . sp-comment))
-;;   :custom
-;;   (sp-highlight-pair-overlay nil)
-;;   (sp-highlight-wrap-overlay nil)
-;;   (sp-highlight-wrap-tag-overlay nil)
-;;   (sp-echo-match-when-invisible nil)
-;;   :config
-;;   (dolist (mode '(lisp-data-mode minibuffer-mode))
-;;     (add-to-list 'sp-lisp-modes mode t)))
-
-;; (use-package smartparens-config
-;;   :after smartparens
-;;   :demand t
-;;   :commands (sp-use-paredit-bindings)
-;;   :config
-;;   (sp-use-paredit-bindings)
-;;   ;; needs to be set manually, because :bind section runs before
-;;   ;; :config which resets bindings with `sp-use-paredit-bindings'.
-;;   (define-key smartparens-mode-map (kbd "M-r") 'sp-rewrap-sexp))
-
 (use-package puni
   :straight t
   :hook (common-lisp-modes-mode . puni-mode)
