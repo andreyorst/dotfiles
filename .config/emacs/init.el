@@ -175,8 +175,15 @@ lisp-modes mode.
   :bind ( :map region-bindings-mode-map
           ("q" . region-bindings-disable)
           ("r" . replace-string)
-          ("R" . replace-regexp))
+          ("R" . replace-regexp)
+          ("\"" . region-bindings-doublequote))
   :preface
+  (defun region-bindings-doublequote ()
+    "Doublequote active region, escaping strings if needed."
+    (interactive)
+    (let ((s (buffer-substring-no-properties (point) (mark))))
+      (delete-region (point) (mark))
+      (insert (format "%S" s))))
   (define-minor-mode region-bindings-mode
     "Minor mode for mapping commands while region is active.
 
@@ -1326,7 +1333,12 @@ File name is updated to include the same date and current title."
           ("M-[" . puni-wrap-square)
           ("M-{" . puni-wrap-curly)
           ("M-?" . puni-convolute)
-          ("M-S" . puni-split))
+          ("M-S" . puni-split)
+          :map region-bindings-mode-map
+          ("(" . puni-wrap-round)
+          ("[" . puni-wrap-square)
+          ("{" . puni-wrap-curly)
+          ("<" . puni-wrap-angle))
   :config
   (define-advice puni-kill-line (:before (&rest _))
     "Go back to indentation before killing the line if it makes sense to."
