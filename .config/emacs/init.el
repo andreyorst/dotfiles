@@ -1323,6 +1323,8 @@ File name is updated to include the same date and current title."
           ("M-<up>" . puni-splice-killing-backward)
           ("M-<down>" . puni-splice-killing-forward)
           ("M-(" . puni-wrap-round)
+          ("M-[" . puni-wrap-square)
+          ("M-{" . puni-wrap-curly)
           ("M-?" . puni-convolute)
           ("M-S" . puni-split))
   :config
