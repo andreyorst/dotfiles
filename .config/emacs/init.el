@@ -1302,7 +1302,8 @@ File name is updated to include the same date and current title."
 
 (use-package puni
   :straight t
-  :hook (common-lisp-modes-mode . puni-mode)
+  :hook (((common-lisp-modes-mode nxml-mode) . puni-mode)
+         (puni-mode . electric-pair-mode))
   ;; paredit-like keys
   :bind ( :map puni-mode-map
           ("C-M-f" . puni-forward-sexp-or-up-list)
@@ -1329,9 +1330,6 @@ File name is updated to include the same date and current title."
     "Go back to indentation before killing the line if it makes sense to."
     (when (looking-back "^[[:space:]]*")
       (back-to-indentation))))
-
-(use-package elec-pair
-  :hook (common-lisp-modes-mode . electric-pair-mode))
 
 (use-package vundo
   :straight ( :host github
