@@ -1315,6 +1315,7 @@ File name is updated to include the same date and current title."
   :bind ( :map puni-mode-map
           ("C-M-f" . puni-forward-sexp-or-up-list)
           ("C-M-b" . puni-backward-sexp-or-up-list)
+          ("C-M-t" . puni-transpose)
           ;; slurping & barfing
           ("C-<left>" . puni-barf-forward)
           ("C-}" . puni-barf-forward)
