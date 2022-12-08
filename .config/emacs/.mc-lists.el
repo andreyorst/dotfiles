@@ -86,6 +86,10 @@
         parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        puni-backward-delete-char
+        puni-backward-sexp-or-up-list
+        puni-forward-delete-char
+        puni-forward-kill-word
         region-bindings-disable
         save-some-buffers
         sp-backward-delete-char
