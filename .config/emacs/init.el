@@ -1330,7 +1330,9 @@ File name is updated to include the same date and current title."
   (define-advice puni-kill-line (:before (&rest _))
     "Go back to indentation before killing the line if it makes sense to."
     (when (looking-back "^[[:space:]]*")
-      (back-to-indentation))))
+      (if (bound-and-true-p indent-line-function)
+          (funcall indent-line-function)
+        (back-to-indentation)))))
 
 (use-package vundo
   :straight ( :host github
@@ -1793,7 +1795,7 @@ returned is test, otherwise it's src."
   :hook (cider-mode . cider-toggle-lsp-completion-maybe)
   :preface
   (defun cider-toggle-lsp-completion-maybe ()
-    (lsp-completion-mode (if (bound-and-true-p 'cider-mode) -1 1))))
+    (lsp-completion-mode (if (bound-and-true-p cider-mode) -1 1))))
 
 (use-package lsp-treemacs
   :straight t
