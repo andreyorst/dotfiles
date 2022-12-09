@@ -89,7 +89,7 @@
         puni-backward-delete-char
         puni-backward-sexp-or-up-list
         puni-forward-delete-char
-        puni-forward-kill-word
+        puni-forward-sexp-or-up-list
         region-bindings-disable
         save-some-buffers
         sp-backward-delete-char
