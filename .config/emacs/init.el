@@ -5,12 +5,11 @@
 ;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
-;; Emacs config.
+;; Emacs 29+ config.
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'use-package))
+(use-package straight)
 
 (use-package delight :straight t)
 
@@ -217,7 +216,6 @@ Bindings will be enabled next time region is highlighted."
 
 (use-package defaults
   :defer t
-  :hook (focus-out . garbage-collect)
   :preface
   (setq-default
    indent-tabs-mode nil
@@ -245,6 +243,10 @@ Bindings will be enabled next time region is highlighted."
    enable-recursive-minibuffers t)
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
+  (defun focus-out-collect-garbage ()
+    (unless (frame-focus-state)
+      (garbage-collect)))
+  (add-function :after after-focus-change-function 'focus-out-collect-garbage)
   (provide 'defaults))
 
 (use-package messages
@@ -1057,22 +1059,6 @@ File name is updated to include the same date and current title."
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1)))
 
-(use-package fennel-mode
-  :no-require t
-  :after (smartparens-config fennel-mode)
-  :config
-  (defvar fennel-modes
-    '(fennel-mode fennel-repl-mode)
-    "List of Fennel-related modes")
-  (sp-with-modes fennel-modes
-    (sp-local-pair "`" "`"
-                   :when '(sp-in-string-p sp-in-comment-p)
-                   :unless '(sp-lisp-invalid-hyperlink-p)))
-  (defvar fennel-prefix "\\(?:[@`'#~,_?^]+\\)"
-    "Prefix used in `sp-sexp-prefix' for Fennel modes.")
-  (dolist (mode fennel-modes)
-    (add-to-list 'sp-sexp-prefix `(,mode regexp ,fennel-prefix))))
-
 (use-package ob-fennel
   :straight ( :host gitlab
               :repo "andreyorst/ob-fennel"
@@ -1807,7 +1793,7 @@ returned is test, otherwise it's src."
   :hook (cider-mode . cider-toggle-lsp-completion-maybe)
   :preface
   (defun cider-toggle-lsp-completion-maybe ()
-    (lsp-completion-mode (if cider-mode -1 1))))
+    (lsp-completion-mode (if (bound-and-true-p 'cider-mode) -1 1))))
 
 (use-package lsp-treemacs
   :straight t
@@ -1872,6 +1858,7 @@ returned is test, otherwise it's src."
   :defer t
   :custom
   (erc-hide-list '("JOIN" "PART" "QUIT"))
+  :commands (erc-compute-server)
   :preface
   (defcustom erc-tunnel-conf nil
     "Connection spec for IRC server behind an SSH tunnel.
@@ -1999,6 +1986,7 @@ the generated command."
                       (funcall fn))
         (funcall fn))))
   :config
+  (defvar mu4e-contexts)
   (when (load (expand-file-name "mail-contexts.el" user-emacs-directory) 'noerror)
     (setq mu4e-contexts (mapcar #'make-context mail-contexts)
           user-mail-address (plist-get (car mail-contexts) :address)

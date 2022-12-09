@@ -71,8 +71,5 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(require 'straight)
-(straight-use-package 'use-package)
-
 (provide 'early-init)
 ;;; early-init.el ends here
