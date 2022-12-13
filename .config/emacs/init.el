@@ -402,6 +402,28 @@ applied to the name.")
     (unless (file-exists-p auto-save-dir)
       (make-directory auto-save-dir t))))
 
+(use-package files
+  :preface
+  (defvar backup-dir
+    (expand-file-name ".cache/backups" user-emacs-directory)
+    "Directory to store backups.")
+  (defvar auto-save-dir
+    (expand-file-name ".cache/auto-save/" user-emacs-directory)
+    "Directory to store auto-save files.")
+  :custom
+  (backup-by-copying t)
+  (create-lockfiles nil)
+  (backup-directory-alist
+   `(("." . ,backup-dir)))
+  (auto-save-file-name-transforms
+   `((".*" ,auto-save-dir t)))
+  (auto-save-no-message t)
+  (auto-save-interval 100)
+  (require-final-newline t)
+  :config
+  (unless (file-exists-p auto-save-dir)
+    (make-directory auto-save-dir t)))
+
 (use-package subr
   :no-require t
   :init
