@@ -525,6 +525,7 @@ Based on `so-long-detected-long-line-p'."
   (blink-matching-delay 0)
   (blink-matching-paren t)
   (copy-region-blink-delay 0)
+  (shell-command-default-error-buffer "*Shell Command Errors*")
   :config
   (defun overwrite-mode-set-cursor-shape ()
     (when (display-graphic-p)
@@ -1624,6 +1625,14 @@ returned is test, otherwise it's src."
   (when (fboundp #'ansi-color-compilation-filter)
     (add-hook 'compilation-filter #'ansi-color-compilation-filter))
   (compile-add-error-syntax
+   'clj-kondo-warning
+   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): warning"
+   1 2 3 1)
+  (compile-add-error-syntax
+   'clj-kondo-error
+   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): error"
+   1 2 3)
+  (compile-add-error-syntax
    'kaocha-tap
    "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
    (compile-clojure-filename-fn "(\\([^(:]*\\):[0-9]*)")
@@ -1638,6 +1647,12 @@ returned is test, otherwise it's src."
    "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
    (compile-clojure-filename-fn
     "^Reflection warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
+   2 3)
+  (compile-add-error-syntax
+   'clojure-performance-warning
+   "^Performance warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
+   (compile-clojure-filename-fn
+    "^Performance warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
    2 3)
   (compile-add-error-syntax
    'clojure-syntax-error
