@@ -3,14 +3,6 @@
 
 (setq mc/cmds-to-run-for-all
       '(
-        aorst/downcase-region-or-word
-        aorst/exchange-point-and-mark
-        aorst/kill-region-or-word
-        aorst/newline-above
-        aorst/newline-below
-        aorst/paredit-kill-word
-        aorst/split-pararagraph-into-lines
-        aorst/upcase-region-or-word
         backward-sexp
         beginning-of-buffer
         c-electric-brace
@@ -51,8 +43,6 @@
         markdown-outdent-or-delete
         mc/vertical-align-with-space
         message-beginning-of-line
-        my/select-line
-        my/smart-move-beginning-of-line
         nxml-electric-slash
         org-beginning-of-line
         org-ctrl-c-ctrl-c
@@ -92,7 +82,9 @@
         puni-forward-kill-word
         puni-forward-sexp-or-up-list
         puni-kill-line
+        puni-kill-active-region
         puni-splice-killing-backward
+        puni-transpose
         puni-wrap-round
         region-bindings-disable
         save-some-buffers
@@ -123,9 +115,6 @@
 
 (setq mc/cmds-to-run-once
       '(
-        aorst/treemacs-expand-all-projects
-        aorst/vterm-focus
-        aorst/vterm-toggle
         cider-debug-mode-send-reply
         cider-repl-previous-input
         cider-repl-return
