@@ -1620,10 +1620,11 @@ returned is test, otherwise it's src."
                       "test"
                     "src")))
         (message "%S" (cons filename dir))
-        (cons filename dir))))
+        (cons filename dir)))))
+
+(use-package compile
+  :after compile
   :config
-  (when (fboundp #'ansi-color-compilation-filter)
-    (add-hook 'compilation-filter #'ansi-color-compilation-filter))
   (compile-add-error-syntax
    'clj-kondo-warning
    "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): warning"
