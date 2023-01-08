@@ -5,7 +5,7 @@
 ;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
-;; Emacs early initialization configuration.
+;; Emacs 29+ early initialization configuration.
 
 ;;; Code:
 
@@ -23,7 +23,7 @@
                        (tool-bar-lines . 0)
                        (bottom-divider-width . 0)
                        (right-divider-width . 1))
- initial-frame-alist initial-frame-alist
+ initial-frame-alist default-frame-alist
  frame-inhibit-implied-resize t
  x-gtk-resize-child-frames 'resize-mode
  fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
@@ -45,10 +45,10 @@
     (scroll-bar-mode -1)))
 
 (when (featurep 'native-compile)
-  (defvar native-comp-deferred-compilation)
-  (setq native-comp-deferred-compilation t)
+  (defvar inhibit-automatic-native-compilation)
+  (setq inhibit-automatic-native-compilation nil)
   (defvar native-comp-async-report-warnings-errors)
-  (setq native-comp-async-report-warnings-errors nil))
+  (setq native-comp-async-report-warnings-errors 'silent))
 
 ;;; Straight
 

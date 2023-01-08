@@ -5,7 +5,7 @@
 ;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
-;; Emacs 29+ config.
+;; Emacs 29+ configuration.
 
 ;;; Code:
 
@@ -1778,6 +1778,10 @@ returned is test, otherwise it's src."
 (use-package phi-search
   :straight t
   :defer t)
+
+(use-package avy
+  :straight t
+  :bind (("C-:" . avy-goto-char-2)))
 
 (use-package profiler
   :straight t
