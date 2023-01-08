@@ -81,8 +81,8 @@
         puni-forward-delete-char
         puni-forward-kill-word
         puni-forward-sexp-or-up-list
-        puni-kill-line
         puni-kill-active-region
+        puni-kill-line
         puni-splice-killing-backward
         puni-transpose
         puni-wrap-round
@@ -146,6 +146,7 @@
         magit-refresh-all
         magit-stage
         mark-whole-buffer
+        mc--insert-number-and-increase
         mc/mark-all-in-region-regexp
         minions-minor-modes-menu
         mouse-drag-mode-line
