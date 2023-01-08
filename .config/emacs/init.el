@@ -9,6 +9,9 @@
 
 ;;; Code:
 
+(unless (featurep 'early-init)
+  (load-file (expand-file-name "early-init.el" user-emacs-directory)))
+
 (use-package straight)
 
 (use-package delight :straight t)
