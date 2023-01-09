@@ -1419,6 +1419,12 @@ File name is updated to include the same date and current title."
     "Files or directories that indicate the root of a project."
     :type '(repeat string)
     :group 'project)
+  (defcustom project-compilation-mode nil
+    "Mode to run the `compile' command with."
+    :type 'symbol
+    :group 'project
+    :safe #'symbolp
+    :local t)
   (defun project-root-p (path)
     "Check if the current PATH has any of the project root markers."
     (catch 'found
@@ -1438,6 +1444,20 @@ means save all with no questions."
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (funcall-interactively #'save-some-buffers arg pred)))
+  (define-advice compile (:filter-args (args) use-project-compilation-mode)
+    (let ((cmd (car args))
+          (mode (cadr args))
+          (rest (cddr args)))
+      (if (and (null mode) project-compilation-mode)
+          (append (list cmd project-compilation-mode) rest)
+        args)))
+  (define-advice compilation-start (:filter-args (args) use-project-compilation-mode)
+    (let ((cmd (car args))
+          (mode (cadr args))
+          (rest (cddr args)))
+      (if (and (null mode) project-compilation-mode)
+          (append (list cmd project-compilation-mode) rest)
+        args)))
   (define-advice project-compile (:around (fn) save-project-buffers)
     "Only ask to save project-related buffers."
     (defvar compilation-save-buffers-predicate)
@@ -1624,18 +1644,36 @@ the prefix argument is supplied."
   (compilation-filter . ansi-color-compilation-filter)
   :custom
   (compilation-scroll-output 'first-error)
-  (compilation-error-regexp-alist nil)
   :preface
-  (defun compile-add-error-syntax (name regexp file line &optional col level)
+  (cl-defun compile-add-error-syntax (mode name regexp &key file line col (level 'error))
     "Register new compilation error syntax.
 
 Add NAME symbol to `compilation-error-regexp-alist', and then add
 REGEXP FILE LINE and optional COL LEVEL info to
 `compilation-error-regexp-alist-alist'."
-    (add-to-list 'compilation-error-regexp-alist name)
-    (add-to-list 'compilation-error-regexp-alist-alist
-                 (list name regexp file line col level)))
-  (defun compile-clojure-filename-fn (regexp)
+    (or file (error "missing value for :file keyword"))
+    (or line (error "missing value for :line keyword"))
+    (let ((level (cond ((eq level 'info) 0)
+                       ((eq level 'warn) 1)
+                       ((eq level 'error) 2)
+                       (t (error "unsupported level type" level))))
+          (mode (symbol-name (or mode 'compilation))))
+
+      (add-to-list (intern (concat mode "-error-regexp-alist")) name)
+      (add-to-list (intern (concat mode "-error-regexp-alist-alist"))
+                   (list name regexp file line col level)))))
+
+(use-package clojure-compilation-mode
+  :preface
+  (defvar clojure-compilation-error-regexp-alist nil)
+  (defvar clojure-compilation-error-regexp-alist-alist nil)
+  (define-derived-mode clojure-compilation-mode compilation-mode "Clojure(Script) Compilation"
+    "Compilation mode for Clojure output."
+    (setq-local compilation-error-regexp-alist
+                clojure-compilation-error-regexp-alist)
+    (setq-local compilation-error-regexp-alist-alist
+                clojure-compilation-error-regexp-alist-alist))
+  (defun clojure-compilation-filename-fn (regexp)
     "Create a function that gets filename from the error message.
 
 REGEX is a regular expression to extract filename from first
@@ -1651,59 +1689,83 @@ returned is test, otherwise it's src."
              (dir (if (string-suffix-p "_test.clj" filename)
                       "test"
                     "src")))
-        (message "%S" (cons filename dir))
-        (cons filename dir)))))
-
-(use-package compile
-  :after compile
+        (cons filename dir))))
+  (provide 'clojure-compilation-mode)
   :config
   (compile-add-error-syntax
+   'clojure-compilation
    'clj-kondo-warning
    "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): warning"
-   1 2 3 1)
+   :file 1 :line 2 :col 3 :level 'warn)
   (compile-add-error-syntax
+   'clojure-compilation
    'clj-kondo-error
    "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): error"
-   1 2 3)
+   :file 1 :line 2 :col 3)
   (compile-add-error-syntax
+   'clojure-compilation
    'kaocha-tap
    "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
-   (compile-clojure-filename-fn "(\\([^(:]*\\):[0-9]*)")
-   2)
+   :file (clojure-compilation-filename-fn "(\\([^(:]*\\):[0-9]*)")
+   :line 2)
   (compile-add-error-syntax
+   'clojure-compilation
    'clojure-fail
    ".*\\(?:FAIL\\|ERROR\\) in.*(\\([^:]*\\):\\([0-9]*\\))$"
-   (compile-clojure-filename-fn "(\\([^:]*\\):[0-9]*)")
-   2)
+   :file (clojure-compilation-filename-fn "(\\([^:]*\\):[0-9]*)")
+   :line 2)
   (compile-add-error-syntax
+   'clojure-compilation
    'clojure-reflection-warning
    "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
-   (compile-clojure-filename-fn
-    "^Reflection warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
-   2 3)
+   :file (clojure-compilation-filename-fn
+          "^Reflection warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
+   :line 2 :col 3
+   :level 'warn)
   (compile-add-error-syntax
+   'clojure-compilation
    'clojure-performance-warning
    "^Performance warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
-   (compile-clojure-filename-fn
-    "^Performance warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
-   2 3)
+   :file (clojure-compilation-filename-fn
+          "^Performance warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
+   :line 2 :col 3
+   :level 'warn)
   (compile-add-error-syntax
+   'clojure-compilation
    'clojure-syntax-error
    "^Syntax error .* at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\))\.$"
-   (compile-clojure-filename-fn "(\\([^:]+\\):[0-9]+:[0-9]+)")
-   2 3)
+   :file (clojure-compilation-filename-fn "(\\([^:]+\\):[0-9]+:[0-9]+)")
+   :line 2 :col 3)
   (compile-add-error-syntax
+   'clojure-compilation
    'kaocha-unit-error
    "^ERROR in unit (\\([^:]+\\):\\([0-9]+\\))$"
-   (compile-clojure-filename-fn "(\\([^:]+\\):[0-9]+)")
-   2)
-  (compile-add-error-syntax 'lua-stacktrace
-                            "\\(?:^[[:space:]]+\\([^
+   :file (clojure-compilation-filename-fn "(\\([^:]+\\):[0-9]+)")
+   :line 2))
+
+(use-package fennel-compilation-mode
+  :preface
+  (defvar fennel-compilation-error-regexp-alist nil)
+  (defvar fennel-compilation-error-regexp-alist-alist nil)
+  (define-derived-mode fennel-compilation-mode compilation-mode "Clojure(Script) Compilation"
+    "Compilation mode for Fennel output."
+    (setq-local compilation-error-regexp-alist
+                fennel-compilation-error-regexp-alist)
+    (setq-local compilation-error-regexp-alist-alist
+                fennel-compilation-error-regexp-alist-alist))
+  (provide 'fennel-compilation-mode)
+  :config
+  (compile-add-error-syntax
+   'fennel-compilation
+   'fennel-compile-error
+   "^\\(?:Compile error in \\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\)?\\)$"
+   :file 1 :line 2 :col 3)
+  (compile-add-error-syntax
+   'fennel-compilation
+   'lua-stacktrace
+   "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
-                            1 2)
-  (compile-add-error-syntax 'fennel-compile-error
-                            "^\\(?:Compile error in \\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\)?\\)$"
-                            1 2 3))
+   :file 1 :line 2))
 
 (use-package isearch
   :bind ( :map isearch-mode-map
