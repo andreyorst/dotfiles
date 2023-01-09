@@ -1,3 +1,5 @@
+[core]
+	attributesfile = ~/.gitattributes.global
 [alias]
 	clean-all = clean -xdf
 	st = status
@@ -20,3 +22,9 @@
 	path = .gitconfig.local
 [init]
 	defaultBranch = main
+[diff "lisp"]
+	xfuncname = "^(\\((def\\S+|let)\\s+\\S+)"
+[diff "elisp"]
+	xfuncname = "^(\\((def\\S+|use-package)\\s+\\S+)"
+[diff "fennel"]
+	xfuncname = "^(\\(fn\\S+\\s+\\S+)"
