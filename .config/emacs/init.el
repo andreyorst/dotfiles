@@ -1444,13 +1444,6 @@ means save all with no questions."
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (funcall-interactively #'save-some-buffers arg pred)))
-  (define-advice compile (:filter-args (args) use-project-compilation-mode)
-    (let ((cmd (car args))
-          (mode (cadr args))
-          (rest (cddr args)))
-      (if (and (null mode) project-compilation-mode)
-          (append (list cmd project-compilation-mode) rest)
-        args)))
   (define-advice compilation-start (:filter-args (args) use-project-compilation-mode)
     (let ((cmd (car args))
           (mode (cadr args))
@@ -1458,20 +1451,22 @@ means save all with no questions."
       (if (and (null mode) project-compilation-mode)
           (append (list cmd project-compilation-mode) rest)
         args)))
-  (define-advice project-compile (:around (fn) save-project-buffers)
+  (defun project-make-predicate-buffer-in-project-p ()
+    (let ((project-buffers (project-buffers (project-current))))
+      (lambda () (memq (current-buffer) project-buffers))))
+  (define-advice project-compile (:around (fn) save-project-buffers-only)
     "Only ask to save project-related buffers."
     (defvar compilation-save-buffers-predicate)
-    (let* ((project-buffers (project-buffers (project-current)))
-           (compilation-save-buffers-predicate
-            (lambda () (memq (current-buffer) project-buffers))))
+    (let ((compilation-save-buffers-predicate
+           (project-make-predicate-buffer-in-project-p)))
       (funcall fn)))
-  (define-advice recompile (:around (fn &optional edit-command) save-project-buffers)
+  (define-advice recompile (:around (fn &optional edit-command) save-project-buffers-only)
     "Only ask to save project-related buffers if inside of a project."
-    (if (project-current)
-        (let* ((project-buffers (project-buffers (project-current)))
-               (compilation-save-buffers-predicate
-                (lambda () (memq (current-buffer) project-buffers))))
-          (funcall fn edit-command))
+    (defvar compilation-save-buffers-predicate)
+    (let ((compilation-save-buffers-predicate
+           (if (project-current)
+               (project-make-predicate-buffer-in-project-p)
+             compilation-save-buffers-predicate)))
       (funcall fn edit-command)))
   :config
   (add-to-list 'project-switch-commands
