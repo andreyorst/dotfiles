@@ -1372,7 +1372,6 @@ File name is updated to include the same date and current title."
           ("M-<up>" . puni-splice-killing-backward)
           ("M-<down>" . puni-splice-killing-forward)
           ("M-(" . puni-wrap-round)
-          ("M-[" . puni-wrap-square)
           ("M-{" . puni-wrap-curly)
           ("M-?" . puni-convolute)
           ("M-S" . puni-split)
@@ -1388,6 +1387,12 @@ File name is updated to include the same date and current title."
       (if (bound-and-true-p indent-line-function)
           (funcall indent-line-function)
         (back-to-indentation)))))
+
+(use-package puni
+  :when window-system
+  :bind ( :map puni-mode-map
+          ;; doesn't work in terminal
+          ("M-[" . puni-wrap-square)))
 
 (use-package vundo
   :straight ( :host github
