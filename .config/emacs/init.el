@@ -1660,14 +1660,23 @@ REGEXP FILE LINE and optional COL LEVEL info to
 
 (use-package clojure-compilation-mode
   :preface
-  (defvar clojure-compilation-error-regexp-alist nil)
-  (defvar clojure-compilation-error-regexp-alist-alist nil)
+  (defvar clojure-compilation-error-regexp-alist nil
+    "Alist that specifies how to match errors in Clojure compiler output.
+See `compilation-error-regexp-alist' for more information.")
+  (defvar clojure-compilation-error-regexp-alist-alist nil
+    "Alist of values for `clojure-compilation-error-regexp-alist'.")
+  (defvar-local clojure-compilation-project nil
+    "Current root of the project being compiled.")
+  (defvar-local clojure-compilation-project-files nil
+    "Current list of files belonging to the project being compiled.")
   (define-derived-mode clojure-compilation-mode compilation-mode "Clojure(Script) Compilation"
     "Compilation mode for Clojure output."
     (setq-local compilation-error-regexp-alist
                 clojure-compilation-error-regexp-alist)
     (setq-local compilation-error-regexp-alist-alist
-                clojure-compilation-error-regexp-alist-alist))
+                clojure-compilation-error-regexp-alist-alist)
+    (setq-local clojure-compilation-project (project-current t))
+    (setq-local clojure-compilation-project-files (project-files clojure-compilation-project)))
   (defun clojure-compilation-filename-fn (regexp)
     "Create a function that gets filename from the error message.
 
@@ -1740,9 +1749,12 @@ returned is test, otherwise it's src."
 
 (use-package fennel-compilation-mode
   :preface
-  (defvar fennel-compilation-error-regexp-alist nil)
-  (defvar fennel-compilation-error-regexp-alist-alist nil)
-  (define-derived-mode fennel-compilation-mode compilation-mode "Clojure(Script) Compilation"
+  (defvar fennel-compilation-error-regexp-alist nil
+    "Alist that specifies how to match errors in Clojure compiler output.
+See `compilation-error-regexp-alist' for more information.")
+  (defvar fennel-compilation-error-regexp-alist-alist nil
+    "Alist of values for `clojure-compilation-error-regexp-alist'.")
+  (define-derived-mode fennel-compilation-mode compilation-mode "Fennel Compilation"
     "Compilation mode for Fennel output."
     (setq-local compilation-error-regexp-alist
                 fennel-compilation-error-regexp-alist)
