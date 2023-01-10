@@ -1684,16 +1684,19 @@ See `compilation-error-regexp-alist' for more information.")
                 clojure-compilation-error-regexp-alist-alist)
     (setq-local clojure-compilation-project (project-current t))
     (setq-local clojure-compilation-project-files (project-files clojure-compilation-project)))
-  (defun clojure-compilation-filename-fn (regexp)
+  (defun clojure-compilation-filename-fn (rule-name)
     "Create a function that gets filename from the error message.
 
-REGEX is a regular expression to extract filename from first
-group via a backward search."
+RULE-NAME is a symbol in `clojure-compilation-error-regexp-alist-alist'.
+It is used to obtain the regular expression, which used for a
+backward search in order to extract the filename from the first
+group."
     (lambda ()
       "Get a filname from the error message and compute relative directory."
-      (let ((filename (save-match-data
-                        (re-search-backward regexp)
-                        (substring-no-properties (match-string 1)))))
+      (let* ((regexp (car (alist-get rule-name clojure-compilation-error-regexp-alist-alist)))
+             (filename (save-match-data
+                         (re-search-backward regexp)
+                         (substring-no-properties (match-string 1)))))
         (if-let ((file (seq-find
                         (lambda (s)
                           (string-suffix-p filename s))
@@ -1719,41 +1722,39 @@ group via a backward search."
    'clojure-compilation
    'kaocha-tap
    "^not ok.*(\\([^:]*\\):\\([0-9]*\\))$"
-   :file (clojure-compilation-filename-fn "(\\([^(:]*\\):[0-9]*)")
+   :file (clojure-compilation-filename-fn 'kaocha-tap)
    :line 2)
   (compile-add-error-syntax
    'clojure-compilation
    'clojure-fail
    ".*\\(?:FAIL\\|ERROR\\) in.*(\\([^:]*\\):\\([0-9]*\\))$"
-   :file (clojure-compilation-filename-fn "(\\([^:]*\\):[0-9]*)")
+   :file (clojure-compilation-filename-fn 'clojure-fail)
    :line 2)
   (compile-add-error-syntax
    'clojure-compilation
    'clojure-reflection-warning
    "^Reflection warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
-   :file (clojure-compilation-filename-fn
-          "^Reflection warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
+   :file (clojure-compilation-filename-fn 'clojure-reflection-warning)
    :line 2 :col 3
    :level 'warn)
   (compile-add-error-syntax
    'clojure-compilation
    'clojure-performance-warning
    "^Performance warning,[[:space:]]*\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\).*$"
-   :file (clojure-compilation-filename-fn
-          "^Performance warning,[[:space:]]*\\([^:]+\\):[0-9]+:[0-9]+.*$")
+   :file (clojure-compilation-filename-fn 'clojure-performance-warning)
    :line 2 :col 3
    :level 'warn)
   (compile-add-error-syntax
    'clojure-compilation
    'clojure-syntax-error
    "^Syntax error .* at (\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\))\.$"
-   :file (clojure-compilation-filename-fn "(\\([^:]+\\):[0-9]+:[0-9]+)")
+   :file (clojure-compilation-filename-fn 'clojure-syntax-error)
    :line 2 :col 3)
   (compile-add-error-syntax
    'clojure-compilation
    'kaocha-unit-error
    "^ERROR in unit (\\([^:]+\\):\\([0-9]+\\))$"
-   :file (clojure-compilation-filename-fn "(\\([^:]+\\):[0-9]+)")
+   :file (clojure-compilation-filename-fn 'kaocha-unit-error)
    :line 2))
 
 (use-package fennel-compilation-mode
