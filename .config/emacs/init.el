@@ -1687,13 +1687,22 @@ group via backward search."
 
 If the filename ends with _test.clj, the relative directory
 returned is test, otherwise it's src."
-      (let* ((filename (save-match-data
-                         (re-search-backward regexp)
-                         (substring-no-properties (match-string 1))))
-             (dir (if (string-suffix-p "_test.clj" filename)
-                      "test"
-                    "src")))
-        (cons filename dir))))
+      (let ((filename (save-match-data
+                        (re-search-backward regexp)
+                        (substring-no-properties (match-string 1)))))
+        (if-let ((file (seq-find
+                        (lambda (s)
+                          (string-suffix-p filename s))
+                        clojure-compilation-project-files)))
+            (let ((dir (thread-last
+                         clojure-compilation-project
+                         project-root
+                         length
+                         (substring file)
+                         file-name-split
+                         car)))
+              (cons filename dir))
+          filename))))
   (provide 'clojure-compilation-mode)
   :config
   (compile-add-error-syntax
