@@ -1688,12 +1688,9 @@ See `compilation-error-regexp-alist' for more information.")
     "Create a function that gets filename from the error message.
 
 REGEX is a regular expression to extract filename from first
-group via backward search."
+group via a backward search."
     (lambda ()
-      "Get a filname from the error message and compute relative directory.
-
-If the filename ends with _test.clj, the relative directory
-returned is test, otherwise it's src."
+      "Get a filname from the error message and compute relative directory."
       (let ((filename (save-match-data
                         (re-search-backward regexp)
                         (substring-no-properties (match-string 1)))))
@@ -1701,13 +1698,9 @@ returned is test, otherwise it's src."
                         (lambda (s)
                           (string-suffix-p filename s))
                         clojure-compilation-project-files)))
-            (let ((dir (thread-last
-                         clojure-compilation-project
-                         project-root
-                         length
-                         (substring file)
-                         file-name-split
-                         car)))
+            (let* ((path-in-project
+                    (substring file (length (project-root clojure-compilation-project))))
+                   (dir (substring path-in-project 0 (- (length filename)))))
               (cons filename dir))
           filename))))
   (provide 'clojure-compilation-mode)
