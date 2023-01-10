@@ -1193,6 +1193,8 @@ File name is updated to include the same date and current title."
 (use-package cider
   :no-require t
   :after (org cider)
+  :custom
+  (org-babel-clojure-backend 'cider)
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages
