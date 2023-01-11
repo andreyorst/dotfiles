@@ -1760,10 +1760,10 @@ group."
 (use-package fennel-compilation-mode
   :preface
   (defvar fennel-compilation-error-regexp-alist nil
-    "Alist that specifies how to match errors in Clojure compiler output.
+    "Alist that specifies how to match errors in Fennel compiler output.
 See `compilation-error-regexp-alist' for more information.")
   (defvar fennel-compilation-error-regexp-alist-alist nil
-    "Alist of values for `clojure-compilation-error-regexp-alist'.")
+    "Alist of values for `fennel-compilation-error-regexp-alist'.")
   (define-derived-mode fennel-compilation-mode compilation-mode "Fennel Compilation"
     "Compilation mode for Fennel output."
     (setq-local compilation-error-regexp-alist
