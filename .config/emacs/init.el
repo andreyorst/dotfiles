@@ -1158,6 +1158,7 @@ File name is updated to include the same date and current title."
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   (cider-error-highlight-face ((t (:inherit flymake-error))))
   (cider-warning-highlight-face ((t (:inherit flymake-warning))))
+  (cider-reader-conditional-face ((t (:inherit font-lock-comment-face))))
   :custom
   (nrepl-log-messages nil)
   (cider-repl-display-help-banner nil)
