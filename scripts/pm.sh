@@ -1,30 +1,11 @@
 # Package manager wrappers
 
-for pm in yay pacman rpm-ostree dnf yum apt; do
+for pm in pacman rpm-ostree dnf yum apt; do
     if [ -n "$(command -v $pm)" ]; then
         alias pm="pm_\$(echo \$pm | sed 's/[^a-zA-Z_]/_/g')"
         break
     fi
 done
-
-pm_yay() {
-    cmd="$1"
-    shift
-    case "$cmd" in
-        (update)     yay -Syyu \
-                         --noconfirm \
-                         --devel \
-                         --nodiffmenu \
-                         --noeditmenu \
-                         --noupgrademenu \
-                         --removemake "$@" ;;
-        (install)    yay -Sy "$@" ;;
-        (remove)     yay -Rsc "$@" ;;
-        (autoremove) yay -C "$@" ;;
-        (search)     yay -Ss "$@" ;;
-        (*)          yay "$cmd" "$@" ;;
-    esac
-}
 
 pm_packman() {
     cmd="$1"

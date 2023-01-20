@@ -1,5 +1,0 @@
---std=c99
--Wpedantic
--Wextra
--Weverything
--Wall
