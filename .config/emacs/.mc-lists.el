@@ -17,6 +17,7 @@
         c-end-of-defun
         c-indent-line-or-region
         cider-eval-defun-at-point
+        cider-eval-last-sexp
         cider-repl-newline-and-indent
         cljr-slash
         comment-line
@@ -78,11 +79,13 @@
         parinfer-smart-yank:yank
         puni-backward-delete-char
         puni-backward-sexp-or-up-list
+        puni-barf-backward
         puni-forward-delete-char
         puni-forward-kill-word
         puni-forward-sexp-or-up-list
         puni-kill-active-region
         puni-kill-line
+        puni-slurp-forward
         puni-splice-killing-backward
         puni-transpose
         puni-wrap-round
