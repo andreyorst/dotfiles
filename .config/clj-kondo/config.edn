@@ -1,0 +1,6 @@
+{:linters {:def-fn :info
+           :aliased-namespace-symbol :info
+           :reduce-without-init :warning
+           :keyword-binding :warning
+           :namespace-name-mismatch :error
+           :redundant-fn-wrapper :warn}}
