@@ -1131,6 +1131,8 @@ File name is updated to include the same date and current title."
           clojurescript-mode)
          . clojure-mode-setup)
   :commands (clojure-project-dir)
+  :bind ( :map clojure-mode-map
+          ("C-:" . nil))
   :preface
   (defun clojure-set-compile-command ()
     (let ((project-dir (clojure-project-dir)))
@@ -1148,12 +1150,15 @@ File name is updated to include the same date and current title."
 (use-package cider
   :straight t
   :delight " CIDER"
+  :commands cider-find-and-clear-repl-buffer
   :functions flycheck-mode
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode)
          (cider-popup-buffer-mode . cider-disable-linting))
   :bind ( :map cider-repl-mode-map
-          ("C-c C-S-o" . cider-repl-clear-buffer))
+          ("C-c C-S-o" . cider-repl-clear-buffer)
+          :map cider-mode-map
+          ("C-c C-S-o" . cider-find-and-clear-repl-buffer))
   :custom-face
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   (cider-error-highlight-face ((t (:inherit flymake-error))))
@@ -1189,7 +1194,12 @@ File name is updated to include the same date and current title."
       (flymake-mode -1)))
   (defun cider-repl-prompt-newline (namespace)
     "Return a prompt string that mentions NAMESPACE with a newline."
-    (format "%s\n> " namespace)))
+    (format "%s\n> " namespace))
+  (defun cider-find-and-clear-repl-buffer ()
+    "Find the current REPL buffer and clear it.
+See `cider-find-and-clear-repl-output' for more info."
+    (interactive)
+    (cider-find-and-clear-repl-output 'clear-repl)))
 
 (use-package cider
   :no-require t
@@ -1973,9 +1983,6 @@ See `compilation-error-regexp-alist' for more information.")
 (use-package lsp-metals
   :straight t
   :custom
-  ;; Metals claims to support range formatting by default but it supports range
-  ;; formatting of multiline strings only. You might want to disable it so that
-  ;; emacs can use indentation provided by scala-mode.
   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
   :hook (scala-mode . lsp))
 
