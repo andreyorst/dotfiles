@@ -80,6 +80,7 @@
         puni-backward-delete-char
         puni-backward-sexp-or-up-list
         puni-barf-backward
+        puni-barf-forward
         puni-forward-delete-char
         puni-forward-kill-word
         puni-forward-sexp-or-up-list
