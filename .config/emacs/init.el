@@ -1491,7 +1491,11 @@ means save all with no questions."
                '(project-dired "Dired"))
   (add-to-list 'project-switch-commands
                '(project-switch-to-buffer "Switch buffer"))
-  (add-to-list 'project-find-functions #'project-find-root))
+  (if (boundp 'project-vc-extra-root-markers)
+      (customize-set-variable
+       'project-vc-extra-root-markers
+       project-root-markers)
+    (add-to-list 'project-find-functions #'project-find-root)))
 
 (use-package toggle-test
   :straight t
