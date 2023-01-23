@@ -1786,8 +1786,15 @@ See `compilation-error-regexp-alist' for more information.")
   (compile-add-error-syntax
    'fennel-compilation
    'fennel-compile-error
-   "^\\(?:Compile error in \\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\)?\\)$"
+   "^Compile error in \\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\)?\\$"
    :file 1 :line 2 :col 3)
+  (compile-add-error-syntax
+   'fennel-compilation
+   'fennel-test-error
+   "^not ok[[:space:]]+[0-9]+[^
+]+
+#[[:space:]]+\\([^:]+\\):\\([0-9]+\\):"
+   :file 1 :line 2 :level 'error)
   (compile-add-error-syntax
    'fennel-compilation
    'lua-stacktrace
