@@ -1614,14 +1614,13 @@ the prefix argument is supplied."
 Add NAME symbol to `compilation-error-regexp-alist', and then add
 REGEXP FILE LINE and optional COL LEVEL info to
 `compilation-error-regexp-alist-alist'."
-    (or file (error "missing value for :file keyword"))
-    (or line (error "missing value for :line keyword"))
+    (or file (error "Missing value for :file keyword"))
+    (or line (error "Missing value for :line keyword"))
     (let ((level (cond ((eq level 'info) 0)
                        ((eq level 'warn) 1)
                        ((eq level 'error) 2)
-                       (t (error "unsupported level type" level))))
+                       (t (error "Mnsupported level type: %S" level))))
           (mode (symbol-name (or mode 'compilation))))
-
       (add-to-list (intern (concat mode "-error-regexp-alist")) name)
       (add-to-list (intern (concat mode "-error-regexp-alist-alist"))
                    (list name regexp file line col level)))))
