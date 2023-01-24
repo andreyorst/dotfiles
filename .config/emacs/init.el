@@ -227,12 +227,12 @@ Bindings will be enabled next time region is highlighted."
    bidi-paragraph-direction 'left-to-right
    frame-title-format "Emacs"
    auto-window-vscroll nil
-   mouse-highlight nil
+   mouse-highlight t
    hscroll-step 1
    hscroll-margin 1
    scroll-margin 0
    scroll-preserve-screen-position nil
-   scroll-conservatively 101
+   ;; scroll-conservatively 101
    frame-resize-pixelwise window-system
    window-resize-pixelwise window-system)
   (when (window-system)
@@ -388,22 +388,6 @@ applied to the name.")
   :custom
   (user-mail-address "andreyorst@gmail.com")
   (user-full-name "Andrey Listopadov"))
-
-(use-package files
-  :custom
-  (backup-by-copying t)
-  (create-lockfiles nil)
-  (backup-directory-alist
-   `(("." . ,(expand-file-name ".cache/backups" user-emacs-directory))))
-  (auto-save-file-name-transforms
-   `((".*" ,(expand-file-name ".cache/auto-save/" user-emacs-directory) t)))
-  (auto-save-no-message t)
-  (auto-save-interval 100)
-  (require-final-newline t)
-  :config
-  (let ((auto-save-dir (expand-file-name ".cache/auto-save/" user-emacs-directory)))
-    (unless (file-exists-p auto-save-dir)
-      (make-directory auto-save-dir t))))
 
 (use-package files
   :preface
@@ -1310,18 +1294,6 @@ See `cider-find-and-clear-repl-output' for more info."
   :custom
   (csv-align-max-width 80))
 
-(use-package erlang
-  :load-path "/usr/share/emacs/site-lisp/erlang/"
-  :mode ("\\.erl\\'" . erlang-mode))
-
-(use-package elixir-mode
-  :straight t
-  :defer t)
-
-(use-package zig-mode
-  :straight t
-  :defer t)
-
 (use-package scala-mode
   :straight t
   :defer t)
@@ -1427,32 +1399,19 @@ See `cider-find-and-clear-repl-output' for more info."
   :straight t
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
-  :commands (project-root)
   :custom
   (project-compilation-buffer-name-function 'project-prefixed-buffer-name)
+  (project-vc-extra-root-markers
+   '("Cargo.toml" "compile_commands.json"
+     "compile_flags.txt" "project.clj"
+     "deps.edn" "shadow-cljs.edn"))
   :preface
-  (defcustom project-root-markers
-    '("Cargo.toml" "compile_commands.json" "compile_flags.txt"
-      "project.clj" ".git" "deps.edn" "shadow-cljs.edn")
-    "Files or directories that indicate the root of a project."
-    :type '(repeat string)
-    :group 'project)
   (defcustom project-compilation-mode nil
     "Mode to run the `compile' command with."
     :type 'symbol
     :group 'project
     :safe #'symbolp
     :local t)
-  (defun project-root-p (path)
-    "Check if the current PATH has any of the project root markers."
-    (catch 'found
-      (dolist (marker project-root-markers)
-        (when (file-exists-p (concat path marker))
-          (throw 'found marker)))))
-  (defun project-find-root (path)
-    "Search up the PATH for `project-root-markers'."
-    (when-let ((root (locate-dominating-file path #'project-root-p)))
-      (cons 'transient (expand-file-name root))))
   (defun project-save-some-buffers (&optional arg)
     "Save some modified file-visiting buffers in the current project.
 
@@ -1490,12 +1449,7 @@ means save all with no questions."
   (add-to-list 'project-switch-commands
                '(project-dired "Dired"))
   (add-to-list 'project-switch-commands
-               '(project-switch-to-buffer "Switch buffer"))
-  (if (boundp 'project-vc-extra-root-markers)
-      (customize-set-variable
-       'project-vc-extra-root-markers
-       project-root-markers)
-    (add-to-list 'project-find-functions #'project-find-root)))
+               '(project-switch-to-buffer "Switch buffer")))
 
 (use-package toggle-test
   :straight t
@@ -1567,14 +1521,6 @@ the prefix argument is supplied."
   (require 'project)
   (add-to-list 'project-switch-commands
                '(magit-project-status "Magit") t))
-
-(use-package magit-todos
-  :straight t
-  :after magit
-  :custom
-  (magit-todos-nice (and (executable-find "nice") t))
-  :config
-  (magit-todos-mode 1))
 
 (use-package server
   :commands (server-running-p)
@@ -1825,6 +1771,7 @@ See `compilation-error-regexp-alist' for more information.")
 (use-package dired
   :bind ( :map dired-mode-map
           ("<backspace>" . dired-up-directory)
+          ("M-<up>" . dired-up-directory)
           ("~" . dired-home-directory))
   :hook (dired-mode . dired-hide-details-mode)
   :custom
@@ -2016,27 +1963,6 @@ See `compilation-error-regexp-alist' for more information.")
   (jdecomp-decompiler-paths `((cfr . ,cfr-path)
                               (fernflower . ,fernflower-path))))
 
-(use-package languagetool
-  :straight t
-  :when (and langtool-installation-dir
-             (file-exists-p langtool-installation-dir))
-  :commands (languagetool-server-mode
-             languagetool-server-start)
-  :preface
-  (defvar langtool-args
-    (when-let* ((ngrams (and langtool-ngrams-dir-name
-                             langtool-installation-dir
-                             (expand-file-name
-                              langtool-ngrams-dir-name
-                              langtool-installation-dir)))
-                (ngrams (and (file-exists-p ngrams) ngrams)))
-      (list (concat "--languagemodel " ngrams))))
-  :custom
-  (languagetool-server-command
-   (expand-file-name "languagetool-server.jar"
-                     langtool-installation-dir))
-  (languagetool-server-arguments langtool-args))
-
 (use-package erc
   :defer t
   :custom
@@ -2103,8 +2029,7 @@ the generated command."
   :custom
   (message-kill-buffer-on-exit t))
 
-(use-package smtpmail
-  :defer t)
+(use-package smtpmail :defer t)
 
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -2200,12 +2125,6 @@ the generated command."
       (:around (fn &optional require-match) use-orderless)
     (let ((completion-styles (append completion-styles '(orderless))))
       (funcall fn require-match))))
-
-(use-package aoc
-  :straight ( :host github
-              :repo "pkulev/aoc.el"
-              :branch "main")
-  :defer t)
 
 (provide 'init)
 ;;; init.el ends here
