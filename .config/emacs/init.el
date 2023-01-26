@@ -736,9 +736,7 @@ are defining or executing a macro."
   (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package corfu
-  :straight ( :host github
-              :repo "minad/corfu"
-              :branch "main")
+  :straight (:host github :repo "minad/corfu")
   :load-path "straight/repos/corfu/extensions/"
   :bind ( :map corfu-map
           ("TAB" . corfu-next)
@@ -777,16 +775,12 @@ are defining or executing a macro."
   (corfu-popupinfo ((t :height 1.0))))
 
 (use-package popon
-  :straight ( :type git
-              :repo "https://codeberg.org/akib/emacs-popon.git"
-              :branch "master")
+  :straight (:type git :repo "https://codeberg.org/akib/emacs-popon.git")
   :defer t
   :unless (display-graphic-p))
 
 (use-package corfu-terminal
-  :straight ( :type git
-              :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"
-              :branch "master")
+  :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
   :unless (display-graphic-p)
   :after corfu
   :config
@@ -985,9 +979,7 @@ File name is updated to include the same date and current title."
   (org-modern-block-fringe nil))
 
 (use-package ox-hugo
-  :straight ( :host github
-              :repo "kaushalmodi/ox-hugo"
-              :branch "main")
+  :straight (:host github :repo "kaushalmodi/ox-hugo")
   :after ox)
 
 (use-package ox-latex
@@ -1033,10 +1025,7 @@ File name is updated to include the same date and current title."
      t)))
 
 (use-package fennel-mode
-  :straight ( :type git
-              :host nil
-              :branch "main"
-              :repo "https://git.sr.ht/~technomancy/fennel-mode")
+  :straight (:host sourcehut :repo "technomancy/fennel-mode")
   :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
@@ -1058,9 +1047,7 @@ File name is updated to include the same date and current title."
     (put sym 'fennel-indent-function 1)))
 
 (use-package ob-fennel
-  :straight ( :host gitlab
-              :repo "andreyorst/ob-fennel"
-              :branch "main")
+  :straight (:host gitlab :repo "andreyorst/ob-fennel")
   :after (org fennel-mode)
   :config
   (org-babel-do-load-languages
@@ -1339,9 +1326,7 @@ See `cider-find-and-clear-repl-output' for more info."
           ("M-[" . puni-wrap-square)))
 
 (use-package vundo
-  :straight ( :host github
-              :repo "casouri/vundo"
-              :branch "master")
+  :straight (:host github :repo "casouri/vundo")
   :bind (("C-c u" . vundo))
   :custom
   (vundo-roll-back-on-quit nil)
@@ -1542,9 +1527,7 @@ the prefix argument is supplied."
   (vc-follow-symlinks t))
 
 (use-package isayt
-  :straight ( :host gitlab
-              :repo "andreyorst/isayt.el"
-              :branch "main")
+  :straight (:host gitlab :repo "andreyorst/isayt.el")
   :delight isayt-mode
   :hook (common-lisp-modes-mode . isayt-mode))
 
