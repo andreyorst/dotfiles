@@ -173,55 +173,8 @@ lisp-modes mode.
   (provide 'common-lisp-modes))
 
 (use-package region-bindings
-  :hook (after-init . global-region-bindings-mode)
-  :bind ( :map region-bindings-mode-map
-          ("q" . region-bindings-disable)
-          ("r" . replace-string)
-          ("R" . replace-regexp)
-          ("\"" . region-bindings-doublequote))
-  :preface
-  (defun region-bindings-doublequote ()
-    "Doublequote active region, escaping strings if needed."
-    (interactive)
-    (let ((s (buffer-substring-no-properties (point) (mark))))
-      (delete-region (point) (mark))
-      (insert (format "%S" s))))
-  (defun region-bindings-mode-enable ()
-    "Enable `region-bindings-mode' in the current buffer."
-    (add-hook 'activate-mark-hook #'region-bindings-enable nil 'local)
-    (add-hook 'deactivate-mark-hook #'region-bindings-disable nil 'local))
-  (defun region-bindings-mode-disable ()
-    "Disable `region-bindings-mode' in the current buffer."
-    (remove-hook 'activate-mark-hook #'region-bindings-enable 'local)
-    (remove-hook 'deactivate-mark-hook #'region-bindings-disable 'local))
-  (define-minor-mode region-bindings-mode
-    "Minor mode for mapping commands while region is active.
-
-\\<region-bindings-mode-map>"
-    :lighter " rbm"
-    :group 'convenience
-    :keymap (make-sparse-keymap)
-    (if (and region-bindings-mode
-             (not current-prefix-arg))
-        (region-bindings-mode-enable)
-      (region-bindings-mode-disable)))
-  (defun region-bindings-disable ()
-    "Turn off bindings temporarely while keeping the region active.
-Bindings will be enabled next time region is highlighted."
-    (interactive)
-    (region-bindings-mode -1)
-    (region-bindings-mode-enable))
-  (defun region-bindings-enable ()
-    "Enable bindings temporarely while keeping the region active."
-    (interactive)
-    (when (or transient-mark-mode
-              (eq #'mouse-set-region this-command))
-      (region-bindings-mode 1)))
-  (define-global-minor-mode global-region-bindings-mode
-    region-bindings-mode
-    region-bindings-mode-enable
-    :group 'convenience)
-  (provide 'region-bindings))
+  :straight (:host gitlab :repo "andreyorst/region-bindings.el")
+  :hook (after-init . global-region-bindings-mode))
 
 (use-package defaults
   :defer t
