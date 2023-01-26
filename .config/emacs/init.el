@@ -2067,5 +2067,11 @@ the generated command."
     (let ((completion-styles (append completion-styles '(orderless))))
       (funcall fn require-match))))
 
+(use-package eat
+  :straight `( :type git
+               :repo "https://codeberg.org/akib/emacs-eat"
+               :files ,(append '(("terminfo/*" "terminfo/*"))
+                               straight-default-files-directive)))
+
 (provide 'init)
 ;;; init.el ends here
