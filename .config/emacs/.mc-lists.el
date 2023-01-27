@@ -22,6 +22,7 @@
         cljr-slash
         comment-line
         common-lisp-modes-indent-or-fill-sexp
+        corfu-complete-and-quit
         counsel-M-x
         default-indent-new-line
         delete-indentation
@@ -30,6 +31,7 @@
         electric-newline-and-maybe-indent
         end-of-buffer
         end-of-defun
+        eval-last-sexp
         fill-paragraph
         forward-sexp
         goto-line
