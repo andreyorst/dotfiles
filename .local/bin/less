@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+command less --tabs 3 -RF "$@" || command less -RF "$@";

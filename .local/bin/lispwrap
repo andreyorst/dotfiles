@@ -1,0 +1,3 @@
+#!/usr/bin/env/sh
+
+rlwrap -r -q'"' -b "(){}[],^%#@\";:'"
