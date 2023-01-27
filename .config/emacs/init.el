@@ -5,16 +5,20 @@
 ;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
-;; Emacs 29+ configuration.
+;; Emacs 29.1+ configuration.
 
 ;;; Code:
 
-(unless (featurep 'early-init)
+(use-package early-init
+  :no-require
+  :unless (featurep 'early-init)
+  :config
   (load-file (expand-file-name "early-init.el" user-emacs-directory)))
 
 (use-package straight)
 
-(use-package delight :straight t)
+(use-package delight
+  :straight t)
 
 (use-package local-config
   :defer t
@@ -148,33 +152,9 @@ Used in various places to avoid getting wrong line height when
 
 (use-package common-lisp-modes
   :delight common-lisp-modes-mode
+  :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el")
   :bind ( :map common-lisp-modes-mode-map
-          ("M-q" . common-lisp-modes-indent-or-fill-sexp))
-  :preface
-  (define-minor-mode common-lisp-modes-mode
-    "Mode for enabling all modes that are common for lisps.
-
-For reference, this is not a common-lisp modes mode, but a common
-lisp-modes mode.
-
-\\<common-lisp-modes-mode-map>"
-    :lighter " clmm"
-    :keymap (make-sparse-keymap))
-  (defun common-lisp-modes-indent-or-fill-sexp ()
-    "Indent s-expression or fill string/comment."
-    (interactive)
-    (let ((ppss (syntax-ppss)))
-      (if (or (nth 3 ppss)
-              (nth 4 ppss))
-          (fill-paragraph)
-        (save-excursion
-          (mark-sexp)
-          (indent-region (point) (mark))))))
-  (provide 'common-lisp-modes))
-
-(use-package region-bindings
-  :straight (:host gitlab :repo "andreyorst/region-bindings.el")
-  :hook (after-init . global-region-bindings-mode))
+          ("M-q" . common-lisp-modes-indent-or-fill-sexp)))
 
 (use-package defaults
   :defer t
@@ -334,13 +314,14 @@ applied to the name.")
   (load custom-file :noerror))
 
 (use-package novice
-  :init
+  :preface
   (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
     "File to store disabled commands, that were enabled permanently.")
-  (define-advice enable-command (:around (foo command) use-disabled-file)
+  :config
+  (define-advice enable-command (:around (fn command) use-disabled-file)
     (let ((user-init-file disabled-commands))
-      (funcall foo command)))
-  (load disabled-commands :noerror))
+      (funcall fn command)))
+  (load disabled-commands 'noerror))
 
 (use-package startup
   :no-require t
@@ -479,7 +460,8 @@ Based on `so-long-detected-long-line-p'."
   :preface
   (unless (fboundp 'minibuffer-keyboard-quit)
     (autoload #'minibuffer-keyboard-quit "delsel" nil t))
-  (define-advice keyboard-quit (:around (quit) quit-current-context)
+  (define-advice keyboard-quit
+      (:around (quit) quit-current-context)
     "Quit the current context.
 
 When there is an active minibuffer and we are not inside it close
@@ -494,6 +476,16 @@ are defining or executing a macro."
       (unless (or defining-kbd-macro
                   executing-kbd-macro)
         (funcall-interactively quit))))
+  (define-advice exchange-point-and-mark
+      (:around (fn &optional arg) tmm)
+    "Conditionally exchange point and mark.
+
+Only exchange point and mark when `transient-mark-mode' is either
+disabled, or enabled and the mark is active."
+    (when (or (and transient-mark-mode
+                   mark-active)
+              (not transient-mark-mode))
+      (funcall fn arg)))
   :init
   (column-number-mode 1)
   (line-number-mode 1))
@@ -1279,6 +1271,10 @@ See `cider-find-and-clear-repl-output' for more info."
             (executable-find "hunspell"))
   :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
 
+(use-package region-bindings
+  :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
+  :hook (after-init . global-region-bindings-mode))
+
 (use-package puni
   :straight t
   :hook (((common-lisp-modes-mode nxml-mode) . puni-mode)
@@ -1403,24 +1399,29 @@ means save all with no questions."
   :custom
   (tgt-open-in-new-window nil)
   :preface
-  (defun tgt-local-setup (&optional spec)
+  (cl-defun tgt-local-setup
+      (&key (src-dirs "src")
+            (test-dirs "test")
+            suffixes
+            prefixes)
+    "Generate a hook for toggle-test with the given options."
     (lambda ()
       (when-let* ((root (project-current))
                   (project-root (project-root root)))
         (setq-local
          tgt-projects
          `(((:root-dir ,project-root)
-            (:src-dirs ,(or (plist-get spec :src-dirs) "src"))
-            (:test-dirs ,(or (plist-get spec :test-dirs) "test"))
-            (:test-suffixes ,(plist-get spec :suffixes))
-            (:test-prefixes ,(plist-get spec :prefixes))))))))
+            (:src-dirs ,src-dirs)
+            (:test-dirs ,test-dirs)
+            (:test-suffixes ,suffixes)
+            (:test-prefixes ,prefixes)))))))
   :init
   (dolist (hook '(clojure-mode-hook
                   clojurec-mode-hook
                   clojurescript-mode-hook))
-    (add-hook hook (tgt-local-setup '(:suffixes "_test"))))
+    (add-hook hook (tgt-local-setup :suffixes "_test")))
   (add-hook 'fennel-mode-hook
-            (tgt-local-setup '(:test-dirs "tests" :suffixes "-test"))))
+            (tgt-local-setup :test-dirs "tests" :suffixes "-test")))
 
 (use-package vterm
   :straight t
@@ -1550,7 +1551,8 @@ the prefix argument is supplied."
   :custom
   (compilation-scroll-output 'first-error)
   :preface
-  (cl-defun compile-add-error-syntax (mode name regexp &key file line col (level 'error))
+  (cl-defun compile-add-error-syntax
+      (mode name regexp &key file line col (level 'error))
     "Register new compilation error syntax.
 
 Add NAME symbol to `compilation-error-regexp-alist', and then add
@@ -1708,6 +1710,12 @@ See `compilation-error-regexp-alist' for more information.")
   :hook (eshell-mode . common-lisp-modes-mode)
   :custom
   (eshell-scroll-show-maximum-output nil))
+
+(use-package esh-module
+  :after eshell
+  :custom
+  (eshell-modules-list
+   (cl-remove 'eshell-term eshell-modules-list)))
 
 (use-package dired
   :bind ( :map dired-mode-map
@@ -1882,7 +1890,8 @@ See `compilation-error-regexp-alist' for more information.")
 (use-package lsp-metals
   :straight t
   :custom
-  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
+  (lsp-metals-server-args
+   '("-J-Dmetals.allow-multiline-string-formatting=off"))
   :hook (scala-mode . lsp))
 
 (use-package jdecomp
@@ -1970,7 +1979,8 @@ the generated command."
   :custom
   (message-kill-buffer-on-exit t))
 
-(use-package smtpmail :defer t)
+(use-package smtpmail
+  :defer t)
 
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -2070,8 +2080,9 @@ the generated command."
 (use-package eat
   :straight `( :type git
                :repo "https://codeberg.org/akib/emacs-eat"
-               :files ,(append '(("terminfo/*" "terminfo/*"))
-                               straight-default-files-directive)))
+               :files ,(append '(("terminfo/" "terminfo/*"))
+                               straight-default-files-directive))
+  :hook (eshell-load . eat-eshell-mode))
 
 (provide 'init)
 ;;; init.el ends here
