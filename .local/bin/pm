@@ -1,11 +1,5 @@
+#!/usr/bin/env sh
 # Package manager wrappers
-
-for pm in pacman rpm-ostree dnf yum apt; do
-    if [ -n "$(command -v $pm)" ]; then
-        alias pm="pm_\$(echo \$pm | sed 's/[^a-zA-Z_]/_/g')"
-        break
-    fi
-done
 
 pm_packman() {
     cmd="$1"
@@ -19,7 +13,7 @@ pm_packman() {
         (list)       case $1 in
                          (all) pacman -Qe ;;
                          (*)   echo "wrong argument for 'list'" >&2
-                               return 1 ;;
+                               exit 1 ;;
                      esac ;;
         (*)          pacman "$cmd" "$@" ;;
     esac
@@ -39,7 +33,7 @@ pm_dnf() {
                          (all)       dnf list all ;;
                          (installed) dnf list installed ;;
                          (*)         echo "wrong argument for 'list'" >&2
-                                     return 1 ;;
+                                     exit 1 ;;
                      esac ;;
         (*)          dnf "$cmd" "$@" ;;
     esac
@@ -80,3 +74,12 @@ pm_apt() {
         (*)           sudo apt "$cmd" "$@" ;;
     esac
 }
+
+for pm in pacman rpm-ostree dnf yum apt; do
+    if [ -n "$(command -v $pm)" ]; then
+        alias pm="pm_\$(echo \$pm | sed 's/[^a-zA-Z_]/_/g')"
+        break
+    fi
+done
+
+pm $@
