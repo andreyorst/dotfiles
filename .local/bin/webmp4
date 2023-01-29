@@ -2,7 +2,7 @@
 
 if [ -z "$(command -v ffmpeg)" ]; then
     printf "%s\n" "ffmpeg is not installed" >&2
-    return 1
+    exit 1
 fi
 
 while [ $# -ne 0 ]; do

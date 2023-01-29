@@ -2,12 +2,12 @@
 
 if [ -z "$(command -v ffmpeg)" ]; then
     printf "%s\n" "ffmpeg is not installed" >&2
-    return 1
+    exit 1
 fi
 
 if [ -z "$(command -v gifsicle)" ]; then
     printf "%s\n" "gifsicle is not installed" >&2
-    return 1
+    exit 1
 fi
 
 palette=$(mktemp "/tmp/palette-XXXXXXXXX.png")
