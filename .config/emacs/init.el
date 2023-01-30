@@ -153,8 +153,19 @@ Used in various places to avoid getting wrong line height when
 (use-package common-lisp-modes
   :delight common-lisp-modes-mode
   :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el")
+  :preface
+  (defun indent-sexp-or-fill ()
+    "Indent an s-expression or fill string/comment."
+    (interactive)
+    (let ((ppss (syntax-ppss)))
+      (if (or (nth 3 ppss)
+              (nth 4 ppss))
+          (fill-paragraph)
+        (save-excursion
+          (mark-sexp)
+          (indent-region (point) (mark))))))
   :bind ( :map common-lisp-modes-mode-map
-          ("M-q" . common-lisp-modes-indent-or-fill-sexp)))
+          ("M-q" . indent-sexp-or-fill)))
 
 (use-package defaults
   :defer t
