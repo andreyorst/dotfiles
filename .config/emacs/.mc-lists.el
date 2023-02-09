@@ -88,6 +88,7 @@
         puni-forward-sexp-or-up-list
         puni-kill-active-region
         puni-kill-line
+        puni-raise
         puni-slurp-forward
         puni-splice-killing-backward
         puni-transpose
