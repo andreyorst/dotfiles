@@ -150,23 +150,6 @@ Used in various places to avoid getting wrong line height when
           (or value (puthash args (apply fn args) memo))))))
   (provide 'functions))
 
-(use-package common-lisp-modes
-  :delight common-lisp-modes-mode
-  :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el")
-  :preface
-  (defun indent-sexp-or-fill ()
-    "Indent an s-expression or fill string/comment."
-    (interactive)
-    (let ((ppss (syntax-ppss)))
-      (if (or (nth 3 ppss)
-              (nth 4 ppss))
-          (fill-paragraph)
-        (save-excursion
-          (mark-sexp)
-          (indent-region (point) (mark))))))
-  :bind ( :map common-lisp-modes-mode-map
-          ("M-q" . indent-sexp-or-fill)))
-
 (use-package defaults
   :defer t
   :preface
@@ -201,6 +184,9 @@ Used in various places to avoid getting wrong line height when
       (garbage-collect)))
   (add-function :after after-focus-change-function 'focus-out-collect-garbage)
   (provide 'defaults))
+
+
+;;; Core packages
 
 (use-package messages
   :preface
@@ -335,7 +321,7 @@ applied to the name.")
   (load disabled-commands 'noerror))
 
 (use-package startup
-  :no-require t
+  :no-require
   :custom
   (user-mail-address "andreyorst@gmail.com")
   (user-full-name "Andrey Listopadov"))
@@ -363,7 +349,7 @@ applied to the name.")
     (make-directory auto-save-dir t)))
 
 (use-package subr
-  :no-require t
+  :no-require
   :init
   (fset 'yes-or-no-p 'y-or-n-p))
 
@@ -438,14 +424,14 @@ Based on `so-long-detected-long-line-p'."
   :hook (after-init . savehist-mode))
 
 (use-package mule-cmds
-  :no-require t
+  :no-require
   :custom
   (default-input-method 'russian-computer)
   :init
   (prefer-coding-system 'utf-8))
 
 (use-package select
-  :no-require t
+  :no-require
   :when (display-graphic-p)
   :custom
   (x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
@@ -555,7 +541,7 @@ disabled, or enabled and the mark is active."
       (funcall-interactively fn buffer-or-name norecord))))
 
 (use-package startup
-  :no-require t
+  :no-require
   :custom
   (inhibit-splash-screen t))
 
@@ -607,7 +593,7 @@ disabled, or enabled and the mark is active."
                         #'color-scheme-changed))
 
 (use-package modus-themes
-  :straight t
+  :no-require
   :requires (local-config)
   :custom
   (modus-themes-org-blocks nil)
@@ -623,42 +609,43 @@ disabled, or enabled and the mark is active."
   (modus-themes-mode-line '(borderless))
   (modus-themes-fringes nil)
   :config
-  (setq modus-themes-common-palette-overrides
-        `(;; syntax
-          (builtin magenta-faint)
-          (keyword cyan-faint)
-          (comment fg-dim)
-          (constant blue-faint)
-          (docstring fg-dim)
-          (docmarkup fg-dim)
-          (fnname magenta-faint)
-          (preprocessor cyan-faint)
-          (string red-faint)
-          (type magenta-cooler)
-          (variable blue-faint)
-          (rx-construct magenta-faint)
-          (rx-backslash blue-faint)
-          ;; misc
-          (bg-paren-match bg-ochre)
-          (bg-region bg-ochre)
-          ;; line-numbers
-          (fg-line-number-active fg-main)
-          (bg-line-number-inactive bg-main)
-          (fg-line-number-inactive fg-dim)
-          ;; modeline
-          (border-mode-line-active unspecified)
-          (border-mode-line-inactive unspecified)
-          ;; links
-          (underline-link unspecified)
-          (underline-link-visited unspecified)
-          (underline-link-symbolic unspecified)
-          ,@modus-themes-preset-overrides-faint))
-  (cond ((in-termux-p)
-         (load-theme local-config-dark-theme t))
-        ((and (fboundp 'dark-mode-enabled-p)
-              (dark-mode-enabled-p))
-         (load-theme local-config-dark-theme t))
-        (t (load-theme local-config-light-theme t))))
+  (let ((theme (if (or (and (fboundp 'dark-mode-enabled-p)
+                            (dark-mode-enabled-p))
+                       (in-termux-p))
+                   local-config-dark-theme
+                 local-config-light-theme)))
+    (load-theme theme t t)
+    (setq modus-themes-common-palette-overrides
+          `(;; syntax
+            (builtin magenta-faint)
+            (keyword cyan-faint)
+            (comment fg-dim)
+            (constant blue-faint)
+            (docstring fg-dim)
+            (docmarkup fg-dim)
+            (fnname magenta-faint)
+            (preprocessor cyan-faint)
+            (string red-faint)
+            (type magenta-cooler)
+            (variable blue-faint)
+            (rx-construct magenta-faint)
+            (rx-backslash blue-faint)
+            ;; misc
+            (bg-paren-match bg-ochre)
+            (bg-region bg-ochre)
+            ;; line-numbers
+            (fg-line-number-active fg-main)
+            (bg-line-number-inactive bg-main)
+            (fg-line-number-inactive fg-dim)
+            ;; modeline
+            (border-mode-line-active unspecified)
+            (border-mode-line-inactive unspecified)
+            ;; links
+            (underline-link unspecified)
+            (underline-link-visited unspecified)
+            (underline-link-symbolic unspecified)
+            ,@modus-themes-preset-overrides-faint))
+    (load-theme theme t)))
 
 (use-package uniquify
   :defer t
@@ -698,6 +685,122 @@ disabled, or enabled and the mark is active."
   :hook (after-init . pixel-scroll-precision-mode)
   :custom
   (scroll-margin 0))
+
+(use-package paren
+  :hook (prog-mode . show-paren-mode))
+
+(use-package vc-hooks
+  :defer t
+  :custom
+  (vc-follow-symlinks t))
+
+(use-package eldoc
+  :delight eldoc-mode
+  :defer t
+  :custom
+  (eldoc-echo-area-use-multiline-p nil))
+
+(use-package esh-mode
+  :hook (eshell-mode . common-lisp-modes-mode)
+  :custom
+  (eshell-scroll-show-maximum-output nil))
+
+(use-package esh-module
+  :after eshell
+  :custom
+  (eshell-modules-list
+   (cl-remove 'eshell-term eshell-modules-list)))
+
+(use-package dired
+  :bind ( :map dired-mode-map
+          ("<backspace>" . dired-up-directory)
+          ("M-<up>" . dired-up-directory)
+          ("~" . dired-home-directory))
+  :hook (dired-mode . dired-hide-details-mode)
+  :custom
+  (dired-listing-switches "-lAXhv --group-directories-first")
+  :config
+  (defun dired-home-directory ()
+    (interactive)
+    (dired (expand-file-name "~/"))))
+
+(use-package comint
+  :defer t
+  :custom
+  (comint-scroll-show-maximum-output nil)
+  (comint-highlight-input nil))
+
+(use-package rect
+  :bind (("C-x r C-y" . rectangle-yank-add-lines))
+  :preface
+  (defun rectangle-yank-add-lines ()
+    (interactive "*")
+    (when (use-region-p)
+      (delete-region (region-beginning) (region-end)))
+    (save-restriction
+      (narrow-to-region (point) (point))
+      (yank-rectangle))))
+
+(use-package profiler
+  :straight t
+  :bind ("<f2>" . profiler-start-or-report)
+  :commands (profiler-report)
+  :preface
+  (defun profiler-start-or-report ()
+    (interactive)
+    (if (not (profiler-cpu-running-p))
+        (profiler-start 'cpu)
+      (profiler-report)
+      (profiler-cpu-stop))))
+
+(use-package hideshow
+  :hook (prog-mode . hs-minor-mode)
+  :delight hs-minor-mode
+  :config
+  (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
+    "Move point to the location of the mouse pointer."
+    (mouse-set-point last-input-event)))
+
+(use-package help
+  :custom
+  (help-window-select t))
+
+(use-package doc-view
+  :defer t
+  :custom
+  (doc-view-resolution 192))
+
+(use-package flymake
+  :preface
+  (defvar flymake-prefix-map (make-sparse-keymap))
+  (fset 'flymake-prefix-map flymake-prefix-map)
+  :bind ( :map ctl-x-map
+          ("!" . flymake-prefix-map)
+          :map flymake-prefix-map
+          ("l" . flymake-show-buffer-diagnostics)
+          ("n" . flymake-goto-next-error)
+          ("p" . flymake-goto-prev-error))
+  :custom
+  (flymake-fringe-indicator-position 'right-fringe)
+  (flymake-mode-line-lighter "FlyM")
+  (flymake-mode-line-counter-format
+   '(":" flymake-mode-line-error-counter "/"
+     (:eval (flymake--mode-line-counter :warning 'no-space))))
+  :config
+  (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
+
+(use-package flyspell
+  :straight t
+  :when (or (executable-find "ispell")
+            (executable-find "aspell")
+            (executable-find "hunspell"))
+  :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
+
+(use-package autorevert
+  :hook (after-init . global-auto-revert-mode))
+
+
+;;; Completion
 
 (use-package vertico
   :straight t
@@ -795,6 +898,9 @@ disabled, or enabled and the mark is active."
   :config
   (setq completion-at-point-functions
         '(cape-file cape-dabbrev)))
+
+
+;;; Org
 
 (use-package org
   :straight (:type built-in)
@@ -988,6 +1094,9 @@ File name is updated to include the same date and current title."
 (use-package ox-latex
   :after ox)
 
+
+;;; Languages
+
 (use-package cc-mode
   :hook (c-mode-common . cc-mode-setup)
   :custom
@@ -1135,7 +1244,7 @@ See `cider-find-and-clear-repl-output' for more info."
     (cider-find-and-clear-repl-output 'clear-repl)))
 
 (use-package cider
-  :no-require t
+  :no-require
   :after (org cider)
   :custom
   (org-babel-clojure-backend 'cider)
@@ -1247,44 +1356,139 @@ See `cider-find-and-clear-repl-output' for more info."
   :straight t
   :defer t)
 
-(use-package help
-  :custom
-  (help-window-select t))
+(use-package zig-mode
+  :straight t)
 
-(use-package doc-view
+
+;;; LSP
+
+(use-package lsp-mode
+  :straight t
+  :hook ((lsp-mode . lsp-diagnostics-mode)
+         (lsp-mode . lsp-completion-mode))
+  :custom
+  (lsp-keymap-prefix "C-c l")
+  (lsp-diagnostics-provider :flymake)
+  (lsp-completion-provider :none)
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-log-io nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-idle-delay 0.5)
+  ;; core
+  (lsp-enable-xref t)
+  (lsp-auto-configure nil)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-file-watchers nil)
+  (lsp-enable-folding nil)
+  (lsp-enable-imenu nil)
+  (lsp-enable-indentation nil)
+  (lsp-enable-links nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-suggest-server-download nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-text-document-color nil)
+  ;; completion
+  (lsp-completion-enable t)
+  (lsp-completion-enable-additional-text-edit nil)
+  (lsp-enable-snippet nil)
+  (lsp-completion-show-kind nil)
+  ;; headerline
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  ;; modeline
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-enable nil)
+  (lsp-modeline-workspace-status-enable nil)
+  (lsp-signature-doc-lines 1)
+  ;; lens
+  (lsp-lens-enable nil)
+  ;; semantic
+  (lsp-semantic-tokens-enable nil)
+  :init
+  (setq lsp-use-plists t))
+
+(use-package lsp-clojure
+  :no-require
+  :hook ((clojure-mode
+          clojurec-mode
+          clojurescript-mode)
+         . lsp))
+
+(use-package lsp-clojure
+  :demand t
+  :after lsp-mode
+  :hook (cider-mode . cider-toggle-lsp-completion-maybe)
+  :preface
+  (defun cider-toggle-lsp-completion-maybe ()
+    (lsp-completion-mode (if (bound-and-true-p cider-mode) -1 1))))
+
+(use-package lsp-treemacs
+  :straight t
   :defer t
   :custom
-  (doc-view-resolution 192))
+  (lsp-treemacs-theme "Iconless"))
 
-(use-package flymake
-  :preface
-  (defvar flymake-prefix-map (make-sparse-keymap))
-  (fset 'flymake-prefix-map flymake-prefix-map)
-  :bind ( :map ctl-x-map
-          ("!" . flymake-prefix-map)
-          :map flymake-prefix-map
-          ("l" . flymake-show-buffer-diagnostics)
-          ("n" . flymake-goto-next-error)
-          ("p" . flymake-goto-prev-error))
-  :custom
-  (flymake-fringe-indicator-position 'right-fringe)
-  (flymake-mode-line-lighter "FlyM")
-  (flymake-mode-line-counter-format
-   '(":" flymake-mode-line-error-counter "/"
-     (:eval (flymake--mode-line-counter :warning 'no-space))))
-  :config
-  (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
-
-(use-package flyspell
+(use-package lsp-java
   :straight t
-  :when (or (executable-find "ispell")
-            (executable-find "aspell")
-            (executable-find "hunspell"))
-  :hook ((org-mode git-commit-mode markdown-mode) . flyspell-mode))
+  :demand t
+  :after lsp-mode
+  :when (and openjdk-11-path
+             (file-exists-p openjdk-11-path))
+  :custom
+  (lsp-java-java-path openjdk-11-path))
 
-(use-package region-bindings
-  :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
-  :hook (after-init . global-region-bindings-mode))
+(use-package lsp-java
+  :no-require
+  :hook (java-mode . lsp))
+
+(use-package lsp-metals
+  :straight t
+  :custom
+  (lsp-metals-server-args
+   '("-J-Dmetals.allow-multiline-string-formatting=off"))
+  :hook (scala-mode . lsp))
+
+(use-package jdecomp
+  :straight t
+  :mode ("\\.class\\'" . jdecomp-mode)
+  :preface
+  (defvar cfr-path
+    (file-truename "~/.local/lib/cfr.jar")
+    "Path to the cfr Java decompiler library.")
+  (defvar fernflower-path
+    (file-truename "~/.local/lib/fernflower.jar")
+    "Path to the FernFlower library.")
+  :custom
+  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
+                                  'cfr)
+                                 ((file-exists-p fernflower-path)
+                                  'fernflower)
+                                 (t jdecomp-decompiler-type)))
+  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
+                              (fernflower . ,fernflower-path))))
+
+
+;;; Navigation & Editing
+
+(use-package common-lisp-modes
+  :delight common-lisp-modes-mode
+  :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el")
+  :preface
+  (defun indent-sexp-or-fill ()
+    "Indent an s-expression or fill string/comment."
+    (interactive)
+    (let ((ppss (syntax-ppss)))
+      (if (or (nth 3 ppss)
+              (nth 4 ppss))
+          (fill-paragraph)
+        (save-excursion
+          (mark-sexp)
+          (indent-region (point) (mark))))))
+  :bind ( :map common-lisp-modes-mode-map
+          ("M-q" . indent-sexp-or-fill)))
 
 (use-package puni
   :straight t
@@ -1332,12 +1536,82 @@ See `cider-find-and-clear-repl-output' for more info."
           ;; doesn't work in terminal
           ("M-[" . puni-wrap-square)))
 
+(use-package isearch
+  :bind ( :map isearch-mode-map
+          ("<backspace>" . isearch-del-char)
+          ("<left>" . isearch-edit-string)
+          ("<right>" . isearch-edit-string)
+          :map minibuffer-local-isearch-map
+          ("<left>" . backward-char)
+          ("<right>" . forward-char))
+  :custom
+  (isearch-lazy-highlight t))
+
+(use-package dumb-jump
+  :straight t
+  :defer t
+  :custom
+  (dumb-jump-prefer-searcher 'rg)
+  (dumb-jump-selector 'completing-read)
+  :init
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(use-package phi-search
+  :straight t
+  :defer t)
+
+(use-package avy
+  :straight t
+  :bind (("C-:" . avy-goto-char-2)))
+
+(use-package isayt
+  :straight (:host gitlab :repo "andreyorst/isayt.el")
+  :delight isayt-mode
+  :hook (common-lisp-modes-mode . isayt-mode))
+
+(use-package expand-region
+  :straight t
+  :bind ("C-=" . er/expand-region))
+
+(use-package multiple-cursors
+  :straight t
+  :bind
+  (("S-<mouse-1>" . mc/add-cursor-on-click)
+   :map region-bindings-mode-map
+   ("n" . mc/mark-next-symbol-like-this)
+   ("N" . mc/mark-next-like-this)
+   ("p" . mc/mark-previous-symbol-like-this)
+   ("P" . mc/mark-previous-like-this)
+   ("a" . mc/mark-all-symbols-like-this)
+   ("A" . mc/mark-all-like-this)
+   ("s" . mc/mark-all-in-region-regexp)
+   ("l" . mc/edit-ends-of-lines)))
+
+(use-package multiple-cursors-core
+  :bind
+  (( :map mc/keymap
+     ("<return>" . nil)
+     ("C-&" . mc/vertical-align-with-space)
+     ("C-#" . mc/insert-numbers))))
+
+(use-package region-bindings
+  :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
+  :hook (after-init . global-region-bindings-mode))
+
 (use-package vundo
   :straight (:host github :repo "casouri/vundo")
   :bind (("C-c u" . vundo))
   :custom
   (vundo-roll-back-on-quit nil)
   (vundo--window-max-height 10))
+
+(use-package yasnippet
+  :straight t
+  :defer t
+  :delight yas-minor-mode)
+
+
+;;; Tools
 
 (use-package ediff
   :custom
@@ -1464,6 +1738,13 @@ the prefix argument is supplied."
   (add-to-list 'project-switch-commands
                '(vterm-project-dir "vterm") t))
 
+(use-package eat
+  :straight `( :type git
+               :repo "https://codeberg.org/akib/emacs-eat"
+               :files ,(append '(("terminfo/" "terminfo/*"))
+                               straight-default-files-directive))
+  :hook (eshell-load . eat-eshell-mode))
+
 (use-package magit
   :straight t
   :hook (git-commit-mode . flyspell-mode)
@@ -1516,41 +1797,10 @@ the prefix argument is supplied."
                      (expand-file-name "workspace/.cache/" user-emacs-directory)))
     (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*"))))
 
-(use-package dumb-jump
-  :straight t
-  :defer t
-  :custom
-  (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'completing-read)
-  :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-
 (use-package gcmh
   :straight t
   :hook (after-init . gcmh-mode)
   :delight gcmh-mode)
-
-(use-package paren
-  :hook (prog-mode . show-paren-mode))
-
-(use-package vc-hooks
-  :defer t
-  :custom
-  (vc-follow-symlinks t))
-
-(use-package isayt
-  :straight (:host gitlab :repo "andreyorst/isayt.el")
-  :delight isayt-mode
-  :hook (common-lisp-modes-mode . isayt-mode))
-
-(use-package eldoc
-  :delight eldoc-mode
-  :defer t
-  :custom
-  (eldoc-echo-area-use-multiline-p nil))
-
-(use-package autorevert
-  :hook (after-init . global-auto-revert-mode))
 
 (use-package hl-todo
   :straight t
@@ -1706,223 +1956,21 @@ See `compilation-error-regexp-alist' for more information.")
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
    :file 1 :line 2))
 
-(use-package isearch
-  :bind ( :map isearch-mode-map
-          ("<backspace>" . isearch-del-char)
-          ("<left>" . isearch-edit-string)
-          ("<right>" . isearch-edit-string)
-          :map minibuffer-local-isearch-map
-          ("<left>" . backward-char)
-          ("<right>" . forward-char))
-  :custom
-  (isearch-lazy-highlight t))
-
-(use-package esh-mode
-  :hook (eshell-mode . common-lisp-modes-mode)
-  :custom
-  (eshell-scroll-show-maximum-output nil))
-
-(use-package esh-module
-  :after eshell
-  :custom
-  (eshell-modules-list
-   (cl-remove 'eshell-term eshell-modules-list)))
-
-(use-package dired
-  :bind ( :map dired-mode-map
-          ("<backspace>" . dired-up-directory)
-          ("M-<up>" . dired-up-directory)
-          ("~" . dired-home-directory))
-  :hook (dired-mode . dired-hide-details-mode)
-  :custom
-  (dired-listing-switches "-lAXhv --group-directories-first")
+(use-package password-store
+  :when (executable-find "pass")
+  :commands (password-store-copy
+             password-store-get
+             password-store-insert
+             password-store-generate)
+  :load-path "/usr/share/doc/pass/emacs/"
   :config
-  (defun dired-home-directory ()
-    (interactive)
-    (dired (expand-file-name "~/"))))
+  (define-advice password-store--completing-read
+      (:around (fn &optional require-match) use-orderless)
+    (let ((completion-styles (append completion-styles '(orderless))))
+      (funcall fn require-match))))
 
-(use-package comint
-  :defer t
-  :custom
-  (comint-scroll-show-maximum-output nil)
-  (comint-highlight-input nil))
 
-(use-package rect
-  :bind (("C-x r C-y" . rectangle-yank-add-lines))
-  :preface
-  (defun rectangle-yank-add-lines ()
-    (interactive "*")
-    (when (use-region-p)
-      (delete-region (region-beginning) (region-end)))
-    (save-restriction
-      (narrow-to-region (point) (point))
-      (yank-rectangle))))
-
-(use-package expand-region
-  :straight t
-  :bind ("C-=" . er/expand-region))
-
-(use-package multiple-cursors
-  :straight t
-  :bind
-  (("S-<mouse-1>" . mc/add-cursor-on-click)
-   :map region-bindings-mode-map
-   ("n" . mc/mark-next-symbol-like-this)
-   ("N" . mc/mark-next-like-this)
-   ("p" . mc/mark-previous-symbol-like-this)
-   ("P" . mc/mark-previous-like-this)
-   ("a" . mc/mark-all-symbols-like-this)
-   ("A" . mc/mark-all-like-this)
-   ("s" . mc/mark-all-in-region-regexp)
-   ("l" . mc/edit-ends-of-lines)))
-
-(use-package multiple-cursors-core
-  :bind
-  (( :map mc/keymap
-     ("<return>" . nil)
-     ("C-&" . mc/vertical-align-with-space)
-     ("C-#" . mc/insert-numbers))))
-
-(use-package phi-search
-  :straight t
-  :defer t)
-
-(use-package avy
-  :straight t
-  :bind (("C-:" . avy-goto-char-2)))
-
-(use-package profiler
-  :straight t
-  :bind ("<f2>" . profiler-start-or-report)
-  :commands (profiler-report)
-  :preface
-  (defun profiler-start-or-report ()
-    (interactive)
-    (if (not (profiler-cpu-running-p))
-        (profiler-start 'cpu)
-      (profiler-report)
-      (profiler-cpu-stop))))
-
-(use-package hideshow
-  :hook (prog-mode . hs-minor-mode)
-  :delight hs-minor-mode
-  :config
-  (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
-    "Move point to the location of the mouse pointer."
-    (mouse-set-point last-input-event)))
-
-(use-package yasnippet
-  :straight t
-  :defer t
-  :delight yas-minor-mode)
-
-(use-package lsp-mode
-  :straight t
-  :hook ((lsp-mode . lsp-diagnostics-mode)
-         (lsp-mode . lsp-completion-mode))
-  :custom
-  (lsp-keymap-prefix "C-c l")
-  (lsp-diagnostics-provider :flymake)
-  (lsp-completion-provider :none)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-log-io nil)
-  (lsp-keep-workspace-alive nil)
-  (lsp-idle-delay 0.5)
-  ;; core
-  (lsp-enable-xref t)
-  (lsp-auto-configure nil)
-  (lsp-eldoc-enable-hover nil)
-  (lsp-enable-dap-auto-configure nil)
-  (lsp-enable-file-watchers nil)
-  (lsp-enable-folding nil)
-  (lsp-enable-imenu nil)
-  (lsp-enable-indentation nil)
-  (lsp-enable-links nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-suggest-server-download nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-text-document-color nil)
-  ;; completion
-  (lsp-completion-enable t)
-  (lsp-completion-enable-additional-text-edit nil)
-  (lsp-enable-snippet nil)
-  (lsp-completion-show-kind nil)
-  ;; headerline
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-headerline-breadcrumb-enable-diagnostics nil)
-  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
-  (lsp-headerline-breadcrumb-icons-enable nil)
-  ;; modeline
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-modeline-diagnostics-enable nil)
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-signature-doc-lines 1)
-  ;; lens
-  (lsp-lens-enable nil)
-  ;; semantic
-  (lsp-semantic-tokens-enable nil)
-  :init
-  (setq lsp-use-plists t))
-
-(use-package lsp-clojure
-  :no-require t
-  :hook ((clojure-mode
-          clojurec-mode
-          clojurescript-mode)
-         . lsp))
-
-(use-package lsp-clojure
-  :demand t
-  :after lsp-mode
-  :hook (cider-mode . cider-toggle-lsp-completion-maybe)
-  :preface
-  (defun cider-toggle-lsp-completion-maybe ()
-    (lsp-completion-mode (if (bound-and-true-p cider-mode) -1 1))))
-
-(use-package lsp-treemacs
-  :straight t
-  :defer t
-  :custom
-  (lsp-treemacs-theme "Iconless"))
-
-(use-package lsp-java
-  :straight t
-  :demand t
-  :after lsp-mode
-  :when (and openjdk-11-path
-             (file-exists-p openjdk-11-path))
-  :custom
-  (lsp-java-java-path openjdk-11-path))
-
-(use-package lsp-java
-  :no-require t
-  :hook (java-mode . lsp))
-
-(use-package lsp-metals
-  :straight t
-  :custom
-  (lsp-metals-server-args
-   '("-J-Dmetals.allow-multiline-string-formatting=off"))
-  :hook (scala-mode . lsp))
-
-(use-package jdecomp
-  :straight t
-  :mode ("\\.class\\'" . jdecomp-mode)
-  :preface
-  (defvar cfr-path
-    (file-truename "~/.local/lib/cfr.jar")
-    "Path to the cfr Java decompiler library.")
-  (defvar fernflower-path
-    (file-truename "~/.local/lib/fernflower.jar")
-    "Path to the FernFlower library.")
-  :custom
-  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
-                                  'cfr)
-                                 ((file-exists-p fernflower-path)
-                                  'fernflower)
-                                 (t jdecomp-decompiler-type)))
-  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
-                              (fernflower . ,fernflower-path))))
+;;; Messaging
 
 (use-package erc
   :defer t
@@ -2064,7 +2112,7 @@ the generated command."
                                           mail-contexts))))
 
 (use-package mu4e
-  :no-require t
+  :no-require
   :after (orderless mu4e)
   :config
   (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
@@ -2075,25 +2123,6 @@ the generated command."
   :straight t
   :hook (gnus-part-display . message-view-patch-highlight))
 
-(use-package password-store
-  :when (executable-find "pass")
-  :commands (password-store-copy
-             password-store-get
-             password-store-insert
-             password-store-generate)
-  :load-path "/usr/share/doc/pass/emacs/"
-  :config
-  (define-advice password-store--completing-read
-      (:around (fn &optional require-match) use-orderless)
-    (let ((completion-styles (append completion-styles '(orderless))))
-      (funcall fn require-match))))
-
-(use-package eat
-  :straight `( :type git
-               :repo "https://codeberg.org/akib/emacs-eat"
-               :files ,(append '(("terminfo/" "terminfo/*"))
-                               straight-default-files-directive))
-  :hook (eshell-load . eat-eshell-mode))
 
 (provide 'init)
 ;;; init.el ends here
