@@ -1653,6 +1653,8 @@ means save all with no questions."
       (if (and (null mode) project-compilation-mode)
           (append (list cmd project-compilation-mode) rest)
         args)))
+  (define-advice project-root (:around (fn project) expand-project-root)
+    (expand-file-name (funcall fn project)))
   (defun project-make-predicate-buffer-in-project-p ()
     (let ((project-buffers (project-buffers (project-current))))
       (lambda () (memq (current-buffer) project-buffers))))
