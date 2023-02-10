@@ -1573,6 +1573,10 @@ See `cider-find-and-clear-repl-output' for more info."
   :straight t
   :bind ("C-=" . er/expand-region))
 
+(use-package region-bindings
+  :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
+  :hook (after-init . global-region-bindings-mode))
+
 (use-package multiple-cursors
   :straight t
   :bind
@@ -1593,10 +1597,6 @@ See `cider-find-and-clear-repl-output' for more info."
      ("<return>" . nil)
      ("C-&" . mc/vertical-align-with-space)
      ("C-#" . mc/insert-numbers))))
-
-(use-package region-bindings
-  :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
-  :hook (after-init . global-region-bindings-mode))
 
 (use-package vundo
   :straight (:host github :repo "casouri/vundo")
