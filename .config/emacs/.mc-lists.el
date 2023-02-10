@@ -29,6 +29,7 @@
         dired-flag-file-deletion
         downcase-region
         electric-newline-and-maybe-indent
+        electric-pair-delete-pair
         end-of-buffer
         end-of-defun
         eval-last-sexp
@@ -174,6 +175,7 @@
         pixel-scroll-start-momentum
         project-compile
         rust-format-buffer
+        shell-command
         tab-line-select-tab
         term-line-mode
         term-send-raw
