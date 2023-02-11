@@ -33,6 +33,7 @@
         end-of-buffer
         end-of-defun
         eval-last-sexp
+        eval-print-last-sexp
         fill-paragraph
         forward-sexp
         goto-line
