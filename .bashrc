@@ -120,3 +120,6 @@ function container_pc {
 
 export XCURSOR_SIZE=24
 export LSP_USE_PLISTS=true
+
+[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
+    . /usr/share/bash-completion/bash_completion
