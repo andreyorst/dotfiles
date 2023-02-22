@@ -9,6 +9,11 @@
 
 ;;; Code:
 
+(use-package use-package
+  :no-require
+  :custom
+  (use-package-enable-imenu-support t))
+
 (use-package early-init
   :no-require
   :unless (featurep 'early-init)
@@ -490,6 +495,9 @@ disabled, or enabled and the mark is active."
 (use-package delsel
   :hook (after-init . delete-selection-mode))
 
+(use-package common-lisp-modes
+  :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el"))
+
 (use-package minibuffer
   :hook (eval-expression-minibuffer-setup . common-lisp-modes-mode)
   :bind ( :map minibuffer-inactive-mode-map
@@ -593,7 +601,7 @@ disabled, or enabled and the mark is active."
                         #'color-scheme-changed))
 
 (use-package modus-themes
-  :no-require
+  :straight t
   :requires (local-config)
   :custom
   (modus-themes-org-blocks nil)
@@ -1124,17 +1132,57 @@ File name is updated to include the same date and current title."
 
 (use-package elisp-mode
   :hook ((emacs-lisp-mode . eldoc-mode)
-         (emacs-lisp-mode . common-lisp-modes-mode)
-         (emacs-lisp-mode . setup-imenu-use-package-support))
+         (emacs-lisp-mode . common-lisp-modes-mode)))
+
+(use-package racket-mode
+  :straight t
+  :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
+
+(use-package yaml-mode
+  :straight t
+  :defer t
+  :custom
+  (yaml-indent-offset 4))
+
+(use-package css-mode
+  :defer t
+  :custom
+  (css-indent-offset 2))
+
+(use-package json-mode
+  :defer t
+  :custom
+  (js-indent-level 2))
+
+(use-package csv-mode
+  :straight t
+  :defer t
+  :custom
+  (csv-align-max-width 80))
+
+(use-package scala-mode
+  :straight t
+  :defer t)
+
+(use-package zig-mode
+  :straight t)
+
+;;;; Lua
+
+(use-package lua-mode
+  :straight t
+  :defer t
+  :custom
+  (lua-indent-level 2))
+
+(use-package ob-lua
+  :after (org lua-mode)
   :config
-  (defun setup-imenu-use-package-support ()
-    "Add `use-package' support to `imenu'."
-    (add-to-list
-     'imenu-generic-expression
-     '("use-package"
-       "\\s(use-package[[:space:]]+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)"
-       1)
-     t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lua . t))))
+
+;;;; Fennel
 
 (use-package fennel-mode
   :straight (:host sourcehut :repo "technomancy/fennel-mode")
@@ -1165,6 +1213,8 @@ File name is updated to include the same date and current title."
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((fennel . t))))
+
+;;;; Clojure
 
 (use-package clojure-mode
   :straight t
@@ -1267,6 +1317,8 @@ See `cider-find-and-clear-repl-output' for more info."
   :straight t
   :hook (cider-mode . clj-decompiler-setup))
 
+;;;; Lisp
+
 (use-package lisp-mode
   :hook ((lisp-mode lisp-data-mode) . common-lisp-modes-mode))
 
@@ -1299,6 +1351,8 @@ See `cider-find-and-clear-repl-output' for more info."
   :config
   (sly-symbol-completion-mode -1))
 
+;;;; Scheme
+
 (use-package scheme
   :hook (scheme-mode . common-lisp-modes-mode))
 
@@ -1312,52 +1366,6 @@ See `cider-find-and-clear-repl-output' for more info."
 (use-package geiser-guile
   :straight t
   :after geiser)
-
-(use-package racket-mode
-  :straight t
-  :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
-
-(use-package yaml-mode
-  :straight t
-  :defer t
-  :custom
-  (yaml-indent-offset 4))
-
-(use-package lua-mode
-  :straight t
-  :defer t
-  :custom
-  (lua-indent-level 2))
-
-(use-package ob-lua
-  :after (org lua-mode)
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lua . t))))
-
-(use-package css-mode
-  :defer t
-  :custom
-  (css-indent-offset 2))
-
-(use-package json-mode
-  :defer t
-  :custom
-  (js-indent-level 2))
-
-(use-package csv-mode
-  :straight t
-  :defer t
-  :custom
-  (csv-align-max-width 80))
-
-(use-package scala-mode
-  :straight t
-  :defer t)
-
-(use-package zig-mode
-  :straight t)
 
 
 ;;; LSP
@@ -1475,7 +1483,6 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package common-lisp-modes
   :delight common-lisp-modes-mode
-  :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el")
   :preface
   (defun indent-sexp-or-fill ()
     "Indent an s-expression or fill string/comment."
