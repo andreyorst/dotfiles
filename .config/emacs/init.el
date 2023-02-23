@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t -*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t; outline-regexp: "^;;*[[:space:]]\\w" -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
