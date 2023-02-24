@@ -1741,9 +1741,11 @@ the prefix argument is supplied."
            (name (project-prefixed-buffer-name "vterm")))
       (if (and (not current-prefix-arg) (get-buffer name))
           (switch-to-buffer name)
-        (funcall-interactively #'vterm name))))
-  :init
-  (require 'project)
+        (funcall-interactively #'vterm name)))))
+
+(use-package vterm
+  :after project
+  :config
   (add-to-list 'project-switch-commands
                '(vterm-project-dir "vterm") t))
 
@@ -1762,9 +1764,11 @@ the prefix argument is supplied."
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all)
-  :init
-  (require 'project)
+  (magit-diff-refine-hunk 'all))
+
+(use-package magit
+  :after project
+  :config
   (add-to-list 'project-switch-commands
                '(magit-project-status "Magit") t))
 
