@@ -96,6 +96,7 @@
         puni-transpose
         puni-wrap-round
         region-bindings-disable
+        region-bindings-doublequote
         save-some-buffers
         sp-backward-delete-char
         sp-backward-kill-word
@@ -200,4 +201,5 @@
         wgrep-finish-edit
         xref-find-definitions
         yank-rectangle
+        zig-format-buffer
         ))
