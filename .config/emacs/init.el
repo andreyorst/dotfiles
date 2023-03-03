@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t; outline-regexp: "^;;*[[:space:]]\\w" -*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t; outline-regexp: "^;;;;*[[:space:]]\\w" -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
@@ -192,7 +192,6 @@ Used in various places to avoid getting wrong line height when
 
 
 ;;; Core packages
-
 (use-package messages
   :preface
   (provide 'messages)
@@ -807,9 +806,12 @@ disabled, or enabled and the mark is active."
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode))
 
+(use-package outline
+  :custom
+  (outline-minor-mode-cycle t))
+
 
 ;;; Completion
-
 (use-package vertico
   :straight t
   :load-path "straight/repos/vertico/extensions/"
@@ -888,13 +890,8 @@ disabled, or enabled and the mark is active."
   :custom-face
   (corfu-popupinfo ((t :height 1.0))))
 
-(use-package popon
-  :straight (:type git :repo "https://codeberg.org/akib/emacs-popon.git")
-  :defer t
-  :unless (display-graphic-p))
-
 (use-package corfu-terminal
-  :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :unless (display-graphic-p)
   :after corfu
   :config
@@ -909,7 +906,6 @@ disabled, or enabled and the mark is active."
 
 
 ;;; Org
-
 (use-package org
   :straight (:type built-in)
   :hook ((org-mode . org-change-syntax-table)
@@ -1104,7 +1100,6 @@ File name is updated to include the same date and current title."
 
 
 ;;; Languages
-
 (use-package cc-mode
   :hook (c-mode-common . cc-mode-setup)
   :custom
@@ -1167,8 +1162,6 @@ File name is updated to include the same date and current title."
 (use-package zig-mode
   :straight t)
 
-;;;; Lua
-
 (use-package lua-mode
   :straight t
   :defer t
@@ -1181,8 +1174,6 @@ File name is updated to include the same date and current title."
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((lua . t))))
-
-;;;; Fennel
 
 (use-package fennel-mode
   :straight (:host sourcehut :repo "technomancy/fennel-mode")
@@ -1213,8 +1204,6 @@ File name is updated to include the same date and current title."
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((fennel . t))))
-
-;;;; Clojure
 
 (use-package clojure-mode
   :straight t
@@ -1317,8 +1306,6 @@ See `cider-find-and-clear-repl-output' for more info."
   :straight t
   :hook (cider-mode . clj-decompiler-setup))
 
-;;;; Lisp
-
 (use-package lisp-mode
   :hook ((lisp-mode lisp-data-mode) . common-lisp-modes-mode))
 
@@ -1351,8 +1338,6 @@ See `cider-find-and-clear-repl-output' for more info."
   :config
   (sly-symbol-completion-mode -1))
 
-;;;; Scheme
-
 (use-package scheme
   :hook (scheme-mode . common-lisp-modes-mode))
 
@@ -1369,7 +1354,6 @@ See `cider-find-and-clear-repl-output' for more info."
 
 
 ;;; LSP
-
 (use-package lsp-mode
   :straight t
   :hook ((lsp-mode . lsp-diagnostics-mode)
@@ -1418,6 +1402,12 @@ See `cider-find-and-clear-repl-output' for more info."
   :init
   (setq lsp-use-plists t))
 
+(use-package lsp-treemacs
+  :straight t
+  :defer t
+  :custom
+  (lsp-treemacs-theme "Iconless"))
+
 (use-package lsp-clojure
   :no-require
   :hook ((clojure-mode
@@ -1432,12 +1422,6 @@ See `cider-find-and-clear-repl-output' for more info."
   :preface
   (defun cider-toggle-lsp-completion-maybe ()
     (lsp-completion-mode (if (bound-and-true-p cider-mode) -1 1))))
-
-(use-package lsp-treemacs
-  :straight t
-  :defer t
-  :custom
-  (lsp-treemacs-theme "Iconless"))
 
 (use-package lsp-java
   :straight t
@@ -1459,28 +1443,8 @@ See `cider-find-and-clear-repl-output' for more info."
    '("-J-Dmetals.allow-multiline-string-formatting=off"))
   :hook (scala-mode . lsp))
 
-(use-package jdecomp
-  :straight t
-  :mode ("\\.class\\'" . jdecomp-mode)
-  :preface
-  (defvar cfr-path
-    (file-truename "~/.local/lib/cfr.jar")
-    "Path to the cfr Java decompiler library.")
-  (defvar fernflower-path
-    (file-truename "~/.local/lib/fernflower.jar")
-    "Path to the FernFlower library.")
-  :custom
-  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
-                                  'cfr)
-                                 ((file-exists-p fernflower-path)
-                                  'fernflower)
-                                 (t jdecomp-decompiler-type)))
-  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
-                              (fernflower . ,fernflower-path))))
-
 
 ;;; Navigation & Editing
-
 (use-package common-lisp-modes
   :delight common-lisp-modes-mode
   :preface
@@ -1582,7 +1546,8 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package region-bindings
   :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
-  :hook (after-init . global-region-bindings-mode))
+  :hook ((after-init . global-region-bindings-mode)
+         (magit-mode . (lambda () (region-bindings-mode -1)))))
 
 (use-package multiple-cursors
   :straight t
@@ -1619,7 +1584,6 @@ See `cider-find-and-clear-repl-output' for more info."
 
 
 ;;; Tools
-
 (use-package ediff
   :custom
   (ediff-split-window-function 'split-window-horizontally)
@@ -1750,8 +1714,8 @@ the prefix argument is supplied."
                '(vterm-project-dir "vterm") t))
 
 (use-package eat
-  :straight `( :type git
-               :repo "https://codeberg.org/akib/emacs-eat"
+  :straight `( :host codeberg
+               :repo "akib/emacs-eat"
                :files ,(append '(("terminfo/" "terminfo/*"))
                                straight-default-files-directive))
   :hook (eshell-load . eat-eshell-mode))
@@ -1982,9 +1946,27 @@ See `compilation-error-regexp-alist' for more information.")
     (let ((completion-styles (append completion-styles '(orderless))))
       (funcall fn require-match))))
 
+(use-package jdecomp
+  :straight t
+  :mode ("\\.class\\'" . jdecomp-mode)
+  :preface
+  (defvar cfr-path
+    (file-truename "~/.local/lib/cfr.jar")
+    "Path to the cfr Java decompiler library.")
+  (defvar fernflower-path
+    (file-truename "~/.local/lib/fernflower.jar")
+    "Path to the FernFlower library.")
+  :custom
+  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
+                                  'cfr)
+                                 ((file-exists-p fernflower-path)
+                                  'fernflower)
+                                 (t jdecomp-decompiler-type)))
+  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
+                              (fernflower . ,fernflower-path))))
+
 
 ;;; Messaging
-
 (use-package erc
   :defer t
   :custom
