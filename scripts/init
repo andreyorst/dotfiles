@@ -24,15 +24,17 @@
             done
 
             for dir in ".config" ".local/bin" ".local/share/applications"; do
-                mkdir -p "$HOME/$dir"
-                cd "$HOME/$dir" || exit
-                shopt -s dotglob
+                if [ -d "$dotfiles_dir/$dir" ]; then
+                    mkdir -p "$HOME/$dir"
+                    cd "$HOME/$dir" || exit
+                    shopt -s dotglob
 
-                for file in "$dotfiles_dir/$dir"/*; do
-                    printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
-                    ln -sf "$file" ./
-                done
+                    for file in "$dotfiles_dir/$dir"/*; do
+                        printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
+                        ln -sf "$file" ./
+                    done
+                fi
             done
             ;;
-        esac
+    esac
 )
