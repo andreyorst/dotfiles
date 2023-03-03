@@ -137,6 +137,7 @@
         describe-variable
         dired-up-directory
         god-local-mode
+        hs-show-all
         hydra--digit-argument
         hydra--universal-argument
         iedit-next-occurrence
