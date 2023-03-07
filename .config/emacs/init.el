@@ -1265,6 +1265,7 @@ File name is updated to include the same date and current title."
   (cider-use-tooltips nil)
   (cider-connection-message-fn #'cider-random-tip)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
+  (cider-auto-inspect-after-eval nil)
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   (defun cider-disable-linting ()
@@ -1932,6 +1933,48 @@ See `compilation-error-regexp-alist' for more information.")
    "\\(?:^[[:space:]]+\\([^
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
    :file 1 :line 2))
+
+(use-package zig-compilation-mode
+  :preface
+  (defvar zig-compilation-error-regexp-alist nil
+    "Alist that specifies how to match errors in Zig compiler output.
+See `compilation-error-regexp-alist' for more information.")
+  (defvar zig-compilation-error-regexp-alist-alist nil
+    "Alist of values for `zig-compilation-error-regexp-alist'.")
+  (defvar-local zig-compilation-project nil
+    "Current root of the project being compiled.")
+  (defvar-local zig-compilation-project-files nil
+    "Current list of files belonging to the project being compiled.")
+  (define-derived-mode zig-compilation-mode compilation-mode "Zig Compilation"
+    "Compilation mode for Zig output."
+    (setq-local compilation-error-regexp-alist
+                zig-compilation-error-regexp-alist)
+    (setq-local compilation-error-regexp-alist-alist
+                zig-compilation-error-regexp-alist-alist)
+    (setq-local zig-compilation-project (project-current t))
+    (setq-local zig-compilation-project-files (project-files zig-compilation-project)))
+  (provide 'zig-compilation-mode)
+  :config
+  (compile-add-error-syntax
+   'zig-compilation
+   'zig-error
+   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): error:"
+   :file 1 :line 2 :col 3)
+  (compile-add-error-syntax
+   'zig-compilation
+   'zig-note
+   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): note:"
+   :file 1 :line 2 :col 3 :level 'info)
+  (compile-add-error-syntax
+   'zig-compilation
+   'zig-error
+   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\):.*in.*([^)]+)"
+   :file 1 :line 2 :col 3 :level 'info)
+  (compile-add-error-syntax
+   'zig-compilation
+   'zig-reference
+   "^[[:space:]]+\\(?:freeObject\\|deinit\\):[[:space:]]\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\)"
+   :file 1 :line 2 :col 3 :level 'info))
 
 (use-package password-store
   :when (executable-find "pass")
