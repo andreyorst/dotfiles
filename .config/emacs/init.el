@@ -1967,7 +1967,7 @@ See `compilation-error-regexp-alist' for more information.")
    :file 1 :line 2 :col 3 :level 'info)
   (compile-add-error-syntax
    'zig-compilation
-   'zig-error
+   'zig-error-in
    "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\):.*in.*([^)]+)"
    :file 1 :line 2 :col 3 :level 'info)
   (compile-add-error-syntax
