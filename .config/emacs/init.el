@@ -1806,50 +1806,62 @@ REGEXP FILE LINE and optional COL LEVEL info to
           (mode (symbol-name (or mode 'compilation))))
       (add-to-list (intern (concat mode "-error-regexp-alist")) name)
       (add-to-list (intern (concat mode "-error-regexp-alist-alist"))
-                   (list name regexp file line col level)))))
+                   (list name regexp file line col level))))
+  (defmacro define-compilation-mode (base-name &rest body)
+    (let* ((name (symbol-name base-name))
+           (doc-name (capitalize (symbol-name base-name)))
+           (error-regexp-alist (intern (concat name "-error-regexp-alist")))
+           (error-regexp-alist-alist (intern (concat name "-error-regexp-alist-alist")))
+           (project-root (intern (concat name "-project")))
+           (list-files (intern (concat name "-project-files")))
+           (compilation-mode-name (intern (concat name "-mode"))))
+      `(progn
+         (defvar ,error-regexp-alist nil
+           ,(concat "Alist that specifies how to match errors in " doc-name " compiler output.
+See `compilation-error-regexp-alist' for more information."))
+         (defvar ,error-regexp-alist-alist nil
+           ,(concat "Alist of values for `" doc-name "-compilation-error-regexp-alist'."))
+         (defvar-local ,project-root nil
+           "Current root of the project being compiled.")
+         (defvar-local ,list-files nil
+           "Current list of files belonging to the project being compiled.")
+         (define-derived-mode ,compilation-mode-name
+           compilation-mode ,(concat doc-name " Compilation")
+           ,(concat "Compilation mode for " doc-name " output.")
+           (setq-local compilation-error-regexp-alist
+                       ,error-regexp-alist)
+           (setq-local compilation-error-regexp-alist-alist
+                       ,error-regexp-alist-alist)
+           (setq-local ,project-root (project-current t))
+           (setq-local ,list-files (project-files ,project-root)))
+         ,@body
+         (provide ',compilation-mode-name)))))
 
 (use-package clojure-compilation-mode
   :preface
-  (defvar clojure-compilation-error-regexp-alist nil
-    "Alist that specifies how to match errors in Clojure compiler output.
-See `compilation-error-regexp-alist' for more information.")
-  (defvar clojure-compilation-error-regexp-alist-alist nil
-    "Alist of values for `clojure-compilation-error-regexp-alist'.")
-  (defvar-local clojure-compilation-project nil
-    "Current root of the project being compiled.")
-  (defvar-local clojure-compilation-project-files nil
-    "Current list of files belonging to the project being compiled.")
-  (define-derived-mode clojure-compilation-mode compilation-mode "Clojure(Script) Compilation"
-    "Compilation mode for Clojure output."
-    (setq-local compilation-error-regexp-alist
-                clojure-compilation-error-regexp-alist)
-    (setq-local compilation-error-regexp-alist-alist
-                clojure-compilation-error-regexp-alist-alist)
-    (setq-local clojure-compilation-project (project-current t))
-    (setq-local clojure-compilation-project-files (project-files clojure-compilation-project)))
-  (defun clojure-compilation-filename-fn (rule-name)
-    "Create a function that gets filename from the error message.
+  (define-compilation-mode clojure-compilation
+    (defun clojure-compilation-filename-fn (rule-name)
+      "Create a function that gets filename from the error message.
 
-RULE-NAME is a symbol in `clojure-compilation-error-regexp-alist-alist'.
-It is used to obtain the regular expression, which used for a
-backward search in order to extract the filename from the first
-group."
-    (lambda ()
-      "Get a filname from the error message and compute relative directory."
-      (let* ((regexp (car (alist-get rule-name clojure-compilation-error-regexp-alist-alist)))
-             (filename (save-match-data
-                         (re-search-backward regexp)
-                         (substring-no-properties (match-string 1)))))
-        (if-let ((file (seq-find
-                        (lambda (s)
-                          (string-suffix-p filename s))
-                        clojure-compilation-project-files)))
-            (let* ((path-in-project
-                    (substring file (length (project-root clojure-compilation-project))))
-                   (dir (substring path-in-project 0 (- (length filename)))))
-              (cons filename dir))
-          filename))))
-  (provide 'clojure-compilation-mode)
+  RULE-NAME is a symbol in `clojure-compilation-error-regexp-alist-alist'.
+  It is used to obtain the regular expression, which used for a
+  backward search in order to extract the filename from the first
+  group."
+      (lambda ()
+        "Get a filname from the error message and compute relative directory."
+        (let* ((regexp (car (alist-get rule-name clojure-compilation-error-regexp-alist-alist)))
+               (filename (save-match-data
+                           (re-search-backward regexp)
+                           (substring-no-properties (match-string 1)))))
+          (if-let ((file (seq-find
+                          (lambda (s)
+                            (string-suffix-p filename s))
+                          clojure-compilation-project-files)))
+              (let* ((path-in-project
+                      (substring file (length (project-root clojure-compilation-project))))
+                     (dir (substring path-in-project 0 (- (length filename)))))
+                (cons filename dir))
+            filename)))))
   :config
   (compile-add-error-syntax
    'clojure-compilation
@@ -1902,18 +1914,7 @@ group."
 
 (use-package fennel-compilation-mode
   :preface
-  (defvar fennel-compilation-error-regexp-alist nil
-    "Alist that specifies how to match errors in Fennel compiler output.
-See `compilation-error-regexp-alist' for more information.")
-  (defvar fennel-compilation-error-regexp-alist-alist nil
-    "Alist of values for `fennel-compilation-error-regexp-alist'.")
-  (define-derived-mode fennel-compilation-mode compilation-mode "Fennel Compilation"
-    "Compilation mode for Fennel output."
-    (setq-local compilation-error-regexp-alist
-                fennel-compilation-error-regexp-alist)
-    (setq-local compilation-error-regexp-alist-alist
-                fennel-compilation-error-regexp-alist-alist))
-  (provide 'fennel-compilation-mode)
+  (define-compilation-mode fennel-compilation)
   :config
   (compile-add-error-syntax
    'fennel-compilation
@@ -1936,24 +1937,7 @@ See `compilation-error-regexp-alist' for more information.")
 
 (use-package zig-compilation-mode
   :preface
-  (defvar zig-compilation-error-regexp-alist nil
-    "Alist that specifies how to match errors in Zig compiler output.
-See `compilation-error-regexp-alist' for more information.")
-  (defvar zig-compilation-error-regexp-alist-alist nil
-    "Alist of values for `zig-compilation-error-regexp-alist'.")
-  (defvar-local zig-compilation-project nil
-    "Current root of the project being compiled.")
-  (defvar-local zig-compilation-project-files nil
-    "Current list of files belonging to the project being compiled.")
-  (define-derived-mode zig-compilation-mode compilation-mode "Zig Compilation"
-    "Compilation mode for Zig output."
-    (setq-local compilation-error-regexp-alist
-                zig-compilation-error-regexp-alist)
-    (setq-local compilation-error-regexp-alist-alist
-                zig-compilation-error-regexp-alist-alist)
-    (setq-local zig-compilation-project (project-current t))
-    (setq-local zig-compilation-project-files (project-files zig-compilation-project)))
-  (provide 'zig-compilation-mode)
+  (define-compilation-mode zig-compilation)
   :config
   (compile-add-error-syntax
    'zig-compilation
