@@ -90,7 +90,7 @@ Used in various places to avoid getting wrong line height when
           (when auto-fill-p
             (auto-fill-mode t))
           (when (looking-at "^$")
-            (backward-delete-char 1))))))
+            (delete-char -1))))))
   (defun indirect-narrow-to-defun ()
     (interactive)
     (clone-indirect-buffer (buffer-name) t t)
@@ -1789,6 +1789,7 @@ the prefix argument is supplied."
   (compilation-filter . ansi-color-compilation-filter)
   :custom
   (compilation-scroll-output 'first-error)
+  :commands (define-compilation-mode)
   :preface
   (cl-defun compile-add-error-syntax
       (mode name regexp &key file line col (level 'error))
@@ -1807,46 +1808,44 @@ REGEXP FILE LINE and optional COL LEVEL info to
       (add-to-list (intern (concat mode "-error-regexp-alist")) name)
       (add-to-list (intern (concat mode "-error-regexp-alist-alist"))
                    (list name regexp file line col level))))
-  (defmacro define-compilation-mode (base-name &rest body)
+  (defmacro define-project-compilation-mode (base-name &rest body)
+    (declare (indent 1))
     (let* ((name (symbol-name base-name))
-           (doc-name (capitalize (symbol-name base-name)))
-           (error-regexp-alist (intern (concat name "-error-regexp-alist")))
-           (error-regexp-alist-alist (intern (concat name "-error-regexp-alist-alist")))
-           (project-root (intern (concat name "-project")))
-           (list-files (intern (concat name "-project-files")))
+           (doc-name (capitalize (replace-regexp-in-string "-compilation$" "" name)))
+           (current-project-root (intern (concat name "-current-project")))
+           (current-project-files (intern (concat name "-current-project-files")))
            (compilation-mode-name (intern (concat name "-mode"))))
       `(progn
-         (defvar ,error-regexp-alist nil
+         (defvar ,(intern (concat name "-error-regexp-alist")) nil
            ,(concat "Alist that specifies how to match errors in " doc-name " compiler output.
 See `compilation-error-regexp-alist' for more information."))
-         (defvar ,error-regexp-alist-alist nil
-           ,(concat "Alist of values for `" doc-name "-compilation-error-regexp-alist'."))
-         (defvar-local ,project-root nil
-           "Current root of the project being compiled.")
-         (defvar-local ,list-files nil
-           "Current list of files belonging to the project being compiled.")
-         (define-derived-mode ,compilation-mode-name
-           compilation-mode ,(concat doc-name " Compilation")
+         (defvar ,(intern (concat name "-error-regexp-alist-alist")) nil
+           ,(concat "Alist of values for `" (downcase doc-name) "-compilation-error-regexp-alist'.
+See `compilation-error-regexp-alist-alist' for more information."))
+         (defvar-local ,current-project-root nil
+           ,(concat "Current root of the project being compiled.
+Set automatically by the `" (symbol-name compilation-mode-name) "'."))
+         (defvar-local ,current-project-files nil
+           ,(concat "Current list of files belonging to the project being compiled.
+Set automatically by the `" (symbol-name compilation-mode-name) "'."))
+         (define-compilation-mode ,compilation-mode-name
+           ,(concat doc-name " Compilation")
            ,(concat "Compilation mode for " doc-name " output.")
-           (setq-local compilation-error-regexp-alist
-                       ,error-regexp-alist)
-           (setq-local compilation-error-regexp-alist-alist
-                       ,error-regexp-alist-alist)
-           (setq-local ,project-root (project-current t))
-           (setq-local ,list-files (project-files ,project-root)))
+           (setq-local ,current-project-root (project-current t))
+           (setq-local ,current-project-files (project-files ,current-project-root)))
          ,@body
          (provide ',compilation-mode-name)))))
 
 (use-package clojure-compilation-mode
   :preface
-  (define-compilation-mode clojure-compilation
+  (define-project-compilation-mode clojure-compilation
     (defun clojure-compilation-filename-fn (rule-name)
       "Create a function that gets filename from the error message.
 
-  RULE-NAME is a symbol in `clojure-compilation-error-regexp-alist-alist'.
-  It is used to obtain the regular expression, which used for a
-  backward search in order to extract the filename from the first
-  group."
+RULE-NAME is a symbol in `clojure-compilation-error-regexp-alist-alist'.
+It is used to obtain the regular expression, which used for a
+backward search in order to extract the filename from the first
+group."
       (lambda ()
         "Get a filname from the error message and compute relative directory."
         (let* ((regexp (car (alist-get rule-name clojure-compilation-error-regexp-alist-alist)))
@@ -1856,9 +1855,9 @@ See `compilation-error-regexp-alist' for more information."))
           (if-let ((file (seq-find
                           (lambda (s)
                             (string-suffix-p filename s))
-                          clojure-compilation-project-files)))
+                          clojure-compilation-current-project-files)))
               (let* ((path-in-project
-                      (substring file (length (project-root clojure-compilation-project))))
+                      (substring file (length (project-root clojure-compilation-current-project))))
                      (dir (substring path-in-project 0 (- (length filename)))))
                 (cons filename dir))
             filename)))))
@@ -1914,7 +1913,7 @@ See `compilation-error-regexp-alist' for more information."))
 
 (use-package fennel-compilation-mode
   :preface
-  (define-compilation-mode fennel-compilation)
+  (define-project-compilation-mode fennel-compilation)
   :config
   (compile-add-error-syntax
    'fennel-compilation
@@ -1937,7 +1936,7 @@ See `compilation-error-regexp-alist' for more information."))
 
 (use-package zig-compilation-mode
   :preface
-  (define-compilation-mode zig-compilation)
+  (define-project-compilation-mode zig-compilation)
   :config
   (compile-add-error-syntax
    'zig-compilation
