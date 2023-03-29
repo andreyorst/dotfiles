@@ -749,7 +749,6 @@ disabled, or enabled and the mark is active."
       (yank-rectangle))))
 
 (use-package profiler
-  :straight t
   :bind ("<f2>" . profiler-start-or-report)
   :commands (profiler-report)
   :preface
@@ -1534,7 +1533,7 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package avy
   :straight t
-  :bind (("C-:" . avy-goto-char-2)))
+  :bind (("C-:" . avy-goto-char-timer)))
 
 (use-package isayt
   :straight (:host gitlab :repo "andreyorst/isayt.el")
@@ -1993,6 +1992,7 @@ group."
 
 
 ;;; Messaging
+
 (use-package erc
   :defer t
   :custom
@@ -2051,6 +2051,9 @@ the generated command."
          :nick erc-nick
          :password erc-pass))
   :config
+  (add-to-list 'erc-modules 'notifications)
+  (add-to-list 'erc-modules 'spelling)
+  (erc-update-modules)
   (when-let ((hook (erc-setup-port-forwarding erc-tunnel-conf)))
     (add-hook 'erc-connect-pre-hook hook)))
 
@@ -2144,6 +2147,12 @@ the generated command."
   :straight t
   :hook (gnus-part-display . message-view-patch-highlight))
 
+(use-package eros
+  :straight (:host github
+             :repo "andreyorst/eros"
+             :branch "public-api")
+  :config
+  (eros-mode 1))
 
 (provide 'init)
 ;;; init.el ends here
