@@ -2147,12 +2147,5 @@ the generated command."
   :straight t
   :hook (gnus-part-display . message-view-patch-highlight))
 
-(use-package eros
-  :straight (:host github
-             :repo "andreyorst/eros"
-             :branch "public-api")
-  :config
-  (eros-mode 1))
-
 (provide 'init)
 ;;; init.el ends here
