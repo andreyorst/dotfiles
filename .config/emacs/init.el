@@ -809,6 +809,24 @@ disabled, or enabled and the mark is active."
   :custom
   (outline-minor-mode-cycle t))
 
+(use-package face-remap
+  :hook (text-scale-mode . text-scale-adjust-latex-previews)
+  :preface
+  (defun text-scale-adjust-latex-previews ()
+    "Adjust the size of latex previews when changing text scale."
+    (dolist (ov (overlays-in (point-min) (point-max)))
+      (when (pcase major-mode
+              ('latex-mode (eq (overlay-get ov 'category)
+                               'preview-overlay))
+              ('org-mode (eq (overlay-get ov 'org-overlay-type)
+                             'org-latex-overlay)))
+        (overlay-put
+         ov 'display
+         (cons 'image
+               (plist-put
+                (cdr (overlay-get ov 'display))
+                :scale (+ 1.0 (* 0.25 text-scale-mode-amount)))))))))
+
 
 ;;; Completion
 (use-package vertico
