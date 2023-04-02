@@ -91,16 +91,6 @@ Used in various places to avoid getting wrong line height when
             (auto-fill-mode t))
           (when (looking-at "^$")
             (delete-char -1))))))
-  (defun indirect-narrow-to-defun ()
-    (interactive)
-    (clone-indirect-buffer (buffer-name) t t)
-    (narrow-to-defun))
-  (defun indirect-narrow-to-region ()
-    (interactive)
-    (let ((beg (mark))
-          (end (point)))
-      (clone-indirect-buffer (buffer-name) t t)
-      (narrow-to-region beg end)))
   (defun narrow-next-page ()
     "Narrow to the next page."
     (interactive)
@@ -125,29 +115,6 @@ Used in various places to avoid getting wrong line height when
   (defun edit-early-init-file ()
     (interactive)
     (find-file (expand-file-name "early-init.el" user-emacs-directory)))
-  (defun clj-kondo-install (&optional install-dir)
-    "Install clj-kondo using steps from the official installation script."
-    (interactive (list (if current-prefix-arg
-			   (expand-file-name (read-string "Install dir: " default-directory))
-		         (expand-file-name "~/.local/bin"))))
-    (let ((inhibit-message t)
-          (tmp (make-temp-file "clj-kondo-install-"))
-          (platform (cond ((string-equal system-type "darwin") "macos")
-                          ((string-equal system-type "gnu/linux") "linux")
-                          (t (user-error "Unsupported platform %s" system-type)))))
-      (if (url-copy-file "https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/resources/CLJ_KONDO_RELEASED_VERSION" tmp t)
-          (let* ((version (with-temp-buffer
-                            (insert-file-contents tmp)
-                            (string-trim (buffer-string))))
-                 (url (format "https://github.com/clj-kondo/clj-kondo/releases/download/v%s/clj-kondo-%s-%s-amd64.zip" version version platform))
-                 (target (expand-file-name (format "%s/clj-kondo-%s.zip" install-dir version))))
-            (if (url-copy-file url target t)
-                (if (shell-command (format "unzip -qqo %s -d %s" target install-dir))
-                    (let (inhibit-message)
-                      (message "Installed clj-kondo v%s to %s" version install-dir))
-                  (user-error "Unable to unzip %s" target))
-              (user-error "Unable to download clj-kondo-%s-%s-amd64.zip" version platform)))
-        (user-error "Unable to retrieve clj-kondo version"))))
   (defun memoize (fn)
     (let ((memo (make-hash-table :test 'equal)))
       (lambda (&rest args)
@@ -192,6 +159,7 @@ Used in various places to avoid getting wrong line height when
 
 
 ;;; Core packages
+
 (use-package messages
   :preface
   (provide 'messages)
@@ -227,6 +195,10 @@ the timestamp in the echo area only."
                kmacro-exec-ring-item
                apply-macro-to-region-lines))
     (advice-add f :around #'block-undo)))
+
+(use-package mouse
+  :bind (("<mode-line> <mouse-2>" . nil)
+         ("<mode-line> <mouse-3>" . nil)))
 
 (use-package mode-line
   :defer t
@@ -829,6 +801,7 @@ disabled, or enabled and the mark is active."
 
 
 ;;; Completion
+
 (use-package vertico
   :straight t
   :load-path "straight/repos/vertico/extensions/"
@@ -923,6 +896,7 @@ disabled, or enabled and the mark is active."
 
 
 ;;; Org
+
 (use-package org
   :straight (:type built-in)
   :hook ((org-mode . org-change-syntax-table)
@@ -1117,6 +1091,7 @@ File name is updated to include the same date and current title."
 
 
 ;;; Languages
+
 (use-package cc-mode
   :hook (c-mode-common . cc-mode-setup)
   :custom
@@ -1194,7 +1169,8 @@ File name is updated to include the same date and current title."
 
 (use-package fennel-mode
   :straight (:host sourcehut :repo "technomancy/fennel-mode")
-  :hook ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode)
+  :hook ((fennel-mode . fennel-proto-repl-minor-mode)
+         ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode))
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
           ("M-," . xref-go-back)
@@ -1372,6 +1348,7 @@ See `cider-find-and-clear-repl-output' for more info."
 
 
 ;;; LSP
+
 (use-package lsp-mode
   :straight t
   :hook ((lsp-mode . lsp-diagnostics-mode)
@@ -1463,6 +1440,7 @@ See `cider-find-and-clear-repl-output' for more info."
 
 
 ;;; Navigation & Editing
+
 (use-package common-lisp-modes
   :delight common-lisp-modes-mode
   :preface
@@ -1602,6 +1580,7 @@ See `cider-find-and-clear-repl-output' for more info."
 
 
 ;;; Tools
+
 (use-package ediff
   :custom
   (ediff-split-window-function 'split-window-horizontally)
@@ -2164,6 +2143,7 @@ the generated command."
 (use-package message-view-patch
   :straight t
   :hook (gnus-part-display . message-view-patch-highlight))
+
 
 (provide 'init)
 ;;; init.el ends here
