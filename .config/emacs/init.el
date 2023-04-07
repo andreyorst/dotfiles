@@ -590,7 +590,14 @@ disabled, or enabled and the mark is active."
   :config
   (let ((theme (if (or (and (fboundp 'dark-mode-enabled-p)
                             (dark-mode-enabled-p))
-                       (in-termux-p))
+                       (and (in-termux-p)
+                            (equal "dark"
+                                   (with-temp-buffer
+                                     (insert-file
+                                      (expand-file-name "~/.termux/theme-variant"))
+                                     (string-trim
+                                      (buffer-substring-no-properties
+                                       (point-min) (point-max)))))))
                    local-config-dark-theme
                  local-config-light-theme)))
     (load-theme theme t t)
