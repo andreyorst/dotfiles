@@ -166,17 +166,6 @@ Used in various places to avoid getting wrong line height when
   :bind ( :map messages-buffer-mode-map
           ("C-c C-o" . messages-clear-buffer))
   :config
-  (define-advice message (:around (msg fmt &rest args) log-message-date)
-    "Attach a timestamp to messages that go to the *Messages* buffer.
-
-If `message-log-max' is nil just use the original MSG function
-with FMT and ARGS.  Otherwise call MSG with timestamp attached,
-and then set `message-log-max' so the message would be without
-the timestamp in the echo area only."
-    (when message-log-max
-      (apply msg (concat (format-time-string "[%FT%T.%3N] ") fmt) args))
-    (let (message-log-max)
-      (apply msg fmt args)))
   (defun messages-clear-buffer ()
     "Clear the *Messages* buffer."
     (interactive)
@@ -741,6 +730,27 @@ disabled, or enabled and the mark is active."
 (use-package hideshow
   :hook (prog-mode . hs-minor-mode)
   :delight hs-minor-mode
+  :preface
+  (defvar hs-mode-private-regex-alist
+    '(((emacs-lisp-mode lisp-mode) . (rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
+      ((clojure-mode clojurescrip-mode clojurec-mode) . (rx  "(" (or "defn-" "def ^:private"))))
+    "Alist of major modes to regular expressions for finding private definitions")
+  (defun hs-hide-all-private ()
+    "Hide all private definitions in the current buffer.
+Search is based on regular expressions in the
+`hs-private-regex-mode-alist' variable."
+    (interactive)
+    (when hs-minor-mode
+      (if-let ((re (alist-get major-mode hs-mode-private-regex-alist nil nil
+                              (lambda (key1 key2)
+                                (if (listp key1)
+                                    (and (memq key2 key1) t)
+                                  (eq key1 key2))))))
+          (save-excursion
+            (goto-char (point-min))
+            (while (re-search-forward re nil t)
+              (hs-hide-block)))
+        (error "Mode %s doesn't define a regex to find private definitions" major-mode))))
   :config
   (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
