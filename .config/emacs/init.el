@@ -540,18 +540,6 @@ disabled, or enabled and the mark is active."
       (if (equal (car value) '1)
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
-  (defun dark-mode-enabled-p ()
-    "Check if dark mode is enabled."
-    (equal '1 (caar (condition-case nil
-                        (dbus-call-method
-                         :session
-                         "org.freedesktop.portal.Desktop"
-                         "/org/freedesktop/portal/desktop"
-                         "org.freedesktop.portal.Settings"
-                         "Read"
-                         "org.freedesktop.appearance"
-                         "color-scheme")
-                      (error nil)))))
   :init
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
@@ -576,17 +564,27 @@ disabled, or enabled and the mark is active."
                                      (string "#f5aa80")))
   (modus-themes-mode-line '(borderless))
   (modus-themes-fringes nil)
+  :preface
+  (defun dark-mode-enabled-p ()
+    "Check if dark mode is enabled."
+    (cond ((in-termux-p)
+           (with-temp-buffer
+             (insert-file
+              (expand-file-name "~/.termux/theme-variant")
+              (re-search-backward "dark" nil t))))
+          ((featurep 'dbus)
+           (equal '1 (caar (condition-case nil
+                               (dbus-call-method
+                                :session
+                                "org.freedesktop.portal.Desktop"
+                                "/org/freedesktop/portal/desktop"
+                                "org.freedesktop.portal.Settings"
+                                "Read"
+                                "org.freedesktop.appearance"
+                                "color-scheme")
+                             (error nil)))))))
   :config
-  (let ((theme (if (or (and (fboundp 'dark-mode-enabled-p)
-                            (dark-mode-enabled-p))
-                       (and (in-termux-p)
-                            (equal "dark"
-                                   (with-temp-buffer
-                                     (insert-file
-                                      (expand-file-name "~/.termux/theme-variant"))
-                                     (string-trim
-                                      (buffer-substring-no-properties
-                                       (point-min) (point-max)))))))
+  (let ((theme (if (dark-mode-enabled-p)
                    local-config-dark-theme
                  local-config-light-theme)))
     (load-theme theme t t)
