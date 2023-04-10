@@ -8,33 +8,44 @@
                 ln -sf "$HOME"/.dotfiles/.local/share/applications/emacs.desktop "$HOME"/.local/share/applications/
                 ;;
         (*)
-            dotfiles_dir="$(realpath "$(dirname "$0")"/../)"
+            (dotfiles_dir="$(realpath "$(dirname "$0")"/../)"
 
-            cd "$HOME" || exit
+             cd "$HOME" || exit
 
-            for file in "$HOME/.local/share/applications/emacs*"; do
-                rm -f "$file"
-            done
+             for file in "$HOME/.local/share/applications/emacs*"; do
+                 rm -f "$file"
+             done
 
-            for file in "$dotfiles_dir"/.*; do
-                if [ -f "$file" ] && [ "$(basename "$file")" != ".gitignore" ]; then
-                    printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
-                    ln -sf "$file" ./
-                fi
-            done
+             for file in "$dotfiles_dir"/.*; do
+                 if [ -f "$file" ] && [ "$(basename "$file")" != ".gitignore" ]; then
+                     printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
+                     ln -sf "$file" ./
+                 fi
+             done
 
-            for dir in ".config" ".local/bin" ".local/share/applications"; do
-                if [ -d "$dotfiles_dir/$dir" ]; then
-                    mkdir -p "$HOME/$dir"
-                    cd "$HOME/$dir" || exit
-                    shopt -s dotglob
+             (for dir in ".config" ".local/bin" ".local/share/applications"; do
+                  if [ -d "$dotfiles_dir/$dir" ]; then
+                      mkdir -p "$HOME/$dir"
+                      cd "$HOME/$dir" || exit
+                      shopt -s dotglob
 
-                    for file in "$dotfiles_dir/$dir"/*; do
-                        printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
-                        ln -sf "$file" ./
-                    done
-                fi
-            done
+                      for file in "$dotfiles_dir/$dir"/*; do
+                          printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
+                          ln -sf "$file" ./
+                      done
+                  fi
+              done)
+
+             (cd "$HOME/.termux" || exit
+              for file in "$dotfiles_dir/.termux/"*; do
+
+                  printf "rm -rf %s/%s\n" "$PWD" "$(basename "$file")"
+                  rm -rf "$PWD"/"$(basename "$file")"
+                  printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
+                  cp -r "$file" "$PWD"
+              done))
+
+            $0 emacs
             ;;
     esac
 )

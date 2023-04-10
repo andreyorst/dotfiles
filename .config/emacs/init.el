@@ -569,9 +569,10 @@ disabled, or enabled and the mark is active."
     "Check if dark mode is enabled."
     (cond ((in-termux-p)
            (with-temp-buffer
+             (pop-to-buffer (current-buffer))
              (insert-file
               (expand-file-name "~/.termux/theme-variant"))
-             (re-search-backward "dark" nil t)))
+             (looking-at-p "dark")))
           ((featurep 'dbus)
            (equal '1 (caar (condition-case nil
                                (dbus-call-method
