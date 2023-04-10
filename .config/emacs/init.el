@@ -569,7 +569,6 @@ disabled, or enabled and the mark is active."
     "Check if dark mode is enabled."
     (cond ((in-termux-p)
            (with-temp-buffer
-             (pop-to-buffer (current-buffer))
              (insert-file
               (expand-file-name "~/.termux/theme-variant"))
              (looking-at-p "dark")))
