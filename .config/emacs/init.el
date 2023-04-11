@@ -2002,6 +2002,10 @@ group."
   (jdecomp-decompiler-paths `((cfr . ,cfr-path)
                               (fernflower . ,fernflower-path))))
 
+(use-package chatgpt-shell
+  :no-require t
+  :straight (:host github :repo "xenodium/chatgpt-shell"))
+
 
 ;;; Messaging
 
@@ -2009,6 +2013,9 @@ group."
   :defer t
   :custom
   (erc-hide-list '("JOIN" "PART" "QUIT"))
+  (erc-fill-function 'erc-fill-static)
+  (erc-fill-static-center 22)
+  (erc-fill-column 110)
   :commands (erc-compute-server)
   :preface
   (defcustom erc-tunnel-conf nil
