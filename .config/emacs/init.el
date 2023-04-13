@@ -730,8 +730,9 @@ disabled, or enabled and the mark is active."
   :delight hs-minor-mode
   :preface
   (defvar hs-mode-private-regex-alist
-    '(((emacs-lisp-mode lisp-mode) . (rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
-      ((clojure-mode clojurescrip-mode clojurec-mode) . (rx  "(" (or "defn-" "def ^:private"))))
+    `(((emacs-lisp-mode lisp-mode) . ,(rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
+      ((clojure-mode clojurescrip-mode clojurec-mode) . ,(rx  "(" (or "defn-" "def ^:private")))
+      (zig-mode . ,(rx bol (* space) "fn" (+ (not "{")) "{")))
     "Alist of major modes to regular expressions for finding private definitions")
   (defun hs-hide-all-private ()
     "Hide all private definitions in the current buffer.
