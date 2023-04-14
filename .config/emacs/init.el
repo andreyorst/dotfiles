@@ -1186,7 +1186,10 @@ File name is updated to include the same date and current title."
 (use-package fennel-mode
   :straight (:host sourcehut :repo "technomancy/fennel-mode")
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
-         ((fennel-mode fennel-repl-mode) . common-lisp-modes-mode))
+         ((fennel-mode
+           fennel-repl-mode
+           fennel-proto-repl-mode)
+          . common-lisp-modes-mode))
   :bind ( :map fennel-mode-map
           ("M-." . xref-find-definitions)
           ("M-," . xref-go-back)
