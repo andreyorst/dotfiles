@@ -94,6 +94,7 @@
         puni-slurp-forward
         puni-splice-killing-backward
         puni-transpose
+        puni-wrap-curly
         puni-wrap-round
         region-bindings-disable
         region-bindings-doublequote
@@ -186,6 +187,7 @@
         treemacs-collapse-all-projects
         treemacs-leftclick-action
         treemacs-rename
+        undo-redo
         undo-tree-visualize
         vterm--self-insert
         vterm-clear
