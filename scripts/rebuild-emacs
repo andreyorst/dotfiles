@@ -8,8 +8,8 @@ cd ~/Git/emacs && \
            --with-native-compilation=aot \
            --with-pgtk \
            --with-mailutils \
-           --prefix="$HOME"/.local \
-    && make -j$(($(nproc)/2)) \
+           --prefix="$HOME"/.local $@ \
+    && make -j$(($(nproc)-1)) \
     && make uninstall \
     && make install \
     && init emacs
