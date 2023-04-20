@@ -529,7 +529,7 @@ disabled, or enabled and the mark is active."
                               (no-special-glyphs . t))))
 
 (use-package dbus
-  :when window-system
+  :when (featurep 'dbusbind)
   :requires (functions local-config)
   :commands (dbus-register-signal dbus-call-method)
   :preface
@@ -2005,10 +2005,6 @@ group."
                                  (t jdecomp-decompiler-type)))
   (jdecomp-decompiler-paths `((cfr . ,cfr-path)
                               (fernflower . ,fernflower-path))))
-
-(use-package chatgpt-shell
-  :no-require t
-  :straight (:host github :repo "xenodium/chatgpt-shell"))
 
 
 ;;; Messaging
