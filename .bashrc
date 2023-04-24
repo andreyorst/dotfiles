@@ -29,19 +29,23 @@ shopt -s histappend
 PATH="$HOME/.dotfiles/scripts:$PATH"
 PATH="$HOME/.local/bin:$PATH"
 
-# Rebar3
+## Graal
+[ -d "$HOME/.graalvm" ] && PATH="$HOME/.graalvm/bin/:$PATH"
+
+## Rebar3
 [ -d "$HOME/.cache/rebar3" ] && PATH="$HOME/.cache/rebar3/bin:$PATH"
 
-# Lua related stuff
+## Cask
+
+[ -d "$HOME/.cask" ] && PATH="$HOME/.cask/bin:$PATH"
+
+## Lua related stuff
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
-
-export PATH
-
-for path in "$HOME"/.local/share/lua/*; do
-    LUA_PATH="$path/?.lua;$LUA_PATH"
-done
-
+for path in "$HOME"/.local/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
 export LUA_PATH
+
+## Finalize PATH building
+export PATH
 
 # History
 export HISTFILESIZE=
