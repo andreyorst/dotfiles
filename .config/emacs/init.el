@@ -967,12 +967,7 @@ Search is based on regular expressions in the
   (unless (version<= org-version "9.1.9")
     (add-to-list 'org-modules 'org-tempo)))
 
-(use-package ob-shell
-  :after org
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((shell . t))))
+(use-package ob-shell :after org)
 
 (use-package blog
   :commands (blog-publish-file
@@ -1176,12 +1171,7 @@ File name is updated to include the same date and current title."
   :custom
   (lua-indent-level 2))
 
-(use-package ob-lua
-  :after (org lua-mode)
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lua . t))))
+(use-package ob-lua :after org)
 
 (use-package fennel-mode
   :straight (:host sourcehut :repo "technomancy/fennel-mode")
@@ -1209,13 +1199,7 @@ File name is updated to include the same date and current title."
   (dolist (sym '(global local var))
     (put sym 'fennel-indent-function 1)))
 
-(use-package ob-fennel
-  :straight (:host gitlab :repo "andreyorst/ob-fennel")
-  :after (org fennel-mode)
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((fennel . t))))
+(use-package ob-fennel :after org)
 
 (use-package clojure-mode
   :straight t
@@ -1293,17 +1277,26 @@ File name is updated to include the same date and current title."
     "Find the current REPL buffer and clear it.
 See `cider-find-and-clear-repl-output' for more info."
     (interactive)
-    (cider-find-and-clear-repl-output 'clear-repl)))
+    (cider-find-and-clear-repl-output 'clear-repl))
+  (defun cider-open-portal ()
+    (interactive)
+    (cider-nrepl-request:eval
+     "(do
+        (ns dev)
+        (def portal ((requiring-resolve 'portal.api/open) {:launcher :emacs}))
+        (add-tap (requiring-resolve 'portal.api/submit)))"
+     #'ignore))
+  (defun cider-clear-clear ()
+    (interactive)
+    (cider-nrepl-request:eval "(portal.api/clear)" #'ignore))
+  (defun cider-close-portal ()
+    (interactive)
+    (cider-nrepl-request:eval "(portal.api/close)" #'ignore)))
 
-(use-package cider
-  :no-require
-  :after (org cider)
+(use-package ob-clojure
+  :after (cider org)
   :custom
-  (org-babel-clojure-backend 'cider)
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((clojure . t))))
+  (org-babel-clojure-backend 'cider))
 
 (use-package clj-refactor
   :straight t
