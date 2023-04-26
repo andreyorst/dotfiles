@@ -53,9 +53,10 @@ export HISTSIZE=-1
 export HISTTIMEFORMAT="[%F %T] "
 export HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 
-# Prompt
+
+# Prompt (assuming 256 colors)
 PS1="\$TIME_PC[36m\w[m\$GIT_PC\$CONTAINER_PC\$SSH_PC
-\$(if [ \$? -ne 0 ]; then echo \"[31m$[m\"; else echo \"$\"; fi) "
+\[\e[27m\]\$(if [ ! \$? -eq 0 ]; then echo [31m; fi)\$[m "
 
 function vterm_printf {
     if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
@@ -80,7 +81,7 @@ fi
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -n; time_pc; git_pc; ssh_pc; container_pc"
 
 function time_pc {
-    TIME_PC="$(date +'%a %H:%M') "
+    TIME_PC="[38;5;243m$(date +'%a %H:%M') [m"
 }
 
 ## NO_GIT_PC can be bound in order to skip parsing if repository is
@@ -93,9 +94,9 @@ function git_pc {
             fi
         fi
         if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-            GIT_PC=" on [35m${branch:-unknown}[m"
+            GIT_PC="[38;5;243m on [35m${branch:-unknown}[m"
         else
-            GIT_PC=" on ${branch:-unknown}"
+            GIT_PC="[38;5;243m on ${branch:-unknown}[m"
         fi
     else
         GIT_PC=
@@ -104,7 +105,7 @@ function git_pc {
 
 function ssh_pc {
     if [ -n "$SSH_CONNECTION" ]; then
-        SSH_PC=" via ssh"
+        SSH_PC=" [38;5;243mvia ssh[m"
     else
         SSH_PC=
     fi
@@ -112,11 +113,11 @@ function ssh_pc {
 
 function container_pc {
     if [ -e /run/.toolboxenv ]; then
-        CONTAINER_PC=" in toolbox"
+        CONTAINER_PC=" [38;5;243min toolbox[m"
     elif [ -e /run/.containerenv  ]; then
-        CONTAINER_PC=" in podman"
+        CONTAINER_PC=" [38;5;243min podman[m"
     elif [ -e /.dockerenv ]; then
-        CONTAINER_PC=" in docker"
+        CONTAINER_PC=" [38;5;243min docker[m"
     else
         CONTAINER_PC=
     fi
