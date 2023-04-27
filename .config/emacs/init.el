@@ -91,30 +91,31 @@ Used in various places to avoid getting wrong line height when
             (auto-fill-mode t))
           (when (looking-at "^$")
             (delete-char -1))))))
-  (defun narrow-next-page ()
-    "Narrow to the next page."
-    (interactive)
-    (widen)
-    (unless (looking-at (char-to-string ?\^L))
-      (forward-page))
-    (narrow-to-page))
-  (defun narrow-prev-page ()
-    "Narrow to the previous page."
-    (interactive)
-    (widen)
-    (unless (looking-at (char-to-string ?\^L))
-      (backward-page))
-    (backward-page)
-    (narrow-to-page))
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
+  (defun termux-color-theme-dark-p ()
+    (with-temp-buffer
+      (insert-file
+       (expand-file-name "~/.termux/theme-variant"))
+      (looking-at-p "dark")))
+  (defun dark-mode-enabled-p ()
+    "Check if dark mode is enabled."
+    (cond ((in-termux-p)
+           (termux-color-theme-dark-p))
+          ((featurep 'dbus)
+           (dbus-color-theme-dark-p))
+          (t nil)))
   (defun edit-init-file ()
     (interactive)
-    (find-file (expand-file-name "init.el" user-emacs-directory)))
-  (defun edit-early-init-file ()
-    (interactive)
-    (find-file (expand-file-name "early-init.el" user-emacs-directory)))
+    (if current-prefix-arg
+        (find-file
+         (expand-file-name
+          (completing-read
+           "file"
+           (directory-files user-emacs-directory nil "^[^.].*.el$"))
+          user-emacs-directory))
+      (find-file (expand-file-name "init.el" user-emacs-directory))))
   (defun memoize (fn)
     (let ((memo (make-hash-table :test 'equal)))
       (lambda (&rest args)
@@ -480,12 +481,7 @@ disabled, or enabled and the mark is active."
 
 (use-package bindings
   :bind ( :map ctl-x-map
-          ("C-d" . dired-jump)
-          :map narrow-map
-          ("i d" . indirect-narrow-to-defun)
-          ("i n" . indirect-narrow-to-region)
-          ("]" . narrow-next-page)
-          ("[" . narrow-prev-page))
+          ("C-d" . dired-jump))
   :init
   (setq mode-line-end-spaces nil))
 
@@ -540,6 +536,17 @@ disabled, or enabled and the mark is active."
       (if (equal (car value) '1)
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
+  (defun dbus-color-theme-dark-p ()
+    (equal '1 (caar (condition-case nil
+                        (dbus-call-method
+                         :session
+                         "org.freedesktop.portal.Desktop"
+                         "/org/freedesktop/portal/desktop"
+                         "org.freedesktop.portal.Settings"
+                         "Read"
+                         "org.freedesktop.appearance"
+                         "color-scheme")
+                      (error nil)))))
   :init
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
@@ -553,72 +560,61 @@ disabled, or enabled and the mark is active."
   :requires (local-config)
   :custom
   (modus-themes-org-blocks nil)
-  (modus-themes-region '(bg-only no-extend))
-  (modus-themes-completions '((matches . (intense bold))
-                              (selection . (intense))))
-  (modus-operandi-palette-overrides '((bg-main "#fbfbfb")
-                                      (string "#702f00")
-                                      (bg-line-number-active "#f0f0f0")))
-  (modus-vivendi-palette-overrides `((bg-main ,(if (in-termux-p) "#000000" "#181818"))
-                                     (bg-line-number-active "#1e1e1e")
-                                     (string "#f5aa80")))
-  (modus-themes-mode-line '(borderless))
-  (modus-themes-fringes nil)
-  :preface
-  (defun dark-mode-enabled-p ()
-    "Check if dark mode is enabled."
-    (cond ((in-termux-p)
-           (with-temp-buffer
-             (insert-file
-              (expand-file-name "~/.termux/theme-variant"))
-             (looking-at-p "dark")))
-          ((featurep 'dbus)
-           (equal '1 (caar (condition-case nil
-                               (dbus-call-method
-                                :session
-                                "org.freedesktop.portal.Desktop"
-                                "/org/freedesktop/portal/desktop"
-                                "org.freedesktop.portal.Settings"
-                                "Read"
-                                "org.freedesktop.appearance"
-                                "color-scheme")
-                             (error nil)))))))
+  (modus-themes-completions
+   '((matches . (intense bold))
+     (selection . (intense))))
+  (modus-operandi-palette-overrides
+   '((bg-main "#fbfbfb")
+     (string "#702f00")
+     (bg-line-number-active "#f0f0f0")))
+  (modus-vivendi-palette-overrides
+   `((bg-main ,(if (in-termux-p) "#000000" "#181818"))
+     (bg-line-number-active "#1e1e1e")
+     (string "#f5aa80")))
+  :custom-face
+  (region ((t :extend nil))))
+
+(use-package modus-themes
+  :after modus-themes
+  :no-require
+  :custom
+  (modus-themes-common-palette-overrides
+   `(;; syntax
+     (builtin magenta-faint)
+     (keyword cyan-faint)
+     (comment fg-dim)
+     (constant blue-faint)
+     (docstring fg-dim)
+     (docmarkup fg-dim)
+     (fnname magenta-faint)
+     (preprocessor cyan-faint)
+     (string red-faint)
+     (type magenta-cooler)
+     (variable blue-faint)
+     (rx-construct magenta-faint)
+     (rx-backslash blue-faint)
+     ;; misc
+     (bg-paren-match bg-ochre)
+     (bg-region bg-inactive)
+     (fg-region unspecified)
+     ;; line-numbers
+     (fg-line-number-active fg-main)
+     (bg-line-number-inactive bg-main)
+     (fg-line-number-inactive fg-dim)
+     ;; modeline
+     (border-mode-line-active unspecified)
+     (border-mode-line-inactive unspecified)
+     ;; links
+     (underline-link unspecified)
+     (underline-link-visited unspecified)
+     (underline-link-symbolic unspecified)
+     ,@modus-themes-preset-overrides-faint))
   :config
-  (let ((theme (if (dark-mode-enabled-p)
-                   local-config-dark-theme
-                 local-config-light-theme)))
-    (load-theme theme t t)
-    (setq modus-themes-common-palette-overrides
-          `(;; syntax
-            (builtin magenta-faint)
-            (keyword cyan-faint)
-            (comment fg-dim)
-            (constant blue-faint)
-            (docstring fg-dim)
-            (docmarkup fg-dim)
-            (fnname magenta-faint)
-            (preprocessor cyan-faint)
-            (string red-faint)
-            (type magenta-cooler)
-            (variable blue-faint)
-            (rx-construct magenta-faint)
-            (rx-backslash blue-faint)
-            ;; misc
-            (bg-paren-match bg-ochre)
-            (bg-region bg-ochre)
-            ;; line-numbers
-            (fg-line-number-active fg-main)
-            (bg-line-number-inactive bg-main)
-            (fg-line-number-inactive fg-dim)
-            ;; modeline
-            (border-mode-line-active unspecified)
-            (border-mode-line-inactive unspecified)
-            ;; links
-            (underline-link unspecified)
-            (underline-link-visited unspecified)
-            (underline-link-symbolic unspecified)
-            ,@modus-themes-preset-overrides-faint))
-    (load-theme theme t)))
+  (load-theme
+   (if (dark-mode-enabled-p)
+       local-config-dark-theme
+     local-config-light-theme)
+   t))
 
 (use-package uniquify
   :defer t
@@ -728,10 +724,12 @@ disabled, or enabled and the mark is active."
 (use-package hideshow
   :hook (prog-mode . hs-minor-mode)
   :delight hs-minor-mode
+  :bind ( :map hs-minor-mode-map
+          ("C-c @ C-p" . hs-hide-all-private))
   :preface
   (defvar hs-mode-private-regex-alist
     `(((emacs-lisp-mode lisp-mode) . ,(rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
-      ((clojure-mode clojurescrip-mode clojurec-mode) . ,(rx  "(" (or "defn-" "def ^:private")))
+      ((clojure-mode clojurescrip-mode clojurec-mode) . ,(rx  "(" (or "defn-" "def ^:private" "comment")))
       (zig-mode . ,(rx bol (* space) "fn" (+ (not "{")) "{")))
     "Alist of major modes to regular expressions for finding private definitions")
   (defun hs-hide-all-private ()
@@ -751,6 +749,10 @@ Search is based on regular expressions in the
               (hs-hide-block)))
         (error "Mode %s doesn't define a regex to find private definitions" major-mode))))
   :config
+  (easy-menu-add-item hs-minor-mode-map '(menu-bar hide/show)
+                      ["Hide all private definitions" hs-hide-all-private
+                       :help "Hide all private definitions based on `hs-mode-private-regex-alist'."]
+                      "--")
   (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
     (mouse-set-point last-input-event)))
@@ -1990,14 +1992,15 @@ group."
   (defvar fernflower-path
     (file-truename "~/.local/lib/fernflower.jar")
     "Path to the FernFlower library.")
+  :when (or (file-exists-p cfr-path)
+            (file-exists-p fernflower-path))
   :custom
-  (jdecomp-decompiler-type (cond ((file-exists-p cfr-path)
-                                  'cfr)
-                                 ((file-exists-p fernflower-path)
-                                  'fernflower)
-                                 (t jdecomp-decompiler-type)))
-  (jdecomp-decompiler-paths `((cfr . ,cfr-path)
-                              (fernflower . ,fernflower-path))))
+  (jdecomp-decompiler-type
+   (cond ((file-exists-p cfr-path) 'cfr)
+         ((file-exists-p fernflower-path) 'fernflower)))
+  (jdecomp-decompiler-paths
+   `((cfr . ,cfr-path)
+     (fernflower . ,fernflower-path))))
 
 
 ;;; Messaging

@@ -55,8 +55,9 @@ export HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 
 
 # Prompt (assuming 256 colors)
-PS1="\$TIME_PC[36m\w[m\$GIT_PC\$CONTAINER_PC\$SSH_PC
-\[\e[27m\]\$(if [ ! \$? -eq 0 ]; then echo [31m; fi)\$[m "
+PS1='$TIME_PC[36m\w[m$GIT_PC$CONTAINER_PC$SSH_PC'
+PS1=$PS1'$(code=$?; if [ $code -eq 0 ]; then echo [36m; else echo "[31m !$code"; fi)'
+PS1=$PS1'\n$\[[m\] '
 
 function vterm_printf {
     if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
@@ -71,7 +72,11 @@ function vterm_printf {
 }
 
 function vterm_prompt_end {
-    vterm_printf "51;A$(pwd)"
+    if [ -n "$SSH_CONNECTION" ]; then
+        vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
+    else
+        vterm_printf "51;A$(pwd)"
+    fi
 }
 
 if [ -n "$VTERM" ]; then
