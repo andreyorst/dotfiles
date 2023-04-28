@@ -740,7 +740,10 @@ disabled, or enabled and the mark is active."
                                    (seq "{" (* (not "}")) ":private" (+ space) "true")))
                       "comment")))
       (zig-mode
-       . ,(rx bol (* space) "fn" (+ (not "{")) "{")))
+       . ,(rx bol (* space) "fn" (+ (not "{")) "{"))
+      (fennel-mode
+       . ,(rx bol "(" (or (seq (or "fn" "local" "var") (+ space) "-" alpha)
+                          "comment"))))
     "Alist of major modes to regular expressions for finding private definitions")
   (defun hs-hide-all-private ()
     "Hide all private definitions in the current buffer.
