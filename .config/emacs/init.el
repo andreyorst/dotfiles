@@ -107,6 +107,9 @@ Used in various places to avoid getting wrong line height when
            (dbus-color-theme-dark-p))
           (t nil)))
   (defun edit-init-file ()
+    "Edit `user-init-file'.
+With prefix argument promtps to select a file from all Emacs Lisp
+in `user-emacs-directory'."
     (interactive)
     (if current-prefix-arg
         (find-file
@@ -728,9 +731,16 @@ disabled, or enabled and the mark is active."
           ("C-c @ C-p" . hs-hide-all-private))
   :preface
   (defvar hs-mode-private-regex-alist
-    `(((emacs-lisp-mode lisp-mode) . ,(rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
-      ((clojure-mode clojurescrip-mode clojurec-mode) . ,(rx  "(" (or "defn-" "def ^:private" "comment")))
-      (zig-mode . ,(rx bol (* space) "fn" (+ (not "{")) "{")))
+    `(((emacs-lisp-mode lisp-mode)
+       . ,(rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
+      ((clojure-mode clojurescrip-mode clojurec-mode)
+       . ,(rx "(" (or "defn-"
+                      (seq "def" (* (not space)) (+ space)
+                           "^" (or ":private"
+                                   (seq "{" (* (not "}")) ":private" (+ space) "true")))
+                      "comment")))
+      (zig-mode
+       . ,(rx bol (* space) "fn" (+ (not "{")) "{")))
     "Alist of major modes to regular expressions for finding private definitions")
   (defun hs-hide-all-private ()
     "Hide all private definitions in the current buffer.
@@ -744,8 +754,8 @@ Search is based on regular expressions in the
                                     (and (memq key2 key1) t)
                                   (eq key1 key2))))))
           (save-excursion
-            (goto-char (point-min))
-            (while (re-search-forward re nil t)
+            (goto-char (point-max))
+            (while (re-search-backward re nil t)
               (hs-hide-block)))
         (error "Mode %s doesn't define a regex to find private definitions" major-mode))))
   :config
