@@ -674,8 +674,29 @@ disabled, or enabled and the mark is active."
 
 (use-package esh-mode
   :hook (eshell-mode . common-lisp-modes-mode)
+  :preface
+  (defun eshell-prompt ()
+    (let* ((date (propertize (format-time-string "%a %H:%M") 'face '(:inherit shadow)))
+           (path (abbreviate-file-name default-directory))
+           (branch (when (and (eshell-search-path "git")
+                              (locate-dominating-file default-directory ".git"))
+                     (concat " on " (string-trim (shell-command-to-string "git branch --show-current")))))
+           (container (cond ((file-exists-p "/run/.containerenv") " in podman")
+                            ((file-exists-p "/run/.toolboxenv") " in toolbox")
+                            ((file-exists-p "/.dockerenv") " in docker")))
+           (ssh (when (getenv "SSH_CONNECTION") " via ssh"))
+           (info (propertize (concat (or branch "")
+                                     (or container "")
+                                     (or ssh ""))
+                             'face '(:inherit shadow)))
+           (prompt (if (= eshell-last-command-status 0)
+                       "$"
+                     (propertize "$" 'face '(:inherit error)))))
+      (concat date " " path info "\n" prompt " ")))
   :custom
-  (eshell-scroll-show-maximum-output nil))
+  (eshell-scroll-show-maximum-output nil)
+  (eshell-prompt-function 'eshell-prompt)
+  (eshell-banner-message ""))
 
 (use-package esh-module
   :after eshell
