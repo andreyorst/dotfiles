@@ -40,8 +40,9 @@ PATH="$HOME/.local/bin:$PATH"
 [ -d "$HOME/.cask" ] && PATH="$HOME/.cask/bin:$PATH"
 
 ## Lua related stuff
-[ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
+for path in /usr/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
 for path in "$HOME"/.local/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
+[ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
 export LUA_PATH
 
 ## Finalize PATH building
