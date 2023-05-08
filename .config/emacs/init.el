@@ -1966,6 +1966,11 @@ group."
    :file 1 :line 2 :col 3)
   (compile-add-error-syntax
    'fennel-compilation
+   'fennel-compile-error-2
+   "^\\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\|\\?\\)? Compile error: "
+   :file 1 :line 2 :col 3)
+  (compile-add-error-syntax
+   'fennel-compilation
    'fennel-test-error
    "^not ok[[:space:]]+[0-9]+[^
 ]+
