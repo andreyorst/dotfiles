@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-mv "$2" "$1"

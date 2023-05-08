@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-# tsls - tab separated ls
-
-ls ${@:-"-1"} | column -t -s ${TSLS_SEP:-"	"}
