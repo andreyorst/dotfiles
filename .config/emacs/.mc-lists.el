@@ -90,6 +90,7 @@
         puni-forward-sexp-or-up-list
         puni-kill-active-region
         puni-kill-line
+        puni-kill-region
         puni-raise
         puni-slurp-forward
         puni-splice-killing-backward
