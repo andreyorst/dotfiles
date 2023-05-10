@@ -1223,6 +1223,7 @@ File name is updated to include the same date and current title."
           ("C-c C-o" . fennel-repl-delete-all-output))
   :custom
   (fennel-eldoc-fontify-markdown t)
+  (fennel-scratch-use-proto-repl t)
   :preface
   (defun fennel-repl-delete-all-output ()
     (interactive)
@@ -1232,7 +1233,7 @@ File name is updated to include the same date and current title."
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
   :config
-  (dolist (sym '(global local var))
+  (dolist (sym '(global local var set))
     (put sym 'fennel-indent-function 1)))
 
 (use-package ob-fennel :after org)
