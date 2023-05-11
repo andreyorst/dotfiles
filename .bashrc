@@ -118,10 +118,9 @@ function ssh_pc {
 }
 
 function container_pc {
-    if [ -e /run/.toolboxenv ]; then
-        CONTAINER_PC=" [38;5;243min toolbox[m"
-    elif [ -e /run/.containerenv  ]; then
-        CONTAINER_PC=" [38;5;243min podman[m"
+    if [ -e /run/.containerenv  ]; then
+        name=$(grep -oP "(?<=name=\")[^\";]+" /run/.containerenv)
+        CONTAINER_PC=" [38;5;243min ${name:-podman}[m"
     elif [ -e /.dockerenv ]; then
         CONTAINER_PC=" [38;5;243min docker[m"
     else
