@@ -2213,6 +2213,15 @@ the generated command."
   :straight t
   :hook (gnus-part-display . message-view-patch-highlight))
 
+(use-package mu4e-alert
+  :straight t
+  :after mu4e
+  :custom
+  (mu4e-alert-style 'libnotify)
+  (mu4e-alert-icon "emacs")
+  :config
+  (mu4e-alert-enable-notifications))
+
 
 (provide 'init)
 ;;; init.el ends here
