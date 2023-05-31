@@ -20,6 +20,41 @@
   :config
   (load-file (expand-file-name "early-init.el" user-emacs-directory)))
 
+(use-package gsettings
+  :straight t)
+
+(use-package proxy
+  :after gsettings
+  :preface
+  (defun proxy--get-host (type)
+    (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
+      (and (not (string-empty-p host)) host)))
+  (defun proxy--get-port (type)
+    (let ((port (gsettings-get (format "org.gnome.system.proxy.%s" type) "port")))
+      (and (numberp port) port)))
+  (defun proxy--get-ignore ()
+    (let ((ignore (gsettings-get "org.gnome.system.proxy" "ignore-hosts")))
+      (and (vectorp ignore) (string-join ignore ","))))
+  (defun proxy--enabled? ()
+    (string= "manual" (gsettings-get "org.gnome.system.proxy" "mode")))
+  (defun proxy-setup-env ()
+    (if-let ((enabled (proxy--enabled?))
+             (host (proxy--get-host "http"))
+             (port (proxy--get-port "http"))
+             (ignore (proxy--get-ignore)))
+        (let ((proxy (format "http://%s:%s" host port)))
+          (dolist (v '("http_proxy" "https_proxy" "ftp_proxy"
+                       "HTTP_PROXY" "HTTPS_PROXY" "FTP_PROXY"))
+            (setenv v proxy))
+          (dolist (v '("no_proxy" "NO_PROXY"))
+            (setenv v ignore)))
+      (dolist (v '("http_proxy" "https_proxy" "ftp_proxy" "no_proxy"
+                   "HTTP_PROXY" "HTTPS_PROXY" "FTP_PROXY" "NO_PROXY"))
+        (setenv v))))
+  (provide 'proxy)
+  :init
+  (proxy-setup-env))
+
 (use-package straight)
 
 (use-package delight
@@ -458,38 +493,6 @@ disabled, or enabled and the mark is active."
 
 (use-package delsel
   :hook (after-init . delete-selection-mode))
-
-(use-package gsettings
-  :straight t)
-
-(use-package proxy
-  :after gsettings
-  :preface
-  (defun proxy--get-host (type)
-    (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
-      (and (not (string-empty-p host)) host)))
-  (defun proxy--get-port (type)
-    (let ((port (gsettings-get (format "org.gnome.system.proxy.%s" type) "port")))
-      (and (numberp port) port)))
-  (defun proxy--get-ignore ()
-    (let ((ignore (gsettings-get "org.gnome.system.proxy" "ignore-hosts")))
-      (and (vectorp ignore) (string-join ignore ","))))
-  (defun proxy-setup ()
-    (when-let ((host (proxy--get-host "http"))
-               (port (proxy--get-port "http"))
-               (ignore (proxy--get-ignore)))
-      (let ((proxy (format "http://%s:%s" host port)))
-        (setenv "http_proxy" proxy)
-        (setenv "https_proxy" proxy)
-        (setenv "ftp_proxy" proxy)
-        (setenv "no_proxy" ignore)
-        (setenv "HTTP_PROXY" proxy)
-        (setenv "HTTPS_PROXY" proxy)
-        (setenv "FTP_PROXY" proxy)
-        (setenv "NO_PROXY" ignore))))
-  (provide 'proxy)
-  :init
-  (proxy-setup))
 
 (use-package common-lisp-modes
   :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el"))
