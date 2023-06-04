@@ -50,6 +50,20 @@
   (defvar native-comp-async-report-warnings-errors)
   (setq native-comp-async-report-warnings-errors 'silent))
 
+(defun edit-init-file ()
+  "Edit `user-init-file'.
+With prefix argument promtps to select a file from all Emacs Lisp
+in `user-emacs-directory'."
+  (interactive)
+  (if current-prefix-arg
+      (find-file
+       (expand-file-name
+        (completing-read
+         "file"
+         (directory-files user-emacs-directory nil "^[^.].*.el$"))
+        user-emacs-directory))
+    (find-file (expand-file-name "init.el" user-emacs-directory))))
+
 ;;; Straight
 
 (defvar straight-process-buffer)

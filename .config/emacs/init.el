@@ -141,19 +141,6 @@ Used in various places to avoid getting wrong line height when
           ((featurep 'dbus)
            (dbus-color-theme-dark-p))
           (t nil)))
-  (defun edit-init-file ()
-    "Edit `user-init-file'.
-With prefix argument promtps to select a file from all Emacs Lisp
-in `user-emacs-directory'."
-    (interactive)
-    (if current-prefix-arg
-        (find-file
-         (expand-file-name
-          (completing-read
-           "file"
-           (directory-files user-emacs-directory nil "^[^.].*.el$"))
-          user-emacs-directory))
-      (find-file (expand-file-name "init.el" user-emacs-directory))))
   (defun memoize (fn)
     (let ((memo (make-hash-table :test 'equal)))
       (lambda (&rest args)
@@ -767,7 +754,8 @@ disabled, or enabled and the mark is active."
   :defer t
   :custom
   (comint-scroll-show-maximum-output nil)
-  (comint-highlight-input nil))
+  (comint-highlight-input nil)
+  (comint-input-ignoredups t))
 
 (use-package rect
   :bind (("C-x r C-y" . rectangle-yank-add-lines))
