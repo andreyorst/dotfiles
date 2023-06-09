@@ -1053,6 +1053,7 @@ Search is based on regular expressions in the
 #+hugo_tags: %(blog-read-list-items \"Select tags: \" 'blog-tags)
 #+hugo_categories: %(blog-read-list-items \"Select categories: \" 'blog-categories)
 #+hugo_custom_front_matter: :license %(format \"%S\" blog-license)
+#+hugo_draft: true
 
 %?"
     "Org-capture template for blog posts.")
@@ -1115,7 +1116,9 @@ File name is updated to include the same date and current title."
         (save-excursion
           (goto-char (point-min))
           (re-search-forward "^#\\+date:.*$")
-          (replace-match (format "#+date: %s %s" today now)))
+          (replace-match (format "#+date: %s %s" today now))
+          (re-search-forward "^#\\+hugo_draft:.*$")
+          (replace-match "#+hugo_draft: false"))
         (let* ((file-name (save-excursion
                             (goto-char (point-min))
                             (re-search-forward "^#\\+title:[[:space:]]*\\(.*\\)$")
