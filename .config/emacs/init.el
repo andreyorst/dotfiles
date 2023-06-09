@@ -1102,7 +1102,7 @@ items were read by the `completing-read' function."
        (file-name-concat
         (expand-file-name blog-directory)
         "posts"
-        (format "%s-%s.org"
+        (format "DRAFT-%s-%s.org"
                 (format-time-string "%Y-%m-%d")
                 (blog-title-to-fname title))))))
   (defun blog-publish-file ()
