@@ -64,29 +64,9 @@ in `user-emacs-directory'."
         user-emacs-directory))
     (find-file (expand-file-name "init.el" user-emacs-directory))))
 
-;;; Straight
-
-(defvar straight-process-buffer)
-(setq-default straight-process-buffer " *straight-process*")
-
-(defvar straight-build-dir)
-(setq straight-build-dir (format "build-%s" emacs-version))
-
-(defvar straight-repository-branch)
-(setq straight-repository-branch "develop")
-
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
 (provide 'early-init)
 ;;; early-init.el ends here

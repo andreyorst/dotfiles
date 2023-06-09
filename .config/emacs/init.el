@@ -21,7 +21,7 @@
   (load-file (expand-file-name "early-init.el" user-emacs-directory)))
 
 (use-package gsettings
-  :straight t)
+  :ensure t)
 
 (use-package proxy
   :after gsettings
@@ -55,10 +55,10 @@
   :init
   (proxy-setup-env))
 
-(use-package straight)
+;; (use-package straight)
 
 (use-package delight
-  :straight t)
+  :ensure t)
 
 (use-package local-config
   :defer t
@@ -482,7 +482,7 @@ disabled, or enabled and the mark is active."
   :hook (after-init . delete-selection-mode))
 
 (use-package common-lisp-modes
-  :straight (:host gitlab :repo "andreyorst/common-lisp-modes.el"))
+  :vc (:url "https://gitlab.com/andreyorst/common-lisp-modes.el" :branch "main"))
 
 (use-package minibuffer
   :hook (eval-expression-minibuffer-setup . common-lisp-modes-mode)
@@ -496,7 +496,7 @@ disabled, or enabled and the mark is active."
   (completions-first-difference ((t (:inherit unspecified)))))
 
 (use-package orderless
-  :straight t
+  :ensure t
   :defer t
   :custom
   (completion-category-overrides
@@ -581,7 +581,7 @@ disabled, or enabled and the mark is active."
                         #'color-scheme-changed))
 
 (use-package modus-themes
-  :straight t
+  :ensure t
   :requires (local-config)
   :custom
   (modus-themes-org-blocks nil)
@@ -854,7 +854,7 @@ Search is based on regular expressions in the
   (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
 
 (use-package flyspell
-  :straight t
+  :ensure t
   :when (or (executable-find "ispell")
             (executable-find "aspell")
             (executable-find "hunspell"))
@@ -889,7 +889,7 @@ Search is based on regular expressions in the
 ;;; Completion
 
 (use-package vertico
-  :straight t
+  :ensure t
   :load-path "straight/repos/vertico/extensions/"
   :bind ( :map vertico-map
           ("M-RET" . vertico-exit-input))
@@ -905,13 +905,13 @@ Search is based on regular expressions in the
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package marginalia
-  :straight t
+  :ensure t
   :after vertico
   :config
   (marginalia-mode))
 
 (use-package consult
-  :straight t
+  :ensure t
   :preface
   (defvar consult-prefix-map (make-sparse-keymap))
   (fset 'consult-prefix-map consult-prefix-map)
@@ -928,8 +928,7 @@ Search is based on regular expressions in the
   (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package corfu
-  :straight (:host github :repo "minad/corfu")
-  :load-path "straight/repos/corfu/extensions/"
+  :ensure t
   :bind ( :map corfu-map
           ("TAB" . corfu-next)
           ([tab] . corfu-next)
@@ -955,8 +954,7 @@ Search is based on regular expressions in the
     (interactive)
     (corfu-complete)
     (corfu-quit))
-  :init
-  (global-corfu-mode 1))
+  :hook (after-init . global-corfu-mode))
 
 (use-package corfu-popupinfo
   :bind ( :map corfu-popupinfo-map
@@ -967,14 +965,14 @@ Search is based on regular expressions in the
   (corfu-popupinfo ((t :height 1.0))))
 
 (use-package corfu-terminal
-  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
+  :ensure t   ;(:url "https://codeberg.org/akib/emacs-corfu-terminal")
   :unless (display-graphic-p)
   :after corfu
   :config
   (corfu-terminal-mode 1))
 
 (use-package cape
-  :straight t
+  :ensure t
   :after corfu
   :config
   (setq completion-at-point-functions
@@ -984,7 +982,6 @@ Search is based on regular expressions in the
 ;;; Org
 
 (use-package org
-  :straight (:type built-in)
   :hook ((org-mode . org-change-syntax-table)
          ((org-capture-mode org-src-mode) . discard-history)
          (org-babel-after-execute . org-redisplay-inline-images))
@@ -1146,14 +1143,14 @@ File name is updated to include the same date and current title."
                             :immediate-finish t))))
 
 (use-package org-tree-slide
-  :straight t
+  :ensure t
   :defer t
   :custom
   (org-tree-slide-slide-in-effect nil)
   (org-tree-slide-never-touch-face t))
 
 (use-package org-modern
-  :straight t
+  :ensure t
   :defer t
   :hook (org-tree-slide-mode . org-modern-mode)
   :custom-face
@@ -1164,7 +1161,7 @@ File name is updated to include the same date and current title."
   (org-modern-block-fringe nil))
 
 (use-package ox-hugo
-  :straight (:host github :repo "kaushalmodi/ox-hugo")
+  :ensure t
   :after ox)
 
 (use-package ox-latex
@@ -1186,7 +1183,7 @@ File name is updated to include the same date and current title."
                 tab-width 4)))
 
 (use-package markdown-mode
-  :straight t
+  :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
@@ -1203,11 +1200,11 @@ File name is updated to include the same date and current title."
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
 (use-package racket-mode
-  :straight t
+  :ensure t
   :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
 
 (use-package yaml-mode
-  :straight t
+  :ensure t
   :defer t
   :custom
   (yaml-indent-offset 4))
@@ -1223,20 +1220,20 @@ File name is updated to include the same date and current title."
   (js-indent-level 2))
 
 (use-package csv-mode
-  :straight t
+  :ensure t
   :defer t
   :custom
   (csv-align-max-width 80))
 
 (use-package scala-mode
-  :straight t
+  :ensure t
   :defer t)
 
 (use-package zig-mode
-  :straight t)
+  :ensure t)
 
 (use-package lua-mode
-  :straight t
+  :ensure t
   :defer t
   :custom
   (lua-indent-level 2))
@@ -1244,7 +1241,7 @@ File name is updated to include the same date and current title."
 (use-package ob-lua :after org)
 
 (use-package fennel-mode
-  :straight (:host sourcehut :repo "technomancy/fennel-mode")
+  :ensure t
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
            fennel-repl-mode
@@ -1273,7 +1270,7 @@ File name is updated to include the same date and current title."
 (use-package ob-fennel :after org)
 
 (use-package clojure-mode
-  :straight t
+  :ensure t
   :hook ((clojure-mode
           clojurec-mode
           clojurescript-mode)
@@ -1296,7 +1293,7 @@ File name is updated to include the same date and current title."
     (clojure-set-compile-command)))
 
 (use-package cider
-  :straight t
+  :ensure t
   :delight " CIDER"
   :commands cider-find-and-clear-repl-buffer
   :functions flycheck-mode
@@ -1370,7 +1367,7 @@ See `cider-find-and-clear-repl-output' for more info."
   (org-babel-clojure-backend 'cider))
 
 (use-package clj-refactor
-  :straight t
+  :ensure t
   :delight clj-refactor-mode
   :hook ((clj-refactor-mode . yas-minor-mode)
          (cider-mode . clj-refactor-mode))
@@ -1380,7 +1377,7 @@ See `cider-find-and-clear-repl-output' for more info."
   (cljr-warn-on-eval nil))
 
 (use-package clj-decompiler
-  :straight t
+  :ensure t
   :hook (cider-mode . clj-decompiler-setup))
 
 (use-package lisp-mode
@@ -1409,7 +1406,7 @@ See `cider-find-and-clear-repl-output' for more info."
             (lisp-eval-last-sexp)))))))
 
 (use-package sly
-  :straight t
+  :ensure t
   :hook (sly-mrepl-mode . common-lisp-modes-mode)
   :commands (sly-symbol-completion-mode)
   :config
@@ -1419,21 +1416,21 @@ See `cider-find-and-clear-repl-output' for more info."
   :hook (scheme-mode . common-lisp-modes-mode))
 
 (use-package geiser
-  :straight t
+  :ensure t
   :hook (scheme-mode . geiser-mode)
   :custom
   (geiser-active-implementations '(guile))
   (geiser-default-implementation 'guile))
 
 (use-package geiser-guile
-  :straight t
+  :ensure t
   :after geiser)
 
 
 ;;; LSP
 
 (use-package lsp-mode
-  :straight t
+  :ensure t
   :hook ((lsp-mode . lsp-diagnostics-mode)
          (lsp-mode . lsp-completion-mode))
   :custom
@@ -1481,7 +1478,7 @@ See `cider-find-and-clear-repl-output' for more info."
   (setq lsp-use-plists t))
 
 (use-package lsp-treemacs
-  :straight t
+  :ensure t
   :defer t
   :custom
   (lsp-treemacs-theme "Iconless"))
@@ -1502,7 +1499,7 @@ See `cider-find-and-clear-repl-output' for more info."
     (lsp-completion-mode (if (bound-and-true-p cider-mode) -1 1))))
 
 (use-package lsp-java
-  :straight t
+  :ensure t
   :demand t
   :after lsp-mode
   :when (and openjdk-11-path
@@ -1515,7 +1512,7 @@ See `cider-find-and-clear-repl-output' for more info."
   :hook (java-mode . lsp))
 
 (use-package lsp-metals
-  :straight t
+  :ensure t
   :custom
   (lsp-metals-server-args
    '("-J-Dmetals.allow-multiline-string-formatting=off"))
@@ -1541,7 +1538,7 @@ See `cider-find-and-clear-repl-output' for more info."
           ("M-q" . indent-sexp-or-fill)))
 
 (use-package puni
-  :straight t
+  :ensure t
   :hook (((common-lisp-modes-mode nxml-mode) . puni-mode)
          (puni-mode . electric-pair-mode))
   ;; paredit-like keys
@@ -1598,7 +1595,7 @@ See `cider-find-and-clear-repl-output' for more info."
   (isearch-lazy-highlight t))
 
 (use-package dumb-jump
-  :straight t
+  :ensure t
   :defer t
   :custom
   (dumb-jump-prefer-searcher 'rg)
@@ -1607,29 +1604,29 @@ See `cider-find-and-clear-repl-output' for more info."
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package phi-search
-  :straight t
+  :ensure t
   :defer t)
 
 (use-package avy
-  :straight t
+  :ensure t
   :bind (("C-:" . avy-goto-char-timer)))
 
 (use-package isayt
-  :straight (:host gitlab :repo "andreyorst/isayt.el")
+  :vc (:url "https://gitlab.com/andreyorst/isayt.el" :branch "main")
   :delight isayt-mode
   :hook (common-lisp-modes-mode . isayt-mode))
 
 (use-package expand-region
-  :straight t
+  :ensure t
   :bind ("C-=" . er/expand-region))
 
 (use-package region-bindings
-  :straight ( :host gitlab :repo "andreyorst/region-bindings.el")
+  :vc (:url "https://gitlab.com/andreyorst/region-bindings.el" :branch "main")
   :hook ((after-init . global-region-bindings-mode)
          (magit-mode . (lambda () (region-bindings-mode -1)))))
 
 (use-package multiple-cursors
-  :straight t
+  :ensure t
   :bind
   (("S-<mouse-1>" . mc/add-cursor-on-click)
    :map region-bindings-mode-map
@@ -1650,14 +1647,14 @@ See `cider-find-and-clear-repl-output' for more info."
      ("C-#" . mc/insert-numbers))))
 
 (use-package vundo
-  :straight (:host github :repo "casouri/vundo")
+  :ensure t
   :bind (("C-c u" . vundo))
   :custom
   (vundo-roll-back-on-quit nil)
   (vundo--window-max-height 10))
 
 (use-package yasnippet
-  :straight t
+  :ensure t
   :defer t
   :delight yas-minor-mode)
 
@@ -1672,7 +1669,7 @@ See `cider-find-and-clear-repl-output' for more info."
   (advice-add 'ediff-window-display-p :override #'ignore))
 
 (use-package project
-  :straight t
+  :ensure t
   :bind ( :map project-prefix-map
           ("s" . project-save-some-buffers))
   :custom
@@ -1730,7 +1727,7 @@ means save all with no questions."
                '(project-switch-to-buffer "Switch buffer")))
 
 (use-package toggle-test
-  :straight t
+  :ensure t
   :after (project)
   :bind ( :map project-prefix-map
           ("T" . tgt-toggle))
@@ -1762,7 +1759,7 @@ means save all with no questions."
             (tgt-local-setup :test-dirs "tests" :suffixes "-test")))
 
 (use-package vterm
-  :straight t
+  :ensure t
   :when (bound-and-true-p module-file-suffix)
   :bind ( :map vterm-mode-map
           ("<insert>" . ignore)
@@ -1794,14 +1791,11 @@ the prefix argument is supplied."
                '(vterm-project-dir "vterm") t))
 
 (use-package eat
-  :straight `( :host codeberg
-               :repo "akib/emacs-eat"
-               :files ,(append '(("terminfo/" "terminfo/*"))
-                               straight-default-files-directive))
+  :ensure t
   :hook (eshell-load . eat-eshell-mode))
 
 (use-package magit
-  :straight t
+  :ensure t
   :hook (git-commit-mode . flyspell-mode)
   :bind ( :map project-prefix-map
           ("m" . magit-project-status))
@@ -1823,7 +1817,7 @@ the prefix argument is supplied."
     (server-start)))
 
 (use-package separedit
-  :straight t
+  :ensure t
   :hook (separedit-buffer-creation . separedit-header-line-setup)
   :bind ( :map prog-mode-map
           ("C-c '" . separedit)
@@ -1855,12 +1849,12 @@ the prefix argument is supplied."
     (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*"))))
 
 (use-package gcmh
-  :straight t
+  :ensure t
   :hook (after-init . gcmh-mode)
   :delight gcmh-mode)
 
 (use-package hl-todo
-  :straight t
+  :ensure t
   :hook (prog-mode . hl-todo-mode))
 
 (use-package compile
@@ -2057,7 +2051,7 @@ group."
       (funcall fn require-match))))
 
 (use-package jdecomp
-  :straight t
+  :ensure t
   :mode ("\\.class\\'" . jdecomp-mode)
   :preface
   (defvar cfr-path
@@ -2233,11 +2227,11 @@ the generated command."
       (funcall fn prompt))))
 
 (use-package message-view-patch
-  :straight t
+  :ensure t
   :hook (gnus-part-display . message-view-patch-highlight))
 
 (use-package mu4e-alert
-  :straight t
+  :ensure t
   :after mu4e
   :custom
   (mu4e-alert-style 'libnotify)
