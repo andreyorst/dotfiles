@@ -3,4 +3,5 @@
            :reduce-without-init :warning
            :keyword-binding :warning
            :namespace-name-mismatch :error
-           :redundant-fn-wrapper :warn}}
+           :redundant-fn-wrapper :warn}
+ :config-in-comment {:linters {:unresolved-namespace {:level :off}}}}
