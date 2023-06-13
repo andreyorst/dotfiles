@@ -20,6 +20,50 @@
   :config
   (load-file (expand-file-name "early-init.el" user-emacs-directory)))
 
+(use-package package
+  :preface
+  (defcustom package-last-refresh
+    (expand-file-name ".package-last-refresh" user-emacs-directory)
+    "Date and time when package lists have been refreshed.
+
+This file is then used to check whether
+`package-refresh-contents' call is needed before calling
+`package-install'. The data in this file is updated when
+`package-refresh-contents' is called.
+
+See `package-refresh-hour-threshold' for the amount of time
+needed to trigger a refresh."
+    :type 'file
+    :group 'package)
+  (defcustom package-automatic-refresh-threshold 24
+    "Amount of hours since last `package-refresh-contents' call
+needed to trigger automatic refresh before calling `package-install'."
+    :type 'number
+    :group 'package)
+  (defun package-last-refresh ()
+    (when (file-exists-p package-last-refresh)
+      (with-temp-buffer
+        (insert-file-contents package-last-refresh)
+        (date-to-time
+         (buffer-substring-no-properties
+          (point-min) (point-max))))))
+  :init
+  (define-advice package-install
+      (:before (&rest _) package-refresh-contents-maybe)
+    "Automatically call `package-refresh-contents' if time since last
+refresh is greater than `package-automatic-refresh-threshold'."
+    (let ((last-refresh (package-last-refresh)))
+      (when (or (null last-refresh)
+                (> (/ (float-time (time-subtract nil last-refresh)) 3600)
+                   package-automatic-refresh-threshold))
+        (package-refresh-contents))))
+  (define-advice package-refresh-contents
+      (:after (&rest _) update-package-refresh-date)
+    "Write current date and time to the `package-last-refresh' file."
+    (with-temp-buffer
+      (insert (format-time-string "%Y-%m-%dT%H:%M:%S%z"))
+      (write-file package-last-refresh))))
+
 (use-package gsettings
   :ensure t)
 
@@ -482,7 +526,7 @@ disabled, or enabled and the mark is active."
   :hook (after-init . delete-selection-mode))
 
 (use-package common-lisp-modes
-  :vc (:url "https://gitlab.com/andreyorst/common-lisp-modes.el" :branch "main"))
+  :vc (:url "https://gitlab.com/andreyorst/common-lisp-modes.el.git"))
 
 (use-package minibuffer
   :hook (eval-expression-minibuffer-setup . common-lisp-modes-mode)
@@ -1039,7 +1083,9 @@ Search is based on regular expressions in the
 (use-package blog
   :commands (blog-publish-file
              blog-generate-file-name
-             blog-read-list-items)
+             blog-read-list-items
+             blog-new-post)
+  :after ox-hugo
   :preface
   (defvar blog-capture-template
     "#+hugo_base_dir: ../
@@ -1047,6 +1093,7 @@ Search is based on regular expressions in the
 #+hugo_auto_set_lastmod: t
 #+options: tex:dvisvgm
 #+macro: kbd @@html:<kbd>$1</kbd>@@
+#+macro: a @@html:<a href=\"$1\">$2</a>@@
 
 #+title: %(format \"%s\" blog--current-post-name)
 #+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
@@ -1108,7 +1155,8 @@ items were read by the `completing-read' function."
                 (blog-title-to-fname title))))))
   (defun blog-publish-file ()
     "Update '#+date:' tag, and rename the currently visited file.
-File name is updated to include the same date and current title."
+File name is updated to include the same date and current title.
+Export the file to md with the `ox-hugo' package."
     (interactive)
     (save-match-data
       (let ((today (format-time-string "%Y-%m-%d"))
@@ -1132,7 +1180,12 @@ File name is updated to include the same date and current title."
                            (match-string 1 file-name)
                          file-name)))
             (file-already-exists nil))
-          (save-buffer)))))
+          (save-buffer)
+          (org-hugo-export-to-md)))))
+  (defun blog-new-post ()
+    "Capture a new post."
+    (interactive)
+    (org-capture nil "p"))
   (provide 'blog))
 
 (use-package org-capture
@@ -1615,7 +1668,7 @@ See `cider-find-and-clear-repl-output' for more info."
   :bind (("C-:" . avy-goto-char-timer)))
 
 (use-package isayt
-  :vc (:url "https://gitlab.com/andreyorst/isayt.el" :branch "main")
+  :vc (:url "https://gitlab.com/andreyorst/isayt.el.git")
   :delight isayt-mode
   :hook (common-lisp-modes-mode . isayt-mode))
 
@@ -1624,7 +1677,7 @@ See `cider-find-and-clear-repl-output' for more info."
   :bind ("C-=" . er/expand-region))
 
 (use-package region-bindings
-  :vc (:url "https://gitlab.com/andreyorst/region-bindings.el" :branch "main")
+  :vc (:url "https://gitlab.com/andreyorst/region-bindings.el.git")
   :hook ((after-init . global-region-bindings-mode)
          (magit-mode . (lambda () (region-bindings-mode -1)))))
 
