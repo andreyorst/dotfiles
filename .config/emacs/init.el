@@ -1288,11 +1288,35 @@ Export the file to md with the `ox-hugo' package."
 (use-package zig-mode
   :ensure t)
 
+(use-package abbrev
+  :custom
+  (save-abbrevs nil))
+
 (use-package lua-mode
   :ensure t
-  :defer t
+  :hook (lua-mode . lua-setup-abbrev-prettify)
   :custom
-  (lua-indent-level 2))
+  (lua-indent-level 2)
+  :preface
+  (defvar lua-syntax-expansions
+    '(("func" "local function")
+      ("fn"  "function")
+      ("def" "local")
+      ("<-" "return")))
+  (defun lua-setup-abbrev-prettify ()
+    (setq prettify-symbols-alist
+          (mapcar (lambda (abbrev-exp)
+                    (let ((abbrev (car abbrev-exp))
+                          (exp (cadr abbrev-exp)))
+                      `(,exp . ,(vconcat (cdr (mapcan (lambda (ch) (list '(Br . Bl) ch)) abbrev))))))
+                  lua-syntax-expansions))
+    (prettify-symbols-mode 1)
+    (dolist (abbrev-exp lua-syntax-expansions)
+      (apply #'define-abbrev lua-mode-abbrev-table abbrev-exp))
+    (abbrev-table-put
+     lua-mode-abbrev-table
+     :regexp (regexp-opt (mapcar #'car lua-syntax-expansions) "\\("))
+    (abbrev-mode)))
 
 (use-package ob-lua :after org)
 
