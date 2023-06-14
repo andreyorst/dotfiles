@@ -1289,6 +1289,7 @@ Export the file to md with the `ox-hugo' package."
   :ensure t)
 
 (use-package abbrev
+  :delight abbrev-mode
   :custom
   (save-abbrevs nil))
 
@@ -1301,7 +1302,7 @@ Export the file to md with the `ox-hugo' package."
   (defvar lua-syntax-expansions
     '(("func" "local function")
       ("fn"  "function")
-      ("def" "local")
+      ("let" "local")
       ("<-" "return")))
   (defun lua-setup-abbrev-prettify ()
     (setq prettify-symbols-alist
@@ -1313,9 +1314,6 @@ Export the file to md with the `ox-hugo' package."
     (prettify-symbols-mode 1)
     (dolist (abbrev-exp lua-syntax-expansions)
       (apply #'define-abbrev lua-mode-abbrev-table abbrev-exp))
-    (abbrev-table-put
-     lua-mode-abbrev-table
-     :regexp (regexp-opt (mapcar #'car lua-syntax-expansions) "\\("))
     (abbrev-mode)))
 
 (use-package ob-lua :after org)
@@ -1506,6 +1504,8 @@ See `cider-find-and-clear-repl-output' for more info."
   :ensure t
   :after geiser)
 
+(use-package sql-indent
+  :ensure t)
 
 ;;; LSP
 
@@ -1882,7 +1882,15 @@ the prefix argument is supplied."
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all))
+  (magit-diff-refine-hunk 'all)
+  :config
+  (define-advice magit-list-refnames (:filter-return (refs) range-at-point)
+    (require 'thingatpt)
+    (if-let ((range (save-match-data
+                      (and (thing-at-point-looking-at "[a-f0-9]+\.\.[a-f0-9]+")
+                           (match-string 0)))))
+        (cons range refs)
+      refs)))
 
 (use-package magit
   :after project
