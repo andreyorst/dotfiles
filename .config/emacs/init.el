@@ -2337,6 +2337,8 @@ the generated command."
   :config
   (mu4e-alert-enable-notifications))
 
+(use-package elfeed
+  :ensure t)
 
 (provide 'init)
 ;;; init.el ends here
