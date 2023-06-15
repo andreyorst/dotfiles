@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-ssh -4 -N -L "$1":localhost:"$1" "$2"

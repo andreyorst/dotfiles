@@ -1,7 +1,0 @@
-#!/bin/sh
-
-if [ -n "$*" ]; then
-    exec emacsclient -a emacs -n "$@"
-else
-    exec emacs
-fi

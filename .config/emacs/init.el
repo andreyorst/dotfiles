@@ -190,6 +190,16 @@ Used in various places to avoid getting wrong line height when
       (lambda (&rest args)
         (let ((value (gethash args memo)))
           (or value (puthash args (apply fn args) memo))))))
+  (defun ssh-tunnel (host port &optional local-port)
+    "Start an SSH tunnel from localhost to HOST:PORT.
+If LOCAL-PORT is nil, PORT is used as local port."
+    (interactive "shost: \nnport: ")
+    (let ((name (if local-port
+                    (format "*ssh-tunnel:%s:%s:%s" (or local-port port) host port)
+                  (format "*ssh-tunnel:%s:%s" host port))))
+      (async-shell-command
+       (format "ssh -4 -N -L %s:localhost:%s %s" (or local-port port) port host)
+       (concat " " name))))
   (provide 'functions))
 
 (use-package defaults
