@@ -1391,7 +1391,8 @@ Export the file to md with the `ox-hugo' package."
   :bind ( :map cider-repl-mode-map
           ("C-c C-S-o" . cider-repl-clear-buffer)
           :map cider-mode-map
-          ("C-c C-S-o" . cider-find-and-clear-repl-buffer))
+          ("C-c C-S-o" . cider-find-and-clear-repl-buffer)
+          ("C-c C-p" . cider-pprint-eval-last-sexp-to-comment))
   :custom-face
   (cider-result-overlay-face ((t (:box (:line-width -1 :color "grey50")))))
   (cider-error-highlight-face ((t (:inherit flymake-error))))
@@ -1418,6 +1419,8 @@ Export the file to md with the `ox-hugo' package."
   (cider-connection-message-fn #'cider-random-tip)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   (cider-auto-inspect-after-eval nil)
+  (cider-comment-continued-prefix "")
+  (cider-comment-prefix "")
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   (defun cider-disable-linting ()
