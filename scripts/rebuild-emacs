@@ -8,6 +8,7 @@ cd ~/Git/emacs && \
            --with-native-compilation=aot \
            --with-pgtk \
            --with-mailutils \
+           --with-xwidgets \
            --prefix="$HOME"/.local $@ \
     && make -j$(($(nproc)-1)) \
     && make uninstall \
