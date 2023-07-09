@@ -1702,7 +1702,9 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package avy
   :ensure t
-  :bind (("C-:" . avy-goto-char-timer)))
+  :bind
+  (("C-:" . avy-goto-char-timer)
+   ("C-M-:" . avy-goto-line)))
 
 (use-package isayt
   :vc (:url "https://gitlab.com/andreyorst/isayt.el.git")
