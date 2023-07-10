@@ -1631,7 +1631,7 @@ See `cider-find-and-clear-repl-output' for more info."
           ("M-q" . indent-sexp-or-fill)))
 
 (use-package puni
-  :ensure t
+  :vc (:url "https://github.com/andreyorst/puni" :branch "fix-#49" :rev :newest)
   :hook (((common-lisp-modes-mode nxml-mode) . puni-mode)
          (puni-mode . electric-pair-mode))
   ;; paredit-like keys
