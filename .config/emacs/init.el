@@ -1445,7 +1445,7 @@ See `cider-find-and-clear-repl-output' for more info."
         (def portal ((requiring-resolve 'portal.api/open) {:launcher :emacs}))
         (add-tap (requiring-resolve 'portal.api/submit)))"
      #'ignore))
-  (defun cider-clear-clear ()
+  (defun cider-clear-portal ()
     (interactive)
     (cider-nrepl-request:eval "(portal.api/clear)" #'ignore))
   (defun cider-close-portal ()
@@ -2344,6 +2344,55 @@ the generated command."
 
 (use-package elfeed
   :ensure t)
+
+(use-package infinite
+  :preface
+  (defvar-local infinite-base-frame nil)
+  (defvar-local infinite-frames nil)
+
+  (defun start-infinite ()
+    (interactive)
+    (let ((f (make-frame)))
+      (select-frame f)
+      (switch-to-buffer "*infinite*")
+      (infinite-mode)))
+
+  (define-derived-mode infinite-mode fundamental-mode
+    "Infinite"
+    "Create infinite space that can be panned with mouse and spawn windows on it."
+    (setq infinite-base-frame (window-frame (get-buffer-window))
+          infinite-frames nil))
+
+  (defun infinite-delete-frame ()
+    (interactive)
+    (let ((frame (window-frame (get-buffer-window))))
+      (setq infinite-frames (delq frame infinite-frames))
+      (delete-frame frame)))
+
+  (defun infinite-make-frame (x y &optional buffer)
+    (interactive)
+    (let ((nframe (make-frame
+                   `((left . ,x) (top . ,y)
+                     (width . 80) (height . 40)
+                     (parent-frame . ,infinite-base-frame)
+                     (child-frame-border-width . 2)
+                     (drag-with-header-line . t)
+                     (drag-internal-border . t)))))
+      (set-window-parameter
+       (frame-root-window nframe)
+       'header-line-format
+       '(:eval
+         (concat
+          " "
+          (propertize "[x]"
+                      'face '(:foreground "red")
+                      'mouse-face '(:foreground "red" :weight bold)
+                      'help-echo "Click to kill window frame"
+                      'action #'infinite-delete-frame)
+          " My Header Line Text ")))
+      (add-to-list 'infinite-frames nframe)
+      nil)))
+
 
 (provide 'init)
 ;;; init.el ends here
