@@ -17,12 +17,14 @@ The basic layout as follows:
 ├── .config/emacs                ~> ├── .emacs.d (for pre Emacs 27 users)
 ├── .local/bin/*                 ~> ├── .local/bin
 ├── .local/share/applications/*  ~> ├── .local/share/applications
-├── c_project_template              │
+├── .termux/*                    ~> ├── .termux/ (when in termux)
 ├── .editorconfig                ~> ├── .editorconfig
 ├── .git/                           │
 ├── .gitignore                      │
 ├── .gitconfig                   ~> ├── .gitconfig
+├── .gitattributes.global        ~> ├── .gitattributes.global
 ├── .inputrc                     ~> ├── .inputrc
+├── .fennelrc                    ~> ├── .fennelrc
 ├── README.md                       │
 ├── scripts                         │
 └── .tmux.conf                   ~> └── .tmux.conf
@@ -33,7 +35,6 @@ These directories and files should be excluded from copying or sym-linking:
 - `.git`, `.gitignore`, `README.md` - obviously, there's no need to copy these files to your home directory, as those are git related files.
 - `.gitconfig` defines some `git` aliases and settings, and supports loading `.gitconfig.local` if you want to override anything.
   Include it if you want.
-- `c_project_template` - is a template for creating a C project, that is used by a script placed in `scripts` directory.
 - `scripts` - directory stores scripts that I use directly from there, either by sourcing or by invoking from `$PATH`.
 - `.config` - directory should not be sym-linked to home directory, since all your configuration files will be visible to git.
   Only files that inside this directory should be copied or sym-linked.

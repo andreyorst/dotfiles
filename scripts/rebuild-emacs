@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-cd ~/Git/emacs && \
-    git clean -xdf \
+cd ~/Git/emacs \
+    && git clean -xdf \
     && ./autogen.sh \
     && ./configure \
            --without-compress-install \
