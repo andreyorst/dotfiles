@@ -20,50 +20,6 @@
   :config
   (load-file (expand-file-name "early-init.el" user-emacs-directory)))
 
-(use-package package
-  :preface
-  (defcustom package-last-refresh
-    (expand-file-name ".package-last-refresh" user-emacs-directory)
-    "Date and time when package lists have been refreshed.
-
-This file is then used to check whether
-`package-refresh-contents' call is needed before calling
-`package-install'. The data in this file is updated when
-`package-refresh-contents' is called.
-
-See `package-refresh-hour-threshold' for the amount of time
-needed to trigger a refresh."
-    :type 'file
-    :group 'package)
-  (defcustom package-automatic-refresh-threshold 24
-    "Amount of hours since last `package-refresh-contents' call
-needed to trigger automatic refresh before calling `package-install'."
-    :type 'number
-    :group 'package)
-  (defun package-last-refresh ()
-    (when (file-exists-p package-last-refresh)
-      (with-temp-buffer
-        (insert-file-contents package-last-refresh)
-        (date-to-time
-         (buffer-substring-no-properties
-          (point-min) (point-max))))))
-  :init
-  (define-advice package-install
-      (:before (&rest _) package-refresh-contents-maybe)
-    "Automatically call `package-refresh-contents' if time since last
-refresh is greater than `package-automatic-refresh-threshold'."
-    (let ((last-refresh (package-last-refresh)))
-      (when (or (null last-refresh)
-                (> (/ (float-time (time-subtract nil last-refresh)) 3600)
-                   package-automatic-refresh-threshold))
-        (package-refresh-contents))))
-  (define-advice package-refresh-contents
-      (:after (&rest _) update-package-refresh-date)
-    "Write current date and time to the `package-last-refresh' file."
-    (with-temp-buffer
-      (insert (format-time-string "%Y-%m-%dT%H:%M:%S%z"))
-      (write-file package-last-refresh))))
-
 (use-package gsettings
   :ensure t)
 
