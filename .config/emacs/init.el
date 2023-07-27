@@ -876,6 +876,7 @@ Search is based on regular expressions in the
   :hook (after-init . global-auto-revert-mode))
 
 (use-package outline
+  :hook (common-lisp-modes-mode . outline-minor-mode)
   :custom
   (outline-minor-mode-cycle t))
 
