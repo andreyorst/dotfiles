@@ -93,6 +93,11 @@
                    string)
     :tag "Langtool ngrams installation directory"
     :group 'local-config)
+  (defcustom no-scroll-modes '(term-mode)
+    "Major modes to disable horizontal scrolling."
+    :tag "Modes to disable horizontal scrolling"
+    :type '(repeat symbol)
+    :group 'local-config)
   (defvar local-config-line-pixel-height (line-pixel-height)
     "Line height in pixels.
 
@@ -185,10 +190,6 @@ If LOCAL-PORT is nil, PORT is used as local port."
    enable-recursive-minibuffers t)
   (when (version<= "27.1" emacs-version)
     (setq bidi-inhibit-bpa t))
-  (defun focus-out-collect-garbage ()
-    (unless (frame-focus-state)
-      (garbage-collect)))
-  (add-function :after after-focus-change-function 'focus-out-collect-garbage)
   (provide 'defaults))
 
 
@@ -241,6 +242,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
     '(:eval (propertize (if-let ((name (buffer-file-name)))
                             (abbreviate-file-name-memo name)
                           (buffer-name))
+                        'help-echo (buffer-name)
                         'face (when (and (buffer-file-name) (buffer-modified-p))
                                 'font-lock-builtin-face)))
     "Show file name if buffer is visiting a file, otherwise show
@@ -414,7 +416,7 @@ Based on `so-long-detected-long-line-p'."
     (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
   (define-advice scroll-left (:before-while (&rest _) prevent-overscroll)
     (and truncate-lines
-         (not (memq major-mode '(vterm-mode term-mode)))
+         (not (memq major-mode no-scroll-modes))
          (truncated-lines-p)))
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
@@ -1812,38 +1814,6 @@ means save all with no questions."
   (add-hook 'fennel-mode-hook
             (tgt-local-setup :test-dirs "tests" :suffixes "-test")))
 
-(use-package vterm
-  :ensure t
-  :when (bound-and-true-p module-file-suffix)
-  :bind ( :map vterm-mode-map
-          ("<insert>" . ignore)
-          ("<f2>" . ignore)
-          :map project-prefix-map
-          ("t" . vterm-project-dir))
-  :custom
-  (vterm-always-compile-module t)
-  (vterm-environment '("VTERM=1"))
-  :preface
-  (unless (fboundp 'project-prefixed-buffer-name)
-    (autoload #'project-prefixed-buffer-name "project"))
-  (defun vterm-project-dir (&optional _)
-    "Launch vterm in current project.
-
-Opens an existing vterm buffer for a project if present, unless
-the prefix argument is supplied."
-    (interactive "P")
-    (let* ((default-directory (project-root (project-current t)))
-           (name (project-prefixed-buffer-name "vterm")))
-      (if (and (not current-prefix-arg) (get-buffer name))
-          (switch-to-buffer name)
-        (funcall-interactively #'vterm name)))))
-
-(use-package vterm
-  :after project
-  :config
-  (add-to-list 'project-switch-commands
-               '(vterm-project-dir "vterm") t))
-
 (use-package eat
   :ensure t
   :hook (eshell-load . eat-eshell-mode))
@@ -2303,10 +2273,6 @@ the generated command."
 
 (use-package elfeed
   :ensure t)
-
-(use-package infinite
-  :vc (:url "https://gitlab.com/andreyorst/infinite.el")
-  :defer t)
 
 (provide 'init)
 ;;; init.el ends here
