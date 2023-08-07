@@ -980,7 +980,7 @@ Search is based on regular expressions in the
   (corfu-popupinfo ((t :height 1.0))))
 
 (use-package corfu-terminal
-  :ensure t   ;(:url "https://codeberg.org/akib/emacs-corfu-terminal")
+  :ensure t
   :unless (display-graphic-p)
   :after corfu
   :config
@@ -1275,6 +1275,11 @@ Export the file to md with the `ox-hugo' package."
       ("fn"  "function")
       ("let" "local")
       ("<-" "return")))
+  (defun lua-expand-abbrev-maybe ()
+    (when (looking-back "<-" 2)
+      (progn
+        (delete-char -2)
+        (abbrev-insert (abbrev-symbol "<-")))))
   (defun lua-setup-abbrev-prettify ()
     (setq prettify-symbols-alist
           (mapcar (lambda (abbrev-exp)
@@ -1285,7 +1290,9 @@ Export the file to md with the `ox-hugo' package."
     (prettify-symbols-mode 1)
     (dolist (abbrev-exp lua-syntax-expansions)
       (apply #'define-abbrev lua-mode-abbrev-table abbrev-exp))
-    (abbrev-mode)))
+    (modify-syntax-entry ?- "w")
+    (abbrev-mode)
+    (add-function :before (local 'abbrev-expand-function) #'lua-expand-abbrev-maybe)))
 
 (use-package ob-lua :after org)
 
@@ -1441,8 +1448,9 @@ See `cider-find-and-clear-repl-output' for more info."
           ("C-M-k" . lisp-eval-each-sexp))
   :commands (lisp-eval-last-sexp)
   :custom
-  (inferior-lisp-program (cond ((executable-find "sbcl") "sbcl")
-                               ((executable-find "ecl") "ecl")))
+  (inferior-lisp-program
+   (cond ((executable-find "sbcl") "sbcl")
+         ((executable-find "ecl") "ecl")))
   :config
   (defun lisp-eval-each-sexp ()
     "Evaluate each s-expression in the buffer consequentially."
@@ -1758,7 +1766,7 @@ means save all with no questions."
           (append (list cmd project-compilation-mode) rest)
         args)))
   (define-advice project-root (:around (fn project) expand-project-root)
-    (expand-file-name (funcall fn project)))
+    (abbreviate-file-name (funcall fn project)))
   (defun project-make-predicate-buffer-in-project-p ()
     (let ((project-buffers (project-buffers (project-current))))
       (lambda () (memq (current-buffer) project-buffers))))
