@@ -27,4 +27,4 @@
 [diff "elisp"]
 	xfuncname = "^(\\((def\\S+|use-package)\\s+\\S+)"
 [diff "fennel"]
-	xfuncname = "^(\\(fn\\S+\\s+\\S+)"
+	xfuncname = "^(\\((fn\\S+|lambda)\\s+\\S+)"
