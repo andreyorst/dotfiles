@@ -1290,7 +1290,7 @@ Export the file to md with the `ox-hugo' package."
     (prettify-symbols-mode 1)
     (dolist (abbrev-exp lua-syntax-expansions)
       (apply #'define-abbrev lua-mode-abbrev-table abbrev-exp))
-    (modify-syntax-entry ?- "w")
+    (modify-syntax-entry ?- "w 12")
     (abbrev-mode)
     (add-function :before (local 'abbrev-expand-function) #'lua-expand-abbrev-maybe)))
 
