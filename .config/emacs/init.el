@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t; outline-regexp: "^;;;;*[[:space:]]\\w" -*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
@@ -134,7 +134,7 @@ Used in various places to avoid getting wrong line height when
     (executable-find "termux-info"))
   (defun termux-color-theme-dark-p ()
     (with-temp-buffer
-      (insert-file
+      (insert-file-contents
        (expand-file-name "~/.termux/theme-variant"))
       (looking-at-p "dark")))
   (defun dark-mode-enabled-p ()
@@ -152,9 +152,12 @@ Used in various places to avoid getting wrong line height when
   (defun ssh-tunnel (host port &optional local-port)
     "Start an SSH tunnel from localhost to HOST:PORT.
 If LOCAL-PORT is nil, PORT is used as local port."
-    (interactive "shost: \nnport: ")
-    (let ((name (if local-port
-                    (format "*ssh-tunnel:%s:%s:%s" (or local-port port) host port)
+    (interactive (list (read-string "host: " nil 'ssh-host-history)
+                       (read-number "port: " nil 'ssh-port-history)
+                       (when current-prefix-arg
+                         (read-number "local port: " nil 'ssh-port-history))))
+    (let ((name (if (and local-port (not (= local-port port)))
+                    (format "*ssh-tunnel:%s:%s:%s" local-port host port)
                   (format "*ssh-tunnel:%s:%s" host port))))
       (async-shell-command
        (format "ssh -4 -N -L %s:localhost:%s %s" (or local-port port) port host)
@@ -176,14 +179,13 @@ If LOCAL-PORT is nil, PORT is used as local port."
    hscroll-margin 1
    scroll-margin 0
    scroll-preserve-screen-position nil
-   ;; scroll-conservatively 101
    frame-resize-pixelwise window-system
    window-resize-pixelwise window-system)
   (when (window-system)
     (setq-default
      x-gtk-use-system-tooltips nil
      cursor-type 'box
-     cursor-in-non-selected-windows nil))
+     cursor-in-non-selected-windows 'hbar))
   (setq
    ring-bell-function 'ignore
    mode-line-percent-position nil
@@ -707,6 +709,7 @@ disabled, or enabled and the mark is active."
 (use-package esh-mode
   :hook (eshell-mode . common-lisp-modes-mode)
   :preface
+  (declare-function eshell-search-path "ext:esh-ext")
   (defun eshell-prompt ()
     (let* ((date (propertize (format-time-string "%a %H:%M") 'face '(:inherit shadow)))
            (path (abbreviate-file-name default-directory))
@@ -878,9 +881,13 @@ Search is based on regular expressions in the
   :hook (after-init . global-auto-revert-mode))
 
 (use-package outline
-  :hook (common-lisp-modes-mode . outline-minor-mode)
+  :hook (common-lisp-modes-mode . lisp-outline-minor-mode)
   :custom
-  (outline-minor-mode-cycle t))
+  (outline-minor-mode-cycle t)
+  :preface
+  (defun lisp-outline-minor-mode ()
+    (setq-local outline-regexp "^;;;;*[[:space:]]\\w")
+    (outline-minor-mode)))
 
 (use-package face-remap
   :hook (text-scale-mode . text-scale-adjust-latex-previews)
@@ -1352,7 +1359,7 @@ Export the file to md with the `ox-hugo' package."
   :ensure t
   :delight " CIDER"
   :commands cider-find-and-clear-repl-buffer
-  :functions flycheck-mode
+  :functions (cider-nrepl-request:eval cider-find-and-clear-repl-output)
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode)
          (cider-popup-buffer-mode . cider-disable-linting))
@@ -1393,8 +1400,6 @@ Export the file to md with the `ox-hugo' package."
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   (defun cider-disable-linting ()
     "Disable linting integrations for current buffer."
-    (when (bound-and-true-p flycheck-mode)
-      (flycheck-mode -1))
     (when (bound-and-true-p flymake-mode)
       (flymake-mode -1)))
   (defun cider-repl-prompt-newline (namespace)
@@ -1634,7 +1639,7 @@ See `cider-find-and-clear-repl-output' for more info."
   :config
   (define-advice puni-kill-line (:before (&rest _))
     "Go back to indentation before killing the line if it makes sense to."
-    (when (looking-back "^[[:space:]]*")
+    (when (looking-back "^[[:space:]]*" nil)
       (if (bound-and-true-p indent-line-function)
           (funcall indent-line-function)
         (back-to-indentation)))))
@@ -1789,38 +1794,6 @@ means save all with no questions."
                '(project-dired "Dired"))
   (add-to-list 'project-switch-commands
                '(project-switch-to-buffer "Switch buffer")))
-
-(use-package toggle-test
-  :ensure t
-  :after (project)
-  :bind ( :map project-prefix-map
-          ("T" . tgt-toggle))
-  :custom
-  (tgt-open-in-new-window nil)
-  :preface
-  (cl-defun tgt-local-setup
-      (&key (src-dirs "src")
-            (test-dirs "test")
-            suffixes
-            prefixes)
-    "Generate a hook for toggle-test with the given options."
-    (lambda ()
-      (when-let* ((root (project-current))
-                  (project-root (project-root root)))
-        (setq-local
-         tgt-projects
-         `(((:root-dir ,project-root)
-            (:src-dirs ,src-dirs)
-            (:test-dirs ,test-dirs)
-            (:test-suffixes ,suffixes)
-            (:test-prefixes ,prefixes)))))))
-  :init
-  (dolist (hook '(clojure-mode-hook
-                  clojurec-mode-hook
-                  clojurescript-mode-hook))
-    (add-hook hook (tgt-local-setup :suffixes "_test")))
-  (add-hook 'fennel-mode-hook
-            (tgt-local-setup :test-dirs "tests" :suffixes "-test")))
 
 (use-package eat
   :ensure t
@@ -2083,6 +2056,7 @@ group."
              password-store-get
              password-store-insert
              password-store-generate)
+  :functions (password-store--completing-read@use-orderless)
   :load-path "/usr/share/doc/pass/emacs/"
   :config
   (define-advice password-store--completing-read
@@ -2120,7 +2094,8 @@ group."
   (erc-fill-function 'erc-fill-static)
   (erc-fill-static-center 22)
   (erc-fill-column 110)
-  :commands (erc-compute-server)
+  :functions (erc-update-modules)
+  :autoload (erc-compute-server)
   :preface
   (defcustom erc-tunnel-conf nil
     "Connection spec for IRC server behind an SSH tunnel.
@@ -2197,6 +2172,7 @@ the generated command."
   :when (executable-find "mu")
   :defines mu4e-personal-addresses
   :commands (mu4e mu4e-ask-maildir make-mu4e-context mu4e-context-current mu4e-get-maildirs)
+  :functions (mu4e-message-field mu4e-context-vars)
   :requires seq
   :custom
   (mu4e-completing-read-function #'completing-read)
@@ -2265,6 +2241,7 @@ the generated command."
 (use-package mu4e
   :no-require
   :after (orderless mu4e)
+  :functions (mu4e-ask-maildir@use-orderless)
   :config
   (define-advice mu4e-ask-maildir (:around (fn prompt) use-orderless)
     (let ((completion-styles (append completion-styles '(orderless))))
