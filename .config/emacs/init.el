@@ -912,7 +912,6 @@ Search is based on regular expressions in the
 
 (use-package vertico
   :ensure t
-  :load-path "straight/repos/vertico/extensions/"
   :bind ( :map vertico-map
           ("M-RET" . vertico-exit-input))
   :init
