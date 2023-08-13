@@ -354,7 +354,9 @@ applied to the name.")
 (use-package subr
   :no-require
   :init
-  (fset 'yes-or-no-p 'y-or-n-p))
+  (if (boundp 'use-short-answers)
+      (setq-default use-short-answers t)
+    (fset 'yes-or-no-p 'y-or-n-p)))
 
 (use-package mwheel
   :bind (("S-<down-mouse-1>" . nil)
