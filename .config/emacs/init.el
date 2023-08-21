@@ -908,6 +908,10 @@ Search is based on regular expressions in the
                 (cdr (overlay-get ov 'display))
                 :scale (+ 1.0 (* 0.25 text-scale-mode-amount)))))))))
 
+(use-package browse-url
+  :when (fboundp 'xwidget-webkit-browse-url)
+  :custom (browse-url-browser-function #'xwidget-webkit-browse-url))
+
 
 ;;; Completion
 
