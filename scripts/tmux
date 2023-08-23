@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-command -p tmux new-session -d -s \>_ 2>/dev/null; command -p tmux new-session -t \>_ \; set-option destroy-unattached
