@@ -36,17 +36,16 @@ PATH="$HOME/.local/bin:$PATH"
 [ -d "$HOME/.cache/rebar3" ] && PATH="$HOME/.cache/rebar3/bin:$PATH"
 
 ## Cask
-
 [ -d "$HOME/.cask" ] && PATH="$HOME/.cask/bin:$PATH"
 
-## Lua related stuff
+## Finalize PATH building
+export PATH
+
+# Lua related stuff
 for path in /usr/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
 for path in "$HOME"/.local/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
 export LUA_PATH
-
-## Finalize PATH building
-export PATH
 
 # History
 export HISTFILESIZE=
@@ -54,35 +53,10 @@ export HISTSIZE=-1
 export HISTTIMEFORMAT="[%F %T] "
 export HISTIGNORE='ls:ll:cd:pwd:bg:fg:history'
 
-
 # Prompt (assuming 256 colors)
 PS1='$TIME_PC[36m\w[m$GIT_PC$CONTAINER_PC$SSH_PC'
 PS1=$PS1'$(code=$?; if [ $code -eq 0 ]; then echo [36m; else echo "[31m !$code"; fi)'
 PS1=$PS1'\n$\[[m\] '
-
-function vterm_printf {
-    if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
-        # Tell tmux to pass the escape sequences through
-        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
-    elif [ "${TERM%%-*}" = "screen" ]; then
-        # GNU screen (screen, screen-256color, screen-256color-bce)
-        printf "\eP\e]%s\007\e\\" "$1"
-    else
-        printf "\e]%s\e\\" "$1"
-    fi
-}
-
-function vterm_prompt_end {
-    if [ -n "$SSH_CONNECTION" ]; then
-        vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
-    else
-        vterm_printf "51;A$(pwd)"
-    fi
-}
-
-if [ -n "$VTERM" ]; then
-    PS1=$PS1'\[$(vterm_prompt_end)\]'
-fi
 
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -n; time_pc; git_pc; ssh_pc; container_pc"
 
