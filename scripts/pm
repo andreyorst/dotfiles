@@ -1,24 +1,6 @@
 #!/usr/bin/env sh
 # Package manager wrappers
 
-pm_packman() {
-    cmd="$1"
-    shift
-    case "$cmd" in
-        (install)    sudo pacman -Sy "$@" ;;
-        (update)     sudo pacman -Syyu --noconfirm "$@" ;;
-        (remove)     sudo pacman -Rsc "$@" ;;
-        (autoremove) pacman -Qtdq "$@" | sudo pacman -Rns - ;;
-        (search)     pacman -Ss "$@" ;;
-        (list)       case $1 in
-                         (all) pacman -Qe ;;
-                         (*)   echo "wrong argument for 'list'" >&2
-                               exit 1 ;;
-                     esac ;;
-        (*)          pacman "$cmd" "$@" ;;
-    esac
-}
-
 pm_dnf() {
     cmd="$1"
     shift
@@ -75,7 +57,7 @@ pm_apt() {
     esac
 }
 
-for pm in pacman rpm-ostree dnf yum apt; do
+for pm in rpm-ostree dnf yum apt; do
     if [ -n "$(command -v $pm)" ]; then
         alias pm="pm_\$(echo \$pm | sed 's/[^a-zA-Z_]/_/g')"
         break
