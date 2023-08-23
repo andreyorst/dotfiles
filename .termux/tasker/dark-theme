@@ -1,8 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/sh
 emacsclient -e '(progn
                   (disable-theme local-config-light-theme)
-                  (load-theme local-config-dark-theme t))'
+                  (load-theme local-config-dark-theme t))' > /dev/null 2>&1 &
 
 echo -n "" > ~/.termux/colors.properties
 echo "dark" > ~/.termux/theme-variant
-termux-reload-settings
+termux-reload-settings > /dev/null 2>&1 &

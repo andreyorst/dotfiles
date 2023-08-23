@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/sh
 emacsclient -e '(progn
                   (disable-theme local-config-dark-theme)
-                  (load-theme local-config-light-theme t))'
+                  (load-theme local-config-light-theme t))' > /dev/null 2>&1 &
 
 echo "background=#fbfbfb
 foreground=#000000
@@ -26,4 +26,4 @@ color14=#00ffff
 color15=#ffffff" > ~/.termux/colors.properties
 
 echo "light" > ~/.termux/theme-variant
-termux-reload-settings
+termux-reload-settings > /dev/null 2>&1 &

@@ -1,51 +1,31 @@
 #!/usr/bin/env bash
 
-(
-    case $1 in
-        (emacs) echo "rm -rf $HOME/.local/share/applications/emacs*"
-                rm -rf "$HOME"/.local/share/applications/emacs*
-                echo "ln -sf $HOME/.dotfiles/.local/share/applications/emacs.desktop $HOME/.local/share/applications/"
-                ln -sf "$HOME"/.dotfiles/.local/share/applications/emacs.desktop "$HOME"/.local/share/applications/
-                ;;
-        (*)
-            (dotfiles_dir="$(realpath "$(dirname "$0")"/../)"
+erun() { echo "$*" ; "$@" ; }
 
-             cd "$HOME" || exit
+DOTFILES="$(realpath "$(dirname "$0")"/../)"
 
-             for file in "$HOME/.local/share/applications/emacs*"; do
-                 rm -f "$file"
-             done
-
-             for file in "$dotfiles_dir"/.*; do
-                 if [ -f "$file" ] && [ "$(basename "$file")" != ".gitignore" ]; then
-                     printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
-                     ln -sf "$file" ./
-                 fi
-             done
-
-             (for dir in ".config" ".local/bin" ".local/share/applications"; do
-                  if [ -d "$dotfiles_dir/$dir" ]; then
-                      mkdir -p "$HOME/$dir"
-                      cd "$HOME/$dir" || exit
-                      shopt -s dotglob
-
-                      for file in "$dotfiles_dir/$dir"/*; do
-                          printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
-                          ln -sf "$file" ./
-                      done
-                  fi
-              done)
-
-             (cd "$HOME/.termux" || exit
-              for file in "$dotfiles_dir/.termux/"*; do
-
-                  printf "rm -rf %s/%s\n" "$PWD" "$(basename "$file")"
-                  rm -rf "$PWD"/"$(basename "$file")"
-                  printf "%s -> %s/%s\n" "$file" "$PWD" "$(basename "$file")"
-                  cp -r "$file" "$PWD"
-              done))
-
-            $0 emacs
-            ;;
-    esac
-)
+case $1 in
+    (termux) (if [ -d "$HOME"/.termux ]; then
+                  shopt -s dotglob
+                  for file in "$DOTFILES"/.termux/*; do
+                      erun ln -sf "$file" "$HOME"/.termux/
+                  done
+              fi)
+             ;;
+    (*) (for file in "$DOTFILES"/.*; do
+             if [ -f "$file" ] && [ "$(basename "$file")" != ".gitignore" ]; then
+                 erun ln -sf "$file" "$HOME"/
+             fi
+         done
+         (for dir in ".config" ".local/bin" ".local/share/applications"; do
+              if [ -d "$DOTFILES/$dir" ]; then
+                  erun mkdir -p "$HOME/$dir"
+                  shopt -s dotglob
+                  for file in "$DOTFILES/$dir"/*; do
+                      erun ln -sf "$file" "$HOME/$dir"/
+                  done
+              fi
+          done))
+        $0 termux
+        ;;
+esac
