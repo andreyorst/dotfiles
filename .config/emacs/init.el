@@ -1168,6 +1168,16 @@ Export the file to md with the `ox-hugo' package."
     "Capture a new post."
     (interactive)
     (org-capture nil "p"))
+  (defun blog-scour-svg (file)
+    (if (executable-find "scour")
+        (let ((tmp (make-temp-file "scour.svg.")))
+          (with-temp-file tmp
+            (insert-file-contents-literally file))
+          (make-process :name "scour"
+                        :connection-type 'pipe
+                        :sentinel (lambda (_ _) (delete-file tmp))
+                        :command (list "scour" "-i" tmp "-o" file)))
+      (user-error "scour is not installed")))
   (provide 'blog))
 
 (use-package org-capture
