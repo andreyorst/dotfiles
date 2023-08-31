@@ -98,6 +98,7 @@
         puni-transpose
         puni-wrap-curly
         puni-wrap-round
+        puni-wrap-square
         region-bindings-disable
         region-bindings-doublequote
         save-some-buffers
