@@ -1178,7 +1178,58 @@ Export the file to md with the `ox-hugo' package."
                         :sentinel (lambda (_ _) (delete-file tmp))
                         :command (list "scour" "-i" tmp "-o" file)))
       (user-error "scour is not installed")))
-  (provide 'blog))
+  (defun blog-export-static-org-link (path description back-end properties)
+    "Export link to Markdown."
+    (let ((new-path (expand-file-name
+                     (file-name-concat "../static" path)
+                     org-hugo-base-dir)))
+      (copy-file (expand-file-name path) new-path t)
+      (format "[%s](/%s)"
+              (or description path)
+              (file-name-nondirectory path))))
+  (defun blog-create-static-org-link (&optional _)
+    "Create a file link using completion."
+    (let ((file (read-file-name "File: "))
+	  (pwd (file-name-as-directory (expand-file-name ".")))
+	  (pwd1 (file-name-as-directory (abbreviate-file-name
+				         (expand-file-name ".")))))
+      (cond ((string-match
+	      (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
+	     (concat "org:" (match-string 1 file)))
+	    ((string-match
+	      (concat "^" (regexp-quote pwd) "\\(.+\\)")
+	      (expand-file-name file))
+	     (concat "org:"
+		     (match-string 1 (expand-file-name file))))
+	    (t (concat "org:" file)))))
+  (require 'ol)
+  (org-link-set-parameters
+   "org"
+   :export #'blog-export-static-org-link
+   :complete #'blog-create-static-org-link)
+  (defun blog-follow-html-link (path arg)
+    (funcall browse-url-browser-function path arg))
+  (defun blog-export-hmtl-link (path description back-end properties)
+    "Export link directly to HTML."
+    (format "<a href=\"%s\">%s</a>" path (or description path)))
+  (defun blog-create-html-link (&optional _)
+    "Create a file link using completion."
+    (let ((link (read-string "Link: ")))
+      (concat "blog-html:" link)))
+  (org-link-set-parameters
+   "blog-html"
+   :follow #'blog-follow-html-link
+   :export #'blog-export-hmtl-link
+   :complete #'blog-create-html-link)
+  (provide 'blog)
+  :config
+  (define-advice org-hugo-heading (:around (fn heading contents info) :patch)
+    (if (org-export-get-node-property :BLOG_COLLAPSABLE heading)
+        (let ((title (org-export-data (org-element-property :title heading) info)))
+          (concat "<details class=\"foldlist\"><summary>" title "\n</summary>\n\n"
+                  contents
+                  "</details>"))
+      (funcall fn heading contents info))))
 
 (use-package org-capture
   :defer t
