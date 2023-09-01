@@ -1224,7 +1224,7 @@ Export the file to md with the `ox-hugo' package."
   (provide 'blog)
   :config
   (define-advice org-hugo-heading (:around (fn heading contents info) :patch)
-    (if (org-export-get-node-property :BLOG_COLLAPSABLE heading)
+    (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
         (let ((title (org-export-data (org-element-property :title heading) info)))
           (concat "<details class=\"foldlist\"><summary>" title "\n</summary>\n\n"
                   contents
@@ -1235,11 +1235,23 @@ Export the file to md with the `ox-hugo' package."
   :defer t
   :custom
   (org-directory blog-directory)
-  (org-capture-templates `(("p" "Post" plain
-                            (function blog-generate-file-name)
-                            ,blog-capture-template
-                            :jump-to-captured t
-                            :immediate-finish t))))
+  (org-capture-templates
+   `(("p" "Post" plain
+      (function blog-generate-file-name)
+      ,blog-capture-template
+      :jump-to-captured t
+      :immediate-finish t)
+     ,@(mapcar
+        (lambda (spec)
+          (seq-let (btn descr heading) spec
+            `( ,btn ,descr entry
+               (file+headline ,(expand-file-name "kb/index.org" blog-directory) ,heading)
+               "* [[blog-html:%^{Link}][%^{Description}]]\n:properties:\n:blog-collapsable: t\n:end:"
+               :immediate-finish t
+               :before-finalize (org-hugo-export-to-md))))
+        '(("a" "Article" "Articles")
+          ("t" "Talk" "Talks")
+          ("w" "Web page" "Various Web pages"))))))
 
 (use-package org-tree-slide
   :ensure t
