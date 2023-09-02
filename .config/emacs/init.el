@@ -329,6 +329,7 @@ applied to the name.")
   (user-full-name "Andrey Listopadov"))
 
 (use-package files
+  :demand t
   :preface
   (defvar backup-dir
     (expand-file-name ".cache/backups" user-emacs-directory)
@@ -346,6 +347,7 @@ applied to the name.")
   (auto-save-no-message t)
   (auto-save-interval 100)
   (require-final-newline t)
+  :bind ("<f5>" . revert-buffer-quick)
   :config
   (unless (file-exists-p auto-save-dir)
     (make-directory auto-save-dir t)))
@@ -1226,9 +1228,10 @@ Export the file to md with the `ox-hugo' package."
   (define-advice org-hugo-heading (:around (fn heading contents info) :patch)
     (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
         (let ((title (org-export-data (org-element-property :title heading) info)))
-          (concat "<details class=\"foldlist\"><summary>" title "\n</summary>\n\n"
+          (concat "<details class=\"foldlist\"><summary>" title
+                  "</summary><div class=\"foldlistdata\">\n\n"
                   contents
-                  "</details>"))
+                  "</div></details>"))
       (funcall fn heading contents info))))
 
 (use-package org-capture
