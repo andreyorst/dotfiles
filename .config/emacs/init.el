@@ -1010,24 +1010,24 @@ Search is based on regular expressions in the
 ;;; Org
 
 (use-package org
-  :hook ((org-mode . org-change-syntax-table)
-         ((org-capture-mode org-src-mode) . discard-history)
-         (org-babel-after-execute . org-redisplay-inline-images))
+  :hook ((org-babel-after-execute . org-redisplay-inline-images))
   :bind ( :map org-mode-map
           ("M-Q" . split-pararagraph-into-lines)
           ("C-c l" . org-store-link))
   :custom-face
   (org-block ((t (:extend t))))
-  (org-block-begin-line ((t ( :slant unspecified
-                              :weight normal
-                              :background unspecified
-                              :inherit org-block
-                              :extend t))))
-  (org-block-end-line ((t ( :slant unspecified
-                            :weight normal
-                            :background unspecified
-                            :inherit org-block-begin-line
-                            :extend t))))
+  (org-block-begin-line
+   ((t ( :slant unspecified
+         :weight normal
+         :background unspecified
+         :inherit org-block
+         :extend t))))
+  (org-block-end-line
+   ((t ( :slant unspecified
+         :weight normal
+         :background unspecified
+         :inherit org-block-begin-line
+         :extend t))))
   (org-drawer ((t (:foreground unspecified :inherit shadow))))
   :commands (org-return org-cycle)
   :custom
@@ -1041,20 +1041,6 @@ Search is based on regular expressions in the
   (org-log-done 'time)
   (org-image-actual-width nil)
   (org-edit-src-content-indentation 0)
-  :preface
-  (define-advice org-return (:around (f &rest args) preserve-indentation)
-    (let ((org-src-preserve-indentation t))
-      (apply f args)))
-  (define-advice org-cycle (:around (f &rest args) preserve-indentation)
-    (let ((org-src-preserve-indentation t))
-      (apply f args)))
-  (defun discard-history ()
-    "Discard undo history of org src and capture blocks."
-    (setq buffer-undo-list nil)
-    (set-buffer-modified-p nil))
-  (defun org-change-syntax-table ()
-    (modify-syntax-entry ?< "w")
-    (modify-syntax-entry ?> "w"))
   :config
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
@@ -1236,6 +1222,7 @@ Export the file to md with the `ox-hugo' package."
 
 (use-package org-capture
   :defer t
+  :bind ("C-c o c" . org-capture)
   :custom
   (org-directory blog-directory)
   (org-capture-templates
@@ -1254,7 +1241,8 @@ Export the file to md with the `ox-hugo' package."
                :before-finalize (org-hugo-export-to-md))))
         '(("a" "Article" "Articles")
           ("t" "Talk" "Talks")
-          ("w" "Web page" "Various Web pages"))))))
+          ("w" "Web page" "Various Web pages")
+          ("b" "Books, courses" "Books, Courses"))))))
 
 (use-package org-tree-slide
   :ensure t
