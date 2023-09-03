@@ -1261,6 +1261,12 @@ Export the file to md with the `ox-hugo' package."
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
+(use-package lisp-extra-font-lock
+  :ensure t
+  :hook (emacs-lisp-mode . lisp-extra-font-lock-mode)
+  :custom
+  (lisp-extra-font-lock-quoted-face nil))
+
 (use-package racket-mode
   :ensure t
   :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
