@@ -20,40 +20,6 @@
   :config
   (load-file (expand-file-name "early-init.el" user-emacs-directory)))
 
-(use-package gsettings
-  :ensure t)
-
-(use-package proxy
-  :after gsettings
-  :preface
-  (defun proxy--get-host (type)
-    (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
-      (and (not (string-empty-p host)) host)))
-  (defun proxy--get-port (type)
-    (let ((port (gsettings-get (format "org.gnome.system.proxy.%s" type) "port")))
-      (and (numberp port) port)))
-  (defun proxy--get-ignore ()
-    (let ((ignore (gsettings-get "org.gnome.system.proxy" "ignore-hosts")))
-      (and (vectorp ignore) (string-join ignore ","))))
-  (defun proxy--enabled? ()
-    (string= "manual" (gsettings-get "org.gnome.system.proxy" "mode")))
-  (defun proxy-setup-env ()
-    "Aqcuire proxy information from the settings and set the ENV vars."
-    (interactive)
-    (let ((vars '("http_proxy" "https_proxy" "ftp_proxy" "no_proxy")))
-      (if-let ((enabled (proxy--enabled?))
-               (host (proxy--get-host "http"))
-               (port (proxy--get-port "http"))
-               (ignore (proxy--get-ignore))
-               (proxy (format "http://%s:%s" host port)))
-          (dolist (v (append vars (mapcar #'upcase vars)))
-            (setenv v (pcase (downcase v) ("no_proxy" ignore) (_ proxy))))
-        (dolist (v (append vars (mapcar #'upcase vars)))
-          (setenv v)))))
-  (provide 'proxy)
-  :init
-  (proxy-setup-env))
-
 (use-package delight
   :ensure t)
 
@@ -230,7 +196,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
   :preface
   (defvar mode-line-interactive-position
     `(line-number-mode
-      (:propertize " %l:%c"
+      (:propertize " %l:%C"
                    help-echo "mouse-1: Goto line"
                    mouse-face mode-line-highlight
                    local-map ,(let ((map (make-sparse-keymap)))
@@ -322,14 +288,7 @@ applied to the name.")
       (funcall fn command)))
   (load disabled-commands 'noerror))
 
-(use-package startup
-  :no-require
-  :custom
-  (user-mail-address "andreyorst@gmail.com")
-  (user-full-name "Andrey Listopadov"))
-
 (use-package files
-  :demand t
   :preface
   (defvar backup-dir
     (expand-file-name ".cache/backups" user-emacs-directory)
@@ -348,7 +307,7 @@ applied to the name.")
   (auto-save-interval 100)
   (require-final-newline t)
   :bind ("<f5>" . revert-buffer-quick)
-  :config
+  :init
   (unless (file-exists-p auto-save-dir)
     (make-directory auto-save-dir t)))
 
@@ -1166,8 +1125,9 @@ Export the file to md with the `ox-hugo' package."
                         :sentinel (lambda (_ _) (delete-file tmp))
                         :command (list "scour" "-i" tmp "-o" file)))
       (user-error "scour is not installed")))
-  (defun blog-export-static-org-link (path description back-end properties)
+  (defun blog-export-static-org-link (path description _backend _properties)
     "Export link to Markdown."
+    (defvar org-hugo-base-dir)
     (let ((new-path (expand-file-name
                      (file-name-concat "../static" path)
                      org-hugo-base-dir)))
@@ -1197,7 +1157,7 @@ Export the file to md with the `ox-hugo' package."
    :complete #'blog-create-static-org-link)
   (defun blog-follow-html-link (path arg)
     (funcall browse-url-browser-function path arg))
-  (defun blog-export-hmtl-link (path description back-end properties)
+  (defun blog-export-hmtl-link (path description _backend _properties)
     "Export link directly to HTML."
     (format "<a href=\"%s\">%s</a>" path (or description path)))
   (defun blog-create-html-link (&optional _)
@@ -1209,16 +1169,16 @@ Export the file to md with the `ox-hugo' package."
    :follow #'blog-follow-html-link
    :export #'blog-export-hmtl-link
    :complete #'blog-create-html-link)
-  (provide 'blog)
-  :config
-  (define-advice org-hugo-heading (:around (fn heading contents info) :patch)
+  (require 'ox)
+  (define-advice org-hugo-heading (:around (fn heading contents info) patch)
     (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
         (let ((title (org-export-data (org-element-property :title heading) info)))
           (concat "<details class=\"foldlist\"><summary>" title
                   "</summary><div class=\"foldlistdata\">\n\n"
                   contents
                   "</div></details>"))
-      (funcall fn heading contents info))))
+      (funcall fn heading contents info)))
+  (provide 'blog))
 
 (use-package org-capture
   :defer t
@@ -1704,8 +1664,8 @@ See `cider-find-and-clear-repl-output' for more info."
           ("[" . puni-wrap-square)
           ("{" . puni-wrap-curly)
           ("<" . puni-wrap-angle))
-  :config
-  (define-advice puni-kill-line (:before (&rest _))
+  :preface
+  (define-advice puni-kill-line (:before (&rest _) back-to-indentation)
     "Go back to indentation before killing the line if it makes sense to."
     (when (looking-back "^[[:space:]]*" nil)
       (if (bound-and-true-p indent-line-function)
@@ -1835,7 +1795,8 @@ means save all with no questions."
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (funcall-interactively #'save-some-buffers arg pred)))
-  (define-advice compilation-start (:filter-args (args) use-project-compilation-mode)
+  (define-advice compilation-start
+      (:filter-args (args) use-project-compilation-mode)
     (let ((cmd (car args))
           (mode (cadr args))
           (rest (cddr args)))
@@ -1853,7 +1814,8 @@ means save all with no questions."
     (let ((compilation-save-buffers-predicate
            (project-make-predicate-buffer-in-project-p)))
       (funcall fn)))
-  (define-advice recompile (:around (fn &optional edit-command) save-project-buffers-only)
+  (define-advice recompile
+      (:around (fn &optional edit-command) save-project-buffers-only)
     "Only ask to save project-related buffers if inside of a project."
     (defvar compilation-save-buffers-predicate)
     (let ((compilation-save-buffers-predicate
@@ -1881,7 +1843,8 @@ means save all with no questions."
   (magit-diff-refine-ignore-whitespace t)
   (magit-diff-refine-hunk 'all)
   :config
-  (define-advice magit-list-refnames (:filter-return (refs) range-at-point)
+  (define-advice magit-list-refnames
+      (:filter-return (refs) range-at-point)
     (require 'thingatpt)
     (if-let ((range (save-match-data
                       (and (thing-at-point-looking-at "[a-f0-9]+\.\.[a-f0-9]+")
@@ -2155,6 +2118,40 @@ group."
   (jdecomp-decompiler-paths
    `((cfr . ,cfr-path)
      (fernflower . ,fernflower-path))))
+
+(use-package gsettings
+  :ensure t)
+
+(use-package proxy
+  :after gsettings
+  :preface
+  (defun proxy--get-host (type)
+    (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
+      (and (not (string-empty-p host)) host)))
+  (defun proxy--get-port (type)
+    (let ((port (gsettings-get (format "org.gnome.system.proxy.%s" type) "port")))
+      (and (numberp port) port)))
+  (defun proxy--get-ignore ()
+    (let ((ignore (gsettings-get "org.gnome.system.proxy" "ignore-hosts")))
+      (and (vectorp ignore) (string-join ignore ","))))
+  (defun proxy--enabled? ()
+    (string= "manual" (gsettings-get "org.gnome.system.proxy" "mode")))
+  (defun proxy-setup-env ()
+    "Aqcuire proxy information from the settings and set the ENV vars."
+    (interactive)
+    (let ((vars '("http_proxy" "https_proxy" "ftp_proxy" "no_proxy")))
+      (if-let ((enabled (proxy--enabled?))
+               (host (proxy--get-host "http"))
+               (port (proxy--get-port "http"))
+               (ignore (proxy--get-ignore))
+               (proxy (format "http://%s:%s" host port)))
+          (dolist (v (append vars (mapcar #'upcase vars)))
+            (setenv v (pcase (downcase v) ("no_proxy" ignore) (_ proxy))))
+        (dolist (v (append vars (mapcar #'upcase vars)))
+          (setenv v)))))
+  (provide 'proxy)
+  :init
+  (proxy-setup-env))
 
 
 ;;; Messaging
