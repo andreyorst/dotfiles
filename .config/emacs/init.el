@@ -1759,8 +1759,12 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package region-bindings
   :vc (:url "https://gitlab.com/andreyorst/region-bindings.el.git")
+  :preface
+  (defun region-bindings-off ()
+    (region-bindings-mode -1))
   :hook ((after-init . global-region-bindings-mode)
-         (magit-mode . (lambda () (region-bindings-mode -1)))))
+         ((elfeed-search-mode magit-mode mu4e-headers-mode)
+          . region-bindings-off)))
 
 (use-package multiple-cursors
   :ensure t
