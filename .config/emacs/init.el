@@ -1340,7 +1340,7 @@ Export the file to md with the `ox-hugo' package."
 (use-package ob-lua :after org)
 
 (use-package fennel-mode
-  :vc (:url "git@git.sr.ht:~technomancy/fennel-mode" :branch "main" :rev :newest)
+  :vc (:url "https://git.sr.ht/~technomancy/fennel-mode" :branch "main" :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
            fennel-repl-mode
