@@ -114,13 +114,15 @@ Used in various places to avoid getting wrong line height when
       (lambda (&rest args)
         (let ((value (gethash args memo)))
           (or value (puthash args (apply fn args) memo))))))
+  (defvar-local ssh-tunnel-port nil)
+  (put 'ssh-tunnel-port 'safe-local-variable #'numberp)
   (defun ssh-tunnel (host port &optional local-port)
     "Start an SSH tunnel from localhost to HOST:PORT.
 If LOCAL-PORT is nil, PORT is used as local port."
     (interactive (list (read-string "host: " nil 'ssh-host-history)
-                       (read-number "port: " nil 'ssh-port-history)
+                       (read-number "port: " ssh-tunnel-port 'ssh-port-history)
                        (when current-prefix-arg
-                         (read-number "local port: " nil 'ssh-port-history))))
+                         (read-number "local port: " ssh-tunnel-port 'ssh-port-history))))
     (let ((name (if (and local-port (not (= local-port port)))
                     (format "*ssh-tunnel:%s:%s:%s" local-port host port)
                   (format "*ssh-tunnel:%s:%s" host port))))
