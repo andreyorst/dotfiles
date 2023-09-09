@@ -1098,21 +1098,27 @@ Export the file to md with the `ox-hugo' package."
           (replace-match (format "#+date: %s %s" today now))
           (re-search-forward "^#\\+hugo_draft:.*$")
           (replace-match "#+hugo_draft: false"))
+        (save-buffer)
         (let* ((file-name (save-excursion
                             (goto-char (point-min))
                             (re-search-forward "^#\\+title:[[:space:]]*\\(.*\\)$")
-                            (blog-title-to-fname (match-string 1)))))
+                            (blog-title-to-fname (match-string 1))))
+               (exported-file (org-hugo-export-to-md))
+               (new-name (format "%s-%s" today
+                                 (if (string-match
+                                      "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
+                                      file-name)
+                                     (match-string 1 file-name)
+                                   file-name))))
           (condition-case nil
-              (rename-visited-file
-               (format "%s-%s.org" today
-                       (if (string-match
-                            "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
-                            file-name)
-                           (match-string 1 file-name)
-                         file-name)))
+              (rename-visited-file (format "%s.org" new-name))
             (file-already-exists nil))
-          (save-buffer)
-          (org-hugo-export-to-md)))))
+          (rename-file
+           exported-file
+           (expand-file-name
+            (format "%s.md" new-name)
+            (file-name-directory exported-file))
+           t)))))
   (defun blog-new-post ()
     "Capture a new post."
     (interactive)
