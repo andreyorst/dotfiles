@@ -1823,16 +1823,7 @@ means save all with no questions."
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all)
-  :config
-  (define-advice magit-list-refnames
-      (:filter-return (refs) range-at-point)
-    (require 'thingatpt)
-    (if-let ((range (save-match-data
-                      (and (thing-at-point-looking-at "[a-f0-9]+\.\.[a-f0-9]+")
-                           (match-string 0)))))
-        (cons range refs)
-      refs)))
+  (magit-diff-refine-hunk 'all))
 
 (use-package magit
   :after project
