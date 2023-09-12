@@ -18,7 +18,7 @@
   :no-require
   :unless (featurep 'early-init)
   :config
-  (load-file (expand-file-name "early-init.el" user-emacs-directory)))
+  (load-file (locate-user-emacs-file "early-init.el")))
 
 (use-package delight
   :ensure t)
@@ -40,34 +40,11 @@
     :tag "Light theme"
     :type 'symbol
     :group 'local-config)
-  (defcustom openjdk-11-path nil
-    "Path to OpenJDK 11 installation"
-    :type '(choice (const :tag "not installed" nil)
-                   string)
-    :tag "OpenJDK 11 Path"
-    :group 'local-config)
-  (defcustom langtool-installation-dir nil
-    "Path to the local installation of langtool."
-    :type '(choice (const :tag "not installed" nil)
-                   string)
-    :tag "Langtool installation directory"
-    :group 'local-config)
-  (defcustom langtool-ngrams-dir-name nil
-    "Path to the unzipped directory with ngram data for langtool."
-    :type '(choice (const :tag "not installed" nil)
-                   string)
-    :tag "Langtool ngrams installation directory"
-    :group 'local-config)
-  (defcustom no-scroll-modes '(term-mode)
+  (defcustom no-hscroll-modes '(term-mode)
     "Major modes to disable horizontal scrolling."
     :tag "Modes to disable horizontal scrolling"
     :type '(repeat symbol)
     :group 'local-config)
-  (defvar local-config-line-pixel-height (line-pixel-height)
-    "Line height in pixels.
-
-Used in various places to avoid getting wrong line height when
-`text-scale-mode' is active.")
   (provide 'local-config))
 
 (use-package functions
@@ -276,13 +253,13 @@ applied to the name.")
 
 (use-package cus-edit
   :custom
-  (custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (custom-file (locate-user-emacs-file "custom.el"))
   :init
   (load custom-file :noerror))
 
 (use-package novice
   :preface
-  (defvar disabled-commands (expand-file-name "disabled.el" user-emacs-directory)
+  (defvar disabled-commands (locate-user-emacs-file "disabled.el")
     "File to store disabled commands, that were enabled permanently.")
   :config
   (define-advice enable-command (:around (fn command) use-disabled-file)
@@ -293,10 +270,10 @@ applied to the name.")
 (use-package files
   :preface
   (defvar backup-dir
-    (expand-file-name ".cache/backups" user-emacs-directory)
+    (locate-user-emacs-file ".cache/backups")
     "Directory to store backups.")
   (defvar auto-save-dir
-    (expand-file-name ".cache/auto-save/" user-emacs-directory)
+    (locate-user-emacs-file ".cache/auto-save/")
     "Directory to store auto-save files.")
   :custom
   (backup-by-copying t)
@@ -382,7 +359,7 @@ Based on `so-long-detected-long-line-p'."
     (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
   (define-advice scroll-left (:before-while (&rest _) prevent-overscroll)
     (and truncate-lines
-         (not (memq major-mode no-scroll-modes))
+         (not (memq major-mode no-hscroll-modes))
          (truncated-lines-p)))
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
@@ -519,11 +496,12 @@ disabled, or enabled and the mark is active."
   :when (window-system)
   :custom
   (tooltip-x-offset 0)
-  (tooltip-y-offset local-config-line-pixel-height)
-  (tooltip-frame-parameters `((name . "tooltip")
-                              (internal-border-width . 2)
-                              (border-width . 1)
-                              (no-special-glyphs . t))))
+  (tooltip-y-offset (line-pixel-height))
+  (tooltip-frame-parameters
+   `((name . "tooltip")
+     (internal-border-width . 2)
+     (border-width . 1)
+     (no-special-glyphs . t))))
 
 (use-package dbus
   :when (featurep 'dbusbind)
@@ -846,6 +824,7 @@ Search is based on regular expressions in the
 
 (use-package outline
   :hook (common-lisp-modes-mode . lisp-outline-minor-mode)
+  :delight outline-minor-mode
   :custom
   (outline-minor-mode-cycle t)
   :preface
@@ -990,7 +969,6 @@ Search is based on regular expressions in the
          :inherit org-block-begin-line
          :extend t))))
   (org-drawer ((t (:foreground unspecified :inherit shadow))))
-  :commands (org-return org-cycle)
   :custom
   (org-tags-column -120)
   (org-startup-folded 'content)
@@ -1545,7 +1523,7 @@ See `cider-find-and-clear-repl-output' for more info."
   (lsp-auto-configure nil)
   (lsp-diagnostics-provider :flymake)
   (lsp-completion-provider :none)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-session-file (locate-user-emacs-file ".lsp-session"))
   (lsp-log-io nil)
   (lsp-keep-workspace-alive nil)
   (lsp-idle-delay 0.5)
@@ -1553,12 +1531,6 @@ See `cider-find-and-clear-repl-output' for more info."
   (lsp-signature-doc-lines 1)
   :init
   (setq lsp-use-plists t))
-
-(use-package lsp-treemacs
-  :ensure t
-  :defer t
-  :custom
-  (lsp-treemacs-theme "Iconless"))
 
 (use-package lsp-clojure
   :demand t
@@ -1577,15 +1549,6 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package lsp-java
   :ensure t
-  :demand t
-  :after lsp-mode
-  :when (and openjdk-11-path
-             (file-exists-p openjdk-11-path))
-  :custom
-  (lsp-java-java-path openjdk-11-path))
-
-(use-package lsp-java
-  :no-require
   :hook (java-mode . lsp))
 
 (use-package lsp-metals
@@ -1615,7 +1578,7 @@ See `cider-find-and-clear-repl-output' for more info."
           ("M-q" . indent-sexp-or-fill)))
 
 (use-package puni
-  :vc (:url "https://github.com/andreyorst/puni" :branch "fix-#49" :rev :newest)
+  :ensure t
   :hook (((common-lisp-modes-mode nxml-mode) . puni-mode)
          (puni-mode . electric-pair-mode))
   ;; paredit-like keys
@@ -1865,8 +1828,8 @@ means save all with no questions."
   (recentf-max-saved-items 100)
   :config
   (add-to-list 'recentf-exclude "\\.gpg\\")
-  (dolist (dir (list (expand-file-name ".cache/" user-emacs-directory)
-                     (expand-file-name "workspace/.cache/" user-emacs-directory)))
+  (dolist (dir (list (locate-user-emacs-file ".cache/")
+                     (locate-user-emacs-file "workspace/.cache/")))
     (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*"))))
 
 (use-package gcmh
@@ -2274,7 +2237,7 @@ the generated command."
         (funcall fn))))
   :config
   (defvar mu4e-contexts)
-  (when (load (expand-file-name "mail-contexts.el" user-emacs-directory) 'noerror)
+  (when (load (locate-user-emacs-file "mail-contexts.el") 'noerror)
     (setq mu4e-contexts (mapcar #'make-context mail-contexts)
           user-mail-address (plist-get (car mail-contexts) :address)
           mu4e-personal-addresses (mapcar (lambda (ctx) (plist-get ctx :address))
