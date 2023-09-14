@@ -1532,6 +1532,12 @@ See `cider-find-and-clear-repl-output' for more info."
   :init
   (setq lsp-use-plists t))
 
+(use-package lsp-treemacs
+  :ensure t
+  :defer t
+  :custom
+  (lsp-treemacs-theme "Iconless"))
+
 (use-package lsp-clojure
   :demand t
   :after lsp-mode
