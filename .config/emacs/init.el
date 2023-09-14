@@ -129,7 +129,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
     (setq-default
      x-gtk-use-system-tooltips nil
      cursor-type 'box
-     cursor-in-non-selected-windows 'hbar))
+     cursor-in-non-selected-windows nil))
   (setq
    ring-bell-function 'ignore
    mode-line-percent-position nil
