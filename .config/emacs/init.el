@@ -1136,7 +1136,11 @@ Export the file to md with the `ox-hugo' package."
 	     (concat "org:"
 		     (match-string 1 (expand-file-name file))))
 	    (t (concat "org:" file)))))
-  (require 'ol)
+  (provide 'blog))
+
+(use-package ol
+  :after blog
+  :config
   (org-link-set-parameters
    "org"
    :export #'blog-export-static-org-link
@@ -1154,8 +1158,11 @@ Export the file to md with the `ox-hugo' package."
    "blog-html"
    :follow #'blog-follow-html-link
    :export #'blog-export-hmtl-link
-   :complete #'blog-create-html-link)
-  (require 'ox)
+   :complete #'blog-create-html-link))
+
+(use-package ox
+  :defer t
+  :config
   (define-advice org-hugo-heading (:around (fn heading contents info) patch)
     (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
         (let ((title (org-export-data (org-element-property :title heading) info)))
@@ -1163,8 +1170,7 @@ Export the file to md with the `ox-hugo' package."
                   "</summary><div class=\"foldlistdata\">\n\n"
                   contents
                   "</div></details>"))
-      (funcall fn heading contents info)))
-  (provide 'blog))
+      (funcall fn heading contents info))))
 
 (use-package org-capture
   :defer t
@@ -2268,6 +2274,7 @@ the generated command."
   (mu4e-alert-enable-notifications))
 
 (use-package elfeed
+  :defer t
   :ensure t)
 
 (provide 'init)
