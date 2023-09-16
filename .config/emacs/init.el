@@ -24,7 +24,7 @@
   :ensure t)
 
 (use-package local-config
-  :defer t
+  :no-require
   :preface
   (defgroup local-config ()
     "Customization group for local settings."
@@ -48,7 +48,7 @@
   (provide 'local-config))
 
 (use-package functions
-  :defer t
+  :no-require
   :preface
   (require 'subr-x)
   (defun split-pararagraph-into-lines ()
@@ -109,7 +109,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
   (provide 'functions))
 
 (use-package defaults
-  :defer t
+  :no-require
   :preface
   (setq-default
    indent-tabs-mode nil
@@ -142,6 +142,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
 ;;; Core packages
 
 (use-package messages
+  :no-require
   :preface
   (provide 'messages)
   :bind ( :map messages-buffer-mode-map
@@ -171,7 +172,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
          ("<mode-line> <mouse-3>" . nil)))
 
 (use-package mode-line
-  :defer t
+  :no-require
   :preface
   (defvar mode-line-interactive-position
     `(line-number-mode
@@ -237,6 +238,7 @@ applied to the name.")
   (provide 'mode-line))
 
 (use-package font
+  :no-require
   :hook (after-init . setup-fonts)
   :preface
   (defun font-installed-p (font-name)
@@ -611,6 +613,7 @@ disabled, or enabled and the mark is active."
     (hl-line-mode (if display-line-numbers-mode 1 -1))))
 
 (use-package formfeed
+  :no-require
   :hook ((help-mode
           org-mode
           outline-mode
@@ -990,6 +993,7 @@ Search is based on regular expressions in the
 (use-package ob-shell :after org)
 
 (use-package blog
+  :no-require
   :commands (blog-publish-file
              blog-generate-file-name
              blog-read-list-items
@@ -1268,7 +1272,7 @@ Export the file to md with the `ox-hugo' package."
   :custom
   (css-indent-offset 2))
 
-(use-package json-mode
+(use-package js
   :defer t
   :custom
   (js-indent-level 2))
@@ -1906,6 +1910,7 @@ Set automatically by the `" (symbol-name compilation-mode-name) "'."))
          (provide ',compilation-mode-name)))))
 
 (use-package clojure-compilation-mode
+  :no-require
   :preface
   (define-project-compilation-mode clojure-compilation
     (defun clojure-compilation-filename-fn (rule-name)
@@ -1981,6 +1986,7 @@ group."
    :line 2))
 
 (use-package fennel-compilation-mode
+  :no-require
   :preface
   (define-project-compilation-mode fennel-compilation)
   :config
@@ -2009,6 +2015,7 @@ group."
    :file 1 :line 2))
 
 (use-package zig-compilation-mode
+  :no-require
   :preface
   (define-project-compilation-mode zig-compilation)
   :config
@@ -2034,6 +2041,7 @@ group."
    :file 1 :line 2 :col 3 :level 'info))
 
 (use-package password-store
+  :no-require
   :when (executable-find "pass")
   :commands (password-store-copy
              password-store-get
@@ -2071,6 +2079,7 @@ group."
   :ensure t)
 
 (use-package proxy
+  :no-require
   :after gsettings
   :preface
   (defun proxy--get-host (type)
@@ -2185,6 +2194,7 @@ the generated command."
   :defer t)
 
 (use-package mu4e
+  :no-require
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
   :when (executable-find "mu")
   :defines mu4e-personal-addresses
