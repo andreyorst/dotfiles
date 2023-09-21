@@ -857,6 +857,9 @@ Search is based on regular expressions in the
   :when (fboundp 'xwidget-webkit-browse-url)
   :custom (browse-url-browser-function #'xwidget-webkit-browse-url))
 
+(use-package repeat-mode
+  :hook (after-init . repeat-mode))
+
 
 ;;; Completion
 
