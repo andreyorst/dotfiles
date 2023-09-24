@@ -2290,5 +2290,19 @@ the generated command."
   :defer t
   :ensure t)
 
+
+;;; Games
+
+(use-package gnugo
+  :when (executable-find "gnugo")
+  :hook (gnugo-start-game . gnugo-gen-images)
+  :preface
+  (defun gnugo-gen-images ()
+    (when-let ((size (gnugo-get :SZ)))
+      (setq gnugo-xpms (gnugo-imgen-create-xpms size))
+      (gnugo-image-display-mode 1)))
+  :config
+  (setq gnugo-imgen-sizing-function (lambda (_) 32)))
+
 (provide 'init)
 ;;; init.el ends here
