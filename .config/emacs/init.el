@@ -2294,6 +2294,7 @@ the generated command."
 ;;; Games
 
 (use-package gnugo
+  :ensure t
   :when (executable-find "gnugo")
   :hook (gnugo-start-game . gnugo-gen-images)
   :preface
