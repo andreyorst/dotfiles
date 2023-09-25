@@ -804,9 +804,6 @@ Search is based on regular expressions in the
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   (flymake-mode-line-lighter "FlyM")
-  (flymake-mode-line-counter-format
-   '(":" flymake-mode-line-error-counter "/"
-     (:eval (cdr (flymake--mode-line-counter :warning)))))
   :config
   (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
 
@@ -2299,7 +2296,7 @@ the generated command."
   :hook (gnugo-start-game . gnugo-gen-images)
   :preface
   (defun gnugo-gen-images ()
-    (when-let ((size (gnugo-get :SZ)))
+    (when-let ((size (and window-system (gnugo-get :SZ))))
       (setq gnugo-xpms (gnugo-imgen-create-xpms size))
       (gnugo-image-display-mode 1)))
   :config
