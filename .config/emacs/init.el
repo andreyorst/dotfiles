@@ -355,14 +355,14 @@ Based on `so-long-detected-long-line-p'."
                                 (and (eobp) (<= (- (point) start)
                                                 threshold)))
                       (throw 'excessive t))))))))))
-  :init
-  (if (fboundp #'context-menu-mode)
-      (context-menu-mode 1)
-    (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
   (define-advice scroll-left (:before-while (&rest _) prevent-overscroll)
     (and truncate-lines
          (not (memq major-mode no-hscroll-modes))
          (truncated-lines-p)))
+  :init
+  (if (fboundp #'context-menu-mode)
+      (context-menu-mode 1)
+    (global-set-key (kbd "<mouse-3>") menu-bar-edit-menu))
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
@@ -389,7 +389,9 @@ Based on `so-long-detected-long-line-p'."
          ("C-h C-f" . describe-face)
          ([remap undo] . undo-only))
   :hook ((before-save . delete-trailing-whitespace)
-         (overwrite-mode . overwrite-mode-set-cursor-shape))
+         (overwrite-mode . overwrite-mode-set-cursor-shape)
+         (after-init . column-number-mode)
+         (after-init . line-number-mode))
   :custom
   (yank-excluded-properties t)
   (blink-matching-delay 0)
@@ -428,10 +430,7 @@ disabled, or enabled and the mark is active."
     (when (or (and transient-mark-mode
                    mark-active)
               (not transient-mark-mode))
-      (funcall fn arg)))
-  :init
-  (column-number-mode 1)
-  (line-number-mode 1))
+      (funcall fn arg))))
 
 (use-package delsel
   :hook (after-init . delete-selection-mode))
