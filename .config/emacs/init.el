@@ -807,7 +807,7 @@ Search is based on regular expressions in the
   (flymake-mode-line-lighter "FlyM")
   (flymake-mode-line-counter-format
    '(":" flymake-mode-line-error-counter "/"
-     (:eval (flymake--mode-line-counter :warning 'no-space))))
+     (:eval (cdr (flymake--mode-line-counter :warning)))))
   :config
   (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
 
