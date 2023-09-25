@@ -1933,7 +1933,8 @@ group."
                             (string-suffix-p filename s))
                           clojure-compilation-current-project-files)))
               (let* ((path-in-project
-                      (substring file (length (project-root clojure-compilation-current-project))))
+                      (substring (expand-file-name file)
+                                 (length (expand-file-name (project-root clojure-compilation-current-project)))))
                      (dir (substring path-in-project 0 (- (length filename)))))
                 (cons filename dir))
             filename)))))
