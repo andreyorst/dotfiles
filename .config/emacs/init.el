@@ -982,6 +982,7 @@ Search is based on regular expressions in the
   (org-log-done 'time)
   (org-image-actual-width nil)
   (org-edit-src-content-indentation 0)
+  (org-src-preserve-indentation t)
   :config
   (defun org-babel-edit-prep:emacs-lisp (_)
     "Setup Emacs Lisp buffer for Org Babel."
@@ -1296,33 +1297,8 @@ Export the file to md with the `ox-hugo' package."
 
 (use-package lua-mode
   :ensure t
-  :hook (lua-mode . lua-setup-abbrev-prettify)
   :custom
-  (lua-indent-level 2)
-  :preface
-  (defvar lua-syntax-expansions
-    '(("func" "local function")
-      ("fn"  "function")
-      ("let" "local")
-      ("<-" "return")))
-  (defun lua-expand-abbrev-maybe ()
-    (when (looking-back "<-" 2)
-      (progn
-        (delete-char -2)
-        (abbrev-insert (abbrev-symbol "<-")))))
-  (defun lua-setup-abbrev-prettify ()
-    (setq prettify-symbols-alist
-          (mapcar (lambda (abbrev-exp)
-                    (let ((abbrev (car abbrev-exp))
-                          (exp (cadr abbrev-exp)))
-                      `(,exp . ,(vconcat (cdr (mapcan (lambda (ch) (list '(Br . Bl) ch)) abbrev))))))
-                  lua-syntax-expansions))
-    (prettify-symbols-mode 1)
-    (dolist (abbrev-exp lua-syntax-expansions)
-      (apply #'define-abbrev lua-mode-abbrev-table abbrev-exp))
-    (modify-syntax-entry ?- "w 12")
-    (abbrev-mode)
-    (add-function :before (local 'abbrev-expand-function) #'lua-expand-abbrev-maybe)))
+  (lua-indent-level 4))
 
 (use-package ob-lua :after org)
 
