@@ -134,6 +134,7 @@
         cider-repl-return
         cider-switch-to-repl-buffer
         clang-format-buffer
+        compile-goto-error
         counsel-describe-function
         counsel-find-file
         count-lines-page

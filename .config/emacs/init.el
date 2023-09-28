@@ -49,6 +49,7 @@
 
 (use-package functions
   :no-require
+  :functions (dbus-color-theme-dark-p)
   :preface
   (require 'subr-x)
   (defun split-pararagraph-into-lines ()
@@ -725,6 +726,24 @@ disabled, or enabled and the mark is active."
       (narrow-to-region (point) (point))
       (yank-rectangle))))
 
+(use-package page
+  :bind ( :map narrow-map
+          ("]" . narrow-forward-page)
+          ("[" . narrow-backward-page))
+  :preface
+  (defun narrow-forward-page (&optional count)
+    (interactive "p")
+    (or count (setq count 1))
+    (widen)
+    (forward-page count)
+    (narrow-to-page))
+  (defun narrow-backward-page (&optional count)
+    (interactive "p")
+    (or count (setq count 1))
+    (widen)
+    (forward-page (- (1+ count))) ; 1+ needed to actually cross page boundary
+    (narrow-to-page)))
+
 (use-package profiler
   :bind ("<f2>" . profiler-start-or-report)
   :commands (profiler-report)
@@ -739,6 +758,7 @@ disabled, or enabled and the mark is active."
 (use-package hideshow
   :hook (prog-mode . hs-minor-mode)
   :delight hs-minor-mode
+  :commands (hs-hide-block)
   :bind ( :map hs-minor-mode-map
           ("C-c @ C-p" . hs-hide-all-private))
   :preface
@@ -863,8 +883,7 @@ Search is based on regular expressions in the
   :ensure t
   :bind ( :map vertico-map
           ("M-RET" . vertico-exit-input))
-  :init
-  (vertico-mode))
+  :hook (after-init . vertico-mode))
 
 (use-package vertico-directory
   :after vertico
@@ -876,12 +895,11 @@ Search is based on regular expressions in the
 
 (use-package marginalia
   :ensure t
-  :after vertico
-  :config
-  (marginalia-mode))
+  :hook (after-init . marginalia-mode))
 
 (use-package consult
   :ensure t
+  :commands (consult-completion-in-region)
   :preface
   (defvar consult-prefix-map (make-sparse-keymap))
   (fset 'consult-prefix-map consult-prefix-map)
@@ -907,6 +925,7 @@ Search is based on regular expressions in the
           ([remap completion-at-point] . corfu-complete)
           ("RET" . corfu-complete-and-quit)
           ("<return>" . corfu-complete-and-quit))
+  :commands (corfu-quit)
   :custom
   (corfu-cycle t)
   (corfu-preselect-first t)
@@ -938,6 +957,7 @@ Search is based on regular expressions in the
   :ensure t
   :unless (display-graphic-p)
   :after corfu
+  :commands (corfu-terminal-mode)
   :config
   (corfu-terminal-mode 1))
 
@@ -1066,6 +1086,7 @@ items were read by the `completing-read' function."
         (format "DRAFT-%s-%s.org"
                 (format-time-string "%Y-%m-%d")
                 (blog-title-to-fname title))))))
+  (autoload #'org-hugo-export-to-md "ox-hugo")
   (defun blog-publish-file ()
     "Update '#+date:' tag, and rename the currently visited file.
 File name is updated to include the same date and current title.
@@ -1114,7 +1135,7 @@ Export the file to md with the `ox-hugo' package."
                         :connection-type 'pipe
                         :sentinel (lambda (_ _) (delete-file tmp))
                         :command (list "scour" "-i" tmp "-o" file)))
-      (user-error "scour is not installed")))
+      (user-error "Scour is not installed")))
   (defun blog-export-static-org-link (path description _backend _properties)
     "Export link to Markdown."
     (defvar org-hugo-base-dir)
@@ -1144,6 +1165,10 @@ Export the file to md with the `ox-hugo' package."
 
 (use-package ol
   :after blog
+  :functions (org-link-set-parameters
+              blog-follow-html-link
+              blog-export-hmtl-link
+              blog-create-html-link)
   :config
   (org-link-set-parameters
    "org"
@@ -1163,18 +1188,6 @@ Export the file to md with the `ox-hugo' package."
    :follow #'blog-follow-html-link
    :export #'blog-export-hmtl-link
    :complete #'blog-create-html-link))
-
-(use-package ox
-  :defer t
-  :config
-  (define-advice org-hugo-heading (:around (fn heading contents info) patch)
-    (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
-        (let ((title (org-export-data (org-element-property :title heading) info)))
-          (concat "<details class=\"foldlist\"><summary>" title
-                  "</summary><div class=\"foldlistdata\">\n\n"
-                  contents
-                  "</div></details>"))
-      (funcall fn heading contents info))))
 
 (use-package org-capture
   :defer t
@@ -1220,7 +1233,16 @@ Export the file to md with the `ox-hugo' package."
 
 (use-package ox-hugo
   :ensure t
-  :after ox)
+  :after ox
+  :preface
+  (define-advice org-hugo-heading (:around (fn heading contents info) patch)
+    (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
+        (let ((title (org-export-data (org-element-property :title heading) info)))
+          (concat "<details class=\"foldlist\"><summary>" title
+                  "</summary><div class=\"foldlistdata\">\n\n"
+                  contents
+                  "</div></details>"))
+      (funcall fn heading contents info))))
 
 (use-package ox-latex
   :after ox)
@@ -1497,12 +1519,7 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package lsp-mode
   :ensure t
-  :hook ((lsp-mode . lsp-diagnostics-mode)
-         (lsp-mode . lsp-completion-mode-maybe))
-  :preface
-  (defun lsp-completion-mode-maybe ()
-    (unless (bound-and-true-p cider-mode)
-      (lsp-completion-mode 1)))
+  :hook ((lsp-mode . lsp-diagnostics-mode))
   :custom
   (lsp-keymap-prefix "C-c l")
   (lsp-auto-configure nil)
@@ -1516,6 +1533,15 @@ See `cider-find-and-clear-repl-output' for more info."
   (lsp-signature-doc-lines 1)
   :init
   (setq lsp-use-plists t))
+
+(use-package lsp-completion
+  :no-require
+  :hook ((lsp-mode . lsp-completion-mode-maybe))
+  :commands (lsp-completion-mode)
+  :preface
+  (defun lsp-completion-mode-maybe ()
+    (unless (bound-and-true-p cider-mode)
+      (lsp-completion-mode 1))))
 
 (use-package lsp-treemacs
   :ensure t
@@ -1567,6 +1593,16 @@ See `cider-find-and-clear-repl-output' for more info."
           (indent-region (point) (mark))))))
   :bind ( :map common-lisp-modes-mode-map
           ("M-q" . indent-sexp-or-fill)))
+
+(use-package region-bindings
+  :vc (:url "https://gitlab.com/andreyorst/region-bindings.el.git")
+  :commands (region-bindings-mode)
+  :preface
+  (defun region-bindings-off ()
+    (region-bindings-mode -1))
+  :hook ((after-init . global-region-bindings-mode)
+         ((elfeed-search-mode magit-mode mu4e-headers-mode)
+          . region-bindings-off)))
 
 (use-package puni
   :ensure t
@@ -1628,6 +1664,7 @@ See `cider-find-and-clear-repl-output' for more info."
 (use-package dumb-jump
   :ensure t
   :defer t
+  :commands (dumb-jump-xref-activate)
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-selector 'completing-read)
@@ -1652,15 +1689,6 @@ See `cider-find-and-clear-repl-output' for more info."
 (use-package expand-region
   :ensure t
   :bind ("C-=" . er/expand-region))
-
-(use-package region-bindings
-  :vc (:url "https://gitlab.com/andreyorst/region-bindings.el.git")
-  :preface
-  (defun region-bindings-off ()
-    (region-bindings-mode -1))
-  :hook ((after-init . global-region-bindings-mode)
-         ((elfeed-search-mode magit-mode mu4e-headers-mode)
-          . region-bindings-off)))
 
 (use-package multiple-cursors
   :ensure t
@@ -2057,6 +2085,8 @@ group."
 (use-package proxy
   :no-require
   :after gsettings
+  :commands (gsettings-get)
+  :when (executable-find "gsettings")
   :preface
   (defun proxy--get-host (type)
     (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
@@ -2253,6 +2283,7 @@ the generated command."
 (use-package mu4e-alert
   :ensure t
   :after mu4e
+  :commands (mu4e-alert-enable-notifications)
   :custom
   (mu4e-alert-style 'libnotify)
   (mu4e-alert-icon "emacs")
@@ -2270,6 +2301,8 @@ the generated command."
   :ensure t
   :when (executable-find "gnugo")
   :hook (gnugo-start-game . gnugo-gen-images)
+  :functions (gnugo-get gnugo-imgen-create-xpms gnugo-image-display-mode)
+  :defines (gnugo-imgen-sizing-function)
   :preface
   (defun gnugo-gen-images ()
     (when-let ((size (and window-system (gnugo-get :SZ))))
