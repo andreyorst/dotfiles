@@ -1013,155 +1013,7 @@ Search is based on regular expressions in the
 (use-package ob-shell :after org)
 
 (use-package blog
-  :no-require
-  :commands (blog-publish-file
-             blog-generate-file-name
-             blog-read-list-items
-             blog-new-post)
-  :after ox-hugo
-  :preface
-  (defvar blog-capture-template
-    "#+hugo_base_dir: ../
-#+hugo_section: posts
-#+hugo_auto_set_lastmod: t
-#+options: tex:dvisvgm
-#+macro: kbd @@html:<kbd>$1</kbd>@@
-#+macro: a @@html:<a href=\"$1\">$2</a>@@
-
-#+title: %(format \"%s\" blog--current-post-name)
-#+date: %(format-time-string \"%Y-%m-%d %h %H:%M\")
-#+hugo_tags: %(blog-read-list-items \"Select tags: \" 'blog-tags)
-#+hugo_categories: %(blog-read-list-items \"Select categories: \" 'blog-categories)
-#+hugo_custom_front_matter: :license %(format \"%S\" blog-license)
-#+hugo_draft: true
-
-%?"
-    "Org-capture template for blog posts.")
-  (defcustom blog-tags nil
-    "A list of tags used for posts."
-    :type '(repeat string)
-    :group 'blog)
-  (defcustom blog-categories nil
-    "A list of tags used for posts."
-    :type '(repeat string)
-    :group 'blog)
-  (defcustom blog-directory "~/blog"
-    "Location of the blog directory for org-capture."
-    :type 'string
-    :group 'blog)
-  (defcustom blog-license ""
-    "Blog license string."
-    :type 'string
-    :group 'blog)
-  (defvar blog--current-post-name nil
-    "Current post name for org-capture template.")
-  (defun blog-read-list-items (prompt var)
-    "Completing read items with the PROMPT from the VAR.
-
-VAR must be a quoted custom variable, which will be saved if new
-items were read by the `completing-read' function."
-    (let ((items (eval var)) item result)
-      (while (not (string-empty-p item))
-        (setq item (string-trim (or (completing-read prompt items) "")))
-        (unless (string-empty-p item)
-          (push item result)
-          (setq items (remove item items))
-          (unless (member item (eval var))
-            (customize-save-variable var (sort (cons item (eval var)) #'string<)))))
-      (string-join result " ")))
-  (defun blog-title-to-fname (title)
-    (thread-last
-      title
-      (replace-regexp-in-string "[[:space:]]" "-")
-      (replace-regexp-in-string "-+" "-")
-      (replace-regexp-in-string "[^[:alnum:]-]+" "")
-      downcase))
-  (defun blog-generate-file-name (&rest _)
-    (let ((title (read-string "Title: ")))
-      (setq blog--current-post-name title)
-      (find-file
-       (file-name-concat
-        (expand-file-name blog-directory)
-        "posts"
-        (format "DRAFT-%s-%s.org"
-                (format-time-string "%Y-%m-%d")
-                (blog-title-to-fname title))))))
-  (autoload #'org-hugo-export-to-md "ox-hugo")
-  (defun blog-publish-file ()
-    "Update '#+date:' tag, and rename the currently visited file.
-File name is updated to include the same date and current title.
-Export the file to md with the `ox-hugo' package."
-    (interactive)
-    (save-match-data
-      (let ((today (format-time-string "%Y-%m-%d"))
-            (now (format-time-string "%h %H:%M")))
-        (save-excursion
-          (goto-char (point-min))
-          (re-search-forward "^#\\+date:.*$")
-          (replace-match (format "#+date: %s %s" today now))
-          (re-search-forward "^#\\+hugo_draft:.*$")
-          (replace-match "#+hugo_draft: false"))
-        (save-buffer)
-        (let* ((file-name (save-excursion
-                            (goto-char (point-min))
-                            (re-search-forward "^#\\+title:[[:space:]]*\\(.*\\)$")
-                            (blog-title-to-fname (match-string 1))))
-               (exported-file (org-hugo-export-to-md))
-               (new-name (format "%s-%s" today
-                                 (if (string-match
-                                      "^[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}-\\(.*\\)$"
-                                      file-name)
-                                     (match-string 1 file-name)
-                                   file-name))))
-          (condition-case nil
-              (rename-visited-file (format "%s.org" new-name))
-            (file-already-exists nil))
-          (rename-file
-           exported-file
-           (expand-file-name
-            (format "%s.md" new-name)
-            (file-name-directory exported-file))
-           t)))))
-  (defun blog-new-post ()
-    "Capture a new post."
-    (interactive)
-    (org-capture nil "p"))
-  (defun blog-scour-svg (file)
-    (if (executable-find "scour")
-        (let ((tmp (make-temp-file "scour.svg.")))
-          (with-temp-file tmp
-            (insert-file-contents-literally file))
-          (make-process :name "scour"
-                        :connection-type 'pipe
-                        :sentinel (lambda (_ _) (delete-file tmp))
-                        :command (list "scour" "-i" tmp "-o" file)))
-      (user-error "Scour is not installed")))
-  (defun blog-export-static-org-link (path description _backend _properties)
-    "Export link to Markdown."
-    (defvar org-hugo-base-dir)
-    (let ((new-path (expand-file-name
-                     (file-name-concat "../static" path)
-                     org-hugo-base-dir)))
-      (copy-file (expand-file-name path) new-path t)
-      (format "[%s](/%s)"
-              (or description path)
-              (file-name-nondirectory path))))
-  (defun blog-create-static-org-link (&optional _)
-    "Create a file link using completion."
-    (let ((file (read-file-name "File: "))
-	  (pwd (file-name-as-directory (expand-file-name ".")))
-	  (pwd1 (file-name-as-directory (abbreviate-file-name
-				         (expand-file-name ".")))))
-      (cond ((string-match
-	      (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
-	     (concat "org:" (match-string 1 file)))
-	    ((string-match
-	      (concat "^" (regexp-quote pwd) "\\(.+\\)")
-	      (expand-file-name file))
-	     (concat "org:"
-		     (match-string 1 (expand-file-name file))))
-	    (t (concat "org:" file)))))
-  (provide 'blog))
+  :vc (:url "https://gitlab.com/andreyorst/blog.el"))
 
 (use-package ol
   :after blog
@@ -1191,15 +1043,12 @@ Export the file to md with the `ox-hugo' package."
 
 (use-package org-capture
   :defer t
+  :after blog
   :bind ("C-c o c" . org-capture)
   :custom
   (org-directory blog-directory)
   (org-capture-templates
-   `(("p" "Post" plain
-      (function blog-generate-file-name)
-      ,blog-capture-template
-      :jump-to-captured t
-      :immediate-finish t)
+   `(,blog-capture-template
      ,@(mapcar
         (lambda (spec)
           (seq-let (btn descr heading) spec
