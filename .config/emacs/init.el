@@ -1825,9 +1825,11 @@ Returns a list of all jar archives."
                             0)))
   (defun clojure-compilation--find-file-in-project (file)
     "Check if FILE is part of the currently compiled project."
-    (seq-find
-     (lambda (s) (string-suffix-p file s))
-     clojure-compilation-current-project-files))
+    (if (file-name-absolute-p file)
+        file
+      (seq-find
+       (lambda (s) (string-suffix-p file s))
+       clojure-compilation-current-project-files)))
   (defun clojure-compilation--file-exists-jar-p (jar file)
     "Check if FILE is present in the JAR archive."
     (with-temp-buffer
