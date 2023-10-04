@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t -*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t-*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
@@ -100,6 +100,9 @@ transparent."
           (if (eq value memo)
               (puthash args (apply fn args) memo)
             value)))))
+  (defmacro defmemo (name &rest funtail)
+    (declare (doc-string 3) (indent 2) (debug defun))
+    `(defalias ',name (memoize (lambda ,@funtail))))
   (defvar-local ssh-tunnel-port nil)
   (put 'ssh-tunnel-port 'safe-local-variable #'numberp)
   (defun ssh-tunnel (host port &optional local-port)
@@ -1779,7 +1782,8 @@ Set automatically by the `" (symbol-name compilation-mode-name) "'."))
   (defun clojure-compilation--split-classpath (classpath)
     "Split the CLASSPATH string."
     (split-string classpath ":" t "[[:space:]\n]+"))
-  (defun clojure-compilation--get-project-dependencies* (command _deps-file _mod-time)
+  (defmemo clojure-compilation--get-project-dependencies-memo
+      (command _deps-file _mod-time)
     "Call COMMAND to obtain the classpath string.
 DEPS-FILE and MOD-TIME are used for memoization."
     (thread-last
@@ -1787,8 +1791,6 @@ DEPS-FILE and MOD-TIME are used for memoization."
       shell-command-to-string
       clojure-compilation--split-classpath
       (seq-filter (lambda (s) (string-suffix-p ".jar" s)))))
-  (fset 'clojure-compilation--get-project-dependencies-memo
-        (memoize #'clojure-compilation--get-project-dependencies*))
   (defun clojure-compilation--get-lein-project-dependencies (root)
     "Obtain classpath from lein for ROOT."
     (let* ((project-file (expand-file-name "project.clj" root))
@@ -1840,15 +1842,14 @@ Returns a list of all jar archives."
         (goto-char (point-min))
         (save-match-data
           (re-search-forward (format "^%s$" (regexp-quote file)) nil t)))))
-  (defun clojure-compilation--find-dep* (file _project _deps-mod-time)
+  (defmemo clojure-compilation--find-dep-memo
+      (file _project _deps-mod-time)
     "Find FILE in current project dependency list.
 PROJECT and DEPS-MOD-TIME are used for memoizing the call."
     (when (not (string-empty-p file))
       (seq-find (lambda (d)
                   (clojure-compilation--file-exists-jar-p d file))
                 clojure-compilation-project-deps)))
-  (fset 'clojure-compilation--find-dep-memo
-        (memoize #'clojure-compilation--find-dep*))
   (defun clojure-compilation--find-dep (file)
     "Find FILE in current project dependency list."
     (clojure-compilation--find-dep-memo
