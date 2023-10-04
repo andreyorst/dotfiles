@@ -95,8 +95,11 @@ and saves its result in the storage.  FN must be referentially
 transparent."
     (let ((memo (make-hash-table :test 'equal)))
       (lambda (&rest args)
-        (let ((value (gethash args memo)))
-          (or value (puthash args (apply fn args) memo))))))
+        ;; `memo' is used as a singleton to check for absense of value
+        (let ((value (gethash args memo memo)))
+          (if (eq value memo)
+              (puthash args (apply fn args) memo)
+            value)))))
   (defvar-local ssh-tunnel-port nil)
   (put 'ssh-tunnel-port 'safe-local-variable #'numberp)
   (defun ssh-tunnel (host port &optional local-port)
