@@ -967,10 +967,7 @@ Search is based on regular expressions in the
 (use-package corfu-terminal
   :ensure t
   :unless (display-graphic-p)
-  :after corfu
-  :commands (corfu-terminal-mode)
-  :config
-  (corfu-terminal-mode 1))
+  :hook (after-init . corfu-terminal-mode))
 
 (use-package cape
   :ensure t
