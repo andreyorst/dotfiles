@@ -740,7 +740,9 @@ disabled, or enabled and the mark is active."
 (use-package page
   :bind ( :map narrow-map
           ("]" . narrow-forward-page)
-          ("[" . narrow-backward-page))
+          ("[" . narrow-backward-page)
+          :map ctl-x-map
+          ("C-p" . nil))
   :preface
   (defun narrow-forward-page (&optional count)
     (interactive "p")
