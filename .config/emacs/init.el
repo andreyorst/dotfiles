@@ -777,7 +777,7 @@ disabled, or enabled and the mark is active."
   :preface
   (defvar hs-mode-private-regex-alist
     `(((emacs-lisp-mode lisp-mode)
-       . ,(rx bol "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
+       . ,(rx "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
       ((clojure-mode clojurescrip-mode clojurec-mode)
        . ,(rx "(" (or "defn-"
                       (seq "def" (* (not space)) (+ space)
