@@ -153,6 +153,12 @@ If LOCAL-PORT is nil, PORT is used as local port."
 
 ;;; Core packages
 
+(use-package window
+  :config
+  (add-to-list 'display-buffer-alist
+               '("\\*Calendar*"
+                 (display-buffer-at-bottom))))
+
 (use-package messages
   :no-require
   :preface
@@ -448,7 +454,9 @@ disabled, or enabled and the mark is active."
   :hook (after-init . delete-selection-mode))
 
 (use-package common-lisp-modes
-  :vc (:url "https://gitlab.com/andreyorst/common-lisp-modes.el.git"))
+  :vc ( :url "https://gitlab.com/andreyorst/common-lisp-modes.el.git"
+        :branch "main"
+        :rev :newest))
 
 (use-package minibuffer
   :hook (eval-expression-minibuffer-setup . common-lisp-modes-mode)
@@ -1023,7 +1031,9 @@ Search is based on regular expressions in the
 (use-package ob-shell :after org)
 
 (use-package blog
-  :vc (:url "https://gitlab.com/andreyorst/blog.el"))
+  :vc ( :url "https://gitlab.com/andreyorst/blog.el.git"
+        :branch "main"
+        :rev :newest))
 
 (use-package ol
   :after blog
@@ -1184,7 +1194,9 @@ Search is based on regular expressions in the
 (use-package ob-lua :after org)
 
 (use-package fennel-mode
-  :vc (:url "https://git.sr.ht/~technomancy/fennel-mode" :branch "main" :rev :newest)
+  :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
+        :branch "main"
+        :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
            fennel-repl-mode
@@ -1454,7 +1466,9 @@ See `cider-find-and-clear-repl-output' for more info."
           ("M-q" . indent-sexp-or-fill)))
 
 (use-package region-bindings
-  :vc (:url "https://gitlab.com/andreyorst/region-bindings.el.git")
+  :vc ( :url "https://gitlab.com/andreyorst/region-bindings.el.git"
+        :branch "main"
+        :rev :newest)
   :commands (region-bindings-mode)
   :preface
   (defun region-bindings-off ()
@@ -1541,7 +1555,9 @@ See `cider-find-and-clear-repl-output' for more info."
    ("C-M-:" . avy-goto-line)))
 
 (use-package isayt
-  :vc (:url "https://gitlab.com/andreyorst/isayt.el.git")
+  :vc ( :url "https://gitlab.com/andreyorst/isayt.el.git"
+        :branch "main"
+        :rev :newest)
   :delight isayt-mode
   :hook (common-lisp-modes-mode . isayt-mode))
 
