@@ -141,6 +141,7 @@
         dabbrev-expand
         describe-variable
         dired-up-directory
+        fennel-proto-repl-switch-to-repl
         god-local-mode
         hs-show-all
         hydra--digit-argument
