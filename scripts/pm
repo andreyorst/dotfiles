@@ -33,17 +33,6 @@ pm_yum() {
     esac
 }
 
-pm_rpm_ostree() {
-    cmd="$1"
-    shift
-    case "$cmd" in
-        (install) rpm-ostree install "$@" ;;
-        (update)  rpm-ostree upgrade "$@" ;;
-        (remove)  rpm-ostree remove "$@" ;;
-        (*)       rpm-ostree "$cmd" "$@" ;;
-    esac
-}
-
 pm_apt() {
     cmd="$1"
     shift
@@ -57,11 +46,22 @@ pm_apt() {
     esac
 }
 
-for pm in rpm-ostree dnf yum apt; do
+pm_pkg() {
+    cmd="$1"
+    shift
+    case "$cmd" in
+        (install)     pkg install "$@" ;;
+        (update)      pkg update "$@" ;;
+        (remove)      pkg remove "$@" ;;
+        (autoremove)  pkg autoremove "$@" ;;
+        (search)      pkg search "$@" ;;
+        (*)           pkg "$cmd" "$@" ;;
+    esac
+}
+
+for pm in dnf yum pkg apt; do
     if [ -n "$(command -v $pm)" ]; then
-        alias pm="pm_\$(echo \$pm | sed 's/[^a-zA-Z_]/_/g')"
+        $pm "$@"
         break
     fi
 done
-
-pm $@
