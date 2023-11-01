@@ -50,6 +50,7 @@
 (use-package functions
   :no-require
   :functions (dbus-color-theme-dark-p)
+  :bind (("M-Q" . split-pararagraph-into-lines))
   :preface
   (require 'subr-x)
   (defun split-pararagraph-into-lines ()
@@ -987,7 +988,6 @@ Search is based on regular expressions in the
 (use-package org
   :hook ((org-babel-after-execute . org-redisplay-inline-images))
   :bind ( :map org-mode-map
-          ("M-Q" . split-pararagraph-into-lines)
           ("C-c l" . org-store-link))
   :custom-face
   (org-block ((t (:extend t))))
