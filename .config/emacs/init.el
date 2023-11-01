@@ -1560,7 +1560,7 @@ See `cider-find-and-clear-repl-output' for more info."
   :preface
   (defalias 'avy-map-prefix (make-sparse-keymap))
   (defvar avy-map (symbol-function 'avy-map-prefix)
-    "Keymap for characters following \\`C-c'.")
+    "Keymap for characters following \\`M-a'.")
   (define-key global-map (kbd "M-a") 'avy-map-prefix))
 
 (use-package isayt
