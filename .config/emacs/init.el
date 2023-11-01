@@ -75,15 +75,10 @@
   (defun in-termux-p ()
     "Detect if Emacs is running in Termux."
     (executable-find "termux-info"))
-  (defun termux-color-theme-dark-p ()
-    (with-temp-buffer
-      (insert-file-contents
-       (expand-file-name "~/.termux/theme-variant"))
-      (looking-at-p "dark")))
   (defun dark-mode-enabled-p ()
     "Check if dark mode is enabled."
-    (cond ((in-termux-p)
-           (termux-color-theme-dark-p))
+    (cond ((file-exists-p (expand-file-name "~/.dark-mode"))
+           t)
           ((featurep 'dbus)
            (dbus-color-theme-dark-p))
           (t nil)))
@@ -1064,7 +1059,8 @@ Search is based on regular expressions in the
 (use-package org-capture
   :defer t
   :after blog
-  :bind ("C-c o c" . org-capture)
+  :bind ( :map mode-specific-map
+          ("o c" . org-capture))
   :custom
   (org-directory blog-directory)
   (org-capture-templates
@@ -1588,7 +1584,8 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package vundo
   :ensure t
-  :bind (("C-c u" . vundo))
+  :bind ( :map mode-specific-map
+          ("u" . vundo))
   :custom
   (vundo-roll-back-on-quit nil)
   (vundo--window-max-height 10))
