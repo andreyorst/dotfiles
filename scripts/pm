@@ -61,7 +61,7 @@ pm_pkg() {
 
 for pm in dnf yum pkg apt; do
     if [ -n "$(command -v $pm)" ]; then
-        $pm "$@"
+        eval "pm_${pm} $@"
         break
     fi
 done
