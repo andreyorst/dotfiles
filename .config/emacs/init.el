@@ -1548,7 +1548,20 @@ See `cider-find-and-clear-repl-output' for more info."
   :ensure t
   :bind
   (("C-:" . avy-goto-char-timer)
-   ("C-M-:" . avy-goto-line)))
+   :map avy-map
+   ("w l" . avy-kill-ring-save-whole-line)
+   ("k l" . avy-kill-whole-line)
+   ("w r" . avy-kill-ring-save-region)
+   ("k r" . avy-kill-region)
+   ("g c" . avy-goto-char-timer)
+   ("g l" . avy-goto-line)
+   ("n" . avy-next)
+   ("p" . avy-prev))
+  :preface
+  (defalias 'avy-map-prefix (make-sparse-keymap))
+  (defvar avy-map (symbol-function 'avy-map-prefix)
+    "Keymap for characters following \\`C-c'.")
+  (define-key global-map (kbd "M-a") 'avy-map-prefix))
 
 (use-package isayt
   :vc ( :url "https://gitlab.com/andreyorst/isayt.el.git"
