@@ -45,8 +45,6 @@
     (scroll-bar-mode -1)))
 
 (when (featurep 'native-compile)
-  (defvar inhibit-automatic-native-compilation)
-  (setq inhibit-automatic-native-compilation nil)
   (defvar native-comp-async-report-warnings-errors)
   (setq native-comp-async-report-warnings-errors 'silent))
 
