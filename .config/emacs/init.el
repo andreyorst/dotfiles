@@ -1579,16 +1579,15 @@ See `cider-find-and-clear-repl-output' for more info."
 (use-package avy
   :ensure t
   :bind
-  (("C-:" . avy-goto-char-timer)
-   :map avy-map
-   ("w l" . avy-kill-ring-save-whole-line)
-   ("k l" . avy-kill-whole-line)
-   ("w r" . avy-kill-ring-save-region)
-   ("k r" . avy-kill-region)
-   ("g c" . avy-goto-char-timer)
-   ("g l" . avy-goto-line)
-   ("n" . avy-next)
-   ("p" . avy-prev))
+  ( :map avy-map
+    ("M-w l" . avy-kill-ring-save-whole-line)
+    ("M-k l" . avy-kill-whole-line)
+    ("M-w r" . avy-kill-ring-save-region)
+    ("M-k r" . avy-kill-region)
+    ("c" . avy-goto-char-timer)
+    ("l" . avy-goto-line)
+    ("n" . avy-next)
+    ("p" . avy-prev))
   :preface
   (defalias 'avy-map-prefix (make-sparse-keymap))
   (defvar avy-map (symbol-function 'avy-map-prefix)
