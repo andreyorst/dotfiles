@@ -699,6 +699,29 @@ disabled, or enabled and the mark is active."
                        "$"
                      (propertize "$" 'face '(:inherit error)))))
       (concat date " " path info "\n" prompt " ")))
+  (declare-function eshell-buffered-print "ext:esh-io")
+  (declare-function eshell-flush "ext:esh-io")
+  (define-advice eshell/cat (:around (cat &rest args) iimage-mode-refresh)
+    "Display image when using cat on it."
+    (require 'iimage)
+    (dolist (arg args)
+      (with-silent-modifications
+        (save-excursion
+          (catch 'done
+            (dolist (pair iimage-mode-image-regex-alist)
+              (when-let (image (and (string-match-p (car pair) arg)
+                                    (file-exists-p arg)
+                                    (expand-file-name arg)))
+                (add-text-properties
+                 0 (length arg)
+                 `(display ,(create-image image)
+                           modification-hooks
+                           (iimage-modification-hook))
+                 arg)
+                (eshell-buffered-print arg)
+                (eshell-flush)
+                (throw 'done t)))
+            (funcall cat arg))))))
   :custom
   (eshell-scroll-show-maximum-output nil)
   (eshell-prompt-function 'eshell-prompt)
@@ -708,7 +731,16 @@ disabled, or enabled and the mark is active."
   :after eshell
   :custom
   (eshell-modules-list
-   (cl-remove 'eshell-term eshell-modules-list)))
+   (remove 'eshell-term eshell-modules-list)))
+
+(use-package em-smart
+  :after eshell
+  :custom
+  (eshell-where-to-jump 'begin)
+  (eshell-review-quick-commands nil)
+  (eshell-smart-space-goes-to-end t)
+  (eshell-modules-list
+   (push 'eshell-smart eshell-modules-list)))
 
 (use-package dired
   :bind ( :map dired-mode-map
