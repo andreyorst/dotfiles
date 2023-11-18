@@ -1179,6 +1179,23 @@ Search is based on regular expressions in the
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
+(use-package highlight-defined
+  :ensure t
+  :hook (emacs-lisp-mode . highlight-defined-mode)
+  :custom-face
+  (highlight-defined-function-name-face
+   ((t :inherit unspecified)))
+  (highlight-defined-builtin-function-name-face
+   ((t :inherit unspecified)))
+  (highlight-defined-special-form-name-face
+   ((t :inherit unspecified)))
+  (highlight-defined-macro-name-face
+   ((t :inherit unspecified)))
+  :preface
+  (define-advice highlight-defined--determine-face (:around (fn symbol) ignore-t)
+    (unless (eq symbol 't)
+      (funcall fn symbol))))
+
 (use-package racket-mode
   :ensure t
   :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
