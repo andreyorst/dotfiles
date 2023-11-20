@@ -277,10 +277,10 @@ applied to the name.")
   :preface
   (defvar disabled-commands (locate-user-emacs-file "disabled.el")
     "File to store disabled commands, that were enabled permanently.")
-  :config
   (define-advice enable-command (:around (fn command) use-disabled-file)
     (let ((user-init-file disabled-commands))
       (funcall fn command)))
+  :init
   (load disabled-commands 'noerror))
 
 (use-package files
@@ -704,6 +704,7 @@ disabled, or enabled and the mark is active."
   (define-advice eshell/cat (:around (cat &rest args) iimage-mode-refresh)
     "Display image when using cat on it."
     (require 'iimage)
+    (defvar iimage-mode-image-regex-alist)
     (dolist (arg args)
       (with-silent-modifications
         (save-excursion
@@ -922,7 +923,7 @@ Search is based on regular expressions in the
   :when (fboundp 'xwidget-webkit-browse-url)
   :custom (browse-url-browser-function #'xwidget-webkit-browse-url))
 
-(use-package repeat-mode
+(use-package repeat
   :hook (after-init . repeat-mode))
 
 
@@ -1005,6 +1006,7 @@ Search is based on regular expressions in the
 (use-package corfu-terminal
   :ensure t
   :unless (display-graphic-p)
+  :commands (corfu-terminal-mode)
   :hook (after-init . corfu-terminal-mode))
 
 (use-package cape
@@ -1058,21 +1060,15 @@ Search is based on regular expressions in the
 (use-package ob-shell :after org)
 
 (use-package blog
+  :defer t
   :vc ( :url "https://gitlab.com/andreyorst/blog.el.git"
         :branch "main"
         :rev :newest))
 
 (use-package ol
   :after blog
-  :functions (org-link-set-parameters
-              blog-follow-html-link
-              blog-export-hmtl-link
-              blog-create-html-link)
-  :config
-  (org-link-set-parameters
-   "org"
-   :export #'blog-export-static-org-link
-   :complete #'blog-create-static-org-link)
+  :functions (org-link-set-parameters)
+  :preface
   (defun blog-follow-html-link (path arg)
     (funcall browse-url-browser-function path arg))
   (defun blog-export-hmtl-link (path description _backend _properties)
@@ -1082,6 +1078,11 @@ Search is based on regular expressions in the
     "Create a file link using completion."
     (let ((link (read-string "Link: ")))
       (concat "blog-html:" link)))
+  :config
+  (org-link-set-parameters
+   "org"
+   :export #'blog-export-static-org-link
+   :complete #'blog-create-static-org-link)
   (org-link-set-parameters
    "blog-html"
    :follow #'blog-follow-html-link
@@ -1132,6 +1133,8 @@ Search is based on regular expressions in the
   :ensure t
   :after ox
   :preface
+  (declare-function org-export-data "ext:ox")
+  (declare-function org-export-get-node-property "ext:ox")
   (define-advice org-hugo-heading (:around (fn heading contents info) patch)
     (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
         (let ((title (org-export-data (org-element-property :title heading) info)))
@@ -1207,17 +1210,13 @@ Search is based on regular expressions in the
   :defer t)
 
 (use-package zig-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package abbrev
   :delight abbrev-mode
   :custom
   (save-abbrevs nil))
-
-(use-package lua-mode
-  :ensure t
-  :custom
-  (lua-indent-level 4))
 
 (use-package ob-lua :after org)
 
@@ -1277,9 +1276,12 @@ Search is based on regular expressions in the
 
 (use-package cider
   :ensure t
+  :after clojure-mode
   :delight " CIDER"
   :commands cider-find-and-clear-repl-buffer
-  :functions (cider-nrepl-request:eval cider-find-and-clear-repl-output)
+  :functions (cider-nrepl-request:eval
+              cider-find-and-clear-repl-output
+              cider-random-tip)
   :hook (((cider-repl-mode cider-mode) . eldoc-mode)
          (cider-repl-mode . common-lisp-modes-mode)
          (cider-popup-buffer-mode . cider-disable-linting))
@@ -1318,6 +1320,7 @@ Search is based on regular expressions in the
   (cider-comment-prefix "")
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
+  :preface
   (defun cider-disable-linting ()
     "Disable linting integrations for current buffer."
     (when (bound-and-true-p flymake-mode)
@@ -1346,9 +1349,11 @@ See `cider-find-and-clear-repl-output' for more info."
     (cider-nrepl-request:eval "(portal.api/close)" #'ignore)))
 
 (use-package ob-clojure
-  :after (cider org)
+  :after (org clojure-mode)
   :custom
-  (org-babel-clojure-backend 'cider))
+  (org-babel-clojure-backend 'cider)
+  :init
+  (require 'cider))
 
 (use-package clj-refactor
   :ensure t
@@ -1412,7 +1417,88 @@ See `cider-find-and-clear-repl-output' for more info."
   :after geiser)
 
 (use-package sql-indent
+  :defer t
   :ensure t)
+
+;;;; tree-sitter modes
+
+(use-package treesit
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+  :custom
+  (treesit-font-lock-level 2))
+
+(use-package js
+  :defer t
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+  :init
+  (unless (treesit-language-available-p 'javascript)
+    (add-to-list
+     'treesit-language-source-alist
+     '( javascript
+        "https://github.com/tree-sitter/tree-sitter-javascript"
+        "master" "src"))
+    (treesit-install-language-grammar 'javascript))
+  (when (treesit-ready-p 'javascript)
+    (dolist (mode '(js-mode javascript-mode js2-mode))
+      (add-to-list
+       'major-mode-remap-alist
+       `(,mode . js-ts-mode)))))
+
+(use-package json-ts-mode
+  :defer t
+  :after json
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+  :init
+  (unless (treesit-language-available-p 'json)
+    (add-to-list
+     'treesit-language-source-alist
+     '(json "https://github.com/tree-sitter/tree-sitter-json"))
+    (treesit-install-language-grammar 'json))
+  (when (treesit-ready-p 'json)
+    (add-to-list
+     'major-mode-remap-alist
+     '(js-json-mode . json-ts-mode))))
+
+(use-package lua-ts-mode
+  :defer t
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+  :mode "\\.lua\\'"
+  :custom
+  (lua-ts-indent-offset 4)
+  :init
+  (unless (treesit-language-available-p 'lua)
+    (add-to-list
+     'treesit-language-source-alist
+     '(lua "https://github.com/MunifTanjim/tree-sitter-lua"))
+    (treesit-install-language-grammar 'lua))
+  (when (treesit-ready-p 'lua)
+    (add-to-list
+     'major-mode-remap-alist
+     '(lua-mode . lua-ts-mode))))
+
+(use-package elixir-ts-mode
+  :defer t
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+  :config
+  (unless (treesit-language-available-p 'elixir)
+    (add-to-list
+     'treesit-language-source-alist
+     '(elixir "https://github.com/elixir-lang/tree-sitter-elixir"))
+    (treesit-install-language-grammar 'elixir)))
+
+(use-package heex-ts-mode
+  :defer t
+  :config
+  (unless (treesit-language-available-p 'heex)
+    (add-to-list
+     'treesit-language-source-alist
+     '(heex "https://github.com/phoenixframework/tree-sitter-heex"))
+    (treesit-install-language-grammar 'heex)))
 
 ;;; LSP
 
@@ -1562,16 +1648,6 @@ See `cider-find-and-clear-repl-output' for more info."
   :custom
   (isearch-lazy-highlight t))
 
-(use-package dumb-jump
-  :ensure t
-  :defer t
-  :commands (dumb-jump-xref-activate)
-  :custom
-  (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'completing-read)
-  :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-
 (use-package phi-search
   :ensure t
   :defer t)
@@ -1643,6 +1719,7 @@ See `cider-find-and-clear-repl-output' for more info."
 ;;; Tools
 
 (use-package ediff
+  :defer t
   :custom
   (ediff-split-window-function 'split-window-horizontally)
   (ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -2063,13 +2140,13 @@ dependency artifact based on the project's dependencies."
      (fernflower . ,fernflower-path))))
 
 (use-package gsettings
-  :ensure t)
+  :ensure t
+  :when (executable-find "gsettings"))
 
 (use-package proxy
   :no-require
   :after gsettings
-  :commands (gsettings-get)
-  :when (executable-find "gsettings")
+  :functions (gsettings-get)
   :preface
   (defun proxy--get-host (type)
     (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
