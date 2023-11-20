@@ -8,4 +8,3 @@
 !.config/emacs/transient/
 .config/emacs/transient/*
 !.config/emacs/transient/values.el
-.recentf
