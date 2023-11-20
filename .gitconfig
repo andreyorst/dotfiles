@@ -1,23 +1,11 @@
 [core]
 	attributesfile = ~/.gitattributes.global
 [alias]
-	clean-all = clean -xdf
-	st = status
-	co = checkout
-	ci = commit
-	cim = commit -m
-	br = branch
-	bra = branch -a
 	root = rev-parse --show-toplevel
 	exec = "!exec "
 [pull]
 	ff = only
 	rebase = false
-[sendemail]
-	transferencoding = base64
-	smtpserver = smtp.googlemail.com
-	smtpencryption = tls
-	smtpserverport = 587
 [include]
 	path = .gitconfig.local
 [init]
