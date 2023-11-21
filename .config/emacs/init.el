@@ -1639,14 +1639,7 @@ See `cider-find-and-clear-repl-output' for more info."
           ("(" . puni-wrap-round)
           ("[" . puni-wrap-square)
           ("{" . puni-wrap-curly)
-          ("<" . puni-wrap-angle))
-  :preface
-  (define-advice puni-kill-line (:before (&rest _) back-to-indentation)
-    "Go back to indentation before killing the line if it makes sense to."
-    (when (looking-back "^[[:space:]]*" nil)
-      (if (bound-and-true-p indent-line-function)
-          (funcall indent-line-function)
-        (back-to-indentation)))))
+          ("<" . puni-wrap-angle)))
 
 (use-package puni
   :when window-system
