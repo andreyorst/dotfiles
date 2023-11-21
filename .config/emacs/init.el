@@ -734,15 +734,6 @@ disabled, or enabled and the mark is active."
   (eshell-modules-list
    (remove 'eshell-term eshell-modules-list)))
 
-(use-package em-smart
-  :after eshell
-  :custom
-  (eshell-where-to-jump 'begin)
-  (eshell-review-quick-commands nil)
-  (eshell-smart-space-goes-to-end t)
-  (eshell-modules-list
-   (push 'eshell-smart eshell-modules-list)))
-
 (use-package dired
   :bind ( :map dired-mode-map
           ("<backspace>" . dired-up-directory)
