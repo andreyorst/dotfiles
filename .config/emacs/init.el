@@ -917,6 +917,10 @@ Search is based on regular expressions in the
 (use-package repeat
   :hook (after-init . repeat-mode))
 
+(use-package newcomment
+  :bind ( :map common-lisp-modes-mode-map
+          (";" . comment-dwim)))
+
 
 ;;; Completion
 
