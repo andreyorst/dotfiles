@@ -1563,6 +1563,9 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package lsp-java
   :ensure t
+  :after lsp-mode)
+
+(use-package lsp-java
   :hook (java-mode . lsp))
 
 (use-package lsp-metals
