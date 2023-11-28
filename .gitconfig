@@ -11,11 +11,11 @@
 [init]
 	defaultBranch = main
 [diff "lisp"]
-	xfuncname = "^(\\((def\\S+|let)\\s+\\S+)"
+	xfuncname = ^(\\((def[^[:space:]]*|let)[[:space:]]+[^[:space:]]+)
 [diff "elisp"]
-	xfuncname = "^(\\((def\\S+|use-package)\\s+\\S+)"
+	xfuncname = ^(\\((def[^[:space:]]+|use-package)[[:space:]]+[^[:space:]]+)
 [diff "fennel"]
-	xfuncname = "^(\\((fn\\S+|lambda)\\s+\\S+)"
+	xfuncname = ^(\\((fn[^[:space:]]*|lambda|macro|λ)[[:space:]]+[^[:space:]]+)
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
