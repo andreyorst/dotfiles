@@ -1008,8 +1008,7 @@ Search is based on regular expressions in the
   :ensure t
   :after corfu
   :config
-  (setq completion-at-point-functions
-        '(cape-file cape-dabbrev)))
+  (setq completion-at-point-functions '(cape-file)))
 
 
 ;;; Org
@@ -1187,13 +1186,15 @@ Search is based on regular expressions in the
   (highlight-defined-macro-name-face
    ((t :inherit unspecified)))
   :preface
-  (define-advice highlight-defined--determine-face (:around (fn symbol) ignore-t)
+  (define-advice highlight-defined--determine-face
+      (:around (fn symbol) ignore-t)
     (unless (eq symbol 't)
       (funcall fn symbol))))
 
 (use-package racket-mode
   :ensure t
-  :hook ((racket-mode racket-repl-mode) . common-lisp-modes-mode))
+  :hook ((racket-mode racket-repl-mode)
+         . common-lisp-modes-mode))
 
 (use-package yaml-mode
   :ensure t
@@ -1570,9 +1571,12 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package lsp-metals
   :ensure t
+  :after lsp-mode
   :custom
   (lsp-metals-server-args
-   '("-J-Dmetals.allow-multiline-string-formatting=off"))
+   '("-J-Dmetals.allow-multiline-string-formatting=off")))
+
+(use-package lsp-metals
   :hook (scala-mode . lsp))
 
 
@@ -2357,27 +2361,6 @@ the generated command."
   (mu4e-alert-icon "emacs")
   :config
   (mu4e-alert-enable-notifications))
-
-(use-package elfeed
-  :defer t
-  :ensure t)
-
-
-;;; Games
-
-(use-package gnugo
-  :ensure t
-  :when (executable-find "gnugo")
-  :hook (gnugo-start-game . gnugo-gen-images)
-  :functions (gnugo-get gnugo-imgen-create-xpms gnugo-image-display-mode)
-  :defines (gnugo-imgen-sizing-function)
-  :preface
-  (defun gnugo-gen-images ()
-    (when-let ((size (and window-system (gnugo-get :SZ))))
-      (setq gnugo-xpms (gnugo-imgen-create-xpms size))
-      (gnugo-image-display-mode 1)))
-  :config
-  (setq gnugo-imgen-sizing-function (lambda (_) 32)))
 
 (provide 'init)
 ;;; init.el ends here
