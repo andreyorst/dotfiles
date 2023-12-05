@@ -2151,42 +2151,13 @@ dependency artifact based on the project's dependencies."
    `((cfr . ,cfr-path)
      (fernflower . ,fernflower-path))))
 
-(use-package gsettings
-  :ensure t
-  :when (executable-find "gsettings"))
-
-(use-package proxy
-  :no-require
-  :after gsettings
-  :functions (gsettings-get)
-  :preface
-  (defun proxy--get-host (type)
-    (let ((host (gsettings-get (format "org.gnome.system.proxy.%s" type) "host")))
-      (and (not (string-empty-p host)) host)))
-  (defun proxy--get-port (type)
-    (let ((port (gsettings-get (format "org.gnome.system.proxy.%s" type) "port")))
-      (and (numberp port) port)))
-  (defun proxy--get-ignore ()
-    (let ((ignore (gsettings-get "org.gnome.system.proxy" "ignore-hosts")))
-      (and (vectorp ignore) (string-join ignore ","))))
-  (defun proxy--enabled? ()
-    (string= "manual" (gsettings-get "org.gnome.system.proxy" "mode")))
-  (defun proxy-setup-env ()
-    "Aqcuire proxy information from the settings and set the ENV vars."
-    (interactive)
-    (let ((vars '("http_proxy" "https_proxy" "ftp_proxy" "no_proxy")))
-      (if-let ((enabled (proxy--enabled?))
-               (host (proxy--get-host "http"))
-               (port (proxy--get-port "http"))
-               (ignore (proxy--get-ignore))
-               (proxy (format "http://%s:%s" host port)))
-          (dolist (v (append vars (mapcar #'upcase vars)))
-            (setenv v (pcase (downcase v) ("no_proxy" ignore) (_ proxy))))
-        (dolist (v (append vars (mapcar #'upcase vars)))
-          (setenv v)))))
-  (provide 'proxy)
+(use-package gnome-proxy
+  :vc ( :url "https://gitlab.com/andreyorst/gnome-proxy.el.git"
+        :branch "main"
+        :rev :newest)
+  :when (executable-find "gsettings")
   :init
-  (proxy-setup-env))
+  (gnome-proxy-setup-env))
 
 
 ;;; Messaging
