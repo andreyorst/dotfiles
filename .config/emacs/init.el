@@ -1856,11 +1856,6 @@ means save all with no questions."
                      (locate-user-emacs-file "workspace/.cache/")))
     (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*"))))
 
-(use-package gcmh
-  :ensure t
-  :hook (after-init . gcmh-mode)
-  :delight gcmh-mode)
-
 (use-package hl-todo
   :ensure t
   :hook (prog-mode . hl-todo-mode))

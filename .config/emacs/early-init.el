@@ -9,13 +9,18 @@
 
 ;;; Code:
 
-(setq
- gc-cons-threshold most-positive-fixnum
- read-process-output-max (* 1024 1024 4) ; 4mb
- inhibit-compacting-font-caches t
- message-log-max 16384
- package-enable-at-startup nil
- load-prefer-newer noninteractive)
+(let ((original-gc-cons-threshold gc-cons-threshold))
+  (setq
+   gc-cons-threshold most-positive-fixnum
+   read-process-output-max (* 1024 1024 4) ; 4mb
+   inhibit-compacting-font-caches t
+   message-log-max 16384
+   package-enable-at-startup nil
+   load-prefer-newer noninteractive)
+  (add-hook
+   'emacs-startup-hook
+   (lambda nil
+     (setq gc-cons-threshold original-gc-cons-threshold))))
 
 (setq-default
  default-frame-alist '((width . 170)
@@ -29,18 +34,17 @@
  fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
 
 (unless (or (daemonp) noninteractive)
-  (let ((restore-file-name-handler-alist file-name-handler-alist))
+  (let ((original-file-name-handler-alist file-name-handler-alist))
     (setq-default file-name-handler-alist nil)
-    (defun restore-file-handler-alist ()
-      (setq file-name-handler-alist
-            (delete-dups (append file-name-handler-alist
-                                 restore-file-name-handler-alist)))))
-
-  (add-hook 'emacs-startup-hook #'restore-file-handler-alist 101)
-
+    (add-hook
+     'emacs-startup-hook
+     (lambda nil
+       (setq file-name-handler-alist
+             (delete-dups (append file-name-handler-alist
+                                  original-file-name-handler-alist))))
+     101))
   (when (fboundp #'tool-bar-mode)
     (tool-bar-mode -1))
-
   (when (fboundp #'scroll-bar-mode)
     (scroll-bar-mode -1)))
 
