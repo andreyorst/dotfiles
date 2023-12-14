@@ -2085,32 +2085,6 @@ dependency artifact based on the project's dependencies."
 :]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
    :file 1 :line 2))
 
-(use-package zig-compilation-mode
-  :no-require
-  :preface
-  (define-project-compilation-mode zig-compilation)
-  :config
-  (compile-add-error-syntax
-   'zig-compilation
-   'zig-error
-   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): error:"
-   :file 1 :line 2 :col 3)
-  (compile-add-error-syntax
-   'zig-compilation
-   'zig-note
-   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): note:"
-   :file 1 :line 2 :col 3 :level 'info)
-  (compile-add-error-syntax
-   'zig-compilation
-   'zig-error-in
-   "^\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\):.*in.*([^)]+)"
-   :file 1 :line 2 :col 3 :level 'info)
-  (compile-add-error-syntax
-   'zig-compilation
-   'zig-reference
-   "^[[:space:]]+\\(?:freeObject\\|deinit\\):[[:space:]]\\(/[^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\)"
-   :file 1 :line 2 :col 3 :level 'info))
-
 (use-package password-store
   :no-require
   :when (executable-find "pass")
