@@ -1827,8 +1827,7 @@ means save all with no questions."
 (use-package separedit
   :ensure t
   :hook (separedit-buffer-creation . separedit-header-line-setup)
-  :bind ( :map prog-mode-map
-          ("C-c '" . separedit)
+  :bind ( ("C-c '" . separedit)
           :map separedit-mode-map
           ("C-c C-c" . separedit-commit)
           :map edit-indirect-mode-map
