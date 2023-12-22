@@ -3,13 +3,13 @@
 cd ~/Git/emacs \
     && git clean -xdf \
     && ./autogen.sh \
-    && ./configure \
-           --without-compress-install \
-           --with-native-compilation=aot \
-           --with-pgtk \
-           --with-mailutils \
-           --with-xwidgets \
-           --prefix="$HOME"/.local $@ \
+    && ./configure --without-compress-install \
+                   --with-native-compilation=yes \
+                   --with-pgtk \
+                   --with-mailutils \
+                   --with-xwidgets \
+                   --prefix="$HOME"/.local \
+                   $@ \
     && make -j$(($(nproc)-1)) \
     && make uninstall \
     && make install \

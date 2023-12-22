@@ -917,10 +917,6 @@ Search is based on regular expressions in the
 (use-package repeat
   :hook (after-init . repeat-mode))
 
-(use-package newcomment
-  :bind ( :map common-lisp-modes-mode-map
-          (";" . comment-dwim)))
-
 
 ;;; Completion
 
@@ -1173,24 +1169,6 @@ Search is based on regular expressions in the
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
-(use-package highlight-defined
-  :ensure t
-  :hook (emacs-lisp-mode . highlight-defined-mode)
-  :custom-face
-  (highlight-defined-function-name-face
-   ((t :inherit unspecified)))
-  (highlight-defined-builtin-function-name-face
-   ((t :inherit unspecified)))
-  (highlight-defined-special-form-name-face
-   ((t :inherit unspecified)))
-  (highlight-defined-macro-name-face
-   ((t :inherit unspecified)))
-  :preface
-  (define-advice highlight-defined--determine-face
-      (:around (fn symbol) ignore-t)
-    (unless (eq symbol 't)
-      (funcall fn symbol))))
-
 (use-package racket-mode
   :ensure t
   :hook ((racket-mode racket-repl-mode)
@@ -1329,8 +1307,6 @@ Search is based on regular expressions in the
   (cider-connection-message-fn #'cider-random-tip)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   (cider-auto-inspect-after-eval nil)
-  (cider-comment-continued-prefix "")
-  (cider-comment-prefix "")
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   :preface
@@ -1513,7 +1489,7 @@ See `cider-find-and-clear-repl-output' for more info."
      '(heex "https://github.com/phoenixframework/tree-sitter-heex"))
     (treesit-install-language-grammar 'heex)))
 
-;;; LSP
+;;;; LSP
 
 (use-package lsp-mode
   :ensure t
@@ -1798,10 +1774,6 @@ means save all with no questions."
   (add-to-list 'project-switch-commands
                '(project-switch-to-buffer "Switch buffer")))
 
-(use-package eat
-  :ensure t
-  :hook (eshell-load . eat-eshell-mode))
-
 (use-package magit
   :ensure t
   :hook (git-commit-mode . flyspell-mode)
@@ -1854,10 +1826,6 @@ means save all with no questions."
   (dolist (dir (list (locate-user-emacs-file ".cache/")
                      (locate-user-emacs-file "workspace/.cache/")))
     (add-to-list 'recentf-exclude (concat (regexp-quote dir) ".*"))))
-
-(use-package hl-todo
-  :ensure t
-  :hook (prog-mode . hl-todo-mode))
 
 (use-package compile
   :hook
@@ -2055,35 +2023,6 @@ dependency artifact based on the project's dependencies."
    :file #'clojure-compilation-filename
    :line 2 :col 3 :level 'warn :hyperlink 1 :highlight 1))
 
-(use-package fennel-compilation-mode
-  :no-require
-  :preface
-  (define-project-compilation-mode fennel-compilation)
-  :config
-  (compile-add-error-syntax
-   'fennel-compilation
-   'fennel-compile-error
-   "^Compile error in \\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\)?\\$"
-   :file 1 :line 2 :col 3)
-  (compile-add-error-syntax
-   'fennel-compilation
-   'fennel-compile-error-2
-   "^\\(.*\.fnl\\):\\([[:digit:]]+\\):?\\([[:digit:]]+\\|\\?\\)? Compile error: "
-   :file 1 :line 2 :col 3)
-  (compile-add-error-syntax
-   'fennel-compilation
-   'fennel-test-error
-   "^not ok[[:space:]]+[0-9]+[^
-]+
-#[[:space:]]+\\([^:]+\\):\\([0-9]+\\):"
-   :file 1 :line 2 :level 'error)
-  (compile-add-error-syntax
-   'fennel-compilation
-   'lua-stacktrace
-   "\\(?:^[[:space:]]+\\([^
-:]+\\):\\([[:digit:]]+\\):[[:space:]]+in.+$\\)"
-   :file 1 :line 2))
-
 (use-package password-store
   :no-require
   :when (executable-find "pass")
@@ -2129,74 +2068,6 @@ dependency artifact based on the project's dependencies."
 
 
 ;;; Messaging
-
-(use-package erc
-  :defer t
-  :custom
-  (erc-hide-list '("JOIN" "PART" "QUIT"))
-  (erc-fill-function 'erc-fill-static)
-  (erc-fill-static-center 22)
-  (erc-fill-column 110)
-  :functions (erc-update-modules)
-  :autoload (erc-compute-server)
-  :preface
-  (defcustom erc-tunnel-conf nil
-    "Connection spec for IRC server behind an SSH tunnel.
-Can be used to connect to a bouncer running behind SSH.  A plist
-with the following keys:
-
-  :host - remote host.
-
-  :port - remote port.
-
-  :ssh-port - SSH port.
-              Optional, needed when SSH is running on a custom
-              port.
-
-The rest options for the tunnel are taken from ERC directly.  See
-the options: `erc-port' or `erc-default-port', and `erc-server'."
-    :tag "ERC tunnel configuration"
-    :type 'plist
-    :group 'erc)
-  (defcustom erc-pass ""
-    "Password to pass to the `erc' function."
-    :tag "ERC password for the bouncer"
-    :type 'string
-    :group 'erc)
-  (defun erc-setup-port-forwarding (conf)
-    "Setup a connection function based on plist CONF.
-Connection is specified by the keys :host, :port, and an optional
-:ssh-port. Returns a lambda which will call `start-process' with
-the generated command."
-    (when-let ((host (plist-get conf :host))
-               (port (plist-get conf :port)))
-      (let* ((name "erc-tunnel")
-             (buf (format " *%s-%s:%s*" name host port))
-             (cmd (format "ssh -L %s:%s:%s %s %s"
-                          (or erc-port erc-default-port)
-                          (or erc-server "localhost")
-                          port
-                          (if-let ((ssh-port (plist-get conf :ssh-port)))
-                              (format "-p %s" ssh-port)
-                            "")
-                          host)))
-        (lambda (&rest _)
-          (when (or (not (get-buffer buf))
-                    (not (get-buffer-process (get-buffer buf))))
-            (apply #'start-process name buf (split-string-shell-command cmd)))))))
-  (defun erc-connect ()
-    "Connect to the bouncer."
-    (interactive)
-    (erc :server (or erc-server (erc-compute-server))
-         :port (or erc-port erc-default-port)
-         :nick erc-nick
-         :password erc-pass))
-  :config
-  (add-to-list 'erc-modules 'notifications)
-  (add-to-list 'erc-modules 'spelling)
-  (erc-update-modules)
-  (when-let ((hook (erc-setup-port-forwarding erc-tunnel-conf)))
-    (add-hook 'erc-connect-pre-hook hook)))
 
 (use-package message
   :defer t
