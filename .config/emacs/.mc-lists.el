@@ -51,6 +51,7 @@
         message-beginning-of-line
         nxml-electric-slash
         org-beginning-of-line
+        org-comment-dwim
         org-ctrl-c-ctrl-c
         org-cycle
         org-delete-char
