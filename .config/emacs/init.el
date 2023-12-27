@@ -1019,7 +1019,7 @@ Search is based on regular expressions in the
    ((t ( :slant unspecified
          :weight normal
          :background unspecified
-         :inherit org-block
+         :inherit (org-block shadow)
          :extend t))))
   (org-block-end-line
    ((t ( :slant unspecified
@@ -1101,24 +1101,6 @@ Search is based on regular expressions in the
           ("w" "Web page" "Various Web pages")
           ("b" "Books, courses" "Books, Courses"))))))
 
-(use-package org-tree-slide
-  :ensure t
-  :defer t
-  :custom
-  (org-tree-slide-slide-in-effect nil)
-  (org-tree-slide-never-touch-face t))
-
-(use-package org-modern
-  :ensure t
-  :defer t
-  :hook (org-tree-slide-mode . org-modern-mode)
-  :custom-face
-  (org-modern-block-name ((t (:height 1.0))))
-  (org-modern-label ((t (:height 1.0))))
-  :custom
-  (org-modern-hide-stars t)
-  (org-modern-block-fringe nil))
-
 (use-package ox-hugo
   :ensure t
   :after ox
@@ -1136,6 +1118,27 @@ Search is based on regular expressions in the
 
 (use-package ox-latex
   :after ox)
+
+(use-package epresent
+  :custom
+  (epresent-text-scale 200)
+  (epresent-format-latex-scale 2)
+  :hook
+  (epresent-start-presentation . epresent-setup)
+  :preface
+  (defun epresent-setup ()
+    (interactive)
+    (visual-line-mode 1)
+    (flyspell-mode -1)
+    (set-window-fringes (selected-window) 600 600)
+    (set-face-attribute
+     'org-block (selected-frame)
+     :background (modus-themes-get-color-value 'bg-dim))
+    (set-face-attribute
+     'header-line (selected-frame)
+     :height 1200
+     :background 'unspecified)
+    (setq-local header-line-format " ")))
 
 
 ;;; Languages
