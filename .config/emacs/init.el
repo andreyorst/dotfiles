@@ -801,7 +801,8 @@ disabled, or enabled and the mark is active."
   :delight hs-minor-mode
   :commands (hs-hide-block)
   :bind ( :map hs-minor-mode-map
-          ("C-c @ C-p" . hs-hide-all-private))
+          ("C-c @ C-p" . hs-hide-all-private)
+          ("C-c @ C-m" . hs-hide-all-methods))
   :preface
   (defvar hs-mode-private-regex-alist
     `(((emacs-lisp-mode lisp-mode)
@@ -813,28 +814,44 @@ disabled, or enabled and the mark is active."
                                    (seq "{" (* (not "}")) ":private" (+ space) "true")))
                       "comment")))
       (zig-mode
-       . ,(rx bol (* space) "fn" (+ (not "{")) "{"))
+       . ,(rx bol (* space) (or "inline fn" "fn") (+ (not "{")) "{"))
       (fennel-mode
        . ,(rx bol "(" (or (seq (or "fn" "local" "var") (+ space) "-" alpha)
                           "comment"))))
     "Alist of major modes to regular expressions for finding private definitions")
-  (defun hs-hide-all-private ()
-    "Hide all private definitions in the current buffer.
-Search is based on regular expressions in the
-`hs-private-regex-mode-alist' variable."
-    (interactive)
+  (defun hs--hide-all-from-custom-alist (alist)
     (when hs-minor-mode
-      (if-let ((re (alist-get major-mode hs-mode-private-regex-alist nil nil
+      (if-let ((re (alist-get major-mode alist nil nil
                               (lambda (key1 key2)
                                 (if (listp key1)
                                     (and (memq key2 key1) t)
                                   (eq key1 key2))))))
           (save-excursion
-            (goto-char (point-max))
-            (while (re-search-backward re nil t)
+            (goto-char (point-min))
+            (while (re-search-forward re nil t)
               (hs-hide-block)))
         (error "Mode %s doesn't define a regex to find private definitions" major-mode))))
+  (defun hs-hide-all-private ()
+    "Hide all private definitions in the current buffer.
+Search is based on regular expressions in the
+`hs-mode-private-regex-alist' variable."
+    (interactive)
+    (hs--hide-all-from-custom-alist hs-mode-private-regex-alist))
+  (defvar hs-mode-method-regex-alist
+    `((zig-mode
+       . ,(rx bol (+ space) (or "inline pub fn" "pub inline fn" "pub fn" "inline fn" "fn") (+ (not "{")) "{")))
+    "Alist of major modes to regular expressions for finding private definitions")
+  (defun hs-hide-all-methods ()
+    "Hide all method definitions in the current buffer.
+Search is based on regular expressions in the
+`hs-mode-method-regex-alist' variable."
+    (interactive)
+    (hs--hide-all-from-custom-alist hs-mode-method-regex-alist))
   :config
+  (easy-menu-add-item hs-minor-mode-map '(menu-bar hide/show)
+                      ["Hide all method definitions" hs-hide-all-methods
+                       :help "Hide all method definitions based on `hs-mode-method-regex-alist'."]
+                      "--")
   (easy-menu-add-item hs-minor-mode-map '(menu-bar hide/show)
                       ["Hide all private definitions" hs-hide-all-private
                        :help "Hide all private definitions based on `hs-mode-private-regex-alist'."]
