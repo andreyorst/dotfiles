@@ -1070,14 +1070,37 @@ Search is based on regular expressions in the
 
 (use-package ob-shell :after org)
 
+(use-package org-capture
+  :bind ( :map mode-specific-map
+          ("o c" . org-capture)))
+
 (use-package blog
-  :defer t
+  :after org-capture
   :vc ( :url "https://gitlab.com/andreyorst/blog.el.git"
         :branch "main"
         :rev :newest))
 
-(use-package ol
+(use-package blog
   :after blog
+  :custom
+  (org-directory blog-directory)
+  (org-capture-templates
+   `(,blog-capture-template
+     ,@(mapcar
+        (lambda (spec)
+          (seq-let (btn descr heading) spec
+            `( ,btn ,descr entry
+               (file+headline ,(expand-file-name "kb/index.org" blog-directory) ,heading)
+               "* [[blog-html:%^{Link}][%^{Description}]]\n:properties:\n:blog-collapsable: t\n:end:"
+               :immediate-finish t
+               :before-finalize (org-hugo-export-to-md))))
+        '(("a" "Article" "Articles")
+          ("t" "Talk" "Talks")
+          ("w" "Web page" "Various Web pages")
+          ("b" "Books, courses" "Books, Courses"))))))
+
+(use-package ol
+  :after org-capture
   :functions (org-link-set-parameters)
   :preface
   (defun blog-follow-html-link (path arg)
@@ -1099,28 +1122,6 @@ Search is based on regular expressions in the
    :follow #'blog-follow-html-link
    :export #'blog-export-hmtl-link
    :complete #'blog-create-html-link))
-
-(use-package org-capture
-  :defer t
-  :after blog
-  :bind ( :map mode-specific-map
-          ("o c" . org-capture))
-  :custom
-  (org-directory blog-directory)
-  (org-capture-templates
-   `(,blog-capture-template
-     ,@(mapcar
-        (lambda (spec)
-          (seq-let (btn descr heading) spec
-            `( ,btn ,descr entry
-               (file+headline ,(expand-file-name "kb/index.org" blog-directory) ,heading)
-               "* [[blog-html:%^{Link}][%^{Description}]]\n:properties:\n:blog-collapsable: t\n:end:"
-               :immediate-finish t
-               :before-finalize (org-hugo-export-to-md))))
-        '(("a" "Article" "Articles")
-          ("t" "Talk" "Talks")
-          ("w" "Web page" "Various Web pages")
-          ("b" "Books, courses" "Books, Courses"))))))
 
 (use-package ox-hugo
   :ensure t
