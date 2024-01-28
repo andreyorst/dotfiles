@@ -610,7 +610,7 @@ disabled, or enabled and the mark is active."
    (if (dark-mode-enabled-p)
        local-config-dark-theme
      local-config-light-theme)
-   t))
+   'no-confirm))
 
 (use-package uniquify
   :defer t
@@ -733,6 +733,10 @@ disabled, or enabled and the mark is active."
   :custom
   (eshell-modules-list
    (remove 'eshell-term eshell-modules-list)))
+
+(use-package eat
+  :ensure t
+  :hook (eshell-load . eat-eshell-mode))
 
 (use-package dired
   :bind ( :map dired-mode-map
