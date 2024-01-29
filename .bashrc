@@ -108,4 +108,8 @@ export LSP_USE_PLISTS=true
 [[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
     . /usr/share/bash-completion/bash_completion
 
+if [ -f "$HOME"/.bashrc_local ]; then
+    source "$HOME"/.bashrc_local
+fi
+
 true
