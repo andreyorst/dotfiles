@@ -151,35 +151,9 @@ If LOCAL-PORT is nil, PORT is used as local port."
 
 (use-package window
   :config
-  (add-to-list 'display-buffer-alist
-               '("\\*Calendar*"
-                 (display-buffer-at-bottom))))
-
-(use-package messages
-  :no-require
-  :preface
-  (provide 'messages)
-  :bind ( :map messages-buffer-mode-map
-          ("C-c C-o" . messages-clear-buffer))
-  :config
-  (defun messages-clear-buffer ()
-    "Clear the *Messages* buffer."
-    (interactive)
-    (let ((inhibit-read-only t))
-      (delete-region (point-min) (point-max)))))
-
-(use-package kmacro
-  :defer t
-  :preface
-  (defun block-undo (fn &rest args)
-    (let ((marker (prepare-change-group)))
-      (unwind-protect (apply fn args)
-        (undo-amalgamate-change-group marker))))
-  :config
-  (dolist (f '(kmacro-call-macro
-               kmacro-exec-ring-item
-               apply-macro-to-region-lines))
-    (advice-add f :around #'block-undo)))
+  (add-to-list
+   'display-buffer-alist
+   '("\\*Calendar*" (display-buffer-at-bottom))))
 
 (use-package mouse
   :bind (("<mode-line> <mouse-2>" . nil)
@@ -434,17 +408,7 @@ are defining or executing a macro."
           (abort-recursive-edit))
       (unless (or defining-kbd-macro
                   executing-kbd-macro)
-        (funcall-interactively quit))))
-  (define-advice exchange-point-and-mark
-      (:around (fn &optional arg) tmm)
-    "Conditionally exchange point and mark.
-
-Only exchange point and mark when `transient-mark-mode' is either
-disabled, or enabled and the mark is active."
-    (when (or (and transient-mark-mode
-                   mark-active)
-              (not transient-mark-mode))
-      (funcall fn arg))))
+        (funcall-interactively quit)))))
 
 (use-package delsel
   :hook (after-init . delete-selection-mode))
@@ -483,21 +447,7 @@ disabled, or enabled and the mark is active."
 (use-package frame
   :requires seq
   :bind (("C-z" . ignore)
-         ("C-x C-z" . ignore))
-  :config
-  (define-advice toggle-frame-fullscreen
-      (:before (&optional frame) hide-menu-bar)
-    "Hide menu bar when FRAME goes full screen."
-    (set-frame-parameter
-     nil 'menu-bar-lines
-     (if (memq (frame-parameter frame 'fullscreen) '(fullscreen fullboth)) 1 0)))
-  (define-advice switch-to-buffer-other-frame
-      (:around (fn buffer-or-name &optional norecord) clone-frame-parameters)
-    "Clone fame parameters when switching to another frame."
-    (let* ((default-frame-alist
-            (seq-remove (lambda (elem) (eq (car elem) 'name))
-                        (frame-parameters (selected-frame)))))
-      (funcall-interactively fn buffer-or-name norecord))))
+         ("C-x C-z" . ignore)))
 
 (use-package startup
   :no-require
@@ -627,25 +577,6 @@ disabled, or enabled and the mark is active."
   (defun toggle-hl-line ()
     (hl-line-mode (if display-line-numbers-mode 1 -1))))
 
-(use-package formfeed
-  :no-require
-  :hook ((help-mode
-          org-mode
-          outline-mode
-          prog-mode)
-         . formfeed-make-display-line)
-  :preface
-  (defun formfeed-make-display-line ()
-    "Display the formfeed ^L char as a comment or as a continuous line."
-    (unless buffer-display-table
-      (setq buffer-display-table (make-display-table)))
-    (aset buffer-display-table ?\^L
-          (vconcat (make-list (or fill-column 70)
-                              (make-glyph-code
-                               (string-to-char (or comment-start "-"))
-                               'shadow)))))
-  (provide 'formfeed))
-
 (use-package pixel-scroll
   :when (fboundp #'pixel-scroll-precision-mode)
   :hook (after-init . pixel-scroll-precision-mode)
@@ -699,30 +630,6 @@ disabled, or enabled and the mark is active."
                        "$"
                      (propertize "$" 'face '(:inherit error)))))
       (concat date " " path info "\n" prompt " ")))
-  (declare-function eshell-buffered-print "ext:esh-io")
-  (declare-function eshell-flush "ext:esh-io")
-  (define-advice eshell/cat (:around (cat &rest args) iimage-mode-refresh)
-    "Display image when using cat on it."
-    (require 'iimage)
-    (defvar iimage-mode-image-regex-alist)
-    (dolist (arg args)
-      (with-silent-modifications
-        (save-excursion
-          (catch 'done
-            (dolist (pair iimage-mode-image-regex-alist)
-              (when-let (image (and (string-match-p (car pair) arg)
-                                    (file-exists-p arg)
-                                    (expand-file-name arg)))
-                (add-text-properties
-                 0 (length arg)
-                 `(display ,(create-image image)
-                           modification-hooks
-                           (iimage-modification-hook))
-                 arg)
-                (eshell-buffered-print arg)
-                (eshell-flush)
-                (throw 'done t)))
-            (funcall cat arg))))))
   :custom
   (eshell-scroll-show-maximum-output nil)
   (eshell-prompt-function 'eshell-prompt)
@@ -769,26 +676,6 @@ disabled, or enabled and the mark is active."
       (narrow-to-region (point) (point))
       (yank-rectangle))))
 
-(use-package page
-  :bind ( :map narrow-map
-          ("]" . narrow-forward-page)
-          ("[" . narrow-backward-page)
-          :map ctl-x-map
-          ("C-p" . nil))
-  :preface
-  (defun narrow-forward-page (&optional count)
-    (interactive "p")
-    (or count (setq count 1))
-    (widen)
-    (forward-page count)
-    (narrow-to-page))
-  (defun narrow-backward-page (&optional count)
-    (interactive "p")
-    (or count (setq count 1))
-    (widen)
-    (forward-page (- (1+ count))) ; 1+ needed to actually cross page boundary
-    (narrow-to-page)))
-
 (use-package profiler
   :bind ("<f2>" . profiler-start-or-report)
   :commands (profiler-report)
@@ -803,63 +690,7 @@ disabled, or enabled and the mark is active."
 (use-package hideshow
   :hook (prog-mode . hs-minor-mode)
   :delight hs-minor-mode
-  :commands (hs-hide-block)
-  :bind ( :map hs-minor-mode-map
-          ("C-c @ C-p" . hs-hide-all-private)
-          ("C-c @ C-m" . hs-hide-all-methods))
-  :preface
-  (defvar hs-mode-private-regex-alist
-    `(((emacs-lisp-mode lisp-mode)
-       . ,(rx "(def" (+ (not space)) (+ space) (+ (not space)) "--"))
-      ((clojure-mode clojurescrip-mode clojurec-mode)
-       . ,(rx "(" (or "defn-"
-                      (seq "def" (* (not space)) (+ space)
-                           "^" (or ":private"
-                                   (seq "{" (* (not "}")) ":private" (+ space) "true")))
-                      "comment")))
-      (zig-mode
-       . ,(rx bol (* space) (or "inline fn" "fn") (+ (not "{")) "{"))
-      (fennel-mode
-       . ,(rx bol "(" (or (seq (or "fn" "local" "var") (+ space) "-" alpha)
-                          "comment"))))
-    "Alist of major modes to regular expressions for finding private definitions")
-  (defun hs--hide-all-from-custom-alist (alist)
-    (when hs-minor-mode
-      (if-let ((re (alist-get major-mode alist nil nil
-                              (lambda (key1 key2)
-                                (if (listp key1)
-                                    (and (memq key2 key1) t)
-                                  (eq key1 key2))))))
-          (save-excursion
-            (goto-char (point-min))
-            (while (re-search-forward re nil t)
-              (hs-hide-block)))
-        (error "Mode %s doesn't define a regex to find private definitions" major-mode))))
-  (defun hs-hide-all-private ()
-    "Hide all private definitions in the current buffer.
-Search is based on regular expressions in the
-`hs-mode-private-regex-alist' variable."
-    (interactive)
-    (hs--hide-all-from-custom-alist hs-mode-private-regex-alist))
-  (defvar hs-mode-method-regex-alist
-    `((zig-mode
-       . ,(rx bol (+ space) (or "inline pub fn" "pub inline fn" "pub fn" "inline fn" "fn") (+ (not "{")) "{")))
-    "Alist of major modes to regular expressions for finding private definitions")
-  (defun hs-hide-all-methods ()
-    "Hide all method definitions in the current buffer.
-Search is based on regular expressions in the
-`hs-mode-method-regex-alist' variable."
-    (interactive)
-    (hs--hide-all-from-custom-alist hs-mode-method-regex-alist))
   :config
-  (easy-menu-add-item hs-minor-mode-map '(menu-bar hide/show)
-                      ["Hide all method definitions" hs-hide-all-methods
-                       :help "Hide all method definitions based on `hs-mode-method-regex-alist'."]
-                      "--")
-  (easy-menu-add-item hs-minor-mode-map '(menu-bar hide/show)
-                      ["Hide all private definitions" hs-hide-all-private
-                       :help "Hide all private definitions based on `hs-mode-private-regex-alist'."]
-                      "--")
   (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
     (mouse-set-point last-input-event)))
@@ -889,10 +720,6 @@ Search is based on regular expressions in the
   :config
   (setq elisp-flymake-byte-compile-load-path (cons "./" load-path)))
 
-(use-package package-lint-flymake
-  :ensure t
-  :defer t)
-
 (use-package flyspell
   :ensure t
   :when (or (executable-find "ispell")
@@ -912,24 +739,6 @@ Search is based on regular expressions in the
   (defun lisp-outline-minor-mode ()
     (setq-local outline-regexp "^;;;;*[[:space:]]\\w")
     (outline-minor-mode)))
-
-(use-package face-remap
-  :hook (text-scale-mode . text-scale-adjust-latex-previews)
-  :preface
-  (defun text-scale-adjust-latex-previews ()
-    "Adjust the size of latex previews when changing text scale."
-    (dolist (ov (overlays-in (point-min) (point-max)))
-      (when (pcase major-mode
-              ('latex-mode (eq (overlay-get ov 'category)
-                               'preview-overlay))
-              ('org-mode (eq (overlay-get ov 'org-overlay-type)
-                             'org-latex-overlay)))
-        (overlay-put
-         ov 'display
-         (cons 'image
-               (plist-put
-                (cdr (overlay-get ov 'display))
-                :scale (+ 1.0 (* 0.25 text-scale-mode-amount)))))))))
 
 (use-package browse-url
   :when (fboundp 'xwidget-webkit-browse-url)
@@ -1385,50 +1194,6 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package lisp-mode
   :hook ((lisp-mode lisp-data-mode) . common-lisp-modes-mode))
-
-(use-package inf-lisp
-  :hook (inferior-lisp-mode . common-lisp-modes-mode)
-  :bind ( :map common-lisp-modes-mode-map
-          ("C-M-k" . lisp-eval-each-sexp))
-  :commands (lisp-eval-last-sexp)
-  :custom
-  (inferior-lisp-program
-   (cond ((executable-find "sbcl") "sbcl")
-         ((executable-find "ecl") "ecl")))
-  :config
-  (defun lisp-eval-each-sexp ()
-    "Evaluate each s-expression in the buffer consequentially."
-    (interactive)
-    (save-excursion
-      (save-restriction
-        (goto-char (point-min))
-        (while (save-excursion
-                 (search-forward-regexp "[^[:space:]]." nil t))
-          (forward-sexp)
-          (when (and (not (nth 4 (syntax-ppss)))
-                     (looking-back "." 1))
-            (lisp-eval-last-sexp)))))))
-
-(use-package sly
-  :ensure t
-  :hook (sly-mrepl-mode . common-lisp-modes-mode)
-  :commands (sly-symbol-completion-mode)
-  :config
-  (sly-symbol-completion-mode -1))
-
-(use-package scheme
-  :hook (scheme-mode . common-lisp-modes-mode))
-
-(use-package geiser
-  :ensure t
-  :hook (scheme-mode . geiser-mode)
-  :custom
-  (geiser-active-implementations '(guile))
-  (geiser-default-implementation 'guile))
-
-(use-package geiser-guile
-  :ensure t
-  :after geiser)
 
 (use-package sql-indent
   :defer t
