@@ -1437,82 +1437,80 @@ See `cider-find-and-clear-repl-output' for more info."
 ;;;; tree-sitter modes
 
 (use-package treesit
-  :when (and (fboundp 'treesit-available-p)
-             (treesit-available-p))
+  :when (treesit-p)
+  :preface
+  (defun treesit-p ()
+    "Check if Emacs was built with treesiter in a protable way."
+    (and (fboundp 'treesit-available-p)
+         (treesit-available-p)))
+  (cl-defun treesit-install-and-remap (lang url &key revision source-dir modes remap)
+    "Convenience function for installing and enabling a ts-* mode.
+
+LANG is the language symbol.  URL is the Git repository URL for
+the grammar.  REVISION is the Git tag or branch of the desired
+version, defaulting to the latest default branch.  SOURCE-DIR is
+the relative subdirectory in the repository in which the
+grammar’s parser.c file resides, defaulting to \"src\".  MODES is
+a list of modes to remap to a symbol REMAP."
+    (when (and (fboundp 'treesit-available-p)
+               (treesit-available-p))
+      (unless (treesit-language-available-p lang)
+        (add-to-list
+         'treesit-language-source-alist
+         (list lang url revision source-dir))
+        (treesit-install-language-grammar lang))
+      (when (and remap (treesit-ready-p lang))
+        (dolist (mode modes)
+          (add-to-list
+           'major-mode-remap-alist
+           (cons mode remap))))))
   :custom
   (treesit-font-lock-level 2))
 
 (use-package js
   :defer t
-  :when (and (fboundp 'treesit-available-p)
-             (treesit-available-p))
+  :when (treesit-p)
   :init
-  (unless (treesit-language-available-p 'javascript)
-    (add-to-list
-     'treesit-language-source-alist
-     '( javascript
-        "https://github.com/tree-sitter/tree-sitter-javascript"
-        "master" "src"))
-    (treesit-install-language-grammar 'javascript))
-  (when (treesit-ready-p 'javascript)
-    (dolist (mode '(js-mode javascript-mode js2-mode))
-      (add-to-list
-       'major-mode-remap-alist
-       `(,mode . js-ts-mode)))))
+  (treesit-install-and-remap
+   'javascript
+   "https://github.com/tree-sitter/tree-sitter-javascript"
+   :revision "master" :source-dir "src"
+   :remap '(js-mode javascript-mode js2-mode)
+   :remap 'js-ts-mode))
 
 (use-package json-ts-mode
   :defer t
   :after json
-  :when (and (fboundp 'treesit-available-p)
-             (treesit-available-p))
+  :when (treesit-p)
   :init
-  (unless (treesit-language-available-p 'json)
-    (add-to-list
-     'treesit-language-source-alist
-     '(json "https://github.com/tree-sitter/tree-sitter-json"))
-    (treesit-install-language-grammar 'json))
-  (when (treesit-ready-p 'json)
-    (add-to-list
-     'major-mode-remap-alist
-     '(js-json-mode . json-ts-mode))))
+  (treesit-install-and-remap
+   'json "https://github.com/tree-sitter/tree-sitter-json"
+   :modes '(js-json-mode)
+   :remap 'json-ts-mode))
 
 (use-package lua-ts-mode
   :defer t
-  :when (and (fboundp 'treesit-available-p)
-             (treesit-available-p))
+  :when (treesit-p)
   :mode "\\.lua\\'"
   :custom
   (lua-ts-indent-offset 4)
   :init
-  (unless (treesit-language-available-p 'lua)
-    (add-to-list
-     'treesit-language-source-alist
-     '(lua "https://github.com/MunifTanjim/tree-sitter-lua"))
-    (treesit-install-language-grammar 'lua))
-  (when (treesit-ready-p 'lua)
-    (add-to-list
-     'major-mode-remap-alist
-     '(lua-mode . lua-ts-mode))))
+  (treesit-install-and-remap
+   'lua "https://github.com/MunifTanjim/tree-sitter-lua"))
 
 (use-package elixir-ts-mode
   :defer t
-  :when (and (fboundp 'treesit-available-p)
-             (treesit-available-p))
-  :config
-  (unless (treesit-language-available-p 'elixir)
-    (add-to-list
-     'treesit-language-source-alist
-     '(elixir "https://github.com/elixir-lang/tree-sitter-elixir"))
-    (treesit-install-language-grammar 'elixir)))
+  :when (treesit-p)
+  :init
+  (treesit-install-and-remap
+   'elixir "https://github.com/elixir-lang/tree-sitter-elixir"))
 
 (use-package heex-ts-mode
   :defer t
-  :config
-  (unless (treesit-language-available-p 'heex)
-    (add-to-list
-     'treesit-language-source-alist
-     '(heex "https://github.com/phoenixframework/tree-sitter-heex"))
-    (treesit-install-language-grammar 'heex)))
+  :when (treesit-p)
+  :init
+  (treesit-install-and-remap
+   'heex "https://github.com/phoenixframework/tree-sitter-heex"))
 
 ;;;; LSP
 
