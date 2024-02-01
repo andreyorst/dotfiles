@@ -297,6 +297,9 @@ applied to the name.")
   (mouse-wheel-tilt-scroll t)
   (mouse-wheel-progressive-speed nil)
   :preface
+  (defun window-font-width-unscaled ()
+    (let (face-remapping-alist)
+      (window-font-width)))
   (defun truncated-lines-p ()
     "Non-nil if any line is longer than `window-width' + `window-hscroll'.
 
@@ -304,45 +307,44 @@ Returns t if any line exceeds the right border of the window.
 Used for stopping scroll from going beyond the longest line.
 Based on `so-long-detected-long-line-p'."
     (let ((buffer (current-buffer))
-          (tabwidth tab-width))
-      (or (> (buffer-size buffer) 1000000) ; avoid searching in huge buffers
-          (with-temp-buffer
-            (insert-buffer-substring buffer)
-            (setq-local tab-width tabwidth)
-            (untabify (point-min) (point-max))
-            (goto-char (point-min))
-            (let* ((window-width
-                    ;; this computes a more accurate width rather than `window-width', and respects
-                    ;; `text-scale-mode' font width.
-                    (/ (window-body-width nil t) (window-font-width)))
-                   (hscroll-offset
-                    ;; `window-hscroll' returns columns that are not affected by
-                    ;; `text-scale-mode'.  Because of that, we have to recompute the correct
-                    ;; `window-hscroll' by multiplying it with a non-scaled value and
-                    ;; dividing it with a scaled width value, rounding it to the upper
-                    ;; boundary.  Since there's no way to get unscaled value, we have to get
-                    ;; a width of a face that is not scaled by `text-scale-mode', such as
-                    ;; `window-divider' face.
-                    (ceiling (/ (* (window-hscroll) (window-font-width nil 'window-divider))
-                                (float (window-font-width)))))
-                   (line-number-width
-                    ;; compensate line numbers width
-                    (if (bound-and-true-p display-line-numbers-mode)
-                        (- display-line-numbers-width)
-                      0))
-                   (threshold (+ window-width hscroll-offset line-number-width
-                                 -2))) ; compensate imprecise calculations
-              (catch 'excessive
-                (while (not (eobp))
-                  (let ((start (point)))
-                    (save-restriction
-                      (narrow-to-region start (min (+ start 1 threshold)
-                                                   (point-max)))
-                      (forward-line 1))
-                    (unless (or (bolp)
-                                (and (eobp) (<= (- (point) start)
-                                                threshold)))
-                      (throw 'excessive t))))))))))
+          (tabwidth tab-width)
+          (start (window-start))
+          (end (window-end)))
+      (let* ((window-width
+              ;; this computes a more accurate width rather than `window-width', and
+              ;; respects `text-scale-mode' font width.
+              (/ (window-body-width nil t) (window-font-width)))
+             (hscroll-offset
+              ;; `window-hscroll' returns columns that are not affected by
+              ;; `text-scale-mode'.  Because of that, we have to recompute the correct
+              ;; `window-hscroll' by multiplying it with a non-scaled value and
+              ;; dividing it with a scaled width value, rounding it to the upper
+              ;; boundary.
+              (ceiling (/ (* (window-hscroll) (window-font-width-unscaled))
+                          (float (window-font-width)))))
+             (line-number-width
+              ;; compensate line numbers width
+              (if (bound-and-true-p display-line-numbers-mode)
+                  (- display-line-numbers-width)
+                0))
+             (threshold (+ window-width hscroll-offset line-number-width
+                           -2)))   ; compensate imprecise calculations
+        (with-temp-buffer
+          (insert-buffer-substring buffer start end)
+          (let ((tab-width tabwidth))
+            (untabify (point-min) (point-max)))
+          (goto-char (point-min))
+          (catch 'excessive
+            (while (not (eobp))
+              (let ((start (point)))
+                (save-restriction
+                  (narrow-to-region start (min (+ start 1 threshold)
+                                               (point-max)))
+                  (forward-line 1))
+                (unless (or (bolp)
+                            (and (eobp) (<= (- (point) start)
+                                            threshold)))
+                  (throw 'excessive t)))))))))
   (define-advice scroll-left (:before-while (&rest _) prevent-overscroll)
     (and truncate-lines
          (not (memq major-mode no-hscroll-modes))
