@@ -1530,14 +1530,22 @@ means save all with no questions."
     (let* ((project-buffers (project-buffers (project-current)))
            (pred (lambda () (memq (current-buffer) project-buffers))))
       (funcall-interactively #'save-some-buffers arg pred)))
-  (define-advice compilation-start
-      (:filter-args (args) use-project-compilation-mode)
-    (let ((cmd (car args))
-          (mode (cadr args))
-          (rest (cddr args)))
-      (if (and (null mode) project-compilation-mode)
-          (append (list cmd project-compilation-mode) rest)
-        args)))
+  (defvar project-compilation-modes nil
+    "List of functions to check for specific compilation mode.
+
+The function must return a symbol of an applicable compilation
+mode.")
+(define-advice compilation-start
+    (:filter-args (args) use-project-compilation-mode)
+  (let ((cmd (car args))
+        (mode (cadr args))
+        (rest (cddr args)))
+    (catch 'args
+      (when (null mode)
+        (dolist (comp-mode-p project-compilation-modes)
+          (when-let ((mode (funcall comp-mode-p)))
+            (throw 'args (append (list cmd mode) rest)))))
+      args)))
   (define-advice project-root (:filter-return (project) abbreviate-project-root)
     (abbreviate-file-name project))
   (defun project-make-predicate-buffer-in-project-p ()
@@ -1675,7 +1683,13 @@ Set automatically by the `" (symbol-name compilation-mode-name) "'."))
 
 (use-package clojure-compilation-mode
   :no-require
-  :preface
+  :after compile
+  :config
+  (defun clojure-compilation-p ()
+    (and (require 'clojure-mode nil 'noerror)
+         (clojure-project-root-path)
+         'clojure-compilation-mode))
+  (add-to-list 'project-compilation-modes 'clojure-compilation-p)
   (defun clojure-compilation--split-classpath (classpath)
     "Split the CLASSPATH string."
     (split-string classpath ":" t "[[:space:]\n]+"))
@@ -1761,7 +1775,6 @@ dependency artifact based on the project's dependencies."
       (or (clojure-compilation--find-file-in-project filename)
           (when-let ((dep (clojure-compilation--find-dep filename)))
             (concat (expand-file-name dep) "/" filename)))))
-  :config
   (compile-add-error-syntax
    'clojure-compilation 'some-warning
    "^\\([^:[:space:]]+\\):\\([0-9]+\\) "
