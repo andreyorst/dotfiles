@@ -44,7 +44,9 @@
         indent-sexp
         kill-region
         magit-previous-line
+        markdown-beginning-of-line
         markdown-electric-backquote
+        markdown-end-of-line
         markdown-enter-key
         markdown-outdent-or-delete
         mc/vertical-align-with-space
@@ -130,6 +132,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        async-shell-command
         cider-debug-mode-send-reply
         cider-repl-previous-input
         cider-repl-return
@@ -152,6 +155,7 @@
         ignore
         imenu
         isearch-abort
+        isearch-del-char
         isearch-delete-char
         isearch-exit
         isearch-forward-regexp
