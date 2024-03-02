@@ -901,7 +901,7 @@ are defining or executing a macro."
         (lambda (spec)
           (seq-let (btn descr heading) spec
             `( ,btn ,descr entry
-               (file+headline ,(expand-file-name "kb/index.org" blog-directory) ,heading)
+               (file+headline ,(expand-file-name "notes/index.org" blog-directory) ,heading)
                "* [[blog-html:%^{Link}][%^{Description}]]\n:properties:\n:blog-collapsable: t\n:end:"
                :immediate-finish t
                :before-finalize (org-hugo-export-to-md))))
@@ -1048,9 +1048,7 @@ are defining or executing a macro."
 (use-package ob-lua :after org)
 
 (use-package fennel-mode
-  :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
-        :branch "main"
-        :rev :newest)
+  :ensure t
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
            fennel-repl-mode
@@ -1064,7 +1062,7 @@ are defining or executing a macro."
   :custom
   (fennel-eldoc-fontify-markdown t)
   (fennel-scratch-use-proto-repl t)
-  :preface
+  :config
   (defun fennel-repl-delete-all-output ()
     (interactive)
     (save-excursion
@@ -1072,7 +1070,6 @@ are defining or executing a macro."
       (forward-line 0)
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
-  :config
   (dolist (sym '(global local var set))
     (put sym 'fennel-indent-function 1)))
 
@@ -1087,7 +1084,7 @@ are defining or executing a macro."
   :commands (clojure-project-dir)
   :bind ( :map clojure-mode-map
           ("C-:" . nil))
-  :preface
+  :config
   (defun clojure-set-compile-command ()
     (let ((project-dir (clojure-project-dir)))
       (cond ((and (file-exists-p (expand-file-name "project.clj" project-dir))
@@ -1145,7 +1142,6 @@ are defining or executing a macro."
   (cider-auto-inspect-after-eval nil)
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
-  :preface
   (defun cider-disable-linting ()
     "Disable linting integrations for current buffer."
     (when (bound-and-true-p flymake-mode)
@@ -1157,21 +1153,7 @@ are defining or executing a macro."
     "Find the current REPL buffer and clear it.
 See `cider-find-and-clear-repl-output' for more info."
     (interactive)
-    (cider-find-and-clear-repl-output 'clear-repl))
-  (defun cider-open-portal ()
-    (interactive)
-    (cider-nrepl-request:eval
-     "(do
-        (ns dev)
-        (def portal ((requiring-resolve 'portal.api/open) {:launcher :emacs}))
-        (add-tap (requiring-resolve 'portal.api/submit)))"
-     #'ignore))
-  (defun cider-clear-portal ()
-    (interactive)
-    (cider-nrepl-request:eval "(portal.api/clear)" #'ignore))
-  (defun cider-close-portal ()
-    (interactive)
-    (cider-nrepl-request:eval "(portal.api/close)" #'ignore)))
+    (cider-find-and-clear-repl-output 'clear-repl)))
 
 (use-package ob-clojure
   :after (org clojure-mode)
@@ -1294,9 +1276,7 @@ a list of modes to remap to a symbol REMAP."
   (lsp-keep-workspace-alive nil)
   (lsp-idle-delay 0.5)
   (lsp-enable-xref t)
-  (lsp-signature-doc-lines 1)
-  :init
-  (setq lsp-use-plists t))
+  (lsp-signature-doc-lines 1))
 
 (use-package lsp-completion
   :no-require
