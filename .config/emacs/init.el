@@ -78,10 +78,8 @@
     (executable-find "termux-info"))
   (defun dark-mode-enabled-p ()
     "Check if dark mode is enabled."
-    (cond ((file-exists-p (expand-file-name "~/.dark-mode"))
-           t)
-          ((featurep 'dbus)
-           (dbus-color-theme-dark-p))
+    (cond ((file-exists-p (expand-file-name "~/.dark-mode")) t)
+          ((featurep 'dbus) (dbus-color-theme-dark-p))
           (t nil)))
   (defun memoize (fn)
     "Create a storage for FN's args.
@@ -779,10 +777,7 @@ are defining or executing a macro."
   :bind ( :map ctl-x-map
           ("c" . consult-prefix-map)
           :map consult-prefix-map
-          ("r" . consult-recent-file)
-          ("o" . consult-outline)
-          ("i" . consult-imenu)
-          ("g" . consult-grep))
+          ("r" . consult-recent-file))
   :custom
   (consult-preview-key nil)
   :init
@@ -893,6 +888,7 @@ are defining or executing a macro."
 
 (use-package blog
   :after blog
+  :no-require
   :custom
   (org-directory blog-directory)
   (org-capture-templates
