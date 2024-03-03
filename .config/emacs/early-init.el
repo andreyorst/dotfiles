@@ -30,7 +30,6 @@
                        (right-divider-width . 1))
  initial-frame-alist default-frame-alist
  frame-inhibit-implied-resize t
- x-gtk-resize-child-frames 'resize-mode
  fringe-indicator-alist (assq-delete-all 'truncation fringe-indicator-alist))
 
 (unless (or (daemonp) noninteractive)
