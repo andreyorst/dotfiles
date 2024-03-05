@@ -747,6 +747,31 @@ are defining or executing a macro."
 (use-package repeat
   :hook (after-init . repeat-mode))
 
+(use-package indirect-narrow
+  :bind ( :map narrow-map
+          ("i n" . indirect-narrow-to-region)
+          ("i d" . indirect-narrow-to-defun)
+          ("i p" . indirect-narrow-to-page))
+  :preface
+  (defun indirect-narrow-to-region (start end)
+    (interactive "r")
+    (deactivate-mark)
+    (with-current-buffer (clone-indirect-buffer nil nil)
+      (narrow-to-region start end)
+      (pop-to-buffer (current-buffer))))
+  (defun indirect-narrow-to-page (&optional arg)
+    (interactive "P")
+    (deactivate-mark)
+    (with-current-buffer (clone-indirect-buffer nil nil)
+      (narrow-to-page arg)
+      (pop-to-buffer (current-buffer))))
+  (defun indirect-narrow-to-defun (&optional include-comments)
+    (interactive (list narrow-to-defun-include-comments))
+    (deactivate-mark)
+    (with-current-buffer (clone-indirect-buffer nil nil)
+      (narrow-to-defun include-comments)
+      (pop-to-buffer (current-buffer))))
+  (provide 'indirect-narrow))
 
 ;;; Completion
 
@@ -1188,15 +1213,16 @@ See `cider-find-and-clear-repl-output' for more info."
     "Check if Emacs was built with treesiter in a protable way."
     (and (fboundp 'treesit-available-p)
          (treesit-available-p)))
-  (cl-defun treesit-install-and-remap (lang url &key revision source-dir modes remap)
+  (cl-defun treesit-install-and-remap (lang url &key revision source-dir modes remap org-src)
     "Convenience function for installing and enabling a ts-* mode.
 
-LANG is the language symbol.  URL is the Git repository URL for
-the grammar.  REVISION is the Git tag or branch of the desired
-version, defaulting to the latest default branch.  SOURCE-DIR is
-the relative subdirectory in the repository in which the
-grammar’s parser.c file resides, defaulting to \"src\".  MODES is
-a list of modes to remap to a symbol REMAP."
+LANG is the language symbol.  URL is the Git repository URL for the
+grammar.  REVISION is the Git tag or branch of the desired version,
+defaulting to the latest default branch.  SOURCE-DIR is the relative
+subdirectory in the repository in which the grammar’s parser.c file
+resides, defaulting to \"src\".  MODES is a list of modes to remap to a
+symbol REMAP.  ORG-SRC is a cons specifying a source code block language
+name and a corresponding major mode."
     (when (and (fboundp 'treesit-available-p)
                (treesit-available-p))
       (unless (treesit-language-available-p lang)
@@ -1208,7 +1234,10 @@ a list of modes to remap to a symbol REMAP."
         (dolist (mode modes)
           (add-to-list
            'major-mode-remap-alist
-           (cons mode remap))))))
+           (cons mode remap))))
+      (when (and org-src (treesit-ready-p lang))
+        (eval-after-load 'org
+          (lambda () (add-to-list 'org-src-lang-modes org-src))))))
   :custom
   (treesit-font-lock-level 2))
 
@@ -1217,11 +1246,11 @@ a list of modes to remap to a symbol REMAP."
   :when (treesit-p)
   :init
   (treesit-install-and-remap
-   'javascript
-   "https://github.com/tree-sitter/tree-sitter-javascript"
+   'javascript "https://github.com/tree-sitter/tree-sitter-javascript"
    :revision "master" :source-dir "src"
-   :remap '(js-mode javascript-mode js2-mode)
-   :remap 'js-ts-mode))
+   :modes '(js-mode javascript-mode js2-mode)
+   :remap 'js-ts-mode
+   :org-src '("js" . js-ts)))
 
 (use-package json-ts-mode
   :defer t
@@ -1231,7 +1260,8 @@ a list of modes to remap to a symbol REMAP."
   (treesit-install-and-remap
    'json "https://github.com/tree-sitter/tree-sitter-json"
    :modes '(js-json-mode)
-   :remap 'json-ts-mode))
+   :remap 'json-ts-mode
+   :org-src '("json" . json-ts)))
 
 (use-package lua-ts-mode
   :defer t
@@ -1241,14 +1271,16 @@ a list of modes to remap to a symbol REMAP."
   (lua-ts-indent-offset 4)
   :init
   (treesit-install-and-remap
-   'lua "https://github.com/MunifTanjim/tree-sitter-lua"))
+   'lua "https://github.com/MunifTanjim/tree-sitter-lua"
+   :org-src '("lua" . lua-ts)))
 
 (use-package elixir-ts-mode
   :defer t
   :when (treesit-p)
   :init
   (treesit-install-and-remap
-   'elixir "https://github.com/elixir-lang/tree-sitter-elixir"))
+   'elixir "https://github.com/elixir-lang/tree-sitter-elixir"
+   :org-src '("elixir" . elixir-ts)))
 
 (use-package heex-ts-mode
   :defer t
