@@ -1213,7 +1213,8 @@ See `cider-find-and-clear-repl-output' for more info."
     "Check if Emacs was built with treesiter in a protable way."
     (and (fboundp 'treesit-available-p)
          (treesit-available-p)))
-  (cl-defun treesit-install-and-remap (lang url &key revision source-dir modes remap org-src)
+  (cl-defun treesit-install-and-remap
+      (lang url &key revision source-dir modes remap org-src)
     "Convenience function for installing and enabling a ts-* mode.
 
 LANG is the language symbol.  URL is the Git repository URL for the
@@ -1237,7 +1238,8 @@ name and a corresponding major mode."
            (cons mode remap))))
       (when (and org-src (treesit-ready-p lang))
         (eval-after-load 'org
-          (lambda () (add-to-list 'org-src-lang-modes org-src))))))
+          (lambda ()
+            (add-to-list 'org-src-lang-modes org-src))))))
   :custom
   (treesit-font-lock-level 2))
 
@@ -1543,17 +1545,17 @@ means save all with no questions."
 
 The function must return a symbol of an applicable compilation
 mode.")
-(define-advice compilation-start
-    (:filter-args (args) use-project-compilation-mode)
-  (let ((cmd (car args))
-        (mode (cadr args))
-        (rest (cddr args)))
-    (catch 'args
-      (when (null mode)
-        (dolist (comp-mode-p project-compilation-modes)
-          (when-let ((mode (funcall comp-mode-p)))
-            (throw 'args (append (list cmd mode) rest)))))
-      args)))
+  (define-advice compilation-start
+      (:filter-args (args) use-project-compilation-mode)
+    (let ((cmd (car args))
+          (mode (cadr args))
+          (rest (cddr args)))
+      (catch 'args
+        (when (null mode)
+          (dolist (comp-mode-p project-compilation-modes)
+            (when-let ((mode (funcall comp-mode-p)))
+              (throw 'args (append (list cmd mode) rest)))))
+        args)))
   (define-advice project-root (:filter-return (project) abbreviate-project-root)
     (abbreviate-file-name project))
   (defun project-make-predicate-buffer-in-project-p ()
