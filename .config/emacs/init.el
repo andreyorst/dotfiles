@@ -440,6 +440,7 @@ are defining or executing a macro."
 
 (use-package bindings
   :bind ( :map ctl-x-map
+          ("DEL" . nil)
           ("C-d" . dired-jump))
   :init
   (setq mode-line-end-spaces nil))
@@ -772,6 +773,11 @@ are defining or executing a macro."
       (narrow-to-defun include-comments)
       (pop-to-buffer (current-buffer))))
   (provide 'indirect-narrow))
+
+(use-package page
+  :bind ( ;; I often input C-x C-p instead of C-x p followed by project
+          ;; key, deleting contents of whole buffer as a result.
+          "C-x C-p" . nil))
 
 ;;; Completion
 
