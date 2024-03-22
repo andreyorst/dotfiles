@@ -1265,6 +1265,11 @@ name and a corresponding major mode."
    :remap 'json-ts-mode
    :org-src '("json" . json-ts)))
 
+(use-package flymake-json
+  :ensure t
+  :when (executable-find "jsonlint")
+  :hook ((js-json-mode json-ts-mode) . flymake-json-load))
+
 (use-package lua-ts-mode
   :defer t
   :when (treesit-p)
