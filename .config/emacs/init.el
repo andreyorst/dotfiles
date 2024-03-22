@@ -1399,8 +1399,8 @@ name and a corresponding major mode."
 
 (use-package puni
   :ensure t
-  :hook (((common-lisp-modes-mode nxml-mode) . puni-mode)
-         (puni-mode . electric-pair-mode))
+  :hook (((common-lisp-modes-mode nxml-mode json-ts-mode) . puni-mode)
+         (puni-mode . electric-pair-local-mode))
   ;; paredit-like keys
   :bind ( :map puni-mode-map
           ("C-M-f" . puni-forward-sexp-or-up-list)
