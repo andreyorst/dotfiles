@@ -97,6 +97,11 @@ transparent."
   (defmacro defmemo (name &rest funtail)
     (declare (doc-string 3) (indent 2) (debug defun))
     `(defalias ',name (memoize (lambda ,@funtail))))
+  (font-lock-add-keywords
+   'emacs-lisp-mode
+   '(("(\\(defmemo\\)\\_>\\s *\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+      (1 font-lock-keyword-face nil t)
+      (2 font-lock-function-name-face nil t))))
   (defvar-local ssh-tunnel-port nil)
   (put 'ssh-tunnel-port 'safe-local-variable #'numberp)
   (defun ssh-tunnel (host port &optional local-port)
