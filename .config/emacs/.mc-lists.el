@@ -144,6 +144,7 @@
         count-lines-page
         dabbrev-expand
         describe-variable
+        diff-buffer-with-file
         dired-up-directory
         fennel-proto-repl-switch-to-repl
         god-local-mode
