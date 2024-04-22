@@ -127,6 +127,7 @@
         upcase-region
         wdired--self-insert
         yaml-electric-backspace
+        yaml-electric-dash-and-dot
         zap-up-to-char
         ))
 
