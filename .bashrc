@@ -42,6 +42,7 @@ PATH="$HOME/.local/bin:$PATH"
 export PATH
 
 # Lua related stuff
+LUA_PATH="./?.lua;$LUA_PATH"
 for path in /usr/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
 for path in "$HOME"/.local/share/lua/*; do LUA_PATH="$path/?.lua;$LUA_PATH"; done
 [ -n "$(command -v luarocks)" ] && eval "$(luarocks path)"
