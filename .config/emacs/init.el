@@ -1279,9 +1279,35 @@ name and a corresponding major mode."
 (use-package lua-ts-mode
   :defer t
   :when (treesit-p)
+  :hook (lua-ts-mode . lua-setup-abbrev-prettify)
   :mode "\\.lua\\'"
   :custom
   (lua-ts-indent-offset 4)
+  :preface
+  (defvar lua-syntax-expansions
+    '(("def" "local function")
+      ("unless" "if not")
+      ("fn"  "function")
+      ("let" "local")
+      ("<-" "return")))
+  (defun lua-expand-abbrev-maybe ()
+    (when (looking-back "<-" 2)
+      (progn
+        (delete-char -2)
+        (abbrev-insert (abbrev-symbol "<-")))))
+  (defun lua-setup-abbrev-prettify ()
+    (setq prettify-symbols-alist
+          (mapcar (lambda (abbrev-exp)
+                    (let ((abbrev (car abbrev-exp))
+                          (exp (cadr abbrev-exp)))
+                      `(,exp . ,(vconcat (cdr (mapcan (lambda (ch) (list '(Br . Bl) ch)) abbrev))))))
+                  lua-syntax-expansions))
+    (prettify-symbols-mode 1)
+    (dolist (abbrev-exp lua-syntax-expansions)
+      (apply #'define-abbrev lua-ts-mode-abbrev-table abbrev-exp))
+    (modify-syntax-entry ?- "w 12")
+    (abbrev-mode)
+    (add-function :before (local 'abbrev-expand-function) #'lua-expand-abbrev-maybe))
   :init
   (treesit-install-and-remap
    'lua "https://github.com/MunifTanjim/tree-sitter-lua"
