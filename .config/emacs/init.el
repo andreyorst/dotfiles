@@ -1278,40 +1278,58 @@ name and a corresponding major mode."
 
 (use-package lua-ts-mode
   :defer t
-  :when (treesit-p)
-  :hook (lua-ts-mode . lua-setup-abbrev-prettify)
+  :when (and (treesit-p)
+             (package-installed-p 'lua-ts-mode))
   :mode "\\.lua\\'"
   :custom
   (lua-ts-indent-offset 4)
+  :init
+  (treesit-install-and-remap
+   'lua "https://github.com/MunifTanjim/tree-sitter-lua"
+   :org-src '("lua" . lua-ts)))
+
+(use-package lua-mode
+  :ensure (not (package-installed-p 'lua-ts-mode))
+  :mode "\\.lua\\'"
+  :custom
+  (lua-indent-offset 4))
+
+(use-package lua-prettify
+  :hook ((lua-mode lua-ts-mode) . lua-prettify-setup-abbrev)
   :preface
-  (defvar lua-syntax-expansions
+  (defvar lua-prettify-syntax-expansions
     '(("def" "local function")
       ("unless" "if not")
       ("fn"  "function")
       ("let" "local")
       ("<-" "return")))
-  (defun lua-expand-abbrev-maybe ()
+  (defun lua-prettify--expand-abbrev-maybe ()
     (when (looking-back "<-" 2)
-      (progn
-        (delete-char -2)
-        (abbrev-insert (abbrev-symbol "<-")))))
-  (defun lua-setup-abbrev-prettify ()
+      (delete-char -2)
+      (abbrev-insert (abbrev-symbol "<-"))))
+  (defun lua-prettify-setup-abbrev ()
     (setq prettify-symbols-alist
           (mapcar (lambda (abbrev-exp)
                     (let ((abbrev (car abbrev-exp))
                           (exp (cadr abbrev-exp)))
-                      `(,exp . ,(vconcat (cdr (mapcan (lambda (ch) (list '(Br . Bl) ch)) abbrev))))))
-                  lua-syntax-expansions))
+                      `(,exp . ,(thread-last
+                                  abbrev
+                                  (mapcan
+                                   (lambda (ch)
+                                     (list '(Br . Bl) ch)))
+                                  cdr
+                                  vconcat))))
+                  lua-prettify-syntax-expansions))
     (prettify-symbols-mode 1)
-    (dolist (abbrev-exp lua-syntax-expansions)
-      (apply #'define-abbrev lua-ts-mode-abbrev-table abbrev-exp))
+    (let ((at (eval (intern (format "%s-abbrev-table" major-mode)))))
+      (dolist (abbrev-exp lua-prettify-syntax-expansions)
+        (apply #'define-abbrev at abbrev-exp)))
     (modify-syntax-entry ?- "w 12")
     (abbrev-mode)
-    (add-function :before (local 'abbrev-expand-function) #'lua-expand-abbrev-maybe))
-  :init
-  (treesit-install-and-remap
-   'lua "https://github.com/MunifTanjim/tree-sitter-lua"
-   :org-src '("lua" . lua-ts)))
+    (add-function
+     :before (local 'abbrev-expand-function)
+     #'lua-prettify--expand-abbrev-maybe))
+  (provide 'lua-prettify))
 
 (use-package elixir-ts-mode
   :defer t
