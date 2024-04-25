@@ -5,7 +5,7 @@
 ;; Homepage: https://gitlab.com/andreyorst/dotfiles.git
 
 ;;; Commentary:
-;; Emacs 29+ early initialization configuration.
+;; Emacs 30+ early initialization configuration.
 
 ;;; Code:
 
