@@ -1288,12 +1288,6 @@ name and a corresponding major mode."
    'lua "https://github.com/MunifTanjim/tree-sitter-lua"
    :org-src '("lua" . lua-ts)))
 
-(use-package lua-mode
-  :ensure (not (package-installed-p 'lua-ts-mode))
-  :mode "\\.lua\\'"
-  :custom
-  (lua-indent-offset 4))
-
 (use-package lua-prettify
   :hook ((lua-mode lua-ts-mode) . lua-prettify-setup-abbrev)
   :preface
