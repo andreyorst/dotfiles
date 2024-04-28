@@ -1060,9 +1060,9 @@ are defining or executing a macro."
 
 (use-package csv-mode
   :ensure t
-  :defer t
+  :hook ((csv-mode . csv-guess-set-separator))
   :custom
-  (csv-align-max-width 80))
+  (csv-align-max-width most-positive-fixnum))
 
 (use-package scala-mode
   :ensure t
