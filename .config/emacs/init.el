@@ -1165,13 +1165,14 @@ are defining or executing a macro."
   (cider-auto-select-error-buffer t)
   (cider-show-eval-spinner t)
   (nrepl-use-ssh-fallback-for-remote-hosts t)
-  (cider-enrich-classpath t)
   (cider-repl-history-file (expand-file-name "~/.cider-history"))
   (cider-clojure-cli-global-options "-J-XX:-OmitStackTraceInFastThrow")
   (cider-use-tooltips nil)
   (cider-connection-message-fn #'cider-random-tip)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   (cider-auto-inspect-after-eval nil)
+  (cider-enrich-classpath nil)   ; when enabled causes troubles behind
+                                 ; proxy and with new add-lib* feature
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   (defun cider-disable-linting ()
