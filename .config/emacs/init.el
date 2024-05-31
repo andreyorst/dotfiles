@@ -869,6 +869,10 @@ are defining or executing a macro."
   :config
   (setq completion-at-point-functions '(cape-file)))
 
+(use-package ov
+  :ensure t
+  :commands (ov-regexp))
+
 
 ;;; Org
 
@@ -1276,6 +1280,34 @@ name and a corresponding major mode."
    :modes '(js-json-mode)
    :remap 'json-ts-mode
    :org-src '("json" . json-ts)))
+
+(use-package json-hs-extra
+  :after json
+  :hook (json-ts-mode . json-hs-extra-setup)
+  :preface
+  (defun json-hs-extra-create-overlays (overlay)
+    "Creates overlays for block beginning, hiding whitespace.
+Sets OVERLAY `json-hs-extra-overlays' property to the list of created
+overlays."
+    (let ((end (point)))
+      (save-excursion
+        (forward-sexp -1)
+        (when-let ((overlays (ov-regexp "{[[:space:]\n]*" (point) end)))
+          (mapc (lambda (ov) (overlay-put ov 'display "{")) overlays)
+          (overlay-put overlay 'json-hs-extra-overlays overlays)))))
+  (defun json-hs-extra-delete-overlays (fn overlay)
+    "Deletes overlays for block beginning created earlier.
+Deletes overlays in the `json-hs-extra-overlays' property of OVERLAY,
+created with `json-hs-extra-create-overlays'."
+    (mapc #'delete-overlay (overlay-get overlay 'json-hs-extra-overlays))
+    (funcall fn overlay))
+  (defun json-hs-extra-setup ()
+    "Special settings for JSON buffers."
+    (setq-local hs-block-start-regexp "\\(?:{[[:space:]\n]*\\|\\[\\)"
+                hs-set-up-overlay #'json-hs-extra-create-overlays))
+  (provide 'json-hs-extra)
+  :config
+  (advice-add 'delete-overlay :around #'json-hs-extra-delete-overlays))
 
 (use-package lua-ts-mode
   :defer t
