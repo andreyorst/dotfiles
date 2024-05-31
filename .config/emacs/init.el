@@ -378,7 +378,7 @@ Based on `so-long-detected-long-line-p'."
 (use-package simple
   :bind (("M-z" . zap-up-to-char)
          ("M-S-z" . zap-to-char)
-         ("C-x k" . kill-this-buffer)
+         ("C-x k" . kill-current-buffer)
          ("C-h C-f" . describe-face)
          ([remap undo] . undo-only))
   :hook ((before-save . delete-trailing-whitespace)
