@@ -1106,7 +1106,7 @@ are defining or executing a macro."
       (forward-line 0)
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
-  (dolist (sym '(global local var set))
+  (dolist (sym '(global local var set testing deftest))
     (put sym 'fennel-indent-function 1)))
 
 (use-package ob-fennel :after org)
@@ -1701,7 +1701,11 @@ mode.")
   (add-to-list 'project-switch-commands
                '(project-dired "Dired"))
   (add-to-list 'project-switch-commands
-               '(project-switch-to-buffer "Switch buffer")))
+               '(project-switch-to-buffer "Switch buffer"))
+  (add-to-list 'project-switch-commands
+               '(project-compile "Compile"))
+  (add-to-list 'project-switch-commands
+               '(project-save-some-buffers "Save") t))
 
 (use-package magit
   :ensure t
