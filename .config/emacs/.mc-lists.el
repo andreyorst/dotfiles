@@ -35,6 +35,8 @@
         end-of-defun
         eval-last-sexp
         eval-print-last-sexp
+        fennel-proto-repl-eval-last-sexp
+        fennel-proto-repl-eval-print-last-sexp
         fill-paragraph
         forward-sexp
         goto-line
