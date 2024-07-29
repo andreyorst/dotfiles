@@ -17,7 +17,7 @@ pm_dnf() {
                          (*)         echo "wrong argument for 'list'" >&2
                                      exit 1 ;;
                      esac ;;
-        (*)          dnf "$cmd" "$@" ;;
+        (*)          sudo dnf "$cmd" "$@" ;;
     esac
 }
 
@@ -29,7 +29,7 @@ pm_yum() {
         (update)  sudo yum update "$@" ;;
         (remove)  sudo yum remove "$@" ;;
         (search)  yum search "$@" ;;
-        (*)       yum "$cmd" "$@" ;;
+        (*)       sudo yum "$cmd" "$@" ;;
     esac
 }
 
@@ -42,6 +42,12 @@ pm_apt() {
         (remove)      sudo apt remove "$@" ;;
         (autoremove)  sudo apt autoremove "$@" ;;
         (search)      apt search "$@" ;;
+        (list)        case $1 in
+                          (all)       apt list ;;
+                          (installed) apt list --installed ;;
+                          (*)         echo "wrong argument for 'list'" >&2
+                                      exit 1 ;;
+                      esac ;;
         (*)           sudo apt "$cmd" "$@" ;;
     esac
 }
