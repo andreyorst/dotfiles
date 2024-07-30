@@ -1136,8 +1136,44 @@ created with `json-hs-extra-create-overlays'."
       (forward-line 0)
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
-  (dolist (sym '(global local var set testing deftest))
-    (put sym 'fennel-indent-function 1)))
+  (dolist (sym '( global local var set
+                  testing deftest go-loop
+                  import-macros pick-values))
+    (put sym 'fennel-indent-function 1))
+  (dolist (sym '(go))
+    (put sym 'fennel-indent-function 0)))
+
+(use-package fennel-proto-repl
+  :hook ((fennel-proto-repl-minor-mode . fennel-proto-repl-link-project-buffer))
+  :bind ( :map fennel-proto-repl-minor-mode-map
+          ("C-c C-z" . fennel-proto-repl-switch-to-repl-in-project))
+  :preface
+  (defun fennel-proto-repl-p (buffer)
+    (with-current-buffer buffer
+      (and (eq major-mode 'fennel-proto-repl-mode)
+           buffer)))
+  (defun fennel-proto-repl-managed-buffer-p (buffer)
+    (with-current-buffer buffer
+      (and fennel-proto-repl-minor-mode
+           buffer)))
+  (defun fennel-proto-repl-switch-to-repl-in-project (&optional project)
+    (interactive)
+    (if-let ((project (or project (project-current nil))))
+        (let ((default-directory (project-root project)))
+          (when (funcall-interactively #'fennel-proto-repl-switch-to-repl)
+            (let* ((project-buffers (project-buffers project))
+                   (proto-repl (seq-find #'fennel-proto-repl-p project-buffers))
+                   (fennel-buffers (seq-filter #'fennel-proto-repl-managed-buffer-p project-buffers)))
+              (dolist (buffer fennel-buffers)
+                (with-current-buffer buffer
+                  (unless (buffer-live-p fennel-proto-repl--buffer)
+                    (fennel-proto-repl-link-buffer proto-repl)))))))
+      (fennel-proto-repl-switch-to-repl-in-project (project-current t))))
+  (defun fennel-proto-repl-link-project-buffer ()
+    (interactive)
+    (when-let ((project (project-current nil)))
+      (when-let ((proto-repl (seq-find #'fennel-proto-repl-p (project-buffers project))))
+        (fennel-proto-repl-link-buffer proto-repl)))))
 
 (use-package ob-fennel :after org)
 
@@ -1730,6 +1766,7 @@ mode.")
                '(magit-project-status "Magit") t))
 
 (use-package magit-todos
+  :ensure t
   :after magit
   :config (magit-todos-mode 1))
 
