@@ -1,0 +1,12 @@
+#!/bin/bash
+executable=$(basename $0)
+
+if [ -e /run/.containerenv  ]; then
+    exec host-spawn "$executable" "$@"
+else
+    executable=$(PATH=${PATH//"$HOME/.local/bin:"/}
+                 PATH=${PATH//":$HOME/.local/bin"/}
+                 PATH=${PATH//"$HOME/.local/bin"/}
+                 builtin type -P "$executable")
+    exec "$executable" "$@"
+fi
