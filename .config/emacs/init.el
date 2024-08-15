@@ -1136,8 +1136,8 @@ created with `json-hs-extra-create-overlays'."
       (forward-line 0)
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
-  (dolist (sym '( global local var set
-                  testing deftest go-loop use-fixtures
+  (dolist (sym '( global local var set catch
+                  testing deftest use-fixtures go-loop
                   import-macros pick-values))
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(tset))
@@ -1151,14 +1151,19 @@ created with `json-hs-extra-create-overlays'."
           ("C-c C-z" . fennel-proto-repl-switch-to-repl-in-project))
   :preface
   (defun fennel-proto-repl-p (buffer)
+    "Check if the BUFFER is a Fennel Proto REPL buffer."
     (with-current-buffer buffer
       (and (eq major-mode 'fennel-proto-repl-mode)
            buffer)))
   (defun fennel-proto-repl-managed-buffer-p (buffer)
+    "Check if the BUFFER is managed by `fennel-proto-repl-minor-mode'."
     (with-current-buffer buffer
       (and fennel-proto-repl-minor-mode
            buffer)))
   (defun fennel-proto-repl-switch-to-repl-in-project (&optional project)
+    "Switch to the currently linked project REPL buffer.
+If invoked interactively with a prefix argument, asks for command
+to start the REPL."
     (interactive)
     (if-let ((project (or project (project-current nil))))
         (let ((default-directory (project-root project)))
@@ -1172,6 +1177,9 @@ created with `json-hs-extra-create-overlays'."
                     (fennel-proto-repl-link-buffer proto-repl)))))))
       (fennel-proto-repl-switch-to-repl-in-project (project-current t))))
   (defun fennel-proto-repl-link-project-buffer ()
+    "Hook to automatically link project buffers to Fennel Proto REPL.
+Finds the REPL buffer in the current project, and links all managed
+buffer with it."
     (interactive)
     (when-let ((project (project-current nil)))
       (when-let ((proto-repl (seq-find #'fennel-proto-repl-p (project-buffers project))))

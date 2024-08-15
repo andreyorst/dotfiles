@@ -88,6 +88,7 @@
         parinfer-smart-tab:backward-char
         parinfer-smart-tab:forward-char
         parinfer-smart-yank:yank
+        proced-send-signal
         puni-backward-delete-char
         puni-backward-sexp-or-up-list
         puni-barf-backward
@@ -150,6 +151,7 @@
         describe-variable
         diff-buffer-with-file
         dired-up-directory
+        eat
         fennel-proto-repl-switch-to-repl
         god-local-mode
         hs-show-all
