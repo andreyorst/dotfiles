@@ -28,6 +28,7 @@
         default-indent-new-line
         delete-indentation
         dired-flag-file-deletion
+        dired-mark
         downcase-region
         electric-newline-and-maybe-indent
         electric-pair-delete-pair
