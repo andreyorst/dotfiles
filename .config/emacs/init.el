@@ -1137,9 +1137,11 @@ created with `json-hs-extra-create-overlays'."
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
   (dolist (sym '( global local var set
-                  testing deftest go-loop
+                  testing deftest go-loop use-fixtures
                   import-macros pick-values))
     (put sym 'fennel-indent-function 1))
+  (dolist (sym '(tset))
+    (put sym 'fennel-indent-function 2))
   (dolist (sym '(go))
     (put sym 'fennel-indent-function 0)))
 
