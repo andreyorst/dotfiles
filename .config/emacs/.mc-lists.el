@@ -20,6 +20,7 @@
         cider-eval-last-sexp
         cider-repl-newline-and-indent
         cljr-slash
+        clojure-thread-first-all
         comment-dwim
         comment-line
         common-lisp-modes-indent-or-fill-sexp
