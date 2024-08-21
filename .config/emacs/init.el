@@ -1137,13 +1137,32 @@ created with `json-hs-extra-create-overlays'."
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min)))))
   (dolist (sym '( global local var set catch
-                  testing deftest use-fixtures go-loop
                   import-macros pick-values))
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(tset))
-    (put sym 'fennel-indent-function 2))
+    (put sym 'fennel-indent-function 2)))
+
+(use-package fennel-font-lock-extras
+  :after fennel-mode
+  :preface
+  (dolist (sym '( testing deftest use-fixtures go-loop))
+    (put sym 'fennel-indent-function 1))
   (dolist (sym '(go))
-    (put sym 'fennel-indent-function 0)))
+    (put sym 'fennel-indent-function 0))
+  (font-lock-add-keywords
+   'fennel-mode
+   `((,(rx (syntax open-parenthesis)
+           (group
+            word-start
+            (or "assert-is" "assert-not" "assert-eq" "assert-ne"
+                "deftest" "testing" "use-fixtures" "catch" "go" "go-loop")
+            word-end))
+      1 font-lock-keyword-face)
+     (,(rx (syntax open-parenthesis)
+           word-start "deftest" word-end (1+ space)
+           (group (1+ (or (syntax word) (syntax symbol) "-" "_"))))
+      1 font-lock-function-name-face)))
+  (provide 'fennel-font-lock-extras))
 
 (use-package fennel-proto-repl
   :hook ((fennel-proto-repl-minor-mode . fennel-proto-repl-link-project-buffer))
