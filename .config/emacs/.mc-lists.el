@@ -109,6 +109,7 @@
         puni-wrap-square
         region-bindings-disable
         region-bindings-doublequote
+        replace-string
         save-some-buffers
         sp-backward-delete-char
         sp-backward-kill-word
