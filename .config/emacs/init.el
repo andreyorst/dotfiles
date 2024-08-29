@@ -1780,13 +1780,25 @@ mode.")
 
 (use-package magit
   :ensure t
-  :hook (git-commit-mode . flyspell-mode)
+  :hook ((git-commit-mode . flyspell-mode)
+         (git-commit-setup . magit-git-commit-insert-branch))
   :bind ( :map project-prefix-map
           ("m" . magit-project-status))
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
-  (magit-diff-refine-hunk 'all))
+  (magit-diff-refine-hunk 'all)
+  :preface
+  (defun magit-extract-branch-tag (branch-name)
+    "Extract branch tag from BRANCH-NAME."
+    (let ((ticket-pattern "\\([[:alpha:]]+-[[:digit:]]+\\)"))
+      (when (string-match-p ticket-pattern branch-name)
+        (upcase (replace-regexp-in-string ticket-pattern "\\1: \n" branch-name)))))
+  (defun magit-git-commit-insert-branch ()
+    "Insert the branch tag in the commit buffer if feasible."
+    (when-let ((tag (magit-extract-branch-tag (magit-get-current-branch))))
+      (insert tag)
+      (forward-char -1))))
 
 (use-package magit
   :after project
