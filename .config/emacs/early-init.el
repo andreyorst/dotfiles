@@ -41,14 +41,15 @@
              (delete-dups (append file-name-handler-alist
                                   original-file-name-handler-alist)))
        (setq read-process-output-max
-             (if (eq system-type 'gnu/linux)
-                 (with-temp-buffer
-                   (insert-file-contents-literally
-                    "/proc/sys/fs/pipe-max-size")
-                   (string-to-number
-                    (buffer-substring-no-properties
-                     (point-min) (point-max))))
-               (* 4 1024 1024))))
+             (or (and (eq system-type 'gnu/linux)
+                      (ignore-error permission-denied
+                        (with-temp-buffer
+                          (insert-file-contents-literally
+                           "/proc/sys/fs/pipe-max-size")
+                          (string-to-number
+                           (buffer-substring-no-properties
+                            (point-min) (point-max))))))
+                 (* 4 1024 1024))))
      101))
   (when (fboundp #'tool-bar-mode)
     (tool-bar-mode -1))
