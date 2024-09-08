@@ -1129,6 +1129,8 @@ created with `json-hs-extra-create-overlays'."
   (fennel-eldoc-fontify-markdown t)
   (fennel-scratch-use-proto-repl t)
   :config
+  (put 'fennel-program 'safe-local-variable
+       (lambda (s) (string-match-p "^\\(fennel\\|love\\)" s)))
   (defun fennel-repl-delete-all-output ()
     (interactive)
     (save-excursion
