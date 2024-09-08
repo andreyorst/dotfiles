@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        abort-recursive-edit
         backward-sexp
         beginning-of-buffer
         c-electric-brace
@@ -132,6 +133,7 @@
         undo-only
         upcase-region
         wdired--self-insert
+        xterm-paste
         yaml-electric-backspace
         yaml-electric-dash-and-dot
         zap-up-to-char
