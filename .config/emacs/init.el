@@ -1392,6 +1392,7 @@ name and a corresponding major mode."
 (use-package lua-prettify
   :hook ((lua-mode lua-ts-mode) . lua-prettify-mode)
   :delight lua-prettify-mode
+  :unless (in-termux-p)
   :preface
   (defgroup lua-prettify ()
     "Lua prettification and ease of writing enchancements."
@@ -1781,7 +1782,7 @@ mode.")
 (use-package magit
   :ensure t
   :hook ((git-commit-mode . flyspell-mode)
-         (git-commit-setup . magit-git-commit-insert-branch))
+         (git-commit-mode . magit-git-commit-insert-branch))
   :bind ( :map project-prefix-map
           ("m" . magit-project-status))
   :custom
