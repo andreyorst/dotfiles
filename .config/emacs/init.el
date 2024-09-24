@@ -2091,9 +2091,10 @@ dependency artifact based on the project's dependencies."
   :vc ( :url "https://gitlab.com/andreyorst/gnome-proxy.el.git"
         :branch "main"
         :rev :newest)
-  :when (executable-find "gsettings")
-  :init
-  (gnome-proxy-setup-env))
+  :when (and (executable-find "gsettings")
+             (executable-find "dconf"))
+  :delight gnome-proxy-watch-mode
+  :hook (after-init . gnome-proxy-watch-mode))
 
 
 ;;; Messaging
