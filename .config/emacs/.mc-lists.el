@@ -20,6 +20,7 @@
         cider-eval-defun-at-point
         cider-eval-last-sexp
         cider-repl-newline-and-indent
+        cider-repl-tab
         cljr-slash
         clojure-thread-first-all
         comment-dwim
