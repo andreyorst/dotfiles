@@ -76,6 +76,7 @@ in `user-emacs-directory'."
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("gnu-devel" . "https://elpa.gnu.org/devel/"))
 (package-initialize)
 
 (provide 'early-init)
