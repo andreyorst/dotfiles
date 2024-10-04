@@ -1811,8 +1811,13 @@ mode.")
 
 (use-package magit-todos
   :ensure t
+  :when (version<= emacs-version "30.0.91")
   :after magit
   :config (magit-todos-mode 1))
+
+(use-package hl-todo
+  :ensure t
+  :hook (prog-mode . hl-todo-mode))
 
 (use-package server
   :commands (server-running-p)
