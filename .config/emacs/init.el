@@ -167,7 +167,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
   :preface
   (defvar mode-line-interactive-position
     `(line-number-mode
-      (:propertize " %l:%C"
+      (:propertize "%l:%C"
                    help-echo "mouse-1: Goto line"
                    mouse-face mode-line-highlight
                    local-map ,(let ((map (make-sparse-keymap)))
@@ -188,9 +188,8 @@ buffer name.  If file is modified, a `font-lock-builtin-face' is
 applied to the name.")
   (put 'mode-line-buffer-file-name 'risky-local-variable t)
   (defvar mode-line-input-method
-    '(:eval (when current-input-method-title
-              (propertize (concat " " current-input-method-title)
-                          'help-echo (concat "Input method: " current-input-method))))
+    '(:eval (propertize (or current-input-method-title "EN")
+                        'help-echo (concat "Input method: " (or current-input-method "default"))))
     "Display input method name in the modeline.")
   (put 'mode-line-input-method 'risky-local-variable t)
   (defvar mode-line-buffer-encoding
@@ -222,10 +221,11 @@ applied to the name.")
                             map)))))
   (put 'mode-line-line-encoding 'risky-local-variable t)
   (setq-default mode-line-format
-                '(" " mode-line-buffer-file-name mode-line-input-method
-                  mode-line-buffer-encoding mode-line-line-encoding
-                  mode-line-interactive-position (vc-mode vc-mode) " "
-                  mode-line-modes " " mode-line-misc-info))
+                '(" " mode-line-buffer-file-name " " mode-line-modes
+                  mode-line-format-right-align mode-line-misc-info
+                  mode-line-input-method mode-line-buffer-encoding
+                  mode-line-line-encoding " " mode-line-interactive-position
+                  (vc-mode vc-mode) "  "))
   (provide 'mode-line))
 
 (use-package font
