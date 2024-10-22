@@ -655,7 +655,8 @@ are defining or executing a macro."
   :bind ( :map dired-mode-map
           ("<backspace>" . dired-up-directory)
           ("M-<up>" . dired-up-directory)
-          ("~" . dired-home-directory))
+          ("~" . dired-home-directory)
+          ("C-c l" . org-store-link))
   :hook (dired-mode . dired-hide-details-mode)
   :custom
   (dired-listing-switches "-lAXhv --group-directories-first")
@@ -808,9 +809,9 @@ created with `json-hs-extra-create-overlays'."
   (provide 'indirect-narrow))
 
 (use-package page
-  :bind ( ;; I often input C-x C-p instead of C-x p followed by project
-          ;; key, deleting contents of whole buffer as a result.
-          "C-x C-p" . nil))
+  ;; I often input C-x C-p instead of C-x p followed by project
+  ;; key, deleting contents of whole buffer as a result.
+  :bind ("C-x C-p" . nil))
 
 
 ;;; Completion
@@ -1389,6 +1390,8 @@ name and a corresponding major mode."
   :init
   (treesit-install-and-remap
    'lua "https://github.com/MunifTanjim/tree-sitter-lua"
+   :modes '(lua-mode)
+   :remap 'lua-ts-mode
    :org-src '("lua" . lua-ts)))
 
 (use-package lua-prettify
@@ -1474,6 +1477,8 @@ Abbrevs that normally don't expand via abbrev-mode are handled manually."
   :init
   (treesit-install-and-remap
    'elixir "https://github.com/elixir-lang/tree-sitter-elixir"
+   :modes '(elixir-mode)
+   :remap 'elixir-ts-mode
    :org-src '("elixir" . elixir-ts)))
 
 (use-package heex-ts-mode
