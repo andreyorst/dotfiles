@@ -41,6 +41,7 @@
         eval-print-last-sexp
         fennel-proto-repl-eval-last-sexp
         fennel-proto-repl-eval-print-last-sexp
+        fennel-proto-repl-reload
         fill-paragraph
         forward-sexp
         goto-line
