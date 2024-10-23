@@ -158,6 +158,7 @@
         diff-buffer-with-file
         dired-up-directory
         eat
+        eval-defun
         fennel-proto-repl-switch-to-repl
         god-local-mode
         hs-show-all
