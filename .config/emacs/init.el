@@ -776,8 +776,10 @@ created with `json-hs-extra-create-overlays'."
     (outline-minor-mode)))
 
 (use-package browse-url
-  :when (fboundp 'xwidget-webkit-browse-url)
-  :custom (browse-url-browser-function #'xwidget-webkit-browse-url))
+  :custom (browse-url-browser-function
+           (if (featurep 'xwidget-internal)
+               #'xwidget-webkit-browse-url
+             #'eww-browse-url)))
 
 (use-package repeat
   :hook (after-init . repeat-mode))

@@ -7,7 +7,7 @@ cd ~/Git/emacs \
                    --with-native-compilation=yes \
                    --with-pgtk \
                    --with-mailutils \
-                   --with-xwidgets \
+                   --disable-gc-mark-trace \
                    --prefix="$HOME"/.local \
                    $@ \
     && make -j$(($(nproc)-1)) \
