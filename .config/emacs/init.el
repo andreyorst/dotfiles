@@ -359,6 +359,9 @@ Based on `so-long-detected-long-line-p'."
   (unless (display-graphic-p)
     (xterm-mouse-mode t)))
 
+(use-package face-remap
+  :bind ([remap text-scale-pinch] . ignore))
+
 (use-package savehist
   :hook (after-init . savehist-mode))
 
