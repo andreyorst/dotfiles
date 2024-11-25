@@ -1734,12 +1734,14 @@ mode.")
     "Extract branch tag from BRANCH-NAME."
     (let ((ticket-pattern "\\([[:alpha:]]+-[[:digit:]]+\\)"))
       (when (string-match-p ticket-pattern branch-name)
-        (upcase (replace-regexp-in-string ticket-pattern "\\1: \n" branch-name)))))
+        (upcase (replace-regexp-in-string ticket-pattern "\\1: " branch-name)))))
   (defun magit-git-commit-insert-branch ()
     "Insert the branch tag in the commit buffer if feasible."
     (when-let ((tag (magit-extract-branch-tag (magit-get-current-branch))))
-      (insert tag)
-      (forward-char -1))))
+      (unless
+          ;; avoid repeated insertion when amending
+          (save-excursion (search-forward (string-trim tag) nil 'no-error))
+        (insert tag)))))
 
 (use-package magit
   :after project
