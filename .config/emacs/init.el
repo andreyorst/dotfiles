@@ -1120,7 +1120,9 @@ created with `json-hs-extra-create-overlays'."
 (use-package ob-lua :after org)
 
 (use-package fennel-mode
-  :ensure t
+  :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
+        :branch "main"
+        :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
            fennel-repl-mode
@@ -1213,6 +1215,11 @@ buffer with it."
         (fennel-proto-repl-link-buffer proto-repl)))))
 
 (use-package ob-fennel :after org)
+
+(use-package require-fennel
+  :vc ( :url "https://gitlab.com/andreyorst/require-fennel.el"
+        :branch "master"
+        :rev :newest))
 
 (use-package clojure-mode
   :ensure t
