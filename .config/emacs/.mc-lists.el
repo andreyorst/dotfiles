@@ -49,6 +49,7 @@
         hydra--negative-argument
         indent-for-tab-command
         indent-sexp
+        indent-sexp-or-fill
         kill-region
         magit-previous-line
         markdown-beginning-of-line
