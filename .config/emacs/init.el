@@ -177,7 +177,7 @@ If LOCAL-PORT is nil, PORT is used as local port."
   (put 'mode-line-interactive-position 'risky-local-variable t)
   (fset 'abbreviate-file-name-memo (memoize #'abbreviate-file-name))
   (defvar mode-line-buffer-file-name
-    '(:eval (propertize (if-let ((name (buffer-file-name)))
+    '(:eval (propertize (if-let* ((name (buffer-file-name)))
                             (abbreviate-file-name-memo name)
                           (buffer-name))
                         'help-echo (buffer-name)
@@ -203,11 +203,11 @@ applied to the name.")
              'local-map mode-line-coding-system-map)))
   (put 'mode-line-buffer-encoding 'risky-local-variable t)
   (defvar mode-line-line-encoding
-    '(:eval (when-let ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
-                              (0 "LF")
-                              (1 "CRLF")
-                              (2 "CR")
-                              (_ nil))))
+    '(:eval (when-let* ((eol (pcase (coding-system-eol-type buffer-file-coding-system)
+                               (0 "LF")
+                               (1 "CRLF")
+                               (2 "CR")
+                               (_ nil))))
               (propertize
                (concat " " eol)
                'help-echo (format "Line ending style: %s"
@@ -716,7 +716,7 @@ overlays."
     (let ((end (point)))
       (save-excursion
         (forward-sexp -1)
-        (when-let ((overlays (ov-regexp "{[[:space:]\n]*" (point) end)))
+        (when-let* ((overlays (ov-regexp "{[[:space:]\n]*" (point) end)))
           (mapc (lambda (ov) (overlay-put ov 'display "{")) overlays)
           (overlay-put overlay 'json-hs-extra-overlays overlays)))))
   (defun json-hs-extra-delete-overlays (fn overlay)
@@ -1194,7 +1194,7 @@ created with `json-hs-extra-create-overlays'."
 If invoked interactively with a prefix argument, asks for command
 to start the REPL."
     (interactive)
-    (if-let ((project (or project (project-current nil))))
+    (if-let* ((project (or project (project-current nil))))
         (let ((default-directory (project-root project)))
           (when (funcall-interactively #'fennel-proto-repl-switch-to-repl)
             (let* ((project-buffers (project-buffers project))
@@ -1210,8 +1210,8 @@ to start the REPL."
 Finds the REPL buffer in the current project, and links all managed
 buffer with it."
     (interactive)
-    (when-let ((project (project-current nil)))
-      (when-let ((proto-repl (seq-find #'fennel-proto-repl-p (project-buffers project))))
+    (when-let* ((project (project-current nil)))
+      (when-let* ((proto-repl (seq-find #'fennel-proto-repl-p (project-buffers project))))
         (fennel-proto-repl-link-buffer proto-repl)))))
 
 (use-package ob-fennel :after org)
@@ -1328,6 +1328,10 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package sql-indent
   :defer t
+  :ensure t)
+
+(use-package sql-clickhouse
+  :after sql
   :ensure t)
 
 
@@ -1693,7 +1697,7 @@ mode.")
       (catch 'args
         (when (null mode)
           (dolist (comp-mode-p project-compilation-modes)
-            (when-let ((mode (funcall comp-mode-p)))
+            (when-let* ((mode (funcall comp-mode-p)))
               (throw 'args (append (list cmd mode) rest)))))
         args)))
   (define-advice project-root (:filter-return (project) abbreviate-project-root)
@@ -1744,7 +1748,7 @@ mode.")
         (upcase (replace-regexp-in-string ticket-pattern "\\1: " branch-name)))))
   (defun magit-git-commit-insert-branch ()
     "Insert the branch tag in the commit buffer if feasible."
-    (when-let ((tag (magit-extract-branch-tag (magit-get-current-branch))))
+    (when-let* ((tag (magit-extract-branch-tag (magit-get-current-branch))))
       (unless
           ;; avoid repeated insertion when amending
           (save-excursion (search-forward (string-trim tag) nil 'no-error))
@@ -1949,9 +1953,9 @@ PROJECT and DEPS-MOD-TIME are used for memoizing the call."
     "Function that gets filename from the error message.
 If the filename comes from a dependency, try to guess the
 dependency artifact based on the project's dependencies."
-    (when-let ((filename (substring-no-properties (match-string 1))))
+    (when-let* ((filename (substring-no-properties (match-string 1))))
       (or (clojure-compilation--find-file-in-project filename)
-          (when-let ((dep (clojure-compilation--find-dep filename)))
+          (when-let* ((dep (clojure-compilation--find-dep filename)))
             (concat (expand-file-name dep) "/" filename)))))
   (compile-add-error-syntax
    'clojure-compilation 'some-warning
