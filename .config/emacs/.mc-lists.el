@@ -50,6 +50,7 @@
         indent-for-tab-command
         indent-sexp
         indent-sexp-or-fill
+        insert-char
         kill-region
         magit-previous-line
         markdown-beginning-of-line
