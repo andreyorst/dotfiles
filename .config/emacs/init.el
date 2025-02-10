@@ -1285,8 +1285,8 @@ buffer with it."
   (cider-connection-message-fn #'cider-random-tip)
   (cider-repl-prompt-function #'cider-repl-prompt-newline)
   (cider-auto-inspect-after-eval nil)
-  (cider-enrich-classpath nil)   ; when enabled causes troubles behind
-                                 ; proxy and with new add-lib* feature
+  (cider-enrich-classpath nil) ; causes troubles behind proxy and with add-lib feature
+  (cider-download-java-sources t)
   :config
   (put 'cider-clojure-cli-aliases 'safe-local-variable #'listp)
   (defun cider-disable-linting ()
@@ -1474,6 +1474,17 @@ name and a corresponding major mode."
           clojurec-mode
           clojurescript-mode)
          . lsp))
+
+(use-package lsp-fennel
+  :demand t
+  :after lsp-mode
+  :when (executable-find "fennel-ls")
+  :config
+  (add-to-list 'lsp-language-id-configuration '(fennel-mode . "fennel")))
+
+(use-package lsp-fennel
+  :no-require
+  :hook (fennel-mode . lsp))
 
 (use-package lsp-java
   :ensure t
@@ -1667,7 +1678,7 @@ name and a corresponding major mode."
   (project-vc-extra-root-markers
    '("Cargo.toml" "compile_commands.json"
      "compile_flags.txt" "project.clj"
-     "deps.edn" "shadow-cljs.edn"))
+     "deps.edn" "shadow-cljs.edn" "deps.fnl"))
   :preface
   (defcustom project-compilation-mode nil
     "Mode to run the `compile' command with."
