@@ -586,10 +586,19 @@ are defining or executing a macro."
   (defun toggle-hl-line ()
     (hl-line-mode (if display-line-numbers-mode 1 -1))))
 
-(use-package pixel-scroll
-  :when (fboundp #'pixel-scroll-precision-mode)
-  :hook (after-init . pixel-scroll-precision-mode)
+;; (use-package pixel-scroll
+;;   :when (fboundp #'pixel-scroll-precision-mode)
+;;   :hook (after-init . pixel-scroll-precision-mode)
+;;   :custom
+;;   (scroll-margin 0))
+
+(use-package ultra-scroll
+  :vc ( :url "https://github.com/jdtsmith/ultra-scroll"
+        :branch "main"
+        :rev :newest)
+  :hook (after-init . ultra-scroll-mode)
   :custom
+  (scroll-conservatively 101)
   (scroll-margin 0))
 
 (use-package paren
@@ -1023,25 +1032,43 @@ created with `json-hs-extra-create-overlays'."
 (use-package ox-latex
   :after ox)
 
+(use-package org-modern
+  :ensure t
+  :custom
+  (org-modern-block-fringe nil)
+  (org-modern-block-fringe nil)
+  (org-modern-fold-stars nil)
+  (org-modern-hide-stars nil)
+  (org-modern-star nil)
+  (org-modern-list nil))
+
 (use-package epresent
   :ensure t
   :custom
-  (epresent-text-scale 200)
-  (epresent-format-latex-scale 2)
+  (epresent-text-scale 144)
+  (epresent-format-latex-scale 1.44)
   :hook
   (epresent-start-presentation . epresent-setup)
   :preface
+  (defcustom epresent-margin-size 400
+    "A margin size to center everything on screen."
+    :type 'number
+    :group 'epresent)
   (defun epresent-setup ()
     (interactive)
+    (org-modern-mode 1)
     (visual-line-mode 1)
     (flyspell-mode -1)
-    (set-window-fringes (selected-window) 600 600)
+    (set-window-fringes
+     (selected-window)
+     epresent-margin-size
+     epresent-margin-size)
     (set-face-attribute
      'org-block (selected-frame)
      :background (modus-themes-get-color-value 'bg-dim))
     (set-face-attribute
      'header-line (selected-frame)
-     :height 1200
+     :height (* epresent-margin-size 2)
      :background 'unspecified)
     (setq-local header-line-format " ")))
 
@@ -1150,7 +1177,9 @@ created with `json-hs-extra-create-overlays'."
                   import-macros pick-values))
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(tset))
-    (put sym 'fennel-indent-function 2)))
+    (put sym 'fennel-indent-function 1))
+  (dolist (sym '(require-macros))
+    (put sym 'fennel-indent-function 'defun)))
 
 (use-package fennel-font-lock-extras
   :after fennel-mode
