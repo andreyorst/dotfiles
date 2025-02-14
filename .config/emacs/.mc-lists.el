@@ -158,6 +158,7 @@
         dabbrev-expand
         describe-variable
         diff-buffer-with-file
+        dired-jump
         dired-up-directory
         eat
         eval-defun
