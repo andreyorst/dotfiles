@@ -1050,6 +1050,7 @@ created with `json-hs-extra-create-overlays'."
 
 (use-package org-modern
   :ensure t
+  :defer t
   :custom
   (org-modern-block-fringe nil)
   (org-modern-block-fringe nil)
@@ -1173,10 +1174,9 @@ created with `json-hs-extra-create-overlays'."
 (use-package fennel-mode
   :mode "\\.fnlm"
   :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
-        :branch "flymake"
+        :branch "main"
         :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
-         (fennel-mode . flymake-mode)
          ((fennel-mode
            fennel-repl-mode
            fennel-proto-repl-mode)
@@ -1190,7 +1190,6 @@ created with `json-hs-extra-create-overlays'."
   (fennel-eldoc-fontify-markdown t)
   (fennel-scratch-use-proto-repl t)
   :config
-  (fennel-ls-flymake-setup)
   (put 'fennel-program 'safe-local-variable
        (lambda (s) (string-match-p "^\\(fennel\\|love\\)" s)))
   (defun fennel-repl-delete-all-output ()
@@ -1207,6 +1206,10 @@ created with `json-hs-extra-create-overlays'."
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(require-macros))
     (put sym 'fennel-indent-function 'defun)))
+
+(use-package fennel-ls-flymake
+  :after fennel-mode
+  :hook (fennel-mode . fennel-ls-flymake))
 
 (use-package fennel-font-lock-extras
   :after fennel-mode
@@ -1271,11 +1274,6 @@ buffer with it."
         (fennel-proto-repl-link-buffer proto-repl)))))
 
 (use-package ob-fennel :after org)
-
-(use-package require-fennel
-  :vc ( :url "https://gitlab.com/andreyorst/require-fennel.el"
-        :branch "master"
-        :rev :newest))
 
 (use-package clojure-mode
   :ensure t
