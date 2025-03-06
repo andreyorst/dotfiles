@@ -668,14 +668,30 @@ are defining or executing a macro."
           ("<backspace>" . dired-up-directory)
           ("M-<up>" . dired-up-directory)
           ("~" . dired-home-directory)
-          ("C-c l" . org-store-link))
+          ("C-c l" . org-store-link)
+          ("h" . dired-toggle-dotfiles))
   :hook (dired-mode . dired-hide-details-mode)
+  :preface
+  (defvar dired-listing-switches-no-dotfiles
+    "-lXhv --group-directories-first")
+  (defvar dired-listing-switches-dotfiles
+    "-lAXhv --group-directories-first")
   :custom
-  (dired-listing-switches "-lAXhv --group-directories-first")
+  (dired-listing-switches dired-listing-switches-dotfiles)
   :config
   (defun dired-home-directory ()
     (interactive)
-    (dired (expand-file-name "~/"))))
+    (dired (expand-file-name "~/")))
+  (defun dired-toggle-dotfiles ()
+    (interactive)
+    (setf dired-listing-switches
+          (if (string= dired-listing-switches
+                       dired-listing-switches-no-dotfiles)
+              dired-listing-switches-dotfiles
+            dired-listing-switches-no-dotfiles))
+    (dolist (buffer dired-buffers)
+      (with-current-buffer (cdr buffer)
+        (dired-noselect (dired-current-directory) dired-listing-switches)))))
 
 (use-package comint
   :defer t
@@ -1146,11 +1162,21 @@ created with `json-hs-extra-create-overlays'."
 
 (use-package ob-lua :after org)
 
+(use-package gnuplot
+  :ensure t
+  :when (executable-find "gnuplot"))
+
+(use-package ob-gnuplot
+  :when (executable-find "gnuplot")
+  :after org)
+
 (use-package fennel-mode
+  :mode "\\.fnlm"
   :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
-        :branch "main"
+        :branch "flymake"
         :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
+         (fennel-mode . flymake-mode)
          ((fennel-mode
            fennel-repl-mode
            fennel-proto-repl-mode)
@@ -1164,6 +1190,7 @@ created with `json-hs-extra-create-overlays'."
   (fennel-eldoc-fontify-markdown t)
   (fennel-scratch-use-proto-repl t)
   :config
+  (fennel-ls-flymake-setup)
   (put 'fennel-program 'safe-local-variable
        (lambda (s) (string-match-p "^\\(fennel\\|love\\)" s)))
   (defun fennel-repl-delete-all-output ()
@@ -1511,9 +1538,9 @@ name and a corresponding major mode."
   :config
   (add-to-list 'lsp-language-id-configuration '(fennel-mode . "fennel")))
 
-(use-package lsp-fennel
-  :no-require
-  :hook (fennel-mode . lsp))
+;; (use-package lsp-fennel
+;;   :no-require
+;;   :hook (fennel-mode . lsp))
 
 (use-package lsp-java
   :ensure t
