@@ -1198,23 +1198,20 @@ created with `json-hs-extra-create-overlays'."
       (goto-char (process-mark (get-buffer-process (current-buffer))))
       (forward-line 0)
       (let ((inhibit-read-only t))
-        (delete-region (point) (point-min)))))
-  (dolist (sym '( global local var set catch
-                  import-macros pick-values))
-    (put sym 'fennel-indent-function 1))
-  (dolist (sym '(tset))
-    (put sym 'fennel-indent-function 1))
-  (dolist (sym '(require-macros))
-    (put sym 'fennel-indent-function 'defun)))
+        (delete-region (point) (point-min))))))
 
 (use-package fennel-ls-flymake
   :after fennel-mode
   :hook (fennel-mode . fennel-ls-flymake))
 
-(use-package fennel-font-lock-extras
+(use-package fennel-extras
   :after fennel-mode
   :preface
-  (dolist (sym '( testing deftest use-fixtures go-loop))
+  (dolist (sym '(require-macros))
+    (put sym 'fennel-indent-function 'defun))
+  (dolist (sym '( tset global local var set catch
+                  import-macros pick-values
+                  testing deftest use-fixtures go-loop))
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(go))
     (put sym 'fennel-indent-function 0))
@@ -1231,7 +1228,7 @@ created with `json-hs-extra-create-overlays'."
            word-start "deftest" word-end (1+ space)
            (group (1+ (or (syntax word) (syntax symbol) "-" "_"))))
       1 font-lock-function-name-face)))
-  (provide 'fennel-font-lock-extras))
+  (provide 'fennel-extras))
 
 (use-package fennel-proto-repl
   :hook ((fennel-proto-repl-minor-mode . fennel-proto-repl-link-project-buffer))
