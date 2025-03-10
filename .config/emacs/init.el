@@ -1207,6 +1207,12 @@ created with `json-hs-extra-create-overlays'."
 (use-package fennel-extras
   :after fennel-mode
   :preface
+  (font-lock-add-keywords
+   'fennel-mode
+   `((,(rx "`" (group-n 1 (optional "#'")
+                        (+ (or (syntax symbol) (syntax word)))) "`")
+      (1 'font-lock-constant-face prepend)))
+   'end)
   (dolist (sym '(require-macros))
     (put sym 'fennel-indent-function 'defun))
   (dolist (sym '( tset global local var set catch
@@ -1215,25 +1221,14 @@ created with `json-hs-extra-create-overlays'."
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(go))
     (put sym 'fennel-indent-function 0))
-  (font-lock-add-keywords
-   'fennel-mode
-   `((,(rx (syntax open-parenthesis)
-           (group
-            word-start
-            (or "assert-is" "assert-not" "assert-eq" "assert-ne"
-                "deftest" "testing" "use-fixtures" "catch" "go" "go-loop")
-            word-end))
-      1 font-lock-keyword-face)
-     (,(rx (syntax open-parenthesis)
-           word-start "deftest" word-end (1+ space)
-           (group (1+ (or (syntax word) (syntax symbol) "-" "_"))))
-      1 font-lock-function-name-face)))
   (provide 'fennel-extras))
 
 (use-package fennel-proto-repl
   :hook ((fennel-proto-repl-minor-mode . fennel-proto-repl-link-project-buffer))
   :bind ( :map fennel-proto-repl-minor-mode-map
           ("C-c C-z" . fennel-proto-repl-switch-to-repl-in-project))
+  :custom
+  (fennel-proto-repl-font-lock-dynamically '(scoped-macro global))
   :preface
   (defun fennel-proto-repl-p (buffer)
     "Check if the BUFFER is a Fennel Proto REPL buffer."
