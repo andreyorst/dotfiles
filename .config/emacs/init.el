@@ -492,16 +492,15 @@ are defining or executing a macro."
           (load-theme local-config-dark-theme t)
         (load-theme local-config-light-theme t))))
   (defun dbus-color-theme-dark-p ()
-    (equal '1 (caar (condition-case nil
-                        (dbus-call-method
-                         :session
-                         "org.freedesktop.portal.Desktop"
-                         "/org/freedesktop/portal/desktop"
-                         "org.freedesktop.portal.Settings"
-                         "Read"
-                         "org.freedesktop.appearance"
-                         "color-scheme")
-                      (error nil)))))
+    (equal '1 (caar (dbus-ignore-errors
+                      (dbus-call-method
+                       :session
+                       "org.freedesktop.portal.Desktop"
+                       "/org/freedesktop/portal/desktop"
+                       "org.freedesktop.portal.Settings"
+                       "Read"
+                       "org.freedesktop.appearance"
+                       "color-scheme")))))
   :init
   (dbus-register-signal :session
                         "org.freedesktop.portal.Desktop"
@@ -1221,6 +1220,12 @@ created with `json-hs-extra-create-overlays'."
     (put sym 'fennel-indent-function 1))
   (dolist (sym '(go))
     (put sym 'fennel-indent-function 0))
+  (font-lock-add-keywords
+   'fennel-mode
+   `((,(rx (syntax open-parenthesis)
+           word-start (or "defn" "defn-" "def" "deftest") word-end (1+ space)
+           (group (1+ (or (syntax word) (syntax symbol) "-" "_"))))
+      1 font-lock-function-name-face)))
   (provide 'fennel-extras))
 
 (use-package fennel-proto-repl
