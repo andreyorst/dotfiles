@@ -1173,7 +1173,7 @@ created with `json-hs-extra-create-overlays'."
 (use-package fennel-mode
   :mode "\\.fnlm"
   :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
-        :branch "main"
+        :branch "project-integration"
         :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
@@ -1229,46 +1229,10 @@ created with `json-hs-extra-create-overlays'."
   (provide 'fennel-extras))
 
 (use-package fennel-proto-repl
-  :hook ((fennel-proto-repl-minor-mode . fennel-proto-repl-link-project-buffer))
-  :bind ( :map fennel-proto-repl-minor-mode-map
-          ("C-c C-z" . fennel-proto-repl-switch-to-repl-in-project))
+  :after fennel-mode
   :custom
-  (fennel-proto-repl-font-lock-dynamically '(scoped-macro global))
-  :preface
-  (defun fennel-proto-repl-p (buffer)
-    "Check if the BUFFER is a Fennel Proto REPL buffer."
-    (with-current-buffer buffer
-      (and (eq major-mode 'fennel-proto-repl-mode)
-           buffer)))
-  (defun fennel-proto-repl-managed-buffer-p (buffer)
-    "Check if the BUFFER is managed by `fennel-proto-repl-minor-mode'."
-    (with-current-buffer buffer
-      (and fennel-proto-repl-minor-mode
-           buffer)))
-  (defun fennel-proto-repl-switch-to-repl-in-project (&optional project)
-    "Switch to the currently linked project REPL buffer.
-If invoked interactively with a prefix argument, asks for command
-to start the REPL."
-    (interactive)
-    (if-let* ((project (or project (project-current nil))))
-        (let ((default-directory (project-root project)))
-          (when (funcall-interactively #'fennel-proto-repl-switch-to-repl)
-            (let* ((project-buffers (project-buffers project))
-                   (proto-repl (seq-find #'fennel-proto-repl-p project-buffers))
-                   (fennel-buffers (seq-filter #'fennel-proto-repl-managed-buffer-p project-buffers)))
-              (dolist (buffer fennel-buffers)
-                (with-current-buffer buffer
-                  (unless (buffer-live-p fennel-proto-repl--buffer)
-                    (fennel-proto-repl-link-buffer proto-repl)))))))
-      (fennel-proto-repl-switch-to-repl-in-project (project-current t))))
-  (defun fennel-proto-repl-link-project-buffer ()
-    "Hook to automatically link project buffers to Fennel Proto REPL.
-Finds the REPL buffer in the current project, and links all managed
-buffer with it."
-    (interactive)
-    (when-let* ((project (project-current nil)))
-      (when-let* ((proto-repl (seq-find #'fennel-proto-repl-p (project-buffers project))))
-        (fennel-proto-repl-link-buffer proto-repl)))))
+  (fennel-proto-repl-project-integration 'project)
+  (fennel-proto-repl-font-lock-dynamically '(scoped-macro global)))
 
 (use-package ob-fennel :after org)
 
