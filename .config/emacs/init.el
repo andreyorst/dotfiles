@@ -95,6 +95,9 @@ transparent."
               (puthash args (apply fn args) memo)
             value)))))
   (defmacro defmemo (name &rest funtail)
+    "Define memoized function NAME.
+FUNTAIL is the rest of arguments to a regular `defun' after the
+function's name."
     (declare (doc-string 3) (indent 2) (debug defun))
     `(defalias ',name (memoize (lambda ,@funtail))))
   (font-lock-add-keywords
@@ -437,15 +440,6 @@ are defining or executing a macro."
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
-(use-package orderless
-  :ensure t
-  :defer t
-  :custom
-  (completion-category-overrides
-   '((buffer (styles basic orderless))
-     (file (styles basic orderless))
-     (project-file (styles basic orderless)))))
-
 (use-package bindings
   :bind ( :map ctl-x-map
           ("DEL" . nil)
@@ -585,19 +579,10 @@ are defining or executing a macro."
   (defun toggle-hl-line ()
     (hl-line-mode (if display-line-numbers-mode 1 -1))))
 
-;; (use-package pixel-scroll
-;;   :when (fboundp #'pixel-scroll-precision-mode)
-;;   :hook (after-init . pixel-scroll-precision-mode)
-;;   :custom
-;;   (scroll-margin 0))
-
-(use-package ultra-scroll
-  :vc ( :url "https://github.com/jdtsmith/ultra-scroll"
-        :branch "main"
-        :rev :newest)
-  :hook (after-init . ultra-scroll-mode)
+(use-package pixel-scroll
+  :when (fboundp #'pixel-scroll-precision-mode)
+  :hook (after-init . pixel-scroll-precision-mode)
   :custom
-  (scroll-conservatively 101)
   (scroll-margin 0))
 
 (use-package paren
@@ -657,10 +642,6 @@ are defining or executing a macro."
   :custom
   (eshell-modules-list
    (remove 'eshell-term eshell-modules-list)))
-
-(use-package eat
-  :ensure t
-  :hook (eshell-load . eat-eshell-mode))
 
 (use-package dired
   :bind ( :map dired-mode-map
@@ -728,34 +709,6 @@ are defining or executing a macro."
   (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
     (mouse-set-point last-input-event)))
-
-(use-package json-hs-extra
-  :after json
-  :hook (json-ts-mode . json-hs-extra-setup)
-  :preface
-  (defun json-hs-extra-create-overlays (overlay)
-    "Creates overlays for block beginning, hiding whitespace.
-Sets OVERLAY `json-hs-extra-overlays' property to the list of created
-overlays."
-    (let ((end (point)))
-      (save-excursion
-        (forward-sexp -1)
-        (when-let* ((overlays (ov-regexp "{[[:space:]\n]*" (point) end)))
-          (mapc (lambda (ov) (overlay-put ov 'display "{")) overlays)
-          (overlay-put overlay 'json-hs-extra-overlays overlays)))))
-  (defun json-hs-extra-delete-overlays (fn overlay)
-    "Deletes overlays for block beginning created earlier.
-Deletes overlays in the `json-hs-extra-overlays' property of OVERLAY,
-created with `json-hs-extra-create-overlays'."
-    (mapc #'delete-overlay (overlay-get overlay 'json-hs-extra-overlays))
-    (funcall fn overlay))
-  (defun json-hs-extra-setup ()
-    "Special settings for JSON buffers."
-    (setq-local hs-block-start-regexp "\\(?:{[[:space:]\n]*\\|\\[\\)"
-                hs-set-up-overlay #'json-hs-extra-create-overlays))
-  (provide 'json-hs-extra)
-  :config
-  (advice-add 'delete-overlay :around #'json-hs-extra-delete-overlays))
 
 (use-package help
   :custom
@@ -1120,11 +1073,6 @@ created with `json-hs-extra-create-overlays'."
   :hook ((emacs-lisp-mode . eldoc-mode)
          (emacs-lisp-mode . common-lisp-modes-mode)))
 
-(use-package racket-mode
-  :ensure t
-  :hook ((racket-mode racket-repl-mode)
-         . common-lisp-modes-mode))
-
 (use-package yaml-mode
   :ensure t
   :defer t
@@ -1173,7 +1121,7 @@ created with `json-hs-extra-create-overlays'."
 (use-package fennel-mode
   :mode "\\.fnlm"
   :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
-        :branch "project-integration"
+        :branch "spring-refactoring"
         :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
@@ -1411,6 +1359,34 @@ name and a corresponding major mode."
    :remap 'json-ts-mode
    :org-src '("json" . json-ts)))
 
+(use-package json-hs-extra
+  :after json
+  :hook (json-ts-mode . json-hs-extra-setup)
+  :preface
+  (defun json-hs-extra-create-overlays (overlay)
+    "Creates overlays for block beginning, hiding whitespace.
+Sets OVERLAY `json-hs-extra-overlays' property to the list of created
+overlays."
+    (let ((end (point)))
+      (save-excursion
+        (forward-sexp -1)
+        (when-let* ((overlays (ov-regexp "{[[:space:]\n]*" (point) end)))
+          (mapc (lambda (ov) (overlay-put ov 'display "{")) overlays)
+          (overlay-put overlay 'json-hs-extra-overlays overlays)))))
+  (defun json-hs-extra-delete-overlays (fn overlay)
+    "Deletes overlays for block beginning created earlier.
+Deletes overlays in the `json-hs-extra-overlays' property of OVERLAY,
+created with `json-hs-extra-create-overlays'."
+    (mapc #'delete-overlay (overlay-get overlay 'json-hs-extra-overlays))
+    (funcall fn overlay))
+  (defun json-hs-extra-setup ()
+    "Special settings for JSON buffers."
+    (setq-local hs-block-start-regexp "\\(?:{[[:space:]\n]*\\|\\[\\)"
+                hs-set-up-overlay #'json-hs-extra-create-overlays))
+  (provide 'json-hs-extra)
+  :config
+  (advice-add 'delete-overlay :around #'json-hs-extra-delete-overlays))
+
 (use-package lua-ts-mode
   :defer t
   :when (and (treesit-p)
@@ -1489,17 +1465,6 @@ name and a corresponding major mode."
           clojurec-mode
           clojurescript-mode)
          . lsp))
-
-(use-package lsp-fennel
-  :demand t
-  :after lsp-mode
-  :when (executable-find "fennel-ls")
-  :config
-  (add-to-list 'lsp-language-id-configuration '(fennel-mode . "fennel")))
-
-;; (use-package lsp-fennel
-;;   :no-require
-;;   :hook (fennel-mode . lsp))
 
 (use-package lsp-java
   :ensure t
@@ -1862,6 +1827,9 @@ REGEXP FILE LINE and optional COL LEVEL info to
                    (list name regexp file line col level hyperlink
                          (list highlight (nth level faces))))))
   (defmacro define-project-compilation-mode (base-name &rest body)
+    "Define a project-based compilation mode.
+BASE-NAME is a symbol that will be used to prefix all mode variables.
+BODY is the usual mode setup and teardown code."
     (declare (indent 1))
     (let* ((name (symbol-name base-name))
            (doc-name (capitalize (replace-regexp-in-string "-compilation$" "" name)))
@@ -2080,6 +2048,18 @@ dependency artifact based on the project's dependencies."
   :delight gnome-proxy-watch-mode
   :hook (after-init . gnome-proxy-watch-mode))
 
+(use-package eat
+  :ensure t
+  :hook (eshell-load . eat-eshell-mode))
+
+(use-package orderless
+  :ensure t
+  :defer t
+  :custom
+  (completion-category-overrides
+   '((buffer (styles basic orderless))
+     (file (styles basic orderless))
+     (project-file (styles basic orderless)))))
 
 ;;; Messaging
 
