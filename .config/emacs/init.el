@@ -1121,7 +1121,7 @@ are defining or executing a macro."
 (use-package fennel-mode
   :mode "\\.fnlm"
   :vc ( :url "https://git.sr.ht/~technomancy/fennel-mode"
-        :branch "spring-refactoring"
+        :branch "main"
         :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
          ((fennel-mode
