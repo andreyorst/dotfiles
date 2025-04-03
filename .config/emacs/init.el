@@ -1,4 +1,4 @@
-;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t-*-
+;;; init.el --- Main configuration file -*- lexical-binding: t; no-byte-compile: t -*-
 
 ;; Author: Andrey Listopadov
 ;; Keywords: Emacs configuration
@@ -650,6 +650,7 @@ are defining or executing a macro."
           ("~" . dired-home-directory)
           ("C-c l" . org-store-link)
           ("h" . dired-toggle-dotfiles))
+  :functions (dired-current-directory)
   :hook (dired-mode . dired-hide-details-mode)
   :preface
   (defvar dired-listing-switches-no-dotfiles
@@ -705,7 +706,7 @@ are defining or executing a macro."
 (use-package hideshow
   :hook (prog-mode . hs-minor-mode)
   :delight hs-minor-mode
-  :config
+  :preface
   (define-advice hs-toggle-hiding (:before (&rest _) move-point-to-mouse)
     "Move point to the location of the mouse pointer."
     (mouse-set-point last-input-event)))
@@ -872,8 +873,7 @@ are defining or executing a macro."
 (use-package corfu-terminal
   :ensure t
   :unless (display-graphic-p)
-  :commands (corfu-terminal-mode)
-  :hook (after-init . corfu-terminal-mode))
+  :hook after-init)
 
 (use-package cape
   :ensure t
@@ -973,14 +973,21 @@ are defining or executing a macro."
       (concat "blog-html:" link)))
   :config
   (org-link-set-parameters
-   "org"
-   :export #'blog-export-static-org-link
-   :complete #'blog-create-static-org-link)
-  (org-link-set-parameters
    "blog-html"
    :follow #'blog-follow-html-link
    :export #'blog-export-hmtl-link
    :complete #'blog-create-html-link))
+
+(use-package blog
+  :after ol
+  :functions
+  (blog-export-static-org-link
+   blog-create-static-org-link)
+  :config
+  (org-link-set-parameters
+   "org"
+   :export #'blog-export-static-org-link
+   :complete #'blog-create-static-org-link))
 
 (use-package ox-hugo
   :ensure t
@@ -988,6 +995,8 @@ are defining or executing a macro."
   :preface
   (declare-function org-export-data "ext:ox")
   (declare-function org-export-get-node-property "ext:ox")
+  (declare-function org-element-property "ext:org-element-ast")
+  (declare-function org-element--property "ext:org-element-ast")
   (define-advice org-hugo-heading (:around (fn heading contents info) patch)
     (if (and (org-export-get-node-property :BLOG-COLLAPSABLE heading) (not (string-empty-p contents)))
         (let ((title (org-export-data (org-element-property :title heading) info)))
@@ -1023,18 +1032,22 @@ are defining or executing a macro."
     "A margin size to center everything on screen."
     :type 'number
     :group 'epresent)
+  (declare-function org-modern-mode "ext:org-modern")
+  (declare-function modus-themes-get-color-value "ext:modus-themes")
   (defun epresent-setup ()
     (interactive)
-    (org-modern-mode 1)
+    (when (require 'org-modern nil 'noerror)
+      (org-modern-mode 1))
     (visual-line-mode 1)
     (flyspell-mode -1)
     (set-window-fringes
      (selected-window)
      epresent-margin-size
      epresent-margin-size)
-    (set-face-attribute
-     'org-block (selected-frame)
-     :background (modus-themes-get-color-value 'bg-dim))
+    (when (require 'modus-themes nil 'noerror)
+      (set-face-attribute
+       'org-block (selected-frame)
+       :background (modus-themes-get-color-value 'bg-dim)))
     (set-face-attribute
      'header-line (selected-frame)
      :height (* epresent-margin-size 2)
@@ -1193,7 +1206,7 @@ are defining or executing a macro."
   :commands (clojure-project-dir)
   :bind ( :map clojure-mode-map
           ("C-:" . nil))
-  :config
+  :preface
   (defun clojure-set-compile-command ()
     (let ((project-dir (clojure-project-dir)))
       (cond ((and (file-exists-p (expand-file-name "project.clj" project-dir))
@@ -1302,6 +1315,7 @@ See `cider-find-and-clear-repl-output' for more info."
 
 (use-package treesit
   :when (treesit-p)
+  :functions (treesit-ready-p)
   :preface
   (defun treesit-p ()
     "Check if Emacs was built with treesiter in a protable way."
@@ -1727,6 +1741,7 @@ mode.")
          (git-commit-mode . magit-git-commit-insert-branch))
   :bind ( :map project-prefix-map
           ("m" . magit-project-status))
+  :functions (magit-get-current-branch)
   :custom
   (magit-ediff-dwim-show-on-hunks t)
   (magit-diff-refine-ignore-whitespace t)
@@ -1754,6 +1769,8 @@ mode.")
 (use-package magit-todos
   :ensure t
   :when (version<= emacs-version "30.0.91")
+  :functions
+  (magit-todos-mode)
   :after magit
   :config (magit-todos-mode 1))
 
@@ -1860,7 +1877,8 @@ Set automatically by the `" (symbol-name compilation-mode-name) "'."))
 (use-package clojure-compilation-mode
   :no-require
   :after compile
-  :config
+  :preface
+  (declare-function clojure-project-root-path "ext:clojure-mode")
   (defun clojure-compilation-p ()
     (and (require 'clojure-mode nil 'noerror)
          (clojure-project-root-path)
@@ -1951,6 +1969,7 @@ dependency artifact based on the project's dependencies."
       (or (clojure-compilation--find-file-in-project filename)
           (when-let* ((dep (clojure-compilation--find-dep filename)))
             (concat (expand-file-name dep) "/" filename)))))
+  :config
   (compile-add-error-syntax
    'clojure-compilation 'some-warning
    "^\\([^:[:space:]]+\\):\\([0-9]+\\) "
