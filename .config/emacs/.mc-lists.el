@@ -23,6 +23,7 @@
         cider-repl-tab
         cljr-slash
         clojure-thread-first-all
+        comint-send-input
         comment-dwim
         comment-line
         common-lisp-modes-indent-or-fill-sexp
@@ -156,6 +157,7 @@
         counsel-find-file
         count-lines-page
         dabbrev-expand
+        delete-window
         describe-variable
         diff-buffer-with-file
         dired-jump
