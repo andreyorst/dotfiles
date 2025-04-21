@@ -747,7 +747,7 @@ are defining or executing a macro."
   :hook (after-init . global-auto-revert-mode))
 
 (use-package outline
-  :hook (common-lisp-modes-mode . lisp-outline-minor-mode)
+  :hook ((common-lisp-modes-mode . lisp-outline-minor-mode))
   :delight outline-minor-mode
   :custom
   (outline-minor-mode-cycle t)
