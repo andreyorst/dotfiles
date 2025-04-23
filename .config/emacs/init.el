@@ -683,6 +683,8 @@ are defining or executing a macro."
 
 (use-package rect
   :bind (("C-x r C-y" . rectangle-yank-add-lines))
+  :custom
+  (rectangle-indicate-zero-width-rectangle nil)
   :preface
   (defun rectangle-yank-add-lines ()
     (interactive "*")
@@ -1141,10 +1143,7 @@ are defining or executing a macro."
            fennel-repl-mode
            fennel-proto-repl-mode)
           . common-lisp-modes-mode))
-  :bind ( :map fennel-mode-map
-          ("M-." . xref-find-definitions)
-          ("M-," . xref-go-back)
-          :map fennel-repl-mode-map
+  :bind ( :map fennel-repl-mode-map
           ("C-c C-o" . fennel-repl-delete-all-output))
   :custom
   (fennel-eldoc-fontify-markdown t)
@@ -1160,6 +1159,14 @@ are defining or executing a macro."
       (let ((inhibit-read-only t))
         (delete-region (point) (point-min))))))
 
+(use-package fennel-proto-repl
+  :after fennel-mode
+  :custom
+  (fennel-proto-repl-project-integration 'project)
+  (fennel-proto-repl-font-lock-dynamically '(scoped-macro global)))
+
+(use-package ob-fennel :after org)
+
 (use-package fennel-ls-flymake
   :after fennel-mode
   :hook (fennel-mode . fennel-ls-flymake))
@@ -1167,12 +1174,6 @@ are defining or executing a macro."
 (use-package fennel-extras
   :after fennel-mode
   :preface
-  (font-lock-add-keywords
-   'fennel-mode
-   `((,(rx "`" (group-n 1 (optional "#'")
-                        (+ (or (syntax symbol) (syntax word)))) "`")
-      (1 'font-lock-constant-face prepend)))
-   'end)
   (dolist (sym '(require-macros))
     (put sym 'fennel-indent-function 'defun))
   (dolist (sym '( tset global local var set catch
@@ -1188,14 +1189,6 @@ are defining or executing a macro."
            (group (1+ (or (syntax word) (syntax symbol) "-" "_"))))
       1 font-lock-function-name-face)))
   (provide 'fennel-extras))
-
-(use-package fennel-proto-repl
-  :after fennel-mode
-  :custom
-  (fennel-proto-repl-project-integration 'project)
-  (fennel-proto-repl-font-lock-dynamically '(scoped-macro global)))
-
-(use-package ob-fennel :after org)
 
 (use-package clojure-mode
   :ensure t
