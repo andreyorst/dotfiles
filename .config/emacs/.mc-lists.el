@@ -97,6 +97,7 @@
         parinfer-smart-yank:yank
         proced-send-signal
         puni-backward-delete-char
+        puni-backward-kill-word
         puni-backward-sexp-or-up-list
         puni-barf-backward
         puni-barf-forward
