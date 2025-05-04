@@ -1408,6 +1408,83 @@ created with `json-hs-extra-create-overlays'."
    :remap 'lua-ts-mode
    :org-src '("lua" . lua-ts)))
 
+(use-package lua-prettify
+  :hook ((lua-mode lua-ts-mode) . lua-prettify-mode)
+  :delight lua-prettify-mode
+  :unless (in-termux-p)
+  :preface
+  (defgroup lua-prettify ()
+    "Lua prettification and ease of writing enchancements."
+    :prefix "lua-prettify-"
+    :group 'languages)
+  (defcustom lua-prettify-syntax-expansions
+    '(("def" "local function")
+      ("unless" "if not")
+      ("fn"  "function")
+      ("let" "local")
+      ("<-" "return"))
+    "List of abbreviarions and expansions for Lua"
+    :type '(repeat (list string string))
+    :group 'lua-prettify)
+  (defvar lua-prettify--original-syntax-table nil
+    "Original Lua syntax table.
+
+Syntax table is modified for abbreviation expansion to work on
+characters not considiered as word characters in original Lua table.
+This variable holds the original value to be restored once the mode is
+disabled.")
+  (defun lua-prettify--expand-abbrev-maybe ()
+    "Special advise for expanding abbreviations.
+
+Abbrevs that normally don't expand via abbrev-mode are handled manually."
+    (when (looking-back "<-" 1)
+      (delete-char -2)
+      (abbrev-insert (abbrev-symbol "<-"))))
+  (defun lua-prettify--cleanup ()
+    "Disable Lua prettification."
+    (setq prettify-symbols-alist nil)
+    (prettify-symbols-mode -1)
+    (abbrev-mode -1)
+    (remove-function
+     (local 'abbrev-expand-function)
+     #'lua-prettify--expand-abbrev-maybe)
+    (when lua-prettify--original-syntax-table
+      (set-syntax-table lua-prettify--original-syntax-table)
+      (setq lua-prettify--original-syntax-table nil)))
+  (defun lua-prettify--setup ()
+    "Setup Lua prettification."
+    (setq prettify-symbols-alist
+          (mapcar (lambda (abbrev-exp)
+                    (let ((abbrev (car abbrev-exp))
+                          (exp (cadr abbrev-exp)))
+                      `(,exp . ,(thread-last
+                                  abbrev
+                                  (mapcan
+                                   (lambda (ch)
+                                     (list '(Br . Bl) ch)))
+                                  cdr
+                                  vconcat))))
+                  lua-prettify-syntax-expansions))
+    (prettify-symbols-mode 1)
+    (let ((at (eval (intern (format "%s-abbrev-table" major-mode)))))
+      (dolist (abbrev-exp lua-prettify-syntax-expansions)
+        (apply #'define-abbrev at abbrev-exp)))
+    (setq lua-prettify--original-syntax-table (syntax-table))
+    (modify-syntax-entry ?- "w 12")
+    (abbrev-mode 1)
+    (add-function
+     :before (local 'abbrev-expand-function)
+     #'lua-prettify--expand-abbrev-maybe))
+  (define-minor-mode lua-prettify-mode
+    "Lua prettification and ease of writing enchancements."
+    :lighter " Lua Pretty"
+    :init-value nil
+    (if (and lua-prettify-mode
+             (not current-prefix-arg))
+        (lua-prettify--setup)
+      (lua-prettify--cleanup)))
+  (provide 'lua-prettify))
+
 (use-package elixir-ts-mode
   :defer t
   :when (treesit-p)
