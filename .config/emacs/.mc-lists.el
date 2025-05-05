@@ -118,6 +118,7 @@
         region-bindings-doublequote
         replace-string
         save-some-buffers
+        sort-lines
         sp-backward-delete-char
         sp-backward-kill-word
         sp-backward-sexp
