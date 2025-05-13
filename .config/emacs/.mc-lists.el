@@ -167,6 +167,7 @@
         eat
         eval-defun
         fennel-proto-repl-switch-to-repl
+        fennel-view-compilation
         god-local-mode
         hs-show-all
         hydra--digit-argument
