@@ -436,7 +436,7 @@ are defining or executing a macro."
   :custom
   (completion-styles '(partial-completion basic))
   (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
+  ;; (read-file-name-completion-ignore-case t)
   :custom-face
   (completions-first-difference ((t (:inherit unspecified)))))
 
@@ -1139,6 +1139,7 @@ are defining or executing a macro."
         :branch "main"
         :rev :newest)
   :hook ((fennel-mode . fennel-proto-repl-minor-mode)
+         (fennel-mode . fennel-mode-set-compile-command)
          ((fennel-mode
            fennel-repl-mode
            fennel-proto-repl-mode)
@@ -1157,7 +1158,13 @@ are defining or executing a macro."
       (goto-char (process-mark (get-buffer-process (current-buffer))))
       (forward-line 0)
       (let ((inhibit-read-only t))
-        (delete-region (point) (point-min))))))
+        (delete-region (point) (point-min)))))
+  (defun fennel-mode-set-compile-command ()
+    (setq-local
+     compile-command
+     (if (executable-find "deps")
+         "deps --profiles dev "
+       "fennel "))))
 
 (use-package fennel-proto-repl
   :after fennel-mode

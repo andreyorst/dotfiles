@@ -23,7 +23,7 @@
 
 (setq-default
  default-frame-alist '((width . 170)
-                       (height . 56)
+                       (height . 52)
                        (tool-bar-lines . 0)
                        (bottom-divider-width . 0)
                        (right-divider-width . 1))
