@@ -1416,7 +1416,7 @@ created with `json-hs-extra-create-overlays'."
    :org-src '("lua" . lua-ts)))
 
 (use-package lua-prettify
-  :hook ((lua-mode lua-ts-mode) . lua-prettify-mode)
+  :defer t
   :delight lua-prettify-mode
   :unless (in-termux-p)
   :preface
